@@ -109,6 +109,31 @@ describe('cuenta de respaldo: vincular el correo al usuario anónimo', () => {
     expect(await sesion.obtenerToken()).toBe(original);
   });
 
+  it('restaurar en un teléfono nuevo (soloEntrar): va directo al código de entrar sin crear un anónimo', async () => {
+    const original = jwt(ORIGINAL, { is_anonymous: false, email: 'ana@correo.mx' });
+    const { cuenta, auth, signups, sesion } = preparar(
+      { status: 200, cuerpo: {} },
+      { status: 200, cuerpo: sesionAuth(original) },
+      { status: 400, cuerpo: { error_code: 'otp_disabled' } },
+    );
+    expect(await cuenta.pedirCodigo('ana@correo.mx', { soloEntrar: true })).toEqual({
+      ok: true,
+      modo: 'entrar',
+    });
+    expect(auth.llamadas.map((l) => l.url)).toEqual([`${URL_PROYECTO}/auth/v1/otp`]);
+    expect(signups).toEqual([]);
+    expect(await cuenta.verificarCodigo('ana@correo.mx', '654321', 'entrar')).toMatchObject({
+      ok: true,
+      usuarioId: ORIGINAL,
+    });
+    expect(await sesion.obtenerToken()).toBe(original);
+    // Un correo sin cuenta: no hay respaldos que restaurar.
+    expect(await cuenta.pedirCodigo('nadie@correo.mx', { soloEntrar: true })).toEqual({
+      ok: false,
+      error: 'sin_cuenta',
+    });
+  });
+
   it('GoTrue viejo sin error_code: el mensaje "already been registered" también lleva a entrar', async () => {
     const { cuenta } = preparar(
       { status: 422, cuerpo: { msg: 'A user with this email address has already been registered' } },

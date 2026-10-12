@@ -22,8 +22,14 @@ import { type ClaimsSesion, claimsDeToken } from './token';
 export interface CuentaRespaldo {
   /** Sesión actual (con o sin correo); `null` si no hay forma de obtenerla. */
   estado(): Promise<ClaimsSesion | null>;
-  /** Manda el código de un solo uso al correo. `modo` se pasa tal cual a `verificarCodigo`. */
-  pedirCodigo(correo: string): Promise<ResultadoCuenta<{ modo: ModoCodigo }>>;
+  /**
+   * Manda el código de un solo uso al correo. `modo` se pasa tal cual a `verificarCodigo`. Con `soloEntrar`
+   * (restaurar en un teléfono nuevo) va directo a "entrar": no crea ni toca la sesión anónima de este teléfono.
+   */
+  pedirCodigo(
+    correo: string,
+    opciones?: { readonly soloEntrar?: boolean },
+  ): Promise<ResultadoCuenta<{ modo: ModoCodigo }>>;
   /** Confirma el código; la sesión de correo queda guardada. */
   verificarCodigo(correo: string, codigo: string, modo: ModoCodigo): Promise<ResultadoCuenta<ClaimsSesion>>;
   /**
@@ -119,10 +125,11 @@ export function crearCuentaRespaldo(opciones: OpcionesCuentaRespaldo): CuentaRes
       return token ? claimsDeToken(token) : null;
     },
 
-    async pedirCodigo(correoCrudo) {
+    async pedirCodigo(correoCrudo, opcionesCodigo) {
       const correo = normalizarCorreo(correoCrudo);
       if (correo === null) return { ok: false, error: 'correo_invalido' };
       try {
+        if (opcionesCodigo?.soloEntrar) return await enviarOtp(correo);
         const token = await opciones.sesion.obtenerToken();
         if (token === null) return { ok: false, error: 'sin_sesion' };
         // Ya es una sesión de correo (otra cuenta o la misma): entrar con el código.
