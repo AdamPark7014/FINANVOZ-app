@@ -170,3 +170,58 @@ La app no crea otro usuario: **vincula** el correo al usuario anónimo que ya ti
 Registros: en Logs → Edge Functions cada petición deja `{"usuario_hash":null,"endpoint":"/respaldo/lista","codigo":"lista:ok","estado_http":200}`: nunca el usuario, el correo, nombres de archivo, URLs ni tamaños.
 
 Solicitud ARCO o baja manual de una cuenta: usa `DELETE /respaldo/cuenta` con su sesión o, desde el panel, borra primero la carpeta `respaldos/<usuario>/` en Storage y después el usuario en Authentication (borrar solo el usuario deja sus archivos).
+
+## M10 · `llm-turno` (`POST /llm/turno`)
+
+Modo explicar (`docs/06-NLU.md §6`, `02 §22`): un turno **sin estado** de un bucle de herramientas. El teléfono manda la pregunta, las llamadas que pidió el modelo y los resultados **agregados** de sus herramientas de solo lectura (las ejecuta contra su libro); el proxy agrega el sistema fijo (`_shared/llm/prompt.ts`) y responde con las llamadas que pide el modelo o con su texto. Las cifras del texto las valida el teléfono: si alguna no aparece en un resultado de herramienta, muestra la respuesta en plantilla (regla 4). La lógica está en `supabase/functions/_shared/llm/` (Vitest); `llm-turno/index.ts` solo conecta Supabase y los proveedores.
+
+| Archivo | Qué hace |
+|---|---|
+| `_shared/llm/contrato.ts` | Valida `{mensajes, herramientas}`: una sola pregunta (≤ 500 caracteres) al inicio, después solo llamadas del asistente y sus resultados (cada resultado responde a una llamada pendiente), ≤ 3 resultados, ≤ 12 herramientas, cuerpo ≤ 32 KB, sin claves extra |
+| `_shared/llm/proveedores.ts` | Adaptadores con herramientas nativas: Anthropic (`tool_use`/`tool_result`), OpenAI (`tool_calls`, `store: false`) y Google (`functionCall`/`functionResponse`, sin razonamiento). Con 3 resultados ya no ofrece herramientas (`tool_choice` none) |
+| `_shared/llm/turno.ts` | 8 s por llamada; ante 5xx, 429, red o tiempo, un intento con el alterno |
+| `_shared/llm/manejador.ts` | JWT → cuerpo → cupo (`consumir_turno_llm`) → turno → respuesta; registra solo metadatos (código `herramientas` o `respuesta`) |
+| `migrations/20261110000000_llm_turno.sql` | `consumir_turno_llm`: solo Plus o Negocio vigente (`solo_plus` en Gratis, sin consumir); cada turno cuenta una interpretación del mismo cupo que `/nlu/interpretar` |
+
+### Contrato
+
+Petición (con `Authorization: Bearer <JWT>`):
+
+```json
+{
+  "mensajes": [
+    { "rol": "usuario", "texto": "¿por qué no me alcanzó la quincena pasada?" },
+    { "rol": "asistente", "llamadas": [{ "id": "toolu_1", "nombre": "comparar_periodos", "argumentos": {} }] },
+    { "rol": "herramienta", "id": "toolu_1", "nombre": "comparar_periodos", "resultado": "{\"texto\":\"Vas $350 arriba…\"}" }
+  ],
+  "herramientas": [{ "nombre": "comparar_periodos", "descripcion": "…", "parametros": { "type": "object", "properties": {} } }]
+}
+```
+
+Respuesta 200: `{ "salida": { "tipo": "herramientas", "llamadas": [{ "id", "nombre", "argumentos" }] } | { "tipo": "respuesta", "texto" }, "proveedor", "modelo", "tokens_entrada", "tokens_salida", "latencia_ms" }`.
+
+Errores `{ "error": "<código>" }`: los de `/nlu/interpretar` más **403 `solo_plus`** (Gratis o Plus vencido). Con 502 o 504 el turno se devuelve al cupo.
+
+### Desplegar
+
+1. `supabase db push` aplica `20261110000000_llm_turno.sql`.
+2. Usa los mismos secretos que `nlu-interpretar` (`NLU_PROVEEDORES`, llaves, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`). Opcional: `LLM_MODELO_ANTHROPIC` / `LLM_MODELO_OPENAI` / `LLM_MODELO_GOOGLE` para usar en el modo explicar un modelo distinto del intérprete (si faltan, usa `NLU_MODELO_*` y después los de `06 §11`).
+3. `supabase functions deploy llm-turno` (con la verificación de JWT del gateway activa).
+4. Prueba de humo: con la sesión anónima de un usuario Gratis, `curl -X POST https://<ref>.supabase.co/functions/v1/llm-turno -H "Authorization: Bearer <token>" -H 'content-type: application/json' -d '{"mensajes":[{"rol":"usuario","texto":"¿en qué gasto más?"}],"herramientas":[{"nombre":"mayores_gastos","descripcion":"Top de gastos","parametros":{"type":"object","properties":{}}}]}'` responde 403 `solo_plus`; con un usuario en `derechos` como `plus`, 200 con `salida.tipo = "herramientas"`.
+
+Registros: `{"endpoint":"/llm/turno","codigo":"herramientas"|"respuesta"|<error>, …}` con hash de usuario, proveedor, modelo, tokens, latencia y llamadas; nunca la pregunta, argumentos, resultados ni el texto del modelo.
+## M10 · Plantillas remotas firmadas (bucket público `plantillas`)
+
+Sin Edge Function (`docs/07-CAPTURA.md §3.1`): la app baja `https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json` (con `If-None-Match`) y `plantillas.json.sig`, y verifica la firma Ed25519 con las llaves públicas del build (`EXPO_PUBLIC_PLANTILLAS_LLAVES`). El bucket no necesita ser confiable, solo estar disponible.
+
+| Archivo | Qué hace |
+|---|---|
+| `migrations/20261110000001_plantillas.sql` | Bucket público `plantillas` (1 MB, JSON o texto). Sin políticas de INSERT, UPDATE ni DELETE: ningún JWT sube ni borra; se publica desde el panel o con la service role |
+| `_shared/plantillas/bucket.test.ts` | La migración en PGlite: `anon` y `authenticated` (anónimo o de correo) no suben, cambian ni borran plantillas |
+
+Publicar una versión nueva:
+
+1. Copia el archivo de plantillas con `version` mayor que la publicada y `version_minima_app` ≤ la versión de la app que lo debe usar.
+2. Firma **fuera del repositorio**, en la computadora donde vive la llave privada: `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX=<64 hex> node scripts/firmar-plantillas.mjs plantillas.json` (escribe `plantillas.json.sig` e imprime la llave pública, que debe estar en `EXPO_PUBLIC_PLANTILLAS_LLAVES`, y el SHA-256).
+3. Sube los dos archivos al bucket `plantillas` (Storage → plantillas → Upload, reemplazando), uno tras otro. Mientras no coinciden, la app rechaza el archivo (`firma_invalida`), conserva lo que tiene y lo vuelve a intentar al día siguiente.
+4. Comprueba: `curl -s https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json | sha256sum` da el SHA-256 que imprimió el script.

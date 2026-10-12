@@ -22,6 +22,8 @@ const TABLAS = [
   'ajuste',
   'auditoria',
   'tanda',
+  'suscripcion',
+  'plantilla_remota',
 ] as const;
 
 export const FORMATO_EXPORTACION = 'finanvoz-exportacion';

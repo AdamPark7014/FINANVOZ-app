@@ -41,6 +41,15 @@ export {
   type VistaAjustes,
 } from './ajustes';
 export {
+  construirVistaWidget,
+  ENLACE_WIDGET,
+  fijarOcultarMontosWidget,
+  obtenerAjustesWidget,
+  obtenerVistaWidget,
+  type AjustesWidget,
+  type VistaWidget,
+} from './widget';
+export {
   aplicarEleccion,
   confirmarCompraMsi,
   confirmarCuentaDividida,
@@ -76,6 +85,14 @@ export {
   type PlantillaConsulta,
   type RespuestaConsulta,
 } from './consultas';
+export {
+  AVISO_SIN_EXPLICACION,
+  explicar,
+  LLAMADAS_MAXIMAS_EXPLICAR,
+  PIE_EXPLICAR,
+  type OpcionesExplicar,
+  type RespuestaExplicar,
+} from './explicar';
 export { contextoNube, type Conectividad, type NivelNube } from './nube';
 export {
   aplicarCorreccion,
@@ -201,6 +218,16 @@ export {
   type TandaYaEmpezada,
   type TarjetaTanda,
 } from './tandas';
+export {
+  convertirEnCompromiso,
+  listarSuscripciones,
+  marcarNoEsSuscripcion,
+  procesarSuscripciones,
+  procesarSuscripcionesDelDia,
+  yaLaCancele,
+  type SuscripcionVista,
+  type VistaSuscripciones,
+} from './suscripciones';
 export { crearPersona, fijarApartarDeuda, listarPersonas, registrarPrestamo, type Persona } from './personas';
 export {
   MAX_PARTES,

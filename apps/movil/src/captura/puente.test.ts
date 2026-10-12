@@ -197,6 +197,24 @@ describe('puente de captura con el módulo nativo', () => {
   });
 });
 
+describe('catálogo remoto en el módulo nativo (M10, 07 §3.1)', () => {
+  const bancos = [{ id: 'banco_a', nombre: 'Banco A', paquetes_android: ['mx.ejemplo.bancoa'] }];
+
+  it('pasa los bancos verificados como JSON `{bancos}` y `null` para quitarlos', async () => {
+    const fijar = vi.fn(async (json: string | null) => (json ? 1 : 0));
+    const p = crearPuente(() => ({ ...crearNativoFalso().nativo, fijarCatalogoRemoto: fijar }));
+    expect(await p.fijarCatalogoRemoto(bancos)).toBe(true);
+    expect(JSON.parse(fijar.mock.calls[0]?.[0] ?? 'null')).toEqual({ bancos });
+    expect(await p.fijarCatalogoRemoto(null)).toBe(true);
+    expect(fijar).toHaveBeenLastCalledWith(null);
+  });
+
+  it('un build anterior a M10 (sin la función) no falla', async () => {
+    const p = crearPuente(() => crearNativoFalso().nativo);
+    expect(await p.fijarCatalogoRemoto(bancos)).toBe(false);
+  });
+});
+
 describe('puente de captura sin módulo nativo (Jest, Expo Go, iOS)', () => {
   it('degrada sin lanzar', async () => {
     const p = crearPuente(() => null);
@@ -217,6 +235,7 @@ describe('puente de captura sin módulo nativo (Jest, Expo Go, iOS)', () => {
       ultimo_evento: null,
     });
     await expect(p.solicitarReconexion()).resolves.toBeUndefined();
+    expect(await p.fijarCatalogoRemoto([])).toBe(false);
     expect((await p.diagnostico.resumen()).activo).toBe(false);
     expect(await p.diagnostico.muestras()).toEqual([]);
     const cancelar = p.suscribirse(() => {});

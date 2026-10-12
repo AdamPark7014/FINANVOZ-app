@@ -103,6 +103,8 @@ export interface ModuloCapturaNativo {
   diagnosticoConfigurar(activo: boolean, muestras: boolean): Promise<unknown>;
   diagnosticoMuestras(): Promise<unknown[]>;
   diagnosticoBorrar(): Promise<void>;
+  /** M10 (`07 §3.1`): bancos de las plantillas remotas verificadas, `{bancos}` en JSON; `null` las quita. */
+  fijarCatalogoRemoto?(json: string | null): Promise<number>;
   addListener(evento: 'notificacion', oyente: (n: unknown) => void): Suscripcion;
 }
 
@@ -225,6 +227,12 @@ export interface PuenteCaptura {
   estadoServicio(): Promise<EstadoServicio>;
   /** Pide al sistema reconectar el servicio (`requestRebind`). */
   solicitarReconexion(): Promise<void>;
+  /**
+   * Pasa al módulo nativo los bancos de las plantillas remotas ya verificadas (`07 §3.1`): ganan por id sobre
+   * el catálogo embebido, así un banco o paquete nuevo puede entrar a la lista blanca sin publicar la app.
+   * `null` vuelve al embebido. `false` sin módulo o con un build anterior a M10.
+   */
+  fijarCatalogoRemoto(bancos: readonly unknown[] | null): Promise<boolean>;
   diagnostico: {
     resumen(): Promise<ResumenDiagnostico>;
     /** `muestras: true` solo funciona en builds de depuración; en otros lanza. */
@@ -323,6 +331,13 @@ export function crearPuente(cargar: () => ModuloCapturaNativo | null): PuenteCap
 
     async solicitarReconexion() {
       await modulo()?.solicitarReconexion();
+    },
+
+    async fijarCatalogoRemoto(bancos) {
+      const m = modulo();
+      if (!m || typeof m.fijarCatalogoRemoto !== 'function') return false;
+      await m.fijarCatalogoRemoto(bancos === null ? null : JSON.stringify({ bancos }));
+      return true;
     },
 
     diagnostico: {

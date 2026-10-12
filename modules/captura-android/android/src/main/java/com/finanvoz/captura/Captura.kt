@@ -17,6 +17,7 @@ import com.finanvoz.captura.nucleo.AlmacenArchivo
 import com.finanvoz.captura.nucleo.ArchivoTexto
 import com.finanvoz.captura.nucleo.Banco
 import com.finanvoz.captura.nucleo.Catalogo
+import com.finanvoz.captura.nucleo.CatalogoRemoto
 import com.finanvoz.captura.nucleo.Cola
 import com.finanvoz.captura.nucleo.Diagnostico
 import com.finanvoz.captura.nucleo.Filtro
@@ -41,6 +42,7 @@ internal object Captura {
   private const val DESCONECTADO_EN = "desconectado_en"
   private const val ARCHIVO_CATALOGO = "captura.bancos.json"
   private const val ARCHIVO_CATALOGO_DEPURACION = "captura.bancos.depuracion.json"
+  private const val ARCHIVO_CATALOGO_REMOTO = "catalogo.remoto.json"
 
   @Volatile private var cola: Cola? = null
   @Volatile private var diagnostico: Diagnostico? = null
@@ -66,13 +68,27 @@ internal object Captura {
     ).also { diagnostico = it }
   }
 
-  /** Catálogo embebido y, solo en depuración, el de bancos sintéticos para `adb`. */
+  private fun catalogoRemoto(ctx: Context) = CatalogoRemoto(ArchivoTexto(File(directorio(ctx), ARCHIVO_CATALOGO_REMOTO)))
+
+  /**
+   * Catálogo embebido (con los bancos de las plantillas remotas encima, `07 §3.1`) y, solo en depuración, el de
+   * bancos sintéticos para `adb`.
+   */
   private fun catalogos(ctx: Context): Pair<Catalogo, Catalogo?> = catalogos ?: synchronized(this) {
     catalogos ?: run {
-      val principal = leerCatalogo(ctx, ARCHIVO_CATALOGO) ?: Catalogo(emptyList())
+      val embebido = leerCatalogo(ctx, ARCHIVO_CATALOGO) ?: Catalogo(emptyList())
+      val principal = catalogoRemoto(ctx).leer()?.sobre(embebido) ?: embebido
       val depuracion = if (Variante.DEPURACION) leerCatalogo(ctx, ARCHIVO_CATALOGO_DEPURACION) else null
       (principal to depuracion).also { catalogos = it }
     }
+  }
+
+  /**
+   * Bancos de las plantillas remotas que JS ya verificó (`{bancos}` en JSON; `null` los quita). Un JSON
+   * inválido lanza y deja el anterior. Devuelve cuántos bancos remotos quedaron.
+   */
+  fun fijarCatalogoRemoto(ctx: Context, json: String?): Int = synchronized(this) {
+    catalogoRemoto(ctx).fijar(json).also { catalogos = null }
   }
 
   private fun leerCatalogo(ctx: Context, nombre: String): Catalogo? = try {

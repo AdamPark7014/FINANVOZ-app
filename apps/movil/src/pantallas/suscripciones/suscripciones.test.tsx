@@ -1,0 +1,92 @@
+import { fireEvent, screen } from '@testing-library/react-native';
+import { listarCuentas, obtenerHoy, sincronizarPlan, type Contexto } from '../../servicios';
+import { registrarGastosE14, type GastoVectorE14 } from '../../servicios/__pruebas__/suscripciones';
+import { conEscenario, vector } from '../principal/__pruebas__/base';
+import { renderConSesion } from '../principal/__pruebas__/arnes';
+import { PantallaCuentas } from '../principal/PantallaCuentas';
+import { PantallaSuscripciones } from './PantallaSuscripciones';
+
+interface VectorE14 {
+  hoy: string;
+  catalogo: string[];
+  gastos: GastoVectorE14[];
+}
+
+const textoDe = (testID: string) => {
+  const hijos = screen.getByTestId(testID).props.children as unknown;
+  return Array.isArray(hijos) ? hijos.join('') : String(hijos);
+};
+
+/** Semilla e4-01 (hoy dom 11 oct) con un libro equivalente a E14-01 y su catálogo (vacío). */
+function preparar(): { ctx: Contexto } {
+  const v = vector<VectorE14>('E14-01');
+  const p = conEscenario('e4-01');
+  sincronizarPlan(p.ctx, { plus: { vigenteHasta: null, enPrueba: false, renovara: true } });
+  const efectivo = listarCuentas(p.ctx).tienes.find((c) => c.nombre === 'Cartera')?.id as string;
+  registrarGastosE14(p.ctx, v.gastos, efectivo);
+  return { ctx: { ...p.ctx, catalogoSuscripciones: v.catalogo } };
+}
+
+describe('Suscripciones (02 §20)', () => {
+  it('CA-M10-01 · muestra las 5 activas con monto y fecha, el resumen, "antes $115" y Disney Plus aparte', () => {
+    const { ctx } = preparar();
+    renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(textoDe('suscripciones-resumen')).toBe(
+      'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
+    );
+    const filas: [string, string, string][] = [
+      ['estudio-yoga', '$150 cada semana', 'próximo vie 16 oct'],
+      ['smart-fit', '$599 al mes', 'próximo 1 nov'],
+      ['netflix', '$219 al mes', 'próximo 14 oct'],
+      ['spotify', '$129 al mes (antes $115)', 'próximo 5 nov'],
+      ['dominio-web', '$350 al año', 'próximo 8 oct 2027'],
+    ];
+    for (const [id, monto, proximo] of filas) {
+      expect(textoDe(`suscripcion-${id}-monto`)).toBe(monto);
+      expect(textoDe(`suscripcion-${id}-proximo`)).toBe(proximo);
+    }
+    expect(screen.queryByTestId('suscripcion-disney-plus')).toBeNull();
+    expect(textoDe('suscripciones-inactivas')).toBe('Ya no se cobran: Disney Plus (último cargo 20 jul)');
+  });
+
+  it('Convertir en compromiso: Hoy aparta Netflix y la fila lo dice', () => {
+    const { ctx } = preparar();
+    const antes = obtenerHoy(ctx).reservado;
+    renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
+    expect(textoDe('suscripciones-mensaje')).toBe('Listo: Hoy aparta tu Netflix antes de cada cargo.');
+    expect(screen.getByTestId('suscripcion-netflix-apartada')).toBeTruthy();
+    expect(screen.queryByTestId('suscripcion-netflix-compromiso')).toBeNull();
+    expect(obtenerHoy(ctx).reservado - antes).toBe(21_900);
+  });
+
+  it('Ya la cancelé y No es suscripción la quitan de la lista y del resumen', () => {
+    const { ctx } = preparar();
+    renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('suscripcion-smart-fit-cancelada'));
+    expect(screen.queryByTestId('suscripcion-smart-fit')).toBeNull();
+    expect(textoDe('suscripciones-mensaje')).toBe(
+      'Ya no te muestro Smart Fit. Si vuelve a cobrarse, te aviso aquí.',
+    );
+    fireEvent.press(screen.getByTestId('suscripcion-dominio-web-no-es'));
+    expect(screen.queryByTestId('suscripcion-dominio-web')).toBeNull();
+    expect(textoDe('suscripciones-resumen')).toBe(
+      'Pagas unos $998 al mes en 3 suscripciones ($11,976 al año)',
+    );
+  });
+
+  it('sin cargos que se repitan lo explica sin cifras', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(screen.getByTestId('suscripciones-vacio')).toBeTruthy();
+    expect(screen.queryByTestId('suscripciones-inactivas')).toBeNull();
+  });
+
+  it('Cuentas abre Suscripciones', () => {
+    const p = conEscenario('e4-01');
+    const alAbrir = jest.fn();
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirSuscripciones={alAbrir} />);
+    fireEvent.press(screen.getByTestId('boton-suscripciones'));
+    expect(alAbrir).toHaveBeenCalled();
+  });
+});

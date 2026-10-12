@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import {
   contarEsperandoConexion,
   descartarPorInterpretar,
+  explicar,
   obtenerPlan,
   registrarTexto,
   registrarTextoLocal,
@@ -38,8 +39,12 @@ import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
 import { TarjetaConsulta } from './TarjetaConsulta';
+import { TarjetaExplicacion, type ExplicacionMostrable } from './TarjetaExplicacion';
 import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
 import {
+  MENSAJE_EXPLICANDO,
+  MENSAJE_EXPLICAR_ERROR,
+  MENSAJE_EXPLICAR_SIN_RED,
   MENSAJE_GUARDADA,
   MENSAJE_NO_ENCONTRE,
   MENSAJE_NO_ENTENDI,
@@ -112,6 +117,8 @@ export function PanelRegistrar({
   const [interpretando, setInterpretando] = useState(fraseRevision !== undefined);
   const [tarjeta, setTarjeta] = useState<{ datos: ConTarjeta; origen: OrigenDictado } | null>(null);
   const [respuesta, setRespuesta] = useState<RespuestaConsulta | null>(null);
+  const [explicacion, setExplicacion] = useState<ExplicacionMostrable | null>(null);
+  const [explicando, setExplicando] = useState(false);
   const enRevision = useRef<string | null>(null);
   const registrarEvento = useAnalitica();
   /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
@@ -152,6 +159,7 @@ export function PanelRegistrar({
     (r: ResultadoTexto, origen: OrigenDictado) => {
       setTarjeta(null);
       setRespuesta(null);
+      setExplicacion(null);
       switch (r.resultado) {
         case 'registrado':
           terminarRevision();
@@ -229,6 +237,22 @@ export function PanelRegistrar({
           setTexto('');
           setRespuesta(r.respuesta);
           return;
+        case 'explicar':
+          terminarRevision();
+          setTexto('');
+          // Modo explicar (`02 §22`): varias vueltas con la nube; las cifras ya vienen verificadas.
+          setExplicando(true);
+          explicar(ctx, r.pregunta, { nube })
+            .then((e) => {
+              if (e.tipo === 'sin_red') setMensaje(MENSAJE_EXPLICAR_SIN_RED);
+              else if (e.tipo === 'error') setMensaje(MENSAJE_EXPLICAR_ERROR);
+              else if (e.tipo === 'limite')
+                setMensaje(mensajeLimite(e.codigo, plan) ?? MENSAJE_EXPLICAR_ERROR);
+              else setExplicacion(e);
+            })
+            .catch(() => setMensaje(MENSAJE_EXPLICAR_ERROR))
+            .finally(() => setExplicando(false));
+          return;
         case 'arqueo':
           terminarRevision();
           setTexto('');
@@ -254,15 +278,16 @@ export function PanelRegistrar({
           return;
       }
     },
-    [alArqueo, alMeAlcanza, avisarRegistro, contarRegistro, plan, refrescar, terminarRevision],
+    [alArqueo, alMeAlcanza, avisarRegistro, contarRegistro, ctx, nube, plan, refrescar, terminarRevision],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {
     const limpio = frase.trim();
-    if (limpio === '' || interpretando) return;
+    if (limpio === '' || interpretando || explicando) return;
     setMensaje(null);
     setTarjeta(null);
     setRespuesta(null);
+    setExplicacion(null);
     medicion.current = { inicio: Date.now(), nivel: 'reglas', pregunto: false };
     let local: ResultadoTexto | null;
     try {
@@ -322,6 +347,13 @@ export function PanelRegistrar({
           respuesta={respuesta}
           {...(alVerMovimientos ? { alVerMovimientos } : {})}
           alCerrar={() => setRespuesta(null)}
+        />
+      ) : null}
+      {explicacion ? (
+        <TarjetaExplicacion
+          respuesta={explicacion}
+          {...(alVerMovimientos ? { alVerMovimientos } : {})}
+          alCerrar={() => setExplicacion(null)}
         />
       ) : null}
       {tarjeta?.datos.resultado === 'confirmar' ? (
@@ -437,6 +469,11 @@ export function PanelRegistrar({
           testID="interpretando"
         >
           Déjame entenderlo…
+        </Texto>
+      ) : null}
+      {explicando ? (
+        <Texto variante="secundario" tono="secundario" accessibilityLiveRegion="polite" testID="explicando">
+          {MENSAJE_EXPLICANDO}
         </Texto>
       ) : null}
       {mensaje ? (

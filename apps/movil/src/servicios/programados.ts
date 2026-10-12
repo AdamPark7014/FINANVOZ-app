@@ -85,6 +85,8 @@ export function insertarProgramado(
     hasta?: PlainDate | null;
     cuentaId?: string | null;
     categoriaCuentaId?: string | null;
+    /** Comercio normalizado (E9.1) para cubrir por comercio (E3.5); lo pone "Convertir en compromiso" (E14). */
+    comercioNormalizado?: string | null;
     variable?: boolean;
     defineHorizonte?: boolean;
   },
@@ -104,6 +106,7 @@ export function insertarProgramado(
       regla: JSON.stringify(regla),
       cuentaId: datos.cuentaId ?? null,
       categoriaCuentaId: datos.categoriaCuentaId ?? null,
+      comercioNormalizado: datos.comercioNormalizado ?? null,
       variable: datos.variable ? 1 : 0,
       defineHorizonte: datos.defineHorizonte ? 1 : 0,
       desde: datos.desde,

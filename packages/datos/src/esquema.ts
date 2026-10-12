@@ -262,6 +262,29 @@ export const tanda = sqliteTable('tanda', {
 /** Tablas de `0002_tandas`, por nombre SQL. */
 export const TABLAS_0002 = { tanda } as const;
 
+/** `0003_suscripciones` (M10, `04 §3`): suscripciones detectadas por E14. */
+export const suscripcion = sqliteTable('suscripcion', {
+  comercioNormalizado: text('comercio_normalizado').primaryKey(),
+  periodicidad: text('periodicidad').notNull(),
+  montoTipico: integer('monto_tipico').notNull(),
+  ultimoCargo: text('ultimo_cargo').notNull(),
+  estado: text('estado').notNull(),
+  programadoId: text('programado_id').references(() => programado.id),
+  actualizadaEn: integer('actualizada_en').notNull(),
+});
+
+/** `0003_suscripciones` (M10, `07 §3.1`): versiones de plantillas remotas firmadas; a lo más una activa. */
+export const plantillaRemota = sqliteTable('plantilla_remota', {
+  version: integer('version').primaryKey(),
+  sha256: text('sha256').notNull(),
+  firma: text('firma').notNull(),
+  recibidaEn: integer('recibida_en').notNull(),
+  activa: integer('activa').notNull().default(0),
+});
+
+/** Tablas de `0003_suscripciones`, por nombre SQL. */
+export const TABLAS_0003 = { suscripcion, plantilla_remota: plantillaRemota } as const;
+
 /** Tablas de `0001_inicial`, por nombre SQL. */
 export const TABLAS_0001 = {
   contacto,

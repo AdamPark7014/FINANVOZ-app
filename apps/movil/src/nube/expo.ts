@@ -4,7 +4,7 @@
  * `null` y la app funciona igual que en M2 (todo lo que el nivel 0 no cubre queda "por interpretar").
  */
 import Constants from 'expo-constants';
-import { crearClienteNube } from '@cartera/nlu';
+import { crearClienteNube, crearClienteTurno } from '@cartera/nlu';
 import { almacenExpo } from '../db/expo';
 import { crearPuertoEvidencia, type PuertoEvidencia } from '../privacidad/evidencia-servidor';
 import type { NivelNube, NubeRespaldo } from '../servicios';
@@ -33,6 +33,7 @@ export function crearNivelNubeExpo(): NivelNube | null {
   const sesion = sesionNubeExpo(config);
   return {
     cliente: crearClienteNube({ url: config.url, obtenerToken: (o) => sesion.obtenerToken(o) }),
+    turno: crearClienteTurno({ url: config.url, obtenerToken: (o) => sesion.obtenerToken(o) }),
     conectividad: conectividadExpo,
     usuarioId: async () => {
       const token = await sesion.obtenerToken();

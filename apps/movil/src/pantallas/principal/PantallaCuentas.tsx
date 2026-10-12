@@ -40,6 +40,7 @@ export function PantallaCuentas({
   alContarEfectivo,
   alAbrirPersona,
   alAbrirTandas,
+  alAbrirSuscripciones,
 }: {
   alAbrirAjustes: () => void;
   /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
@@ -50,6 +51,8 @@ export function PantallaCuentas({
   alContarEfectivo?: (cuentaId: string) => void;
   /** Cuentas → Tandas (`02 §18`). */
   alAbrirTandas?: () => void;
+  /** Cuentas → Suscripciones (`02 §20`). */
+  alAbrirSuscripciones?: () => void;
 }) {
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
@@ -156,6 +159,17 @@ export function PantallaCuentas({
             variante="secundario"
             alPresionar={alAbrirTandas}
             testID="boton-tandas"
+          />
+        </Seccion>
+      ) : null}
+
+      {alAbrirSuscripciones ? (
+        <Seccion titulo="Suscripciones" testID="seccion-suscripciones">
+          <Boton
+            etiqueta="Ver mis suscripciones"
+            variante="secundario"
+            alPresionar={alAbrirSuscripciones}
+            testID="boton-suscripciones"
           />
         </Seccion>
       ) : null}

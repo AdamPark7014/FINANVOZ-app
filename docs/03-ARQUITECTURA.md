@@ -48,7 +48,7 @@ flowchart LR
 | Avisos | `expo-notifications` (solo locales) | Sin servidor de push |
 | Tareas en segundo plano | `expo-background-task` | Cortes, ocurrencias, respaldo automático, plantillas remotas |
 | Captura Android | Expo Module propio en Kotlin + config plugin | Control total del filtrado nativo (RF-CAP-02) |
-| Criptografía (M9, M10) | Primitivas nativas: scrypt, AES-256-GCM, Ed25519 y aleatorios seguros. Elegida en el spike de M9 (`docs/ESTADO.md`): scrypt con `react-native-quick-crypto` (en JS puro `n = 2^17` no cabe en 3 s sin JIT); AES-256-GCM y aleatorios con `expo-crypto`. Ed25519 (M10) por decidir entre quick-crypto y `@noble/curves` | Respaldo cifrado y plantillas firmadas; `packages/respaldo` recibe la criptografía inyectada para probarla en Node |
+| Criptografía (M9, M10) | Primitivas nativas: scrypt, AES-256-GCM, Ed25519 y aleatorios seguros. Elegida en el spike de M9 (`docs/ESTADO.md`): scrypt con `react-native-quick-crypto` (en JS puro `n = 2^17` no cabe en 3 s sin JIT); AES-256-GCM y aleatorios con `expo-crypto`. Ed25519 (M10, solo verificar) con `@noble/curves`: JS puro y auditado, el mismo código en Node y en Hermes; verificar un archivo al día no necesita velocidad nativa | Respaldo cifrado y plantillas firmadas; `packages/respaldo` recibe la criptografía inyectada para probarla en Node |
 | Archivos | `expo-sharing`, `expo-document-picker`, `expo-print` (PDF desde HTML), `fflate` (zip/gzip en JS) | Exportar, respaldo, paquete para el contador |
 | XML (M12) | Lector XML en JS puro sin evaluación de entidades externas (candidata: `fast-xml-parser`) | CFDI; sin riesgo XXE |
 | Widget (M10) | `react-native-android-widget` con config plugin (spike en M10) | "Hoy puedes" en la pantalla de inicio |
@@ -170,7 +170,7 @@ Acceso: las funciones de `/compartido/*` (`§6`) verifican la pertenencia y el e
 | Endpoint | Entrada | Salida |
 |---|---|---|
 | `POST /nlu/interpretar` | `{texto, contexto_min, version_esquema}` (`06 §4`) | `{interpretacion, proveedor, modelo, tokens_entrada, tokens_salida, latencia_ms}` |
-| `POST /llm/turno` (M10) | `{mensajes, herramientas}` | mensaje del asistente o llamada a herramienta; sin estado |
+| `POST /llm/turno` (M10) | `{mensajes, herramientas}` (una pregunta, después solo llamadas y sus resultados; ≤ 3 resultados) | `{salida: {tipo: 'respuesta', texto} \| {tipo: 'herramientas', llamadas}, proveedor, modelo, tokens_entrada, tokens_salida, latencia_ms}`; sin estado; solo Plus (403 `solo_plus`); cada turno cuenta en el cupo de interpretaciones |
 | `POST /webhooks/revenuecat` | evento firmado | actualiza `derechos` |
 | `POST /respaldo/url` (M9) | `{operacion: 'subir', version}` o `{operacion: 'bajar', nombre}` con sesión de correo | `{nombre, url}`: al subir, el servidor pone el nombre (`<AAAAMMDDTHHMMSSZ>-v<version>.cartera`) y la URL firmada de subida la fija Supabase (2 h, sin sobrescribir); al bajar, URL firmada de 5 min |
 | `GET /respaldo/lista` (M9) | sesión de correo | `[{nombre, tamano, creado_en, version}]`; deja solo los 4 más recientes |

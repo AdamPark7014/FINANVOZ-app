@@ -1,4 +1,4 @@
-/** Barril de E9 (comercios y deduplicación) y del motor de captura (`docs/07-CAPTURA.md §3 y §6`). */
+/** Barril de E9 (comercios y deduplicación), del motor de captura (`docs/07-CAPTURA.md §3 y §6`) y de E14 (suscripciones). */
 export { jaro, jaroWinkler, normalizarComercio, similitud } from './comercios';
 export {
   CUENTA_POR_ASIGNAR,
@@ -42,3 +42,13 @@ export {
   type ReglasComercio,
   type ResultadoCategoria,
 } from './captura/categorizar';
+export {
+  CATALOGO_SUSCRIPCIONES,
+  detectarSuscripciones,
+  resumenActivas,
+  VENTANA_SUSCRIPCIONES_DIAS,
+  type GastoSuscripcion,
+  type Periodicidad,
+  type ResumenSuscripciones,
+  type Suscripcion,
+} from './suscripciones';
