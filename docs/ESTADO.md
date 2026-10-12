@@ -12,7 +12,7 @@
 | M3 · Intérprete en la nube | En curso | 2026-10-12 | | Código completo; cierra con el benchmark real (pendiente 14) |
 | M4 · Tarjetas, MSI y compromisos | En curso | 2026-10-12 | | Código completo; falta ver los avisos en el teléfono (pendiente 13) |
 | M5 · Captura Android y arqueo | En curso | 2026-10-12 | | Ingesta, pasos de `07 §5`, arqueo y su UI completos y probados en Node/jest (CA-M5-01 mitad CI, 03, 04, 05, 06, 09, 10, 11). Faltan plantillas reales (CA-M5-07, pendiente 3), pruebas en el teléfono (CA-M5-01 con `adb`, CA-M5-02, CA-M5-08; pendiente 15) |
-| M6 · Simulador y ¿Me alcanza? | Pendiente | | | |
+| M6 · Simulador y ¿Me alcanza? | En curso | 2026-10-12 | |
 | M7 · Beta cerrada | Pendiente | | | Al cerrar: decidir M11 (`10 §1`) |
 | M8 · Personas y tandas | Pendiente | | | |
 | M9 · Respaldo cifrado | Pendiente | | | Recomendado: publicar en producción al cerrar |
