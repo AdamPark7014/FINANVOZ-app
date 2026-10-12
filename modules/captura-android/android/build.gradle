@@ -11,7 +11,19 @@ android {
   defaultConfig {
     versionCode 1
     versionName "0.1.0"
+    // PdfBox-Android sin Bouncy Castle (solo lo usa el cifrado con certificado; ver dependencias).
+    consumerProguardFiles 'consumer-rules.pro'
   }
   // Las fuentes de src/debug (Variante.DEPURACION = true, catálogo sintético para adb) solo
   // entran al build de depuración; src/release define DEPURACION = false y no trae catálogo extra.
+}
+
+dependencies {
+  // M15 (`07 §8`, spike en docs/ESTADO.md): extracción de texto de estados de cuenta en PDF en el teléfono.
+  // PdfBox-Android 2.0.27.0 (Apache-2.0, port de Apache PDFBox 2.0.27). Bouncy Castle solo lo usa el cifrado
+  // con certificado (PublicKeySecurityHandler), que los estados de cuenta no usan: el cifrado con contraseña
+  // (RC4/AES) va con javax.crypto. Quitarlo ahorra varios MB del APK.
+  implementation('com.tom-roush:pdfbox-android:2.0.27.0') {
+    exclude group: 'org.bouncycastle'
+  }
 }

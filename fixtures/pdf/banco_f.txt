@@ -1,0 +1,22 @@
+BANCO F
+RESUMEN DE TU TARJETA DE CRÉDITO
+Cuenta: 1022
+Periodo facturado: 1 de septiembre de 2026 - 30 de septiembre de 2026
+Corte: 30 de septiembre de 2026
+Paga a más tardar el: 20 de octubre de 2026
+Tu límite de crédito $ 10,000.00
+Adeudo del periodo anterior $ 2,900.00
+Saldo total al corte $ 3,563.67
+Para no pagar intereses $ 3,563.67
+Pago mínimo $ 420.00
+TUS MOVIMIENTOS
+02 SEP PANADERÍA LA ESPIGA $ 86.40
+04 SEP CAFÉ DEL BOSQUE $ 72.00
+05 SEP PAGO DESDE APP -$ 2,900.00
+10 SEP SUPERMERCADO SINTÉTICO $ 1,320.15
+17 SEP INTERESES ORDINARIOS $ 35.12
+21 SEP ÓPTICA DE PRUEBA $ 950.00
+29 SEP GASOLINERA ÑANDÚ $ 600.00
+TUS MESES SIN INTERESES
+MUEBLERIA EJEMPLO · Mensualidad 2 de 6 · $ 500.00 Resta $ 2,000.00 de $ 3,000.00
+Banco F · documento sintético Hoja 1/1
