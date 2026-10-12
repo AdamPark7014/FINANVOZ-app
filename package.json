@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
-    "oraculo": "node scripts/oraculo.mjs --verificar"
+    "oraculo": "node scripts/oraculo.mjs --verificar",
+    "eval:nlu": "pnpm --filter @cartera/nlu eval:nlu"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
