@@ -9,6 +9,7 @@ import {
   registrarMovimiento,
   type EntradaMovimiento,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from '../../ui';
 import { GrupoChips, type OpcionChip } from './Chip';
@@ -83,6 +84,7 @@ const CAMPOS: Record<
  */
 export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) {
   const { ctx, refrescar } = useSesion();
+  const registrarEvento = useAnalitica();
   const avisarRegistro = useAvisoRegistro();
   const vistaCuentas = useVista(listarCuentas);
   const personas = useVista(listarPersonas);
@@ -151,6 +153,10 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
     } as EntradaMovimiento;
     try {
       const r = registrarMovimiento(ctx, entrada, { origen: 'manual' });
+      registrarEvento({
+        nombre: 'movimiento_registrado',
+        propiedades: { origen: 'formulario', pregunto: false, espacio: 'personal' },
+      });
       const nombre = descripcion.trim() || NOMBRE_TIPO[tipo];
       avisarRegistro(`Registré: ${nombre} ${formatearCentavos(monto)}`, r.deshacer);
       setMonto(null);

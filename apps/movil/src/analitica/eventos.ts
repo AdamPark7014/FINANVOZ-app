@@ -27,7 +27,7 @@ export const EVENTOS_PERMITIDOS = {
   captura: z.strictObject({ banco_id: z.string().regex(/^[a-z][a-z0-9_]{1,31}$/), reconocida: z.boolean() }),
   arqueo: z.strictObject({ resultado: z.enum(['exacto', 'faltante', 'sobrante']) }),
   simulacion_vista: z.strictObject({
-    escenarios: z.int().min(1).max(20),
+    escenarios: z.int().min(1).max(40),
     recomendado_tipo: z.enum(['base', 'contado_hoy', 'esperar', 'msi']),
   }),
   plan: z.strictObject({

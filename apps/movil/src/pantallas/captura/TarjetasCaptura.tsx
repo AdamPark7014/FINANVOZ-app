@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Platform, View } from 'react-native';
 import { confirmarArqueo, posponerArqueo, type TarjetaAccion } from '../../servicios';
 import { useCaptura } from '../../captura/ProveedorCaptura';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
@@ -24,6 +25,7 @@ export function TarjetaArqueo({
   alAbrirArqueo: () => void;
 }) {
   const { ctx, refrescar } = useSesion();
+  const registrarEvento = useAnalitica();
   const mostrar = useMostrarAviso();
   const [error, setError] = useState<string | null>(null);
   const exacto = formatearCentavos(t.saldo);
@@ -31,8 +33,10 @@ export function TarjetaArqueo({
     setError(null);
     if (o === 'otra_cantidad') return alAbrirArqueo();
     try {
-      if (o === 'exacto') confirmarArqueo(ctx, { cuentaId: t.cuentaId, efectivoReal: t.saldo });
-      else posponerArqueo(ctx);
+      if (o === 'exacto') {
+        confirmarArqueo(ctx, { cuentaId: t.cuentaId, efectivoReal: t.saldo });
+        registrarEvento({ nombre: 'arqueo', propiedades: { resultado: 'exacto' } });
+      } else posponerArqueo(ctx);
       refrescar();
       mostrar({
         mensaje: o === 'exacto' ? 'Listo: tu efectivo cuadra.' : 'Va. Te pregunto mañana.',

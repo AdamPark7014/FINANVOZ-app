@@ -185,7 +185,7 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
             for (const s of SENSIBLES) expect(json).not.toContain(s.toLowerCase());
             // Ningún número con forma de monto: solo pasos y conteos chicos.
             for (const v of Object.values(enviado.propiedades)) {
-              if (typeof v === 'number') expect(Math.abs(v)).toBeLessThanOrEqual(20);
+              if (typeof v === 'number') expect(Math.abs(v)).toBeLessThanOrEqual(40);
               if (typeof v === 'string') expect(v).not.toMatch(/\d{3,}|\$/);
             }
           }

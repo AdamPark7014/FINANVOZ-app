@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
 
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
@@ -127,6 +128,11 @@ export function PasoOnboarding({
   children?: ReactNode;
   testID: string;
 }) {
+  // Antes de O2 no hay consentimiento y la analítica no envía nada.
+  const registrarEvento = useAnalitica();
+  useEffect(() => {
+    registrarEvento({ nombre: 'onboarding_paso', propiedades: { paso } });
+  }, [registrarEvento, paso]);
   return (
     <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} pie={pie}>
       <Texto variante="secundario" tono="secundario">

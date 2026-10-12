@@ -6,10 +6,12 @@ import {
   registrarTexto,
   registrarTextoLocal,
   revisarPorInterpretar,
+  bucketLatencia,
   type ConsultaMeAlcanza,
   type OrigenDictado,
   type ResultadoTexto,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
   Boton,
@@ -98,6 +100,27 @@ export function PanelRegistrar({
   const [interpretando, setInterpretando] = useState(fraseRevision !== undefined);
   const [tarjeta, setTarjeta] = useState<{ datos: ConTarjeta; origen: OrigenDictado } | null>(null);
   const enRevision = useRef<string | null>(null);
+  const registrarEvento = useAnalitica();
+  /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
+  const medicion = useRef<{ inicio: number; nivel: 'reglas' | 'nube'; pregunto: boolean } | null>(null);
+
+  const contarRegistro = useCallback(
+    (origen: OrigenDictado) => {
+      const m = medicion.current;
+      medicion.current = null;
+      registrarEvento({
+        nombre: 'movimiento_registrado',
+        propiedades: {
+          origen,
+          pregunto: m?.pregunto ?? false,
+          espacio: 'personal',
+          ...(m ? { nivel_interprete: m.nivel } : {}),
+          ...(m && !m.pregunto ? { latencia_bucket: bucketLatencia(Date.now() - m.inicio) } : {}),
+        },
+      });
+    },
+    [registrarEvento],
+  );
 
   /** La frase en revisión ya no hace falta: se quitó de "Por revisar". */
   const terminarRevision = useCallback(() => {
@@ -119,6 +142,7 @@ export function PanelRegistrar({
         case 'registrado':
           terminarRevision();
           setTexto('');
+          contarRegistro(origen);
           avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
           return;
         case 'corregido':
@@ -144,6 +168,7 @@ export function PanelRegistrar({
         case 'registrado_msi':
           terminarRevision();
           setTexto('');
+          contarRegistro(origen);
           avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
           return;
         case 'tarjeta_configurada':
@@ -157,6 +182,7 @@ export function PanelRegistrar({
         case 'aclarar':
         case 'confirmar_msi':
         case 'tarjeta_por_agregar':
+          if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
           return;
         case 'por_interpretar':
@@ -203,6 +229,7 @@ export function PanelRegistrar({
       alVerCuentas,
       alVerMovimientos,
       avisarRegistro,
+      contarRegistro,
       refrescar,
       terminarRevision,
     ],
@@ -213,6 +240,7 @@ export function PanelRegistrar({
     if (limpio === '' || interpretando) return;
     setMensaje(null);
     setTarjeta(null);
+    medicion.current = { inicio: Date.now(), nivel: 'reglas', pregunto: false };
     let local: ResultadoTexto | null;
     try {
       local = registrarTextoLocal(ctx, limpio, origen);
@@ -224,6 +252,7 @@ export function PanelRegistrar({
       mostrar(local, origen);
       return;
     }
+    medicion.current.nivel = 'nube';
     setInterpretando(true);
     registrarTexto(ctx, limpio, origen, { nube })
       .then((r) => mostrar(r, origen))
