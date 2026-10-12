@@ -32,6 +32,12 @@ import {
   type CompromisoConfigurado,
   type ResumenTransaccion,
 } from './correcciones';
+import {
+  registrarCuentaDividida,
+  resolverParticipantes,
+  type CuentaDivididaRegistrada,
+  type EntradaCuentaDividida,
+} from './cuenta-dividida';
 import { registrarMovimiento, type EntradaMovimiento } from './formulario';
 import {
   pasarAMeses,
@@ -71,6 +77,26 @@ export interface PropuestaCompraMsi {
   readonly entrada: Omit<EntradaCompraMsi, 'tarjetaId'> & { readonly tarjetaId?: string };
   /** Si falta, las tarjetas de crédito candidatas. */
   readonly faltaTarjeta: Omit<CuentaPorElegir, 'campo'> | null;
+}
+
+/**
+ * Cuenta dividida dictada (`02 §17`): siempre se confirma, con chips de contactos para cada parte ("¿Con
+ * quién?"). Los nombres dichos que coinciden con un contacto ya vienen elegidos.
+ */
+export interface PropuestaCuentaDividida {
+  readonly total: Centavos;
+  /** Partes contándote a ti; `null` si no lo dijo. */
+  readonly partes: number | null;
+  readonly categoria: string;
+  readonly fecha: PlainDate;
+  readonly descripcion: string | null;
+  /** Con qué pagaste (o la cuenta puente "por asignar"); `null` si falta elegirla. */
+  readonly origenId: string | null;
+  readonly faltaOrigen: Omit<CuentaPorElegir, 'campo'> | null;
+  /** Contactos reconocidos entre los nombres dichos. */
+  readonly personaIds: readonly string[];
+  /** Nombres dichos que no son de ningún contacto (o de varios): "¿Lo agrego?". */
+  readonly sinResolver: readonly string[];
 }
 
 /** Cuenta que falta elegir en la tarjeta de confirmación. */
@@ -150,6 +176,14 @@ export type ResultadoTexto =
       readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado';
       readonly propuesta: PropuestaCompraMsi;
     }
+  /** Cuenta dividida dictada: "Guardar" llama `confirmarCuentaDividida` (CA-M8-01). */
+  | { readonly resultado: 'confirmar_division'; readonly propuesta: PropuestaCuentaDividida }
+  | {
+      readonly resultado: 'registrado_division';
+      readonly registro: CuentaDivididaRegistrada;
+      readonly total: Centavos;
+      readonly deshacer: string;
+    }
   /** "Mi Nu corta el 28 y pago el 18" sobre una tarjeta existente. */
   | {
       readonly resultado: 'tarjeta_configurada';
@@ -194,6 +228,7 @@ export type ResultadoTexto =
 const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'registrado',
   'registrado_msi',
+  'registrado_division',
   'tarjeta_configurada',
   'corregido',
   'anulado',
@@ -411,6 +446,13 @@ function registrarInterpretado(
   cuentas: readonly CuentaResolutor[],
   frase: Frase,
 ): ResultadoTexto | null {
+  const divididas = movimientos.filter((m) => m.tipo === 'cuenta_dividida' || m.division !== undefined);
+  if (divididas.length > 0) {
+    const [unico] = movimientos;
+    // Una cuenta dividida se confirma sola (una frase con varias cosas no se registra por voz).
+    if (movimientos.length > 1 || !unico) return null;
+    return proponerCuentaDividida(ctx, unico, cuentas);
+  }
   const msi = movimientos.filter(
     (m) => m.tipo === 'compra_msi' || (m.tipo === 'gasto' && m.msi !== undefined),
   );
@@ -444,6 +486,59 @@ function registrarInterpretado(
     frase.origen,
     frase.fraseId ? { claveBase: `frase:${frase.fraseId}` } : {},
   );
+}
+
+function proponerCuentaDividida(
+  ctx: Contexto,
+  m: Movimiento,
+  cuentas: readonly CuentaResolutor[],
+): ResultadoTexto | null {
+  if ((m.espacio ?? 'personal') !== 'personal' || m.msi || m.contraparte !== undefined) return null;
+  if (m.tipo !== 'cuenta_dividida' && m.tipo !== 'gasto') return null;
+  const r = resolver(m.origen, 'sale', cuentas, true);
+  const aprendida = categoriaAprendida(ctx, null, m.descripcion, 'gasto');
+  let categoria = aprendida ?? m.categoria ?? 'otros_gastos';
+  try {
+    idCategoriaDe(ctx, categoria, 'gasto');
+  } catch {
+    categoria = 'otros_gastos';
+  }
+  const { personaIds, sinResolver } = resolverParticipantes(ctx, m.division?.participantes ?? []);
+  return {
+    resultado: 'confirmar_division',
+    propuesta: {
+      total: m.monto,
+      partes: m.division?.partes ?? null,
+      categoria,
+      fecha: m.fecha,
+      descripcion: m.descripcion ?? null,
+      origenId: 'id' in r ? r.id : null,
+      faltaOrigen: 'id' in r ? null : r.falta,
+      personaIds,
+      sinResolver,
+    },
+  };
+}
+
+/**
+ * "Guardar" de la confirmación de una cuenta dividida dictada (o del formulario): tu parte a gasto y cada amigo
+ * en "Te deben" (CA-M8-01). Devuelve el token de Deshacer. El alias de una cuenta que no se reconoció se aprende.
+ */
+export function confirmarCuentaDividida(
+  ctx: Contexto,
+  entrada: EntradaCuentaDividida,
+  origen: OrigenDictado | 'manual',
+  opciones: { claveIdempotencia?: string; aprender?: { alias: string } } = {},
+): Extract<ResultadoTexto, { resultado: 'registrado_division' }> {
+  exigirConsentimiento(ctx);
+  return enTransaccion(ctx, () => {
+    const registro = registrarCuentaDividida(ctx, entrada, {
+      origen,
+      ...(opciones.claveIdempotencia ? { claveIdempotencia: opciones.claveIdempotencia } : {}),
+    });
+    if (opciones.aprender) aprenderAlias(ctx, opciones.aprender.alias, entrada.origenId);
+    return { resultado: 'registrado_division', registro, total: entrada.total, deshacer: registro.deshacer };
+  });
 }
 
 function registrarMsiInterpretado(
