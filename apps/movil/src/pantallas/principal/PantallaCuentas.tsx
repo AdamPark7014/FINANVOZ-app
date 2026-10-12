@@ -40,6 +40,7 @@ export function PantallaCuentas({
   alContarEfectivo,
   alAbrirPersona,
   alAbrirTandas,
+  alAbrirCompartidos,
   alAbrirSuscripciones,
   alAbrirDeducciones,
 }: {
@@ -52,6 +53,8 @@ export function PantallaCuentas({
   alContarEfectivo?: (cuentaId: string) => void;
   /** Cuentas → Tandas (`02 §18`). */
   alAbrirTandas?: () => void;
+  /** Cuentas → Gastos compartidos (`02 §27`, M16). */
+  alAbrirCompartidos?: () => void;
   /** Cuentas → Suscripciones (`02 §20`). */
   alAbrirSuscripciones?: () => void;
   /** Personal → Deducciones (`02 §24`): sin negocio, el espacio personal es Cuentas. */
@@ -162,6 +165,17 @@ export function PantallaCuentas({
             variante="secundario"
             alPresionar={alAbrirTandas}
             testID="boton-tandas"
+          />
+        </Seccion>
+      ) : null}
+
+      {alAbrirCompartidos ? (
+        <Seccion titulo="Gastos compartidos" testID="seccion-compartidos">
+          <Boton
+            etiqueta="Gastos con tu pareja"
+            variante="secundario"
+            alPresionar={alAbrirCompartidos}
+            testID="boton-compartidos"
           />
         </Seccion>
       ) : null}
