@@ -15,6 +15,13 @@
       "when": 1791849600000,
       "tag": "0002_tandas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791936000000,
+      "tag": "0003_suscripciones",
+      "breakpoints": true
     }
   ]
 }

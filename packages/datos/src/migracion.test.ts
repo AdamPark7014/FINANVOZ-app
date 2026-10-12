@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { ErrorDominio } from '@cartera/core';
 import { abrirBase, C, migrar } from './__pruebas__/base';
-import { TABLAS_0001, TABLAS_0002 } from './esquema';
+import { TABLAS_0001, TABLAS_0002, TABLAS_0003 } from './esquema';
 import {
   CATEGORIAS_GASTO_FIJO,
   CATEGORIAS_GASTO_VARIABLE,
@@ -14,7 +14,7 @@ import {
 } from './semillas';
 import { construirGasto } from '@cartera/core';
 
-const TODAS = { ...TABLAS_0001, ...TABLAS_0002 };
+const TODAS = { ...TABLAS_0001, ...TABLAS_0002, ...TABLAS_0003 };
 const TABLAS = Object.keys(TODAS).sort();
 
 function codigo(f: () => unknown): string | undefined {
