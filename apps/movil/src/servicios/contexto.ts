@@ -27,6 +27,12 @@ export interface Contexto {
    * el del vector E14-01 (vacío).
    */
   readonly catalogoSuscripciones?: readonly string[];
+  /**
+   * Contenido de `config/fiscal/<año>.json` por ejercicio (M12). Por omisión, los archivos del repositorio
+   * (`servicios/config-fiscal.ts`); las pruebas de CA-M12-03 fijan uno armado con los parámetros sintéticos de
+   * los vectores (`E13.config_prueba`). Siempre pasa por `validarConfigFiscal`.
+   */
+  readonly configFiscal?: Readonly<Record<number, unknown>>;
 }
 
 export function crearContexto(opciones: { db: BaseDatos; reloj: Reloj; generarId: () => string }): Contexto {

@@ -1,0 +1,448 @@
+import { useEffect, useRef, useState } from 'react';
+import type { Centavos } from '@cartera/core';
+import { View } from 'react-native';
+import {
+  asignarAlumnoNivel,
+  confirmarPagoFactura,
+  FORMAS_PAGO_CONFIRMADO,
+  guardarPerfilFiscal,
+  importarCfdi,
+  marcarLentes,
+  obtenerDeducciones,
+  type ArchivoCfdi,
+  type FacturaVista,
+  type FormaPagoConfirmado,
+  type PerfilFiscal,
+  type ResultadoImportacion,
+  type VistaDeducciones,
+} from '../../servicios';
+import { useSesion, useVista } from '../../sesion/ProveedorSesion';
+import { Boton, CampoMonto, CampoTexto, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Chips, MensajeError } from '../onboarding/componentes';
+import { PuertaPlus } from '../plan/CandadoPlus';
+import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import type { ArchivosFacturas } from './archivos';
+
+export const PEDIR_PERFIL =
+  'Para estimar, necesito tu RFC, tus ingresos brutos del año (los de tu constancia de sueldos, incluidos los exentos) y, si la tienes, tu base gravable.';
+export const PERFIL_EN_TELEFONO = 'Se guardan solo en tu teléfono.';
+export const ERROR_RFC = 'Revisa tu RFC: son 13 letras y números, como aparece en tu constancia.';
+export const ERROR_INGRESOS = 'Escribe tus ingresos brutos del año.';
+export const MENSAJE_IMPORTAR_ERROR = 'No pude leer esos archivos. Intenta de nuevo.';
+export const SIN_FACTURAS =
+  'Todavía no tienes facturas de este año. Compártelas con Finanvoz desde tu correo o el portal del SAT (el XML o un ZIP), o elígelas aquí.';
+
+/**
+ * Personal → Deducciones (`02 §24`, RF-FIS-01…03, Plus): importar facturas, pedir el perfil fiscal la primera vez,
+ * "Llevas $25,900 deducibles en 2026 (estimación)" por tipo, lo que no es deducible con su motivo, el ISR que
+ * podrías ahorrar y, por factura, alumno y nivel de las colegiaturas, lentes y "Ya la pagué". Mientras los
+ * parámetros del año no estén validados por un contador, solo lista las facturas y lo dice.
+ */
+export function PantallaDeducciones({
+  alVolver,
+  archivos,
+}: {
+  alVolver: () => void;
+  archivos: ArchivosFacturas;
+}) {
+  return (
+    <PuertaPlus
+      funcion="deducciones"
+      titulo="Tus deducciones del año"
+      descripcion="Con Plus, comparte tus facturas con Finanvoz y te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías ahorrar."
+      alVolver={alVolver}
+    >
+      <Deducciones alVolver={alVolver} archivos={archivos} />
+    </PuertaPlus>
+  );
+}
+
+function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: ArchivosFacturas }) {
+  const { ctx, refrescar } = useSesion();
+  const [ejercicio, setEjercicio] = useState<number | null>(null);
+  // `useVista` relee con este cierre en cada `refrescar()`; al elegir otro año se refresca.
+  const v = useVista((c) => obtenerDeducciones(c, ejercicio ?? undefined));
+  const [editando, setEditando] = useState(false);
+  const [resultado, setResultado] = useState<ResultadoImportacion | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [importando, setImportando] = useState(false);
+
+  const importar = () => {
+    setError(null);
+    setImportando(true);
+    archivos
+      .elegir()
+      .then((elegidos) => {
+        if (!elegidos) return;
+        setResultado(importarCfdi(ctx, elegidos));
+        refrescar();
+      })
+      .catch(() => setError(MENSAJE_IMPORTAR_ERROR))
+      .finally(() => setImportando(false));
+  };
+
+  const pedirPerfil = v.estado === 'sin_perfil' || editando;
+  return (
+    <Pantalla testID="pantalla-deducciones" bordes={['top', 'left', 'right', 'bottom']}>
+      <Boton
+        testID="deducciones-volver"
+        etiqueta="Volver"
+        variante="texto"
+        ancho="contenido"
+        alPresionar={alVolver}
+      />
+      <Texto variante="titulo">{`Deducciones ${v.ejercicio}`}</Texto>
+      {v.ejercicios.length > 1 ? (
+        <Chips
+          opciones={v.ejercicios.map((a) => ({ valor: a, etiqueta: String(a) }))}
+          valor={v.ejercicio}
+          alCambiar={(a) => {
+            setEjercicio(a);
+            refrescar();
+          }}
+          testID="deducciones-anio"
+        />
+      ) : null}
+
+      {pedirPerfil ? (
+        <FormularioPerfil
+          inicial={v.estado === 'sin_perfil' ? null : v.perfil}
+          alGuardar={() => {
+            setEditando(false);
+            refrescar();
+          }}
+          {...(v.estado === 'sin_perfil' ? {} : { alCancelar: () => setEditando(false) })}
+        />
+      ) : null}
+
+      {v.estado === 'listo' ? <Estimacion v={v} /> : null}
+      {v.estado === 'sin_parametros' ? (
+        <Tarjeta testID="deducciones-sin-parametros">
+          <Texto variante="cuerpo">{v.mensaje}</Texto>
+        </Tarjeta>
+      ) : null}
+
+      <Boton
+        testID="deducciones-importar"
+        etiqueta="Importar facturas (XML o ZIP)"
+        variante="secundario"
+        cargando={importando}
+        alPresionar={importar}
+      />
+      <MensajeError texto={error} />
+      {resultado ? <ResultadoImportacionTarjeta r={resultado} alCerrar={() => setResultado(null)} /> : null}
+
+      <Texto variante="subtitulo">Tus facturas</Texto>
+      {v.facturas.length === 0 ? (
+        <Texto variante="secundario" tono="secundario" testID="deducciones-sin-facturas">
+          {SIN_FACTURAS}
+        </Texto>
+      ) : null}
+      {v.facturas.map((f) => (
+        <FilaFactura key={f.uuid} f={f} v={v} />
+      ))}
+
+      {v.estado !== 'sin_perfil' && !editando ? (
+        <Boton
+          testID="deducciones-editar-perfil"
+          etiqueta="Cambiar mi RFC o mis ingresos"
+          variante="texto"
+          ancho="contenido"
+          alPresionar={() => setEditando(true)}
+        />
+      ) : null}
+      {v.estado === 'listo' ? (
+        <Texto variante="pequeno" tono="secundario" testID="deducciones-leyenda">
+          {v.leyenda}
+        </Texto>
+      ) : null}
+    </Pantalla>
+  );
+}
+
+function Estimacion({ v }: { v: Extract<VistaDeducciones, { estado: 'listo' }> }) {
+  return (
+    <Tarjeta testID="deducciones-estimacion">
+      <Texto variante="subtitulo" testID="deducciones-titulo" accessibilityLiveRegion="polite">
+        {v.titulo}
+      </Texto>
+      {v.porTipo.map((t) => (
+        <Texto key={t.uso} variante="cuerpo" testID={`deducciones-tipo-${t.uso}`}>
+          {t.texto}
+        </Texto>
+      ))}
+      {v.textoTope ? (
+        <Texto variante="secundario" tono="secundario" testID="deducciones-tope">
+          {v.textoTope}
+        </Texto>
+      ) : null}
+      <Texto variante="cuerpoFuerte" testID="deducciones-ahorro">
+        {v.textoAhorro}
+      </Texto>
+      {v.noDeducibles.length > 0 ? (
+        <View style={{ gap: espacio.xs }} testID="deducciones-no-deducibles">
+          <Texto variante="etiqueta">No deducibles</Texto>
+          {v.noDeducibles.map((f) => (
+            <Texto key={f.uuid} variante="secundario" testID={`no-deducible-${f.uuid}`}>
+              {`${f.emisor} · ${f.textoTotal}: ${f.textoMotivo ?? ''}`}
+            </Texto>
+          ))}
+        </View>
+      ) : null}
+    </Tarjeta>
+  );
+}
+
+function FormularioPerfil({
+  inicial,
+  alGuardar,
+  alCancelar,
+}: {
+  inicial: PerfilFiscal | null;
+  alGuardar: () => void;
+  alCancelar?: () => void;
+}) {
+  const { ctx } = useSesion();
+  const [rfc, setRfc] = useState(inicial?.rfc ?? '');
+  const [ingresos, setIngresos] = useState<Centavos | null>(inicial?.ingresos ?? null);
+  const [base, setBase] = useState<Centavos | null>(inicial?.base_gravable ?? null);
+  const [error, setError] = useState<string | null>(null);
+  const guardar = () => {
+    if (ingresos === null) {
+      setError(ERROR_INGRESOS);
+      return;
+    }
+    try {
+      guardarPerfilFiscal(ctx, { rfc, ingresos, baseGravable: base });
+      setError(null);
+      alGuardar();
+    } catch (e) {
+      setError((e as { codigo?: string }).codigo === 'rfc_invalido' ? ERROR_RFC : MENSAJE_ERROR_GENERAL);
+    }
+  };
+  return (
+    <Tarjeta testID="deducciones-perfil">
+      <Texto variante="cuerpo">{PEDIR_PERFIL}</Texto>
+      <Texto variante="secundario" tono="secundario">
+        {PERFIL_EN_TELEFONO}
+      </Texto>
+      <CampoTexto
+        etiqueta="Tu RFC"
+        valor={rfc}
+        alCambiar={setRfc}
+        ejemplo="PEPJ800101AB1"
+        nativo={{ autoCapitalize: 'characters', autoCorrect: false }}
+        testID="perfil-rfc"
+      />
+      <CampoMonto
+        etiqueta="Ingresos brutos del año"
+        valorInicial={inicial?.ingresos ?? null}
+        alCambiar={setIngresos}
+        testID="perfil-ingresos"
+      />
+      <CampoMonto
+        etiqueta="Base gravable (opcional)"
+        ayuda="Viene en tu constancia de sueldos o te la da tu contador."
+        valorInicial={inicial?.base_gravable ?? null}
+        alCambiar={setBase}
+        testID="perfil-base"
+      />
+      <MensajeError texto={error} />
+      <Boton etiqueta="Guardar" alPresionar={guardar} testID="perfil-guardar" />
+      {alCancelar ? (
+        <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="perfil-cancelar" />
+      ) : null}
+    </Tarjeta>
+  );
+}
+
+/** "Importé 8 facturas; 1 no es versión 4.0" y, por archivo que no entró, qué pasó. */
+export function ResultadoImportacionTarjeta({
+  r,
+  alCerrar,
+}: {
+  r: ResultadoImportacion;
+  alCerrar?: () => void;
+}) {
+  return (
+    <Tarjeta testID="importacion-resultado">
+      <Texto variante="cuerpoFuerte" testID="importacion-resumen" accessibilityLiveRegion="polite">
+        {r.resumen}
+      </Texto>
+      {r.rechazadas.map((x, i) => (
+        <Texto key={`${x.archivo}-${i}`} variante="secundario" testID={`importacion-rechazo-${i}`}>
+          {`${x.archivo}: ${x.texto}`}
+        </Texto>
+      ))}
+      {alCerrar ? (
+        <Boton
+          etiqueta="Listo"
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alCerrar}
+          testID="importacion-listo"
+        />
+      ) : null}
+    </Tarjeta>
+  );
+}
+
+function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
+  const { ctx, refrescar } = useSesion();
+  const [error, setError] = useState<string | null>(null);
+  const [alumno, setAlumno] = useState(f.alumno ?? '');
+  const [nivel, setNivel] = useState<string | null>(f.nivel);
+  const [pagando, setPagando] = useState(false);
+  const hacer = (accion: () => void) => {
+    try {
+      accion();
+      setError(null);
+      refrescar();
+    } catch {
+      setError(MENSAJE_ERROR_GENERAL);
+    }
+  };
+  const niveles = v.estado === 'listo' ? v.niveles : [];
+  const id = `factura-${f.uuid}`;
+  const estado =
+    f.estado === 'deducible'
+      ? 'Deducible'
+      : f.estado === 'no_deducible'
+        ? `No deducible: ${f.textoMotivo}`
+        : null;
+  return (
+    <Tarjeta testID={id}>
+      <View style={{ gap: espacio.xxs }}>
+        <Texto variante="cuerpoFuerte">{f.emisor}</Texto>
+        <Texto variante="secundario" tono="secundario">
+          {[f.textoFecha, f.textoTotal, f.tipo].filter(Boolean).join(' · ')}
+        </Texto>
+        {estado ? (
+          <Texto variante="secundario" testID={`${id}-estado`}>
+            {estado}
+          </Texto>
+        ) : null}
+      </View>
+
+      {f.pideAlumnoNivel && niveles.length > 0 ? (
+        <View style={{ gap: espacio.xs }}>
+          <CampoTexto
+            etiqueta="¿De quién es la colegiatura?"
+            valor={alumno}
+            alCambiar={setAlumno}
+            testID={`${id}-alumno`}
+          />
+          <Chips
+            etiqueta="Nivel"
+            opciones={niveles}
+            valor={nivel}
+            alCambiar={setNivel}
+            testID={`${id}-nivel`}
+          />
+          <Boton
+            etiqueta="Guardar alumno y nivel"
+            variante="secundario"
+            deshabilitado={alumno.trim() === '' || nivel === null}
+            alPresionar={() => nivel && hacer(() => asignarAlumnoNivel(ctx, f.uuid, alumno, nivel))}
+            testID={`${id}-guardar-alumno`}
+          />
+        </View>
+      ) : null}
+
+      {f.ofreceLentes && v.estado !== 'sin_perfil' ? (
+        <Interruptor
+          etiqueta="Son lentes ópticos"
+          descripcion="Los lentes tienen su propio tope en el año."
+          valor={f.lentes}
+          alCambiar={(valor) => hacer(() => marcarLentes(ctx, f.uuid, valor))}
+          testID={`${id}-lentes`}
+        />
+      ) : null}
+
+      {f.enPagos && f.pagoConfirmado === null && !pagando ? (
+        <Boton
+          etiqueta="Ya la pagué"
+          variante="secundario"
+          alPresionar={() => setPagando(true)}
+          testID={`${id}-ya-la-pague`}
+        />
+      ) : null}
+      {f.enPagos && pagando ? (
+        <Chips<FormaPagoConfirmado>
+          etiqueta="¿Cómo la pagaste?"
+          opciones={FORMAS_PAGO_CONFIRMADO}
+          valor={f.pagoConfirmado}
+          alCambiar={(forma) =>
+            hacer(() => {
+              confirmarPagoFactura(ctx, f.uuid, forma);
+              setPagando(false);
+            })
+          }
+          testID={`${id}-forma`}
+        />
+      ) : null}
+      {f.pagoConfirmado ? (
+        <Texto variante="secundario" tono="secundario" testID={`${id}-pagada`}>
+          {`Pagada con ${FORMAS_PAGO_CONFIRMADO.find((x) => x.valor === f.pagoConfirmado)?.etiqueta.toLowerCase() ?? ''}`}
+        </Texto>
+      ) : null}
+      <MensajeError texto={error} />
+    </Tarjeta>
+  );
+}
+
+/**
+ * Lo que llegó por la hoja de compartir (`app/expo-sharing.tsx`): lee los archivos, los importa una vez y muestra
+ * el resultado. Importar es de todos los planes (son datos); la estimación es de Plus.
+ */
+export function ImportarCompartidas({
+  leer,
+  alVerDeducciones,
+}: {
+  leer: () => Promise<ArchivoCfdi[]>;
+  alVerDeducciones: () => void;
+}) {
+  const { ctx, refrescar } = useSesion();
+  const [estado, setEstado] = useState<
+    { tipo: 'leyendo' } | { tipo: 'listo'; r: ResultadoImportacion } | { tipo: 'error' } | { tipo: 'vacio' }
+  >({ tipo: 'leyendo' });
+  const iniciado = useRef(false);
+  useEffect(() => {
+    if (iniciado.current) return;
+    iniciado.current = true;
+    leer()
+      .then((archivos) => {
+        if (archivos.length === 0) {
+          setEstado({ tipo: 'vacio' });
+          return;
+        }
+        setEstado({ tipo: 'listo', r: importarCfdi(ctx, archivos) });
+        refrescar();
+      })
+      .catch(() => setEstado({ tipo: 'error' }));
+  }, [ctx, leer, refrescar]);
+  return (
+    <Pantalla testID="importar-compartidas" bordes={['top', 'left', 'right', 'bottom']}>
+      <Texto variante="titulo">Importar facturas</Texto>
+      {estado.tipo === 'leyendo' ? (
+        <Texto variante="cuerpo" tono="secundario">
+          Leyendo tus facturas…
+        </Texto>
+      ) : null}
+      {estado.tipo === 'listo' ? <ResultadoImportacionTarjeta r={estado.r} /> : null}
+      {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
+      {estado.tipo === 'vacio' ? (
+        <Texto variante="cuerpo" testID="importar-vacio">
+          No llegó ningún archivo. Comparte el XML de la factura o un ZIP.
+        </Texto>
+      ) : null}
+      {estado.tipo !== 'leyendo' ? (
+        <Boton
+          etiqueta="Ver mis deducciones"
+          alPresionar={alVerDeducciones}
+          testID="importar-ver-deducciones"
+        />
+      ) : null}
+    </Pantalla>
+  );
+}

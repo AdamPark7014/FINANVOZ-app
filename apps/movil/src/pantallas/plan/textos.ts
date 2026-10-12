@@ -16,6 +16,7 @@ export const INCLUYE_PLUS = [
   'Tarjeta del día: con cuál te conviene pagar hoy',
   'Tus meses sin intereses de los próximos 12 meses',
   'Respuestas a tus preguntas: cuánto llevas gastado, cuánto debes, qué pagos vienen y por qué te alcanzó menos',
+  'Deducciones personales: con tus facturas, cuánto llevas deducible en el año y cuánto ISR podrías ahorrar',
   `${INTERPRETACIONES_NUBE_MES.plus} frases al mes interpretadas en internet (en Gratis, ${INTERPRETACIONES_NUBE_MES.gratis})`,
 ] as const;
 

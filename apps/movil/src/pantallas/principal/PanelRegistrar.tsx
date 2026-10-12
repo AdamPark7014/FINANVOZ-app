@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import {
+  AVISO_DEDUCIBLE_EFECTIVO,
   contarEsperandoConexion,
   descartarPorInterpretar,
   explicar,
@@ -119,6 +120,8 @@ export function PanelRegistrar({
   const [respuesta, setRespuesta] = useState<RespuestaConsulta | null>(null);
   const [explicacion, setExplicacion] = useState<ExplicacionMostrable | null>(null);
   const [explicando, setExplicando] = useState(false);
+  /** Aviso preventivo de `02 §24` tras registrar salud en efectivo (CA-M12-04); se queda hasta "Entendido". */
+  const [avisoDeducible, setAvisoDeducible] = useState(false);
   const enRevision = useRef<string | null>(null);
   const registrarEvento = useAnalitica();
   /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
@@ -165,6 +168,7 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
+          setAvisoDeducible(r.movimientos.some((m) => m.avisoDeducible));
           avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
           return;
         case 'corregido':
@@ -285,6 +289,7 @@ export function PanelRegistrar({
     const limpio = frase.trim();
     if (limpio === '' || interpretando || explicando) return;
     setMensaje(null);
+    setAvisoDeducible(false);
     setTarjeta(null);
     setRespuesta(null);
     setExplicacion(null);
@@ -342,6 +347,20 @@ export function PanelRegistrar({
 
   return (
     <View style={{ gap: espacio.m }} testID="panel-registrar">
+      {avisoDeducible ? (
+        <Tarjeta testID="aviso-deducible">
+          <Texto variante="cuerpo" accessibilityLiveRegion="polite">
+            {AVISO_DEDUCIBLE_EFECTIVO}
+          </Texto>
+          <Boton
+            etiqueta="Entendido"
+            variante="texto"
+            ancho="contenido"
+            alPresionar={() => setAvisoDeducible(false)}
+            testID="aviso-deducible-cerrar"
+          />
+        </Tarjeta>
+      ) : null}
       {respuesta ? (
         <TarjetaConsulta
           respuesta={respuesta}

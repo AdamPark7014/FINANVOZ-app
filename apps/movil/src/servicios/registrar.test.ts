@@ -48,6 +48,7 @@ describe('registrar por voz o texto', () => {
         porAsignar: false,
         cobertura: null,
         preguntaLiquidar: null,
+        avisoDeducible: false,
       },
     ]);
     const t = p.ctx.libro.obtener(r.movimientos[0]?.transaccionId as string);

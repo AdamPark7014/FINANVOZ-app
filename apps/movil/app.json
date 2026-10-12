@@ -32,6 +32,26 @@
       ],
       "expo-secure-store",
       [
+        "expo-sharing",
+        {
+          "android": {
+            "enabled": true,
+            "singleShareMimeTypes": [
+              "text/xml",
+              "application/xml",
+              "application/zip",
+              "application/x-zip-compressed"
+            ],
+            "multipleShareMimeTypes": [
+              "text/xml",
+              "application/xml",
+              "application/zip",
+              "application/x-zip-compressed"
+            ]
+          }
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "Finanvoz usa tu biometría para desbloquear la app."

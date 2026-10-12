@@ -48,6 +48,7 @@ import {
 } from './msi';
 import type { ConsultaMeAlcanza } from './me-alcanza';
 import type { MovimientoVista } from './movimientos';
+import { esSaludEnEfectivo } from './deducciones';
 import { contextoNube, type NivelNube } from './nube';
 import { contactosInterprete } from './personas';
 import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './preferencias';
@@ -78,6 +79,8 @@ export interface ResumenMovimiento {
   readonly cobertura: CoberturaAutomatica | null;
   /** Un pago que dejó saldo a favor con meses activos (CA-M4-10). */
   readonly preguntaLiquidar: PreguntaLiquidar | null;
+  /** Gasto de salud en efectivo: Hoy muestra el aviso preventivo de deducciones (`02 §24`, CA-M12-04). */
+  readonly avisoDeducible: boolean;
 }
 
 /** Compra a meses dictada que necesita confirmación (monto alto, tarjeta ambigua o aproximada). */
@@ -448,6 +451,7 @@ function resumir(
         : null,
     cuenta: cuentaPorId(ctx, cuentaId).nombre,
     porAsignar: cuentaId === CUENTAS_SISTEMA.porAsignar || cuentaId === CUENTAS_SISTEMA.porAsignarEntradas,
+    avisoDeducible: esSaludEnEfectivo(ctx, e),
   };
 }
 

@@ -63,6 +63,8 @@ export interface FuncionesPlan {
   readonly consultas: boolean;
   /** Modo explicar: preguntas abiertas con herramientas (RF-CON-02, `02 §22`). */
   readonly explicar: boolean;
+  /** Deducciones personales con facturas (RF-FIS-02, `02 §24`): la estimación y el ISR. Importar es de todos. */
+  readonly deducciones: boolean;
   readonly interpretacionesNubeMes: number;
 }
 
@@ -142,6 +144,7 @@ export function funcionesPlan(ctx: Contexto): FuncionesPlan {
     compromisoMsi12Meses: plus,
     consultas: plus,
     explicar: plus,
+    deducciones: plus,
     interpretacionesNubeMes: INTERPRETACIONES_NUBE_MES[plus ? 'plus' : 'gratis'],
   };
 }

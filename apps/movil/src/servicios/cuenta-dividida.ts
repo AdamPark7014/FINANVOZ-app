@@ -3,6 +3,7 @@ import { ErrorDominio, construirCuentaDividida, dividirCuenta, esFecha, type Cen
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { cuentaPorId, idCategoriaDe, normalizarAliases } from './catalogo';
+import { esSaludEnEfectivo } from './deducciones';
 import { enTransaccion, type Contexto } from './contexto';
 import { trasRegistrar, type MovimientoRegistrado, type OrigenRegistro } from './formulario';
 import { listarPersonas } from './personas';
@@ -94,7 +95,13 @@ export function registrarCuentaDividida(
       porRevisar: false,
     });
     const despues = nueva ? trasRegistrar(ctx, tx.id) : { cobertura: null, preguntaLiquidar: null };
-    return { transaccionId: tx.id, deshacer: tx.id, fecha, reparto, ...despues };
+    const avisoDeducible = esSaludEnEfectivo(ctx, {
+      tipo: 'gasto',
+      monto: e.total,
+      categoria: e.categoria,
+      origenId: e.origenId,
+    });
+    return { transaccionId: tx.id, deshacer: tx.id, fecha, reparto, ...despues, avisoDeducible };
   });
 }
 

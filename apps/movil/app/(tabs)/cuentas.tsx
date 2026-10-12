@@ -13,6 +13,7 @@ export default function Cuentas() {
       alContarEfectivo={(cuentaId) => abrirArqueo(router, { cuentaId })}
       alAbrirTandas={() => router.push('/tandas')}
       alAbrirSuscripciones={() => router.push('/suscripciones')}
+      alAbrirDeducciones={() => router.push('/deducciones')}
     />
   );
 }
