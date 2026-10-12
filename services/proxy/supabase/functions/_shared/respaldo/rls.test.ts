@@ -131,8 +131,9 @@ describe('bucket respaldos (RLS)', () => {
     await insertar(U1, nombre(U1));
     await como(U1, `update storage.objects set name = $1 where name = $2`, [nombre(U2), nombre(U1)]);
     await como(U1, `update storage.objects set metadata = '{"size": 1}' where name = $1`, [nombre(U1)]);
-    const fila = (await db.query<{ name: string; metadata: { size: number } }>('select * from storage.objects'))
-      .rows[0];
+    const fila = (
+      await db.query<{ name: string; metadata: { size: number } }>('select * from storage.objects')
+    ).rows[0];
     expect(fila).toMatchObject({ name: nombre(U1), metadata: { size: 10 } });
   });
 
