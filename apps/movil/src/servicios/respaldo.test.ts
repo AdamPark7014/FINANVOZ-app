@@ -197,11 +197,12 @@ describe('respaldo cifrado (M9)', () => {
     alterado[alterado.length - 40] = (alterado[alterado.length - 40] ?? 0) ^ 1;
 
     const errores: unknown[] = [];
+    // Uno tras otro: la segunda promesa no debe quedar rechazada sin manejador mientras corre la primera.
     for (const intento of [
-      prepararRestauracion(deps, archivo, 'no es la contraseña'),
-      prepararRestauracion(deps, alterado, CONTRASENA),
+      () => prepararRestauracion(deps, archivo, 'no es la contraseña'),
+      () => prepararRestauracion(deps, alterado, CONTRASENA),
     ]) {
-      await intento.catch((e: unknown) => errores.push(e));
+      await intento().catch((e: unknown) => errores.push(e));
     }
     expect(errores.map((e) => (e as ErrorDominio).codigo)).toEqual([
       'respaldo_corrupto_o_contrasena_incorrecta',
