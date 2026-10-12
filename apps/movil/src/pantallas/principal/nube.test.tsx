@@ -218,11 +218,11 @@ describe('Registrar con la nube', () => {
     p.responder('transfiéreme 500 a juan', { intencion: 'fuera_de_alcance', motivo: 'mueve_dinero' });
     await escribir('transfiéreme 500 a juan');
     expect(textoDe('mensaje-registro')).toBe('No muevo dinero por ti: solo llevo la cuenta de lo que pasa.');
-    p.responder('cuánto pago de suscripciones', {
+    p.responder('cuánto puedo deducir', {
       intencion: 'consultar',
-      consulta: { tipo: 'suscripciones' },
+      consulta: { tipo: 'deducciones' },
     });
-    await escribir('cuánto pago de suscripciones');
+    await escribir('cuánto puedo deducir');
     expect(textoDe('mensaje-registro')).toBe('Todavía no sé responder esa pregunta.');
     expect(listarMovimientos(p.ctx)).toEqual([]);
   });

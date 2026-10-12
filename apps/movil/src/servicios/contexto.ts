@@ -22,6 +22,11 @@ export interface Contexto {
   readonly reloj: Reloj;
   /** UUIDv7 en la app (`04 §1`); ids deterministas en pruebas. */
   readonly generarId: () => string;
+  /**
+   * Catálogo semilla de suscripciones para E14 (M10). Por omisión, el de `07 §6`; las pruebas de CA-M10-01 fijan
+   * el del vector E14-01 (vacío).
+   */
+  readonly catalogoSuscripciones?: readonly string[];
 }
 
 export function crearContexto(opciones: { db: BaseDatos; reloj: Reloj; generarId: () => string }): Contexto {

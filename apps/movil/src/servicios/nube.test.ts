@@ -340,8 +340,8 @@ describe('nivel 2 · nube', () => {
         { resultado: 'consulta', respuesta: { plantilla: 'deuda_tarjetas' } },
       ],
       [
-        'cuánto pago de suscripciones',
-        { intencion: 'consultar', consulta: { tipo: 'suscripciones' } },
+        'cuánto puedo deducir',
+        { intencion: 'consultar', consulta: { tipo: 'deducciones' } },
         { resultado: 'no_soportado', motivo: 'consulta' },
       ],
       [
