@@ -1,0 +1,188 @@
+# CA-M2-01 · Onboarding O1–O7 completo en el emulador (build de desarrollo o de prueba de Android).
+#   maestro test apps/movil/.maestro/onboarding.yaml
+# Empieza como recién instalada (clearState) y termina en Hoy. Usa los testID de app/onboarding/*.
+appId: com.finanvoz.app
+name: Onboarding completo
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# O1 · Bienvenida
+- extendedWaitUntil:
+    visible:
+      id: onb-bienvenida
+    timeout: 20000
+- tapOn:
+    id: onb-empezar
+
+# O2 · Consentimiento: el botón no avanza sin la casilla obligatoria
+- assertVisible:
+    id: onb-consentimiento
+- tapOn:
+    id: onb-aceptar
+- assertVisible:
+    id: onb-consentimiento
+- scrollUntilVisible:
+    element:
+      id: onb-casilla-datos
+- tapOn:
+    id: onb-casilla-datos
+- tapOn:
+    id: onb-aceptar
+
+# O3 · Ingreso: quincena (ya elegida) de $13,000
+- assertVisible:
+    id: onb-ingreso
+- tapOn:
+    id: onb-frecuencia-quincena
+- tapOn:
+    id: onb-ingreso-monto
+- inputText: '13000'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: onb-proximo-pago
+- tapOn:
+    id: onb-ingreso-continuar
+
+# O4 · Cuentas: efectivo, una débito y una tarjeta con meses que ya tenía ("No sé")
+- assertVisible:
+    id: onb-cuentas
+- tapOn:
+    id: onb-efectivo
+- inputText: '600'
+- hideKeyboard
+- tapOn:
+    id: onb-agregar-cuenta
+- tapOn:
+    id: onb-cuenta-tipo-debito
+- tapOn:
+    id: onb-cuenta-nombre
+- inputText: 'BBVA'
+- tapOn:
+    id: onb-cuenta-saldo
+- inputText: '4200'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: onb-cuenta-agregar
+- tapOn:
+    id: onb-cuenta-agregar
+- assertVisible: 'BBVA'
+- scrollUntilVisible:
+    element:
+      id: onb-agregar-tarjeta
+- tapOn:
+    id: onb-agregar-tarjeta
+
+- assertVisible:
+    id: onb-tarjeta
+- tapOn:
+    id: tarjeta-nombre
+- inputText: 'Oro'
+- tapOn:
+    id: tarjeta-ultimos4
+- inputText: '8812'
+- tapOn:
+    id: tarjeta-corte
+- inputText: '28'
+- hideKeyboard
+- tapOn:
+    id: tarjeta-modo-limite-dias
+- tapOn:
+    id: tarjeta-limite-pago
+- inputText: '20'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: tarjeta-limite-credito
+- tapOn:
+    id: tarjeta-limite-credito
+- inputText: '30000'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: tarjeta-completa-si
+- tapOn:
+    id: tarjeta-completa-si
+- scrollUntilVisible:
+    element:
+      id: tarjeta-saldo
+- tapOn:
+    id: tarjeta-saldo
+- inputText: '8000'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: tarjeta-msi-si
+- tapOn:
+    id: tarjeta-msi-si
+- scrollUntilVisible:
+    element:
+      id: tarjeta-msi-mensualidad-0
+- tapOn:
+    id: tarjeta-msi-mensualidad-0
+- inputText: '500'
+- tapOn:
+    id: tarjeta-msi-restantes-0
+- inputText: '6'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: tarjeta-incluye-no_se
+- tapOn:
+    id: tarjeta-incluye-no_se
+- assertVisible:
+    id: tarjeta-no-se-ayuda
+- tapOn:
+    id: tarjeta-guardar
+
+- assertVisible:
+    id: onb-cuentas
+- assertVisible: 'Oro'
+- tapOn:
+    id: onb-cuentas-continuar
+
+# O5 · Pagos fijos: renta el día 1
+- assertVisible:
+    id: onb-pagos-fijos
+- tapOn:
+    id: onb-pago-renta
+- tapOn:
+    id: onb-pago-monto
+- inputText: '4500'
+- tapOn:
+    id: onb-pago-dia
+- inputText: '1'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: onb-pago-agregar
+- tapOn:
+    id: onb-pago-agregar
+- assertVisible:
+    id: onb-pagos-lista
+- tapOn:
+    id: onb-pagos-continuar
+
+# O6 · Captura automática: "Disponible pronto"
+- assertVisible:
+    id: onb-captura-pronto
+- assertVisible: 'Disponible pronto'
+- tapOn:
+    id: onb-captura-continuar
+
+# O7 · Colchón: acepta la sugerencia del 10 % y termina
+- assertVisible:
+    id: onb-colchon
+- assertVisible: 'Te sugerimos $1,300: el 10 % de lo que te pagan.'
+- tapOn:
+    id: onb-ver-mi-dia
+
+# Hoy
+- extendedWaitUntil:
+    notVisible:
+      id: onb-colchon
+    timeout: 10000
+- assertVisible: 'Hoy'
