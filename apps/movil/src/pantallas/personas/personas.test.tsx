@@ -78,7 +78,12 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     expect(screen.getAllByText('Elige 3 personas (llevas 0).')).toHaveLength(2);
     expect(listarMovimientos(p.ctx)).toEqual([]);
 
+    // Selección múltiple: TalkBack anuncia casillas, no opciones de radio (pendiente 35, pase de M13).
+    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityRole', 'checkbox');
     for (const id of [p.caro, p.juan, p.ana]) fireEvent.press(screen.getByTestId(`division-persona-${id}`));
+    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityState', {
+      checked: true,
+    });
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
 
     expect(

@@ -6,16 +6,22 @@ export interface OpcionChip<T extends string> {
   readonly etiqueta: string;
 }
 
-/** Opción tocable de una pregunta (02-UX §1.2: una pregunta a la vez, con opciones tocables). */
+/**
+ * Opción tocable de una pregunta (02-UX §1.2: una pregunta a la vez, con opciones tocables). Por omisión es de
+ * selección única (TalkBack la anuncia como opción de radio); con `multiple`, como casilla (pendiente 35).
+ */
 export function Chip({
   etiqueta,
   seleccionado,
   alPresionar,
+  multiple = false,
   testID,
 }: {
   etiqueta: string;
   seleccionado: boolean;
   alPresionar: () => void;
+  /** Se pueden elegir varias del grupo ("¿Con quién?"). */
+  multiple?: boolean;
   testID?: string;
 }) {
   const { c } = useTema();
@@ -23,9 +29,11 @@ export function Chip({
     <Pressable
       testID={testID}
       onPress={alPresionar}
-      accessibilityRole="radio"
+      accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityLabel={etiquetaHablada(etiqueta)}
-      accessibilityState={{ selected: seleccionado, checked: seleccionado }}
+      accessibilityState={
+        multiple ? { checked: seleccionado } : { selected: seleccionado, checked: seleccionado }
+      }
       style={({ pressed }) => ({
         minHeight: OBJETIVO_TACTIL_MIN,
         paddingHorizontal: espacio.l,
