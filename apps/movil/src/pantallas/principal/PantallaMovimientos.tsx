@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { ErrorDominio } from '@cartera/core';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -9,6 +10,7 @@ import {
   listarPorInterpretar,
   listarTarjetas,
   marcarExtraordinaria,
+  MENSAJE_MOVIMIENTO_COMPARTIDO,
   pasarAMeses,
   type FiltroMovimientos,
   type MovimientoVista,
@@ -168,8 +170,13 @@ export function PantallaMovimientos({
                   setAbierto(null);
                   refrescar();
                   mostrar({ mensaje: 'Anulé el movimiento.' });
-                } catch {
-                  mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
+                } catch (e) {
+                  mostrar({
+                    mensaje:
+                      e instanceof ErrorDominio && e.codigo === 'movimiento_compartido'
+                        ? MENSAJE_MOVIMIENTO_COMPARTIDO
+                        : MENSAJE_ERROR_GENERAL,
+                  });
                 }
               }}
               alExtraordinario={() => {

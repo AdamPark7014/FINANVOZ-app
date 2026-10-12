@@ -18,6 +18,8 @@ import {
   unirseConQr,
   type DependenciasCompartido,
 } from './compartido';
+import { aplicarCorreccion } from './correcciones';
+import { anularMovimiento } from './formulario';
 import { deudasConPersonas } from './hoy';
 import { agregarCuenta } from './onboarding';
 import { abrirPrueba, vector, type Prueba } from './__pruebas__/base';
@@ -168,6 +170,23 @@ describe('Validaciones de agregar, saldar y anular', () => {
     expect(() => anularEventoCompartido(t.B.ctx, t.B.deps, t.grupo, id)).toThrow(/solo puedes anular/);
     anularEventoCompartido(t.A.ctx, t.A.deps, t.grupo, id);
     expect(() => anularEventoCompartido(t.A.ctx, t.A.deps, t.grupo, id)).toThrow(ErrorDominio);
+  });
+
+  it('lo compartido no se anula ni se corrige desde Movimientos (el cambio no llegaría a tu pareja)', async () => {
+    const t = await pareja();
+    const id = gastoDeVector(t, { id: 'x', total: 1000, pago: 'a', proporcion_a_bp: 5000 });
+    const fila = t.A.ctx.db
+      .select()
+      .from(esquema.eventoCompartido)
+      .all()
+      .find((e) => e.id === id);
+    const tx = fila?.transaccionId ?? '';
+    expect(() => anularMovimiento(t.A.ctx, tx)).toThrow(
+      expect.objectContaining({ codigo: 'movimiento_compartido' }),
+    );
+    expect(() => aplicarCorreccion(t.A.ctx, tx, { descripcion: 'otra' })).toThrow(
+      expect.objectContaining({ codigo: 'movimiento_compartido' }),
+    );
   });
 
   it('una categoría desconocida o un total en cero se rechazan', async () => {

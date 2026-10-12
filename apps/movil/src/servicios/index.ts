@@ -105,6 +105,7 @@ export {
 export { deshacer } from './deshacer';
 export {
   anularMovimiento,
+  MENSAJE_MOVIMIENTO_COMPARTIDO,
   EntradaMovimiento,
   registrarMovimiento,
   type MovimientoRegistrado,
