@@ -12,6 +12,7 @@ describe('herramientas del modo explicar (06 §6)', () => {
       'tarjetas',
       'compromisos',
       'por_cobrar',
+      'suscripciones',
     ]);
     for (const h of HERRAMIENTAS_EXPLICAR) {
       expect(h.parametros).toMatchObject({ type: 'object', additionalProperties: false });
@@ -27,6 +28,7 @@ describe('herramientas del modo explicar (06 §6)', () => {
     ['saldos', { alias: 'bbva' }, { tipo: 'saldo', alias: 'bbva' }],
     ['saldos', {}, { tipo: 'saldo' }],
     ['por_cobrar', { persona: 'juan' }, { tipo: 'por_cobrar', contraparte: 'juan' }],
+    ['suscripciones', {}, { tipo: 'suscripciones' }],
     ['gasto', {}, { tipo: 'gasto_total' }],
     [
       'gasto',

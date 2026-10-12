@@ -85,6 +85,12 @@ export const HERRAMIENTAS_EXPLICAR = [
     descripcion: 'Quién le debe dinero y cuánto.',
     parametros: objeto({ persona: { type: 'string', maxLength: 60 } }),
   },
+  {
+    nombre: 'suscripciones',
+    descripcion:
+      'Suscripciones y cargos recurrentes detectados en sus gastos y cuánto paga por ellos al mes.',
+    parametros: objeto(),
+  },
 ] as const satisfies readonly DefinicionHerramienta[];
 
 /** Una consulta tipada (`06 §3`) ya validada. */
@@ -121,6 +127,7 @@ const ARGUMENTOS = {
   tarjetas: z.strictObject({}),
   compromisos: z.strictObject({ desde: Fecha.optional(), hasta: Fecha.optional() }),
   por_cobrar: z.strictObject({ persona: Alias.optional() }),
+  suscripciones: z.strictObject({}),
 } satisfies Record<NombreHerramienta, z.ZodType>;
 
 const esNombre = (n: string): n is NombreHerramienta => Object.hasOwn(ARGUMENTOS, n);
@@ -152,6 +159,8 @@ export function consultaDeHerramienta(nombre: string, argumentos: unknown): Cons
       return consulta({ tipo: 'saldo', alias: a.alias });
     case 'por_cobrar':
       return consulta({ tipo: 'por_cobrar', contraparte: a.persona });
+    case 'suscripciones':
+      return consulta({ tipo: 'suscripciones' });
     case 'gasto':
     case 'mayores_gastos':
     case 'compromisos': {
