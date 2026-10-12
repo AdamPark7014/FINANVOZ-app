@@ -22,7 +22,7 @@ Textos fijos:
 - **Datos financieros o patrimoniales requieren consentimiento expreso.** Implementación (RF-PRI-01): pantalla O2 con casilla **no** marcada + botón "Aceptar y continuar"; sin aceptar no se guarda ningún dato.
 - **Evidencia del consentimiento:** registro local `{version_aviso, hash_aviso, aceptado_en}` y copia mínima en Supabase `{usuario_anonimo, version_aviso, aceptado_en}` para poder demostrarlo.
 - **Aviso de privacidad** (integral en la web y en la app; simplificado en O2). Contenido mínimo:
-  - Identidad y domicilio del responsable. **Pendiente de Adam:** persona física con actividad empresarial o persona moral de ZYNORA TEK, domicilio y correo de contacto. Bloquea la publicación de M0 (CA-M0-07).
+  - Identidad y domicilio del responsable: NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V. (NEXARA), Ignacio Allende 512 local 2, Santiago Momoxpan, San Pedro Cholula, Puebla, C.P. 72775; contacto gerencia@nexara.com.mx.
   - Datos tratados: identificadores de la app, datos financieros y patrimoniales que el usuario captura, texto de notificaciones de apps bancarias elegidas (procesado en el teléfono), frases enviadas para interpretar; desde M9, correo de la cuenta de respaldo; desde M12, CFDI que el usuario importa.
   - Finalidades primarias (prestar el servicio) y secundarias (estadísticas de uso, mejora del intérprete) con mecanismo para negarse a las secundarias.
   - Remisiones a encargados: proveedor de LLM (procesamiento efímero de frases), Supabase (autenticación, cuotas, respaldos cifrados y, en v2, eventos compartidos cifrados), RevenueCat (suscripciones), Sentry (errores depurados), PostHog (analítica opcional). Señalar que algunos procesan en el extranjero.
