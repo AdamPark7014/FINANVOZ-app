@@ -178,6 +178,27 @@ export {
   type VistaHoy,
 } from './hoy';
 export { marcarAvisoVisto, type Aviso } from './avisos';
+export {
+  aportarTanda,
+  cobrarTanda,
+  crearTanda,
+  detalleTanda,
+  EntradaTanda,
+  FRECUENCIAS_TANDA,
+  listarTandas,
+  proponerTanda,
+  reglaDeFrecuencia,
+  todaviaNoCobroTanda,
+  type DetalleTanda,
+  type FrecuenciaTanda,
+  type MovimientoTanda,
+  type PropuestaTanda,
+  type RondaTandaVista,
+  type TandaCreada,
+  type TandaVista,
+  type TandaYaEmpezada,
+  type TarjetaTanda,
+} from './tandas';
 export { crearPersona, fijarApartarDeuda, listarPersonas, registrarPrestamo, type Persona } from './personas';
 export {
   listarCategorias,
