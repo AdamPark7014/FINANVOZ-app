@@ -5,6 +5,7 @@ import {
   agregarGastoCompartido,
   listarCategorias,
   listarCuentas,
+  mensajeError,
   type PropuestaGastoCompartido,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -71,8 +72,8 @@ export function FormularioGastoCompartido({
         ...(quien === 'yo' && cuentaId ? { cuentaId } : {}),
         ...(prellenado ? { fecha: prellenado.fecha } : {}),
       });
-    } catch {
-      return setError(ERROR_GUARDAR);
+    } catch (e) {
+      return setError(mensajeError(e, ERROR_GUARDAR));
     }
     setError(null);
     alGuardar();

@@ -4,12 +4,16 @@ import {
   anularEventoCompartido,
   AVISO_NO_COMPARTIDO,
   listarCuentas,
+  MENSAJE_SERVIDOR,
+  mensajeError,
+  mensajeErrorCompartido,
   mostrarCodigo,
   obtenerGrupoCompartido,
   registrarPagoCompartido,
   salirDelGrupo,
   sincronizarGrupo,
   unirseConQr,
+  type ErrorAccionCompartido,
   type ResultadoAccion,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -18,7 +22,7 @@ import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
 import { FormularioGastoCompartido } from './FormularioGastoCompartido';
-import { mensajeErrorCompartido, TEXTO_SALIR } from './textos';
+import { TEXTO_SALIR } from './textos';
 
 type Panel = 'ninguno' | 'agregar' | 'saldar' | 'codigo' | 'revincular' | 'salir';
 
@@ -59,15 +63,27 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
 
+  // Lo pendiente se comparte solo al volver la red; si no queda nada pendiente, no hay nada que reintentar.
+  const errorAlSincronizar = useCallback(
+    (e: ErrorAccionCompartido) =>
+      mensajeErrorCompartido(e, {
+        reintenta: obtenerGrupoCompartido(ctx, deps.almacen, grupoId).pendientes > 0,
+      }),
+    [ctx, deps, grupoId],
+  );
+
   const conResultado = useCallback(
-    async (accion: () => Promise<ResultadoAccion>) => {
+    async (
+      accion: () => Promise<ResultadoAccion>,
+      mensaje: (e: ErrorAccionCompartido) => string = mensajeErrorCompartido,
+    ) => {
       setOcupado(true);
       try {
         const r = await accion();
-        setError(r.ok ? null : mensajeErrorCompartido(r.error));
+        setError(r.ok ? null : mensaje(r.error));
         return r.ok;
-      } catch {
-        setError('No pude hablar con el servidor. Intenta de nuevo en un rato.');
+      } catch (e) {
+        setError(mensajeError(e, MENSAJE_SERVIDOR));
         return false;
       } finally {
         setOcupado(false);
@@ -78,8 +94,8 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   );
 
   const sincronizar = useCallback(
-    () => conResultado(() => sincronizarGrupo(ctx, deps, grupoId)),
-    [conResultado, ctx, deps, grupoId],
+    () => conResultado(() => sincronizarGrupo(ctx, deps, grupoId), errorAlSincronizar),
+    [conResultado, ctx, deps, grupoId, errorAlSincronizar],
   );
 
   // Al abrir: sincroniza en segundo plano (sin bloquear la pantalla) y vuelve a leer la vista.
@@ -88,14 +104,14 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
     sincronizarGrupo(ctx, deps, grupoId)
       .then((r) => {
         if (!vivo) return;
-        setError(r.ok ? null : mensajeErrorCompartido(r.error));
+        setError(r.ok ? null : errorAlSincronizar(r.error));
         refrescar();
       })
       .catch(() => {});
     return () => {
       vivo = false;
     };
-  }, [ctx, deps, grupoId, refrescar]);
+  }, [ctx, deps, grupoId, refrescar, errorAlSincronizar]);
 
   const trasCambio = () => {
     setPanel('ninguno');
@@ -111,8 +127,8 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         quien: g.saldo.debe,
         ...(cuentaPago ? { cuentaId: cuentaPago } : {}),
       });
-    } catch {
-      setError(ERROR_GUARDAR);
+    } catch (e) {
+      setError(mensajeError(e, ERROR_GUARDAR));
       return;
     }
     trasCambio();
@@ -121,8 +137,8 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   const anular = (eventoId: string) => {
     try {
       anularEventoCompartido(ctx, deps, grupoId, eventoId);
-    } catch {
-      setError(ERROR_GUARDAR);
+    } catch (e) {
+      setError(mensajeError(e, ERROR_GUARDAR));
       return;
     }
     trasCambio();
@@ -264,7 +280,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
                     setError(null);
                   } else setError(mensajeErrorCompartido(r.error));
                 })
-                .catch(() => setError('No pude hablar con el servidor. Intenta de nuevo en un rato.'))
+                .catch((e: unknown) => setError(mensajeError(e, MENSAJE_SERVIDOR)))
                 .finally(() => setOcupado(false));
             }}
           />

@@ -16,7 +16,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Cifra, espacio, formatearCentavos, Texto } from '../../ui';
 import { Chip, GrupoChips } from '../principal/Chip';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { textoFaltanPersonas } from './textos';
 
 export type RegistradoDivision = Extract<ResultadoTexto, { resultado: 'registrado_division' }>;
@@ -104,8 +104,8 @@ export function FormularioCuentaDividida({
       setNuevaPersona('');
       setElegidas((xs) => (xs.length < ajenas ? [...xs, id] : xs));
       refrescar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -132,8 +132,8 @@ export function FormularioCuentaDividida({
           alias ? { aprender: { alias } } : {},
         ),
       );
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

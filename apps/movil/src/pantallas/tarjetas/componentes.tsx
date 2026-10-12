@@ -13,7 +13,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajePagoTarjeta } from './textos';
 
@@ -121,8 +121,8 @@ export function FormularioPago({
       const r = pagarTarjeta(ctx, { tarjetaId, origenId: origen, monto });
       avisarRegistro(mensajePagoTarjeta(nombre, monto), r.deshacer);
       alTerminar(r);
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -188,8 +188,8 @@ export function PreguntaLiquidarMeses({
                   l.deshacer,
                 );
                 alTerminar?.();
-              } catch {
-                setError(MENSAJE_ERROR_GENERAL);
+              } catch (e) {
+                setError(mensajeError(e));
               }
             }}
           />
@@ -204,8 +204,8 @@ export function PreguntaLiquidarMeses({
               refrescar();
               mostrar({ mensaje: 'Va. El saldo a favor se queda en tu tarjeta.' });
               alTerminar?.();
-            } catch {
-              setError(MENSAJE_ERROR_GENERAL);
+            } catch (e) {
+              setError(mensajeError(e));
             }
           }}
         />

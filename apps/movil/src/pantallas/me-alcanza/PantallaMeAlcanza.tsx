@@ -19,7 +19,7 @@ import { useNotificaciones } from '../avisos/notificaciones';
 import { leerEntero } from '../onboarding/ingreso';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
 
@@ -321,8 +321,8 @@ function Resultado({
           },
         },
       });
-    } catch {
-      mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
+    } catch (e) {
+      mostrar({ mensaje: mensajeError(e) });
     }
   };
 

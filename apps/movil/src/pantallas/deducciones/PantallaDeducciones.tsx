@@ -20,7 +20,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { PuertaPlus } from '../plan/CandadoPlus';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import type { ArchivosFacturas } from './archivos';
 
 export const PEDIR_PERFIL =
@@ -217,7 +217,7 @@ function FormularioPerfil({
       setError(null);
       alGuardar();
     } catch (e) {
-      setError((e as { codigo?: string }).codigo === 'rfc_invalido' ? ERROR_RFC : MENSAJE_ERROR_GENERAL);
+      setError((e as { codigo?: string }).codigo === 'rfc_invalido' ? ERROR_RFC : mensajeError(e));
     }
   };
   return (
@@ -298,8 +298,8 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       accion();
       setError(null);
       refrescar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
   const niveles = v.estado === 'listo' ? v.niveles : [];

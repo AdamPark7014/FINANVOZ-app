@@ -660,6 +660,35 @@ export async function sincronizarGrupo(
   return { ok: true };
 }
 
+export interface ResultadoSincronizarTodos {
+  /** Grupos abiertos al empezar. */
+  readonly grupos: number;
+  /** Los que no se pudieron sincronizar, con su motivo (en el orden de `gruposAbiertos`). */
+  readonly errores: readonly ErrorAccionCompartido[];
+}
+
+/**
+ * Sincroniza uno tras otro los grupos abiertos (al abrir Gastos compartidos, al volver la red y en la tarea en
+ * segundo plano). Cada grupo decide como `sincronizarGrupo`: un evento ilegible no avanza el cursor y
+ * `no_miembro` marca "Volver a vincular". Un grupo que falla no detiene a los demás.
+ */
+export async function sincronizarGruposAbiertos(
+  ctx: Contexto,
+  deps: DependenciasCompartido,
+): Promise<ResultadoSincronizarTodos> {
+  const ids = gruposAbiertos(ctx);
+  const errores: ErrorAccionCompartido[] = [];
+  for (const id of ids) {
+    try {
+      const r = await sincronizarGrupo(ctx, deps, id);
+      if (!r.ok) errores.push(r.error);
+    } catch {
+      errores.push('servidor');
+    }
+  }
+  return { grupos: ids.length, errores };
+}
+
 /**
  * "Dejar de compartir" (E17, salir): publica lo pendiente, cierra el grupo para los dos en el servidor, descarga
  * todo lo publicado hasta el cierre y solo entonces borra la llave.

@@ -11,7 +11,7 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_TIPO } from './textos';
+import { mensajeError, NOMBRE_TIPO } from './textos';
 
 type Motivo = Extract<ResultadoTexto, { resultado: 'confirmar' }>['motivo'];
 type Registrado = Extract<ResultadoTexto, { resultado: 'registrado' }>;
@@ -82,8 +82,8 @@ export function ConfirmacionRegistro({
     );
     try {
       alGuardar(confirmarRegistro(ctx, entradas, origen, { aprender }));
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

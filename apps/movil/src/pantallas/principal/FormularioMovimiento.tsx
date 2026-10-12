@@ -16,7 +16,7 @@ import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from
 import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
 import { mensajeCuentaDividida } from '../personas/textos';
 import { GrupoChips, type OpcionChip } from './Chip';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_TIPO, type TipoMovimiento } from './textos';
+import { mensajeError, NOMBRE_TIPO, type TipoMovimiento } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
 /** El formulario agrega "Cuenta dividida" (`02 §17`), que tiene su propio formulario con contactos. */
@@ -181,8 +181,8 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
       setIntentado(false);
       setClave((k) => k + 1);
       alGuardar?.();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -194,8 +194,8 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
       setNuevaPersona('');
       setPersonaId(id);
       refrescar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

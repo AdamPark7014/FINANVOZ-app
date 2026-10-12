@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useCompartido } from '../../compartido/ProveedorCompartido';
 import {
   crearGrupoCompartido,
-  gruposAbiertos,
   listarGruposCompartidos,
-  sincronizarGrupo,
+  MENSAJE_SERVIDOR,
+  mensajeError,
+  mensajeErrorCompartido,
+  sincronizarGruposAbiertos,
   unirseConQr,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -12,8 +14,6 @@ import { Boton, CampoTexto, etiquetaHablada, Pantalla, Tarjeta, Texto } from '..
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
-import { mensajeErrorCompartido } from './textos';
-
 type Modo =
   | { tipo: 'lista' }
   | { tipo: 'crear' }
@@ -41,10 +41,9 @@ export function PantallaCompartidos({
 
   useEffect(() => {
     let vivo = true;
-    void (async () => {
-      for (const id of gruposAbiertos(ctx)) await sincronizarGrupo(ctx, deps, id).catch(() => null);
+    void sincronizarGruposAbiertos(ctx, deps).then(() => {
       if (vivo) refrescar();
-    })();
+    });
     return () => {
       vivo = false;
     };
@@ -70,6 +69,8 @@ export function PantallaCompartidos({
         setModo({ tipo: 'qr', grupoId: r.grupoId, qr: r.qr, nombre: nombre.trim() });
         refrescar();
       }
+    } catch (e) {
+      setError(mensajeError(e, MENSAJE_SERVIDOR));
     } finally {
       setOcupado(false);
     }
@@ -85,6 +86,9 @@ export function PantallaCompartidos({
         setError(mensajeErrorCompartido(r.error));
         setModo({ tipo: 'unirse', escaneando: false });
       }
+    } catch (e) {
+      setError(mensajeError(e, MENSAJE_SERVIDOR));
+      setModo({ tipo: 'unirse', escaneando: false });
     } finally {
       setOcupado(false);
     }

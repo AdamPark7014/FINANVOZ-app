@@ -23,7 +23,7 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { useFormularioTarjeta } from '../tarjetas/FormularioTarjetaNueva';
 import { mensajeCompraMsi } from '../tarjetas/textos';
@@ -60,8 +60,8 @@ function useResponder() {
       accion();
       refrescar();
       mostrar({ mensaje });
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
   return { responder, error };
@@ -524,8 +524,8 @@ function FueAMeses({ p, testID }: { p: Pregunta<'fue_a_meses'>; testID: string }
           try {
             const r = fueAMeses(ctx, p.capturaId, Number(v));
             avisarRegistro(mensajeCompraMsi(r), r.deshacer);
-          } catch {
-            setErrorMeses(MENSAJE_ERROR_GENERAL);
+          } catch (e) {
+            setErrorMeses(mensajeError(e));
           }
         }}
         prefijoTestID={`${testID}-meses`}

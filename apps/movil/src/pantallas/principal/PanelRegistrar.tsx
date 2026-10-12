@@ -5,6 +5,7 @@ import {
   contarEsperandoConexion,
   descartarPorInterpretar,
   explicar,
+  mensajeError,
   obtenerPlan,
   registrarTexto,
   registrarTextoLocal,
@@ -304,8 +305,8 @@ export function PanelRegistrar({
     let local: ResultadoTexto | null;
     try {
       local = registrarTextoLocal(ctx, limpio, origen);
-    } catch {
-      setMensaje(MENSAJE_NO_ENTENDI);
+    } catch (e) {
+      setMensaje(mensajeError(e, MENSAJE_NO_ENTENDI));
       return;
     }
     if (local) {
@@ -316,7 +317,7 @@ export function PanelRegistrar({
     setInterpretando(true);
     registrarTexto(ctx, limpio, origen, { nube })
       .then((r) => mostrar(r, origen))
-      .catch(() => setMensaje(MENSAJE_NO_ENTENDI))
+      .catch((e: unknown) => setMensaje(mensajeError(e, MENSAJE_NO_ENTENDI)))
       .finally(() => setInterpretando(false));
   };
 
@@ -331,7 +332,7 @@ export function PanelRegistrar({
         if (r) mostrar(r, 'texto');
         refrescar();
       })
-      .catch(() => vigente && setMensaje(MENSAJE_NO_ENTENDI))
+      .catch((e: unknown) => vigente && setMensaje(mensajeError(e, MENSAJE_NO_ENTENDI)))
       .finally(() => vigente && setInterpretando(false));
     return () => {
       vigente = false;

@@ -7,7 +7,7 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;
 
@@ -41,8 +41,8 @@ export function TarjetaArqueo({
       mostrar({
         mensaje: o === 'exacto' ? 'Listo: tu efectivo cuadra.' : 'Va. Te pregunto mañana.',
       });
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
   return (
