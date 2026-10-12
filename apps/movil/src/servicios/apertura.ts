@@ -3,6 +3,7 @@ import type { Contexto } from './contexto';
 import { procesarCortes, type CorteCerrado } from './cortes';
 import { procesarIntencionesMeses, type PasadoAMeses } from './msi';
 import { materializarOcurrencias } from './ocurrencias';
+import { procesarSuscripcionesDelDia } from './suscripciones';
 
 export interface ResultadoApertura {
   readonly ocurrenciasCreadas: number;
@@ -21,5 +22,7 @@ export function procesarApertura(ctx: Contexto): ResultadoApertura {
   const pasadosAMeses = procesarIntencionesMeses(ctx);
   // Texto crudo de capturas: solo 30 días en el teléfono (`04 §6`).
   purgarTextosCaptura(ctx);
+  // E14 corre una vez al día, no en cada apertura de Hoy (`03 §7`).
+  procesarSuscripcionesDelDia(ctx);
   return { ocurrenciasCreadas, cortesCerrados, pasadosAMeses };
 }

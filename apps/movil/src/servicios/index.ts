@@ -210,6 +210,16 @@ export {
   type TandaYaEmpezada,
   type TarjetaTanda,
 } from './tandas';
+export {
+  convertirEnCompromiso,
+  listarSuscripciones,
+  marcarNoEsSuscripcion,
+  procesarSuscripciones,
+  procesarSuscripcionesDelDia,
+  yaLaCancele,
+  type SuscripcionVista,
+  type VistaSuscripciones,
+} from './suscripciones';
 export { crearPersona, fijarApartarDeuda, listarPersonas, registrarPrestamo, type Persona } from './personas';
 export {
   MAX_PARTES,

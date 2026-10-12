@@ -183,7 +183,7 @@ describe('consultas con gastos registrados', () => {
     expect(responderConsulta(p.ctx, { tipo: 'saldo', alias: 'nu' }).texto).toBe('En tu Nu debes $2,000.');
   });
 
-  it('Hoy en negativo y consultas de M10–M12 no se responden con plantilla', () => {
+  it('Hoy en negativo y consultas de M11–M12 no se responden con plantilla', () => {
     const p = semilla();
     registrarMovimiento(p.ctx, {
       tipo: 'gasto',
@@ -194,7 +194,7 @@ describe('consultas con gastos registrados', () => {
     expect(responderConsulta(p.ctx, { tipo: 'hoy_puedes' }).texto).toMatch(
       /^Hoy: \$0\. Te faltan \$[\d,]+ para cubrir lo que viene antes de tu quincena\.$/,
     );
-    expect(() => responderConsulta(p.ctx, { tipo: 'suscripciones' })).toThrow(
+    expect(() => responderConsulta(p.ctx, { tipo: 'deducciones' })).toThrow(
       expect.objectContaining({ codigo: 'consulta_no_soportada' }),
     );
   });

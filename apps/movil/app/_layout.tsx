@@ -208,6 +208,7 @@ function AppProtegida({
           <Stack.Screen name="persona/[id]" />
           <Stack.Screen name="tandas/index" />
           <Stack.Screen name="tandas/[id]" />
+          <Stack.Screen name="suscripciones" />
           <Stack.Screen name="arqueo" />
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="plan" />

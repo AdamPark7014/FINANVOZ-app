@@ -23,6 +23,7 @@ import { contextoNube } from './nube';
 import { listarOcurrencias } from './ocurrencias';
 import { listarPersonas } from './personas';
 import { ingresoPrincipal } from './programados';
+import { resumenParaConsulta } from './suscripciones';
 import { listarTarjetas } from './vista-tarjetas';
 
 const { asiento, cuenta, transaccionVigente: tv } = esquema;
@@ -36,7 +37,7 @@ export type Consulta = Extract<Interpretacion, { intencion: 'consultar' }>['cons
  * qué periodo; los montos salen de aquí y de `packages/core`. Nada de esto va a logs (regla 9).
  */
 
-/** Consultas con plantilla en M7; `suscripciones` y `explicar` llegan en M10, las del negocio en M11–M12. */
+/** Consultas con plantilla desde M7; `suscripciones` (Q12) en M10; `explicar` en M10, las del negocio en M11–M12. */
 export const PLANTILLAS_CONSULTA = [
   'hoy_puedes',
   'gasto_total',
@@ -47,6 +48,7 @@ export const PLANTILLAS_CONSULTA = [
   'por_cobrar',
   'comparar_periodos',
   'mayores_gastos',
+  'suscripciones',
 ] as const;
 export type PlantillaConsulta = (typeof PLANTILLAS_CONSULTA)[number];
 
@@ -460,7 +462,7 @@ function porCobrar(ctx: Contexto, c: Consulta): RespuestaConsulta {
 
 /**
  * Responde una consulta con su plantilla. Lanza `consulta_no_soportada` para las que llegan con su hito
- * (`suscripciones` y `explicar` en M10; `puedo_retirar` e `impuestos` en M11; `deducciones` en M12).
+ * (`explicar` en M10; `puedo_retirar` e `impuestos` en M11; `deducciones` en M12).
  */
 export function responderConsulta(ctx: Contexto, c: Consulta): RespuestaConsulta {
   if (!tienePlantilla(c.tipo)) {
@@ -486,5 +488,8 @@ export function responderConsulta(ctx: Contexto, c: Consulta): RespuestaConsulta
       return compararPeriodos(ctx, c);
     case 'mayores_gastos':
       return mayoresGastos(ctx, c);
+    case 'suscripciones':
+      // Q12 (E14): la lista de Cuentas → Suscripciones (`02 §20`).
+      return { plantilla: 'suscripciones', ...resumenParaConsulta(ctx), filtro: {} };
   }
 }
