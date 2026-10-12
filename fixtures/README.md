@@ -14,6 +14,7 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `notificaciones/negocio.ejemplos.jsonl` | 2 notificaciones de la terminal de cobro (espacio negocio) | Motor de plantillas, escenario `e-negocio` |
 | `plantillas-firmadas/` | Copia congelada de plantillas firmada con Ed25519 (llave **pública** de prueba de RFC 8032) y `kat.json` | Verificación de plantillas remotas (M10) |
 | `respaldo/` | Archivo de respaldo de ejemplo, su versión alterada y `kat.json` (scrypt + AES-256-GCM), verificados con Python y Node | Respaldo cifrado (M9) |
+| `sincronizacion/kat.json` | XChaCha20-Poly1305 (draft-irtf-cfrg-xchacha-03 §A.3.1) y el blob de un evento compartido, generados por `sincronizacion/kat.py` (Python sin dependencias, independiente de `@noble/ciphers`; `python3 fixtures/sincronizacion/kat.py` verifica) | Gastos compartidos (M16, E17) |
 | `cfdi/*.xml` | 9 CFDI **sintéticos** (8 versión 4.0 y uno 3.3 que debe rechazarse) | E13: lectura de CFDI y deducciones (M12) |
 | `escenarios/*.json` | Estados de usuario para cargar en la app de desarrollo y verificar pantallas: `e4-01`, `e5-10`, `e-captura`, `e-negocio` | Cargador de semillas de `apps/movil` |
 

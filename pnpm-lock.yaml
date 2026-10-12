@@ -301,6 +301,24 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
+  packages/sincronizacion:
+    dependencies:
+      '@cartera/core':
+        specifier: workspace:*
+        version: link:../core
+      '@cartera/respaldo':
+        specifier: workspace:*
+        version: link:../respaldo
+      '@noble/ciphers':
+        specifier: 2.4.0
+        version: 2.4.0
+      fflate:
+        specifier: 0.8.3
+        version: 0.8.3
+      zod:
+        specifier: ^4.6.6
+        version: 4.6.6
+
   services/proxy:
     dependencies:
       zod:
@@ -1363,6 +1381,10 @@ packages:
     engines: {node: ^22.20 || ^24.12 || >=25}
     cpu: [x64]
     os: [linux]
+
+  '@noble/ciphers@2.4.0':
+    resolution: {integrity: sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw==}
+    engines: {node: '>= 20.19.0'}
 
   '@noble/curves@2.4.0':
     resolution: {integrity: sha512-P4/62zrgfH33CneE3Dn4WhJVA22YUU0eR51wKIan4NVRvwsA0YnPTwWGpNbpuacSujmSFLvyzpyuR30+fbq2Ew==}
@@ -7216,6 +7238,8 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@noble/ciphers@2.4.0': {}
 
   '@noble/curves@2.4.0':
     dependencies:

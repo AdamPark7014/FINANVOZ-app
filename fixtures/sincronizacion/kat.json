@@ -1,0 +1,29 @@
+{
+  "descripcion": "Vectores de E17 (docs/05-MOTORES.md §E17) generados por fixtures/sincronizacion/kat.py, implementación independiente en Python sin dependencias.",
+  "xchacha20poly1305": [
+    {
+      "id": "XC-01",
+      "fuente": "draft-irtf-cfrg-xchacha-03 §A.3.1",
+      "llave_hex": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+      "nonce_hex": "404142434445464748494a4b4c4d4e4f5051525354555657",
+      "aad_hex": "50515253c0c1c2c3c4c5c6c7",
+      "texto_utf8": "Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.",
+      "cifrado_y_etiqueta_hex": "bd6d179d3e83d43b9576579493c0e939572a1700252bfaccbed2902c21396cbb731c7f1b0b4aa6440bf3a82f4eda7e39ae64c6708c54c216cb96b72e1213b4522f8c9ba40db5d945b11b69b982c1bb9e3f3fac2bc369488f76b2383565d3fff921f9664c97637da9768812f615c68b13b52ec0875924c1c7987947deafd8780acf49"
+    }
+  ],
+  "eventos": [
+    {
+      "id": "E17-KAT-01",
+      "llave_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "nonce_hex": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7",
+      "fila": {
+        "grupo_id": "7f3c1a52-8d4e-4b6a-9c21-0e5f7a8b9c0d",
+        "id": "3b9f6c2e-1a7d-4e58-b4c3-9d2a6f1e8b70",
+        "autor": "a"
+      },
+      "contenido_utf8": "{\"tipo\":\"gasto_compartido_creado\",\"creado_en\":1792022400000,\"cuerpo\":{\"fecha\":\"2026-10-12\",\"total\":120000,\"pago\":\"a\",\"proporcion_a_bp\":5000,\"descripcion\":\"Súper\",\"categoria\":\"super\"}}",
+      "aad_utf8": "7f3c1a52-8d4e-4b6a-9c21-0e5f7a8b9c0d|3b9f6c2e-1a7d-4e58-b4c3-9d2a6f1e8b70|a",
+      "blob": "oKGio6SlpqeoqaqrrK2ur7CxsrO0tba3Ps5+dMcyhpZDCEz6BV/8o1TH703YcqO9ch/olYLCmlnzq4hMNCMdqMq0Czi5Dp4ZnBQWy+hc4JfKhzHGC0IH5hQCiV6WkEpb/A8iDVpnHk38VexlJzKWM23RCiXjMWJRZnCUVet963lMffG/ceNLiqM77T+sz+frvbQFeoBqHZ0BSjwYrI0pCgMJbbqwtqiICprq+wX7xbsPeZkm/r6jy7ucbYtG/ruETFDn6bpI+lQ5BdgWQVuYKHqdd9Pdy2FLoEWb18MtMPY="
+    }
+  ]
+}

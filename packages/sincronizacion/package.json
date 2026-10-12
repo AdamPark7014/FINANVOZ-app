@@ -1,0 +1,19 @@
+{
+  "name": "@cartera/sincronizacion",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./noble": "./src/noble.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@cartera/core": "workspace:*",
+    "@cartera/respaldo": "workspace:*",
+    "@noble/ciphers": "2.4.0",
+    "fflate": "0.8.3",
+    "zod": "^4.6.6"
+  }
+}
