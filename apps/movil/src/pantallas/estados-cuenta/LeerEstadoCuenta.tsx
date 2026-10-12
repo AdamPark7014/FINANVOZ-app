@@ -1,0 +1,478 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
+import type { ResultadoExtraccionPdf } from '../../captura/puente';
+import {
+  ajustarSaldoConEstado,
+  analizarEstadoCuentaPdf,
+  etiquetaDiaMes,
+  guardarEstadoCuenta,
+  type AnalisisEstadoCuenta,
+  type LecturaEstadoCuenta,
+  type PropuestaConciliacionEstado,
+  type RenglonDudoso,
+  type RenglonEstado,
+} from '../../servicios';
+import { useSesion } from '../../sesion/ProveedorSesion';
+import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
+import {
+  MENSAJE_DEMASIADO_GRANDE,
+  MENSAJE_ERROR_GUARDAR,
+  MENSAJE_ESCANEADO,
+  MENSAJE_INVALIDO,
+  MENSAJE_NO_DISPONIBLE,
+  NOMBRE_TIPO_RENGLON,
+  preguntaConciliacion,
+  resumenEstado,
+} from './textos';
+
+/** Lee el texto del PDF en el teléfono (el módulo nativo en la app; uno falso en las pruebas). */
+export type ExtraerPdf = (contrasena: string | null) => Promise<ResultadoExtraccionPdf>;
+
+type Estado =
+  | { tipo: 'leyendo' }
+  | { tipo: 'contrasena'; incorrecta: boolean }
+  | { tipo: 'error'; mensaje: string }
+  | { tipo: 'lectura'; paginas: readonly string[]; lectura: LecturaEstadoCuenta }
+  | {
+      tipo: 'guardado';
+      tarjetaId: string;
+      nombre: string;
+      agregados: number;
+      propuesta: PropuestaConciliacionEstado | null;
+    }
+  | { tipo: 'ajustado'; tarjetaId: string; nombre: string };
+
+/**
+ * Estado de cuenta en PDF (`02 §26`, `07 §8`): lee el texto en el teléfono (nada se sube), reconoce el banco y la
+ * tarjeta, muestra cuántos movimientos ya tenías, deja revisar los que no y, al guardar, propone la conciliación
+ * si el saldo al corte no coincide. Llega por la hoja de compartir o desde el detalle de la tarjeta.
+ */
+export function LeerEstadoCuenta({
+  extraer,
+  tarjetaId,
+  alVerTarjeta,
+  alSalir,
+}: {
+  extraer: ExtraerPdf;
+  /** Desde el detalle de una tarjeta: el estado es de esa tarjeta. */
+  tarjetaId?: string | undefined;
+  alVerTarjeta: (tarjetaId: string) => void;
+  alSalir: () => void;
+}) {
+  const { ctx, refrescar } = useSesion();
+  const [estado, setEstado] = useState<Estado>({ tipo: 'leyendo' });
+  const iniciado = useRef(false);
+
+  const leer = useCallback(
+    (contrasena: string | null) => {
+      setEstado({ tipo: 'leyendo' });
+      extraer(contrasena)
+        .then((r) => {
+          switch (r.tipo) {
+            case 'texto':
+              setEstado({
+                tipo: 'lectura',
+                paginas: r.paginas,
+                lectura: analizarEstadoCuentaPdf(ctx, r.paginas, { tarjetaId }),
+              });
+              return;
+            case 'pide_contrasena':
+              setEstado({ tipo: 'contrasena', incorrecta: false });
+              return;
+            case 'contrasena_incorrecta':
+              setEstado({ tipo: 'contrasena', incorrecta: true });
+              return;
+            case 'demasiado_grande':
+              setEstado({ tipo: 'error', mensaje: MENSAJE_DEMASIADO_GRANDE });
+              return;
+            case 'no_disponible':
+              setEstado({ tipo: 'error', mensaje: MENSAJE_NO_DISPONIBLE });
+              return;
+            default:
+              setEstado({ tipo: 'error', mensaje: MENSAJE_INVALIDO });
+          }
+        })
+        // Sin detalle: el error podría traer texto del PDF (regla 9).
+        .catch(() => setEstado({ tipo: 'error', mensaje: MENSAJE_INVALIDO }));
+    },
+    [ctx, extraer, tarjetaId],
+  );
+
+  useEffect(() => {
+    if (iniciado.current) return;
+    iniciado.current = true;
+    leer(null);
+  }, [leer]);
+
+  const elegirTarjeta = (paginas: readonly string[], id: string) =>
+    setEstado({
+      tipo: 'lectura',
+      paginas,
+      lectura: analizarEstadoCuentaPdf(ctx, paginas, { tarjetaId: id }),
+    });
+
+  return (
+    <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
+      <Texto variante="titulo">Estado de cuenta</Texto>
+      {estado.tipo === 'leyendo' ? (
+        <Texto variante="cuerpo" tono="secundario" testID="estado-leyendo">
+          Leyendo tu estado de cuenta…
+        </Texto>
+      ) : null}
+      {estado.tipo === 'contrasena' ? (
+        <PedirContrasena incorrecta={estado.incorrecta} alAbrir={leer} alSalir={alSalir} />
+      ) : null}
+      {estado.tipo === 'error' ? (
+        <Aviso texto={estado.mensaje} alSalir={alSalir} testID="estado-error" />
+      ) : null}
+      {estado.tipo === 'lectura' ? (
+        <Lectura
+          lectura={estado.lectura}
+          alElegirTarjeta={(id) => elegirTarjeta(estado.paginas, id)}
+          alGuardar={(a, omitir, dudosos) => {
+            const r = guardarEstadoCuenta(ctx, estado.paginas, {
+              tarjetaId: a.tarjeta.cuentaId,
+              omitir,
+              dudosos,
+            });
+            refrescar();
+            setEstado({
+              tipo: 'guardado',
+              tarjetaId: a.tarjeta.cuentaId,
+              nombre: a.tarjeta.nombre,
+              agregados: r.agregados,
+              propuesta: r.conciliacion,
+            });
+          }}
+          alSalir={alSalir}
+        />
+      ) : null}
+      {estado.tipo === 'guardado' ? (
+        <Guardado
+          agregados={estado.agregados}
+          nombre={estado.nombre}
+          propuesta={estado.propuesta}
+          alAjustar={(p) => {
+            ajustarSaldoConEstado(ctx, p);
+            refrescar();
+            setEstado({ tipo: 'ajustado', tarjetaId: estado.tarjetaId, nombre: estado.nombre });
+          }}
+          alNoAjustar={() => setEstado({ ...estado, propuesta: null })}
+          alVerTarjeta={() => alVerTarjeta(estado.tarjetaId)}
+        />
+      ) : null}
+      {estado.tipo === 'ajustado' ? (
+        <>
+          <Texto variante="cuerpo" testID="estado-ajustado" accessibilityLiveRegion="polite">
+            {`Listo: tu ${estado.nombre} quedó como dice tu banco.`}
+          </Texto>
+          <Boton
+            etiqueta="Ver la tarjeta"
+            alPresionar={() => alVerTarjeta(estado.tarjetaId)}
+            testID="estado-ver-tarjeta"
+          />
+        </>
+      ) : null}
+    </Pantalla>
+  );
+}
+
+function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void; testID: string }) {
+  return (
+    <>
+      <Texto variante="cuerpo" testID={testID} accessibilityLiveRegion="polite">
+        {texto}
+      </Texto>
+      <Boton etiqueta="Entendido" variante="secundario" alPresionar={alSalir} testID="estado-salir" />
+    </>
+  );
+}
+
+function PedirContrasena({
+  incorrecta,
+  alAbrir,
+  alSalir,
+}: {
+  incorrecta: boolean;
+  alAbrir: (contrasena: string) => void;
+  alSalir: () => void;
+}) {
+  const [contrasena, setContrasena] = useState('');
+  const abrir = () => {
+    if (contrasena !== '') alAbrir(contrasena);
+  };
+  return (
+    <>
+      <Texto variante="cuerpo">Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.</Texto>
+      <CampoTexto
+        etiqueta="Contraseña del PDF"
+        valor={contrasena}
+        alCambiar={setContrasena}
+        alEnviar={abrir}
+        error={incorrecta ? 'Esa contraseña no abre el PDF. Intenta de nuevo.' : null}
+        nativo={{ secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false }}
+        testID="estado-contrasena"
+      />
+      <Boton etiqueta="Abrir" alPresionar={abrir} deshabilitado={contrasena === ''} testID="estado-abrir" />
+      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+    </>
+  );
+}
+
+function Lectura({
+  lectura,
+  alElegirTarjeta,
+  alGuardar,
+  alSalir,
+}: {
+  lectura: LecturaEstadoCuenta;
+  alElegirTarjeta: (tarjetaId: string) => void;
+  alGuardar: (a: AnalisisEstadoCuenta, omitir: number[], dudosos: Record<number, 'mismo' | 'otro'>) => void;
+  alSalir: () => void;
+}) {
+  switch (lectura.tipo) {
+    case 'escaneado':
+      return (
+        <>
+          <Texto variante="subtitulo" testID="estado-escaneado" accessibilityLiveRegion="polite">
+            {MENSAJE_ESCANEADO}
+          </Texto>
+          <Aviso
+            texto="Descarga el estado de cuenta desde la app o la página de tu banco: ese sí trae texto."
+            alSalir={alSalir}
+            testID="estado-escaneado-ayuda"
+          />
+        </>
+      );
+    case 'no_reconocido':
+      return (
+        <Aviso
+          texto={
+            lectura.bancos.length > 0
+              ? `Todavía no sé leer estados de cuenta de ese banco. Por ahora leo: ${lectura.bancos.join(', ')}.`
+              : 'Todavía no sé leer estados de cuenta de ese banco.'
+          }
+          alSalir={alSalir}
+          testID="estado-no-reconocido"
+        />
+      );
+    case 'incompleto':
+      return (
+        <Aviso
+          texto={`Es un estado de cuenta de ${lectura.banco}, pero no pude leer todos sus datos. No agregué nada.`}
+          alSalir={alSalir}
+          testID="estado-incompleto"
+        />
+      );
+    case 'sin_tarjetas':
+      return (
+        <Aviso
+          texto={`Es un estado de cuenta de ${lectura.banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`}
+          alSalir={alSalir}
+          testID="estado-sin-tarjetas"
+        />
+      );
+    case 'anterior_al_alta':
+      return (
+        <Aviso
+          texto={`Este estado de cuenta (corte ${etiquetaDiaMes(lectura.corte)}) es de antes de que agregaras la ${lectura.tarjeta.nombre}: ya está en el saldo con que la diste de alta.`}
+          alSalir={alSalir}
+          testID="estado-anterior"
+        />
+      );
+    case 'elegir_tarjeta':
+      return (
+        <>
+          <Texto variante="cuerpo" testID="estado-elegir">
+            {`¿De qué tarjeta es este estado de cuenta de ${lectura.banco}${
+              lectura.ultimos4 ? ` terminación ${lectura.ultimos4}` : ''
+            } (corte ${etiquetaDiaMes(lectura.corte)})?`}
+          </Texto>
+          {lectura.tarjetas.map((t) => (
+            <Boton
+              key={t.cuentaId}
+              etiqueta={t.ultimos4 ? `${t.nombre} ••${t.ultimos4}` : t.nombre}
+              variante="secundario"
+              alPresionar={() => alElegirTarjeta(t.cuentaId)}
+              testID={`estado-tarjeta-${t.cuentaId}`}
+            />
+          ))}
+          <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+        </>
+      );
+    case 'listo':
+      return <Revisar a={lectura.analisis} alGuardar={alGuardar} alSalir={alSalir} />;
+  }
+}
+
+function etiquetaRenglon(r: RenglonEstado): string {
+  return `${NOMBRE_TIPO_RENGLON[r.tipo]}: ${r.descripcion} · ${etiquetaDiaMes(r.fecha)} · ${formatearCentavos(r.monto)}`;
+}
+
+function Revisar({
+  a,
+  alGuardar,
+  alSalir,
+}: {
+  a: AnalisisEstadoCuenta;
+  alGuardar: (a: AnalisisEstadoCuenta, omitir: number[], dudosos: Record<number, 'mismo' | 'otro'>) => void;
+  alSalir: () => void;
+}) {
+  const [quitados, setQuitados] = useState<ReadonlySet<number>>(new Set());
+  const [respuestas, setRespuestas] = useState<Readonly<Record<number, 'mismo' | 'otro'>>>({});
+  const [error, setError] = useState<string | null>(null);
+  const faltan = a.dudosos.some((d) => respuestas[d.indice] === undefined);
+  const guardar = () => {
+    try {
+      alGuardar(a, [...quitados], { ...respuestas });
+    } catch {
+      setError(MENSAJE_ERROR_GUARDAR);
+    }
+  };
+  return (
+    <>
+      <Tarjeta testID="estado-resumen">
+        <Texto variante="cuerpo" testID="estado-resumen-texto" accessibilityLiveRegion="polite">
+          {resumenEstado(a)}
+        </Texto>
+        {a.cuadra === false ? (
+          <Texto variante="secundario" tono="faltante" testID="estado-no-cuadra">
+            Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.
+          </Texto>
+        ) : null}
+        {a.renglonesSinLeer > 0 ? (
+          <Texto variante="secundario" tono="faltante" testID="estado-sin-leer">
+            {a.renglonesSinLeer === 1
+              ? '1 renglón no lo pude leer; revísalo en tu PDF.'
+              : `${a.renglonesSinLeer} renglones no los pude leer; revísalos en tu PDF.`}
+          </Texto>
+        ) : null}
+        {a.anteriores > 0 ? (
+          <Texto variante="secundario" tono="secundario">
+            {a.anteriores === 1
+              ? '1 es de antes de que agregaras la tarjeta; ya está en su saldo.'
+              : `${a.anteriores} son de antes de que agregaras la tarjeta; ya están en su saldo.`}
+          </Texto>
+        ) : null}
+      </Tarjeta>
+
+      {a.nuevos.length > 0 ? (
+        <View style={{ gap: espacio.xs }} testID="estado-nuevos">
+          <Texto variante="subtitulo">{a.nuevos.length === 1 ? 'El que no tenía' : 'Los que no tenía'}</Texto>
+          {a.nuevos.map((n) => (
+            <Casilla
+              key={n.indice}
+              etiqueta={etiquetaRenglon(n)}
+              valor={!quitados.has(n.indice)}
+              alCambiar={(v) =>
+                setQuitados((q) => {
+                  const s = new Set(q);
+                  if (v) s.delete(n.indice);
+                  else s.add(n.indice);
+                  return s;
+                })
+              }
+              testID={`estado-nuevo-${n.indice}`}
+            />
+          ))}
+        </View>
+      ) : null}
+
+      {a.dudosos.length > 0 ? (
+        <View style={{ gap: espacio.m }} testID="estado-dudosos">
+          <Texto variante="subtitulo">¿Ya los tenías?</Texto>
+          {a.dudosos.map((d) => (
+            <Dudoso
+              key={d.indice}
+              d={d}
+              valor={respuestas[d.indice] ?? null}
+              alCambiar={(v) => setRespuestas((r) => ({ ...r, [d.indice]: v }))}
+            />
+          ))}
+        </View>
+      ) : null}
+
+      <MensajeError texto={error} />
+      <Boton etiqueta="Guardar" alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
+      {faltan ? (
+        <Texto variante="secundario" tono="secundario">
+          Contesta si ya tenías cada movimiento para poder guardar.
+        </Texto>
+      ) : null}
+      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+    </>
+  );
+}
+
+function Dudoso({
+  d,
+  valor,
+  alCambiar,
+}: {
+  d: RenglonDudoso;
+  valor: 'mismo' | 'otro' | null;
+  alCambiar: (v: 'mismo' | 'otro') => void;
+}) {
+  const ya = `${d.existente.descripcion ?? 'un movimiento'} del ${etiquetaDiaMes(d.existente.fecha)} por ${formatearCentavos(d.existente.monto)}`;
+  return (
+    <Tarjeta testID={`estado-dudoso-${d.indice}`}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+        <Texto variante="cuerpo" style={{ flex: 1 }}>
+          {`${d.descripcion} · ${etiquetaDiaMes(d.fecha)}`}
+        </Texto>
+        <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
+      </View>
+      <Texto variante="secundario" tono="secundario">{`¿Es el mismo que ya tenías: ${ya}?`}</Texto>
+      <Chips
+        etiqueta={`¿${d.descripcion} ya lo tenías?`}
+        opciones={[
+          { valor: 'mismo', etiqueta: 'Es el mismo' },
+          { valor: 'otro', etiqueta: 'Es otro' },
+        ]}
+        valor={valor}
+        alCambiar={alCambiar}
+        testID={`estado-dudoso-${d.indice}`}
+      />
+    </Tarjeta>
+  );
+}
+
+function Guardado({
+  agregados,
+  nombre,
+  propuesta,
+  alAjustar,
+  alNoAjustar,
+  alVerTarjeta,
+}: {
+  agregados: number;
+  nombre: string;
+  propuesta: PropuestaConciliacionEstado | null;
+  alAjustar: (p: PropuestaConciliacionEstado) => void;
+  alNoAjustar: () => void;
+  alVerTarjeta: () => void;
+}) {
+  return (
+    <>
+      <Texto variante="cuerpo" testID="estado-guardado" accessibilityLiveRegion="polite">
+        {agregados === 0
+          ? `No agregué nada: tu ${nombre} ya tenía todo.`
+          : agregados === 1
+            ? `Agregué 1 movimiento a tu ${nombre}.`
+            : `Agregué ${agregados} movimientos a tu ${nombre}.`}
+      </Texto>
+      {propuesta ? (
+        <Tarjeta testID="estado-conciliacion">
+          <Texto variante="cuerpo" testID="estado-conciliacion-texto">
+            {preguntaConciliacion(propuesta)}
+          </Texto>
+          <Boton etiqueta="Ajustar" alPresionar={() => alAjustar(propuesta)} testID="estado-ajustar" />
+          <Boton etiqueta="No" variante="secundario" alPresionar={alNoAjustar} testID="estado-no-ajustar" />
+        </Tarjeta>
+      ) : (
+        <Boton etiqueta="Ver la tarjeta" alPresionar={alVerTarjeta} testID="estado-ver-tarjeta" />
+      )}
+    </>
+  );
+}

@@ -26,7 +26,16 @@ type Panel = 'pagar' | 'editar' | 'corregir' | null;
  * uso del límite con el 30 % marcado, saldo a favor (nunca como dinero para gastar), meses sin intereses con su
  * compromiso de 12 meses, compras desde el corte, estados de cuenta, pagos planeados y configuración.
  */
-export function PantallaTarjeta({ tarjetaId, alVolver }: { tarjetaId: string; alVolver: () => void }) {
+export function PantallaTarjeta({
+  tarjetaId,
+  alVolver,
+  alLeerEstadoPdf,
+}: {
+  tarjetaId: string;
+  alVolver: () => void;
+  /** "Leer el PDF de tu banco" (`02 §26`); sin él no se ofrece. */
+  alLeerEstadoPdf?: (() => void) | undefined;
+}) {
   // Si la tarjeta deja de existir (p. ej. tras borrar todo), se vuelve.
   const existe = useVista((ctx) => listarTarjetas(ctx).some((t) => t.id === tarjetaId));
   if (!existe) {
@@ -37,10 +46,18 @@ export function PantallaTarjeta({ tarjetaId, alVolver }: { tarjetaId: string; al
       </Pantalla>
     );
   }
-  return <Detalle tarjetaId={tarjetaId} alVolver={alVolver} />;
+  return <Detalle tarjetaId={tarjetaId} alVolver={alVolver} alLeerEstadoPdf={alLeerEstadoPdf} />;
 }
 
-function Detalle({ tarjetaId, alVolver }: { tarjetaId: string; alVolver: () => void }) {
+function Detalle({
+  tarjetaId,
+  alVolver,
+  alLeerEstadoPdf,
+}: {
+  tarjetaId: string;
+  alVolver: () => void;
+  alLeerEstadoPdf: (() => void) | undefined;
+}) {
   const d = useVista((ctx) => detalleTarjeta(ctx, tarjetaId));
   const plus = useVista(funcionesPlan);
   const [panel, setPanel] = useState<Panel>(null);
@@ -141,6 +158,14 @@ function Detalle({ tarjetaId, alVolver }: { tarjetaId: string; alVolver: () => v
         {d.estadosCuenta.map((e) => (
           <EstadoCuenta key={e.corte} e={e} />
         ))}
+        {alLeerEstadoPdf ? (
+          <Boton
+            etiqueta="Leer el PDF de tu banco"
+            variante="secundario"
+            alPresionar={alLeerEstadoPdf}
+            testID="tarjeta-leer-pdf"
+          />
+        ) : null}
       </Seccion>
 
       <Seccion titulo="Configuración" testID="tarjeta-configuracion">

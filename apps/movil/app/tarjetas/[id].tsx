@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Platform } from 'react-native';
 import { ProveedorAvisos } from '../../src/pantallas/principal';
 import { PantallaTarjeta } from '../../src/pantallas/tarjetas';
 
@@ -9,7 +10,17 @@ export default function DetalleTarjetaRuta() {
   const volver = () => (router.canGoBack() ? router.back() : router.replace('/cuentas'));
   return (
     <ProveedorAvisos>
-      <PantallaTarjeta key={id} tarjetaId={String(id)} alVolver={volver} />
+      <PantallaTarjeta
+        key={id}
+        tarjetaId={String(id)}
+        alVolver={volver}
+        alLeerEstadoPdf={
+          // Solo Android lee PDF por ahora (M15); en iPhone sería PDFKit (`07 §8`).
+          Platform.OS === 'android'
+            ? () => router.push({ pathname: '/estado-cuenta', params: { tarjeta: String(id) } })
+            : undefined
+        }
+      />
     </ProveedorAvisos>
   );
 }
