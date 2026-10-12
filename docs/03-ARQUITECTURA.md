@@ -170,7 +170,7 @@ Acceso: las funciones de `/compartido/*` (`§6`) verifican la pertenencia y el e
 | Endpoint | Entrada | Salida |
 |---|---|---|
 | `POST /nlu/interpretar` | `{texto, contexto_min, version_esquema}` (`06 §4`) | `{interpretacion, proveedor, modelo, tokens_entrada, tokens_salida, latencia_ms}` |
-| `POST /llm/turno` (M10) | `{mensajes, herramientas}` | mensaje del asistente o llamada a herramienta; sin estado |
+| `POST /llm/turno` (M10) | `{mensajes, herramientas}` (una pregunta, después solo llamadas y sus resultados; ≤ 3 resultados) | `{salida: {tipo: 'respuesta', texto} \| {tipo: 'herramientas', llamadas}, proveedor, modelo, tokens_entrada, tokens_salida, latencia_ms}`; sin estado; solo Plus (403 `solo_plus`); cada turno cuenta en el cupo de interpretaciones |
 | `POST /webhooks/revenuecat` | evento firmado | actualiza `derechos` |
 | `POST /respaldo/url` (M9) | `{operacion: 'subir', version}` o `{operacion: 'bajar', nombre}` con sesión de correo | `{nombre, url}`: al subir, el servidor pone el nombre (`<AAAAMMDDTHHMMSSZ>-v<version>.cartera`) y la URL firmada de subida la fija Supabase (2 h, sin sobrescribir); al bajar, URL firmada de 5 min |
 | `GET /respaldo/lista` (M9) | sesión de correo | `[{nombre, tamano, creado_en, version}]`; deja solo los 4 más recientes |
