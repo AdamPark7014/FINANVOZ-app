@@ -434,3 +434,32 @@ export {
   type VistaEscenarioMeAlcanza,
   type VistaMeAlcanza,
 } from './me-alcanza';
+export {
+  contarCfdi,
+  importarCfdi,
+  resumenImportacion,
+  TEXTO_RECHAZO,
+  type ArchivoCfdi,
+  type MotivoRechazoCfdi,
+  type RechazoCfdi,
+  type ResultadoImportacion,
+} from './cfdi';
+export {
+  asignarAlumnoNivel,
+  AVISO_DEDUCIBLE_EFECTIVO,
+  confirmarPagoFactura,
+  FORMAS_PAGO_CONFIRMADO,
+  guardarPerfilFiscal,
+  LEYENDA_ESTIMACION,
+  marcarLentes,
+  MENSAJE_SIN_PARAMETROS,
+  normalizarRfc,
+  obtenerDeducciones,
+  obtenerPerfilFiscal,
+  TEXTO_MOTIVO_EXCLUSION,
+  type FacturaVista,
+  type FormaPagoConfirmado,
+  type PerfilFiscal,
+  type TipoDeduccionVista,
+  type VistaDeducciones,
+} from './deducciones';
