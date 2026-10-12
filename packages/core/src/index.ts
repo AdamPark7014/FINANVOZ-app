@@ -12,3 +12,5 @@ export {
   type ResultadoCapacidad,
   type ResultadoCompra,
 } from './capacidad';
+export * from './fecha';
+export { porcentajeMostrado, redondearPorcentaje } from './porcentaje';
