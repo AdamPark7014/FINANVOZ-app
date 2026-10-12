@@ -1,0 +1,9 @@
+docs/
+fixtures/
+pnpm-lock.yaml
+*.md
+.claude/
+assets/
+dist/
+coverage/
+scripts/
