@@ -248,3 +248,34 @@ export {
   type RespuestaSobrante,
   type VistaArqueo,
 } from './arqueo';
+export {
+  ejecutarPorBloques,
+  simularPorBloques,
+  TAMANO_BLOQUE,
+  type OpcionesBloques,
+  type SenalCancelacion,
+} from './bloques';
+export {
+  ETIQUETA_ESTIMACION_INICIAL,
+  leerProbabilidadHoy,
+  MENSAJE_DATOS_INSUFICIENTES,
+  obtenerCalibracion,
+  obtenerProbabilidadHoy,
+  type VistaCalibracion,
+  type VistaProbabilidadHoy,
+} from './probabilidad';
+export {
+  ConsultaMeAlcanza,
+  construirVistaMeAlcanza,
+  loCompre,
+  meAlcanza,
+  TEXTO_SIN_TARJETA_PARA_MSI,
+  type ComoLoCalcule,
+  type CompraElegida,
+  type DatosVistaMeAlcanza,
+  type NivelRecomendacion,
+  type OpcionesLoCompre,
+  type ResultadoLoCompre,
+  type VistaEscenarioMeAlcanza,
+  type VistaMeAlcanza,
+} from './me-alcanza';
