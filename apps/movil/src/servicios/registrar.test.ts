@@ -31,10 +31,10 @@ function conCuentas() {
 }
 
 describe('registrar por voz o texto', () => {
-  it('CA-M2-02 · "coca 25 en efectivo" se registra sin red, el efectivo baja $25 y Deshacer lo regresa', () => {
+  it('CA-M2-02 · "coca 25 en efectivo" se registra sin red, el efectivo baja $25 y Deshacer lo regresa', async () => {
     const p = conCuentas();
     const antes = p.ctx.libro.saldo(p.efectivo);
-    const r = registrarTexto(p.ctx, 'coca 25 en efectivo', 'voz');
+    const r = await registrarTexto(p.ctx, 'coca 25 en efectivo', 'voz');
     if (r.resultado !== 'registrado') throw new Error(`se esperaba registro, llegó ${r.resultado}`);
     expect(p.ctx.libro.saldo(p.efectivo)).toBe(antes - 2_500);
     expect(r.movimientos).toEqual([
@@ -57,26 +57,26 @@ describe('registrar por voz o texto', () => {
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
-  it('sin método de pago queda "por asignar" (caso 13)', () => {
+  it('sin método de pago queda "por asignar" (caso 13)', async () => {
     const p = conCuentas();
-    const r = registrarTexto(p.ctx, 'coca 25');
+    const r = await registrarTexto(p.ctx, 'coca 25');
     if (r.resultado !== 'registrado') throw new Error(r.resultado);
     expect(r.movimientos[0]?.porAsignar).toBe(true);
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.porAsignar)).toBe(-2_500);
     expect(listarMovimientos(p.ctx)[0]?.movimientos[0]?.insignias).toEqual(['por_asignar']);
   });
 
-  it('con alias de tarjeta registra contra la tarjeta', () => {
+  it('con alias de tarjeta registra contra la tarjeta', async () => {
     const p = conCuentas();
-    const r = registrarTexto(p.ctx, 'tacos 80 con la morada');
+    const r = await registrarTexto(p.ctx, 'tacos 80 con la morada');
     if (r.resultado !== 'registrado') throw new Error(r.resultado);
     expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000 - 8_000);
   });
 
-  it('lo que el nivel 0 no cubre queda "por interpretar" sin tocar el libro', () => {
+  it('lo que el nivel 0 no cubre queda "por interpretar" sin tocar el libro', async () => {
     const p = conCuentas();
-    const r = registrarTexto(p.ctx, 'ayer le pasé 200 a mi jefa', 'voz');
-    expect(r.resultado).toBe('por_interpretar');
+    const r = await registrarTexto(p.ctx, 'ayer le pasé 200 a mi jefa', 'voz');
+    expect(r).toMatchObject({ resultado: 'por_interpretar', motivo: 'sin_nube' });
     expect(listarMovimientos(p.ctx)).toEqual([]);
     expect(contarPorInterpretar(p.ctx)).toBe(1);
     const [frase] = listarPorInterpretar(p.ctx);
@@ -85,9 +85,9 @@ describe('registrar por voz o texto', () => {
     expect(contarPorInterpretar(p.ctx)).toBe(0);
   });
 
-  it('más de $5,000 pide confirmación; "Guardar" registra', () => {
+  it('más de $5,000 pide confirmación; "Guardar" registra', async () => {
     const p = conCuentas();
-    const r = registrarTexto(p.ctx, 'compré una tele de 6000 en efectivo');
+    const r = await registrarTexto(p.ctx, 'compré una tele de 6000 en efectivo');
     if (r.resultado !== 'confirmar') throw new Error(r.resultado);
     expect(r.motivo).toBe('monto_alto');
     expect(listarMovimientos(p.ctx)).toEqual([]);
@@ -98,19 +98,19 @@ describe('registrar por voz o texto', () => {
     expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 600_000);
   });
 
-  it('retiro con dos cuentas de débito pregunta cuál (chips con candidatas)', () => {
+  it('retiro con dos cuentas de débito pregunta cuál (chips con candidatas)', async () => {
     const p = conCuentas();
     agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'Banorte', saldo: 0 });
-    const r = registrarTexto(p.ctx, 'saqué 500 del cajero');
+    const r = await registrarTexto(p.ctx, 'saqué 500 del cajero');
     if (r.resultado !== 'confirmar') throw new Error(r.resultado);
     expect(r.motivo).toBe('cuenta');
     expect(r.propuestas[0]?.faltan[0]).toMatchObject({ campo: 'origenId', motivo: 'ambigua' });
     expect(r.propuestas[0]?.faltan[0]?.candidatas.map((c) => c.nombre).sort()).toEqual(['BBVA', 'Banorte']);
   });
 
-  it('"cuánto puedo gastar" es una consulta, no un registro', () => {
+  it('"cuánto puedo gastar" es una consulta, no un registro', async () => {
     const p = conCuentas();
-    expect(registrarTexto(p.ctx, 'cuánto puedo gastar hoy')).toEqual({
+    expect(await registrarTexto(p.ctx, 'cuánto puedo gastar hoy')).toEqual({
       resultado: 'consulta',
       consulta: 'hoy_puedes',
     });

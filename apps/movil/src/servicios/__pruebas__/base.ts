@@ -31,6 +31,17 @@ export function escenario(id: string): unknown {
   return JSON.parse(readFileSync(`${FIXTURES}/escenarios/${id}.json`, 'utf8'));
 }
 
+/** Un caso de `fixtures/nlu/golden.jsonl` por `id` (texto y `esperado`). */
+export function golden(id: string): { texto: string; esperado: Record<string, unknown> } {
+  const caso = readFileSync(`${FIXTURES}/nlu/golden.jsonl`, 'utf8')
+    .split('\n')
+    .filter((l) => l.trim() !== '')
+    .map((l) => JSON.parse(l) as { id: string; texto: string; esperado: Record<string, unknown> })
+    .find((c) => c.id === id);
+  if (!caso) throw new Error(`no existe el caso ${id}`);
+  return caso;
+}
+
 let vectores: unknown = null;
 
 /** Un vector de `fixtures/motores/vectores.json` por `id` (el contrato; nunca se copia). */

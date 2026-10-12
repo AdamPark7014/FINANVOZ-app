@@ -6,7 +6,7 @@ import { etiquetaDiaMes } from './formato';
 
 const { transaccionVigente: tv, asiento, cuenta } = esquema;
 
-export type Insignia = 'automatico' | 'estimado' | 'por_asignar';
+export type Insignia = 'automatico' | 'estimado' | 'por_asignar' | 'corregido';
 
 /** Movimiento en lenguaje llano (`02 §10`): sin débito/crédito ni asientos. */
 export interface MovimientoVista {
@@ -27,6 +27,8 @@ export interface MovimientoVista {
   readonly categoria: string | null;
   readonly porRevisar: boolean;
   readonly insignias: readonly Insignia[];
+  /** Movimiento al que reemplazó (corrección, `04 §4`); su historial sale de `historialMovimiento`. */
+  readonly reemplazaA: string | null;
 }
 
 export interface DiaMovimientos {
@@ -110,6 +112,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     if (AUTOMATICOS.has(t.origen)) insignias.push('automatico');
     if (t.estimada === 1) insignias.push('estimado');
     if (suyos.some((a) => PUENTES.has(a.c.id))) insignias.push('por_asignar');
+    if (t.reemplazaA) insignias.push('corregido');
     vistas.push({
       id: t.id,
       fecha: t.fecha,
@@ -125,6 +128,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
       categoria: categoria?.nombre ?? null,
       porRevisar: t.porRevisar === 1,
       insignias,
+      reemplazaA: t.reemplazaA,
     });
     if (filtro.limite !== undefined && vistas.length >= filtro.limite) break;
   }
