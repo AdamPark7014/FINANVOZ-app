@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import type { FiltroMovimientos, RespuestaConsulta } from '../../servicios';
+import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 
 /**
@@ -16,6 +17,7 @@ export function TarjetaConsulta({
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
   alCerrar: () => void;
 }) {
+  const { abrirPlan } = usePlanTienda();
   return (
     <Tarjeta testID="respuesta-consulta">
       <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="respuesta-consulta-texto">
@@ -39,7 +41,17 @@ export function TarjetaConsulta({
         </View>
       ) : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-        {alVerMovimientos ? (
+        {respuesta.soloPlus ? (
+          abrirPlan ? (
+            <Boton
+              etiqueta="Ver Plus"
+              variante="secundario"
+              ancho="contenido"
+              alPresionar={abrirPlan}
+              testID="boton-ver-plus-consulta"
+            />
+          ) : null
+        ) : alVerMovimientos ? (
           <Boton
             etiqueta="Ver movimientos"
             variante="secundario"

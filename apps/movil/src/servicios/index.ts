@@ -266,6 +266,19 @@ export {
 } from './bloques';
 export { marcarExtraordinaria } from './historial';
 export {
+  DIAS_PRUEBA,
+  funcionesPlan,
+  INTERPRETACIONES_NUBE_MES,
+  obtenerPlan,
+  sincronizarPlan,
+  SIN_PLUS,
+  type CodigoLimite,
+  type EstadoTienda,
+  type FuncionesPlan,
+  type Plan,
+  type VistaPlan,
+} from './plan';
+export {
   ETIQUETA_ESTIMACION_INICIAL,
   leerProbabilidadHoy,
   MENSAJE_DATOS_INSUFICIENTES,

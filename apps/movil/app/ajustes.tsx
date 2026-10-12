@@ -6,6 +6,7 @@ import { compartirArchivo } from '../src/pantallas/ajustes/compartir';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
+import { SeccionPlan } from '../src/pantallas/plan';
 import { exportarCsv, exportarJson, fijarBloqueo, obtenerBloqueo } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
@@ -112,6 +113,7 @@ export default function Ajustes() {
 
       <SeccionAvisos />
       <SeccionCaptura />
+      <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
 
       <Tarjeta>
         <Texto variante="subtitulo">Privacidad</Texto>

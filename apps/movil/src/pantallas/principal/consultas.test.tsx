@@ -1,7 +1,7 @@
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { registrarMovimiento, listarCuentas } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
-import { conEscenario, golden } from './__pruebas__/base';
+import { activarPlus, conEscenario, golden } from './__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { filtroDeParams, paramsDeFiltro } from './filtroRuta';
 import { PantallaHoy } from './PantallaHoy';
@@ -15,8 +15,9 @@ async function escribir(frase: string) {
   });
 }
 
-function preparar() {
+function preparar({ plus = true }: { plus?: boolean } = {}) {
   const p = conEscenario('e4-01');
+  if (plus) activarPlus(p.ctx);
   const f = nubeFalsa();
   for (const id of ['Q01', 'Q02', 'Q04', 'Q06']) f.responder(golden(id).texto, golden(id).esperado);
   const navegacion = navegacionFalsa();
@@ -32,6 +33,15 @@ describe('consultas tipadas en Hoy (RF-CON-01, CA-M7-03)', () => {
       'Hoy puedes gastar $214; faltan 4 días para tu quincena.',
     );
     expect(p.recibidas).toHaveLength(0);
+  });
+
+  it('en Gratis una consulta de Plus lo dice sin cifras ni "Ver movimientos"', async () => {
+    preparar({ plus: false });
+    await escribir(golden('Q04').texto);
+    expect(await screen.findByTestId('respuesta-consulta-texto')).toHaveTextContent(
+      'Responder preguntas sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.',
+    );
+    expect(screen.queryByTestId('boton-ver-movimientos-consulta')).toBeNull();
   });
 
   it('Q04 responde el saldo y "Ver movimientos" abre Movimientos filtrado por la cuenta', async () => {
@@ -62,6 +72,7 @@ describe('consultas tipadas en Hoy (RF-CON-01, CA-M7-03)', () => {
 describe('Movimientos con el filtro de una consulta', () => {
   it('muestra solo lo que suma en la respuesta y "Ver todos" quita el filtro', async () => {
     const p = conEscenario('e4-01');
+    activarPlus(p.ctx);
     const efectivo = listarCuentas(p.ctx).tienes.find((c) => c.nombre === 'Cartera')?.id as string;
     registrarMovimiento(p.ctx, {
       tipo: 'gasto',

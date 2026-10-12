@@ -80,7 +80,7 @@ Con 502 o 504 la interpretación se devuelve al cupo del usuario (no al tope glo
 4. `supabase functions deploy nlu-interpretar` (con la verificación de JWT del gateway activa; no uses `--no-verify-jwt`). El mapa de importaciones está en `nlu-interpretar/deno.json`.
 5. Prueba de humo con una sesión anónima: `curl -X POST https://<ref>.supabase.co/functions/v1/nlu-interpretar -H "Authorization: Bearer <access_token>" -H 'content-type: application/json' -d '{"texto":"uber 120","contexto_min":{"fecha_referencia":"2026-10-12","espacios":["personal"],"cuentas":[]},"version_esquema":1}'`. Sin el encabezado debe responder 401.
 
-Plan Plus a mano hasta M10 (RevenueCat): `insert into derechos (usuario_id, plan) values ('<uuid>', 'plus') on conflict (usuario_id) do update set plan = excluded.plan;`.
+Desde M7 el plan lo actualiza el webhook de RevenueCat (sección siguiente). Para probar sin tienda: `insert into derechos (usuario_id, plan) values ('<uuid>', 'plus') on conflict (usuario_id) do update set plan = excluded.plan;`.
 
 Registros: en Logs → Edge Functions cada petición deja una línea JSON solo con metadatos (nunca el texto, montos, alias ni el cuerpo del proveedor). Alerta del tope global: filtra `codigo = tope_global`. Uso diario total: `select * from nlu_uso_resumen;`.
 
@@ -96,3 +96,24 @@ Lo corre Adam con sus llaves, en su máquina (las llaves nunca entran al reposit
 Contra el proxy (local con `supabase functions serve nlu-interpretar` o desplegado): `NLU_PROXY_URL=<url> NLU_PROXY_JWT=<access_token> pnpm eval:nlu --nivel nube --proveedor anthropic --limite 3`. Consume el cupo de ese usuario (Gratis: 20 al día), así que el benchmark completo se corre directo contra el proveedor.
 
 Hasta que existan las grabaciones, CA-M3-01 y CA-M3-06 quedan pendientes; `pnpm eval:nlu --offline` ya corre en CI y avisa "sin grabaciones".
+
+## M7 · `webhooks-revenuecat` (`POST /webhooks/revenuecat`)
+
+RevenueCat avisa cada compra, renovación, cancelación y vencimiento; la función actualiza `derechos` y el cupo del intérprete lo aplica en la siguiente frase (Gratis 30 al mes, Plus 300). La lógica está en `supabase/functions/_shared/revenuecat/` (Vitest + PGlite).
+
+| Archivo | Qué hace |
+|---|---|
+| `_shared/revenuecat/evento.ts` | Traduce el evento: compra, renovación, cancelación (Plus hasta que vence), problema de cobro y extensión → `plus` con `vigente_hasta`; `EXPIRATION` → `gratis`; `TRANSFER` → mueve el derecho; lo demás se ignora. Solo el derecho `plus` y solo ids que son usuarios de Supabase (uuid) |
+| `_shared/revenuecat/manejador.ts` | `Authorization: Bearer <secreto>` en tiempo constante → cuerpo ≤ 64 KB → evento → base. Registra solo `tipo:resultado` |
+| `migrations/20261015000000_revenuecat.sql` | `derechos.en_prueba` y `evento_ms`, `revenuecat_eventos` (idempotencia) y `aplicar_derecho_revenuecat` / `transferir_derecho_revenuecat` (atómicas; un evento viejo no pisa uno nuevo) |
+
+Respuestas: 200 `{ "resultado": "aplicado" | "duplicado" | "antiguo" | "sin_usuario" | "ignorado" }`; 401 `no_autorizado`; 400 `solicitud_invalida`; 405 `metodo`; 503 `sin_configurar`; 500 `error_interno` (RevenueCat reintenta).
+
+### Desplegar
+
+1. `supabase db push` aplica `20261015000000_revenuecat.sql`.
+2. `supabase secrets set REVENUECAT_WEBHOOK_SECRET=<64 caracteres aleatorios>` (mínimo 32).
+3. `supabase functions deploy webhooks-revenuecat --no-verify-jwt` (RevenueCat no tiene sesión; la protege el secreto).
+4. En RevenueCat → Project settings → Integrations → Webhooks: URL `https://<ref>.supabase.co/functions/v1/webhooks-revenuecat`, encabezado de autorización `Bearer <el mismo secreto>`, ambientes producción y sandbox (los probadores con licencia de Play compran en sandbox). "Send test event" debe responder 200 `ignorado`.
+5. En RevenueCat el derecho (Entitlement) se llama **`plus`** y agrupa los productos mensual y anual con la prueba de 14 días configurada en Play Console.
+6. La app se identifica en RevenueCat con el id de su sesión anónima de Supabase, así el evento llega al mismo `usuario_id` que usa el intérprete.

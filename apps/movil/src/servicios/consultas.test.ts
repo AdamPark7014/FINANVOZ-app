@@ -4,6 +4,7 @@ import { responderConsulta, type Consulta } from './consultas';
 import { registrarMovimiento } from './formulario';
 import { listarMovimientos } from './movimientos';
 import { crearPersona, registrarPrestamo } from './personas';
+import { sincronizarPlan } from './plan';
 import { registrarTexto } from './registrar';
 import { cargarEscenario } from './semilla';
 import { abrirPrueba, escenario, golden } from './__pruebas__/base';
@@ -30,9 +31,10 @@ const ESPERADO: Record<(typeof IDS)[number], { plantilla: string; texto: string 
   Q11: { plantilla: 'gasto_total', texto: 'Desde tu quincena del 30 sep llevas $0.' },
 };
 
-function semilla() {
+function semilla({ plus = true }: { plus?: boolean } = {}) {
   const p = abrirPrueba();
   const e = cargarEscenario(p.ctx, escenario('e4-01'));
+  if (plus) sincronizarPlan(p.ctx, { plus: { vigenteHasta: null, enPrueba: false, renovara: true } });
   const cuentas = listarCuentas(p.ctx);
   const id = (prefijo: string) =>
     [...cuentas.tienes, ...cuentas.debes].find((c) => c.nombre.startsWith(prefijo))?.id as string;
@@ -75,6 +77,19 @@ describe('consultas tipadas sobre la semilla e4-01 (CA-M7-03)', () => {
       soloGastos: true,
       categorias: ['comida_fuera', 'antojos', 'super'],
     });
+  });
+
+  it('en Gratis solo "hoy puedes" responde; las demás consultas son de Plus y no calculan nada', async () => {
+    const p = semilla({ plus: false });
+    const q01 = await registrarTexto(p.ctx, golden('Q01').texto, 'voz');
+    if (q01.resultado !== 'consulta') throw new Error(q01.resultado);
+    expect(q01.respuesta.texto).toBe(ESPERADO['Q01'].texto);
+    expect(q01.respuesta.soloPlus).toBeUndefined();
+    const f = nubeFalsa({ [golden('Q04').texto]: golden('Q04').esperado });
+    const q04 = await registrarTexto(p.ctx, golden('Q04').texto, 'voz', { nube: f.nube });
+    if (q04.resultado !== 'consulta') throw new Error(q04.resultado);
+    expect(q04.respuesta).toMatchObject({ plantilla: 'saldo', soloPlus: true, lineas: [], filtro: {} });
+    expect(q04.respuesta.texto).not.toMatch(/\$/);
   });
 });
 

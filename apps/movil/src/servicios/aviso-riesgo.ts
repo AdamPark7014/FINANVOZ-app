@@ -9,6 +9,7 @@ import {
   type AvisoRiesgoEnviado,
 } from '../avisos/riesgo';
 import { obtenerPreferenciasAvisos } from './avisos-tarjetas';
+import { funcionesPlan } from './plan';
 import type { Contexto } from './contexto';
 import { borrarAjuste, escribirAjuste, leerAjuste } from './preferencias';
 import { leerProbabilidadHoy, prepararProbabilidadHoy } from './probabilidad';
@@ -23,6 +24,8 @@ const Enviado = z.strictObject({ fin: z.string(), fecha: z.string(), hora: z.str
  * horizonte se desliza cada día y el aviso saldría a diario).
  */
 export function planAvisoRiesgo(ctx: Contexto, horaActual: HoraDelDia): AvisoRiesgo[] | null {
+  // Es de Plus, como la probabilidad (`01 §11`): en Gratis se cancela el pendiente.
+  if (!funcionesPlan(ctx).probabilidad) return [];
   const p = prepararProbabilidadHoy(ctx);
   if (p.estado !== 'listo') return [];
   const { ingreso, h } = p.calculo;

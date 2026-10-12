@@ -4,6 +4,7 @@ import { puertoEnMemoria } from '../avisos/puerto';
 import { planAvisoRiesgo, sincronizarAvisoRiesgo } from './aviso-riesgo';
 import { fijarPreferenciasAvisos } from './avisos-tarjetas';
 import { registrarMovimiento } from './formulario';
+import { sincronizarPlan } from './plan';
 import { obtenerProbabilidadHoy } from './probabilidad';
 import { cargarEscenario } from './semilla';
 import { abrirPrueba, escenario } from './__pruebas__/base';
@@ -11,9 +12,10 @@ import { abrirPrueba, escenario } from './__pruebas__/base';
 const sinEspera = { ceder: () => Promise.resolve() };
 
 /** e4-01 con `dias` de gasto diario en efectivo desde el 11 oct y el reloj en el día siguiente al último. */
-function conHistorial(montoDiario: number, hasta: PlainDate) {
+function conHistorial(montoDiario: number, hasta: PlainDate, { plus = true }: { plus?: boolean } = {}) {
   const p = abrirPrueba();
   const e = cargarEscenario(p.ctx, escenario('e4-01'));
+  if (plus) sincronizarPlan(p.ctx, { plus: { vigenteHasta: null, enPrueba: false, renovara: true } });
   for (let f: PlainDate = e.hoy; f < hasta; f = sumarDias(f, 1)) {
     registrarMovimiento(p.ctx, {
       tipo: 'gasto',
@@ -68,6 +70,14 @@ describe('aviso de riesgo de no llegar (02 §13)', () => {
     if (v.estado !== 'ok') throw new Error(v.estado);
     expect(v.riesgo).toBe(false);
     expect(planAvisoRiesgo(holgado.ctx, '10:00')).toEqual([]);
+  });
+
+  it('en Gratis no hay aviso de riesgo y se cancela el pendiente (es de Plus)', async () => {
+    const p = conHistorial(40_000, '2026-10-27', { plus: false });
+    await obtenerProbabilidadHoy(p.ctx, sinEspera);
+    const puerto = puertoEnMemoria();
+    await sincronizarAvisoRiesgo(p.ctx, puerto, '10:00');
+    expect(puerto.lista()).toEqual([]);
   });
 
   it('sin probabilidad calculada no toca nada; con menos de 14 días no hay aviso', async () => {

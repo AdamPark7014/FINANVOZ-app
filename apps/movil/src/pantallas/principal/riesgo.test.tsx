@@ -10,7 +10,7 @@ import {
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
-import { conEscenario } from './__pruebas__/base';
+import { activarPlus, conEscenario } from './__pruebas__/base';
 import { ProbabilidadHoy, TEXTO_RIESGO } from './ProbabilidadHoy';
 
 const sinEspera = { ceder: () => Promise.resolve() };
@@ -29,6 +29,7 @@ function montar(ctx: Contexto, ui: ReactNode, notificaciones = notificacionesEnM
 /** e4-01 con un gasto diario en efectivo desde el 11 oct y la probabilidad de `hasta` ya calculada. */
 async function conGastoDiario(monto: number, hasta: PlainDate) {
   const p = conEscenario('e4-01');
+  activarPlus(p.ctx);
   const efectivo = p.e.cuentas['efectivo'] as string;
   for (let f: PlainDate = p.e.hoy; f < hasta; f = sumarDias(f, 1)) {
     registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto, fecha: f });

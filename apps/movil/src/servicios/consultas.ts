@@ -67,6 +67,19 @@ export interface RespuestaConsulta {
   readonly lineas: readonly LineaConsulta[];
   /** "Ver movimientos": abre Movimientos con este filtro. */
   readonly filtro: FiltroMovimientos;
+  /** En Gratis: la consulta es de Plus; la tarjeta ofrece el plan en lugar de "Ver movimientos". */
+  readonly soloPlus?: true;
+}
+
+/** Respuesta en Gratis a una consulta de Plus (`01 §11`): no se calcula nada. */
+export function respuestaSoloPlus(plantilla: PlantillaConsulta): RespuestaConsulta {
+  return {
+    plantilla,
+    texto: 'Responder preguntas sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.',
+    lineas: [],
+    filtro: {},
+    soloPlus: true,
+  };
 }
 
 /** Grupos para consultas (`04 §2.3`). */

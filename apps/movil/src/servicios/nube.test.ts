@@ -10,6 +10,7 @@ import { contextoNube } from './nube';
 import { listarOcurrencias } from './ocurrencias';
 import { agregarCuenta, agregarTarjetaCredito, configurarIngreso } from './onboarding';
 import { programadosActivos } from './programados';
+import { sincronizarPlan } from './plan';
 import { leerAjuste } from './preferencias';
 import {
   aplicarEleccion,
@@ -326,6 +327,7 @@ describe('nivel 2 · nube', () => {
 
   it('consultas con plantilla, aclarar, fuera de alcance y lo que aún no se hace por voz', async () => {
     const p = conCuentas();
+    sincronizarPlan(p.ctx, { plus: { vigenteHasta: null, enPrueba: false, renovara: true } });
     const casos: [string, unknown, unknown][] = [
       [
         'cuánto llevo este mes',
