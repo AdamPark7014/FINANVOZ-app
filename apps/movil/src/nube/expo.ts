@@ -7,9 +7,11 @@ import Constants from 'expo-constants';
 import { crearClienteNube } from '@cartera/nlu';
 import { almacenExpo } from '../db/expo';
 import { crearPuertoEvidencia, type PuertoEvidencia } from '../privacidad/evidencia-servidor';
-import type { NivelNube } from '../servicios';
+import type { NivelNube, NubeRespaldo } from '../servicios';
 import { leerConfigNube, type ConfigNube } from './config';
 import { conectividadExpo } from './conectividad';
+import { crearCuentaRespaldo } from './cuenta-respaldo';
+import { crearRespaldoNube } from './respaldo-nube';
 import { crearSesionNube, type SesionNube } from './sesion';
 import { usuarioDeToken } from './token';
 
@@ -48,4 +50,23 @@ export function crearPuertoEvidenciaExpo(): PuertoEvidencia | null {
     llaveAnonima: config.llaveAnonima,
     sesion: sesionNubeExpo(config),
   });
+}
+
+/**
+ * Cuenta de respaldo (correo y código) y cliente del bucket `respaldos` (M9) sobre la misma sesión que el resto
+ * de la app; `null` sin configuración (la pantalla de respaldo solo ofrece archivos).
+ */
+export function crearNubeRespaldoExpo(): NubeRespaldo | null {
+  const config = leerConfigNube(Constants.expoConfig?.extra);
+  if (!config) return null;
+  const sesion = sesionNubeExpo(config);
+  return {
+    cuenta: crearCuentaRespaldo({
+      url: config.url,
+      llaveAnonima: config.llaveAnonima,
+      almacen: almacenExpo,
+      sesion,
+    }),
+    respaldos: crearRespaldoNube({ url: config.url, sesion }),
+  };
 }
