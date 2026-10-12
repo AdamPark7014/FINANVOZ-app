@@ -78,7 +78,7 @@ describe('reproducción offline de grabaciones (CA-M3-06)', () => {
     }));
     const r = evaluarNube(golden, perfectas, undefined);
     expect(r.cumple).toBe(true);
-    expect(r.campos.completo).toEqual({ aciertos: 144, total: 144 });
+    expect(r.campos.completo).toEqual({ aciertos: 155, total: 155 });
   });
 });
 

@@ -288,6 +288,28 @@ export const Ajuste = z.discriminatedUnion('tipo', [
 ]);
 export type Ajuste = z.infer<typeof Ajuste>;
 
+export const PAGADORES_COMPARTIDO = ['yo', 'pareja'] as const;
+
+/** Gasto compartido con la pareja (`02 §27`, M16): "Súper 1,200, pagué yo, 60/40". Siempre del espacio personal. */
+export const GastoCompartido = z
+  .strictObject({
+    monto: Centavos,
+    fecha: Fecha,
+    descripcion: Texto.optional(),
+    categoria: Categoria.optional(),
+    /** Quién pagó; si no lo dijo se omite y la confirmación lo pregunta. */
+    pagador: z.enum(PAGADORES_COMPARTIDO).optional(),
+    /** Tu parte en porcentaje entero ("pagué yo, 60/40" → 60); si no lo dijo, 50. */
+    mi_parte: z.int().min(1).max(99).optional(),
+    /** Nombre de la pareja o del grupo, si lo dijo ("pagó Ana"). */
+    grupo: Texto.optional(),
+  })
+  .refine((g) => g.categoria === undefined || !CATEGORIAS_NEGOCIO_EXCLUSIVAS.includes(g.categoria), {
+    message: 'categoría exclusiva del negocio en un gasto compartido',
+    path: ['categoria'],
+  });
+export type GastoCompartido = z.infer<typeof GastoCompartido>;
+
 export const MOTIVOS_ACLARAR = [
   'monto_faltante',
   'monto_ambiguo',
@@ -321,6 +343,7 @@ export const Interpretacion = z.discriminatedUnion('intencion', [
     }),
   }),
   z.strictObject({ intencion: z.literal('configurar'), ajuste: Ajuste }),
+  z.strictObject({ intencion: z.literal('gasto_compartido'), gasto: GastoCompartido }),
   z.strictObject({
     intencion: z.literal('aclarar'),
     motivo: z.enum(MOTIVOS_ACLARAR),

@@ -8,7 +8,7 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `motores/vectores.json` | Salida del oráculo (versión 3): E1, E3–E16, resolutor de cuentas y economía unitaria | `packages/core`, `packages/nlu`, `packages/fiscal` |
 | `nlu/contexto.json` | Usuario ficticio con espacio personal y de negocio (cuentas, alias, contactos, catálogos, fechas) | `packages/nlu` (eval y resolutor) |
 | `nlu/esquema.json` | JSON Schema de `Interpretacion`; debe coincidir con el esquema Zod | `packages/nlu`, `services/proxy` |
-| `nlu/golden.jsonl` | 144 frases en español de México con la interpretación esperada; `reglas: true` marca las 16 que el nivel 0 debe resolver | `pnpm eval:nlu` |
+| `nlu/golden.jsonl` | 155 frases en español de México con la interpretación esperada; `reglas: true` marca las 25 que el nivel 0 debe resolver | `pnpm eval:nlu` |
 | `notificaciones/plantillas.ejemplo.json` | Plantillas **sintéticas** de tres bancos y una terminal de cobro ficticios | Motor de plantillas |
 | `notificaciones/ejemplos.jsonl` | 12 notificaciones sintéticas (personal) con su interpretación esperada | Motor de plantillas, escenario `e-captura` |
 | `notificaciones/negocio.ejemplos.jsonl` | 2 notificaciones de la terminal de cobro (espacio negocio) | Motor de plantillas, escenario `e-negocio` |

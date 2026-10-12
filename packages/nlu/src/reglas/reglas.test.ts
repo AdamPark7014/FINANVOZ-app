@@ -24,10 +24,10 @@ describe('CA-M1-05 · golden set con reglas: true', () => {
     });
   }
 
-  it('cobertura 16/16 y precisión 100 % sobre los 144 casos', () => {
+  it('cobertura 25/25 y precisión 100 % sobre los 155 casos', () => {
     const reporte = evaluarReglas(golden, contexto);
-    expect(reporte.marcados).toBe(16);
-    expect(reporte.marcadosCubiertos).toBe(16);
+    expect(reporte.marcados).toBe(25);
+    expect(reporte.marcadosCubiertos).toBe(25);
     expect(reporte.respondidosCorrectos).toBe(reporte.respondidos);
     expect(reporte.aprobado).toBe(true);
   });
@@ -103,6 +103,117 @@ describe('nivel 0 · formas aceptadas', () => {
       tipo: 'pago_tarjeta',
       destino: { tipo: 'credito', alias: 'oro' },
     });
+  });
+
+  it('pendiente 98 · salud sin internet: "médica", "médico" y descripción compuesta del diccionario', () => {
+    expect(gasto('consulta médica de 800 en efectivo')).toEqual({
+      tipo: 'gasto',
+      monto: 80000,
+      fecha: HOY,
+      descripcion: 'consulta médica',
+      categoria: 'salud',
+      origen: { tipo: 'efectivo' },
+    });
+    expect(gasto('800 de la consulta con el médico')).toMatchObject({
+      monto: 80000,
+      categoria: 'salud',
+      descripcion: 'consulta con el médico',
+    });
+    expect(gasto('medicinas de la farmacia 385')).toMatchObject({ monto: 38500, categoria: 'salud' });
+    expect(gasto('pagué 1,200 en el hospital')).toMatchObject({ monto: 120000, categoria: 'salud' });
+    expect(gasto('análisis 650 con débito')).toMatchObject({
+      categoria: 'salud',
+      origen: { tipo: 'debito' },
+    });
+  });
+});
+
+describe('nivel 0 · gasto compartido con la pareja (02 §27)', () => {
+  const compartido = (texto: string) => {
+    const r = reglas(texto);
+    return r?.intencion === 'gasto_compartido' ? r.gasto : r;
+  };
+
+  it('"Súper 1,200, pagué yo, 60/40": si pagaste tú, la primera cifra es tu parte', () => {
+    expect(reglas('Súper 1,200, pagué yo, 60/40')).toEqual({
+      intencion: 'gasto_compartido',
+      gasto: {
+        monto: 120000,
+        fecha: HOY,
+        descripcion: 'súper',
+        categoria: 'super',
+        pagador: 'yo',
+        mi_parte: 60,
+      },
+    });
+    expect(compartido('súper 1200 40/60 lo pagué yo')).toMatchObject({ mi_parte: 40, pagador: 'yo' });
+  });
+
+  it('pagó ella, él, mi pareja o un nombre', () => {
+    expect(compartido('gasto compartido de 500 en gasolina, pagó ella')).toMatchObject({
+      monto: 50000,
+      categoria: 'gasolina',
+      pagador: 'pareja',
+      mi_parte: 50,
+    });
+    expect(compartido('pagó él la luz 900 a medias')).toMatchObject({
+      pagador: 'pareja',
+      categoria: 'servicios',
+    });
+    expect(compartido('luz 900 a medias, pagó él')).toMatchObject({
+      pagador: 'pareja',
+      categoria: 'servicios',
+    });
+    expect(compartido('pagó mi esposa 300 del cine, 50/50')).toMatchObject({ pagador: 'pareja' });
+    expect(compartido('pagó Ana 300 del cine, 50/50')).toEqual({
+      monto: 30000,
+      fecha: HOY,
+      descripcion: 'cine',
+      categoria: 'entretenimiento',
+      pagador: 'pareja',
+      mi_parte: 50,
+      grupo: 'ana',
+    });
+  });
+
+  it('sin decir quién pagó, mitad y mitad; "8 mil" son 8,000 pesos', () => {
+    expect(compartido('la renta 8 mil mitad y mitad con mi pareja')).toEqual({
+      monto: 800000,
+      fecha: HOY,
+      descripcion: 'renta',
+      categoria: 'vivienda',
+      mi_parte: 50,
+    });
+    expect(compartido('pagué 900 de luz compartido con mi pareja')).toMatchObject({
+      monto: 90000,
+      pagador: 'yo',
+      mi_parte: 50,
+    });
+  });
+
+  it('con señal de compartido pero sin certeza responde null (nunca un gasto propio)', () => {
+    for (const texto of [
+      'súper 1,200, pagó ella, 60/40',
+      'súper 1,200 60/40',
+      'súper 1,200, pagué yo, 60/30',
+      'súper 1,200, pagué yo, 100/0',
+      'súper 1,200, pagué yo, 60/40, 50/50',
+      'pagué yo y pagó ella el súper 1,200 a medias',
+      'ayer súper 1,200 a medias',
+      'súper 1,200 compartido con débito',
+      'plomería 1,200 compartido',
+      'súper compartido',
+      'súper 1,200 y tacos 300 a medias',
+      'pagó 1,200 del súper a medias',
+      'pagó la renta 8 mil a medias',
+    ]) {
+      expect(reglas(texto), texto).toBeNull();
+    }
+  });
+
+  it('sin señal de compartido sigue siendo un gasto propio', () => {
+    expect(reglas('súper 1200 con débito')).toMatchObject({ intencion: 'registrar' });
+    expect(reglas('pagué 1,200 en el súper')).toMatchObject({ intencion: 'registrar' });
   });
 });
 

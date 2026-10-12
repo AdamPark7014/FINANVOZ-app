@@ -58,7 +58,7 @@ CLAUDE.md                       reglas del repositorio para Claude Code
 docs/01-PRD.md … 10-NEGOCIO.md  especificación
 docs/ESTADO.md                  tablero, decisiones, pendientes, verificación
 fixtures/motores/               oráculo de referencia (Python) y vectores.json (v3)
-fixtures/nlu/                   contexto, esquema y golden set de 144 frases
+fixtures/nlu/                   contexto, esquema y golden set de 155 frases
 fixtures/notificaciones/        plantillas y notificaciones sintéticas (personal y negocio)
 fixtures/plantillas-firmadas/   plantillas firmadas con la llave pública de prueba de RFC 8032
 fixtures/respaldo/              respaldo cifrado de ejemplo y su versión alterada
@@ -72,7 +72,7 @@ scripts/                        oraculo.mjs (cualquier SO), firmar-plantillas.mj
 
 - **Vectores de los motores (versión 3)** generados por un oráculo independiente en Python. El generador pseudoaleatorio (mulberry32) y el hash (FNV-1a) dan resultados idénticos bit a bit a JavaScript (Node 22). Las probabilidades simuladas coinciden con las analíticas (0.7509 contra 0.75; 0.7016 contra 0.70). `node scripts/oraculo.mjs --verificar` pasa.
 - **Dos revisiones independientes:** revisores que no habían visto el trabajo encontraron 20 problemas en el núcleo (horizonte con depósitos adelantados, transferencias, MSI existentes, arqueo, redondeos, entre otros) y 25 en la extensión M8–M16 (resolutor de cuentas entre espacios, llave del respaldo automático, transferencias entre el negocio y lo personal, redondeos fiscales, entre otros). Todos están corregidos y registrados en `docs/ESTADO.md` → Decisiones. Después, cuatro rondas de verificación de esas correcciones cerraron los últimos casos (una transferencia del negocio que coincide con un sueldo dictado, el cierre de un grupo compartido, los impuestos del negocio que no son ISR ni IVA, entre otros).
-- **Golden set:** los 144 casos validan contra `fixtures/nlu/esquema.json`, y casos inválidos se rechazan. La gramática del nivel de reglas, probada con una implementación de referencia: cobertura 16/16 y precisión 17/17.
+- **Golden set:** los 155 casos validan contra `fixtures/nlu/esquema.json`, y casos inválidos se rechazan. El nivel de reglas: cobertura 25/25 y precisión 100 % en todo caso que responde.
 - **Plantillas de notificaciones:** los 14 ejemplos (12 personales y 2 de negocio) pasan con el motor de expresiones regulares de JavaScript.
 - **Criptografía:** el respaldo de ejemplo se descifra igual con Python (`cryptography`) y con Node; su versión alterada se rechaza. La firma de plantillas verifica con la llave de prueba y el vector 1 de RFC 8032.
 - **Datos de mercado, regulación y fiscales** con fuentes en `docs/01-PRD.md §14` y `docs/08-CUMPLIMIENTO.md §8`, consultadas el 11 de octubre de 2026. Los valores fiscales no se usan sin validación de un contador.
