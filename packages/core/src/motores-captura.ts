@@ -18,3 +18,27 @@ export {
   type Sentido,
   type TipoCapturaTransferencia,
 } from './deduplicacion';
+export {
+  bancoDePaquete,
+  CAMPOS_PLANTILLA,
+  compilarPlantillas,
+  interpretarNotificacion,
+  parsearMonto,
+  TIPOS_PLANTILLA,
+  type BancoPlantillas,
+  type CampoPlantilla,
+  type CatalogoPlantillas,
+  type Interpretacion,
+  type NotificacionEntrante,
+  type Plantilla,
+  type PlantillaCompilada,
+  type TipoPlantilla,
+} from './captura/plantillas';
+export {
+  CATALOGO_SEMILLA,
+  categorizarComercio,
+  construirCatalogo,
+  type EntradaCatalogo,
+  type ReglasComercio,
+  type ResultadoCategoria,
+} from './captura/categorizar';
