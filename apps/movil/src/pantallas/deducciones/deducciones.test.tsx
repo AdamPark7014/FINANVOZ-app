@@ -143,7 +143,9 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
       'HOSPITAL FICTICIO · $5,000: factura en pagos sin confirmar',
     );
     expect(textoDe('deducciones-ahorro')).toMatch(/agrega tu base gravable/);
-    expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(/estimación/);
+    expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(
+      'Estimación para apartar dinero y preparar tu declaración. No sustituye a tu contador ni presenta declaraciones ante el SAT.',
+    );
 
     fireEvent.press(screen.getByTestId(`factura-${hospital}-ya-la-pague`));
     for (const forma of ['Transferencia', 'Tarjeta', 'Efectivo', 'Cheque'])

@@ -118,8 +118,9 @@ export const FORMAS_PAGO_CONFIRMADO = [
 ] as const;
 export type FormaPagoConfirmado = (typeof FORMAS_PAGO_CONFIRMADO)[number]['valor'];
 
+/** Texto fijo de `08 §1` para impuestos y deducciones (checklist `08 §7.2`), sin cambiar una palabra. */
 export const LEYENDA_ESTIMACION =
-  'Es una estimación para preparar tu declaración anual con tu contador. Finanvoz no presenta declaraciones ni se conecta al SAT.';
+  'Estimación para apartar dinero y preparar tu declaración. No sustituye a tu contador ni presenta declaraciones ante el SAT.';
 
 export const MENSAJE_SIN_PARAMETROS =
   'Todavía no puedo estimar tus deducciones de este año: un contador está revisando los topes y las reglas. En cuanto estén validados, aquí verás cuánto llevas. Tus facturas ya quedan guardadas.';
