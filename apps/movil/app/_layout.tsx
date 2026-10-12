@@ -6,13 +6,14 @@ import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
-import { crearNivelNubeExpo } from '../src/nube/expo';
+import { crearNivelNubeExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
+import { useEvidenciaConsentimiento } from '../src/nube/useEvidenciaConsentimiento';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
-import { cargarEscenario, obtenerBloqueo, relojFijo } from '../src/servicios';
+import { cargarEscenario, obtenerBloqueo, relojFijo, type PuertoEvidencia } from '../src/servicios';
 import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
@@ -46,6 +47,8 @@ export default function Raiz() {
   const notificaciones = useMemo(() => crearNotificacionesExpo(), []);
   // PostHog solo si la build trae llave; aun así nada sale sin el opt-in de estadísticas (`03 §8`).
   const analitica = useMemo(() => crearAnaliticaExpo(), []);
+  // Copia mínima de la evidencia del consentimiento en Supabase (`08 §2`).
+  const evidencia = useMemo(() => crearPuertoEvidenciaExpo(), []);
 
   const reemplazarSesion = useCallback(
     async (preparar?: () => Sesion) => {
@@ -116,7 +119,7 @@ export default function Raiz() {
       <ProveedorNotificaciones notificaciones={notificaciones}>
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
           <ProveedorAnalitica analitica={analitica}>
-            <AppProtegida reiniciada={estado.generacion > 0} />
+            <AppProtegida reiniciada={estado.generacion > 0} evidencia={evidencia} />
           </ProveedorAnalitica>
         </ProveedorSesion>
       </ProveedorNotificaciones>
@@ -125,7 +128,7 @@ export default function Raiz() {
 }
 
 /** Aplica las preferencias de bloqueo guardadas (RF-CFG-03) sobre toda la navegación. */
-function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
+function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidencia: PuertoEvidencia | null }) {
   const { esquema } = useTema();
   // Tras borrar todo (o cargar un escenario) la navegación vuelve al inicio, que decide onboarding o Hoy.
   useEffect(() => {
@@ -139,6 +142,7 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
   const bloqueo = useBloqueo({ activo: preferencias.activo });
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
   useProcesarCola();
+  useEvidenciaConsentimiento(evidencia);
   return (
     // Captura automática (`07`): sin el módulo nativo (Expo Go, iPhone) el puente no está disponible y nada cambia.
     <ProveedorCaptura puente={puenteCaptura} sha256={sha256Expo}>
