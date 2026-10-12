@@ -36,6 +36,7 @@ describe('plan (RF-PAG-01)', () => {
       enPrueba: false,
       diasRestantes: null,
       vigenteHasta: null,
+      fechaFin: null,
       renovara: false,
       terminoPlus: null,
     });
@@ -55,6 +56,7 @@ describe('plan (RF-PAG-01)', () => {
     p.reloj.fijarInstante(T0 + 3 * DIA + 1000);
     expect(obtenerPlan(p.ctx)).toMatchObject({
       plan: 'plus',
+      fechaFin: '2026-10-25',
       enPrueba: true,
       diasRestantes: 11,
       renovara: true,

@@ -263,6 +263,7 @@ export {
   obtenerPlan,
   sincronizarPlan,
   SIN_PLUS,
+  type CodigoLimite,
   type EstadoTienda,
   type FuncionesPlan,
   type Plan,

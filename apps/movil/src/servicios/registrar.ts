@@ -3,6 +3,7 @@ import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
   interpretarReglas,
+  type CodigoLimite,
   resolverCuenta,
   type ContextoInterprete,
   type CuentaResolutor,
@@ -114,7 +115,13 @@ export type ResultadoTexto =
       readonly propuestas: readonly PropuestaMovimiento[];
     }
   /** "Lo guardé; lo interpreto cuando tengas internet." */
-  | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
+  | {
+      readonly resultado: 'por_interpretar';
+      readonly id: string;
+      readonly motivo: MotivoPorInterpretar;
+      /** Con `motivo: 'limite'`: cuál se agotó (CA-M7-02: el mensaje del mes es distinto al del día). */
+      readonly limite?: CodigoLimite;
+    }
   | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
   /** "¿Me alcanza para unos tenis de 1,500?": la pantalla abre "¿Me alcanza?" y llama `meAlcanza(ctx, consulta)`. */
   | { readonly resultado: 'me_alcanza'; readonly consulta: ConsultaMeAlcanza }
@@ -768,13 +775,21 @@ export async function registrarTexto(
   const r = await interpretarEnNube(ctx, frase, opciones.nube ?? null);
   if (r.tipo !== 'ok') {
     if (r.tipo === 'invalida') return { resultado: 'no_entendi' };
-    return { resultado: 'por_interpretar', id: guardarPorInterpretar(ctx, frase), motivo: r.tipo };
+    return {
+      resultado: 'por_interpretar',
+      id: guardarPorInterpretar(ctx, frase),
+      motivo: r.tipo,
+      ...(r.tipo === 'limite' ? { limite: r.codigo } : {}),
+    };
   }
   return aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase);
 }
 
 type RespuestaNube =
-  { tipo: 'ok'; interpretacion: Interpretacion } | { tipo: 'invalida' } | { tipo: MotivoPorInterpretar };
+  | { tipo: 'ok'; interpretacion: Interpretacion }
+  | { tipo: 'invalida' }
+  | { tipo: 'limite'; codigo: CodigoLimite }
+  | { tipo: Exclude<MotivoPorInterpretar, 'limite'> };
 
 async function interpretarEnNube(
   ctx: Contexto,
@@ -794,7 +809,7 @@ async function interpretarEnNube(
     case 'sin_red':
       return { tipo: 'sin_red' };
     case 'limite':
-      return { tipo: 'limite' };
+      return { tipo: 'limite', codigo: r.codigo };
     case 'error':
       return r.codigo === 'respuesta_invalida' ? { tipo: 'invalida' } : { tipo: 'error' };
   }
@@ -919,7 +934,13 @@ export async function revisarPorInterpretar(
     const n = await interpretarEnNube(ctx, frase, nube);
     if (n.tipo === 'invalida') r = { resultado: 'no_entendi' };
     else if (n.tipo === 'ok') r = aplicarInterpretacion(ctx, n.interpretacion, cuentasResolutor(ctx), frase);
-    else return { resultado: 'por_interpretar', id, motivo: n.tipo };
+    else
+      return {
+        resultado: 'por_interpretar',
+        id,
+        motivo: n.tipo,
+        ...(n.tipo === 'limite' ? { limite: n.codigo } : {}),
+      };
   }
   if (AUTOMATICOS.has(r.resultado)) borrarAjuste(ctx, clave);
   return r;

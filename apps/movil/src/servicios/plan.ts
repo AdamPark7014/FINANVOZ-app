@@ -1,6 +1,9 @@
+import type { PlainDate } from '@cartera/core';
 import { z } from 'zod';
 import type { Contexto } from './contexto';
 import { escribirAjuste, leerAjuste } from './preferencias';
+
+export type { CodigoLimite } from '@cartera/nlu';
 
 /**
  * Planes Gratis y Plus (RF-PAG-01, `01 §11`). La tienda (Google Play, vía RevenueCat) es la fuente de verdad; la
@@ -39,6 +42,8 @@ export interface VistaPlan {
   /** Días que le quedan a la prueba o al periodo de Plus; `null` en Gratis o sin vencimiento. */
   readonly diasRestantes: number | null;
   readonly vigenteHasta: number | null;
+  /** Fecha civil del fin de la prueba o del periodo ("hasta el 26 oct"); `null` sin vencimiento. */
+  readonly fechaFin: PlainDate | null;
   readonly renovara: boolean;
   /** En Gratis, si antes tuvo Plus: terminó la prueba o la suscripción. Para decir "todo sigue aquí". */
   readonly terminoPlus: 'prueba' | 'suscripcion' | null;
@@ -108,6 +113,7 @@ export function obtenerPlan(ctx: Contexto): VistaPlan {
       diasRestantes:
         g.plus.vigente_hasta === null ? null : Math.ceil((g.plus.vigente_hasta - ahora) / DIA_MS),
       vigenteHasta: g.plus.vigente_hasta,
+      fechaFin: g.plus.vigente_hasta === null ? null : (ctx.reloj.fechaDe?.(g.plus.vigente_hasta) ?? null),
       renovara: g.plus.renovara,
       terminoPlus: null,
     };
@@ -117,6 +123,7 @@ export function obtenerPlan(ctx: Contexto): VistaPlan {
     enPrueba: false,
     diasRestantes: null,
     vigenteHasta: null,
+    fechaFin: null,
     renovara: false,
     terminoPlus: g?.plus ? (g.plus.en_prueba ? 'prueba' : 'suscripcion') : (g?.termino ?? null),
   };
