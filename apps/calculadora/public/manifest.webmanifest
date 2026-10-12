@@ -1,0 +1,13 @@
+{
+  "name": "Finanvoz · ¿Cuántos MSI aguantas?",
+  "short_name": "Finanvoz",
+  "lang": "es-MX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0E8A6E",
+  "icons": [
+    { "src": "/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

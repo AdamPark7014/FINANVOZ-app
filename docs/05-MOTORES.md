@@ -438,7 +438,10 @@ capacidad = max(0, min(cap_deuda, cap_msi))
 limitante = cap_deuda ≤ cap_msi ? 'deuda_total' : 'msi'
 precio_maximo[n] = capacidad·n  para n ∈ {3, 6, 9, 12, 18, 24}
 compra: cuota_maxima = max(distribuirMayorResiduo(precio, n)); cabe = cuota_maxima ≤ capacidad; margen = capacidad − cuota_maxima
+rebasa_recomendacion = cap_deuda < 0 o cap_msi < 0    (elige el mensaje cuando capacidad = 0)
 ```
+
+Si `pagos_msi_mensuales > pagos_deuda_mensuales` es un error de entrada (`msi_mayor_que_deuda`): los MSI son parte del total.
 
 Vectores: `E10`. Porcentajes configurables (bp); la calculadora cita la fuente en pantalla.
 

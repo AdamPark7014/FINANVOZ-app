@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: node scripts/oraculo.mjs --verificar
+      - run: pnpm --filter @cartera/calculadora build
+      # CA-M0-04: Lighthouse móvil ≥ 90 en rendimiento y accesibilidad.
+      - name: Lighthouse
+        run: |
+          pnpm --filter @cartera/calculadora preview --port 4173 --strictPort &
+          npx --yes wait-on@8 http://localhost:4173
+          npx --yes @lhci/cli@0.15.1 autorun \
+            --collect.url=http://localhost:4173/ --collect.numberOfRuns=3 \
+            --assert.assertions.categories:performance='["error",{"minScore":0.9}]' \
+            --assert.assertions.categories:accessibility='["error",{"minScore":0.9}]' \
+            --upload.target=temporary-public-storage
