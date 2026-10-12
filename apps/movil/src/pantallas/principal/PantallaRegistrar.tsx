@@ -11,10 +11,17 @@ import { PanelRegistrar } from './PanelRegistrar';
 export function PantallaRegistrar({
   alCerrar,
   alConsultarHoy,
+  alVerMovimientos,
+  alVerCuentas,
+  fraseRevision,
   motor,
 }: {
   alCerrar: () => void;
   alConsultarHoy: () => void;
+  alVerMovimientos?: () => void;
+  alVerCuentas?: () => void;
+  /** Frase de "Por revisar" que se abre para confirmarla. */
+  fraseRevision?: string;
   motor?: MotorDictado;
 }) {
   return (
@@ -36,7 +43,14 @@ export function PantallaRegistrar({
           testID="boton-cerrar-registrar"
         />
       </View>
-      <PanelRegistrar alConsultarHoy={alConsultarHoy} abiertoAlInicio {...(motor ? { motor } : {})} />
+      <PanelRegistrar
+        alConsultarHoy={alConsultarHoy}
+        abiertoAlInicio
+        {...(alVerMovimientos ? { alVerMovimientos } : {})}
+        {...(alVerCuentas ? { alVerCuentas } : {})}
+        {...(fraseRevision ? { fraseRevision } : {})}
+        {...(motor ? { motor } : {})}
+      />
       <Texto variante="subtitulo">O llena los datos</Texto>
       <FormularioMovimiento alGuardar={alCerrar} />
       <View style={{ height: espacio.xxxl }} />

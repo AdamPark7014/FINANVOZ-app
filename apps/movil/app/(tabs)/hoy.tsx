@@ -10,6 +10,7 @@ export default function Hoy() {
         // El ingreso se configura en Ajustes (02-UX §12).
         alConfigurarIngreso: () => router.push('/ajustes'),
         alAbrirFormulario: () => router.navigate('/registrar'),
+        alVerCuentas: () => router.navigate('/cuentas'),
       }}
     />
   );

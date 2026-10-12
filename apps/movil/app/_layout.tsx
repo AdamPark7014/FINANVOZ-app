@@ -2,6 +2,8 @@ import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { crearNivelNubeExpo } from '../src/nube/expo';
+import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { cargarEscenario, obtenerBloqueo, relojFijo } from '../src/servicios';
@@ -31,6 +33,8 @@ export default function Raiz() {
   const { esquema } = useTema();
   const [estado, setEstado] = useState<Estado>(() => intentarAbrir(0));
   const sesion = estado.tipo === 'lista' ? estado.sesion : null;
+  // Nivel 2 del intérprete; `null` si la build no trae `supabaseUrl` y `supabaseAnonKey` en `extra`.
+  const nube = useMemo(() => crearNivelNubeExpo(), []);
 
   const reemplazarSesion = useCallback(
     async (preparar?: () => Sesion) => {
@@ -98,7 +102,7 @@ export default function Raiz() {
   return (
     <ProveedorControlApp control={control}>
       {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
-      <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx}>
+      <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
         <AppProtegida reiniciada={estado.generacion > 0} />
       </ProveedorSesion>
     </ProveedorControlApp>
@@ -115,6 +119,7 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
   const preferencias = useVista(obtenerBloqueo);
   const bloqueo = useBloqueo({ activo: preferencias.activo });
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
+  useProcesarCola();
   return (
     <View style={{ flex: 1 }}>
       <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
