@@ -113,6 +113,24 @@ export {
   type OrigenRegistro,
 } from './formulario';
 export {
+  MENSAJE_CORRECCION_NO_SOPORTADA,
+  MENSAJE_ERROR_GENERAL,
+  MENSAJE_GRUPO_CERRADO,
+  MENSAJE_LIMITE_NUBE,
+  MENSAJE_MESES_SIN_TARJETA,
+  MENSAJE_MONTO_INVALIDO,
+  MENSAJE_NO_ENTENDI,
+  MENSAJE_NO_EXISTE,
+  MENSAJE_SERVIDOR,
+  MENSAJE_SIN_RED,
+  MENSAJE_SIN_RED_REINTENTO,
+  MENSAJE_SIN_VINCULO,
+  MENSAJE_YA_ANULADO,
+  mensajeError,
+  mensajeErrorCompartido,
+  mensajePorCodigo,
+} from './mensajes-error';
+export {
   confirmarCobertura,
   rechazarCobertura,
   type CoberturaAutomatica,
@@ -478,6 +496,7 @@ export {
   registrarPagoCompartido,
   salirDelGrupo,
   sincronizarGrupo,
+  sincronizarGruposAbiertos,
   textoSaldo,
   unirseConQr,
   type DependenciasCompartido,
@@ -485,6 +504,7 @@ export {
   type GrupoCompartidoVista,
   type MovimientoCompartido,
   type ResultadoAccion,
+  type ResultadoSincronizarTodos,
   type SaldoCompartido,
 } from './compartido';
 export {

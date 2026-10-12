@@ -9,7 +9,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 
 type ConfirmarMsi = Extract<ResultadoTexto, { resultado: 'confirmar_msi' }>;
 type RegistradoMsi = Extract<ResultadoTexto, { resultado: 'registrado_msi' }>;
@@ -66,8 +66,8 @@ export function TarjetaConfirmarMsi({
           alias ? { aprender: { alias } } : {},
         ),
       );
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

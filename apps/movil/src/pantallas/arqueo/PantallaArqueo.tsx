@@ -15,7 +15,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla } from '../onboarding/componentes';
 import { GrupoChips } from '../principal/Chip';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 
 type Paso = 'marcar' | 'cantidad' | 'resultado';
 
@@ -117,8 +117,8 @@ function Arqueo({
       });
       setHecho(mensaje);
       refrescar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -133,8 +133,8 @@ function Arqueo({
       setReal(efectivoReal);
       setCalculo(c);
       setPaso('resultado');
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

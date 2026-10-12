@@ -4,7 +4,7 @@ import { aportarTanda, cobrarTanda, listarCuentas, type MovimientoTanda } from '
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
-import { MENSAJE_ERROR_GENERAL, codigoError } from '../principal/textos';
+import { codigoError, mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajeAportacion, mensajeCobro } from './textos';
 
@@ -53,7 +53,7 @@ export function useYaLaDi(tandaId: string, fecha: string | null, testID: string)
       avisarRegistro(mensajeAportacion(m), m.deshacer);
     } catch (e) {
       if (codigoError(e) === 'cuenta_requerida') setEligiendo(true);
-      else setError(MENSAJE_ERROR_GENERAL);
+      else setError(mensajeError(e));
     }
   };
   const elegir = eligiendo ? (
@@ -85,8 +85,8 @@ export function MeTocoLaTanda({
             const m = cobrarTanda(ctx, { tandaId, cuentaId });
             avisarRegistro(mensajeCobro(m), m.deshacer);
             alTerminar?.();
-          } catch {
-            setError(MENSAJE_ERROR_GENERAL);
+          } catch (e) {
+            setError(mensajeError(e));
           }
         }}
       />

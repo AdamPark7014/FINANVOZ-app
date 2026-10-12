@@ -20,7 +20,7 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
 import { useMostrarAviso } from './ProveedorAvisos';
-import { codigoError, MENSAJE_ERROR_GENERAL } from './textos';
+import { codigoError, mensajeError } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
 type Compromiso = Extract<TarjetaAccion, { tipo: 'compromiso_vencido' }>;
@@ -132,7 +132,7 @@ function TarjetaOcurrencia({ t, testID }: { t: Compromiso | Ingreso; testID: str
       avisarRegistro(`Registré: ${t.concepto} ${formatearCentavos(t.monto)}`, r.deshacer);
     } catch (e) {
       if (codigoError(e) === 'cuenta_requerida') setEligiendoCuenta(true);
-      else setError(MENSAJE_ERROR_GENERAL);
+      else setError(mensajeError(e));
     }
   };
   const posponer = () => {
@@ -286,8 +286,8 @@ function TarjetaCobertura({ t, testID }: { t: Cobertura; testID: string }) {
           ? `Listo: cuento ese pago como ${t.concepto}.`
           : `Va. Sigo apartando lo de ${t.concepto}.`,
       });
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
   return (

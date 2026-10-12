@@ -10,7 +10,7 @@ import {
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Texto } from '../../ui';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { AYUDA_DATOS_COBRO, MENSAJES_DATOS_COBRO } from './textos';
 
 /**
@@ -40,9 +40,7 @@ export function FormularioDatosCobro({
       alGuardar(datos);
     } catch (e) {
       setError(
-        e instanceof ErrorDominio
-          ? (MENSAJES_DATOS_COBRO[e.codigo] ?? MENSAJE_ERROR_GENERAL)
-          : MENSAJE_ERROR_GENERAL,
+        e instanceof ErrorDominio ? (MENSAJES_DATOS_COBRO[e.codigo] ?? mensajeError(e)) : mensajeError(e),
       );
     }
   };

@@ -14,7 +14,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { MESES_CAPTURA } from './PreguntasCaptura';
@@ -67,8 +67,8 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
       accion();
       refrescar();
       mostrar({ mensaje });
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -144,8 +144,8 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             try {
               const r = fueAMeses(ctx, c.capturaId, Number(n));
               avisarRegistro(mensajeCompraMsi(r), r.deshacer);
-            } catch {
-              setError(MENSAJE_ERROR_GENERAL);
+            } catch (e) {
+              setError(mensajeError(e));
             }
           }}
           prefijoTestID={`${testID}-meses`}

@@ -27,7 +27,7 @@ import {
 import { Chips } from '../onboarding/componentes';
 import { leerDiaMes } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { ElegirCuenta, Seccion } from './componentes';
 import { etiquetaMes, NOMBRE_ESTADO_PLAN } from './textos';
@@ -83,8 +83,8 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
                   `Listo: liquidaste ${p.descripcion} (${formatearCentavos(l.monto)}).`,
                   l.deshacer,
                 );
-              } catch {
-                setError(MENSAJE_ERROR_GENERAL);
+              } catch (e) {
+                setError(mensajeError(e));
               }
             }}
           />
@@ -216,8 +216,8 @@ function FilaPagoPlaneado({ p }: { p: PagoPlaneadoVista }) {
             quitarPagoPlaneado(ctx, p.programadoId);
             refrescar();
             mostrar({ mensaje: 'Quité ese pago. Ahora aparto lo que debes completo.' });
-          } catch {
-            mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
+          } catch (e) {
+            mostrar({ mensaje: mensajeError(e) });
           }
         }}
       />
@@ -247,8 +247,8 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
       refrescar();
       mostrar({ mensaje: `Listo: aparto ${formatearCentavos(monto)} para cada pago planeado.` });
       alTerminar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

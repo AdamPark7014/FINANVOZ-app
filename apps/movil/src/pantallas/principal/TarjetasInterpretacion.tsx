@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import {
   aplicarEleccion,
   etiquetaDiaMes,
+  mensajeError,
   type AccionElegir,
   type MovimientoVista,
   type OrigenDictado,
@@ -11,7 +12,7 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_TIPO_LIBRO } from './textos';
+import { NOMBRE_TIPO_LIBRO } from './textos';
 
 type Elegir = Extract<ResultadoTexto, { resultado: 'elegir' }>;
 type Duplicados = Extract<ResultadoTexto, { resultado: 'duplicados' }>;
@@ -80,8 +81,8 @@ export function TarjetaElegir({
           origen,
         ),
       );
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 
@@ -168,8 +169,8 @@ export function TarjetaDuplicados({
                 alPresionar={() => {
                   try {
                     alTerminar(aplicarEleccion(ctx, { accion: 'anular', transaccionId: m.id }, origen));
-                  } catch {
-                    setError(MENSAJE_ERROR_GENERAL);
+                  } catch (e) {
+                    setError(mensajeError(e));
                   }
                 }}
                 testID={`borrar-duplicado-${m.id}`}

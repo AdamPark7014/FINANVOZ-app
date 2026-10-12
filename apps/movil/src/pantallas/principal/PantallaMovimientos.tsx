@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { ErrorDominio } from '@cartera/core';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -10,7 +9,7 @@ import {
   listarPorInterpretar,
   listarTarjetas,
   marcarExtraordinaria,
-  MENSAJE_MOVIMIENTO_COMPARTIDO,
+  mensajeError,
   pasarAMeses,
   type FiltroMovimientos,
   type MovimientoVista,
@@ -23,7 +22,7 @@ import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips } from './Chip';
 import { useMostrarAviso } from './ProveedorAvisos';
 import { useAvisoRegistro } from './useAvisoRegistro';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO, resumenMovimiento } from './textos';
+import { NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO, resumenMovimiento } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
   automatico: 'automático',
@@ -171,12 +170,7 @@ export function PantallaMovimientos({
                   refrescar();
                   mostrar({ mensaje: 'Anulé el movimiento.' });
                 } catch (e) {
-                  mostrar({
-                    mensaje:
-                      e instanceof ErrorDominio && e.codigo === 'movimiento_compartido'
-                        ? MENSAJE_MOVIMIENTO_COMPARTIDO
-                        : MENSAJE_ERROR_GENERAL,
-                  });
+                  mostrar({ mensaje: mensajeError(e) });
                 }
               }}
               alExtraordinario={() => {
@@ -197,8 +191,8 @@ export function PantallaMovimientos({
                       },
                     },
                   });
-                } catch {
-                  mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
+                } catch (e) {
+                  mostrar({ mensaje: mensajeError(e) });
                 }
               }}
             />
@@ -230,8 +224,8 @@ function PasarAMeses({ m, alTerminar }: { m: MovimientoVista; alTerminar: () => 
       const r = pasarAMeses(ctx, m.id, n);
       avisarRegistro(mensajeCompraMsi(r), r.deshacer);
       alTerminar();
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
   return (

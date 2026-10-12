@@ -10,7 +10,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
-import { MENSAJE_ERROR_GENERAL } from '../principal/textos';
+import { mensajeError } from '../principal/textos';
 
 type Accion = 'compromiso' | 'cancelada' | 'no_es';
 
@@ -39,8 +39,8 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
     try {
       HACER[accion](ctx, s.comercio);
       setMensaje({ texto: MENSAJE[accion](s.nombre), error: false });
-    } catch {
-      setMensaje({ texto: MENSAJE_ERROR_GENERAL, error: true });
+    } catch (e) {
+      setMensaje({ texto: mensajeError(e), error: true });
     }
     refrescar();
   };

@@ -17,7 +17,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips } from '../principal/Chip';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_TIPO_LIBRO } from '../principal/textos';
+import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
 import { etiquetaSaldoPersona, MENSAJE_COMPARTIR_NO_DISPONIBLE } from './textos';
@@ -213,8 +213,8 @@ function YaMePago({
     try {
       const r = registrarPrestamo(ctx, { tipo: 'cobro_prestamo', personaId, cuentaId: destinoId, monto });
       alTerminar(`Registré que te pagó ${formatearCentavos(monto)}`, r.deshacer);
-    } catch {
-      setError(MENSAJE_ERROR_GENERAL);
+    } catch (e) {
+      setError(mensajeError(e));
     }
   };
 

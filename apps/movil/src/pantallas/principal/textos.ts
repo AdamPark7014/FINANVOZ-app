@@ -2,6 +2,12 @@ import { ErrorDominio } from '@cartera/core';
 import { formatearCentavos } from '../../ui';
 import {
   etiquetaDiaMes,
+  MENSAJE_CORRECCION_NO_SOPORTADA,
+  MENSAJE_ERROR_GENERAL,
+  MENSAJE_LIMITE_NUBE,
+  MENSAJE_MESES_SIN_TARJETA,
+  MENSAJE_NO_ENTENDI,
+  mensajeError,
   type CompromisoConfigurado,
   type EntradaMovimiento,
   type MotivoNoSoportado,
@@ -52,16 +58,15 @@ export const NOMBRE_ORIGEN: Record<string, string> = {
   sistema: 'Registrado por la app',
 };
 
-export const MENSAJE_NO_ENTENDI = 'No te entendí. Prueba así: «tacos 80 en efectivo».';
+export { MENSAJE_ERROR_GENERAL, MENSAJE_NO_ENTENDI, mensajeError };
 export const MENSAJE_POR_INTERPRETAR =
   'Lo guardé; lo interpreto cuando tengas internet. Lo encuentras en Movimientos, en Por revisar.';
-export const MENSAJE_ERROR_GENERAL = 'No pude guardarlo. Intenta de nuevo.';
 
 /** Por qué quedó guardada la frase (`02 §5`, punto 8). */
 export const MENSAJE_GUARDADA: Record<MotivoPorInterpretar, string> = {
   sin_nube: MENSAJE_POR_INTERPRETAR,
   sin_red: MENSAJE_POR_INTERPRETAR,
-  limite: 'Ya usaste las frases que interpreto en internet por ahora. La guardé y la interpreto después.',
+  limite: MENSAJE_LIMITE_NUBE,
   error: 'No pude interpretarla en este momento. La guardé y lo intento de nuevo más tarde.',
 };
 
@@ -70,8 +75,8 @@ export const MENSAJE_NO_SOPORTADO: Record<MotivoNoSoportado, string> = {
   intencion: 'Eso todavía no lo hago. Llega pronto.',
   ajuste: 'Eso todavía no lo configuro hablando. Hazlo en Ajustes.',
   consulta: 'Todavía no sé responder esa pregunta.',
-  meses_sin_tarjeta: 'Solo una compra con tarjeta de crédito se puede pasar a meses.',
-  correccion: 'Ese movimiento no lo puedo corregir así. Ábrelo en Movimientos.',
+  meses_sin_tarjeta: MENSAJE_MESES_SIN_TARJETA,
+  correccion: MENSAJE_CORRECCION_NO_SOPORTADA,
 };
 
 type FueraDeAlcance = Extract<ResultadoTexto, { resultado: 'fuera_de_alcance' }>['motivo'];
