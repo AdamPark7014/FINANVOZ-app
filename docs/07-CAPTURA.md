@@ -58,6 +58,9 @@ confirmarCola(hastaClave: string): Promise<void>;   // borra lo ya ingerido
 solicitarReconexion(): void;                        // requestRebind
 ultimoEvento(): Promise<number | null>;             // detección de captura inactiva (RF-CAP-07)
 addListener('notificacion', (n: NotificacionCruda) => void): Subscription;
+extraerTextoPdf(uri: string, contrasena: string | null): Promise<ResultadoPdf>; // M15 (§8)
+// ResultadoPdf: {tipo:'texto', paginas: string[]} | {tipo:'pide_contrasena'} | {tipo:'contrasena_incorrecta'}
+//             | {tipo:'invalido'} | {tipo:'demasiado_grande'}   (en TS se agrega 'no_disponible' sin módulo)
 ```
 
 ### 2.4 Procesamiento
@@ -194,3 +197,12 @@ iOS no permite leer notificaciones de otras apps. La captura automática en iPho
 - Un **analizador por banco** (como las plantillas de §3, pero sobre el texto del PDF) extrae: periodo, fecha de corte, fecha límite, saldo al corte, PNGI, pago mínimo, movimientos (fecha, descripción, monto) y saldos pendientes de MSI.
 - Usos: (1) **conciliar** la tarjeta: comparar saldo al corte del PDF contra el del libro y proponer una `conciliacion` por la diferencia; (2) **completar** movimientos que la captura no vio, con E9.3 para no duplicar; (3) corregir el calendario de MSI con lo que dice el banco.
 - Los analizadores se prueban con PDFs **sintéticos** generados en el repositorio; nunca se suben estados de cuenta reales al repositorio.
+
+**Implementación (M15).**
+
+- **Extracción en Android:** PdfBox-Android 2.0.27.0 (decisión del spike en `ESTADO.md` → Decisiones) dentro de `modules/captura-android`: lee el `content://` con `ContentResolver`, solo en memoria, hasta 20 MB y 60 páginas; texto por página ordenado por posición. Con contraseña devuelve `pide_contrasena`; la contraseña no se guarda ni se registra. Sin red: el módulo no tiene permisos de red propios y nada del PDF sale del teléfono (prueba de red de CA-M15-03).
+- **Escaneado:** si cada página tiene menos de 50 caracteres visibles, el PDF se toma por escaneado: "No puedo leer PDFs escaneados".
+- **Analizadores:** JSON declarativo con expresiones regulares de grupos con nombre (`packages/core/src/captura/estados-cuenta.ts`): reconocimiento, campos del encabezado (grupo `v`; el periodo con `desde`/`hasta`), secciones de movimientos y de MSI (`inicio`, `fin`, `ignorar`, `renglon`) y tipos (`pago`, `comision`; el signo o "CR" marca abonos). Los de bancos reales viven en `apps/movil/src/captura/analizadores/reales.json`; los sintéticos de `fixtures/pdf/` solo se cargan en builds de desarrollo.
+- **Completar (uso 2):** cada renglón pasa por E9.3 contra los movimientos de la tarjeta, de `por_asignar` y de cuentas puente (uno a uno); los de antes del alta de la tarjeta no se proponen. Los nuevos se registran por `Libro.registrar` con `origen = 'estado_cuenta'`: cargo → gasto (categoría aprendida o del catálogo; si no, `otros_gastos`), comisión → `comisiones_intereses`, pago → `transferencia_pendiente` (en tránsito, como §5), abono → `reembolso`. Cada renglón deja una fila en `captura` (`fuente = 'estado_cuenta'`, huella `ec:{tarjeta}:{corte}:{indice}`, sin texto ni montos) para que compartir el mismo PDF otra vez no duplique.
+- **Conciliar (uso 1):** se compara el saldo al corte del banco con la deuda de Cartera al corte (contando los vinculados que el libro fechó después del corte y sin contar los movimientos del libro de los 2 días antes del corte que el banco aún no factura); si difiere, "Según tu banco debes $X; según Cartera, $Y. ¿Ajusto?" → `conciliacion` fechada al corte.
+- **Corregir MSI (uso 3):** no entra en M15 (pendiente en `ESTADO.md`): los MSI se leen y se prueban, pero el calendario no se toca.
