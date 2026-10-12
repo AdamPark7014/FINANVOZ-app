@@ -252,6 +252,25 @@ export {
   type PuertoEvidencia,
 } from '../privacidad/evidencia-servidor';
 export { obtenerCentroPrivacidad, type VistaCentroPrivacidad } from '../privacidad/centro';
+export {
+  fechaRespaldo,
+  fijarContrasenaRespaldo,
+  generarRespaldo,
+  MENSAJE_NO_ABRE,
+  mensajeErrorRespaldo,
+  mensajeRestaurado,
+  MIN_CONTRASENA_RESPALDO,
+  nombreArchivoRespaldo,
+  prepararRestauracion,
+  restaurarRespaldo,
+  resumenRespaldo,
+  tieneContrasenaRespaldo,
+  validarContrasenaNueva,
+  type ArchivosRespaldo,
+  type DependenciasRespaldo,
+  type ProblemaContrasena,
+  type RespaldoListo,
+} from './respaldo';
 export { bucketLatencia, type EventoAnalitica } from '../analitica/eventos';
 export { cargarEscenario, type EscenarioCargado } from './semilla';
 export {

@@ -283,17 +283,22 @@ async function descifrar(
   return { encabezado: leido.encabezado, json };
 }
 
-/** Abre un `.cartera` con la contraseña: valida el encabezado antes de derivar, deriva, descifra y descomprime. */
+/**
+ * Abre un `.cartera` con la contraseña: valida el encabezado antes de derivar, deriva, descifra y descomprime.
+ * Devuelve también la llave derivada con su sal y parámetros.
+ */
 export async function abrirRespaldo(
   cripto: CriptoRespaldo,
   archivo: Uint8Array,
   contrasena: string,
   opciones: OpcionesApertura = {},
-): Promise<RespaldoAbierto> {
+): Promise<RespaldoAbierto & { llave: LlaveRespaldo }> {
   const leido = leerEncabezado(archivo, opciones);
   const { n, r, p } = leido.encabezado.kdf;
   const llave = await derivarLlave(cripto, contrasena, leido.sal, { n, r, p });
-  return descifrar(cripto, leido, llave, opciones);
+  const abierto = await descifrar(cripto, leido, llave, opciones);
+  // La llave del respaldo abierto: al restaurar, el teléfono nuevo sigue respaldando con la misma contraseña.
+  return { ...abierto, llave: { llave, sal: leido.sal, n, r, p } };
 }
 
 /** Abre un `.cartera` con una llave ya derivada (p. ej. verificar un respaldo propio sin pedir la contraseña). */

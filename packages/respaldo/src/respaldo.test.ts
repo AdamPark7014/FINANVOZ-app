@@ -102,6 +102,8 @@ describe('E16 · fixtures/respaldo (CA-M9-01, parte de Node)', () => {
     const r = await abrirRespaldo(criptoNode, leer(kat.archivo), kat.contrasena, PRUEBA);
     expect(r.json).toBe(kat.contenido_descomprimido);
     expect(r.encabezado.creado_en).toBe('2026-10-11T18:00:00Z');
+    expect(hex(r.llave.llave)).toBe(kat.clave_hex);
+    expect(r.llave).toMatchObject({ n: 16384, r: 8, p: 1 });
   });
 
   it('abre el ejemplo con la llave de kat.json (sin contraseña)', async () => {

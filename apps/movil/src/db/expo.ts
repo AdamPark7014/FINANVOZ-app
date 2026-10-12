@@ -47,6 +47,21 @@ export const puertoExpo: PuertoSqlite = {
   },
 };
 
+/** Base desechable en memoria (ensayo de una restauración antes de reemplazar la base real, M9). */
+export function puertoMemoriaExpo(): PuertoSqlite {
+  return {
+    abrir() {
+      const cliente = openDatabaseSync(':memory:');
+      return {
+        ejecutar: (sentencia) => cliente.execSync(sentencia),
+        drizzle: () => drizzle(cliente) as unknown as BaseDatos,
+        cerrar: () => cliente.closeSync(),
+      };
+    },
+    eliminarArchivo() {},
+  };
+}
+
 /** Abre la base de la app (llave en el almacén seguro, `PRAGMA key`, migraciones). */
 export function abrirBaseApp(): BaseAbierta {
   return abrirBaseCifrada({ puerto: puertoExpo, almacen: almacenExpo, aleatorio: getRandomBytes });

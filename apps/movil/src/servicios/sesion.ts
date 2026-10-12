@@ -6,9 +6,11 @@
 import type { BaseAbierta } from '../db/abrir';
 import { abrirBaseApp, aleatorioExpo, almacenExpo, puertoExpo } from '../db/expo';
 import { borrarTodo } from '../privacidad/borrar';
+import { dependenciasRespaldoExpo } from '../respaldo/expo';
 import { crearContexto, type Contexto, type Reloj } from './contexto';
 import { crearGeneradorUuidV7 } from './ids';
 import { relojDispositivo } from './reloj';
+import { restaurarRespaldo, type RespaldoListo } from './respaldo';
 
 export interface Sesion {
   readonly ctx: Contexto;
@@ -18,6 +20,20 @@ export interface Sesion {
 /** `reloj` se inyecta solo en builds de desarrollo (escenarios semilla); en producción es el del teléfono. */
 export function abrirSesion(reloj: Reloj = relojDispositivo()): Sesion {
   const base = abrirBaseApp();
+  const ctx = crearContexto({
+    db: base.db,
+    reloj,
+    generarId: crearGeneradorUuidV7(() => reloj.ahora(), aleatorioExpo),
+  });
+  return { ctx, base };
+}
+
+/**
+ * Restaurar (M9): con la base anterior ya cerrada y borrada, importa el respaldo ensayado en una base nueva y
+ * abre la sesión sobre ella. La llave del respaldo queda guardada para el respaldo automático.
+ */
+export function restaurarSesion(listo: RespaldoListo, reloj: Reloj = relojDispositivo()): Sesion {
+  const base = restaurarRespaldo(dependenciasRespaldoExpo, listo);
   const ctx = crearContexto({
     db: base.db,
     reloj,
