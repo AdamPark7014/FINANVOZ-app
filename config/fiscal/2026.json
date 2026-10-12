@@ -1,0 +1,83 @@
+{
+  "ejercicio": 2026,
+  "estado": "por_validar",
+  "fuentes": [
+    "LISR art. 113-E (RESICO personas físicas)",
+    "LISR art. 151 (deducciones personales)",
+    "LISR art. 152 (tarifa anual)",
+    "CFF art. 20 (ajuste a pesos)",
+    "INEGI (UMA 2026)"
+  ],
+  "dia_pago": 17,
+  "iva_tasa_general_bp": 1600,
+  "porcentaje_por_defecto_bp": 2000,
+  "resico_pf": {
+    "limite_anual": 350000000,
+    "tabla_mensual": [
+      { "hasta": 2500000, "tasa_bp": 100 },
+      { "hasta": 5000000, "tasa_bp": 110 },
+      { "hasta": 8333333, "tasa_bp": 150 },
+      { "hasta": 20833333, "tasa_bp": 200 },
+      { "hasta": 350000000, "tasa_bp": 250 }
+    ]
+  },
+  "tarifa_anual_isr": [{ "limite_inferior": 0, "cuota_fija": 0, "tasa_bp": 192 }, "POR_DEFINIR"],
+  "uma": { "diaria": 11731, "anual": 4279464 },
+  "deducciones": {
+    "tope_global": { "umas": 5, "porcentaje_ingresos_bp": "POR_DEFINIR" },
+    "formas_pago_electronicas": ["02", "03", "04", "28", "29"],
+    "tope_lentes_por_beneficiario": "POR_DEFINIR",
+    "usos": {
+      "D01": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D02": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D03": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D04": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D05": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D06": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D07": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D08": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D09": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope": "POR_DEFINIR"
+      },
+      "D10": {
+        "en_tope_global": "POR_DEFINIR",
+        "requiere_pago_electronico": "POR_DEFINIR",
+        "tope_por_alumno_nivel": "POR_DEFINIR"
+      }
+    }
+  }
+}

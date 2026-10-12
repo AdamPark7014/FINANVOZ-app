@@ -1,4 +1,4 @@
-/** Barril de E13 (deducciones personales e ISR por tarifa). */
+/** Barril de E13 (deducciones personales e ISR por tarifa) y del cargador de `config/fiscal/<año>.json`. */
 export {
   estimarDeducciones,
   type CfdiLeido,
@@ -18,3 +18,11 @@ export {
   type FilaTarifa,
   type ResultadoAhorro,
 } from './fiscal/isr';
+export {
+  camposPorDefinir,
+  POR_DEFINIR,
+  validarConfigFiscal,
+  type ConfigFiscal,
+  type EstadoConfigFiscal,
+  type FilaResico,
+} from './fiscal/config';
