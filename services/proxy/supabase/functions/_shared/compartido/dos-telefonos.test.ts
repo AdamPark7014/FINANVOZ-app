@@ -159,7 +159,8 @@ describe('CA-M16-04 · inspección del servidor', () => {
       expect(crudo).not.toContain(claro);
     }
     const blob = Buffer.from(String(filas[0]?.blob), 'base64').toString('latin1');
-    expect(blob).not.toContain('{');
+    // Un byte suelto como '{' aparece al azar en texto cifrado; se buscan claves JSON completas.
+    expect(blob).not.toContain('"tipo"');
     expect(blob).not.toContain('cuerpo');
 
     const C = cliente(await s.usuario());
