@@ -14,6 +14,7 @@ export default function Privacidad() {
         alLeerAviso={() => router.push('/aviso-privacidad')}
         alLeerTerminos={() => router.push('/terminos')}
         alBorrarTodo={() => control.borrarTodo()}
+        alRestaurar={() => router.push('/restaurar')}
       />
     </Pantalla>
   );

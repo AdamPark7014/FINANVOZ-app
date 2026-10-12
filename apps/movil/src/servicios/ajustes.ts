@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ErrorDominio, type Centavos } from '@cartera/core';
+import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import type { Contexto } from './contexto';
 import { CentavosNoNegativos, borrarAjuste, escribirAjuste, leerAjuste } from './preferencias';
@@ -68,6 +68,13 @@ export function completarOnboarding(ctx: Contexto): void {
 
 export function onboardingCompletado(ctx: Contexto): boolean {
   return leerAjuste(ctx, 'onboarding', Onboarding)?.completado ?? false;
+}
+
+/** Fecha civil en que terminó el onboarding; `null` si no ha terminado (o no se guardó el instante). */
+export function fechaOnboarding(ctx: Contexto): PlainDate | null {
+  const o = leerAjuste(ctx, 'onboarding', Onboarding);
+  if (!o?.completado || o.completado_en === null) return null;
+  return ctx.reloj.fechaDe ? ctx.reloj.fechaDe(o.completado_en) : ctx.reloj.hoy();
 }
 
 export interface VistaAjustes {

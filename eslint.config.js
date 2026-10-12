@@ -49,6 +49,21 @@ export default tseslint.config(
     },
   },
   {
+    // packages/respaldo corre en el teléfono: la criptografía llega inyectada; node:crypto solo en ./node y pruebas.
+    files: ['packages/respaldo/src/**/*.ts'],
+    ignores: ['packages/respaldo/src/node.ts', 'packages/respaldo/src/**/*.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { regex: '^node:', message: 'La criptografía se inyecta (03 §4); Node solo en ./node.' },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['apps/calculadora/src/**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.browser } },
     plugins: { 'react-hooks': reactHooks },

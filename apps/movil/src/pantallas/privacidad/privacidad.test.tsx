@@ -42,6 +42,11 @@ jest.mock('expo-screen-capture', () => ({
   allowScreenCaptureAsync: jest.fn(async () => {}),
 }));
 jest.mock('../../observabilidad', () => ({ iniciarSentry: jest.fn() }));
+jest.mock('../../respaldo/expo', () => {
+  const { crearRespaldoPrueba } = jest.requireActual('../respaldo/__pruebas__/respaldo');
+  const r = crearRespaldoPrueba();
+  return { dependenciasRespaldoExpo: r.deps, archivosRespaldoExpo: r.archivos };
+});
 jest.mock('../ajustes/compartir', () => ({ compartirArchivo: jest.fn(async () => {}) }));
 
 const RUTAS = {

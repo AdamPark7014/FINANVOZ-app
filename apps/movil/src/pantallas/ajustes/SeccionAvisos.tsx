@@ -109,6 +109,13 @@ export function SeccionAvisos() {
         valor={pref.riesgo}
         alCambiar={(riesgo) => guardar({ riesgo })}
       />
+      <Interruptor
+        testID="ajustes-aviso-respaldo"
+        etiqueta="Respaldo pendiente"
+        descripcion="Si pasan 2 semanas sin respaldo, una vez por semana."
+        valor={pref.respaldo}
+        alCambiar={(respaldo) => guardar({ respaldo })}
+      />
       <CampoTexto
         testID="ajustes-aviso-hora"
         etiqueta="Hora de los avisos"

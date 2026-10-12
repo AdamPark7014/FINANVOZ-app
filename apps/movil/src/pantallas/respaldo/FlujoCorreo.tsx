@@ -1,0 +1,136 @@
+import { useState } from 'react';
+import {
+  confirmarCodigoRespaldo,
+  mensajeErrorNube,
+  type CuentaRespaldo,
+  type ModoCodigo,
+} from '../../servicios';
+import { useSesion } from '../../sesion/ProveedorSesion';
+import { Boton, CampoTexto, Texto } from '../../ui';
+
+export interface CuentaConfirmada {
+  readonly modo: ModoCodigo;
+  /** El usuario del proxy cambió (entrar a otra cuenta): las compras deben seguirlo (pendiente 58). */
+  readonly cambioUsuario: boolean;
+}
+
+/**
+ * Correo → código de 6 dígitos (`02 §19`). Vincula el correo a la cuenta anónima de este teléfono o, si ese
+ * correo ya tiene cuenta (otro teléfono), entra a ella. Con `soloEntrar` (restaurar) va directo a entrar. El
+ * correo y el código nunca se registran (regla 9).
+ */
+export function FlujoCorreo({
+  cuenta,
+  soloEntrar = false,
+  alConfirmar,
+}: {
+  cuenta: CuentaRespaldo;
+  soloEntrar?: boolean;
+  alConfirmar: (r: CuentaConfirmada) => void;
+}) {
+  const { ctx, refrescar } = useSesion();
+  const [correo, setCorreo] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [modo, setModo] = useState<ModoCodigo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [trabajando, setTrabajando] = useState(false);
+
+  const pedir = async () => {
+    setError(null);
+    setTrabajando(true);
+    try {
+      const r = await cuenta.pedirCodigo(correo, { soloEntrar });
+      if (r.ok) {
+        setCodigo('');
+        setModo(r.modo);
+      } else setError(mensajeErrorNube(r.error));
+    } finally {
+      setTrabajando(false);
+    }
+  };
+
+  const confirmar = async (m: ModoCodigo) => {
+    setError(null);
+    setTrabajando(true);
+    try {
+      const r = await confirmarCodigoRespaldo(cuenta, ctx, correo, codigo, m);
+      if (!r.ok) {
+        setError(mensajeErrorNube(r.error));
+        return;
+      }
+      refrescar();
+      alConfirmar({ modo: m, cambioUsuario: r.cambioUsuario });
+    } finally {
+      setTrabajando(false);
+    }
+  };
+
+  return modo === null ? (
+    <>
+      <CampoTexto
+        testID="respaldo-correo"
+        etiqueta="Tu correo"
+        valor={correo}
+        alCambiar={setCorreo}
+        teclado="email-address"
+        nativo={{ autoCapitalize: 'none', autoCorrect: false, autoComplete: 'email' }}
+        alEnviar={() => void pedir()}
+      />
+      <Boton
+        testID="respaldo-pedir-codigo"
+        etiqueta="Enviarme el código"
+        cargando={trabajando}
+        deshabilitado={trabajando || correo.trim() === ''}
+        alPresionar={() => void pedir()}
+      />
+      {error ? <MensajeError texto={error} /> : null}
+    </>
+  ) : (
+    <>
+      <Texto variante="secundario" tono="secundario" testID="respaldo-codigo-enviado">
+        {`Te mandé un código a ${correo.trim().toLowerCase()}. Escríbelo aquí.`}
+      </Texto>
+      <CampoTexto
+        testID="respaldo-codigo"
+        etiqueta="Código de 6 dígitos"
+        valor={codigo}
+        alCambiar={setCodigo}
+        teclado="number-pad"
+        autoFocus
+        nativo={{ autoComplete: 'one-time-code', textContentType: 'oneTimeCode' }}
+        alEnviar={() => void confirmar(modo)}
+      />
+      <Boton
+        testID="respaldo-confirmar-codigo"
+        etiqueta="Confirmar"
+        cargando={trabajando}
+        deshabilitado={trabajando || codigo.trim() === ''}
+        alPresionar={() => void confirmar(modo)}
+      />
+      <Boton
+        variante="texto"
+        ancho="contenido"
+        etiqueta="Usar otro correo"
+        deshabilitado={trabajando}
+        alPresionar={() => {
+          setError(null);
+          setModo(null);
+        }}
+      />
+      {error ? <MensajeError texto={error} /> : null}
+    </>
+  );
+}
+
+function MensajeError({ texto }: { texto: string }) {
+  return (
+    <Texto
+      variante="secundario"
+      tono="faltante"
+      accessibilityLiveRegion="polite"
+      testID="respaldo-nube-error"
+    >
+      {texto}
+    </Texto>
+  );
+}

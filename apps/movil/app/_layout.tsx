@@ -6,33 +6,43 @@ import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
-import { crearNivelNubeExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
+import { crearNivelNubeExpo, crearNubeRespaldoExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
 import { useEvidenciaConsentimiento } from '../src/nube/useEvidenciaConsentimiento';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
+import { archivosRespaldoExpo, dependenciasRespaldoExpo } from '../src/respaldo/expo';
+import { programarRespaldoAutomatico } from '../src/respaldo/programar';
+import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/SincronizarRespaldoAutomatico';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
-import { cargarEscenario, obtenerBloqueo, relojFijo, type PuertoEvidencia } from '../src/servicios';
-import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
+import {
+  cargarEscenario,
+  mensajeRestaurado,
+  obtenerBloqueo,
+  relojFijo,
+  type PuertoEvidencia,
+} from '../src/servicios';
+import { abrirSesion, borrarTodoApp, restaurarSesion, type Sesion } from '../src/servicios/sesion';
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
 import { ProveedorSesion, useVista } from '../src/sesion/ProveedorSesion';
-import { Boton, Pantalla, Texto, useTema } from '../src/ui';
+import { Aviso, Boton, Pantalla, Texto, useTema } from '../src/ui';
 
 iniciarSentry();
 
 type Estado =
-  | { tipo: 'lista'; sesion: Sesion; generacion: number }
+  | { tipo: 'lista'; sesion: Sesion; generacion: number; aviso?: string }
   | { tipo: 'trabajando'; generacion: number }
   | { tipo: 'error'; generacion: number };
 
 /** Abre la base cifrada; si falla, la raíz muestra una pantalla amable con "Intentar de nuevo". */
-function intentarAbrir(generacion: number, preparar?: () => Sesion): Estado {
+function intentarAbrir(generacion: number, preparar?: () => Sesion, aviso?: string): Estado {
   try {
-    return { tipo: 'lista', sesion: preparar ? preparar() : abrirSesion(), generacion };
+    const sesion = preparar ? preparar() : abrirSesion();
+    return { tipo: 'lista', sesion, generacion, ...(aviso ? { aviso } : {}) };
   } catch {
     // El error no se muestra ni se registra con detalle: podría llevar rutas o datos (regla 9).
     return { tipo: 'error', generacion };
@@ -53,18 +63,20 @@ export default function Raiz() {
   const analitica = useMemo(() => crearAnaliticaExpo(), []);
   // Copia mínima de la evidencia del consentimiento en Supabase (`08 §2`).
   const evidencia = useMemo(() => crearPuertoEvidenciaExpo(), []);
+  // Cuenta de respaldo y bucket de Supabase (M9); `null` sin configuración: solo respaldo en archivo.
+  const nubeRespaldo = useMemo(() => crearNubeRespaldoExpo(), []);
 
   const reemplazarSesion = useCallback(
-    async (preparar?: () => Sesion) => {
+    async (preparar?: () => Sesion, aviso?: string, conservarSesionNube = false) => {
       const siguiente = estado.generacion + 1;
       setEstado({ tipo: 'trabajando', generacion: siguiente });
       try {
-        await borrarTodoApp(sesion);
+        await borrarTodoApp(sesion, { conservarSesionNube });
       } catch {
         setEstado({ tipo: 'error', generacion: siguiente });
         return;
       }
-      setEstado(intentarAbrir(siguiente, preparar));
+      setEstado(intentarAbrir(siguiente, preparar, aviso));
     },
     [estado.generacion, sesion],
   );
@@ -72,6 +84,15 @@ export default function Raiz() {
   const control = useMemo<ControlApp>(
     () => ({
       borrarTodo: () => reemplazarSesion(),
+      respaldo: {
+        deps: dependenciasRespaldoExpo,
+        archivos: archivosRespaldoExpo,
+        // El respaldo ya se descifró y se ensayó en memoria: aquí solo se reemplaza la base. La sesión de la nube
+        // (la de correo con la que se bajó el respaldo) se conserva: es identidad, no datos.
+        restaurar: (listo) => reemplazarSesion(() => restaurarSesion(listo), mensajeRestaurado(listo), true),
+        nube: nubeRespaldo,
+        programarAutomatico: programarRespaldoAutomatico,
+      },
       ...(__DEV__
         ? {
             cargarEscenario: (datos: unknown) =>
@@ -90,7 +111,7 @@ export default function Raiz() {
           }
         : {}),
     }),
-    [reemplazarSesion],
+    [reemplazarSesion, nubeRespaldo],
   );
 
   if (estado.tipo !== 'lista') {
@@ -124,7 +145,11 @@ export default function Raiz() {
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
           <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
             <ProveedorAnalitica analitica={analitica}>
-              <AppProtegida reiniciada={estado.generacion > 0} evidencia={evidencia} />
+              <AppProtegida
+                reiniciada={estado.generacion > 0}
+                evidencia={evidencia}
+                avisoInicial={estado.aviso ?? null}
+              />
             </ProveedorAnalitica>
           </ProveedorPlan>
         </ProveedorSesion>
@@ -137,8 +162,18 @@ export default function Raiz() {
 const abrirPlan = () => router.push('/plan');
 
 /** Aplica las preferencias de bloqueo guardadas (RF-CFG-03) sobre toda la navegación. */
-function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidencia: PuertoEvidencia | null }) {
+function AppProtegida({
+  reiniciada,
+  evidencia,
+  avisoInicial,
+}: {
+  reiniciada: boolean;
+  evidencia: PuertoEvidencia | null;
+  /** "Listo: recuperé 1,284 movimientos" tras restaurar un respaldo (`02 §19`). */
+  avisoInicial: string | null;
+}) {
   const { esquema } = useTema();
+  const [aviso, setAviso] = useState(avisoInicial);
   // Tras borrar todo (o cargar un escenario) la navegación vuelve al inicio, que decide onboarding o Hoy.
   useEffect(() => {
     if (reiniciada) router.replace('/');
@@ -159,6 +194,8 @@ function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidenci
         <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
         {/* Al abrir la app y tras cada cambio (tarjetas, pagos, cortes, preferencias) se reprograman los avisos. */}
         <SincronizarAvisosTarjetas />
+        {/* La tarea semanal queda registrada solo mientras el respaldo automático está encendido. */}
+        <SincronizarRespaldoAutomatico />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
@@ -172,8 +209,11 @@ function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidenci
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="plan" />
           <Stack.Screen name="privacidad" />
+          <Stack.Screen name="respaldo" />
+          <Stack.Screen name="restaurar" />
           <Stack.Screen name="terminos" />
         </Stack>
+        <Aviso aviso={aviso ? { id: 'restaurado', mensaje: aviso } : null} alCerrar={() => setAviso(null)} />
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>
     </ProveedorCaptura>
