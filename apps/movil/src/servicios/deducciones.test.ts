@@ -29,6 +29,7 @@ import {
   armarZip,
   configFiscalPrueba,
   CONSULTA_MEDICA,
+  CONSULTA_MEDICA_NUBE,
   deduccionE13,
   uuidDe,
 } from './__pruebas__/fiscal';
@@ -342,18 +343,31 @@ describe('Deducciones · perfil y parámetros por validar', () => {
 });
 
 describe('CA-M12-04 · aviso preventivo al registrar salud en efectivo', () => {
-  it('"consulta médica de 800 en efectivo" lo trae; con tarjeta o de otra categoría, no', async () => {
+  it('"consulta médica de 800 en efectivo" lo trae sin internet (nivel 0); con otra categoría, no', async () => {
     const { ctx } = conSemilla();
-    const f = nubeFalsa({ [CONSULTA_MEDICA.texto]: CONSULTA_MEDICA.interpretacion });
-    const r = await registrarTexto(ctx, CONSULTA_MEDICA.texto, 'texto', { nube: f.nube });
+    const r = await registrarTexto(ctx, CONSULTA_MEDICA, 'voz');
     if (r.resultado !== 'registrado') throw new Error(`se esperaba registro, llegó ${r.resultado}`);
-    expect(r.movimientos[0]).toMatchObject({ monto: 80_000, avisoDeducible: true });
+    expect(r.movimientos[0]).toMatchObject({
+      monto: 80_000,
+      descripcion: 'consulta médica',
+      categoria: 'Salud',
+      avisoDeducible: true,
+    });
     expect(AVISO_DEDUCIBLE_EFECTIVO).toBe(
       'Si lo pagas con tarjeta o transferencia y pides factura, lo puedes deducir.',
     );
     const coca = await registrarTexto(ctx, 'coca 25 en efectivo', 'texto');
     if (coca.resultado !== 'registrado') throw new Error(coca.resultado);
     expect(coca.movimientos[0]?.avisoDeducible).toBe(false);
+  });
+
+  it('lo que interpreta la nube también trae el aviso', async () => {
+    const { ctx } = conSemilla();
+    const f = nubeFalsa({ [CONSULTA_MEDICA_NUBE.texto]: CONSULTA_MEDICA_NUBE.interpretacion });
+    const r = await registrarTexto(ctx, CONSULTA_MEDICA_NUBE.texto, 'texto', { nube: f.nube });
+    if (r.resultado !== 'registrado') throw new Error(`se esperaba registro, llegó ${r.resultado}`);
+    expect(f.recibidas).toHaveLength(1);
+    expect(r.movimientos[0]).toMatchObject({ monto: 80_000, avisoDeducible: true });
   });
 
   it('también desde el formulario: salud en efectivo sí, salud con tarjeta no', () => {

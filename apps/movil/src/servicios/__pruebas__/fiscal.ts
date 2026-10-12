@@ -83,12 +83,15 @@ export function ahorroE13(id: string) {
   return v;
 }
 
+/** CA-M12-04: la frase del criterio; la resuelve el nivel 0, sin internet (golden G33). */
+export const CONSULTA_MEDICA = 'consulta médica de 800 en efectivo';
+
 /**
- * CA-M12-04: "consulta médica de 800 en efectivo" no la resuelve el nivel 0 ("médica" no está en el diccionario);
- * la interpreta la nube. Esta es la interpretación que devuelve la nube falsa de las pruebas.
+ * Salud en efectivo que el nivel 0 no resuelve (verbo y monto fuera de su gramática): la interpreta la nube. Esta es
+ * la interpretación que devuelve la nube falsa de las pruebas.
  */
-export const CONSULTA_MEDICA = {
-  texto: 'consulta médica de 800 en efectivo',
+export const CONSULTA_MEDICA_NUBE = {
+  texto: 'fui al doctor y me cobró 800 en efectivo',
   interpretacion: {
     intencion: 'registrar',
     movimientos: [
@@ -97,7 +100,7 @@ export const CONSULTA_MEDICA = {
         monto: 80_000,
         fecha: '2026-10-11',
         categoria: 'salud',
-        descripcion: 'consulta médica',
+        descripcion: 'doctor',
         origen: { tipo: 'efectivo' },
       },
     ],
