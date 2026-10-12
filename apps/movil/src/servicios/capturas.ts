@@ -923,4 +923,6 @@ export const internos = {
   reemplazarVarias,
   asientosDe,
   sentidoDe,
+  categoriaDeComercio,
+  registroDevolucion,
 };
