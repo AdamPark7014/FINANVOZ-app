@@ -143,6 +143,7 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
           <Stack.Screen name="arqueo" />
+          <Stack.Screen name="me-alcanza" />
         </Stack>
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>

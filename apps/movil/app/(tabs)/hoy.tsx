@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
+import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaHoy } from '../../src/pantallas/principal';
 
 export default function Hoy() {
@@ -14,6 +15,7 @@ export default function Hoy() {
         alVerCuentas: () => router.navigate('/cuentas'),
         alAbrirArqueo: (efectivoReal) =>
           abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
+        alAbrirMeAlcanza: (consulta) => abrirMeAlcanza(router, consulta),
       }}
     />
   );
