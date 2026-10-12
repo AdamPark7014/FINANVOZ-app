@@ -144,14 +144,28 @@ export function yaLaPague(
     const p = exigirPendiente(ctx, e, 'egreso');
     const origenId = e.origenId ?? p.cuentaId;
     if (!origenId) throw new ErrorDominio('cuenta_requerida', '¿de qué cuenta salió?');
-    const registrado = registrarMovimiento(ctx, {
-      tipo: 'gasto',
+    const comunes = {
       monto: e.monto ?? p.monto,
       fecha: e.fechaPago ?? ctx.reloj.hoy(),
-      categoria: slugDe(ctx, p.categoriaCuentaId, 'otros_gastos'),
-      origenId,
       descripcion: p.concepto,
-    });
+    };
+    // Pago planeado de una tarjeta en modo plan (RF-TAR-06): es un pago a la tarjeta, no un gasto.
+    const registrado = p.tarjetaId
+      ? registrarMovimiento(
+          ctx,
+          { tipo: 'pago_tarjeta', ...comunes, origenId, destinoId: p.tarjetaId },
+          { cubrir: false },
+        )
+      : registrarMovimiento(
+          ctx,
+          {
+            tipo: 'gasto',
+            ...comunes,
+            categoria: slugDe(ctx, p.categoriaCuentaId, 'otros_gastos'),
+            origenId,
+          },
+          { cubrir: false },
+        );
     marcar(ctx, e, 'cubierta', registrado.transaccionId);
     return registrado;
   });
@@ -192,14 +206,18 @@ export function confirmarIngresoRecibido(
     const p = exigirPendiente(ctx, e, 'ingreso');
     const destinoId = e.destinoId ?? p.cuentaId;
     if (!destinoId) throw new ErrorDominio('cuenta_requerida', '¿a qué cuenta llegó?');
-    const registrado = registrarMovimiento(ctx, {
-      tipo: 'ingreso',
-      monto: e.monto ?? p.monto,
-      fecha: e.fechaPago ?? ctx.reloj.hoy(),
-      categoria: slugDe(ctx, p.categoriaCuentaId, 'otros_ingresos'),
-      destinoId,
-      descripcion: p.concepto,
-    });
+    const registrado = registrarMovimiento(
+      ctx,
+      {
+        tipo: 'ingreso',
+        monto: e.monto ?? p.monto,
+        fecha: e.fechaPago ?? ctx.reloj.hoy(),
+        categoria: slugDe(ctx, p.categoriaCuentaId, 'otros_ingresos'),
+        destinoId,
+        descripcion: p.concepto,
+      },
+      { cubrir: false },
+    );
     marcar(ctx, e, 'cubierta', registrado.transaccionId);
     return registrado;
   });

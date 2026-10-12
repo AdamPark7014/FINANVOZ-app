@@ -1,8 +1,26 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { etiquetaFecha, fijarApartarDeuda, listarCuentas, type CuentaDebes } from '../../servicios';
+import { UMBRAL_USO_BP } from '@cartera/core';
+import {
+  etiquetaFecha,
+  fijarApartarDeuda,
+  listarCuentas,
+  listarTarjetas,
+  type CuentaDebes,
+  type TarjetaVista,
+} from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, formatearCentavos, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Barra,
+  Boton,
+  Cifra,
+  espacio,
+  formatearCentavos,
+  Interruptor,
+  Pantalla,
+  Tarjeta,
+  Texto,
+} from '../../ui';
 
 const NOMBRE_SUBTIPO: Record<string, string> = {
   efectivo: 'Efectivo',
@@ -11,9 +29,21 @@ const NOMBRE_SUBTIPO: Record<string, string> = {
   ahorro: 'Ahorro',
 };
 
-/** Cuentas (02-UX §11): Tienes · Debes · Te deben · Compromisos (próximos 30 días). Engrane → Ajustes. */
-export function PantallaCuentas({ alAbrirAjustes }: { alAbrirAjustes: () => void }) {
+/**
+ * Cuentas (02-UX §11): Tienes · Debes · Te deben · Compromisos (próximos 30 días). Engrane → Ajustes. Cada tarjeta
+ * de crédito abre su detalle (02-UX §8).
+ */
+export function PantallaCuentas({
+  alAbrirAjustes,
+  alAbrirTarjeta,
+  alAgregarTarjeta,
+}: {
+  alAbrirAjustes: () => void;
+  alAbrirTarjeta?: (tarjetaId: string) => void;
+  alAgregarTarjeta?: () => void;
+}) {
   const v = useVista(listarCuentas);
+  const tarjetas = useVista(listarTarjetas);
   return (
     <Pantalla testID="pantalla-cuentas">
       <View
@@ -51,8 +81,26 @@ export function PantallaCuentas({ alAbrirAjustes }: { alAbrirAjustes: () => void
       <Seccion titulo="Debes" testID="seccion-debes">
         {v.debes.length === 0 ? <Vacio texto="No debes nada registrado." /> : null}
         {v.debes.map((d) =>
-          d.tipo === 'tarjeta' ? <TarjetaCredito key={d.id} d={d} /> : <PersonaDebes key={d.id} d={d} />,
+          d.tipo === 'tarjeta' ? (
+            <TarjetaCredito
+              key={d.id}
+              d={d}
+              t={tarjetas.find((t) => t.id === d.id) ?? null}
+              {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
+            />
+          ) : (
+            <PersonaDebes key={d.id} d={d} />
+          ),
         )}
+        {alAgregarTarjeta ? (
+          <Boton
+            etiqueta="Agregar tarjeta de crédito"
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alAgregarTarjeta}
+            testID="boton-agregar-tarjeta"
+          />
+        ) : null}
       </Seccion>
 
       {v.teDeben.length > 0 ? (
@@ -144,10 +192,15 @@ function Fila({
   );
 }
 
-function TarjetaCredito({ d }: { d: CuentaDebes }) {
+function TarjetaCredito({ d, t, alAbrir }: { d: CuentaDebes; t: TarjetaVista | null; alAbrir?: () => void }) {
   const aFavor = d.saldo < 0;
   return (
-    <Tarjeta testID={`cuenta-${d.id}`}>
+    <Tarjeta
+      testID={`cuenta-${d.id}`}
+      {...(alAbrir
+        ? { alPresionar: alAbrir, etiquetaAccesible: d.nombre, pista: 'Abre el detalle de la tarjeta' }
+        : {})}
+    >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <View style={{ flex: 1, gap: espacio.xxs }}>
           <Texto variante="cuerpoFuerte">{d.nombre}</Texto>
@@ -162,7 +215,32 @@ function TarjetaCredito({ d }: { d: CuentaDebes }) {
           {`Meses sin intereses que faltan: ${formatearCentavos(d.meses)}`}
         </Texto>
       ) : null}
-      {d.limiteCredito !== null ? (
+      {aFavor ? (
+        <Texto variante="secundario" tono="secundario">
+          No se suma a tu dinero libre.
+        </Texto>
+      ) : null}
+      {t && t.pngi > 0 ? (
+        <Texto variante="secundario" testID={`cuenta-${d.id}-pngi`}>
+          {`Para no generar intereses: ${formatearCentavos(t.pngi)} antes del ${t.etiquetaFechaLimite}`}
+        </Texto>
+      ) : t ? (
+        <Texto variante="secundario" tono="secundario" testID={`cuenta-${d.id}-limite-pago`}>
+          {`Fecha límite: ${t.etiquetaFechaLimite} · próximo corte: ${t.etiquetaProximoCorte}`}
+        </Texto>
+      ) : null}
+      {t ? (
+        <>
+          <Barra
+            llenoBp={t.usoBp}
+            marcaBp={UMBRAL_USO_BP}
+            etiquetaAccesible={`Usas ${t.usoPorcentaje} % de tu límite`}
+          />
+          <Texto variante="secundario" tono="secundario">
+            {`Usas ${t.usoPorcentaje} % de tu límite de ${formatearCentavos(t.limiteCredito)}`}
+          </Texto>
+        </>
+      ) : d.limiteCredito !== null ? (
         <Texto variante="secundario" tono="secundario">
           {`Límite: ${formatearCentavos(d.limiteCredito)}`}
         </Texto>

@@ -42,6 +42,7 @@ export {
 } from './ajustes';
 export {
   aplicarEleccion,
+  confirmarCompraMsi,
   confirmarRegistro,
   contarEsperandoConexion,
   descartarPorInterpretar,
@@ -59,6 +60,7 @@ export {
   type MotivoPorInterpretar,
   type OpcionesTexto,
   type OrigenDictado,
+  type PropuestaCompraMsi,
   type PropuestaMovimiento,
   type ResultadoCola,
   type ResultadoTexto,
@@ -83,6 +85,71 @@ export {
   type OrigenRegistro,
 } from './formulario';
 export {
+  confirmarCobertura,
+  rechazarCobertura,
+  type CoberturaAutomatica,
+  type PreguntaCoberturaVista,
+} from './cobertura';
+export { procesarApertura, type ResultadoApertura } from './apertura';
+export { procesarCortes, type CorteCerrado, type EstadoCuentaVista } from './cortes';
+export {
+  compromisoMsi12Meses,
+  EntradaCompraMsi,
+  liquidarMsi,
+  listarPlanesMsi,
+  noEraParaLiquidar,
+  pasarAMeses,
+  registrarCompraMsi,
+  type CompraMsiRegistrada,
+  type MesCompromiso,
+  type PasadoAMeses,
+  type PlanLiquidado,
+  type PlanMsiVista,
+  type PlanPorLiquidar,
+  type PreguntaLiquidar,
+} from './msi';
+export {
+  agregarPagoPlaneado,
+  CambiosTarjeta,
+  configurarCicloPorVoz,
+  corregirSaldoTarjeta,
+  editarTarjeta,
+  EntradaPagoPlaneado,
+  listarPagosPlaneados,
+  quitarPagoPlaneado,
+  sugerenciaAvalancha,
+  type PagoPlaneadoVista,
+  type SaldoCorregido,
+  type SugerenciaAvalancha,
+  type TarjetaEditada,
+  type TarjetaPorAgregar,
+} from './config-tarjetas';
+export {
+  detalleTarjeta,
+  listarTarjetas,
+  pagarTarjeta,
+  tarjetaDelDia,
+  type DetalleTarjeta,
+  type TarjetaDelDia,
+  type TarjetaVista,
+} from './vista-tarjetas';
+export type { CuotaPlan, EstadoCuota, EstadoPlan } from './tarjetas';
+export {
+  fijarPreferenciasAvisos,
+  obtenerPreferenciasAvisos,
+  planAvisosTarjetas,
+  sincronizarAvisosTarjetas,
+  type PreferenciasAvisos,
+} from './avisos-tarjetas';
+export {
+  crearPuertoExpo,
+  horaDispositivo,
+  puertoEnMemoria,
+  type ModuloNotificaciones,
+  type PuertoNotificaciones,
+} from '../avisos/puerto';
+export type { AvisoPlaneado, HorarioSilencioso } from '../avisos/planificar';
+export {
   confirmarIngresoRecibido,
   cubrirConMovimiento,
   listarOcurrencias,
@@ -93,7 +160,14 @@ export {
   type OcurrenciaVista,
   type RefOcurrencia,
 } from './ocurrencias';
-export { obtenerHoy, type ConceptoReservado, type EstadoHoy, type TarjetaAccion, type VistaHoy } from './hoy';
+export {
+  obtenerHoy,
+  todaviaNoPagoTarjeta,
+  type ConceptoReservado,
+  type EstadoHoy,
+  type TarjetaAccion,
+  type VistaHoy,
+} from './hoy';
 export { marcarAvisoVisto, type Aviso } from './avisos';
 export { crearPersona, fijarApartarDeuda, listarPersonas, registrarPrestamo, type Persona } from './personas';
 export {

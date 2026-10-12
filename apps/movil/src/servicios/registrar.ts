@@ -15,6 +15,8 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
+import type { CoberturaAutomatica } from './cobertura';
+import { configurarCicloPorVoz, type TarjetaEditada, type TarjetaPorAgregar } from './config-tarjetas';
 import {
   anularPorVoz,
   aplicaDirecto,
@@ -22,12 +24,19 @@ import {
   buscarDuplicados,
   buscarMovimientos,
   configurarCompromiso,
-  registrarPasarAMeses,
+  resumenTransaccion,
   type CambiosResueltos,
   type CompromisoConfigurado,
   type ResumenTransaccion,
 } from './correcciones';
 import { registrarMovimiento, type EntradaMovimiento } from './formulario';
+import {
+  pasarAMeses,
+  registrarCompraMsi,
+  type CompraMsiRegistrada,
+  type EntradaCompraMsi,
+  type PreguntaLiquidar,
+} from './msi';
 import type { MovimientoVista } from './movimientos';
 import { contextoNube, type NivelNube } from './nube';
 import { contactosInterprete } from './personas';
@@ -47,6 +56,17 @@ export interface ResumenMovimiento {
   readonly categoria: string | null;
   readonly cuenta: string;
   readonly porAsignar: boolean;
+  /** Pago fijo o ingreso que este movimiento cubrió solo (E3.5), o la pregunta si el monto no coincide. */
+  readonly cobertura: CoberturaAutomatica | null;
+  /** Un pago que dejó saldo a favor con meses activos (CA-M4-10). */
+  readonly preguntaLiquidar: PreguntaLiquidar | null;
+}
+
+/** Compra a meses dictada que necesita confirmación (monto alto, tarjeta ambigua o aproximada). */
+export interface PropuestaCompraMsi {
+  readonly entrada: Omit<EntradaCompraMsi, 'tarjetaId'> & { readonly tarjetaId?: string };
+  /** Si falta, las tarjetas de crédito candidatas. */
+  readonly faltaTarjeta: Omit<CuentaPorElegir, 'campo'> | null;
 }
 
 /** Cuenta que falta elegir en la tarjeta de confirmación. */
@@ -102,7 +122,35 @@ export type ResultadoTexto =
       readonly deshacer: string;
     }
   | { readonly resultado: 'anulado'; readonly movimiento: ResumenTransaccion; readonly deshacer: string }
-  | { readonly resultado: 'pasar_a_meses'; readonly movimiento: ResumenTransaccion; readonly meses: number }
+  | {
+      readonly resultado: 'pasar_a_meses';
+      /** La compra a meses que reemplazó al cargo (CA-M4-09). */
+      readonly movimiento: ResumenTransaccion;
+      readonly meses: number;
+      readonly planId: string;
+      readonly deshacer: string;
+    }
+  /** Compra a meses registrada (CA-M4-06): plan, calendario y compromiso por mes. */
+  | { readonly resultado: 'registrado_msi'; readonly compra: CompraMsiRegistrada; readonly deshacer: string }
+  /** Compra a meses que necesita confirmación; "Guardar" llama `confirmarCompraMsi`. */
+  | {
+      readonly resultado: 'confirmar_msi';
+      readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado';
+      readonly propuesta: PropuestaCompraMsi;
+    }
+  /** "Mi Nu corta el 28 y pago el 18" sobre una tarjeta existente. */
+  | {
+      readonly resultado: 'tarjeta_configurada';
+      readonly tarjeta: string;
+      readonly editada: TarjetaEditada;
+      readonly deshacer: string | null;
+    }
+  /** La tarjeta dictada no existe: abrir el formulario prellenado (el saldo es obligatorio). */
+  | {
+      readonly resultado: 'tarjeta_por_agregar';
+      readonly prellenado: TarjetaPorAgregar;
+      readonly candidatas: readonly { readonly id: string; readonly nombre: string }[];
+    }
   /** Varias coincidencias, una de hace más de 48 h, o falta la cuenta nueva: chips para elegir (`06 §7`). */
   | {
       readonly resultado: 'elegir';
@@ -133,6 +181,8 @@ export type ResultadoTexto =
 /** Resultados que ya escribieron algo (o que no necesitan a la persona): la cola los da por terminados. */
 const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'registrado',
+  'registrado_msi',
+  'tarjeta_configurada',
   'corregido',
   'anulado',
   'pasar_a_meses',
@@ -306,10 +356,20 @@ function aPropuesta(
   }
 }
 
-function resumir(ctx: Contexto, transaccionId: string, e: EntradaMovimiento): ResumenMovimiento {
+function resumir(
+  ctx: Contexto,
+  r: {
+    transaccionId: string;
+    cobertura: CoberturaAutomatica | null;
+    preguntaLiquidar: PreguntaLiquidar | null;
+  },
+  e: EntradaMovimiento,
+): ResumenMovimiento {
   const cuentaId = 'origenId' in e ? e.origenId : e.destinoId;
   return {
-    transaccionId,
+    transaccionId: r.transaccionId,
+    cobertura: r.cobertura,
+    preguntaLiquidar: r.preguntaLiquidar,
     tipo: e.tipo,
     descripcion: e.descripcion ?? null,
     monto: e.monto,
@@ -338,6 +398,15 @@ function registrarInterpretado(
   cuentas: readonly CuentaResolutor[],
   frase: Frase,
 ): ResultadoTexto | null {
+  const msi = movimientos.filter(
+    (m) => m.tipo === 'compra_msi' || (m.tipo === 'gasto' && m.msi !== undefined),
+  );
+  if (msi.length > 0) {
+    const [unico] = movimientos;
+    // Una compra a meses se registra sola (una frase con varias cosas va al formulario).
+    if (movimientos.length > 1 || !unico) return null;
+    return registrarMsiInterpretado(ctx, unico, cuentas, frase);
+  }
   const propuestas: PropuestaMovimiento[] = [];
   for (const m of movimientos) {
     const p = aPropuesta(ctx, m, cuentas);
@@ -362,6 +431,81 @@ function registrarInterpretado(
     frase.origen,
     frase.fraseId ? { claveBase: `frase:${frase.fraseId}` } : {},
   );
+}
+
+function registrarMsiInterpretado(
+  ctx: Contexto,
+  m: Movimiento,
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto | null {
+  if ((m.espacio ?? 'personal') !== 'personal' || !m.msi || m.msi.meses < 2 || m.contraparte || m.division) {
+    return null;
+  }
+  const credito = cuentas.filter((c) => c.tipo === 'credito');
+  const r = resolver(m.origen ?? { tipo: 'credito' }, 'sale', credito, false);
+  const aprendida = categoriaAprendida(ctx, null, m.descripcion, 'gasto');
+  let categoria = aprendida ?? m.categoria ?? 'otros_gastos';
+  try {
+    idCategoriaDe(ctx, categoria, 'gasto');
+  } catch {
+    categoria = 'otros_gastos';
+  }
+  const entrada = {
+    monto: m.monto,
+    meses: m.msi.meses,
+    fecha: m.fecha,
+    categoria,
+    ...(m.descripcion ? { descripcion: m.descripcion } : {}),
+  };
+  const conTarjeta = 'id' in r ? { ...entrada, tarjetaId: r.id } : entrada;
+  if (!('id' in r)) {
+    return {
+      resultado: 'confirmar_msi',
+      motivo: r.falta.motivo === 'aproximado' ? 'aproximado' : 'cuenta',
+      propuesta: { entrada: conTarjeta, faltaTarjeta: r.falta },
+    };
+  }
+  if (m.aproximado)
+    return {
+      resultado: 'confirmar_msi',
+      motivo: 'aproximado',
+      propuesta: { entrada: conTarjeta, faltaTarjeta: null },
+    };
+  if (m.monto > TOPE_OPTIMISTA) {
+    return {
+      resultado: 'confirmar_msi',
+      motivo: 'monto_alto',
+      propuesta: { entrada: conTarjeta, faltaTarjeta: null },
+    };
+  }
+  return confirmarCompraMsi(
+    ctx,
+    { ...entrada, tarjetaId: r.id },
+    frase.origen,
+    frase.fraseId ? { claveIdempotencia: `frase:${frase.fraseId}:0` } : {},
+  );
+}
+
+/**
+ * "Guardar" de la confirmación de una compra a meses (o el registro optimista): gasto completo en su categoría,
+ * plan y calendario (CA-M4-06). Devuelve el token de Deshacer.
+ */
+export function confirmarCompraMsi(
+  ctx: Contexto,
+  entrada: EntradaCompraMsi,
+  origen: OrigenDictado | 'manual',
+  opciones: { claveIdempotencia?: string; aprender?: { alias: string } } = {},
+): Extract<ResultadoTexto, { resultado: 'registrado_msi' }> {
+  exigirConsentimiento(ctx);
+  return enTransaccion(ctx, () => {
+    const compra = registrarCompraMsi(ctx, entrada, {
+      origen,
+      ...(opciones.claveIdempotencia ? { claveIdempotencia: opciones.claveIdempotencia } : {}),
+    });
+    if (opciones.aprender) aprenderAlias(ctx, opciones.aprender.alias, compra.tarjetaId);
+    return { resultado: 'registrado_msi', compra, deshacer: compra.deshacer };
+  });
 }
 
 function corregirInterpretado(
@@ -431,8 +575,14 @@ export function aplicarEleccion(
         return { resultado: 'anulado', ...r };
       }
       case 'pasar_a_meses': {
-        const movimiento = registrarPasarAMeses(ctx, e.transaccionId, e.meses ?? 0);
-        return { resultado: 'pasar_a_meses', movimiento, meses: e.meses ?? 0 };
+        const r = pasarAMeses(ctx, e.transaccionId, e.meses ?? 0, { origen });
+        return {
+          resultado: 'pasar_a_meses',
+          movimiento: resumenTransaccion(ctx, r.transaccionId),
+          meses: r.meses,
+          planId: r.planId,
+          deshacer: r.deshacer,
+        };
       }
       case 'corregir': {
         const { ...cambios } = e.cambios ?? {};
@@ -444,7 +594,16 @@ export function aplicarEleccion(
           origen,
           ...(fraseId ? { claveIdempotencia: `corr:frase:${fraseId}` } : {}),
         });
-        if (e.meses) registrarPasarAMeses(ctx, r.despues.transaccionId, e.meses);
+        if (e.meses) {
+          const m = pasarAMeses(ctx, r.despues.transaccionId, e.meses, { origen });
+          // Deshacer vuelve al cargo de antes de la corrección.
+          return {
+            resultado: 'corregido',
+            antes: r.antes,
+            despues: resumenTransaccion(ctx, m.transaccionId),
+            deshacer: `m:${m.transaccionId}:${e.transaccionId}`,
+          };
+        }
         return { resultado: 'corregido', ...r };
       }
     }
@@ -452,6 +611,7 @@ export function aplicarEleccion(
     if (error instanceof ErrorDominio) {
       if (error.codigo === 'meses_sin_tarjeta')
         return { resultado: 'no_soportado', motivo: 'meses_sin_tarjeta' };
+      if (error.codigo === 'meses_invalidos') return { resultado: 'no_soportado', motivo: 'correccion' };
       if (error.codigo === 'correccion_no_soportada' || error.codigo === 'patron_invalido') {
         return { resultado: 'no_soportado', motivo: 'correccion' };
       }
@@ -508,6 +668,10 @@ function aplicarInterpretacion(
         : { resultado: 'no_encontrado', accion: 'duplicados' };
     }
     case 'configurar':
+      if (i.ajuste.tipo === 'tarjeta_ciclo') {
+        const r = configurarCicloPorVoz(ctx, i.ajuste);
+        return r.resultado === 'tarjeta_configurada' ? { ...r, deshacer: r.editada.deshacer } : r;
+      }
       if (i.ajuste.tipo !== 'compromiso') return { resultado: 'no_soportado', motivo: 'ajuste' };
       try {
         return { resultado: 'configurado', compromiso: configurarCompromiso(ctx, i.ajuste, frase.fecha) };
@@ -641,7 +805,7 @@ export function confirmarRegistro(
         registrarMovimiento(ctx, e, {
           origen,
           ...(opciones.claveBase ? { claveIdempotencia: `${opciones.claveBase}:${i}` } : {}),
-        }).transaccionId,
+        }),
         e,
       ),
     );

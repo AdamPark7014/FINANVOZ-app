@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import {
+  confirmarCobertura,
   confirmarIngresoRecibido,
   listarCuentas,
   omitirOcurrencia,
+  rechazarCobertura,
   todaviaNo,
+  todaviaNoPagoTarjeta,
   yaLaPague,
+  type PreguntaLiquidar,
   type TarjetaAccion,
 } from '../../servicios';
+import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
@@ -17,6 +22,8 @@ import { useAvisoRegistro } from './useAvisoRegistro';
 
 type Compromiso = Extract<TarjetaAccion, { tipo: 'compromiso_vencido' }>;
 type Ingreso = Extract<TarjetaAccion, { tipo: 'ingreso_no_llego' }>;
+type PagoTarjeta = Extract<TarjetaAccion, { tipo: 'pago_tarjeta' }>;
+type Cobertura = Extract<TarjetaAccion, { tipo: 'confirmar_cobertura' }>;
 
 /** Tarjetas de acción de Hoy (02-UX §4.1); el servicio ya las ordena y limita a dos. */
 export function TarjetasAccion({
@@ -32,6 +39,12 @@ export function TarjetasAccion({
       {tarjetas.map((t, i) => {
         const testID = `tarjeta-accion-${i}`;
         switch (t.tipo) {
+          case 'pago_tarjeta':
+            return <TarjetaPagoTarjeta key={`pago:${t.tarjetaId}:${t.corte}`} t={t} testID={testID} />;
+          case 'confirmar_cobertura':
+            return <TarjetaCobertura key={`cob:${t.programadoId}:${t.fecha}`} t={t} testID={testID} />;
+          case 'liquidar_msi':
+            return <PreguntaLiquidarMeses key={`liq:${t.tarjetaId}`} pregunta={t} testID={testID} />;
           case 'compromiso_vencido':
           case 'ingreso_no_llego':
             return <TarjetaOcurrencia key={`${t.programadoId}:${t.fecha}`} t={t} testID={testID} />;
@@ -163,5 +176,101 @@ function ElegirCuenta({
         prefijoTestID={testID}
       />
     </View>
+  );
+}
+
+/**
+ * 1. Pago de tarjeta que vence (`02 §4.1`): "Tu Banamex Oro ••8812 vence el lun 30." con el pago para no
+ * generar intereses. "Ya la pagué" pregunta de qué cuenta salió y registra con Deshacer; "Todavía no" la oculta
+ * hoy (sigue reservada).
+ */
+function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
+  const { ctx, refrescar } = useSesion();
+  const mostrar = useMostrarAviso();
+  const [pagando, setPagando] = useState(false);
+  const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
+  if (pregunta) return <PreguntaLiquidarMeses pregunta={pregunta} testID={`${testID}-liquidar`} />;
+  return (
+    <Tarjeta testID={testID}>
+      <Texto variante="cuerpoFuerte">{t.texto}</Texto>
+      <Texto variante="secundario" tono="secundario">
+        {`Paga ${formatearCentavos(t.pngi)} para no generar intereses.`}
+      </Texto>
+      {pagando ? (
+        <FormularioPago
+          testID={`${testID}-pago`}
+          tarjetaId={t.tarjetaId}
+          nombre={t.nombre}
+          montoSugerido={t.pngi}
+          alTerminar={(r) => {
+            setPagando(false);
+            setPregunta(r.preguntaLiquidar);
+          }}
+          alCancelar={() => setPagando(false)}
+        />
+      ) : (
+        <View style={{ gap: espacio.s }}>
+          <Boton
+            etiqueta="Ya la pagué"
+            alPresionar={() => setPagando(true)}
+            testID={`${testID}-ya-la-pague`}
+          />
+          <Boton
+            etiqueta="Todavía no"
+            variante="secundario"
+            testID={`${testID}-todavia-no`}
+            alPresionar={() => {
+              todaviaNoPagoTarjeta(ctx, { tarjetaId: t.tarjetaId, corte: t.corte });
+              refrescar();
+              mostrar({ mensaje: 'Lo sigo apartando. Te pregunto mañana.' });
+            }}
+          />
+        </View>
+      )}
+    </Tarjeta>
+  );
+}
+
+/** 5. "¿Este pago fue la renta?" (E3.5 con monto distinto): Sí cubre el pago fijo; No lo deja pendiente. */
+function TarjetaCobertura({ t, testID }: { t: Cobertura; testID: string }) {
+  const { ctx, refrescar } = useSesion();
+  const mostrar = useMostrarAviso();
+  const [error, setError] = useState<string | null>(null);
+  const ref = { programadoId: t.programadoId, fecha: t.fecha };
+  const responder = (si: boolean) => {
+    try {
+      if (si) confirmarCobertura(ctx, ref);
+      else rechazarCobertura(ctx, ref);
+      refrescar();
+      mostrar({
+        mensaje: si
+          ? `Listo: cuento ese pago como ${t.concepto}.`
+          : `Va. Sigo apartando lo de ${t.concepto}.`,
+      });
+    } catch {
+      setError(MENSAJE_ERROR_GENERAL);
+    }
+  };
+  return (
+    <Tarjeta testID={testID}>
+      <Texto variante="cuerpoFuerte">{t.pregunta}</Texto>
+      <Texto variante="secundario" tono="secundario">
+        {`Pagaste ${formatearCentavos(t.montoMovimiento)}; esperaba ${formatearCentavos(t.montoProgramado)} el ${t.etiquetaFecha}.`}
+      </Texto>
+      <View style={{ gap: espacio.s }}>
+        <Boton etiqueta="Sí" alPresionar={() => responder(true)} testID={`${testID}-si`} />
+        <Boton
+          etiqueta="No"
+          variante="secundario"
+          alPresionar={() => responder(false)}
+          testID={`${testID}-no`}
+        />
+      </View>
+      {error ? (
+        <Texto variante="secundario" tono="faltante">
+          {error}
+        </Texto>
+      ) : null}
+    </Tarjeta>
   );
 }

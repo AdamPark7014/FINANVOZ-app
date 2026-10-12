@@ -46,6 +46,8 @@ describe('registrar por voz o texto', () => {
         categoria: 'Antojos',
         cuenta: 'Cartera',
         porAsignar: false,
+        cobertura: null,
+        preguntaLiquidar: null,
       },
     ]);
     const t = p.ctx.libro.obtener(r.movimientos[0]?.transaccionId as string);

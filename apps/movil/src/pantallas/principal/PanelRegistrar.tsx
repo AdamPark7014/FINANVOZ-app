@@ -10,8 +10,21 @@ import {
   type ResultadoTexto,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, OBJETIVO_TACTIL_MIN, radio, Texto, tipo, useTema } from '../../ui';
+import {
+  Boton,
+  CampoTexto,
+  espacio,
+  OBJETIVO_TACTIL_MIN,
+  radio,
+  Tarjeta,
+  Texto,
+  tipo,
+  useTema,
+} from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
+import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
+import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
+import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
 import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
 import {
@@ -31,7 +44,12 @@ import {
 import { useAvisoRegistro } from './useAvisoRegistro';
 
 /** Resultados que se resuelven con una tarjeta en el panel. */
-type ConTarjeta = Extract<ResultadoTexto, { resultado: 'confirmar' | 'elegir' | 'duplicados' | 'aclarar' }>;
+type ConTarjeta = Extract<
+  ResultadoTexto,
+  {
+    resultado: 'confirmar' | 'elegir' | 'duplicados' | 'aclarar' | 'confirmar_msi' | 'tarjeta_por_agregar';
+  }
+>;
 
 /**
  * Registrar hablando o escribiendo (02-UX §5): "Mantén para hablar" con transcripción en vivo y "Escribir".
@@ -114,12 +132,24 @@ export function PanelRegistrar({
         case 'pasar_a_meses':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses));
+          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses), r.deshacer);
+          return;
+        case 'registrado_msi':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
+          return;
+        case 'tarjeta_configurada':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeTarjetaConfigurada(r.tarjeta, r.editada), r.deshacer ?? undefined);
           return;
         case 'confirmar':
         case 'elegir':
         case 'duplicados':
         case 'aclarar':
+        case 'confirmar_msi':
+        case 'tarjeta_por_agregar':
           setTarjeta({ datos: r, origen });
           return;
         case 'por_interpretar':
@@ -235,6 +265,36 @@ export function PanelRegistrar({
             setTarjeta(null);
           }}
         />
+      ) : null}
+      {tarjeta?.datos.resultado === 'confirmar_msi' ? (
+        <TarjetaConfirmarMsi
+          datos={tarjeta.datos}
+          origen={tarjeta.origen}
+          alGuardar={(r) => mostrar(r, tarjeta.origen)}
+          alCancelar={() => setTarjeta(null)}
+        />
+      ) : null}
+      {tarjeta?.datos.resultado === 'tarjeta_por_agregar' ? (
+        <Tarjeta testID="tarjeta-por-agregar">
+          <Texto variante="subtitulo">
+            {tarjeta.datos.prellenado.alias
+              ? `No tengo una tarjeta «${tarjeta.datos.prellenado.alias}». ¿La agrego?`
+              : '¿Qué tarjeta es? Agrégala con sus datos.'}
+          </Texto>
+          <Texto variante="secundario" tono="secundario">
+            Ya puse lo que me dijiste. Falta cuánto debes hoy: sin eso no la agrego.
+          </Texto>
+          <FormularioTarjetaNueva
+            prellenado={tarjeta.datos.prellenado}
+            alGuardar={() => {
+              terminarRevision();
+              setTarjeta(null);
+              setTexto('');
+              avisarRegistro('Listo: agregué tu tarjeta.');
+            }}
+            alCancelar={() => setTarjeta(null)}
+          />
+        </Tarjeta>
       ) : null}
       {tarjeta?.datos.resultado === 'aclarar' ? (
         <TarjetaAclarar

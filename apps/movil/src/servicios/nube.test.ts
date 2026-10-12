@@ -303,7 +303,7 @@ describe('nivel 2 · nube', () => {
     });
   });
 
-  it('"pasar a meses" sobre una compra registrada queda como intención (su efecto llega en M4)', async () => {
+  it('"pasar a meses" sobre una compra registrada la convierte en plan (M4: E6.2, caso 6d)', async () => {
     const p = conCuentas();
     await registrarTexto(p.ctx, 'compré una tele de 4000 con la morada');
     p.responder('la tele fue a 12 meses', {
@@ -314,10 +314,14 @@ describe('nivel 2 · nube', () => {
     const r = await registrarTexto(p.ctx, 'la tele fue a 12 meses', 'voz', { nube: p.nube });
     if (r.resultado !== 'pasar_a_meses') throw new Error(r.resultado);
     expect(r.meses).toBe(12);
+    expect(r.movimiento).toMatchObject({ tipo: 'compra_msi', monto: 400_000 });
     expect(
       leerAjuste(p.ctx, `pasar_a_meses:${r.movimiento.transaccionId}`, z.object({ meses: z.number() })),
-    ).toMatchObject({ meses: 12 });
-    expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000 - 400_000); // el libro no cambia en M3
+    ).toBeNull();
+    // La deuda revolvente vuelve a como estaba antes del cargo; el cargo vive en el plan.
+    expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000);
+    deshacer(p.ctx, r.deshacer);
+    expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000 - 400_000);
   });
 
   it('consultas que ya tienen vista, aclarar, fuera de alcance y lo que aún no se hace por voz', async () => {

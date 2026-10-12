@@ -7,11 +7,17 @@ import {
   historialMovimiento,
   listarMovimientos,
   listarPorInterpretar,
+  listarTarjetas,
+  pasarAMeses,
   type MovimientoVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { leerEntero } from '../onboarding/ingreso';
+import { mensajeCompraMsi } from '../tarjetas/textos';
+import { GrupoChips } from './Chip';
 import { useMostrarAviso } from './ProveedorAvisos';
+import { useAvisoRegistro } from './useAvisoRegistro';
 import { MENSAJE_ERROR_GENERAL, NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO, resumenMovimiento } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
@@ -32,6 +38,18 @@ export function PantallaMovimientos({
 }) {
   const dias = useVista((ctx) => listarMovimientos(ctx));
   const porRevisar = useVista(listarPorInterpretar);
+  // Compras cargadas a una tarjeta de crédito: las únicas que se pueden pasar a meses (02-UX §10).
+  const conTarjeta = useVista(
+    (ctx) =>
+      new Set(
+        listarTarjetas(ctx).flatMap((t) =>
+          listarMovimientos(ctx, { cuentaId: t.id })
+            .flatMap((d) => d.movimientos)
+            .filter((m) => m.tipo === 'gasto')
+            .map((m) => m.id),
+        ),
+      ),
+  );
   const { ctx, refrescar } = useSesion();
   const mostrar = useMostrarAviso();
   const [abierto, setAbierto] = useState<string | null>(null);
@@ -109,6 +127,7 @@ export function PantallaMovimientos({
               key={m.id}
               m={m}
               abierto={abierto === m.id}
+              aMeses={conTarjeta.has(m.id)}
               alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
               alAnular={() => {
                 try {
@@ -133,18 +152,74 @@ function titulo(m: MovimientoVista): string {
   return m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
 }
 
+const MESES_COMUNES = ['3', '6', '9', '12', '18', '24'] as const;
+
+/** "Pasar a meses" (CA-M4-09): cuántos meses y Guardar; el cargo se reemplaza por la compra a meses. */
+function PasarAMeses({ m, alTerminar }: { m: MovimientoVista; alTerminar: () => void }) {
+  const { ctx } = useSesion();
+  const avisarRegistro = useAvisoRegistro();
+  const [meses, setMeses] = useState<string | null>(null);
+  const [otro, setOtro] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const guardar = () => {
+    const n = meses !== null ? Number(meses) : leerEntero(otro, 2, 48);
+    if (n === null) return setError('Elige los meses, de 2 a 48.');
+    try {
+      const r = pasarAMeses(ctx, m.id, n);
+      avisarRegistro(mensajeCompraMsi(r), r.deshacer);
+      alTerminar();
+    } catch {
+      setError(MENSAJE_ERROR_GENERAL);
+    }
+  };
+  return (
+    <View style={{ gap: espacio.s }} testID={`pasar-a-meses-${m.id}`}>
+      <Texto variante="cuerpo">¿A cuántos meses sin intereses fue?</Texto>
+      <GrupoChips
+        opciones={MESES_COMUNES.map((n) => ({ valor: n, etiqueta: `${n} meses` }))}
+        valor={meses}
+        alCambiar={(n) => {
+          setMeses(n);
+          setOtro('');
+        }}
+        prefijoTestID="meses"
+      />
+      <CampoTexto
+        testID="meses-otro"
+        etiqueta="Otro número de meses"
+        teclado="number-pad"
+        valor={otro}
+        alCambiar={(t) => {
+          setOtro(t);
+          setMeses(null);
+        }}
+      />
+      {error ? (
+        <Texto variante="secundario" tono="faltante">
+          {error}
+        </Texto>
+      ) : null}
+      <Boton etiqueta="Pasar a meses" alPresionar={guardar} testID="boton-confirmar-meses" />
+      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alTerminar} />
+    </View>
+  );
+}
+
 function FilaMovimiento({
   m,
   abierto,
+  aMeses,
   alTocar,
   alAnular,
 }: {
   m: MovimientoVista;
   abierto: boolean;
+  aMeses: boolean;
   alTocar: () => void;
   alAnular: () => void;
 }) {
   const [confirmando, setConfirmando] = useState(false);
+  const [pasando, setPasando] = useState(false);
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
   const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
   return (
@@ -178,7 +253,17 @@ function FilaMovimiento({
           <Texto variante="secundario" tono="secundario">
             {`${NOMBRE_ORIGEN[m.origen] ?? 'Registrado'} · ${etiquetaDiaMes(m.fecha)}`}
           </Texto>
-          {confirmando ? (
+          {pasando ? <PasarAMeses m={m} alTerminar={() => setPasando(false)} /> : null}
+          {aMeses && !pasando && !confirmando ? (
+            <Boton
+              etiqueta="Pasar a meses"
+              variante="secundario"
+              ancho="contenido"
+              alPresionar={() => setPasando(true)}
+              testID="boton-pasar-a-meses"
+            />
+          ) : null}
+          {pasando ? null : confirmando ? (
             <View style={{ gap: espacio.s }}>
               <Texto variante="cuerpo">¿Anular este movimiento? Sus montos vuelven a tus cuentas.</Texto>
               <Boton etiqueta="Sí, anular" alPresionar={alAnular} testID="boton-confirmar-anular" />

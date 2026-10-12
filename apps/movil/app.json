@@ -38,6 +38,7 @@
           "androidSpeechServicePackages": ["com.google.android.as", "com.google.android.googlequicksearchbox"]
         }
       ],
+      ["expo-notifications", { "color": "#0A6B57" }],
       "@sentry/react-native"
     ],
     "experiments": { "typedRoutes": true }

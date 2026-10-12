@@ -93,9 +93,12 @@ describe('onboarding', () => {
     marcarAvisoVisto(p.ctx, hoy.avisos[0]?.id as string);
     expect(obtenerHoy(p.ctx).avisos).toEqual([]);
 
-    // Cuando la cuota (límite 30 nov) entra al horizonte, E4 la reserva.
+    // M4: en el corte del 10 nov la primera cuota se factura (E6.2) y pasa a la deuda revolvente, que E4
+    // reserva completa; las que siguen, no facturadas, solo cuando vencen en el horizonte.
     p.reloj.fijar('2026-12-01');
-    expect(obtenerHoy(p.ctx).desglose.cuotas_msi).toBe(v.mensualidad);
+    const despues = obtenerHoy(p.ctx).desglose;
+    expect(despues.tarjetas_saldo_completo).toBe(fixture.saldo_revolvente + v.mensualidad);
+    expect(despues.cuotas_msi).toBe(0);
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 

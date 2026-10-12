@@ -1,20 +1,20 @@
 import { and, eq } from 'drizzle-orm';
-import { z } from 'zod';
 import { ErrorDominio, minFecha, sumarDias, type Centavos, type PlainDate } from '@cartera/core';
 import { CUENTAS_SISTEMA, esquema, type TransaccionNueva } from '@cartera/datos';
 import { normalizarAlias, type Ajuste } from '@cartera/nlu';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { aprenderAlias, aprenderCategoria } from './aprendizaje';
 import { cuentaPorId, idCategoriaDe } from './catalogo';
+import { cubrirAutomaticamente, liberarOcurrencias } from './cobertura';
+import { restaurarPlanDe } from './msi';
 import { enTransaccion, type Contexto } from './contexto';
 import { anularMovimiento } from './formulario';
 import { listarMovimientos, type MovimientoVista } from './movimientos';
 import { materializarOcurrencias } from './ocurrencias';
 import { proximoPago } from './onboarding';
-import { escribirAjuste } from './preferencias';
 import { insertarProgramado, validarRegla } from './programados';
 
-const { transaccion, asiento, cuenta, ocurrencia, programado } = esquema;
+const { transaccion, asiento, cuenta, ocurrencia, programado, planMsi } = esquema;
 
 /** Ventana de búsqueda del objetivo de una corrección o anulación (`06 §7`). */
 export const DIAS_BUSQUEDA = 30;
@@ -156,15 +156,6 @@ function estaAnulada(ctx: Contexto, id: string): boolean {
   return !!ctx.db.select({ id: transaccion.id }).from(transaccion).where(eq(transaccion.revierteA, id)).get();
 }
 
-/** Las ocurrencias que cubría una transacción anulada o reemplazada vuelven a `pendiente` (`04 §5`). */
-function liberarOcurrencias(ctx: Contexto, transaccionId: string): void {
-  ctx.db
-    .update(ocurrencia)
-    .set({ estado: 'pendiente', transaccionId: null })
-    .where(and(eq(ocurrencia.transaccionId, transaccionId), eq(ocurrencia.estado, 'cubierta')))
-    .run();
-}
-
 // ——— Corregir ———
 
 /** Cambios ya resueltos a ids y slugs (la cuenta la resolvió el resolutor o la eligió la persona). */
@@ -207,6 +198,17 @@ export function aplicarCorreccion(
       throw new ErrorDominio('correccion_no_soportada', 'ese movimiento no se puede corregir así');
     }
     const categoria = asientos.find((a) => esCategoria(a.naturaleza));
+    // Una compra a meses solo cambia de categoría o descripción: el monto, la fecha y la tarjeta son del plan.
+    const esMsi = fila.tipo === 'compra_msi';
+    if (
+      esMsi &&
+      (cambios.monto !== undefined || cambios.fecha !== undefined || cambios.origenId !== undefined)
+    ) {
+      throw new ErrorDominio(
+        'correccion_no_soportada',
+        'una compra a meses solo cambia de categoría o descripción',
+      );
+    }
     const nuevos = asientos.map((a) => ({ cuentaId: a.cuentaId, monto: a.monto }));
     if (cambios.monto !== undefined) {
       if (!Number.isSafeInteger(cambios.monto) || cambios.monto <= 0) {
@@ -240,7 +242,16 @@ export function aplicarCorreccion(
       meta: fila.meta,
     };
     const r = ctx.libro.reemplazar(transaccionId, nueva);
+    if (esMsi) {
+      // El plan sigue siendo el mismo: apunta a la versión corregida de su compra.
+      ctx.db
+        .update(planMsi)
+        .set({ transaccionAltaId: r.nueva.id })
+        .where(eq(planMsi.transaccionAltaId, transaccionId))
+        .run();
+    }
     liberarOcurrencias(ctx, transaccionId);
+    cubrirAutomaticamente(ctx, r.nueva.id);
     if (cambios.origenId !== undefined) aprenderAlias(ctx, cambios.aliasDicho, cambios.origenId);
     if (categoriaNueva) aprenderCategoria(ctx, fila.comercio, fila.descripcion, categoriaNueva);
     return {
@@ -272,8 +283,17 @@ function copia(ctx: Contexto, id: string, clave: string): TransaccionNueva {
 /** "Deshacer" de una corrección: reemplaza la versión corregida por una copia de la original. */
 export function deshacerCorreccion(ctx: Contexto, corregidaId: string, originalId: string): void {
   enTransaccion(ctx, () => {
-    ctx.libro.reemplazar(corregidaId, copia(ctx, originalId, `restaura:${originalId}:${corregidaId}`));
+    const r = ctx.libro.reemplazar(
+      corregidaId,
+      copia(ctx, originalId, `restaura:${originalId}:${corregidaId}`),
+    );
+    ctx.db
+      .update(planMsi)
+      .set({ transaccionAltaId: r.nueva.id })
+      .where(eq(planMsi.transaccionAltaId, corregidaId))
+      .run();
     liberarOcurrencias(ctx, corregidaId);
+    cubrirAutomaticamente(ctx, r.nueva.id);
   });
 }
 
@@ -297,7 +317,10 @@ export function anularPorVoz(ctx: Contexto, transaccionId: string): ResultadoAnu
 
 /** "Deshacer" de una anulación: registra de nuevo una copia del movimiento (el libro no se edita). */
 export function restaurarAnulado(ctx: Contexto, transaccionId: string): void {
-  ctx.libro.registrar(copia(ctx, transaccionId, `restaura:${transaccionId}`));
+  const r = ctx.libro.registrar(copia(ctx, transaccionId, `restaura:${transaccionId}`));
+  if (!r.nueva) return;
+  restaurarPlanDe(ctx, transaccionId, r.transaccion.id);
+  cubrirAutomaticamente(ctx, r.transaccion.id);
 }
 
 // ——— Revisar duplicados ———
@@ -321,32 +344,6 @@ export function buscarDuplicados(
     porMonto.set(clave, [...(porMonto.get(clave) ?? []), m]);
   }
   return [...porMonto.values()].filter((g) => g.length >= 2);
-}
-
-// ——— Pasar a meses (intención; su efecto contable llega en M4) ———
-
-const IntencionMeses = z.strictObject({ meses: z.int().min(2).max(48), registrado_en: z.int() });
-
-/**
- * "La tele fue a 12 meses" sobre algo ya registrado: en M3 solo se guarda la intención (`ajuste`
- * `pasar_a_meses:<id>`); M4 la convierte en plan de meses (`05 §E6.2`). Solo aplica a compras con tarjeta.
- */
-export function registrarPasarAMeses(
-  ctx: Contexto,
-  transaccionId: string,
-  meses: number,
-): ResumenTransaccion {
-  exigirConsentimiento(ctx);
-  const { fila, asientos } = leer(ctx, transaccionId);
-  const conTarjeta = asientos.some((a) => a.monto < 0 && a.subtipo === 'tarjeta_credito');
-  if (fila.tipo !== 'gasto' || !conTarjeta) {
-    throw new ErrorDominio('meses_sin_tarjeta', 'solo una compra con tarjeta de crédito pasa a meses');
-  }
-  escribirAjuste(ctx, `pasar_a_meses:${transaccionId}`, IntencionMeses, {
-    meses,
-    registrado_en: ctx.reloj.ahora(),
-  });
-  return resumenTransaccion(ctx, transaccionId);
 }
 
 // ——— Configurar compromiso ———
