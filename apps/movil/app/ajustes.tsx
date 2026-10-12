@@ -18,7 +18,8 @@ const TOQUES_MENU_DEV = 7;
 
 /**
  * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, widget (M10), respaldo (M9), privacidad
- * (exportar, borrar todo y el aviso viven en el centro de privacidad, `app/privacidad.tsx`) y versión. En builds
+ * (exportar, borrar todo y el aviso viven en el centro de privacidad, `app/privacidad.tsx`), ayuda (M13,
+ * `app/ayuda.tsx`) y versión. En builds
  * de desarrollo, tocar 7 veces la versión abre el menú de escenarios semilla.
  */
 export default function Ajustes() {
@@ -115,6 +116,19 @@ export default function Ajustes() {
         ) : null}
       </Tarjeta>
 
+      <Tarjeta testID="ajustes-ayuda">
+        <Texto variante="subtitulo">Ayuda</Texto>
+        <Texto variante="secundario" tono="secundario">
+          Respuestas a las dudas más comunes y nuestro correo de contacto.
+        </Texto>
+        <Boton
+          testID="ajustes-abrir-ayuda"
+          variante="secundario"
+          etiqueta="Ver preguntas frecuentes"
+          alPresionar={() => router.push('/ayuda')}
+        />
+      </Tarjeta>
+
       <Tarjeta testID="ajustes-acerca">
         <Texto variante="subtitulo">Acerca de</Texto>
         <Texto variante="secundario" tono="secundario">
@@ -133,6 +147,7 @@ export default function Ajustes() {
         testID="ajustes-version"
         onPress={tocarVersion}
         accessibilityRole="text"
+        accessibilityLabel={`Finanvoz versión ${version}`}
         style={{ paddingVertical: espacio.s }}
       >
         <Texto variante="secundario" tono="secundario" alinear="center">
