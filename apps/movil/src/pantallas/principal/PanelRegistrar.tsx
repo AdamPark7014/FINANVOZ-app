@@ -30,6 +30,8 @@ import {
   useTema,
 } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
+import { TarjetaConfirmarCompartido } from '../compartido/TarjetaConfirmarCompartido';
+import { MENSAJE_COMPARTIDO_GUARDADO, MENSAJE_SIN_PAREJA } from '../compartido/textos';
 import { mensajeLimite } from '../plan/textos';
 import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
 import { mensajeCuentaDividida, TITULO_CONFIRMAR_DIVISION } from '../personas/textos';
@@ -72,6 +74,7 @@ type ConTarjeta = Extract<
       | 'aclarar'
       | 'confirmar_msi'
       | 'confirmar_division'
+      | 'confirmar_compartido'
       | 'tarjeta_por_agregar'
       | 'tanda_por_crear';
   }
@@ -226,10 +229,14 @@ export function PanelRegistrar({
         case 'aclarar':
         case 'confirmar_msi':
         case 'confirmar_division':
+        case 'confirmar_compartido':
         case 'tarjeta_por_agregar':
         case 'tanda_por_crear':
           if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
+          return;
+        case 'sin_pareja':
+          setMensaje(MENSAJE_SIN_PAREJA);
           return;
         case 'por_interpretar':
           setTexto('');
@@ -421,6 +428,20 @@ export function PanelRegistrar({
             alCancelar={() => setTarjeta(null)}
           />
         </Tarjeta>
+      ) : null}
+      {tarjeta?.datos.resultado === 'confirmar_compartido' ? (
+        <TarjetaConfirmarCompartido
+          propuesta={tarjeta.datos.propuesta}
+          alGuardar={() => {
+            terminarRevision();
+            setTarjeta(null);
+            setTexto('');
+            contarRegistro(tarjeta.origen);
+            refrescar();
+            avisarRegistro(MENSAJE_COMPARTIDO_GUARDADO);
+          }}
+          alCancelar={() => setTarjeta(null)}
+        />
       ) : null}
       {tarjeta?.datos.resultado === 'tarjeta_por_agregar' ? (
         <Tarjeta testID="tarjeta-por-agregar">

@@ -1,4 +1,6 @@
+import type { Centavos } from '@cartera/core';
 import type { ErrorAccionCompartido } from '../../servicios';
+import { formatearCentavos } from '../../ui';
 
 /** Mensajes de gastos compartidos (`02 §14`: qué pasó y qué hacer; nunca el detalle técnico). */
 export function mensajeErrorCompartido(error: ErrorAccionCompartido): string {
@@ -39,6 +41,28 @@ export const OPCIONES_REPARTO: readonly { valor: number; etiqueta: string }[] = 
   { valor: 7000, etiqueta: 'Yo 70 %' },
   { valor: 3000, etiqueta: 'Yo 30 %' },
 ];
+
+export const MENSAJE_SIN_PAREJA = 'Primero vincúlate con tu pareja en Gastos compartidos.';
+export const MENSAJE_COMPARTIDO_GUARDADO = 'Listo: lo agregué a tus gastos compartidos.';
+
+/** Chip de un reparto dictado que no está entre los de siempre: 6500 → "Yo 65 %". */
+export const etiquetaReparto = (miParteBp: number): string => `Yo ${miParteBp / 100} %`;
+
+/** "Súper $1,200.00 · pagaste tú · tú 60 % / tu pareja 40 %": lo dictado antes de compartirlo. */
+export function resumenGastoCompartido(g: {
+  descripcion: string;
+  total: Centavos;
+  pagueYo: boolean | null;
+  miParteBp: number | null;
+}): string {
+  const partes = [
+    `${g.descripcion === '' ? 'Gasto' : g.descripcion} ${formatearCentavos(g.total, 'centavos')}`,
+  ];
+  partes.push(g.pagueYo === null ? 'falta quién pagó' : g.pagueYo ? 'pagaste tú' : 'pagó tu pareja');
+  if (g.miParteBp !== null)
+    partes.push(`tú ${g.miParteBp / 100} % / tu pareja ${(10000 - g.miParteBp) / 100} %`);
+  return partes.join(' · ');
+}
 
 export const OPCIONES_CATEGORIA: readonly { valor: string; etiqueta: string }[] = [
   { valor: 'super', etiqueta: 'Súper' },
