@@ -105,6 +105,7 @@ export {
 export { deshacer } from './deshacer';
 export {
   anularMovimiento,
+  MENSAJE_MOVIMIENTO_COMPARTIDO,
   EntradaMovimiento,
   registrarMovimiento,
   type MovimientoRegistrado,
@@ -463,6 +464,28 @@ export {
   type TipoDeduccionVista,
   type VistaDeducciones,
 } from './deducciones';
+export {
+  agregarGastoCompartido,
+  anularEventoCompartido,
+  AVISO_NO_COMPARTIDO,
+  crearGrupoCompartido,
+  EntradaGastoCompartido,
+  gruposAbiertos,
+  listarGruposCompartidos,
+  mostrarCodigo,
+  obtenerGrupoCompartido,
+  registrarPagoCompartido,
+  salirDelGrupo,
+  sincronizarGrupo,
+  textoSaldo,
+  unirseConQr,
+  type DependenciasCompartido,
+  type ErrorAccionCompartido,
+  type GrupoCompartidoVista,
+  type MovimientoCompartido,
+  type ResultadoAccion,
+  type SaldoCompartido,
+} from './compartido';
 export {
   ajustarSaldoConEstado,
   analizarEstadoCuentaPdf,

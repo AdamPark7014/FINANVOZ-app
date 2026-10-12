@@ -225,3 +225,38 @@ Publicar una versión nueva:
 2. Firma **fuera del repositorio**, en la computadora donde vive la llave privada: `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX=<64 hex> node scripts/firmar-plantillas.mjs plantillas.json` (escribe `plantillas.json.sig` e imprime la llave pública, que debe estar en `EXPO_PUBLIC_PLANTILLAS_LLAVES`, y el SHA-256).
 3. Sube los dos archivos al bucket `plantillas` (Storage → plantillas → Upload, reemplazando), uno tras otro. Mientras no coinciden, la app rechaza el archivo (`firma_invalida`), conserva lo que tiene y lo vuelve a intentar al día siguiente.
 4. Comprueba: `curl -s https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json | sha256sum` da el SHA-256 que imprimió el script.
+
+## M16 · `compartido` (`/compartido/grupos`, `/codigo`, `/unirse`, `/salir`, `/eventos`)
+
+Gastos compartidos en pareja (`docs/03-ARQUITECTURA.md §5.10` y `§6`, `docs/05-MOTORES.md §E17`). Cada teléfono cifra sus eventos con la llave del grupo (XChaCha20-Poly1305, `packages/sincronizacion`) antes de subirlos: el servidor guarda `{grupo_id, id, autor, blob, recibido_en}` y **no puede abrir** el blob (no ve tipos, montos, descripciones ni nombres). La llave viaja solo en el QR que la otra persona escanea en persona y dentro del respaldo cifrado (E16); nunca llega aquí. Una sola Edge Function, **`compartido`**: `https://<ref>.supabase.co/functions/v1/compartido/<ruta>`. La lógica está en `supabase/functions/_shared/compartido/manejador.ts`; la pertenencia y el estado del grupo los deciden las funciones `compartido_*` de la migración (Vitest con PGlite).
+
+| Archivo | Qué hace |
+|---|---|
+| `migrations/20261201000000_compartido.sql` | `grupos_compartidos` (hash SHA-256 del código de unión, su lugar y vencimiento; `cerrado_en`), `miembros_compartidos` (`grupo_id`, `usuario`, `autor`) y `eventos_compartidos`. RLS por pertenencia (segunda barrera) y funciones `compartido_crear`, `_codigo`, `_unirse`, `_salir`, `_publicar` y `_descargar` (solo service role, atómicas) |
+| `_shared/compartido/manejador.ts` | JWT → contrato → función de la base → respuesta. Genera el código de unión (16 bytes, base64url) y guarda solo su hash. Registra solo `endpoint` y código |
+| `_shared/compartido/manejador.test.ts`, `rls.test.ts` | La migración real en PGlite: un solo uso del código, tercera cuenta sin acceso (CA-M16-04), cierre (CA-M16-05), volver a vincular (CA-M16-06), RLS y registros |
+| `_shared/compartido/dos-telefonos.test.ts` | Dos teléfonos (los servicios de la app con su base SQLite) contra este servidor: CA-M16-03, 05 y 06 de punta a punta |
+
+### Contrato
+
+Siempre con `Authorization: Bearer <JWT>` (sesión anónima o de correo).
+
+| Ruta | Entrada | Respuesta 200 |
+|---|---|---|
+| `POST /compartido/grupos` | — | `{grupo_id, codigo_union, vence_en}`: quien llama queda como `'a'`; el código (para el lugar `'b'`) vence en 10 min y va en el QR con la llave |
+| `POST /compartido/codigo` | `{grupo_id}` | `{codigo_union, vence_en}`: código nuevo para el **otro** lugar ("Volver a vincular"); reemplaza al anterior |
+| `POST /compartido/unirse` | `{grupo_id, codigo_union}` | `{grupo_id, autor}`: alta en el lugar del código o reemplazo de la sesión que lo ocupaba (esa sesión pierde el acceso); el código deja de servir |
+| `POST /compartido/salir` | `{grupo_id}` | `{cerrado_en}`: cierra el grupo para los dos (idempotente) |
+| `POST /compartido/eventos` | `{grupo_id, eventos: [{id, blob}]}` (1 a 50; `id` UUIDv4; blob base64 de 56 a 4,096 caracteres) | `{eventos: [{id, recibido_en}]}`. Idempotente por `id`; el `autor` lo pone el servidor |
+| `GET /compartido/eventos?grupo_id=&desde=` | `desde` = el `cursor` anterior (opcional) | `{eventos: [{id, autor, blob, recibido_en}], cursor, mas, cerrado_en}` en orden de llegada, 200 por página. El cursor queda 30 s atrás del reloj del servidor: lo más reciente vuelve a llegar y la app lo descarta por `id` |
+
+Errores `{ "error": "<código>" }`: 400 `solicitud_invalida`, 401 `no_autorizado`, 403 `no_miembro` (también si el grupo no existe), 403 `grupo_cerrado` (publicar o pedir código en un grupo cerrado; descargar sigue permitido), 403 `codigo_invalido` (equivocado, vencido o ya usado), 409 `ya_miembro` (quien ya ocupa el otro lugar), 409 `conflicto` (el mismo `id` con otro blob), 404 `ruta`, 405 `metodo`, 503 `sin_configurar`, 500 `error_interno`.
+
+### Desplegar
+
+1. `supabase db push` aplica `20261201000000_compartido.sql`. En Table Editor deben aparecer las tres tablas con RLS activa.
+2. `supabase functions deploy compartido` (con la verificación de JWT del gateway activa; no uses `--no-verify-jwt`). No necesita secretos propios: usa `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, que inyecta Supabase.
+3. Prueba de humo con el `access_token` de una sesión anónima: `curl -X POST https://<ref>.supabase.co/functions/v1/compartido/grupos -H "Authorization: Bearer <token>"` responde `{grupo_id, codigo_union, vence_en}`; sin el encabezado, 401. Con otra sesión, `GET …/compartido/eventos?grupo_id=<ese grupo>` responde 403 `no_miembro`.
+4. Inspección (CA-M16-04): `select grupo_id, id, autor, left(blob, 40), recibido_en from eventos_compartidos limit 5;` solo muestra texto cifrado.
+
+Registros: `{"usuario_hash":null,"endpoint":"/compartido/eventos","codigo":"ok","estado_http":200}`; nunca usuarios, grupos, ids ni blobs. Si un usuario de Auth se borra (`DELETE /respaldo/cuenta`), su membresía se va en cascada; los eventos del grupo quedan (cifrados) para la otra persona.

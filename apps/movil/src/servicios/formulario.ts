@@ -170,12 +170,30 @@ export function registrarMovimiento(
   });
 }
 
+export const MENSAJE_MOVIMIENTO_COMPARTIDO =
+  'Es un gasto compartido: anúlalo desde Cuentas → Gastos compartidos para que tu pareja también lo vea.';
+
+/**
+ * Lo que viene de un grupo compartido (clave `compartido:<evento>`, M16) solo se anula o corrige desde Gastos
+ * compartidos: así el cambio se publica y los dos libros siguen con el mismo saldo (E17).
+ */
+export function exigirNoCompartido(ctx: Contexto, transaccionId: string): void {
+  const t = ctx.db
+    .select({ clave: transaccion.claveIdempotencia })
+    .from(transaccion)
+    .where(eq(transaccion.id, transaccionId))
+    .get();
+  if (t?.clave.startsWith('compartido:'))
+    throw new ErrorDominio('movimiento_compartido', 'se anula desde gastos compartidos');
+}
+
 /**
  * Anula un movimiento (transacción espejo, E2) y devuelve a `pendiente` las ocurrencias que había cubierto
  * (`04 §5`). Es lo que hace "Deshacer" y "Anular" en el detalle.
  */
 export function anularMovimiento(ctx: Contexto, transaccionId: string): void {
   exigirConsentimiento(ctx);
+  exigirNoCompartido(ctx, transaccionId);
   enTransaccion(ctx, () => {
     // Una compra a meses anulada no tuvo cuotas: se anulan también las que ya se habían facturado.
     anularCuotasDelPlan(ctx, transaccionId);

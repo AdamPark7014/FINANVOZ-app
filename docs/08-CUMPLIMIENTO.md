@@ -73,6 +73,8 @@ Grabar un video corto de este flujo (desde Hoy hasta la captura de un movimiento
 | Frases dictadas o escritas para interpretar | Sí, al proxy y al proveedor de LLM | Información financiera · recopilada · procesada de forma efímera · no compartida (encargados) · necesaria para la función |
 | Respaldo en la nube (M9) | Sí, cifrado de extremo a extremo y opcional | Posición conservadora: Información financiera · recopilada · opcional · cifrada en tránsito; confirmar con la guía vigente de Play si los datos cifrados de extremo a extremo deben declararse |
 | Correo de la cuenta de respaldo (M9) | Sí, opcional | Información personal · correo · recopilado · funcionalidad de la app |
+| Gastos compartidos en pareja (M16) | Sí, cifrados de extremo a extremo y opcionales (solo los eventos del grupo; nunca el libro personal ni el nombre que le pones a tu pareja) | Posición conservadora: Información financiera · recopilada · opcional · cifrada en tránsito · compartida solo con la otra persona del grupo, que la acepta escaneando el QR; misma consulta que el respaldo sobre datos cifrados de extremo a extremo |
+| Cámara (M16) | No: solo lee el QR del grupo en el teléfono; no se toman ni guardan fotos | No recopilado (permiso `CAMERA`) |
 | Identificador anónimo de la app | Sí | Identificadores · recopilado · funcionalidad y cuenta |
 | Registros de fallos depurados | Sí | Diagnóstico · recopilado |
 | Interacción con la app (opt-in) | Sí | Actividad en la app · recopilado · opcional |

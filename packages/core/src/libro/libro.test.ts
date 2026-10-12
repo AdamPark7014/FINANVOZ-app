@@ -10,6 +10,7 @@ import {
   construirConciliacion,
   construirCuentaDividida,
   construirGasto,
+  construirGastoPareja,
   construirIngreso,
   construirLiquidacionMsi,
   construirMsiExistente,
@@ -65,6 +66,7 @@ const PLAN = [
   cuenta('juan', 'contraparte', 'persona'),
   cuenta('ana', 'contraparte', 'persona'),
   cuenta('tanda', 'contraparte', 'tanda'),
+  cuenta('pareja', 'contraparte', 'pareja'),
   cuenta('antojos', 'gasto', 'categoria', { categoriaSlug: 'antojos' }),
   cuenta('hogar', 'gasto', 'categoria', { categoriaSlug: 'hogar' }),
   cuenta('sueldo', 'ingreso', 'categoria', { categoriaSlug: 'sueldo' }),
@@ -543,6 +545,59 @@ const movimientoArb: fc.Arbitrary<MovimientoPropuesto> = fc.oneof(
       construirConciliacion({ cuenta: 'bbva', capital: 'ajuste', saldoLibro, saldoReal }),
     ),
 );
+
+describe('E2 · gasto compartido en pareja (caso 31, E12.2)', () => {
+  it('pagó tu pareja: tu parte a gasto contra lo que le debes; sin parte tuya no hay asiento', () => {
+    const m = construirGastoPareja({
+      categoria: 'antojos',
+      pareja: 'pareja',
+      parteMia: 48000,
+      partePareja: 72000,
+    });
+    expect(m).toEqual({
+      tipo: 'cuenta_dividida',
+      asientos: [
+        { cuentaId: 'antojos', monto: 48000 },
+        { cuentaId: 'pareja', monto: -48000 },
+      ],
+    });
+    registrable(m as MovimientoPropuesto);
+    expect(
+      construirGastoPareja({ categoria: 'antojos', pareja: 'pareja', parteMia: 0, partePareja: 5 }),
+    ).toBe(null);
+  });
+
+  it('pagaste tú: cuenta dividida con las partes dadas, gasto si no le toca nada, préstamo si no te toca nada', () => {
+    const base = { categoria: 'antojos', pareja: 'pareja', pago: 'nu' };
+    const dividida = construirGastoPareja({ ...base, parteMia: 49999, partePareja: 50000 });
+    expect(dividida?.asientos).toEqual([
+      { cuentaId: 'antojos', monto: 49999 },
+      { cuentaId: 'pareja', monto: 50000 },
+      { cuentaId: 'nu', monto: -99999 },
+    ]);
+    const solo = construirGastoPareja({ ...base, parteMia: 45000, partePareja: 0 });
+    const prestado = construirGastoPareja({ ...base, parteMia: 0, partePareja: 45000 });
+    expect([dividida?.tipo, solo?.tipo, prestado?.tipo]).toEqual([
+      'cuenta_dividida',
+      'gasto',
+      'prestamo_otorgado',
+    ]);
+    for (const m of [dividida, solo, prestado]) registrable(m as MovimientoPropuesto);
+  });
+
+  it('rechaza partes negativas, no enteras o un total de cero', () => {
+    const base = { categoria: 'antojos', pareja: 'pareja' };
+    expect(codigo(() => construirGastoPareja({ ...base, parteMia: -1, partePareja: 2 }))).toBe(
+      'monto_invalido',
+    );
+    expect(codigo(() => construirGastoPareja({ ...base, parteMia: 1.5, partePareja: 2 }))).toBe(
+      'monto_invalido',
+    );
+    expect(codigo(() => construirGastoPareja({ ...base, parteMia: 0, partePareja: 0 }))).toBe(
+      'monto_invalido',
+    );
+  });
+});
 
 describe('E2 · I1 sobre los constructores', () => {
   it('I1: Σ montos = 0 y el patrón corresponde al tipo (1,000 corridas)', () => {

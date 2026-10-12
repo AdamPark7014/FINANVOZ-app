@@ -64,6 +64,22 @@ export default tseslint.config(
     },
   },
   {
+    // packages/sincronizacion corre en el teléfono: criptografía y aleatorios inyectados, sin reloj ni Node.
+    files: ['packages/sincronizacion/src/**/*.ts'],
+    ignores: ['packages/sincronizacion/src/**/*.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [{ regex: '^node:', message: 'La criptografía y los aleatorios se inyectan (E17).' }] },
+      ],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Date', property: 'now', message: 'El reloj llega de la app (regla 5).' },
+        { object: 'Math', property: 'random', message: 'Los aleatorios se inyectan (E17).' },
+      ],
+    },
+  },
+  {
     // packages/fiscal corre en el teléfono (Hermes) y en Node: lectura pura, sin módulos de Node ni reloj.
     files: ['packages/fiscal/src/**/*.ts'],
     ignores: ['packages/fiscal/src/**/*.test.ts'],

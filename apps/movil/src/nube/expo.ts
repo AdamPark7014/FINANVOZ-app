@@ -10,6 +10,7 @@ import { crearPuertoEvidencia, type PuertoEvidencia } from '../privacidad/eviden
 import type { NivelNube, NubeRespaldo } from '../servicios';
 import { leerConfigNube, type ConfigNube } from './config';
 import { conectividadExpo } from './conectividad';
+import { crearClienteCompartido, type ClienteCompartido } from './compartido-nube';
 import { crearCuentaRespaldo } from './cuenta-respaldo';
 import { crearRespaldoNube } from './respaldo-nube';
 import { crearSesionNube, type SesionNube } from './sesion';
@@ -70,4 +71,11 @@ export function crearNubeRespaldoExpo(): NubeRespaldo | null {
     }),
     respaldos: crearRespaldoNube({ url: config.url, sesion }),
   };
+}
+
+/** Cliente de `/compartido/*` (M16) sobre la misma sesión anónima; `null` sin configuración. */
+export function crearClienteCompartidoExpo(): ClienteCompartido | null {
+  const config = leerConfigNube(Constants.expoConfig?.extra);
+  if (!config) return null;
+  return crearClienteCompartido({ url: config.url, sesion: sesionNubeExpo(config) });
 }

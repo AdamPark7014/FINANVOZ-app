@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { ErrorDominio } from '@cartera/core';
 import { abrirBase, C, migrar } from './__pruebas__/base';
-import { TABLAS_0001, TABLAS_0002, TABLAS_0003, TABLAS_0004 } from './esquema';
+import { TABLAS_0001, TABLAS_0002, TABLAS_0003, TABLAS_0004, TABLAS_0005 } from './esquema';
 import {
   CATEGORIAS_GASTO_FIJO,
   CATEGORIAS_GASTO_VARIABLE,
@@ -14,7 +14,7 @@ import {
 } from './semillas';
 import { construirGasto } from '@cartera/core';
 
-const TODAS = { ...TABLAS_0001, ...TABLAS_0002, ...TABLAS_0003, ...TABLAS_0004 };
+const TODAS = { ...TABLAS_0001, ...TABLAS_0002, ...TABLAS_0003, ...TABLAS_0004, ...TABLAS_0005 };
 const TABLAS = Object.keys(TODAS).sort();
 
 function codigo(f: () => unknown): string | undefined {
@@ -56,6 +56,8 @@ describe('CA-M1-03 · migración 0001_inicial', () => {
     expect(de('trigger')).toEqual([
       'asiento_inmutable_d',
       'asiento_inmutable_u',
+      'evento_compartido_inmutable_d',
+      'evento_compartido_inmutable_u',
       'reversa_no_anulable',
       'transaccion_campos_fijos',
       'transaccion_inmutable_d',
@@ -330,5 +332,97 @@ describe('M12 · migración 0004_cfdi', () => {
     expect(() => insertar(cliente, 'D', { transaccion: 'no-existe' })).toThrow(
       /FOREIGN KEY constraint failed/,
     );
+  });
+});
+
+describe('M16 · migración 0005_compartido', () => {
+  const GRUPO = '7f3c1a52-8d4e-4b6a-9c21-0e5f7a8b9c0d';
+  const EVENTO = '3b9f6c2e-1a7d-4e58-b4c3-9d2a6f1e8b70';
+
+  function conGrupo(extra: { miAutor?: string; nombre?: string; contraparte?: string } = {}) {
+    const base = abrirBase();
+    base.cliente
+      .prepare(
+        `INSERT INTO grupo_compartido (id, nombre, contraparte_id, mi_autor, creado_en) VALUES (?, ?, ?, ?, 0)`,
+      )
+      .run(GRUPO, extra.nombre ?? 'Ana', extra.contraparte ?? C.ana, extra.miAutor ?? 'b');
+    return base;
+  }
+
+  const insertarEvento = (
+    cliente: ReturnType<typeof abrirBase>['cliente'],
+    id = EVENTO,
+    extra: { autor?: string; tipo?: string; grupo?: string; transaccion?: string | null } = {},
+  ) =>
+    cliente
+      .prepare(
+        `INSERT INTO evento_compartido (id, grupo_id, autor, creado_en, tipo, cuerpo, transaccion_id)
+         VALUES (?, ?, ?, 1, ?, '{}', ?)`,
+      )
+      .run(
+        id,
+        extra.grupo ?? GRUPO,
+        extra.autor ?? 'a',
+        extra.tipo ?? 'gasto_compartido_creado',
+        extra.transaccion ?? null,
+      );
+
+  it('crea las tablas del grupo y de sus eventos; un evento nuevo queda pendiente de publicar', () => {
+    const { cliente } = conGrupo();
+    insertarEvento(cliente);
+    expect(cliente.prepare('SELECT mi_autor, cerrado_en FROM grupo_compartido').get()).toEqual({
+      mi_autor: 'b',
+      cerrado_en: null,
+    });
+    expect(cliente.prepare('SELECT recibido_en, transaccion_id FROM evento_compartido').get()).toEqual({
+      recibido_en: null,
+      transaccion_id: null,
+    });
+  });
+
+  it('CHECK: lugar a o b, tipo de evento conocido, nombre no vacío y una contraparte por grupo', () => {
+    expect(() => conGrupo({ miAutor: 'c' })).toThrow(/CHECK constraint failed/);
+    expect(() => conGrupo({ nombre: '' })).toThrow(/CHECK constraint failed/);
+    expect(() => conGrupo({ contraparte: 'no-existe' })).toThrow(/FOREIGN KEY constraint failed/);
+    const { cliente } = conGrupo();
+    expect(() =>
+      cliente
+        .prepare(
+          `INSERT INTO grupo_compartido (id, nombre, contraparte_id, mi_autor, creado_en) VALUES ('g2', 'x', ?, 'a', 0)`,
+        )
+        .run(C.ana),
+    ).toThrow(/UNIQUE constraint failed/);
+    expect(() => insertarEvento(cliente, 'e1', { autor: 'c' })).toThrow(/CHECK constraint failed/);
+    expect(() => insertarEvento(cliente, 'e2', { tipo: 'gasto' })).toThrow(/CHECK constraint failed/);
+    expect(() => insertarEvento(cliente, 'e3', { grupo: 'otro' })).toThrow(/FOREIGN KEY constraint failed/);
+    expect(() => insertarEvento(cliente, 'e4', { transaccion: 'no-existe' })).toThrow(
+      /FOREIGN KEY constraint failed/,
+    );
+    insertarEvento(cliente, 'e5');
+    expect(() => insertarEvento(cliente, 'e5')).toThrow(/UNIQUE constraint failed/);
+  });
+
+  it('un evento es inmutable: solo se completan transaccion_id y recibido_en; no se borra', () => {
+    const { cliente } = conGrupo();
+    insertarEvento(cliente);
+    for (const cambio of [
+      `autor = 'b'`,
+      `tipo = 'evento_anulado'`,
+      `cuerpo = '{"x":1}'`,
+      'creado_en = 2',
+      `grupo_id = 'x'`,
+      `id = 'x'`,
+    ]) {
+      expect(() => cliente.prepare(`UPDATE evento_compartido SET ${cambio}`).run(), cambio).toThrow(
+        /evento_compartido_inmutable/,
+      );
+    }
+    expect(() => cliente.prepare('DELETE FROM evento_compartido').run()).toThrow(
+      /evento_compartido_inmutable/,
+    );
+    cliente.prepare(`UPDATE evento_compartido SET recibido_en = '2026-10-12T15:30:00.000001Z'`).run();
+    expect(cliente.prepare('SELECT recibido_en FROM evento_compartido').get()).toEqual({
+      recibido_en: '2026-10-12T15:30:00.000001Z',
+    });
   });
 });

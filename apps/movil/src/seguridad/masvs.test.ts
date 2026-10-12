@@ -74,7 +74,11 @@ describe('MASVS L1 verificable en código', () => {
     expect(appJson.expo.android.permissions).toEqual([
       'android.permission.RECORD_AUDIO',
       'android.permission.USE_BIOMETRIC',
+      // M16: escanear en persona el QR del grupo compartido (02 §27); expo-camera sin micrófono.
+      'android.permission.CAMERA',
     ]);
+    const camara = appJson.expo.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-camera');
+    expect(camara?.[1]).toMatchObject({ microphonePermission: false, recordAudioAndroid: false });
     expect(appJson.expo.android.blockedPermissions).toEqual(
       expect.arrayContaining([
         'android.permission.READ_EXTERNAL_STORAGE',

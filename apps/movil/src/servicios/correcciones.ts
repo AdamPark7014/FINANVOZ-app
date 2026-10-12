@@ -6,6 +6,7 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { aprenderAlias, aprenderCategoria } from './aprendizaje';
 import { cuentaPorId, idCategoriaDe } from './catalogo';
 import { cubrirAutomaticamente, liberarOcurrencias } from './cobertura';
+import { exigirNoCompartido } from './formulario';
 import { restaurarPlanDe } from './msi';
 import { enTransaccion, type Contexto } from './contexto';
 import { anularMovimiento } from './formulario';
@@ -192,6 +193,7 @@ export function aplicarCorreccion(
   exigirConsentimiento(ctx);
   return enTransaccion(ctx, () => {
     if (estaAnulada(ctx, transaccionId)) throw new ErrorDominio('ya_anulada', 'ese movimiento ya no está');
+    exigirNoCompartido(ctx, transaccionId);
     const antes = resumenTransaccion(ctx, transaccionId);
     const { fila, asientos } = leer(ctx, transaccionId);
     if (asientos.length !== 2) {

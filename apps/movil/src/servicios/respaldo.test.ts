@@ -28,6 +28,10 @@ import {
   type DependenciasRespaldo,
 } from './respaldo';
 import { cargarEscenario } from './semilla';
+import { crearGrupoCompartido, sincronizarGrupo } from './compartido';
+import { CLAVE_LLAVES_COMPARTIDO, obtenerLlaveGrupo } from '../compartido/llaves';
+import { aceptarConsentimiento } from '../privacidad/consentimiento';
+import { depsTelefono, servidorCompartidoFalso } from './__pruebas__/compartido';
 import { abrirPrueba, escenario } from './__pruebas__/base';
 
 const CONTRASENA = 'mi respaldo seguro 2026';
@@ -269,12 +273,14 @@ describe('respaldo cifrado (M9)', () => {
   it('un respaldo de un esquema anterior (sin la tabla tanda de 0002) se importa y se migra a la versión actual', async () => {
     const p = abrirPrueba('2026-10-11');
     cargarEscenario(p.ctx, escenario('e4-01'));
-    // Lo que exportaba una app con solo 0001_inicial: sin las tablas de 0002 a 0004 y con version_esquema 1.
+    // Lo que exportaba una app con solo 0001_inicial: sin las tablas de 0002 a 0005 y con version_esquema 1.
     const tablas = { ...datosExportacion(p.ctx).tablas };
     delete tablas.tanda;
     delete tablas.suscripcion;
     delete tablas.plantilla_remota;
     delete tablas.cfdi;
+    delete tablas.grupo_compartido;
+    delete tablas.evento_compartido;
     const deps = dependencias();
     const archivo = await conContenido({ ...datosExportacion(p.ctx), version_esquema: 1, tablas }, deps);
 
@@ -305,4 +311,43 @@ describe('respaldo cifrado (M9)', () => {
     await borrarTodo({ base: null, puerto: puertoNode(), almacen: deps.almacen });
     expect(tieneContrasenaRespaldo(deps)).toBe(false);
   });
+
+  it('CA-M16-06 · el respaldo cifrado lleva la llave del grupo compartido y restaurarlo la recupera', async () => {
+    expect(LLAVES_ALMACEN).toContain(CLAVE_LLAVES_COMPARTIDO);
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const servidor = servidorCompartidoFalso();
+    const cliente = servidor.cliente('usuario-a');
+    const grupo = await crearGrupoCompartido(p.ctx, depsTelefono(p, cliente), 'Beto');
+    if (!grupo.ok) throw new Error(grupo.error);
+    const llave = obtenerLlaveGrupo(p.almacen, grupo.grupoId);
+    // La exportación en claro (04 §6) nunca la lleva; el respaldo cifrado sí.
+    expect(JSON.stringify(datosExportacion(p.ctx))).not.toContain('llaves_compartidas');
+    const deps = dependencias(p.almacen);
+    await fijarContrasenaRespaldo(deps, CONTRASENA, CONTRASENA);
+    const archivo = await generarRespaldo(deps, p.ctx);
+    p.base.cerrar();
+
+    await borrarTodo({ base: null, puerto: puertoNode(), almacen: deps.almacen });
+    expect(deps.almacen.valores.has(CLAVE_LLAVES_COMPARTIDO)).toBe(false);
+    const listo = await prepararRestauracion(deps, archivo, CONTRASENA);
+    const restaurada = restaurarRespaldo(deps, listo);
+    expect(obtenerLlaveGrupo(deps.almacen, grupo.grupoId)).toEqual(llave);
+    const nuevo = crearContexto({ db: restaurada.db, reloj: p.reloj, generarId: crearGeneradorSecuencial() });
+    expect(
+      await sincronizarGrupo(nuevo, { ...depsTelefono(p, cliente), almacen: deps.almacen }, grupo.grupoId),
+    ).toEqual({ ok: true });
+    restaurada.cerrar();
+  }, 60_000);
+
+  it('un respaldo con una llave de grupo mal formada no se abre', async () => {
+    const p = abrirPrueba('2026-10-11');
+    const deps = dependencias();
+    const archivo = await conContenido(
+      { ...datosExportacion(p.ctx), llaves_compartidas: { 'no-es-grupo': 'x' } },
+      deps,
+    );
+    expect(await codigoDe(prepararRestauracion(deps, archivo, CONTRASENA))).toBe('respaldo_invalido');
+    p.base.cerrar();
+  }, 60_000);
 });
