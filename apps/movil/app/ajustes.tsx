@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { compartirArchivo } from '../src/pantallas/ajustes/compartir';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
+import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { exportarCsv, exportarJson, fijarBloqueo, obtenerBloqueo } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
@@ -13,7 +14,7 @@ const PALABRA_BORRAR = 'BORRAR';
 const TOQUES_MENU_DEV = 7;
 
 /**
- * Ajustes de M2 (`02 §12`, RF-CFG-03, `04 §6`): bloqueo, ocultar en multitarea, exportar (JSON y CSV, siempre
+ * Ajustes (`02 §12`, RF-CFG-03, `04 §6`): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), exportar (JSON y CSV, siempre
  * gratis), borrar todo con confirmación fuerte, aviso de privacidad y versión. En builds de desarrollo, tocar 7
  * veces la versión abre el menú de escenarios semilla.
  */
@@ -107,6 +108,8 @@ export default function Ajustes() {
           alCambiar={(ocultarEnMultitarea) => cambiarBloqueo({ ocultarEnMultitarea })}
         />
       </Tarjeta>
+
+      <SeccionAvisos />
 
       <Tarjeta>
         <Texto variante="subtitulo">Privacidad</Texto>

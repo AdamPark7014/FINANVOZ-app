@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import { crearNivelNubeExpo } from '../src/nube/expo';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
+import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
+import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { cargarEscenario, obtenerBloqueo, relojFijo } from '../src/servicios';
 import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
@@ -35,6 +37,8 @@ export default function Raiz() {
   const sesion = estado.tipo === 'lista' ? estado.sesion : null;
   // Nivel 2 del intérprete; `null` si la build no trae `supabaseUrl` y `supabaseAnonKey` en `extra`.
   const nube = useMemo(() => crearNivelNubeExpo(), []);
+  // Avisos locales de corte y fecha límite (`02 §13`); nada de push.
+  const notificaciones = useMemo(() => crearNotificacionesExpo(), []);
 
   const reemplazarSesion = useCallback(
     async (preparar?: () => Sesion) => {
@@ -102,9 +106,11 @@ export default function Raiz() {
   return (
     <ProveedorControlApp control={control}>
       {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
-      <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
-        <AppProtegida reiniciada={estado.generacion > 0} />
-      </ProveedorSesion>
+      <ProveedorNotificaciones notificaciones={notificaciones}>
+        <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
+          <AppProtegida reiniciada={estado.generacion > 0} />
+        </ProveedorSesion>
+      </ProveedorNotificaciones>
     </ProveedorControlApp>
   );
 }
@@ -123,10 +129,14 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
+      {/* Al abrir la app y tras cada cambio (tarjetas, pagos, cortes, preferencias) se reprograman los avisos. */}
+      <SincronizarAvisosTarjetas />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
         <Stack.Screen name="ajustes" />
+        <Stack.Screen name="tarjetas/[id]" />
+        <Stack.Screen name="tarjetas/nueva" />
       </Stack>
       <CortinaBloqueo bloqueo={bloqueo} />
     </View>
