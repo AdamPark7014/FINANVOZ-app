@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import {
   ErrorDominio,
@@ -18,9 +18,11 @@ import {
 import { esquema } from '@cartera/datos';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { idCategoriaDe } from './catalogo';
+import { cubrirAutomaticamente, liberarOcurrencias, type CoberturaAutomatica } from './cobertura';
 import { enTransaccion, type Contexto } from './contexto';
+import { anularCuotasDelPlan, preguntaTrasPago, type PreguntaLiquidar } from './msi';
 
-const { ocurrencia } = esquema;
+const { transaccion } = esquema;
 
 const Monto = z.int().min(1).max(Number.MAX_SAFE_INTEGER);
 const Fecha = z.string().refine(esFecha, 'fecha inválida');
@@ -59,6 +61,33 @@ export interface MovimientoRegistrado {
   /** Token de "Deshacer": se pasa tal cual a `deshacer`. */
   readonly deshacer: string;
   readonly fecha: PlainDate;
+  /** Cobertura automática de un pago fijo o un ingreso (E3.5); `null` si no cubrió nada. */
+  readonly cobertura: CoberturaAutomatica | null;
+  /** Un pago que dejó saldo a favor con meses activos: "¿Este pago fue para liquidar tus meses?". */
+  readonly preguntaLiquidar: PreguntaLiquidar | null;
+}
+
+/**
+ * Lo que pasa después de registrar cualquier movimiento (formulario, voz, cola, correcciones): cobertura
+ * automática de ocurrencias (E3.5) y, si fue un pago que dejó saldo a favor, la pregunta de liquidar meses.
+ */
+export function trasRegistrar(
+  ctx: Contexto,
+  transaccionId: string,
+  opciones: { cubrir?: boolean } = {},
+): { cobertura: CoberturaAutomatica | null; preguntaLiquidar: PreguntaLiquidar | null } {
+  const cobertura = opciones.cubrir === false ? null : cubrirAutomaticamente(ctx, transaccionId);
+  const fila = ctx.db
+    .select({ tipo: transaccion.tipo })
+    .from(transaccion)
+    .where(eq(transaccion.id, transaccionId))
+    .get();
+  let preguntaLiquidar: PreguntaLiquidar | null = null;
+  if (fila?.tipo === 'pago_tarjeta') {
+    const tarjetaId = ctx.libro.obtener(transaccionId)?.asientos.find((a) => a.monto > 0)?.cuentaId;
+    if (tarjetaId) preguntaLiquidar = preguntaTrasPago(ctx, tarjetaId, transaccionId);
+  }
+  return { cobertura, preguntaLiquidar };
 }
 
 /** Asientos del movimiento con los constructores de `core` (`04 §4`). */
@@ -100,7 +129,13 @@ export function construirMovimiento(ctx: Contexto, e: EntradaMovimiento): Movimi
 export function registrarMovimiento(
   ctx: Contexto,
   entrada: EntradaMovimiento,
-  opciones: { origen?: OrigenRegistro; porRevisar?: boolean; claveIdempotencia?: string } = {},
+  opciones: {
+    origen?: OrigenRegistro;
+    porRevisar?: boolean;
+    claveIdempotencia?: string;
+    /** `false` cuando quien llama cubre una ocurrencia concreta ("Ya la pagué", "Sí, ya llegó"). */
+    cubrir?: boolean;
+  } = {},
 ): MovimientoRegistrado {
   exigirConsentimiento(ctx);
   const r = EntradaMovimiento.safeParse(entrada);
@@ -108,17 +143,22 @@ export function registrarMovimiento(
   const e = r.data;
   const fecha = e.fecha ?? ctx.reloj.hoy();
   const propuesto = construirMovimiento(ctx, e);
-  const { transaccion } = ctx.libro.registrar({
-    tipo: propuesto.tipo,
-    fecha,
-    origen: opciones.origen ?? 'manual',
-    claveIdempotencia: opciones.claveIdempotencia ?? `mov:${ctx.generarId()}`,
-    asientos: propuesto.asientos,
-    descripcion: e.descripcion ?? null,
-    comercio: e.tipo === 'gasto' ? (e.comercio ?? null) : null,
-    porRevisar: opciones.porRevisar ?? false,
+  return enTransaccion(ctx, () => {
+    const { transaccion: tx, nueva } = ctx.libro.registrar({
+      tipo: propuesto.tipo,
+      fecha,
+      origen: opciones.origen ?? 'manual',
+      claveIdempotencia: opciones.claveIdempotencia ?? `mov:${ctx.generarId()}`,
+      asientos: propuesto.asientos,
+      descripcion: e.descripcion ?? null,
+      comercio: e.tipo === 'gasto' ? (e.comercio ?? null) : null,
+      porRevisar: opciones.porRevisar ?? false,
+    });
+    const despues = nueva
+      ? trasRegistrar(ctx, tx.id, opciones.cubrir === false ? { cubrir: false } : {})
+      : { cobertura: null, preguntaLiquidar: null };
+    return { transaccionId: tx.id, deshacer: tx.id, fecha, ...despues };
   });
-  return { transaccionId: transaccion.id, deshacer: transaccion.id, fecha };
 }
 
 /**
@@ -128,12 +168,10 @@ export function registrarMovimiento(
 export function anularMovimiento(ctx: Contexto, transaccionId: string): void {
   exigirConsentimiento(ctx);
   enTransaccion(ctx, () => {
+    // Una compra a meses anulada no tuvo cuotas: se anulan también las que ya se habían facturado.
+    anularCuotasDelPlan(ctx, transaccionId);
     ctx.libro.anular(transaccionId);
-    ctx.db
-      .update(ocurrencia)
-      .set({ estado: 'pendiente', transaccionId: null })
-      .where(and(eq(ocurrencia.transaccionId, transaccionId), eq(ocurrencia.estado, 'cubierta')))
-      .run();
+    liberarOcurrencias(ctx, transaccionId);
   });
 }
 
