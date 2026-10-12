@@ -15,6 +15,7 @@ import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/panta
 import { archivosRespaldoExpo, dependenciasRespaldoExpo } from '../src/respaldo/expo';
 import { programarRespaldoAutomatico } from '../src/respaldo/programar';
 import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/SincronizarRespaldoAutomatico';
+import { SincronizarWidget } from '../src/widget/SincronizarWidget';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
@@ -196,6 +197,8 @@ function AppProtegida({
         <SincronizarAvisosTarjetas />
         {/* La tarea semanal queda registrada solo mientras el respaldo automático está encendido. */}
         <SincronizarRespaldoAutomatico />
+        {/* El widget "Hoy puedes" se vuelve a pintar tras cada escritura (≤ 5 s con la app abierta, `02 §21`). */}
+        <SincronizarWidget />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />

@@ -63,7 +63,14 @@ export function construirVistaWidget(
   const titulo = hoy.estado === 'libre_negativo' ? 'Hoy:' : 'Hoy puedes';
   const cifra = `$${miles(hoy.estado === 'libre_negativo' ? 0 : hoy.hoyPuedesPesos)}`;
   const detalle = dias(hoy.dias);
-  return { tipo: 'cifra', titulo, cifra, detalle, texto: `${titulo} ${cifra} · ${detalle}`, enlace: ENLACE_WIDGET };
+  return {
+    tipo: 'cifra',
+    titulo,
+    cifra,
+    detalle,
+    texto: `${titulo} ${cifra} · ${detalle}`,
+    enlace: ENLACE_WIDGET,
+  };
 }
 
 /**

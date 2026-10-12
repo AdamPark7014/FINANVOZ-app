@@ -35,27 +35,39 @@ describe('construirVistaWidget (pura)', () => {
   });
 
   it('miles con coma y "1 día" en singular', () => {
-    const v = construirVistaWidget({ estado: 'retrasado', hoyPuedesPesos: 1500, dias: 1 }, { ocultarMontos: false });
+    const v = construirVistaWidget(
+      { estado: 'retrasado', hoyPuedesPesos: 1500, dias: 1 },
+      { ocultarMontos: false },
+    );
     expect(v.texto).toBe('Hoy puedes $1,500 · 1 día');
   });
 
   it('día de pago e ingreso variable también muestran la cifra con sus días', () => {
     expect(
-      construirVistaWidget({ estado: 'dia_de_pago', hoyPuedesPesos: 456, dias: 3 }, { ocultarMontos: false }).texto,
+      construirVistaWidget({ estado: 'dia_de_pago', hoyPuedesPesos: 456, dias: 3 }, { ocultarMontos: false })
+        .texto,
     ).toBe('Hoy puedes $456 · 3 días');
     expect(
-      construirVistaWidget({ estado: 'ingreso_variable', hoyPuedesPesos: 90, dias: 30 }, { ocultarMontos: false })
-        .texto,
+      construirVistaWidget(
+        { estado: 'ingreso_variable', hoyPuedesPesos: 90, dias: 30 },
+        { ocultarMontos: false },
+      ).texto,
     ).toBe('Hoy puedes $90 · 30 días');
   });
 
   it('libre negativo: "Hoy: $0" como en Hoy (`02 §4.2`)', () => {
-    const v = construirVistaWidget({ estado: 'libre_negativo', hoyPuedesPesos: 0, dias: 4 }, { ocultarMontos: false });
+    const v = construirVistaWidget(
+      { estado: 'libre_negativo', hoyPuedesPesos: 0, dias: 4 },
+      { ocultarMontos: false },
+    );
     expect(v).toMatchObject({ tipo: 'cifra', titulo: 'Hoy:', cifra: '$0', texto: 'Hoy: $0 · 4 días' });
   });
 
   it('sin ingreso configurado: pide la frecuencia, sin cifra', () => {
-    const v = construirVistaWidget({ estado: 'sin_ingreso', hoyPuedesPesos: 0, dias: 0 }, { ocultarMontos: false });
+    const v = construirVistaWidget(
+      { estado: 'sin_ingreso', hoyPuedesPesos: 0, dias: 0 },
+      { ocultarMontos: false },
+    );
     expect(v).toMatchObject({ tipo: 'mensaje', texto: 'Dime cada cuándo te pagan', cifra: null });
     sinCifras(v);
   });

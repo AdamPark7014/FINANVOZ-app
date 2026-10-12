@@ -52,7 +52,25 @@
         }
       ],
       "@sentry/react-native",
-      "@cartera/captura-android"
+      "@cartera/captura-android",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "HoyPuedes",
+              "label": "Hoy puedes",
+              "description": "Cuánto puedes gastar hoy y cuántos días faltan para tu ingreso.",
+              "minWidth": "110dp",
+              "minHeight": "40dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 1,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

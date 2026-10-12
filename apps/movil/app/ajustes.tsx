@@ -6,6 +6,7 @@ import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
+import { SeccionWidget } from '../src/pantallas/ajustes/SeccionWidget';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
 import { fijarBloqueo, obtenerBloqueo, obtenerRespaldoNube } from '../src/servicios';
@@ -16,7 +17,7 @@ import { Boton, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../src/ui
 const TOQUES_MENU_DEV = 7;
 
 /**
- * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, respaldo (M9), privacidad
+ * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, widget (M10), respaldo (M9), privacidad
  * (exportar, borrar todo y el aviso viven en el centro de privacidad, `app/privacidad.tsx`) y versión. En builds
  * de desarrollo, tocar 7 veces la versión abre el menú de escenarios semilla.
  */
@@ -78,6 +79,7 @@ export default function Ajustes() {
 
       <SeccionAvisos />
       <SeccionCaptura />
+      <SeccionWidget />
 
       <Tarjeta testID="ajustes-respaldo">
         <Texto variante="subtitulo">Respaldo</Texto>
