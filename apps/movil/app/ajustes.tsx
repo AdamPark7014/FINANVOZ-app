@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
+import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
 import { fijarBloqueo, obtenerBloqueo } from '../src/servicios';
@@ -76,6 +77,7 @@ export default function Ajustes() {
 
       <SeccionAvisos />
       <SeccionCaptura />
+      <SeccionDatosCobro />
       <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
 
       <Tarjeta>

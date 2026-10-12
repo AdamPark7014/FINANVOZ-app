@@ -3,6 +3,7 @@ import {
   horaDispositivo,
   puertoEnMemoria,
   sincronizarAvisosTarjetas,
+  sincronizarRecordatoriosCobro,
   type PuertoNotificaciones,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
@@ -83,6 +84,8 @@ export function SincronizarAvisosTarjetas({ hora = horaDispositivo }: { hora?: (
           estado.current.pendiente = false;
           if ((await notificaciones.permiso()) !== 'concedido') break;
           await sincronizarAvisosTarjetas(ctx, notificaciones.puerto, hora());
+          // Recordatorios de cobro (RF-PER-03): se cancelan solos cuando la persona ya te pagó.
+          await sincronizarRecordatoriosCobro(ctx, notificaciones.puerto, hora());
         } while (estado.current.pendiente);
       } catch {
         // Sin detalle (regla 9): se reintenta en la siguiente escritura o al abrir la app.
