@@ -14,7 +14,7 @@ const esObjeto = (v: Valor): v is Objeto => typeof v === 'object' && v !== null 
 const IGNORADOS = new Set(['descripcion', 'concepto', 'pregunta', 'parcial', 'opciones']);
 const CAMPOS_CUENTA = new Set(['origen', 'destino']);
 /** Personas y alias se comparan normalizados con `normalizarAlias`. */
-const CAMPOS_NORMALIZADOS = new Set(['contraparte', 'alias']);
+const CAMPOS_NORMALIZADOS = new Set(['contraparte', 'alias', 'grupo']);
 
 function contenidoEnAlgunSentido(a: string, b: string): boolean {
   const na = normalizarAlias(a);

@@ -24,8 +24,8 @@ const mov = (extra: Record<string, unknown>) => ({
 const ajuste = (a: Record<string, unknown>) => ({ intencion: 'configurar', ajuste: a });
 
 describe('CA-M1-06 · los esperados del golden set validan con Zod y con esquema.json', () => {
-  it('hay 144 casos', () => {
-    expect(golden).toHaveLength(144);
+  it('hay 155 casos', () => {
+    expect(golden).toHaveLength(155);
   });
 
   for (const caso of golden) {
@@ -116,6 +116,19 @@ const INVALIDOS: [string, unknown][] = [
   ['intencion desconocida', { intencion: 'saludar' }],
   ['saldo_cuenta sin monto', ajuste({ tipo: 'saldo_cuenta', alias: 'bbva' })],
   ['tarjeta_ciclo con dia 32', ajuste({ tipo: 'tarjeta_ciclo', dia_corte: 32 })],
+  ['gasto_compartido sin fecha', { intencion: 'gasto_compartido', gasto: { monto: 100 } }],
+  [
+    'gasto_compartido con mi_parte 100',
+    { intencion: 'gasto_compartido', gasto: { monto: 100, fecha: HOY, mi_parte: 100 } },
+  ],
+  [
+    'gasto_compartido con pagador desconocido',
+    { intencion: 'gasto_compartido', gasto: { monto: 100, fecha: HOY, pagador: 'ana' } },
+  ],
+  [
+    'gasto_compartido de mercancia',
+    { intencion: 'gasto_compartido', gasto: { monto: 100, fecha: HOY, categoria: 'mercancia' } },
+  ],
 ];
 
 const VALIDOS: [string, unknown][] = [
@@ -143,6 +156,7 @@ const VALIDOS: [string, unknown][] = [
   ['revisar_duplicados sin filtro', { intencion: 'revisar_duplicados', filtro: {} }],
   ['ingreso_recurrente sin regla', ajuste({ tipo: 'ingreso_recurrente', monto: 800000 })],
   ['regla anual', ajuste({ tipo: 'compromiso', monto: 980000, regla: { tipo: 'anual', mes: 2, dia: 15 } })],
+  ['gasto_compartido mínimo', { intencion: 'gasto_compartido', gasto: { monto: 100, fecha: HOY } }],
 ];
 
 describe('CA-M1-06 · Zod y esquema.json rechazan lo mismo', () => {

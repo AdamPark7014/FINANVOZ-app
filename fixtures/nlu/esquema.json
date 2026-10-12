@@ -12,6 +12,7 @@
     {"$ref": "#/$defs/consultar"},
     {"$ref": "#/$defs/simular"},
     {"$ref": "#/$defs/configurar"},
+    {"$ref": "#/$defs/gasto_compartido"},
     {"$ref": "#/$defs/aclarar"},
     {"$ref": "#/$defs/fuera_de_alcance"}
   ],
@@ -429,6 +430,32 @@
         }
       },
       "required": ["intencion", "ajuste"],
+      "additionalProperties": false
+    },
+    "gasto_compartido": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "gasto_compartido"},
+        "gasto": {
+          "type": "object",
+          "properties": {
+            "monto": {"$ref": "#/$defs/centavos"},
+            "fecha": {"$ref": "#/$defs/fecha"},
+            "descripcion": {"$ref": "#/$defs/texto"},
+            "categoria": {"$ref": "#/$defs/categoria"},
+            "pagador": {"enum": ["yo", "pareja"]},
+            "mi_parte": {"type": "integer", "minimum": 1, "maximum": 99},
+            "grupo": {"$ref": "#/$defs/texto"}
+          },
+          "required": ["monto", "fecha"],
+          "additionalProperties": false,
+          "not": {
+            "properties": {"categoria": {"$ref": "#/$defs/categoriaNegocioExclusiva"}},
+            "required": ["categoria"]
+          }
+        }
+      },
+      "required": ["intencion", "gasto"],
       "additionalProperties": false
     },
     "aclarar": {

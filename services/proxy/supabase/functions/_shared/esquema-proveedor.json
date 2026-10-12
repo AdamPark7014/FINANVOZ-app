@@ -1115,6 +1115,92 @@
             "properties": {
               "intencion": {
                 "type": "string",
+                "enum": ["gasto_compartido"]
+              },
+              "gasto": {
+                "type": "object",
+                "properties": {
+                  "monto": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "categoria": {
+                    "type": "string",
+                    "enum": [
+                      "comida_fuera",
+                      "antojos",
+                      "super",
+                      "transporte",
+                      "gasolina",
+                      "entretenimiento",
+                      "ropa",
+                      "hogar",
+                      "cuidado_personal",
+                      "salud",
+                      "mascotas",
+                      "regalos",
+                      "apoyo_familiar",
+                      "viajes",
+                      "tecnologia",
+                      "deporte",
+                      "otros_gastos",
+                      "vivienda",
+                      "servicios",
+                      "suscripciones",
+                      "educacion",
+                      "comisiones_intereses",
+                      "sueldo",
+                      "honorarios",
+                      "ventas",
+                      "regalo_recibido",
+                      "reembolso",
+                      "rendimientos",
+                      "otros_ingresos",
+                      "servicios_prestados",
+                      "mercancia",
+                      "insumos",
+                      "renta_local",
+                      "sueldos_ayudantes",
+                      "publicidad",
+                      "equipo",
+                      "mantenimiento",
+                      "impuestos",
+                      "otros_impuestos"
+                    ]
+                  },
+                  "pagador": {
+                    "type": "string",
+                    "enum": ["yo", "pareja"]
+                  },
+                  "mi_parte": {
+                    "type": "integer",
+                    "description": "Entero de 1 a 99."
+                  },
+                  "grupo": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  }
+                },
+                "required": ["monto", "fecha"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "gasto"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
                 "enum": ["aclarar"]
               },
               "motivo": {
@@ -2791,6 +2877,127 @@
               }
             },
             "required": ["intencion", "ajuste"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["gasto_compartido"]
+              },
+              "gasto": {
+                "type": "object",
+                "properties": {
+                  "monto": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "descripcion": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "categoria": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "comida_fuera",
+                          "antojos",
+                          "super",
+                          "transporte",
+                          "gasolina",
+                          "entretenimiento",
+                          "ropa",
+                          "hogar",
+                          "cuidado_personal",
+                          "salud",
+                          "mascotas",
+                          "regalos",
+                          "apoyo_familiar",
+                          "viajes",
+                          "tecnologia",
+                          "deporte",
+                          "otros_gastos",
+                          "vivienda",
+                          "servicios",
+                          "suscripciones",
+                          "educacion",
+                          "comisiones_intereses",
+                          "sueldo",
+                          "honorarios",
+                          "ventas",
+                          "regalo_recibido",
+                          "reembolso",
+                          "rendimientos",
+                          "otros_ingresos",
+                          "servicios_prestados",
+                          "mercancia",
+                          "insumos",
+                          "renta_local",
+                          "sueldos_ayudantes",
+                          "publicidad",
+                          "equipo",
+                          "mantenimiento",
+                          "impuestos",
+                          "otros_impuestos"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pagador": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["yo", "pareja"]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "mi_parte": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Entero de 1 a 99."
+                  },
+                  "grupo": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  }
+                },
+                "required": ["monto", "fecha", "descripcion", "categoria", "pagador", "mi_parte", "grupo"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "gasto"],
             "additionalProperties": false
           },
           {
