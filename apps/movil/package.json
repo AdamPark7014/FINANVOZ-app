@@ -9,7 +9,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:app": "jest",
     "semilla": "tsx scripts/semilla.ts",
-    "migraciones": "tsx scripts/generar-migraciones.ts"
+    "migraciones": "tsx scripts/generar-migraciones.ts",
+    "secretos": "tsx scripts/buscar-secretos.ts"
   },
   "dependencies": {
     "@cartera/captura-android": "workspace:*",
@@ -38,6 +39,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
+    "react-native-purchases": "10.10.2",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "zod": "^4.6.6"

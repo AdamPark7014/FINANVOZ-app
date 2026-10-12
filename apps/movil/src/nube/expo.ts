@@ -6,21 +6,46 @@
 import Constants from 'expo-constants';
 import { crearClienteNube } from '@cartera/nlu';
 import { almacenExpo } from '../db/expo';
+import { crearPuertoEvidencia, type PuertoEvidencia } from '../privacidad/evidencia-servidor';
 import type { NivelNube } from '../servicios';
-import { leerConfigNube } from './config';
+import { leerConfigNube, type ConfigNube } from './config';
 import { conectividadExpo } from './conectividad';
-import { crearSesionNube } from './sesion';
+import { crearSesionNube, type SesionNube } from './sesion';
+import { usuarioDeToken } from './token';
 
-export function crearNivelNubeExpo(): NivelNube | null {
-  const config = leerConfigNube(Constants.expoConfig?.extra);
-  if (!config) return null;
-  const sesion = crearSesionNube({
+let sesionApp: SesionNube | null = null;
+
+/** Una sola sesión anónima para todo lo que habla con Supabase (así nunca se crean dos usuarios a la vez). */
+function sesionNubeExpo(config: ConfigNube): SesionNube {
+  sesionApp ??= crearSesionNube({
     url: config.url,
     llaveAnonima: config.llaveAnonima,
     almacen: almacenExpo,
   });
+  return sesionApp;
+}
+
+export function crearNivelNubeExpo(): NivelNube | null {
+  const config = leerConfigNube(Constants.expoConfig?.extra);
+  if (!config) return null;
+  const sesion = sesionNubeExpo(config);
   return {
     cliente: crearClienteNube({ url: config.url, obtenerToken: (o) => sesion.obtenerToken(o) }),
     conectividad: conectividadExpo,
+    usuarioId: async () => {
+      const token = await sesion.obtenerToken();
+      return token ? usuarioDeToken(token) : null;
+    },
   };
+}
+
+/** Copia de la evidencia del consentimiento en Supabase (`08 §2`); `null` sin configuración. */
+export function crearPuertoEvidenciaExpo(): PuertoEvidencia | null {
+  const config = leerConfigNube(Constants.expoConfig?.extra);
+  if (!config) return null;
+  return crearPuertoEvidencia({
+    url: config.url,
+    llaveAnonima: config.llaveAnonima,
+    sesion: sesionNubeExpo(config),
+  });
 }

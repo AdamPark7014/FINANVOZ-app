@@ -1,31 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import {
   etiquetaDiaMes,
   etiquetaFecha,
+  funcionesPlan,
   marcarAvisoVisto,
   obtenerHoy,
   type Aviso,
   type ConceptoReservado,
   type ConsultaMeAlcanza,
+  type FiltroMovimientos,
   type OpcionesBloques,
   type VistaHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
+import {
+  Boton,
+  Cifra,
+  cifraEnPalabras,
+  espacio,
+  formatearCentavos,
+  Pantalla,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
+import { CandadoPlus } from '../plan/CandadoPlus';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';
 import { encabezadoFecha } from './textos';
 
 export interface NavegacionHoy {
-  alVerMovimientos: () => void;
+  /** Movimientos; con filtro desde "Ver movimientos" de una consulta (`06 §6`). */
+  alVerMovimientos: (filtro?: FiltroMovimientos) => void;
   alConfigurarIngreso: () => void;
   alAbrirFormulario: () => void;
-  /** Consultas por voz de saldos, deudas y compromisos. */
-  alVerCuentas?: () => void;
   /** Arqueo de efectivo (`02 §7`): desde la tarjeta de Hoy, la insignia o "traigo 300". */
   alAbrirArqueo?: (efectivoReal?: number) => void;
   /** "¿Me alcanza?" (`02 §9`): con el botón de Hoy (sin consulta) o diciendo "¿me alcanza para…?". */
@@ -44,6 +56,7 @@ export function PantallaHoy({
   bloques?: Omit<OpcionesBloques, 'senal'>;
 }) {
   const vista = useVista(obtenerHoy);
+  const plus = useVista(funcionesPlan);
   const [verDesglose, setVerDesglose] = useState(false);
   return (
     <Pantalla testID="pantalla-hoy">
@@ -53,8 +66,12 @@ export function PantallaHoy({
       <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
       {vista.estado !== 'sin_ingreso' ? (
         <>
-          {/* Plus en `02 §4`; mientras no hay planes (M10) se muestra a todos (ver ESTADO → Decisiones). */}
-          <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
+          {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad. */}
+          {plus.probabilidad ? (
+            <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
+          ) : (
+            <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
+          )}
           <Boton
             etiqueta={
               verDesglose
@@ -90,10 +107,10 @@ export function PantallaHoy({
       <AvisosUnaVez avisos={vista.avisos} />
       <TarjetasAccion
         tarjetas={vista.tarjetasAccion}
-        alVerMovimientos={navegacion.alVerMovimientos}
+        alVerMovimientos={() => navegacion.alVerMovimientos()}
         {...(navegacion.alAbrirArqueo ? { alAbrirArqueo: () => navegacion.alAbrirArqueo?.() } : {})}
       />
-      {vista.tarjetaDelDia ? (
+      {plus.tarjetaDelDia && vista.tarjetaDelDia ? (
         <Tarjeta testID="tarjeta-del-dia">
           <Texto variante="etiqueta" tono="secundario">
             Tarjeta del día
@@ -115,8 +132,7 @@ export function PantallaHoy({
       ) : null}
       <PanelRegistrar
         alMasOpciones={navegacion.alAbrirFormulario}
-        alVerMovimientos={navegacion.alVerMovimientos}
-        {...(navegacion.alVerCuentas ? { alVerCuentas: navegacion.alVerCuentas } : {})}
+        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
         {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
         {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
         {...(motor ? { motor } : {})}
@@ -195,11 +211,45 @@ function Fila({
   testID?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-      <Texto variante={fuerte ? 'cuerpoFuerte' : 'cuerpo'} style={{ flex: 1 }}>
+    <FilaCifra etiqueta={etiqueta} centavos={centavos}>
+      <Texto variante={fuerte ? 'cuerpoFuerte' : 'cuerpo'} style={ESTILO_CONCEPTO}>
         {etiqueta}
       </Texto>
       <Cifra centavos={centavos} contexto={etiqueta} {...(testID ? { testID } : {})} />
+    </FilaCifra>
+  );
+}
+
+const ESTILO_CONCEPTO = { flexGrow: 1, flexShrink: 1 } as const;
+
+/**
+ * Concepto y monto como un solo elemento de TalkBack ("Libre: ochocientos cincuenta y seis pesos"). Con texto
+ * grande (200 %) la cifra baja de renglón en vez de apretarse: la fila envuelve y la cifra no se encoge.
+ */
+function FilaCifra({
+  etiqueta,
+  centavos,
+  sangria = false,
+  children,
+}: {
+  etiqueta: string;
+  centavos: number;
+  sangria?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${etiqueta}: ${cifraEnPalabras(centavos)}`}
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        columnGap: espacio.s,
+        ...(sangria ? { paddingLeft: espacio.l } : {}),
+      }}
+    >
+      {children}
     </View>
   );
 }
@@ -215,17 +265,17 @@ function Desglose({ vista }: { vista: VistaHoy }) {
         centavos={-vista.reservado}
         testID="desglose-reservado"
       />
-      {vista.reservadoDetalle.map((r, i) => (
-        <View
-          key={i}
-          style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: espacio.l }}
-        >
-          <Texto variante="secundario" tono="secundario" style={{ flex: 1 }}>
-            {`${r.concepto} · ${ROTULO_RESERVADO[r.tipo]}${r.fecha ? ` · ${etiquetaFecha(r.fecha)}` : ''}`}
-          </Texto>
-          <Cifra centavos={r.monto} tamano="secundario" contexto={r.concepto} />
-        </View>
-      ))}
+      {vista.reservadoDetalle.map((r, i) => {
+        const concepto = `${r.concepto} · ${ROTULO_RESERVADO[r.tipo]}${r.fecha ? ` · ${etiquetaFecha(r.fecha)}` : ''}`;
+        return (
+          <FilaCifra key={i} etiqueta={concepto} centavos={r.monto} sangria>
+            <Texto variante="secundario" tono="secundario" style={ESTILO_CONCEPTO}>
+              {concepto}
+            </Texto>
+            <Cifra centavos={r.monto} tamano="secundario" contexto={r.concepto} />
+          </FilaCifra>
+        );
+      })}
       <Fila etiqueta="Colchón" centavos={-vista.colchon} testID="desglose-colchon" />
       <Fila etiqueta="Libre" centavos={vista.libre} fuerte testID="desglose-libre" />
     </Tarjeta>

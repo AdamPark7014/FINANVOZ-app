@@ -2,17 +2,22 @@ import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
-import { crearNivelNubeExpo } from '../src/nube/expo';
+import { crearNivelNubeExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
+import { useEvidenciaConsentimiento } from '../src/nube/useEvidenciaConsentimiento';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
-import { cargarEscenario, obtenerBloqueo, relojFijo } from '../src/servicios';
+import { crearComprasExpo } from '../src/suscripciones/expo';
+import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
+import { cargarEscenario, obtenerBloqueo, relojFijo, type PuertoEvidencia } from '../src/servicios';
 import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
+import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
 import { ProveedorSesion, useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, Pantalla, Texto, useTema } from '../src/ui';
@@ -42,6 +47,12 @@ export default function Raiz() {
   const nube = useMemo(() => crearNivelNubeExpo(), []);
   // Avisos locales de corte y fecha límite (`02 §13`); nada de push.
   const notificaciones = useMemo(() => crearNotificacionesExpo(), []);
+  // Compras de Plus con RevenueCat (M7); `null` sin llave en producción (la cuenta queda en Gratis).
+  const compras = useMemo(() => crearComprasExpo(), []);
+  // PostHog solo si la build trae llave; aun así nada sale sin el opt-in de estadísticas (`03 §8`).
+  const analitica = useMemo(() => crearAnaliticaExpo(), []);
+  // Copia mínima de la evidencia del consentimiento en Supabase (`08 §2`).
+  const evidencia = useMemo(() => crearPuertoEvidenciaExpo(), []);
 
   const reemplazarSesion = useCallback(
     async (preparar?: () => Sesion) => {
@@ -111,24 +122,36 @@ export default function Raiz() {
       {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
       <ProveedorNotificaciones notificaciones={notificaciones}>
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
-          <AppProtegida reiniciada={estado.generacion > 0} />
+          <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
+            <ProveedorAnalitica analitica={analitica}>
+              <AppProtegida reiniciada={estado.generacion > 0} evidencia={evidencia} />
+            </ProveedorAnalitica>
+          </ProveedorPlan>
         </ProveedorSesion>
       </ProveedorNotificaciones>
     </ProveedorControlApp>
   );
 }
 
+/** Pantalla del plan, desde cualquier candado "· Plus". */
+const abrirPlan = () => router.push('/plan');
+
 /** Aplica las preferencias de bloqueo guardadas (RF-CFG-03) sobre toda la navegación. */
-function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
+function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidencia: PuertoEvidencia | null }) {
   const { esquema } = useTema();
   // Tras borrar todo (o cargar un escenario) la navegación vuelve al inicio, que decide onboarding o Hoy.
   useEffect(() => {
     if (reiniciada) router.replace('/');
   }, [reiniciada]);
+  const registrarEvento = useAnalitica();
+  useEffect(() => {
+    registrarEvento({ nombre: 'app_abierta', propiedades: {} });
+  }, [registrarEvento]);
   const preferencias = useVista(obtenerBloqueo);
   const bloqueo = useBloqueo({ activo: preferencias.activo });
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
   useProcesarCola();
+  useEvidenciaConsentimiento(evidencia);
   return (
     // Captura automática (`07`): sin el módulo nativo (Expo Go, iPhone) el puente no está disponible y nada cambia.
     <ProveedorCaptura puente={puenteCaptura} sha256={sha256Expo}>
@@ -144,6 +167,9 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
           <Stack.Screen name="tarjetas/nueva" />
           <Stack.Screen name="arqueo" />
           <Stack.Screen name="me-alcanza" />
+          <Stack.Screen name="plan" />
+          <Stack.Screen name="privacidad" />
+          <Stack.Screen name="terminos" />
         </Stack>
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>

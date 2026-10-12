@@ -28,7 +28,7 @@ import {
   type Notificaciones,
 } from '../avisos/notificaciones';
 import { crearMotorFalso, navegacionFalsa } from '../principal/__pruebas__/arnes';
-import { conEscenario, golden, vector } from '../principal/__pruebas__/base';
+import { activarPlus, conEscenario, golden, vector } from '../principal/__pruebas__/base';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
@@ -71,6 +71,7 @@ beforeEach(() => reiniciarInvitacionAvisos());
 describe('Hoy', () => {
   it('CA-M4-03 · con la semilla e5-10 la tarjeta del día es "Banamex Oro ••8812" con 50 días', () => {
     const p = e510();
+    activarPlus(p.ctx); // la tarjeta del día es de Plus (M7)
     montar(p.ctx, hoy());
     expect(textoDe('tarjeta-del-dia-texto')).toBe(
       'Si compras hoy, usa la Banamex Oro ••8812: tienes 50 días para pagar.',
@@ -156,6 +157,7 @@ describe('Registrar', () => {
   it('CA-M4-06 · "compré una tele de 12 mil a 12 meses…" por texto: confirmación, plan con 12 meses visible en la tarjeta', async () => {
     const caso = golden('S01');
     const p = e510();
+    activarPlus(p.ctx); // el compromiso de 12 meses es de Plus (M7)
     const f = nubeFalsa({ [caso.texto]: caso.esperado });
     montar(
       p.ctx,

@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from 'react-native';
-import { espacio, OBJETIVO_TACTIL_MIN, radio, tipo, useTema } from '../../ui';
+import { espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, tipo, useTema } from '../../ui';
 
 export interface OpcionChip<T extends string> {
   readonly valor: T;
@@ -24,7 +24,7 @@ export function Chip({
       testID={testID}
       onPress={alPresionar}
       accessibilityRole="radio"
-      accessibilityLabel={etiqueta}
+      accessibilityLabel={etiquetaHablada(etiqueta)}
       accessibilityState={{ selected: seleccionado, checked: seleccionado }}
       style={({ pressed }) => ({
         minHeight: OBJETIVO_TACTIL_MIN,

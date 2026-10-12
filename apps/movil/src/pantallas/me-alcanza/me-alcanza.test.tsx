@@ -34,7 +34,13 @@ import {
   type Notificaciones,
 } from '../avisos/notificaciones';
 import { crearMotorFalso, navegacionFalsa } from '../principal/__pruebas__/arnes';
-import { abrirPruebaPantalla, conEscenario, escenario, vector } from '../principal/__pruebas__/base';
+import {
+  abrirPruebaPantalla,
+  activarPlus,
+  conEscenario,
+  escenario,
+  vector,
+} from '../principal/__pruebas__/base';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
@@ -239,6 +245,10 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
+    // Texto fijo de `08 §1`.
+    expect(textoDe('me-alcanza-no-asesoria')).toMatch(
+      /^Finanvoz no es una institución financiera ni asesor de inversiones\./,
+    );
 
     // "Cómo lo calculé" se despliega con las líneas de servicios.
     expect(screen.queryByTestId('como-lo-calcule')).toBeNull();
@@ -460,6 +470,7 @@ describe('Hoy · probabilidad de llegar', () => {
 
   it('CA-M6-05 · con 13 días dice "Necesito 2 semanas…"; con 20, la etiqueta "estimación inicial"', async () => {
     const p = e401();
+    activarPlus(p.ctx); // la probabilidad es de Plus (M7)
     gastosDiarios(p, '2026-10-11', '2026-11-25');
     p.reloj.fijar('2026-10-24');
     const { unmount } = montar(p.ctx, hoy());

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import {
   anularMovimiento,
@@ -10,6 +10,7 @@ import {
   listarTarjetas,
   marcarExtraordinaria,
   pasarAMeses,
+  type FiltroMovimientos,
   type MovimientoVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -33,12 +34,24 @@ const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
 export function PantallaMovimientos({
   alRegistrar,
   alRevisar,
+  filtro = null,
+  alQuitarFiltro,
 }: {
   alRegistrar: () => void;
   /** Abre Registrar con una frase que la nube ya entendió pero necesita confirmación. */
   alRevisar?: (fraseId: string) => void;
+  /** "Ver movimientos" de una consulta (`06 §6`): solo los movimientos que suman en la respuesta. */
+  filtro?: FiltroMovimientos | null;
+  alQuitarFiltro?: () => void;
 }) {
-  const dias = useVista((ctx) => listarMovimientos(ctx));
+  const { ctx, version, refrescar } = useSesion();
+  const claveFiltro = JSON.stringify(filtro ?? {});
+  const dias = useMemo(
+    () => listarMovimientos(ctx, filtro ?? {}),
+    // `claveFiltro` resume el filtro; `version` relee tras cada escritura.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ctx, version, claveFiltro],
+  );
   const porRevisar = useVista(listarPorInterpretar);
   // Compras cargadas a una tarjeta de crédito: las únicas que se pueden pasar a meses (02-UX §10).
   const conTarjeta = useVista(
@@ -52,7 +65,6 @@ export function PantallaMovimientos({
         ),
       ),
   );
-  const { ctx, refrescar } = useSesion();
   const mostrar = useMostrarAviso();
   const [abierto, setAbierto] = useState<string | null>(null);
 
@@ -115,9 +127,26 @@ export function PantallaMovimientos({
 
       <PorRevisarCapturas alRegistrar={alRegistrar} />
 
+      {filtro ? (
+        <Tarjeta testID="movimientos-filtro">
+          <Texto variante="secundario">Solo los movimientos de tu pregunta.</Texto>
+          {alQuitarFiltro ? (
+            <Boton
+              etiqueta="Ver todos"
+              variante="texto"
+              ancho="contenido"
+              alPresionar={alQuitarFiltro}
+              testID="boton-quitar-filtro"
+            />
+          ) : null}
+        </Tarjeta>
+      ) : null}
+
       {dias.length === 0 ? (
         <Texto variante="cuerpo" tono="secundario" testID="movimientos-vacio">
-          Todavía no registras movimientos. En Hoy di o escribe algo como «tacos 80 en efectivo».
+          {filtro
+            ? 'No hay movimientos que coincidan.'
+            : 'Todavía no registras movimientos. En Hoy di o escribe algo como «tacos 80 en efectivo».'}
         </Texto>
       ) : null}
 

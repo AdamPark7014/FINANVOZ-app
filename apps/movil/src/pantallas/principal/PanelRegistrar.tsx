@@ -3,13 +3,18 @@ import { Pressable, View } from 'react-native';
 import {
   contarEsperandoConexion,
   descartarPorInterpretar,
+  obtenerPlan,
   registrarTexto,
   registrarTextoLocal,
   revisarPorInterpretar,
+  bucketLatencia,
   type ConsultaMeAlcanza,
+  type FiltroMovimientos,
   type OrigenDictado,
+  type RespuestaConsulta,
   type ResultadoTexto,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
   Boton,
@@ -23,10 +28,12 @@ import {
   useTema,
 } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
+import { mensajeLimite } from '../plan/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
+import { TarjetaConsulta } from './TarjetaConsulta';
 import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
 import {
   MENSAJE_GUARDADA,
@@ -59,9 +66,7 @@ type ConTarjeta = Extract<
  * discreto dice cuántas frases esperan internet.
  */
 export function PanelRegistrar({
-  alConsultarHoy,
   alVerMovimientos,
-  alVerCuentas,
   alMasOpciones,
   alArqueo,
   alMeAlcanza,
@@ -69,12 +74,8 @@ export function PanelRegistrar({
   abiertoAlInicio = false,
   fraseRevision,
 }: {
-  /** "¿Cuánto puedo gastar hoy?": lleva a Hoy (o no hace nada si ya estás ahí). */
-  alConsultarHoy?: () => void;
-  /** Consultas de gasto: llevan a Movimientos. */
-  alVerMovimientos?: () => void;
-  /** Saldos, deudas y compromisos: llevan a Cuentas. */
-  alVerCuentas?: () => void;
+  /** "Ver movimientos" de una consulta (`06 §6`): abre Movimientos con su filtro. */
+  alVerMovimientos?: (filtro: FiltroMovimientos) => void;
   /** Abre el formulario completo de movimiento. */
   alMasOpciones?: () => void;
   /** "Traigo 300": abre el arqueo con esa cantidad (`02 §7`). */
@@ -91,13 +92,36 @@ export function PanelRegistrar({
   const { c } = useTema();
   const avisarRegistro = useAvisoRegistro();
   const esperando = useVista(contarEsperandoConexion);
+  const plan = useVista(obtenerPlan).plan;
   const [escribiendo, setEscribiendo] = useState(abiertoAlInicio);
   const [texto, setTexto] = useState('');
   const [mensaje, setMensaje] = useState<string | null>(null);
   // Al abrir una frase para revisarla se empieza interpretando (la ruta vuelve a montar el panel por frase).
   const [interpretando, setInterpretando] = useState(fraseRevision !== undefined);
   const [tarjeta, setTarjeta] = useState<{ datos: ConTarjeta; origen: OrigenDictado } | null>(null);
+  const [respuesta, setRespuesta] = useState<RespuestaConsulta | null>(null);
   const enRevision = useRef<string | null>(null);
+  const registrarEvento = useAnalitica();
+  /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
+  const medicion = useRef<{ inicio: number; nivel: 'reglas' | 'nube'; pregunto: boolean } | null>(null);
+
+  const contarRegistro = useCallback(
+    (origen: OrigenDictado) => {
+      const m = medicion.current;
+      medicion.current = null;
+      registrarEvento({
+        nombre: 'movimiento_registrado',
+        propiedades: {
+          origen,
+          pregunto: m?.pregunto ?? false,
+          espacio: 'personal',
+          ...(m ? { nivel_interprete: m.nivel } : {}),
+          ...(m && !m.pregunto ? { latencia_bucket: bucketLatencia(Date.now() - m.inicio) } : {}),
+        },
+      });
+    },
+    [registrarEvento],
+  );
 
   /** La frase en revisión ya no hace falta: se quitó de "Por revisar". */
   const terminarRevision = useCallback(() => {
@@ -115,10 +139,12 @@ export function PanelRegistrar({
   const mostrar = useCallback(
     (r: ResultadoTexto, origen: OrigenDictado) => {
       setTarjeta(null);
+      setRespuesta(null);
       switch (r.resultado) {
         case 'registrado':
           terminarRevision();
           setTexto('');
+          contarRegistro(origen);
           avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
           return;
         case 'corregido':
@@ -144,6 +170,7 @@ export function PanelRegistrar({
         case 'registrado_msi':
           terminarRevision();
           setTexto('');
+          contarRegistro(origen);
           avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
           return;
         case 'tarjeta_configurada':
@@ -157,19 +184,18 @@ export function PanelRegistrar({
         case 'aclarar':
         case 'confirmar_msi':
         case 'tarjeta_por_agregar':
+          if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
           return;
         case 'por_interpretar':
           setTexto('');
-          setMensaje(MENSAJE_GUARDADA[r.motivo]);
+          setMensaje((r.limite ? mensajeLimite(r.limite, plan) : null) ?? MENSAJE_GUARDADA[r.motivo]);
           refrescar();
           return;
         case 'consulta':
           terminarRevision();
           setTexto('');
-          if (r.consulta === 'movimientos') alVerMovimientos?.();
-          else if (r.consulta === 'cuentas') alVerCuentas?.();
-          else alConsultarHoy?.();
+          setRespuesta(r.respuesta);
           return;
         case 'arqueo':
           terminarRevision();
@@ -196,16 +222,7 @@ export function PanelRegistrar({
           return;
       }
     },
-    [
-      alArqueo,
-      alConsultarHoy,
-      alMeAlcanza,
-      alVerCuentas,
-      alVerMovimientos,
-      avisarRegistro,
-      refrescar,
-      terminarRevision,
-    ],
+    [alArqueo, alMeAlcanza, avisarRegistro, contarRegistro, plan, refrescar, terminarRevision],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {
@@ -213,6 +230,8 @@ export function PanelRegistrar({
     if (limpio === '' || interpretando) return;
     setMensaje(null);
     setTarjeta(null);
+    setRespuesta(null);
+    medicion.current = { inicio: Date.now(), nivel: 'reglas', pregunto: false };
     let local: ResultadoTexto | null;
     try {
       local = registrarTextoLocal(ctx, limpio, origen);
@@ -224,6 +243,7 @@ export function PanelRegistrar({
       mostrar(local, origen);
       return;
     }
+    medicion.current.nivel = 'nube';
     setInterpretando(true);
     registrarTexto(ctx, limpio, origen, { nube })
       .then((r) => mostrar(r, origen))
@@ -265,6 +285,13 @@ export function PanelRegistrar({
 
   return (
     <View style={{ gap: espacio.m }} testID="panel-registrar">
+      {respuesta ? (
+        <TarjetaConsulta
+          respuesta={respuesta}
+          {...(alVerMovimientos ? { alVerMovimientos } : {})}
+          alCerrar={() => setRespuesta(null)}
+        />
+      ) : null}
       {tarjeta?.datos.resultado === 'confirmar' ? (
         <ConfirmacionRegistro
           propuestas={tarjeta.datos.propuestas}

@@ -14,7 +14,7 @@ function normalizarHora(texto: string): string {
 }
 
 /**
- * Ajustes → Avisos (`02 §12`, `02 §13`): qué avisos de tarjeta salen, a qué hora y el horario silencioso. Cada
+ * Ajustes → Avisos (`02 §12`, `02 §13`): qué avisos salen (tarjetas y riesgo de no llegar), a qué hora y el horario silencioso. Cada
  * cambio se guarda en servicios y la sincronización vuelve a programar los avisos del teléfono.
  */
 export function SeccionAvisos() {
@@ -101,6 +101,13 @@ export function SeccionAvisos() {
         descripcion="3 días antes, con lo que tienes que pagar para no generar intereses."
         valor={pref.fechaLimite}
         alCambiar={(fechaLimite) => guardar({ fechaLimite })}
+      />
+      <Interruptor
+        testID="ajustes-aviso-riesgo"
+        etiqueta="Riesgo de no llegar"
+        descripcion="Si es más probable que tengas que tocar tu colchón antes de tu próximo ingreso."
+        valor={pref.riesgo}
+        alCambiar={(riesgo) => guardar({ riesgo })}
       />
       <CampoTexto
         testID="ajustes-aviso-hora"

@@ -3,6 +3,7 @@ import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
   interpretarReglas,
+  type CodigoLimite,
   resolverCuenta,
   type ContextoInterprete,
   type CuentaResolutor,
@@ -16,6 +17,8 @@ import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
 import type { CoberturaAutomatica } from './cobertura';
+import { respuestaSoloPlus, responderConsulta, tienePlantilla, type RespuestaConsulta } from './consultas';
+import { funcionesPlan } from './plan';
 import { configurarCicloPorVoz, type TarjetaEditada, type TarjetaPorAgregar } from './config-tarjetas';
 import {
   anularPorVoz,
@@ -98,9 +101,6 @@ export type MotivoNoSoportado =
 
 export type AccionElegir = 'corregir' | 'anular' | 'pasar_a_meses';
 
-/** Vista a la que lleva una consulta (`06 §6`: las que ya tienen pantalla). */
-export type VistaConsulta = 'hoy_puedes' | 'movimientos' | 'cuentas';
-
 export type ResultadoTexto =
   | {
       readonly resultado: 'registrado';
@@ -114,8 +114,15 @@ export type ResultadoTexto =
       readonly propuestas: readonly PropuestaMovimiento[];
     }
   /** "Lo guardé; lo interpreto cuando tengas internet." */
-  | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
-  | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
+  | {
+      readonly resultado: 'por_interpretar';
+      readonly id: string;
+      readonly motivo: MotivoPorInterpretar;
+      /** Con `motivo: 'limite'`: cuál se agotó (CA-M7-02: el mensaje del mes es distinto al del día). */
+      readonly limite?: CodigoLimite;
+    }
+  /** Consulta tipada (`06 §6`): respuesta en plantilla y el filtro de "Ver movimientos". */
+  | { readonly resultado: 'consulta'; readonly respuesta: RespuestaConsulta }
   /** "¿Me alcanza para unos tenis de 1,500?": la pantalla abre "¿Me alcanza?" y llama `meAlcanza(ctx, consulta)`. */
   | { readonly resultado: 'me_alcanza'; readonly consulta: ConsultaMeAlcanza }
   /** "Traigo 300": abre el arqueo con lo que dijo (`02 §7`); nada se registra sin confirmar (E7). */
@@ -626,18 +633,6 @@ export function aplicarEleccion(
   }
 }
 
-/** Consultas que ya tienen una vista; las demás llegan con su hito (`06 §6`). */
-const VISTA_CONSULTA: Partial<Record<string, VistaConsulta>> = {
-  hoy_puedes: 'hoy_puedes',
-  gasto_total: 'movimientos',
-  gasto_por_categoria: 'movimientos',
-  mayores_gastos: 'movimientos',
-  saldo: 'cuentas',
-  deuda_tarjetas: 'cuentas',
-  por_cobrar: 'cuentas',
-  compromisos: 'cuentas',
-};
-
 /**
  * Aplica una `Interpretacion` ya validada (nivel 0 o nube): resolutor → política de confirmación (`06 §7`) →
  * servicios. Síncrono: todo ocurre en la base local.
@@ -687,12 +682,12 @@ function aplicarInterpretacion(
         }
         throw error;
       }
-    case 'consultar': {
-      const vista = VISTA_CONSULTA[i.consulta.tipo];
-      return vista
-        ? { resultado: 'consulta', consulta: vista }
-        : { resultado: 'no_soportado', motivo: 'consulta' };
-    }
+    case 'consultar':
+      if (!tienePlantilla(i.consulta.tipo)) return { resultado: 'no_soportado', motivo: 'consulta' };
+      // "Hoy puedes" es de Gratis; las demás consultas, de Plus (`01 §11`).
+      if (i.consulta.tipo !== 'hoy_puedes' && !funcionesPlan(ctx).consultas)
+        return { resultado: 'consulta', respuesta: respuestaSoloPlus(i.consulta.tipo) };
+      return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
     case 'aclarar':
       return {
         resultado: 'aclarar',
@@ -723,8 +718,8 @@ function aplicarInterpretacion(
 /** Nivel 0: solo lo que el teléfono ya sabe hacer sin la nube; `null` si hay que preguntarle a la nube. */
 function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
   const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
-  if (i?.intencion === 'consultar' && i.consulta.tipo === 'hoy_puedes') {
-    return { resultado: 'consulta', consulta: 'hoy_puedes' };
+  if (i?.intencion === 'consultar' && tienePlantilla(i.consulta.tipo)) {
+    return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion !== 'registrar') return null;
@@ -768,13 +763,21 @@ export async function registrarTexto(
   const r = await interpretarEnNube(ctx, frase, opciones.nube ?? null);
   if (r.tipo !== 'ok') {
     if (r.tipo === 'invalida') return { resultado: 'no_entendi' };
-    return { resultado: 'por_interpretar', id: guardarPorInterpretar(ctx, frase), motivo: r.tipo };
+    return {
+      resultado: 'por_interpretar',
+      id: guardarPorInterpretar(ctx, frase),
+      motivo: r.tipo,
+      ...(r.tipo === 'limite' ? { limite: r.codigo } : {}),
+    };
   }
   return aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase);
 }
 
 type RespuestaNube =
-  { tipo: 'ok'; interpretacion: Interpretacion } | { tipo: 'invalida' } | { tipo: MotivoPorInterpretar };
+  | { tipo: 'ok'; interpretacion: Interpretacion }
+  | { tipo: 'invalida' }
+  | { tipo: 'limite'; codigo: CodigoLimite }
+  | { tipo: Exclude<MotivoPorInterpretar, 'limite'> };
 
 async function interpretarEnNube(
   ctx: Contexto,
@@ -794,7 +797,7 @@ async function interpretarEnNube(
     case 'sin_red':
       return { tipo: 'sin_red' };
     case 'limite':
-      return { tipo: 'limite' };
+      return { tipo: 'limite', codigo: r.codigo };
     case 'error':
       return r.codigo === 'respuesta_invalida' ? { tipo: 'invalida' } : { tipo: 'error' };
   }
@@ -919,7 +922,13 @@ export async function revisarPorInterpretar(
     const n = await interpretarEnNube(ctx, frase, nube);
     if (n.tipo === 'invalida') r = { resultado: 'no_entendi' };
     else if (n.tipo === 'ok') r = aplicarInterpretacion(ctx, n.interpretacion, cuentasResolutor(ctx), frase);
-    else return { resultado: 'por_interpretar', id, motivo: n.tipo };
+    else
+      return {
+        resultado: 'por_interpretar',
+        id,
+        motivo: n.tipo,
+        ...(n.tipo === 'limite' ? { limite: n.codigo } : {}),
+      };
   }
   if (AUTOMATICOS.has(r.resultado)) borrarAjuste(ctx, clave);
   return r;

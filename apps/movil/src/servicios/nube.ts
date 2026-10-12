@@ -21,6 +21,8 @@ export interface Conectividad {
 export interface NivelNube {
   readonly cliente: ClienteNube;
   readonly conectividad: Conectividad;
+  /** Id del usuario anónimo de Supabase (para asociarle las compras de Plus, M7); `null` sin sesión. */
+  readonly usuarioId?: () => Promise<string | null>;
 }
 
 const TIPO_CONTEXTO: Partial<Record<string, CuentaApp['tipo']>> = {

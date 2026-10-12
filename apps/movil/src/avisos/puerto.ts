@@ -36,7 +36,7 @@ function igual(a: NotificacionLocal, b: NotificacionLocal): boolean {
  */
 export async function sincronizarAvisos(
   puerto: PuertoNotificaciones,
-  plan: readonly AvisoPlaneado[],
+  plan: readonly Pick<AvisoPlaneado, 'id' | 'fecha' | 'hora' | 'titulo' | 'cuerpo'>[],
   prefijo: string,
 ): Promise<ResultadoSincronizacion> {
   const deseadas = new Map<string, NotificacionLocal>(

@@ -8,6 +8,7 @@ import {
   maxFecha,
   porcentajeMostrado,
   probabilidadBp,
+  redondearPorcentaje,
   semillaDelDia,
   sumarDias,
   VERSION_SIMULADOR,
@@ -16,6 +17,7 @@ import {
   type PlainDate,
 } from '@cartera/core';
 import { esquema } from '@cartera/datos';
+import { UMBRAL_RIESGO } from '../avisos/riesgo';
 import { procesarApertura } from './apertura';
 import { simularPorBloques, type OpcionesBloques } from './bloques';
 import type { Contexto } from './contexto';
@@ -60,6 +62,8 @@ export type VistaProbabilidadHoy =
       readonly p90: Centavos;
       /** Vino de la caché del día (mismo libro, misma semilla). */
       readonly desdeCache: boolean;
+      /** P < 50 % (porcentaje mostrado): Hoy muestra el aviso de riesgo (`02 §13`). */
+      readonly riesgo: boolean;
     };
 
 export type PreparacionHoy =
@@ -146,6 +150,7 @@ function vistaOk(
     p50: c.p50,
     p90: c.p90,
     desdeCache,
+    riesgo: redondearPorcentaje(c.exitos, c.n) < UMBRAL_RIESGO,
   };
 }
 

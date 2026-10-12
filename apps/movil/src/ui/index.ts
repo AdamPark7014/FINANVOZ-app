@@ -1,6 +1,14 @@
 export * from './tokens';
 export { useTema, type Tema } from './tema';
-export { cifraEnPalabras, enteroEnPalabras, formatearCentavos, leerPesos, type ModoCifra } from './formato';
+export {
+  cifraEnPalabras,
+  enteroEnPalabras,
+  etiquetaHablada,
+  formatearCentavos,
+  leerPesos,
+  tieneCifra,
+  type ModoCifra,
+} from './formato';
 export { Pantalla, type PantallaProps } from './componentes/Pantalla';
 export { Texto, type TextoProps, type TonoTexto } from './componentes/Texto';
 export { Boton, type BotonProps, type VarianteBoton } from './componentes/Boton';

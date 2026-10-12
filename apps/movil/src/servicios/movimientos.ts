@@ -45,6 +45,10 @@ export interface FiltroMovimientos {
   readonly hasta?: PlainDate;
   readonly cuentaId?: string;
   readonly categoria?: string;
+  /** Alguna de estas categorías (grupos de consultas, `04 §2.3`). */
+  readonly categorias?: readonly string[];
+  /** Solo movimientos con gasto (consultas de gasto, `06 §6`). */
+  readonly soloGastos?: boolean;
   readonly origen?: Origen;
   readonly porRevisar?: boolean;
   readonly estimados?: boolean;
@@ -109,6 +113,14 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     if (filtro.cuentaId && !suyos.some((a) => a.c.id === filtro.cuentaId)) continue;
     const categoria = suyos.find((a) => a.c.naturaleza === 'gasto' || a.c.naturaleza === 'ingreso')?.c;
     if (filtro.categoria && categoria?.categoriaSlug !== filtro.categoria) continue;
+    const gastos = suyos.filter((a) => a.c.naturaleza === 'gasto');
+    if (filtro.soloGastos && gastos.length === 0) continue;
+    const categorias = filtro.categorias;
+    if (
+      categorias &&
+      !gastos.some((a) => a.c.categoriaSlug !== null && categorias.includes(a.c.categoriaSlug))
+    )
+      continue;
     const propias = suyos.filter((a) => a.c.naturaleza !== 'gasto' && a.c.naturaleza !== 'ingreso');
     const insignias: Insignia[] = [];
     if (AUTOMATICOS.has(t.origen)) insignias.push('automatico');

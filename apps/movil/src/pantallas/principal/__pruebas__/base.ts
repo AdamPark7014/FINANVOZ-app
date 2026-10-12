@@ -8,7 +8,14 @@ import type { PlainDate } from '@cartera/core';
 import { abrirBaseCifrada } from '../../../db/abrir';
 import { almacenEnMemoria } from '../../../db/llave';
 import { aleatorioNode, puertoNode } from '../../../db/node';
-import { cargarEscenario, crearContexto, crearGeneradorSecuencial, relojFijo } from '../../../servicios';
+import {
+  cargarEscenario,
+  crearContexto,
+  crearGeneradorSecuencial,
+  relojFijo,
+  sincronizarPlan,
+  type Contexto,
+} from '../../../servicios';
 
 const FIXTURES = join(__dirname, '../../../../../../fixtures');
 
@@ -69,4 +76,9 @@ export function conEscenario(id: string) {
   const e = cargarEscenario(p.ctx, escenario(id));
   p.reloj.fijar(e.hoy);
   return { ...p, e };
+}
+
+/** Cuenta con Plus sin vencimiento (pruebas de funciones de Plus: probabilidad, tarjeta del día, 12 meses). */
+export function activarPlus(ctx: Contexto): void {
+  sincronizarPlan(ctx, { plus: { vigenteHasta: null, enPrueba: false, renovara: true } });
 }

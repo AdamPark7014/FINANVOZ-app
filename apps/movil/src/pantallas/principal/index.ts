@@ -4,3 +4,4 @@ export { PantallaCuentas } from './PantallaCuentas';
 export { PantallaRegistrar } from './PantallaRegistrar';
 export { ProveedorAvisos, useMostrarAviso } from './ProveedorAvisos';
 export { IconoPestana } from './IconoPestana';
+export { filtroDeParams, paramsDeFiltro, type ParamsMovimientos } from './filtroRuta';

@@ -112,9 +112,9 @@ describe('registrar por voz o texto', () => {
 
   it('"cuánto puedo gastar" es una consulta, no un registro', async () => {
     const p = conCuentas();
-    expect(await registrarTexto(p.ctx, 'cuánto puedo gastar hoy')).toEqual({
+    expect(await registrarTexto(p.ctx, 'cuánto puedo gastar hoy')).toMatchObject({
       resultado: 'consulta',
-      consulta: 'hoy_puedes',
+      respuesta: { plantilla: 'hoy_puedes' },
     });
   });
 });

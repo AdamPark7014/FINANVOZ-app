@@ -10,6 +10,7 @@ import {
   type RespuestaSobrante,
   type VistaArqueo,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla } from '../onboarding/componentes';
@@ -84,6 +85,7 @@ function Arqueo({
   alCerrar: () => void;
 }) {
   const { ctx, refrescar } = useSesion();
+  const registrarEvento = useAnalitica();
   // La vista se lee una vez: lo que se confirma es lo que se mostró.
   const [inicial] = useState(vista);
   const [paso, setPaso] = useState<Paso>(inicial.porAsignar.length > 0 ? 'marcar' : 'cantidad');
@@ -107,7 +109,12 @@ function Arqueo({
   const confirmar = (extra: Parameters<typeof confirmarArqueo>[1] | null, mensaje: string) => {
     setError(null);
     try {
-      confirmarArqueo(ctx, extra ?? entrada(real ?? esperado));
+      const { hueco } = confirmarArqueo(ctx, extra ?? entrada(real ?? esperado)).calculo;
+      // Solo el tipo de resultado, nunca el monto (`03 §8`).
+      registrarEvento({
+        nombre: 'arqueo',
+        propiedades: { resultado: hueco === 0 ? 'exacto' : hueco > 0 ? 'faltante' : 'sobrante' },
+      });
       setHecho(mensaje);
       refrescar();
     } catch {

@@ -65,8 +65,15 @@ export {
   type ResultadoCola,
   type ResultadoTexto,
   type ResumenMovimiento,
-  type VistaConsulta,
 } from './registrar';
+export {
+  fechaCorta,
+  PLANTILLAS_CONSULTA,
+  responderConsulta,
+  type LineaConsulta,
+  type PlantillaConsulta,
+  type RespuestaConsulta,
+} from './consultas';
 export { contextoNube, type Conectividad, type NivelNube } from './nube';
 export {
   aplicarCorreccion,
@@ -149,6 +156,8 @@ export {
   type PuertoNotificaciones,
 } from '../avisos/puerto';
 export type { AvisoPlaneado, HorarioSilencioso } from '../avisos/planificar';
+export { planAvisoRiesgo, sincronizarAvisoRiesgo } from './aviso-riesgo';
+export { PREFIJO_AVISO_RIESGO, type AvisoRiesgo } from '../avisos/riesgo';
 export {
   confirmarIngresoRecibido,
   cubrirConMovimiento,
@@ -187,6 +196,14 @@ export {
   type MovimientoVista,
 } from './movimientos';
 export { exportarCsv, exportarJson } from '../privacidad/exportar';
+export { estadisticasActivas, fijarEstadisticas } from '../privacidad/estadisticas';
+export {
+  evidenciaPendiente,
+  sincronizarEvidencia,
+  type PuertoEvidencia,
+} from '../privacidad/evidencia-servidor';
+export { obtenerCentroPrivacidad, type VistaCentroPrivacidad } from '../privacidad/centro';
+export { bucketLatencia, type EventoAnalitica } from '../analitica/eventos';
 export { cargarEscenario, type EscenarioCargado } from './semilla';
 export {
   avanzar as avanzarCaptura,
@@ -256,6 +273,19 @@ export {
   type SenalCancelacion,
 } from './bloques';
 export { marcarExtraordinaria } from './historial';
+export {
+  DIAS_PRUEBA,
+  funcionesPlan,
+  INTERPRETACIONES_NUBE_MES,
+  obtenerPlan,
+  sincronizarPlan,
+  SIN_PLUS,
+  type CodigoLimite,
+  type EstadoTienda,
+  type FuncionesPlan,
+  type Plan,
+  type VistaPlan,
+} from './plan';
 export {
   ETIQUETA_ESTIMACION_INICIAL,
   leerProbabilidadHoy,
