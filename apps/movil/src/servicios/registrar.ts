@@ -153,9 +153,18 @@ export interface PropuestaMovimiento {
 /** Por qué una frase quedó "por interpretar". */
 export type MotivoPorInterpretar = 'sin_nube' | 'sin_red' | 'limite' | 'error';
 
-/** Lo que el intérprete entendió pero esta versión todavía no hace por voz. */
+/**
+ * Lo que el intérprete entendió pero esta versión todavía no hace por voz. `movimiento_compartido`: anular o
+ * corregir un gasto compartido se hace desde Gastos compartidos, para que el cambio le llegue a tu pareja (M16).
+ */
 export type MotivoNoSoportado =
-  'tipo_movimiento' | 'intencion' | 'ajuste' | 'consulta' | 'meses_sin_tarjeta' | 'correccion';
+  | 'tipo_movimiento'
+  | 'intencion'
+  | 'ajuste'
+  | 'consulta'
+  | 'meses_sin_tarjeta'
+  | 'correccion'
+  | 'movimiento_compartido';
 
 export type AccionElegir = 'corregir' | 'anular' | 'pasar_a_meses';
 
@@ -847,6 +856,9 @@ export function aplicarEleccion(
       if (error.codigo === 'meses_invalidos') return { resultado: 'no_soportado', motivo: 'correccion' };
       if (error.codigo === 'correccion_no_soportada' || error.codigo === 'patron_invalido') {
         return { resultado: 'no_soportado', motivo: 'correccion' };
+      }
+      if (error.codigo === 'movimiento_compartido') {
+        return { resultado: 'no_soportado', motivo: 'movimiento_compartido' };
       }
     }
     throw error;

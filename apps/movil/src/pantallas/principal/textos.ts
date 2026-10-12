@@ -6,6 +6,7 @@ import {
   MENSAJE_ERROR_GENERAL,
   MENSAJE_LIMITE_NUBE,
   MENSAJE_MESES_SIN_TARJETA,
+  MENSAJE_MOVIMIENTO_COMPARTIDO,
   MENSAJE_NO_ENTENDI,
   mensajeError,
   type CompromisoConfigurado,
@@ -77,6 +78,7 @@ export const MENSAJE_NO_SOPORTADO: Record<MotivoNoSoportado, string> = {
   consulta: 'Todavía no sé responder esa pregunta.',
   meses_sin_tarjeta: MENSAJE_MESES_SIN_TARJETA,
   correccion: MENSAJE_CORRECCION_NO_SOPORTADA,
+  movimiento_compartido: MENSAJE_MOVIMIENTO_COMPARTIDO,
 };
 
 type FueraDeAlcance = Extract<ResultadoTexto, { resultado: 'fuera_de_alcance' }>['motivo'];
