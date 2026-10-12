@@ -20,6 +20,7 @@ const TITULO: Record<Motivo, string> = {
   monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
   cuenta: 'Me falta saber la cuenta.',
   aproximado: 'Confírmame la cuenta.',
+  impuestos: 'Revísalo antes de guardar.',
 };
 
 function pregunta(f: CuentaPorElegir): string {
@@ -72,8 +73,15 @@ export function ConfirmacionRegistro({
       }
       return { ...p.entrada, ...extra } as EntradaMovimiento;
     });
+    // La cuenta elegida para un alias que no reconocí se aprende (06 §12).
+    const aprender = propuestas.flatMap((p, i) =>
+      p.faltan.flatMap((f) => {
+        const id = elecciones[clave(i, f.campo)];
+        return f.alias && id && f.motivo !== 'ambigua' ? [{ alias: f.alias, cuentaId: id }] : [];
+      }),
+    );
     try {
-      alGuardar(confirmarRegistro(ctx, entradas, origen));
+      alGuardar(confirmarRegistro(ctx, entradas, origen, { aprender }));
     } catch {
       setError(MENSAJE_ERROR_GENERAL);
     }

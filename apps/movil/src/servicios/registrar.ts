@@ -1,22 +1,37 @@
 import { z } from 'zod';
 import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
-import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
+import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
   interpretarReglas,
   resolverCuenta,
   type ContextoInterprete,
   type CuentaResolutor,
+  type Interpretacion,
   type Movimiento,
   type RefCuenta,
   type ResultadoResolutor,
 } from '@cartera/nlu';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
+import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
+import {
+  anularPorVoz,
+  aplicaDirecto,
+  aplicarCorreccion,
+  buscarDuplicados,
+  buscarMovimientos,
+  configurarCompromiso,
+  registrarPasarAMeses,
+  type CambiosResueltos,
+  type CompromisoConfigurado,
+  type ResumenTransaccion,
+} from './correcciones';
 import { registrarMovimiento, type EntradaMovimiento } from './formulario';
-import { borrarAjuste, escribirAjuste, listarAjustes } from './preferencias';
-
-const { aliasContacto } = esquema;
+import type { MovimientoVista } from './movimientos';
+import { contextoNube, type NivelNube } from './nube';
+import { contactosInterprete } from './personas';
+import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './preferencias';
 
 /** Tope del registro optimista (`06 §7`): suma de montos ≤ $5,000. */
 export const TOPE_OPTIMISTA: Centavos = 500_000;
@@ -53,6 +68,18 @@ export interface PropuestaMovimiento {
   readonly faltan: readonly CuentaPorElegir[];
 }
 
+/** Por qué una frase quedó "por interpretar". */
+export type MotivoPorInterpretar = 'sin_nube' | 'sin_red' | 'limite' | 'error';
+
+/** Lo que el intérprete entendió pero esta versión todavía no hace por voz. */
+export type MotivoNoSoportado =
+  'tipo_movimiento' | 'intencion' | 'ajuste' | 'consulta' | 'meses_sin_tarjeta' | 'correccion';
+
+export type AccionElegir = 'corregir' | 'anular' | 'pasar_a_meses';
+
+/** Vista a la que lleva una consulta (`06 §6`: las que ya tienen pantalla). */
+export type VistaConsulta = 'hoy_puedes' | 'movimientos' | 'cuentas';
+
 export type ResultadoTexto =
   | {
       readonly resultado: 'registrado';
@@ -62,12 +89,56 @@ export type ResultadoTexto =
     }
   | {
       readonly resultado: 'confirmar';
-      readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado';
+      readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado' | 'impuestos';
       readonly propuestas: readonly PropuestaMovimiento[];
     }
-  /** Fuera del nivel 0 y sin nube (M3): "Lo guardé; lo interpreto cuando tengas internet." */
-  | { readonly resultado: 'por_interpretar'; readonly id: string }
-  | { readonly resultado: 'consulta'; readonly consulta: 'hoy_puedes' };
+  /** "Lo guardé; lo interpreto cuando tengas internet." */
+  | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
+  | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
+  | {
+      readonly resultado: 'corregido';
+      readonly antes: ResumenTransaccion;
+      readonly despues: ResumenTransaccion;
+      readonly deshacer: string;
+    }
+  | { readonly resultado: 'anulado'; readonly movimiento: ResumenTransaccion; readonly deshacer: string }
+  | { readonly resultado: 'pasar_a_meses'; readonly movimiento: ResumenTransaccion; readonly meses: number }
+  /** Varias coincidencias, una de hace más de 48 h, o falta la cuenta nueva: chips para elegir (`06 §7`). */
+  | {
+      readonly resultado: 'elegir';
+      readonly accion: AccionElegir;
+      readonly candidatos: readonly MovimientoVista[];
+      readonly cambios?: CambiosResueltos;
+      readonly meses?: number;
+      readonly faltaCuenta?: CuentaPorElegir;
+    }
+  | { readonly resultado: 'no_encontrado'; readonly accion: AccionElegir | 'duplicados' }
+  | { readonly resultado: 'duplicados'; readonly grupos: readonly (readonly MovimientoVista[])[] }
+  | { readonly resultado: 'configurado'; readonly compromiso: CompromisoConfigurado }
+  | {
+      readonly resultado: 'aclarar';
+      readonly motivo: Extract<Interpretacion, { intencion: 'aclarar' }>['motivo'];
+      readonly pregunta: string;
+      readonly opciones: readonly string[];
+      /** La frase original, para volver a mandarla con la opción elegida. */
+      readonly texto: string;
+    }
+  | { readonly resultado: 'no_entendi' }
+  | { readonly resultado: 'no_soportado'; readonly motivo: MotivoNoSoportado }
+  | {
+      readonly resultado: 'fuera_de_alcance';
+      readonly motivo: Extract<Interpretacion, { intencion: 'fuera_de_alcance' }>['motivo'] | null;
+    };
+
+/** Resultados que ya escribieron algo (o que no necesitan a la persona): la cola los da por terminados. */
+const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
+  'registrado',
+  'corregido',
+  'anulado',
+  'pasar_a_meses',
+  'configurado',
+  'consulta',
+]);
 
 function tipoResolutor(c: CuentaPropia): CuentaResolutor['tipo'] | null {
   switch (c.subtipo) {
@@ -94,16 +165,16 @@ function cuentasResolutor(ctx: Contexto): CuentaResolutor[] {
 }
 
 /** Contexto mínimo del nivel 0 (`06 §4`): tipos y alias de cuentas, alias de contactos, fecha. */
-export function contextoInterprete(ctx: Contexto, cuentas = cuentasResolutor(ctx)): ContextoInterprete {
-  const porContacto = new Map<string, string[]>();
-  for (const a of ctx.db.select().from(aliasContacto).all()) {
-    porContacto.set(a.contactoId, [...(porContacto.get(a.contactoId) ?? []), a.aliasNormalizado]);
-  }
+export function contextoInterprete(
+  ctx: Contexto,
+  cuentas: readonly CuentaResolutor[] = cuentasResolutor(ctx),
+  fecha: PlainDate = ctx.reloj.hoy(),
+): ContextoInterprete {
   return {
-    fecha_referencia: ctx.reloj.hoy(),
+    fecha_referencia: fecha,
     espacios: ['personal'],
     cuentas: cuentas.map((c) => ({ tipo: c.tipo, alias: c.alias, espacio: 'personal' })),
-    contactos: [...porContacto.values()],
+    contactos: contactosInterprete(ctx),
   };
 }
 
@@ -152,7 +223,7 @@ function resolver(
   }
 }
 
-/** Convierte un movimiento del nivel 0 en una entrada del formulario, o `null` si no es de M2. */
+/** Convierte un movimiento interpretado en una entrada del formulario, o `null` si su tipo aún no se registra. */
 function aPropuesta(
   ctx: Contexto,
   m: Movimiento,
@@ -165,7 +236,10 @@ function aPropuesta(
     faltan.push({ campo, ...r.falta });
     return {};
   };
+  // Lo que la persona enseñó al corregir (`06 §12`) gana sobre lo que dijo el intérprete.
   const categoria = (slug: string | undefined, naturaleza: 'gasto' | 'ingreso', porOmision: string) => {
+    const aprendida = categoriaAprendida(ctx, null, m.descripcion, naturaleza);
+    if (aprendida) return aprendida;
     if (!slug) return porOmision;
     try {
       idCategoriaDe(ctx, slug, naturaleza);
@@ -174,8 +248,10 @@ function aPropuesta(
       return porOmision;
     }
   };
+  if ((m.espacio ?? 'personal') !== 'personal') return null; // negocio: M11
   switch (m.tipo) {
     case 'gasto':
+      if (m.contraparte !== undefined || m.msi !== undefined || m.division !== undefined) return null;
       return {
         entrada: {
           tipo: 'gasto',
@@ -202,6 +278,16 @@ function aPropuesta(
           ...base,
           ...cuenta('origenId', resolver(m.origen, 'sale', cuentas, false)),
           ...cuenta('destinoId', resolver(m.destino ?? { tipo: 'efectivo' }, 'entra', cuentas, false)),
+        },
+        faltan,
+      };
+    case 'transferencia':
+      return {
+        entrada: {
+          tipo: 'transferencia',
+          ...base,
+          ...cuenta('origenId', resolver(m.origen, 'sale', cuentas, false)),
+          ...cuenta('destinoId', resolver(m.destino, 'entra', cuentas, false)),
         },
         faltan,
       };
@@ -236,58 +322,330 @@ function resumir(ctx: Contexto, transaccionId: string, e: EntradaMovimiento): Re
   };
 }
 
-/**
- * Registro por voz o texto (`03 §5.1`, `02 §5`): nivel 0 → resolutor → política de confirmación → asientos →
- * `Libro.registrar`. Lo que el nivel 0 no cubre queda "por interpretar" (RF-REG-07). Nunca registra el texto en
- * logs (regla 9).
- */
-export function registrarTexto(
+/** Datos de la frase que se está interpretando. */
+interface Frase {
+  readonly texto: string;
+  readonly origen: OrigenDictado;
+  /** Fecha en que se dijo: la de hoy, o la guardada si viene de "por interpretar". */
+  readonly fecha: PlainDate;
+  /** Id en "por interpretar": hace idempotente el registro al procesar la cola. */
+  readonly fraseId?: string;
+}
+
+function registrarInterpretado(
   ctx: Contexto,
-  texto: string,
-  origen: OrigenDictado = 'texto',
-): ResultadoTexto {
-  exigirConsentimiento(ctx);
-  const cuentas = cuentasResolutor(ctx);
-  const interpretacion = interpretarReglas(texto, contextoInterprete(ctx, cuentas));
-  if (interpretacion?.intencion === 'consultar' && interpretacion.consulta.tipo === 'hoy_puedes') {
-    return { resultado: 'consulta', consulta: 'hoy_puedes' };
-  }
-  if (interpretacion?.intencion !== 'registrar') {
-    return { resultado: 'por_interpretar', id: guardarPorInterpretar(ctx, texto, origen) };
-  }
+  movimientos: readonly Movimiento[],
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto | null {
   const propuestas: PropuestaMovimiento[] = [];
-  for (const m of interpretacion.movimientos) {
+  for (const m of movimientos) {
     const p = aPropuesta(ctx, m, cuentas);
-    if (!p) return { resultado: 'por_interpretar', id: guardarPorInterpretar(ctx, texto, origen) };
+    if (!p) return null;
     propuestas.push(p);
   }
-  const total = interpretacion.movimientos.reduce((s, m) => s + m.monto, 0);
-  const aproximado = interpretacion.movimientos.some((m) => m.aproximado);
+  // Política de confirmación (`06 §7`).
   if (propuestas.some((p) => p.faltan.length > 0)) {
     const soloAproximado = propuestas.every((p) => p.faltan.every((f) => f.motivo === 'aproximado'));
     return { resultado: 'confirmar', motivo: soloAproximado ? 'aproximado' : 'cuenta', propuestas };
   }
-  if (aproximado) return { resultado: 'confirmar', motivo: 'aproximado', propuestas };
+  if (movimientos.some((m) => m.aproximado))
+    return { resultado: 'confirmar', motivo: 'aproximado', propuestas };
+  if (movimientos.some((m) => m.tipo === 'gasto' && m.categoria === 'impuestos')) {
+    return { resultado: 'confirmar', motivo: 'impuestos', propuestas };
+  }
+  const total = movimientos.reduce((s, m) => s + m.monto, 0);
   if (total > TOPE_OPTIMISTA) return { resultado: 'confirmar', motivo: 'monto_alto', propuestas };
   return confirmarRegistro(
     ctx,
     propuestas.map((p) => p.entrada as EntradaMovimiento),
-    origen,
+    frase.origen,
+    frase.fraseId ? { claveBase: `frase:${frase.fraseId}` } : {},
   );
 }
 
-/** "Guardar" de la tarjeta de confirmación: registra todos los movimientos en una transacción SQLite. */
+function corregirInterpretado(
+  ctx: Contexto,
+  i: Extract<Interpretacion, { intencion: 'corregir' }>,
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto {
+  const { msi, origen, ...resto } = i.cambios;
+  const cambios: { -readonly [K in keyof CambiosResueltos]: CambiosResueltos[K] } = { ...resto };
+  let faltaCuenta: CuentaPorElegir | undefined;
+  if (origen) {
+    const r = resolver(origen, 'sale', cuentas, false);
+    if ('id' in r) {
+      cambios.origenId = r.id;
+      cambios.aliasDicho = origen.alias ?? null;
+    } else {
+      faltaCuenta = { campo: 'origenId', ...r.falta };
+    }
+  }
+  const soloMeses = msi !== undefined && Object.keys(i.cambios).length === 1;
+  const accion: AccionElegir = soloMeses ? 'pasar_a_meses' : 'corregir';
+  const candidatos = buscarMovimientos(ctx, i.objetivo, frase.fecha);
+  if (candidatos.length === 0) return { resultado: 'no_encontrado', accion };
+  const [unico] = candidatos;
+  if (unico && aplicaDirecto(ctx, candidatos) && !faltaCuenta) {
+    return aplicarEleccion(
+      ctx,
+      { accion, transaccionId: unico.id, cambios, ...(msi ? { meses: msi.meses } : {}) },
+      frase.origen,
+      frase.fraseId,
+    );
+  }
+  return {
+    resultado: 'elegir',
+    accion,
+    candidatos,
+    cambios,
+    ...(msi ? { meses: msi.meses } : {}),
+    ...(faltaCuenta ? { faltaCuenta } : {}),
+  };
+}
+
+/** Lo que eligió la persona en la tarjeta de "elegir" (o lo que la política aplicó directo). */
+export interface Eleccion {
+  readonly accion: AccionElegir;
+  readonly transaccionId: string;
+  readonly cambios?: CambiosResueltos;
+  readonly meses?: number;
+}
+
+/**
+ * Aplica una corrección, anulación o "pasar a meses" sobre el movimiento elegido. Devuelve el resultado con su
+ * token de "Deshacer".
+ */
+export function aplicarEleccion(
+  ctx: Contexto,
+  e: Eleccion,
+  origen: OrigenDictado,
+  fraseId?: string,
+): ResultadoTexto {
+  exigirConsentimiento(ctx);
+  try {
+    switch (e.accion) {
+      case 'anular': {
+        const r = anularPorVoz(ctx, e.transaccionId);
+        return { resultado: 'anulado', ...r };
+      }
+      case 'pasar_a_meses': {
+        const movimiento = registrarPasarAMeses(ctx, e.transaccionId, e.meses ?? 0);
+        return { resultado: 'pasar_a_meses', movimiento, meses: e.meses ?? 0 };
+      }
+      case 'corregir': {
+        const { ...cambios } = e.cambios ?? {};
+        if (Object.keys(cambios).filter((k) => k !== 'aliasDicho').length === 0) {
+          if (e.meses) return aplicarEleccion(ctx, { ...e, accion: 'pasar_a_meses' }, origen, fraseId);
+          return { resultado: 'no_soportado', motivo: 'correccion' };
+        }
+        const r = aplicarCorreccion(ctx, e.transaccionId, cambios, {
+          origen,
+          ...(fraseId ? { claveIdempotencia: `corr:frase:${fraseId}` } : {}),
+        });
+        if (e.meses) registrarPasarAMeses(ctx, r.despues.transaccionId, e.meses);
+        return { resultado: 'corregido', ...r };
+      }
+    }
+  } catch (error) {
+    if (error instanceof ErrorDominio) {
+      if (error.codigo === 'meses_sin_tarjeta')
+        return { resultado: 'no_soportado', motivo: 'meses_sin_tarjeta' };
+      if (error.codigo === 'correccion_no_soportada' || error.codigo === 'patron_invalido') {
+        return { resultado: 'no_soportado', motivo: 'correccion' };
+      }
+    }
+    throw error;
+  }
+}
+
+/** Consultas que ya tienen una vista; las demás llegan con su hito (`06 §6`). */
+const VISTA_CONSULTA: Partial<Record<string, VistaConsulta>> = {
+  hoy_puedes: 'hoy_puedes',
+  gasto_total: 'movimientos',
+  gasto_por_categoria: 'movimientos',
+  mayores_gastos: 'movimientos',
+  saldo: 'cuentas',
+  deuda_tarjetas: 'cuentas',
+  por_cobrar: 'cuentas',
+  compromisos: 'cuentas',
+};
+
+/**
+ * Aplica una `Interpretacion` ya validada (nivel 0 o nube): resolutor → política de confirmación (`06 §7`) →
+ * servicios. Síncrono: todo ocurre en la base local.
+ */
+function aplicarInterpretacion(
+  ctx: Contexto,
+  i: Interpretacion,
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto {
+  switch (i.intencion) {
+    case 'registrar':
+      return (
+        registrarInterpretado(ctx, i.movimientos, cuentas, frase) ?? {
+          resultado: 'no_soportado',
+          motivo: 'tipo_movimiento',
+        }
+      );
+    case 'corregir':
+      return corregirInterpretado(ctx, i, cuentas, frase);
+    case 'anular': {
+      const candidatos = buscarMovimientos(ctx, i.objetivo, frase.fecha);
+      const [unico] = candidatos;
+      if (!unico) return { resultado: 'no_encontrado', accion: 'anular' };
+      if (aplicaDirecto(ctx, candidatos)) {
+        return aplicarEleccion(ctx, { accion: 'anular', transaccionId: unico.id }, frase.origen);
+      }
+      return { resultado: 'elegir', accion: 'anular', candidatos };
+    }
+    case 'revisar_duplicados': {
+      const grupos = buscarDuplicados(ctx, i.filtro, frase.fecha);
+      return grupos.length > 0
+        ? { resultado: 'duplicados', grupos }
+        : { resultado: 'no_encontrado', accion: 'duplicados' };
+    }
+    case 'configurar':
+      if (i.ajuste.tipo !== 'compromiso') return { resultado: 'no_soportado', motivo: 'ajuste' };
+      try {
+        return { resultado: 'configurado', compromiso: configurarCompromiso(ctx, i.ajuste, frase.fecha) };
+      } catch (error) {
+        if (error instanceof ErrorDominio && error.codigo === 'espacio_no_disponible') {
+          return { resultado: 'no_soportado', motivo: 'ajuste' };
+        }
+        throw error;
+      }
+    case 'consultar': {
+      const vista = VISTA_CONSULTA[i.consulta.tipo];
+      return vista
+        ? { resultado: 'consulta', consulta: vista }
+        : { resultado: 'no_soportado', motivo: 'consulta' };
+    }
+    case 'aclarar':
+      return {
+        resultado: 'aclarar',
+        motivo: i.motivo,
+        pregunta: i.pregunta,
+        opciones: i.opciones ?? [],
+        texto: frase.texto,
+      };
+    case 'fuera_de_alcance':
+      return { resultado: 'fuera_de_alcance', motivo: i.motivo ?? null };
+    case 'arqueo':
+    case 'simular':
+      return { resultado: 'no_soportado', motivo: 'intencion' };
+  }
+}
+
+/** Nivel 0: solo lo que el teléfono ya sabe hacer sin la nube; `null` si hay que preguntarle a la nube. */
+function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
+  const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
+  if (i?.intencion === 'consultar' && i.consulta.tipo === 'hoy_puedes') {
+    return { resultado: 'consulta', consulta: 'hoy_puedes' };
+  }
+  if (i?.intencion !== 'registrar') return null;
+  return registrarInterpretado(ctx, i.movimientos, cuentas, frase);
+}
+
+/**
+ * Solo el nivel 0, síncrono (sin esperar a la red): lo que el teléfono resuelve al instante. `null` si la frase
+ * necesita la nube; entonces la pantalla llama `registrarTexto`.
+ */
+export function registrarTextoLocal(
+  ctx: Contexto,
+  texto: string,
+  origen: OrigenDictado = 'texto',
+): ResultadoTexto | null {
+  exigirConsentimiento(ctx);
+  return nivelCero(ctx, cuentasResolutor(ctx), { texto, origen, fecha: ctx.reloj.hoy() });
+}
+
+export interface OpcionesTexto {
+  /** Nivel 2; `null` o ausente: sin nube (todo lo que no cubre el nivel 0 queda "por interpretar"). */
+  readonly nube?: NivelNube | null;
+}
+
+/**
+ * Registro por voz o texto (`03 §5.1`, `06 §2`): nivel 0 → (null) → nivel 2 con red → validación Zod →
+ * resolutor → política de confirmación → servicios. Sin red, sin nube o si la nube falla, la frase queda "por
+ * interpretar" (RF-REG-07). Nunca registra el texto en logs (regla 9).
+ */
+export async function registrarTexto(
+  ctx: Contexto,
+  texto: string,
+  origen: OrigenDictado = 'texto',
+  opciones: OpcionesTexto = {},
+): Promise<ResultadoTexto> {
+  exigirConsentimiento(ctx);
+  const frase: Frase = { texto, origen, fecha: ctx.reloj.hoy() };
+  const cuentas = cuentasResolutor(ctx);
+  const local = nivelCero(ctx, cuentas, frase);
+  if (local) return local;
+  const r = await interpretarEnNube(ctx, frase, opciones.nube ?? null);
+  if (r.tipo !== 'ok') {
+    if (r.tipo === 'invalida') return { resultado: 'no_entendi' };
+    return { resultado: 'por_interpretar', id: guardarPorInterpretar(ctx, frase), motivo: r.tipo };
+  }
+  return aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase);
+}
+
+type RespuestaNube =
+  { tipo: 'ok'; interpretacion: Interpretacion } | { tipo: 'invalida' } | { tipo: MotivoPorInterpretar };
+
+async function interpretarEnNube(
+  ctx: Contexto,
+  frase: Frase,
+  nube: NivelNube | null,
+): Promise<RespuestaNube> {
+  if (!nube) return { tipo: 'sin_nube' };
+  try {
+    if (!(await nube.conectividad.enLinea())) return { tipo: 'sin_red' };
+  } catch {
+    return { tipo: 'sin_red' };
+  }
+  const r = await nube.cliente.interpretar(frase.texto, contextoNube(ctx, frase.fecha));
+  switch (r.tipo) {
+    case 'ok':
+      return { tipo: 'ok', interpretacion: r.interpretacion };
+    case 'sin_red':
+      return { tipo: 'sin_red' };
+    case 'limite':
+      return { tipo: 'limite' };
+    case 'error':
+      return r.codigo === 'respuesta_invalida' ? { tipo: 'invalida' } : { tipo: 'error' };
+  }
+}
+
+/**
+ * "Guardar" de la tarjeta de confirmación: registra todos los movimientos en una transacción SQLite. Las cuentas
+ * elegidas para un alias que no se reconoció se aprenden (`06 §12`).
+ */
 export function confirmarRegistro(
   ctx: Contexto,
   entradas: readonly EntradaMovimiento[],
   origen: OrigenDictado,
+  opciones: {
+    aprender?: readonly { alias: string; cuentaId: string }[];
+    /** Hace idempotente el registro: la clave de cada movimiento es `<claveBase>:<i>`. */
+    claveBase?: string;
+  } = {},
 ): Extract<ResultadoTexto, { resultado: 'registrado' }> {
   exigirConsentimiento(ctx);
   if (entradas.length === 0) throw new ErrorDominio('movimiento_invalido', 'no hay nada que registrar');
   return enTransaccion(ctx, () => {
-    const movimientos = entradas.map((e) =>
-      resumir(ctx, registrarMovimiento(ctx, e, { origen }).transaccionId, e),
+    const movimientos = entradas.map((e, i) =>
+      resumir(
+        ctx,
+        registrarMovimiento(ctx, e, {
+          origen,
+          ...(opciones.claveBase ? { claveIdempotencia: `${opciones.claveBase}:${i}` } : {}),
+        }).transaccionId,
+        e,
+      ),
     );
+    for (const a of opciones.aprender ?? []) aprenderAlias(ctx, a.alias, a.cuentaId);
     return {
       resultado: 'registrado',
       deshacer: movimientos.map((m) => m.transaccionId).join(','),
@@ -303,6 +661,8 @@ const PorInterpretar = z.strictObject({
   origen: z.enum(['voz', 'texto']),
   fecha: z.string(),
   recibido_en: z.int(),
+  /** `revisar`: la nube ya la interpretó pero necesita a la persona (confirmar, elegir, aclarar). */
+  estado: z.enum(['pendiente', 'revisar']).optional(),
 });
 
 export interface FrasePorInterpretar {
@@ -311,38 +671,141 @@ export interface FrasePorInterpretar {
   readonly origen: OrigenDictado;
   readonly fecha: PlainDate;
   readonly recibidoEn: number;
+  readonly estado: 'pendiente' | 'revisar';
 }
 
 const PREFIJO = 'por_interpretar:';
 
-function guardarPorInterpretar(ctx: Contexto, texto: string, origen: OrigenDictado): string {
+function guardarPorInterpretar(ctx: Contexto, frase: Frase): string {
   const id = ctx.generarId();
   escribirAjuste(ctx, `${PREFIJO}${id}`, PorInterpretar, {
-    texto,
-    origen,
-    fecha: ctx.reloj.hoy(),
+    texto: frase.texto,
+    origen: frase.origen,
+    fecha: frase.fecha,
     recibido_en: ctx.reloj.ahora(),
   });
   return id;
 }
 
-/** "Por revisar": frases guardadas para interpretarlas con el nivel nube (M3). */
+/** "Por revisar": frases guardadas, en el orden en que se dijeron. */
 export function listarPorInterpretar(ctx: Contexto): FrasePorInterpretar[] {
-  return listarAjustes(ctx, PREFIJO, PorInterpretar).map(({ clave, valor }) => ({
-    id: clave.slice(PREFIJO.length),
-    texto: valor.texto,
-    origen: valor.origen,
-    fecha: valor.fecha,
-    recibidoEn: valor.recibido_en,
-  }));
+  return listarAjustes(ctx, PREFIJO, PorInterpretar)
+    .map(({ clave, valor }) => ({
+      id: clave.slice(PREFIJO.length),
+      texto: valor.texto,
+      origen: valor.origen,
+      fecha: valor.fecha,
+      recibidoEn: valor.recibido_en,
+      estado: valor.estado ?? 'pendiente',
+    }))
+    .sort((a, b) => a.recibidoEn - b.recibidoEn || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
+/** Frases guardadas (pendientes de red y por revisar). */
 export function contarPorInterpretar(ctx: Contexto): number {
   return listarAjustes(ctx, PREFIJO, PorInterpretar).length;
 }
 
-/** Quita una frase de "Por revisar" (ya se registró a mano o ya no aplica). */
+/** Frases que esperan conexión (el indicador discreto del panel). */
+export function contarEsperandoConexion(ctx: Contexto): number {
+  return listarPorInterpretar(ctx).filter((f) => f.estado === 'pendiente').length;
+}
+
+/** Quita una frase de "Por revisar" (ya se registró a mano, ya se revisó o ya no aplica). */
 export function descartarPorInterpretar(ctx: Contexto, id: string): void {
   exigirConsentimiento(ctx);
   borrarAjuste(ctx, `${PREFIJO}${id}`);
+}
+
+/**
+ * "Revisar" una frase de "Por revisar": la vuelve a interpretar con la fecha en que se dijo. Si el resultado ya
+ * quedó aplicado, la quita de la lista; si necesita a la persona (confirmar, elegir, aclarar), la pantalla la
+ * descarta al terminar. Sin red o si la nube falla, se queda donde estaba (`por_interpretar` con su mismo id).
+ */
+export async function revisarPorInterpretar(
+  ctx: Contexto,
+  id: string,
+  nube: NivelNube | null,
+): Promise<ResultadoTexto | null> {
+  exigirConsentimiento(ctx);
+  const clave = `${PREFIJO}${id}`;
+  const guardada = leerAjuste(ctx, clave, PorInterpretar);
+  if (!guardada) return null;
+  const frase: Frase = { texto: guardada.texto, origen: guardada.origen, fecha: guardada.fecha, fraseId: id };
+  let r = nivelCero(ctx, cuentasResolutor(ctx), frase);
+  if (!r) {
+    const n = await interpretarEnNube(ctx, frase, nube);
+    if (n.tipo === 'invalida') r = { resultado: 'no_entendi' };
+    else if (n.tipo === 'ok') r = aplicarInterpretacion(ctx, n.interpretacion, cuentasResolutor(ctx), frase);
+    else return { resultado: 'por_interpretar', id, motivo: n.tipo };
+  }
+  if (AUTOMATICOS.has(r.resultado)) borrarAjuste(ctx, clave);
+  return r;
+}
+
+const procesando = new WeakMap<Contexto, Promise<ResultadoCola>>();
+
+export interface ResultadoCola {
+  /** Frases que ya quedaron registradas, corregidas, anuladas o configuradas. */
+  readonly aplicadas: number;
+  /** Frases que la nube entendió pero necesitan a la persona: quedan en "Por revisar". */
+  readonly porRevisar: number;
+  /** Frases que siguen esperando (sin red, límite o error del proxy). */
+  readonly pendientes: number;
+}
+
+/**
+ * CA-M3-05: al reconectar interpreta las frases guardadas **en orden**, una por una, con la fecha en que se
+ * dijeron. Idempotente: cada frase se aplica y se borra de la cola en la misma transacción SQLite (y sus
+ * movimientos llevan clave `frase:<id>:<i>`), y dos llamadas simultáneas comparten la misma corrida. Se detiene
+ * en el primer fallo de red para no saltarse el orden.
+ */
+export function procesarPorInterpretar(ctx: Contexto, nube: NivelNube | null): Promise<ResultadoCola> {
+  const enCurso = procesando.get(ctx);
+  if (enCurso) return enCurso;
+  const corrida = (async (): Promise<ResultadoCola> => {
+    let aplicadas = 0;
+    let porRevisar = 0;
+    const cola = listarPorInterpretar(ctx).filter((f) => f.estado === 'pendiente');
+    let i = 0;
+    for (; i < cola.length; i++) {
+      const f = cola[i] as FrasePorInterpretar;
+      const frase: Frase = { texto: f.texto, origen: f.origen, fecha: f.fecha, fraseId: f.id };
+      const r = await interpretarEnNube(ctx, frase, nube);
+      if (r.tipo !== 'ok' && r.tipo !== 'invalida') break;
+      const clave = `${PREFIJO}${f.id}`;
+      const marcarRevisar = () => {
+        escribirAjuste(ctx, clave, PorInterpretar, {
+          texto: f.texto,
+          origen: f.origen,
+          fecha: f.fecha,
+          recibido_en: f.recibidoEn,
+          estado: 'revisar',
+        });
+        return 'revisar' as const;
+      };
+      let final: 'ya' | 'aplicada' | 'revisar';
+      try {
+        final = enTransaccion(ctx, () => {
+          if (!leerAjuste(ctx, clave, PorInterpretar)) return 'ya' as const; // otra corrida ya la aplicó
+          const res =
+            r.tipo === 'ok'
+              ? aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase)
+              : ({ resultado: 'no_entendi' } as const);
+          if (!AUTOMATICOS.has(res.resultado)) return marcarRevisar();
+          borrarAjuste(ctx, clave);
+          return 'aplicada' as const;
+        });
+      } catch (error) {
+        // Un error de dominio (cuenta archivada, patrón inválido) no detiene la cola: la frase va a revisión.
+        if (!(error instanceof ErrorDominio)) throw error;
+        final = marcarRevisar();
+      }
+      if (final === 'aplicada') aplicadas++;
+      if (final === 'revisar') porRevisar++;
+    }
+    return { aplicadas, porRevisar, pendientes: cola.length - i };
+  })();
+  procesando.set(ctx, corrida);
+  return corrida.finally(() => procesando.delete(ctx));
 }

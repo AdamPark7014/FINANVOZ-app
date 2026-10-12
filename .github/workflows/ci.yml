@@ -30,6 +30,8 @@ jobs:
         run: pnpm --filter movil exec expo export --platform android --output-dir dist
       - run: node scripts/oraculo.mjs --verificar
       - run: pnpm eval:nlu --nivel reglas
+      # CA-M3-06: reproduce el reporte del nivel nube con las grabaciones (sin red ni llaves).
+      - run: pnpm eval:nlu --offline
       # CA-M1-08: cobertura de líneas de packages/core ≥ 90 %.
       - run: pnpm cobertura:core
       - run: pnpm --filter @cartera/calculadora build

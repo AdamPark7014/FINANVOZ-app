@@ -20,6 +20,8 @@ export interface NavegacionHoy {
   alVerMovimientos: () => void;
   alConfigurarIngreso: () => void;
   alAbrirFormulario: () => void;
+  /** Consultas por voz de saldos, deudas y compromisos. */
+  alVerCuentas?: () => void;
 }
 
 /** Hoy (02-UX §4): cifra principal, días al ingreso, desglose, tarjetas de acción, avisos y registro. */
@@ -52,7 +54,12 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
       ) : null}
       <AvisosUnaVez avisos={vista.avisos} />
       <TarjetasAccion tarjetas={vista.tarjetasAccion} alVerMovimientos={navegacion.alVerMovimientos} />
-      <PanelRegistrar alMasOpciones={navegacion.alAbrirFormulario} {...(motor ? { motor } : {})} />
+      <PanelRegistrar
+        alMasOpciones={navegacion.alAbrirFormulario}
+        alVerMovimientos={navegacion.alVerMovimientos}
+        {...(navegacion.alVerCuentas ? { alVerCuentas: navegacion.alVerCuentas } : {})}
+        {...(motor ? { motor } : {})}
+      />
       {/* Espacio para que el aviso inferior no tape el último botón. */}
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>

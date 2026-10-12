@@ -1,0 +1,2866 @@
+{
+  "$comment": "Generado por packages/nlu/src/esquema-proveedor.ts (pnpm --filter @cartera/nlu generar:proveedor). No editar a mano.",
+  "estandar": {
+    "type": "object",
+    "properties": {
+      "interpretacion": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["registrar"]
+              },
+              "movimientos": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tipo": {
+                      "type": "string",
+                      "enum": [
+                        "gasto",
+                        "ingreso",
+                        "transferencia",
+                        "retiro_efectivo",
+                        "pago_tarjeta",
+                        "prestamo_otorgado",
+                        "cobro_prestamo",
+                        "prestamo_recibido",
+                        "pago_prestamo",
+                        "compra_msi",
+                        "cuenta_dividida",
+                        "aportacion_tanda",
+                        "cobro_tanda",
+                        "retiro_dueno",
+                        "aportacion_dueno"
+                      ]
+                    },
+                    "monto": {
+                      "type": "integer",
+                      "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                    },
+                    "fecha": {
+                      "type": "string",
+                      "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                    },
+                    "descripcion": {
+                      "type": "string",
+                      "description": "Texto de 1 a 120 caracteres."
+                    },
+                    "categoria": {
+                      "type": "string",
+                      "enum": [
+                        "comida_fuera",
+                        "antojos",
+                        "super",
+                        "transporte",
+                        "gasolina",
+                        "entretenimiento",
+                        "ropa",
+                        "hogar",
+                        "cuidado_personal",
+                        "salud",
+                        "mascotas",
+                        "regalos",
+                        "apoyo_familiar",
+                        "viajes",
+                        "tecnologia",
+                        "deporte",
+                        "otros_gastos",
+                        "vivienda",
+                        "servicios",
+                        "suscripciones",
+                        "educacion",
+                        "comisiones_intereses",
+                        "sueldo",
+                        "honorarios",
+                        "ventas",
+                        "regalo_recibido",
+                        "reembolso",
+                        "rendimientos",
+                        "otros_ingresos",
+                        "servicios_prestados",
+                        "mercancia",
+                        "insumos",
+                        "renta_local",
+                        "sueldos_ayudantes",
+                        "publicidad",
+                        "equipo",
+                        "mantenimiento",
+                        "impuestos",
+                        "otros_impuestos"
+                      ]
+                    },
+                    "espacio": {
+                      "type": "string",
+                      "enum": ["personal", "negocio"]
+                    },
+                    "origen": {
+                      "type": "object",
+                      "properties": {
+                        "tipo": {
+                          "type": "string",
+                          "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                        },
+                        "alias": {
+                          "type": "string",
+                          "description": "Texto de 1 a 120 caracteres."
+                        }
+                      },
+                      "required": ["tipo"],
+                      "additionalProperties": false
+                    },
+                    "destino": {
+                      "type": "object",
+                      "properties": {
+                        "tipo": {
+                          "type": "string",
+                          "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                        },
+                        "alias": {
+                          "type": "string",
+                          "description": "Texto de 1 a 120 caracteres."
+                        }
+                      },
+                      "required": ["tipo"],
+                      "additionalProperties": false
+                    },
+                    "contraparte": {
+                      "type": "string",
+                      "description": "Texto de 1 a 120 caracteres."
+                    },
+                    "msi": {
+                      "type": "object",
+                      "properties": {
+                        "meses": {
+                          "type": "integer",
+                          "description": "Entero de 2 a 48."
+                        }
+                      },
+                      "required": ["meses"],
+                      "additionalProperties": false
+                    },
+                    "division": {
+                      "type": "object",
+                      "properties": {
+                        "partes": {
+                          "type": "integer",
+                          "description": "Entero de 2 a 50."
+                        },
+                        "participantes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Texto de 1 a 120 caracteres."
+                          }
+                        }
+                      },
+                      "required": ["partes"],
+                      "additionalProperties": false
+                    },
+                    "aproximado": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["tipo", "monto", "fecha"],
+                  "additionalProperties": false
+                },
+                "description": "De 1 a 10 elementos."
+              }
+            },
+            "required": ["intencion", "movimientos"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["corregir"]
+              },
+              "objetivo": {
+                "type": "object",
+                "properties": {
+                  "ultimo": {
+                    "type": "boolean"
+                  },
+                  "texto": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "monto": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "cambios": {
+                "type": "object",
+                "properties": {
+                  "monto": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "categoria": {
+                    "type": "string",
+                    "enum": [
+                      "comida_fuera",
+                      "antojos",
+                      "super",
+                      "transporte",
+                      "gasolina",
+                      "entretenimiento",
+                      "ropa",
+                      "hogar",
+                      "cuidado_personal",
+                      "salud",
+                      "mascotas",
+                      "regalos",
+                      "apoyo_familiar",
+                      "viajes",
+                      "tecnologia",
+                      "deporte",
+                      "otros_gastos",
+                      "vivienda",
+                      "servicios",
+                      "suscripciones",
+                      "educacion",
+                      "comisiones_intereses",
+                      "sueldo",
+                      "honorarios",
+                      "ventas",
+                      "regalo_recibido",
+                      "reembolso",
+                      "rendimientos",
+                      "otros_ingresos",
+                      "servicios_prestados",
+                      "mercancia",
+                      "insumos",
+                      "renta_local",
+                      "sueldos_ayudantes",
+                      "publicidad",
+                      "equipo",
+                      "mantenimiento",
+                      "impuestos",
+                      "otros_impuestos"
+                    ]
+                  },
+                  "origen": {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                      },
+                      "alias": {
+                        "type": "string",
+                        "description": "Texto de 1 a 120 caracteres."
+                      }
+                    },
+                    "required": ["tipo"],
+                    "additionalProperties": false
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "msi": {
+                    "type": "object",
+                    "properties": {
+                      "meses": {
+                        "type": "integer",
+                        "description": "Entero de 2 a 48."
+                      }
+                    },
+                    "required": ["meses"],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "objetivo", "cambios"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["anular"]
+              },
+              "objetivo": {
+                "type": "object",
+                "properties": {
+                  "ultimo": {
+                    "type": "boolean"
+                  },
+                  "texto": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "monto": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "objetivo"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["revisar_duplicados"]
+              },
+              "filtro": {
+                "type": "object",
+                "properties": {
+                  "texto": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "filtro"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["arqueo"]
+              },
+              "efectivo_real": {
+                "type": "integer",
+                "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+              },
+              "aproximado": {
+                "type": "boolean"
+              }
+            },
+            "required": ["intencion", "efectivo_real"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["consultar"]
+              },
+              "consulta": {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "enum": [
+                      "hoy_puedes",
+                      "gasto_total",
+                      "gasto_por_categoria",
+                      "saldo",
+                      "deuda_tarjetas",
+                      "compromisos",
+                      "por_cobrar",
+                      "comparar_periodos",
+                      "mayores_gastos",
+                      "suscripciones",
+                      "explicar",
+                      "impuestos",
+                      "deducciones",
+                      "puedo_retirar"
+                    ]
+                  },
+                  "desde": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "hasta": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "categoria": {
+                    "type": "string",
+                    "enum": [
+                      "comida_fuera",
+                      "antojos",
+                      "super",
+                      "transporte",
+                      "gasolina",
+                      "entretenimiento",
+                      "ropa",
+                      "hogar",
+                      "cuidado_personal",
+                      "salud",
+                      "mascotas",
+                      "regalos",
+                      "apoyo_familiar",
+                      "viajes",
+                      "tecnologia",
+                      "deporte",
+                      "otros_gastos",
+                      "vivienda",
+                      "servicios",
+                      "suscripciones",
+                      "educacion",
+                      "comisiones_intereses",
+                      "sueldo",
+                      "honorarios",
+                      "ventas",
+                      "regalo_recibido",
+                      "reembolso",
+                      "rendimientos",
+                      "otros_ingresos",
+                      "servicios_prestados",
+                      "mercancia",
+                      "insumos",
+                      "renta_local",
+                      "sueldos_ayudantes",
+                      "publicidad",
+                      "equipo",
+                      "mantenimiento",
+                      "impuestos",
+                      "otros_impuestos",
+                      "comida",
+                      "movilidad",
+                      "casa"
+                    ]
+                  },
+                  "alias": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "contraparte": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "actual": {
+                    "type": "object",
+                    "properties": {
+                      "desde": {
+                        "type": "string",
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      },
+                      "hasta": {
+                        "type": "string",
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      }
+                    },
+                    "required": ["desde", "hasta"],
+                    "additionalProperties": false
+                  },
+                  "anterior": {
+                    "type": "object",
+                    "properties": {
+                      "desde": {
+                        "type": "string",
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      },
+                      "hasta": {
+                        "type": "string",
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      }
+                    },
+                    "required": ["desde", "hasta"],
+                    "additionalProperties": false
+                  },
+                  "limite": {
+                    "type": "integer",
+                    "description": "Entero de 1 a 20."
+                  },
+                  "pregunta": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  }
+                },
+                "required": ["tipo"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "consulta"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["simular"]
+              },
+              "compra": {
+                "type": "object",
+                "properties": {
+                  "precio": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "meses": {
+                    "type": "integer",
+                    "description": "Entero de 2 a 48."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  }
+                },
+                "required": ["precio"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "compra"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["configurar"]
+              },
+              "ajuste": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["tarjeta_ciclo"]
+                      },
+                      "alias": {
+                        "type": "string",
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "dia_corte": {
+                        "type": "integer",
+                        "description": "Entero de 1 a 31."
+                      },
+                      "dia_limite_pago": {
+                        "type": "integer",
+                        "description": "Entero de 1 a 31."
+                      },
+                      "dias_para_pagar": {
+                        "type": "integer",
+                        "description": "Entero de 1 a 60."
+                      }
+                    },
+                    "required": ["tipo"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["colchon"]
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+                      }
+                    },
+                    "required": ["tipo", "monto"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["ingreso_recurrente"]
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dias"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "ancla"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": ["tipo"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["saldo_cuenta"]
+                      },
+                      "alias": {
+                        "type": "string",
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+                      }
+                    },
+                    "required": ["tipo", "monto"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["compromiso"]
+                      },
+                      "concepto": {
+                        "type": "string",
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "categoria": {
+                        "type": "string",
+                        "enum": [
+                          "comida_fuera",
+                          "antojos",
+                          "super",
+                          "transporte",
+                          "gasolina",
+                          "entretenimiento",
+                          "ropa",
+                          "hogar",
+                          "cuidado_personal",
+                          "salud",
+                          "mascotas",
+                          "regalos",
+                          "apoyo_familiar",
+                          "viajes",
+                          "tecnologia",
+                          "deporte",
+                          "otros_gastos",
+                          "vivienda",
+                          "servicios",
+                          "suscripciones",
+                          "educacion",
+                          "comisiones_intereses",
+                          "sueldo",
+                          "honorarios",
+                          "ventas",
+                          "regalo_recibido",
+                          "reembolso",
+                          "rendimientos",
+                          "otros_ingresos",
+                          "servicios_prestados",
+                          "mercancia",
+                          "insumos",
+                          "renta_local",
+                          "sueldos_ayudantes",
+                          "publicidad",
+                          "equipo",
+                          "mantenimiento",
+                          "impuestos",
+                          "otros_impuestos"
+                        ]
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dias"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "ancla"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["unica"]
+                              },
+                              "fecha": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              }
+                            },
+                            "required": ["tipo", "fecha"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "espacio": {
+                        "type": "string",
+                        "enum": ["personal", "negocio"]
+                      }
+                    },
+                    "required": ["tipo", "monto", "regla"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["tanda"]
+                      },
+                      "aportacion": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "participantes": {
+                        "type": "integer",
+                        "description": "Entero de 2 a 50."
+                      },
+                      "turno": {
+                        "type": "integer",
+                        "description": "Entero de 1 a 50."
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dias"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "ancla"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "type": "string",
+                                "enum": ["anterior", "siguiente", "ninguno"]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "inicio": {
+                        "type": "string",
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      }
+                    },
+                    "required": ["tipo", "aportacion", "participantes", "turno", "regla"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["intencion", "ajuste"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["aclarar"]
+              },
+              "motivo": {
+                "type": "string",
+                "enum": [
+                  "monto_faltante",
+                  "monto_ambiguo",
+                  "tipo_ambiguo",
+                  "fecha_ambigua",
+                  "referencia_ambigua",
+                  "no_entendi"
+                ]
+              },
+              "pregunta": {
+                "type": "string",
+                "description": "Texto de 1 a 120 caracteres."
+              },
+              "opciones": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Texto de 1 a 120 caracteres."
+                },
+                "description": "Hasta 4 elementos."
+              }
+            },
+            "required": ["intencion", "motivo", "pregunta"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["fuera_de_alcance"]
+              },
+              "motivo": {
+                "type": "string",
+                "enum": ["mueve_dinero", "asesoria_inversion", "ajeno", "instrucciones"]
+              }
+            },
+            "required": ["intencion"],
+            "additionalProperties": false
+          }
+        ],
+        "description": "Interpretación de la frase del usuario (Cartera, docs/06-NLU.md §3)."
+      }
+    },
+    "required": ["interpretacion"],
+    "additionalProperties": false
+  },
+  "nulable": {
+    "type": "object",
+    "properties": {
+      "interpretacion": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["registrar"]
+              },
+              "movimientos": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tipo": {
+                      "type": "string",
+                      "enum": [
+                        "gasto",
+                        "ingreso",
+                        "transferencia",
+                        "retiro_efectivo",
+                        "pago_tarjeta",
+                        "prestamo_otorgado",
+                        "cobro_prestamo",
+                        "prestamo_recibido",
+                        "pago_prestamo",
+                        "compra_msi",
+                        "cuenta_dividida",
+                        "aportacion_tanda",
+                        "cobro_tanda",
+                        "retiro_dueno",
+                        "aportacion_dueno"
+                      ]
+                    },
+                    "monto": {
+                      "type": "integer",
+                      "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                    },
+                    "fecha": {
+                      "type": "string",
+                      "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                    },
+                    "descripcion": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Texto de 1 a 120 caracteres."
+                    },
+                    "categoria": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "comida_fuera",
+                            "antojos",
+                            "super",
+                            "transporte",
+                            "gasolina",
+                            "entretenimiento",
+                            "ropa",
+                            "hogar",
+                            "cuidado_personal",
+                            "salud",
+                            "mascotas",
+                            "regalos",
+                            "apoyo_familiar",
+                            "viajes",
+                            "tecnologia",
+                            "deporte",
+                            "otros_gastos",
+                            "vivienda",
+                            "servicios",
+                            "suscripciones",
+                            "educacion",
+                            "comisiones_intereses",
+                            "sueldo",
+                            "honorarios",
+                            "ventas",
+                            "regalo_recibido",
+                            "reembolso",
+                            "rendimientos",
+                            "otros_ingresos",
+                            "servicios_prestados",
+                            "mercancia",
+                            "insumos",
+                            "renta_local",
+                            "sueldos_ayudantes",
+                            "publicidad",
+                            "equipo",
+                            "mantenimiento",
+                            "impuestos",
+                            "otros_impuestos"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "espacio": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": ["personal", "negocio"]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "origen": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "tipo": {
+                              "type": "string",
+                              "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                            },
+                            "alias": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "description": "Texto de 1 a 120 caracteres."
+                            }
+                          },
+                          "required": ["tipo", "alias"],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "destino": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "tipo": {
+                              "type": "string",
+                              "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                            },
+                            "alias": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "description": "Texto de 1 a 120 caracteres."
+                            }
+                          },
+                          "required": ["tipo", "alias"],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "contraparte": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Texto de 1 a 120 caracteres."
+                    },
+                    "msi": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "meses": {
+                              "type": "integer",
+                              "description": "Entero de 2 a 48."
+                            }
+                          },
+                          "required": ["meses"],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "division": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "partes": {
+                              "type": "integer",
+                              "description": "Entero de 2 a 50."
+                            },
+                            "participantes": {
+                              "anyOf": [
+                                {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "description": "Texto de 1 a 120 caracteres."
+                                  }
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["partes", "participantes"],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "aproximado": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "tipo",
+                    "monto",
+                    "fecha",
+                    "descripcion",
+                    "categoria",
+                    "espacio",
+                    "origen",
+                    "destino",
+                    "contraparte",
+                    "msi",
+                    "division",
+                    "aproximado"
+                  ],
+                  "additionalProperties": false
+                },
+                "description": "De 1 a 10 elementos."
+              }
+            },
+            "required": ["intencion", "movimientos"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["corregir"]
+              },
+              "objetivo": {
+                "type": "object",
+                "properties": {
+                  "ultimo": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "texto": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "monto": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  }
+                },
+                "required": ["ultimo", "texto", "fecha", "monto"],
+                "additionalProperties": false
+              },
+              "cambios": {
+                "type": "object",
+                "properties": {
+                  "monto": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "fecha": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "categoria": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "comida_fuera",
+                          "antojos",
+                          "super",
+                          "transporte",
+                          "gasolina",
+                          "entretenimiento",
+                          "ropa",
+                          "hogar",
+                          "cuidado_personal",
+                          "salud",
+                          "mascotas",
+                          "regalos",
+                          "apoyo_familiar",
+                          "viajes",
+                          "tecnologia",
+                          "deporte",
+                          "otros_gastos",
+                          "vivienda",
+                          "servicios",
+                          "suscripciones",
+                          "educacion",
+                          "comisiones_intereses",
+                          "sueldo",
+                          "honorarios",
+                          "ventas",
+                          "regalo_recibido",
+                          "reembolso",
+                          "rendimientos",
+                          "otros_ingresos",
+                          "servicios_prestados",
+                          "mercancia",
+                          "insumos",
+                          "renta_local",
+                          "sueldos_ayudantes",
+                          "publicidad",
+                          "equipo",
+                          "mantenimiento",
+                          "impuestos",
+                          "otros_impuestos"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "origen": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "tipo": {
+                            "type": "string",
+                            "enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]
+                          },
+                          "alias": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Texto de 1 a 120 caracteres."
+                          }
+                        },
+                        "required": ["tipo", "alias"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "descripcion": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "msi": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "meses": {
+                            "type": "integer",
+                            "description": "Entero de 2 a 48."
+                          }
+                        },
+                        "required": ["meses"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": ["monto", "fecha", "categoria", "origen", "descripcion", "msi"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "objetivo", "cambios"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["anular"]
+              },
+              "objetivo": {
+                "type": "object",
+                "properties": {
+                  "ultimo": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "texto": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "monto": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  }
+                },
+                "required": ["ultimo", "texto", "fecha", "monto"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "objetivo"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["revisar_duplicados"]
+              },
+              "filtro": {
+                "type": "object",
+                "properties": {
+                  "texto": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "fecha": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  }
+                },
+                "required": ["texto", "fecha"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "filtro"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["arqueo"]
+              },
+              "efectivo_real": {
+                "type": "integer",
+                "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+              },
+              "aproximado": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["intencion", "efectivo_real", "aproximado"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["consultar"]
+              },
+              "consulta": {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "enum": [
+                      "hoy_puedes",
+                      "gasto_total",
+                      "gasto_por_categoria",
+                      "saldo",
+                      "deuda_tarjetas",
+                      "compromisos",
+                      "por_cobrar",
+                      "comparar_periodos",
+                      "mayores_gastos",
+                      "suscripciones",
+                      "explicar",
+                      "impuestos",
+                      "deducciones",
+                      "puedo_retirar"
+                    ]
+                  },
+                  "desde": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "hasta": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  },
+                  "categoria": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "comida_fuera",
+                          "antojos",
+                          "super",
+                          "transporte",
+                          "gasolina",
+                          "entretenimiento",
+                          "ropa",
+                          "hogar",
+                          "cuidado_personal",
+                          "salud",
+                          "mascotas",
+                          "regalos",
+                          "apoyo_familiar",
+                          "viajes",
+                          "tecnologia",
+                          "deporte",
+                          "otros_gastos",
+                          "vivienda",
+                          "servicios",
+                          "suscripciones",
+                          "educacion",
+                          "comisiones_intereses",
+                          "sueldo",
+                          "honorarios",
+                          "ventas",
+                          "regalo_recibido",
+                          "reembolso",
+                          "rendimientos",
+                          "otros_ingresos",
+                          "servicios_prestados",
+                          "mercancia",
+                          "insumos",
+                          "renta_local",
+                          "sueldos_ayudantes",
+                          "publicidad",
+                          "equipo",
+                          "mantenimiento",
+                          "impuestos",
+                          "otros_impuestos",
+                          "comida",
+                          "movilidad",
+                          "casa"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "alias": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "contraparte": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "actual": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "desde": {
+                            "type": "string",
+                            "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                          },
+                          "hasta": {
+                            "type": "string",
+                            "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                          }
+                        },
+                        "required": ["desde", "hasta"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "anterior": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "desde": {
+                            "type": "string",
+                            "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                          },
+                          "hasta": {
+                            "type": "string",
+                            "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                          }
+                        },
+                        "required": ["desde", "hasta"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "limite": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Entero de 1 a 20."
+                  },
+                  "pregunta": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "desde",
+                  "hasta",
+                  "categoria",
+                  "alias",
+                  "contraparte",
+                  "actual",
+                  "anterior",
+                  "limite",
+                  "pregunta"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "consulta"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["simular"]
+              },
+              "compra": {
+                "type": "object",
+                "properties": {
+                  "precio": {
+                    "type": "integer",
+                    "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                  },
+                  "descripcion": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Texto de 1 a 120 caracteres."
+                  },
+                  "meses": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Entero de 2 a 48."
+                  },
+                  "fecha": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                  }
+                },
+                "required": ["precio", "descripcion", "meses", "fecha"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["intencion", "compra"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["configurar"]
+              },
+              "ajuste": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["tarjeta_ciclo"]
+                      },
+                      "alias": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "dia_corte": {
+                        "anyOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Entero de 1 a 31."
+                      },
+                      "dia_limite_pago": {
+                        "anyOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Entero de 1 a 31."
+                      },
+                      "dias_para_pagar": {
+                        "anyOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Entero de 1 a 60."
+                      }
+                    },
+                    "required": ["tipo", "alias", "dia_corte", "dia_limite_pago", "dias_para_pagar"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["colchon"]
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+                      }
+                    },
+                    "required": ["tipo", "monto"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["ingreso_recurrente"]
+                      },
+                      "monto": {
+                        "anyOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dias", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ancla", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": ["tipo", "monto", "regla"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["saldo_cuenta"]
+                      },
+                      "alias": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores o iguales a 0 (80 pesos = 8000)."
+                      }
+                    },
+                    "required": ["tipo", "alias", "monto"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["compromiso"]
+                      },
+                      "concepto": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Texto de 1 a 120 caracteres."
+                      },
+                      "monto": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "categoria": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "comida_fuera",
+                              "antojos",
+                              "super",
+                              "transporte",
+                              "gasolina",
+                              "entretenimiento",
+                              "ropa",
+                              "hogar",
+                              "cuidado_personal",
+                              "salud",
+                              "mascotas",
+                              "regalos",
+                              "apoyo_familiar",
+                              "viajes",
+                              "tecnologia",
+                              "deporte",
+                              "otros_gastos",
+                              "vivienda",
+                              "servicios",
+                              "suscripciones",
+                              "educacion",
+                              "comisiones_intereses",
+                              "sueldo",
+                              "honorarios",
+                              "ventas",
+                              "regalo_recibido",
+                              "reembolso",
+                              "rendimientos",
+                              "otros_ingresos",
+                              "servicios_prestados",
+                              "mercancia",
+                              "insumos",
+                              "renta_local",
+                              "sueldos_ayudantes",
+                              "publicidad",
+                              "equipo",
+                              "mantenimiento",
+                              "impuestos",
+                              "otros_impuestos"
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dias", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ancla", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["unica"]
+                              },
+                              "fecha": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              }
+                            },
+                            "required": ["tipo", "fecha"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "espacio": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": ["personal", "negocio"]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": ["tipo", "concepto", "monto", "categoria", "regla", "espacio"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tipo": {
+                        "type": "string",
+                        "enum": ["tanda"]
+                      },
+                      "aportacion": {
+                        "type": "integer",
+                        "description": "Centavos enteros mayores que 0 (80 pesos = 8000)."
+                      },
+                      "participantes": {
+                        "type": "integer",
+                        "description": "Entero de 2 a 50."
+                      },
+                      "turno": {
+                        "type": "integer",
+                        "description": "Entero de 1 a 50."
+                      },
+                      "regla": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_15_ultimo"]
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["quincenal_dias"]
+                              },
+                              "dias": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "description": "Entero de 1 a 31."
+                                },
+                                "description": "Exactamente 2 elementos."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dias", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["mensual"]
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["semanal"]
+                              },
+                              "dia_semana": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 7."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "dia_semana", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["catorcenal"]
+                              },
+                              "ancla": {
+                                "type": "string",
+                                "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "ancla", "ajuste"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "enum": ["anual"]
+                              },
+                              "mes": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 12."
+                              },
+                              "dia": {
+                                "type": "integer",
+                                "description": "Entero de 1 a 31."
+                              },
+                              "ajuste": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["anterior", "siguiente", "ninguno"]
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": ["tipo", "mes", "dia", "ajuste"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "inicio": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Fecha civil 'YYYY-MM-DD' ya resuelta contra la fecha de referencia."
+                      }
+                    },
+                    "required": ["tipo", "aportacion", "participantes", "turno", "regla", "inicio"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["intencion", "ajuste"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["aclarar"]
+              },
+              "motivo": {
+                "type": "string",
+                "enum": [
+                  "monto_faltante",
+                  "monto_ambiguo",
+                  "tipo_ambiguo",
+                  "fecha_ambigua",
+                  "referencia_ambigua",
+                  "no_entendi"
+                ]
+              },
+              "pregunta": {
+                "type": "string",
+                "description": "Texto de 1 a 120 caracteres."
+              },
+              "opciones": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "Texto de 1 a 120 caracteres."
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Hasta 4 elementos."
+              }
+            },
+            "required": ["intencion", "motivo", "pregunta", "opciones"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "intencion": {
+                "type": "string",
+                "enum": ["fuera_de_alcance"]
+              },
+              "motivo": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": ["mueve_dinero", "asesoria_inversion", "ajeno", "instrucciones"]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["intencion", "motivo"],
+            "additionalProperties": false
+          }
+        ],
+        "description": "Interpretación de la frase del usuario (Cartera, docs/06-NLU.md §3)."
+      }
+    },
+    "required": ["interpretacion"],
+    "additionalProperties": false
+  }
+}

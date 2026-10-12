@@ -1,0 +1,23 @@
+{
+  "descripcion": "Precios de lista de los modelos candidatos del nivel nube (docs/06-NLU.md §11), en USD por millón de tokens, para el costo por caso completo correcto de `pnpm eval:nlu`. Clave: <proveedor>/<modelo>. null = sin confirmar (el reporte lo dice). Confirmar contra la página de precios de cada proveedor antes de registrar la decisión en docs/ESTADO.md.",
+  "moneda": "USD",
+  "unidad": "por millón de tokens",
+  "actualizado": "2026-10-12",
+  "modelos": {
+    "anthropic/claude-haiku-5-5": {
+      "entrada": 0.1,
+      "salida": 0.5,
+      "fuente": "Precio de lista de Anthropic para prompts de hasta 100K tokens (caché de modelos, 2026-10-06)"
+    },
+    "openai/gpt-5-mini": {
+      "entrada": 0.25,
+      "salida": 2.0,
+      "fuente": "Precio público de OpenAI conocido en 2025; confirmar el vigente"
+    },
+    "google/gemini-2.5-flash": {
+      "entrada": 0.3,
+      "salida": 2.5,
+      "fuente": "Precio público de Google conocido en 2025; confirmar el vigente"
+    }
+  }
+}

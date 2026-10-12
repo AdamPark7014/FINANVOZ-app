@@ -4,5 +4,13 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@cartera/nlu": "workspace:*",
+    "@electric-sql/pglite": "0.3.16",
+    "ajv": "^8.20.0"
   }
 }

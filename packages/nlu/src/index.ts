@@ -11,3 +11,4 @@ export {
 } from './resolutor';
 export { interpretarReglas } from './reglas';
 export { compararInterpretacion } from './eval/comparar';
+export * from './cliente';

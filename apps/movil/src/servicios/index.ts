@@ -41,21 +41,42 @@ export {
   type VistaAjustes,
 } from './ajustes';
 export {
+  aplicarEleccion,
   confirmarRegistro,
+  contarEsperandoConexion,
   descartarPorInterpretar,
   listarPorInterpretar,
+  procesarPorInterpretar,
   registrarTexto,
+  registrarTextoLocal,
+  revisarPorInterpretar,
   TOPE_OPTIMISTA,
+  type AccionElegir,
   type CuentaPorElegir,
+  type Eleccion,
   type FrasePorInterpretar,
+  type MotivoNoSoportado,
+  type MotivoPorInterpretar,
+  type OpcionesTexto,
   type OrigenDictado,
   type PropuestaMovimiento,
+  type ResultadoCola,
   type ResultadoTexto,
   type ResumenMovimiento,
+  type VistaConsulta,
 } from './registrar';
+export { contextoNube, type Conectividad, type NivelNube } from './nube';
+export {
+  aplicarCorreccion,
+  historialMovimiento,
+  type CambiosResueltos,
+  type CompromisoConfigurado,
+  type ResumenTransaccion,
+  type VersionAnterior,
+} from './correcciones';
+export { deshacer } from './deshacer';
 export {
   anularMovimiento,
-  deshacer,
   EntradaMovimiento,
   registrarMovimiento,
   type MovimientoRegistrado,

@@ -1,73 +1,198 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { registrarTexto, type OrigenDictado, type ResultadoTexto } from '../../servicios';
-import { useSesion } from '../../sesion/ProveedorSesion';
+import {
+  contarEsperandoConexion,
+  descartarPorInterpretar,
+  registrarTexto,
+  registrarTextoLocal,
+  revisarPorInterpretar,
+  type OrigenDictado,
+  type ResultadoTexto,
+} from '../../servicios';
+import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, OBJETIVO_TACTIL_MIN, radio, Texto, tipo, useTema } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
-import { MENSAJE_NO_ENTENDI, MENSAJE_POR_INTERPRETAR, mensajeRegistrado } from './textos';
+import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
+import {
+  MENSAJE_GUARDADA,
+  MENSAJE_NO_ENCONTRE,
+  MENSAJE_NO_ENTENDI,
+  MENSAJE_NO_SOPORTADO,
+  MENSAJE_SIN_DUPLICADOS,
+  mensajeAnulado,
+  mensajeConfigurado,
+  mensajeCorregido,
+  mensajeEsperandoConexion,
+  mensajeFueraDeAlcance,
+  mensajePasarAMeses,
+  mensajeRegistrado,
+} from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
-type Confirmar = Extract<ResultadoTexto, { resultado: 'confirmar' }>;
+/** Resultados que se resuelven con una tarjeta en el panel. */
+type ConTarjeta = Extract<ResultadoTexto, { resultado: 'confirmar' | 'elegir' | 'duplicados' | 'aclarar' }>;
 
 /**
  * Registrar hablando o escribiendo (02-UX §5): "Mantén para hablar" con transcripción en vivo y "Escribir".
- * Completo y seguro → se guarda y aparece "Deshacer"; necesita confirmación → tarjeta con chips; fuera del
- * nivel 0 → queda "por revisar"; "¿cuánto puedo gastar?" → Hoy.
+ * El nivel 0 responde al instante; lo demás va a la nube (si hay red) y vuelve como registro con "Deshacer",
+ * tarjeta de confirmación, elección de movimiento o pregunta. Sin red queda "por revisar" y un indicador
+ * discreto dice cuántas frases esperan internet.
  */
 export function PanelRegistrar({
   alConsultarHoy,
+  alVerMovimientos,
+  alVerCuentas,
   alMasOpciones,
   motor,
   abiertoAlInicio = false,
+  fraseRevision,
 }: {
   /** "¿Cuánto puedo gastar hoy?": lleva a Hoy (o no hace nada si ya estás ahí). */
   alConsultarHoy?: () => void;
+  /** Consultas de gasto: llevan a Movimientos. */
+  alVerMovimientos?: () => void;
+  /** Saldos, deudas y compromisos: llevan a Cuentas. */
+  alVerCuentas?: () => void;
   /** Abre el formulario completo de movimiento. */
   alMasOpciones?: () => void;
   /** Reconocedor de voz inyectable (pruebas). */
   motor?: MotorDictado;
   abiertoAlInicio?: boolean;
+  /** Id de una frase de "Por revisar" que se abre para revisarla. */
+  fraseRevision?: string;
 }) {
-  const { ctx, refrescar } = useSesion();
+  const { ctx, refrescar, nube } = useSesion();
   const { c } = useTema();
   const avisarRegistro = useAvisoRegistro();
+  const esperando = useVista(contarEsperandoConexion);
   const [escribiendo, setEscribiendo] = useState(abiertoAlInicio);
   const [texto, setTexto] = useState('');
   const [mensaje, setMensaje] = useState<string | null>(null);
-  const [confirmar, setConfirmar] = useState<{ datos: Confirmar; origen: OrigenDictado } | null>(null);
+  // Al abrir una frase para revisarla se empieza interpretando (la ruta vuelve a montar el panel por frase).
+  const [interpretando, setInterpretando] = useState(fraseRevision !== undefined);
+  const [tarjeta, setTarjeta] = useState<{ datos: ConTarjeta; origen: OrigenDictado } | null>(null);
+  const enRevision = useRef<string | null>(null);
+
+  /** La frase en revisión ya no hace falta: se quitó de "Por revisar". */
+  const terminarRevision = useCallback(() => {
+    const id = enRevision.current;
+    enRevision.current = null;
+    if (id) {
+      try {
+        descartarPorInterpretar(ctx, id);
+      } catch {
+        // Ya no existe.
+      }
+    }
+  }, [ctx]);
+
+  const mostrar = useCallback(
+    (r: ResultadoTexto, origen: OrigenDictado) => {
+      setTarjeta(null);
+      switch (r.resultado) {
+        case 'registrado':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
+          return;
+        case 'corregido':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeCorregido(r.antes, r.despues), r.deshacer);
+          return;
+        case 'anulado':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeAnulado(r.movimiento), r.deshacer);
+          return;
+        case 'configurado':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajeConfigurado(r.compromiso), r.compromiso.deshacer);
+          return;
+        case 'pasar_a_meses':
+          terminarRevision();
+          setTexto('');
+          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses));
+          return;
+        case 'confirmar':
+        case 'elegir':
+        case 'duplicados':
+        case 'aclarar':
+          setTarjeta({ datos: r, origen });
+          return;
+        case 'por_interpretar':
+          setTexto('');
+          setMensaje(MENSAJE_GUARDADA[r.motivo]);
+          refrescar();
+          return;
+        case 'consulta':
+          terminarRevision();
+          setTexto('');
+          if (r.consulta === 'movimientos') alVerMovimientos?.();
+          else if (r.consulta === 'cuentas') alVerCuentas?.();
+          else alConsultarHoy?.();
+          return;
+        case 'no_encontrado':
+          setMensaje(r.accion === 'duplicados' ? MENSAJE_SIN_DUPLICADOS : MENSAJE_NO_ENCONTRE);
+          return;
+        case 'no_entendi':
+          setMensaje(MENSAJE_NO_ENTENDI);
+          return;
+        case 'no_soportado':
+          setMensaje(MENSAJE_NO_SOPORTADO[r.motivo]);
+          return;
+        case 'fuera_de_alcance':
+          setMensaje(mensajeFueraDeAlcance(r.motivo));
+          return;
+      }
+    },
+    [alConsultarHoy, alVerCuentas, alVerMovimientos, avisarRegistro, refrescar, terminarRevision],
+  );
 
   const enviar = (frase: string, origen: OrigenDictado) => {
     const limpio = frase.trim();
-    if (limpio === '') return;
+    if (limpio === '' || interpretando) return;
     setMensaje(null);
-    setConfirmar(null);
-    let r: ResultadoTexto;
+    setTarjeta(null);
+    let local: ResultadoTexto | null;
     try {
-      r = registrarTexto(ctx, limpio, origen);
+      local = registrarTextoLocal(ctx, limpio, origen);
     } catch {
       setMensaje(MENSAJE_NO_ENTENDI);
       return;
     }
-    switch (r.resultado) {
-      case 'registrado':
-        setTexto('');
-        avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
-        return;
-      case 'confirmar':
-        setConfirmar({ datos: r, origen });
-        return;
-      case 'por_interpretar':
-        setTexto('');
-        setMensaje(MENSAJE_POR_INTERPRETAR);
-        refrescar();
-        return;
-      case 'consulta':
-        setTexto('');
-        alConsultarHoy?.();
-        return;
+    if (local) {
+      mostrar(local, origen);
+      return;
     }
+    setInterpretando(true);
+    registrarTexto(ctx, limpio, origen, { nube })
+      .then((r) => mostrar(r, origen))
+      .catch(() => setMensaje(MENSAJE_NO_ENTENDI))
+      .finally(() => setInterpretando(false));
   };
+
+  // "Revisar" desde "Por revisar": se interpreta de nuevo con la fecha en que se dijo.
+  useEffect(() => {
+    if (!fraseRevision) return;
+    let vigente = true;
+    enRevision.current = fraseRevision;
+    revisarPorInterpretar(ctx, fraseRevision, nube)
+      .then((r) => {
+        if (!vigente) return;
+        if (r) mostrar(r, 'texto');
+        refrescar();
+      })
+      .catch(() => vigente && setMensaje(MENSAJE_NO_ENTENDI))
+      .finally(() => vigente && setInterpretando(false));
+    return () => {
+      vigente = false;
+    };
+    // Solo al abrir la frase.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fraseRevision]);
 
   const dictado = useDictado({
     ...(motor ? { motor } : {}),
@@ -83,17 +208,39 @@ export function PanelRegistrar({
 
   return (
     <View style={{ gap: espacio.m }} testID="panel-registrar">
-      {confirmar ? (
+      {tarjeta?.datos.resultado === 'confirmar' ? (
         <ConfirmacionRegistro
-          propuestas={confirmar.datos.propuestas}
-          motivo={confirmar.datos.motivo}
-          origen={confirmar.origen}
-          alGuardar={(r) => {
-            setConfirmar(null);
-            setTexto('');
-            avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
+          propuestas={tarjeta.datos.propuestas}
+          motivo={tarjeta.datos.motivo}
+          origen={tarjeta.origen}
+          alGuardar={(r) => mostrar(r, tarjeta.origen)}
+          alCancelar={() => setTarjeta(null)}
+        />
+      ) : null}
+      {tarjeta?.datos.resultado === 'elegir' ? (
+        <TarjetaElegir
+          datos={tarjeta.datos}
+          origen={tarjeta.origen}
+          alTerminar={(r) => mostrar(r, tarjeta.origen)}
+          alCancelar={() => setTarjeta(null)}
+        />
+      ) : null}
+      {tarjeta?.datos.resultado === 'duplicados' ? (
+        <TarjetaDuplicados
+          datos={tarjeta.datos}
+          origen={tarjeta.origen}
+          alTerminar={(r) => mostrar(r, tarjeta.origen)}
+          alCerrar={() => {
+            terminarRevision();
+            setTarjeta(null);
           }}
-          alCancelar={() => setConfirmar(null)}
+        />
+      ) : null}
+      {tarjeta?.datos.resultado === 'aclarar' ? (
+        <TarjetaAclarar
+          datos={tarjeta.datos}
+          alElegir={(frase) => enviar(frase, tarjeta.origen)}
+          alCancelar={() => setTarjeta(null)}
         />
       ) : null}
 
@@ -105,6 +252,16 @@ export function PanelRegistrar({
       {errorVoz ? (
         <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {errorVoz}
+        </Texto>
+      ) : null}
+      {interpretando ? (
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLiveRegion="polite"
+          testID="interpretando"
+        >
+          Déjame entenderlo…
         </Texto>
       ) : null}
       {mensaje ? (
@@ -174,6 +331,11 @@ export function PanelRegistrar({
           testID="boton-escribir"
         />
       </View>
+      {esperando > 0 ? (
+        <Texto variante="secundario" tono="secundario" testID="indicador-esperando-conexion">
+          {mensajeEsperandoConexion(esperando)}
+        </Texto>
+      ) : null}
       {alMasOpciones ? (
         <Boton
           etiqueta="Registrar con formulario"

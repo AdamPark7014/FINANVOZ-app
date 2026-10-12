@@ -100,7 +100,7 @@ export function construirMovimiento(ctx: Contexto, e: EntradaMovimiento): Movimi
 export function registrarMovimiento(
   ctx: Contexto,
   entrada: EntradaMovimiento,
-  opciones: { origen?: OrigenRegistro; porRevisar?: boolean } = {},
+  opciones: { origen?: OrigenRegistro; porRevisar?: boolean; claveIdempotencia?: string } = {},
 ): MovimientoRegistrado {
   exigirConsentimiento(ctx);
   const r = EntradaMovimiento.safeParse(entrada);
@@ -112,7 +112,7 @@ export function registrarMovimiento(
     tipo: propuesto.tipo,
     fecha,
     origen: opciones.origen ?? 'manual',
-    claveIdempotencia: `mov:${ctx.generarId()}`,
+    claveIdempotencia: opciones.claveIdempotencia ?? `mov:${ctx.generarId()}`,
     asientos: propuesto.asientos,
     descripcion: e.descripcion ?? null,
     comercio: e.tipo === 'gasto' ? (e.comercio ?? null) : null,

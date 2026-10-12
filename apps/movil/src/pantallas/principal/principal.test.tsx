@@ -273,12 +273,13 @@ describe('Registrar', () => {
     expect(listarMovimientos(p.ctx)[0]?.movimientos[0]?.origen).toBe('voz');
   });
 
-  it('lo que el nivel 0 no entiende queda por revisar y aparece en Movimientos', () => {
+  it('lo que el nivel 0 no entiende queda por revisar y aparece en Movimientos', async () => {
     const p = conEscenario('e4-01');
     todas(p.ctx);
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    await screen.findByTestId('mensaje-registro');
     expect(textoDe('mensaje-registro')).toMatch(/^Lo guardé; lo interpreto cuando tengas internet\./);
     expect(screen.getByText('«ayer fui al súper con mi prima y pagó ella»')).toBeTruthy();
     expect(screen.getByText('Tienes 1 frase por revisar.')).toBeTruthy();

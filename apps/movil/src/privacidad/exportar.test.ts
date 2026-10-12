@@ -24,14 +24,14 @@ afterEach(() => {
 });
 
 describe('exportar y borrar todo', () => {
-  it('CA-M2-04 · exportar genera JSON completo y CSV de movimientos', () => {
+  it('CA-M2-04 · exportar genera JSON completo y CSV de movimientos', async () => {
     const p = abrirPrueba();
     const e = cargarEscenario(p.ctx, escenario('e4-01'));
-    const r = registrarTexto(p.ctx, 'coca 25 en efectivo');
-    const r2 = registrarTexto(p.ctx, 'tacos, "al pastor" 80 con la nu');
+    const r = await registrarTexto(p.ctx, 'coca 25 en efectivo');
+    const r2 = await registrarTexto(p.ctx, 'tacos, "al pastor" 80 con la nu');
     expect(r2.resultado).toBe('por_interpretar');
     if (r.resultado !== 'registrado') throw new Error(r.resultado);
-    const anulado = registrarTexto(p.ctx, 'café 40 en efectivo');
+    const anulado = await registrarTexto(p.ctx, 'café 40 en efectivo');
     if (anulado.resultado !== 'registrado') throw new Error(anulado.resultado);
     anularMovimiento(p.ctx, anulado.deshacer);
 
