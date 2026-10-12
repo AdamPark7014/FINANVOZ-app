@@ -41,6 +41,15 @@ export {
   type VistaAjustes,
 } from './ajustes';
 export {
+  construirVistaWidget,
+  ENLACE_WIDGET,
+  fijarOcultarMontosWidget,
+  obtenerAjustesWidget,
+  obtenerVistaWidget,
+  type AjustesWidget,
+  type VistaWidget,
+} from './widget';
+export {
   aplicarEleccion,
   confirmarCompraMsi,
   confirmarCuentaDividida,
