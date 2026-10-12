@@ -112,7 +112,7 @@ Respuestas: 200 `{ "resultado": "aplicado" | "duplicado" | "antiguo" | "sin_usua
 ### Desplegar
 
 1. `supabase db push` aplica `20261015000000_revenuecat.sql`.
-2. `supabase secrets set REVENUECAT_WEBHOOK_SECRETO=<64 caracteres aleatorios>` (mínimo 32).
+2. `supabase secrets set REVENUECAT_WEBHOOK_SECRET=<64 caracteres aleatorios>` (mínimo 32).
 3. `supabase functions deploy webhooks-revenuecat --no-verify-jwt` (RevenueCat no tiene sesión; la protege el secreto).
 4. En RevenueCat → Project settings → Integrations → Webhooks: URL `https://<ref>.supabase.co/functions/v1/webhooks-revenuecat`, encabezado de autorización `Bearer <el mismo secreto>`, ambientes producción y sandbox (los probadores con licencia de Play compran en sandbox). "Send test event" debe responder 200 `ignorado`.
 5. En RevenueCat el derecho (Entitlement) se llama **`plus`** y agrupa los productos mensual y anual con la prueba de 14 días configurada en Play Console.

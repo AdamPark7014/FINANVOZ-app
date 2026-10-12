@@ -2,7 +2,7 @@
 // URL: https://<ref>.supabase.co/functions/v1/webhooks-revenuecat (se despliega con `--no-verify-jwt`: RevenueCat
 // no tiene sesión de Supabase; la autoriza el secreto compartido).
 // Variables (en el proyecto de Supabase, nunca en el repositorio, regla 8): SUPABASE_URL y
-// SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase) y REVENUECAT_WEBHOOK_SECRETO (el mismo valor que va, con
+// SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase) y REVENUECAT_WEBHOOK_SECRET (el mismo valor que va, con
 // "Bearer ", en el encabezado Authorization del webhook en el panel de RevenueCat).
 // Privacidad (regla 9): solo se registran el tipo de evento y el resultado.
 import { createClient } from '@supabase/supabase-js';
@@ -16,7 +16,7 @@ const supabase = createClient(env('SUPABASE_URL') ?? '', env('SUPABASE_SERVICE_R
 });
 
 const manejador = crearManejadorRevenueCat({
-  secreto: env('REVENUECAT_WEBHOOK_SECRETO'),
+  secreto: env('REVENUECAT_WEBHOOK_SECRET'),
   async aplicar(accion) {
     const { data, error } =
       accion.tipo === 'transferir'

@@ -1,5 +1,5 @@
 // Manejador de `POST /webhooks/revenuecat` (Edge Function `webhooks-revenuecat`, CA-M7-01). RevenueCat manda en
-// `Authorization` el valor que se configura en su panel; aquí se exige `Bearer <REVENUECAT_WEBHOOK_SECRETO>` y se
+// `Authorization` el valor que se configura en su panel; aquí se exige `Bearer <REVENUECAT_WEBHOOK_SECRET>` y se
 // compara en tiempo constante. La base se inyecta: la Edge Function llama a las funciones SQL; las pruebas, un doble.
 import type { Registrador } from '../nlu/registro.ts';
 import { type AccionDerecho, traducirEvento } from './evento.ts';
@@ -11,7 +11,7 @@ export const CUERPO_MAXIMO_WEBHOOK = 64 * 1024;
 export const LARGO_MINIMO_SECRETO = 32;
 
 export interface DependenciasRevenueCat {
-  /** `REVENUECAT_WEBHOOK_SECRETO`; sin él (o corto) responde 503. */
+  /** `REVENUECAT_WEBHOOK_SECRET`; sin él (o corto) responde 503. */
   secreto: string | undefined;
   /** Aplica el cambio (funciones SQL atómicas); devuelve su resultado (`aplicado`, `duplicado`, …). */
   aplicar(accion: Exclude<AccionDerecho, { tipo: 'ignorar' }>): Promise<string>;
