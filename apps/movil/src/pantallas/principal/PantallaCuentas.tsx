@@ -37,10 +37,13 @@ export function PantallaCuentas({
   alAbrirAjustes,
   alAbrirTarjeta,
   alAgregarTarjeta,
+  alContarEfectivo,
 }: {
   alAbrirAjustes: () => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
   alAgregarTarjeta?: () => void;
+  /** Cuentas → Efectivo → arqueo (`02 §7`). */
+  alContarEfectivo?: (cuentaId: string) => void;
 }) {
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
@@ -74,6 +77,14 @@ export function PantallaCuentas({
             titulo={c.nombre}
             subtitulo={NOMBRE_SUBTIPO[c.subtipo] ?? null}
             centavos={c.saldo}
+            {...(c.subtipo === 'efectivo' && alContarEfectivo
+              ? {
+                  accion: {
+                    etiqueta: 'Contar mi efectivo',
+                    alPresionar: () => alContarEfectivo(c.id),
+                  },
+                }
+              : {})}
           />
         ))}
       </Seccion>
@@ -169,11 +180,13 @@ function Fila({
   subtitulo,
   centavos,
   testID,
+  accion,
 }: {
   titulo: string;
   subtitulo: string | null;
   centavos: number;
   testID?: string;
+  accion?: { etiqueta: string; alPresionar: () => void };
 }) {
   return (
     <Tarjeta {...(testID ? { testID } : {})}>
@@ -188,6 +201,15 @@ function Fila({
         </View>
         <Cifra centavos={centavos} contexto={titulo} {...(testID ? { testID: `${testID}-saldo` } : {})} />
       </View>
+      {accion ? (
+        <Boton
+          etiqueta={accion.etiqueta}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={accion.alPresionar}
+          {...(testID ? { testID: `${testID}-accion` } : {})}
+        />
+      ) : null}
     </Tarjeta>
   );
 }

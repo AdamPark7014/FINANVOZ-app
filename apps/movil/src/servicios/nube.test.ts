@@ -360,7 +360,7 @@ describe('nivel 2 · nube', () => {
       [
         'traigo como 300',
         { intencion: 'arqueo', efectivo_real: 30_000, aproximado: true },
-        { resultado: 'no_soportado', motivo: 'intencion' },
+        { resultado: 'arqueo', efectivoReal: 30_000 },
       ],
       [
         'le presté 200 a juan',

@@ -12,6 +12,8 @@ import {
   type PreguntaLiquidar,
   type TarjetaAccion,
 } from '../../servicios';
+import { TarjetaPreguntaCaptura } from '../captura/PreguntasCaptura';
+import { TarjetaArqueo, TarjetaCapturaInactiva } from '../captura/TarjetasCaptura';
 import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
@@ -29,9 +31,12 @@ type Cobertura = Extract<TarjetaAccion, { tipo: 'confirmar_cobertura' }>;
 export function TarjetasAccion({
   tarjetas,
   alVerMovimientos,
+  alAbrirArqueo,
 }: {
   tarjetas: readonly TarjetaAccion[];
   alVerMovimientos: () => void;
+  /** Abre el arqueo de efectivo (`02 §7`); sin él, "Otra cantidad" no aparece como pantalla. */
+  alAbrirArqueo?: () => void;
 }) {
   if (tarjetas.length === 0) return null;
   return (
@@ -48,6 +53,36 @@ export function TarjetasAccion({
           case 'compromiso_vencido':
           case 'ingreso_no_llego':
             return <TarjetaOcurrencia key={`${t.programadoId}:${t.fecha}`} t={t} testID={testID} />;
+          case 'arqueo':
+            return (
+              <TarjetaArqueo
+                key={`arqueo:${t.cuentaId}`}
+                t={t}
+                testID={testID}
+                alAbrirArqueo={alAbrirArqueo ?? (() => {})}
+              />
+            );
+          case 'captura_inactiva':
+            return <TarjetaCapturaInactiva key="captura_inactiva" testID={testID} />;
+          case 'pregunta_captura':
+            return (
+              <TarjetaPreguntaCaptura
+                key={`captura:${t.pregunta.capturaId}`}
+                pregunta={t.pregunta}
+                testID={testID}
+              />
+            );
+          case 'capturas_por_revisar':
+            return (
+              <Tarjeta key="capturas_por_revisar" testID={testID}>
+                <Texto variante="cuerpo">
+                  {t.cantidad === 1
+                    ? 'Registré 1 movimiento de tu banco que necesita que lo revises.'
+                    : `Registré ${t.cantidad} movimientos de tu banco que necesitan que los revises.`}
+                </Texto>
+                <Boton etiqueta="Ver por revisar" variante="secundario" alPresionar={alVerMovimientos} />
+              </Tarjeta>
+            );
           case 'por_interpretar':
             return (
               <Tarjeta key="por_interpretar" testID={testID}>

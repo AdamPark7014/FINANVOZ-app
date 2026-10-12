@@ -2,6 +2,9 @@ import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
+import { puenteCaptura } from '../src/captura/puente';
+import { sha256Expo } from '../src/captura/sha256Expo';
 import { crearNivelNubeExpo } from '../src/nube/expo';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
@@ -127,18 +130,22 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
   useProcesarCola();
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
-      {/* Al abrir la app y tras cada cambio (tarjetas, pagos, cortes, preferencias) se reprograman los avisos. */}
-      <SincronizarAvisosTarjetas />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
-        <Stack.Screen name="ajustes" />
-        <Stack.Screen name="tarjetas/[id]" />
-        <Stack.Screen name="tarjetas/nueva" />
-      </Stack>
-      <CortinaBloqueo bloqueo={bloqueo} />
-    </View>
+    // Captura automática (`07`): sin el módulo nativo (Expo Go, iPhone) el puente no está disponible y nada cambia.
+    <ProveedorCaptura puente={puenteCaptura} sha256={sha256Expo}>
+      <View style={{ flex: 1 }}>
+        <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
+        {/* Al abrir la app y tras cada cambio (tarjetas, pagos, cortes, preferencias) se reprograman los avisos. */}
+        <SincronizarAvisosTarjetas />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="ajustes" />
+          <Stack.Screen name="tarjetas/[id]" />
+          <Stack.Screen name="tarjetas/nueva" />
+          <Stack.Screen name="arqueo" />
+        </Stack>
+        <CortinaBloqueo bloqueo={bloqueo} />
+      </View>
+    </ProveedorCaptura>
   );
 }

@@ -13,6 +13,7 @@ export function PantallaRegistrar({
   alConsultarHoy,
   alVerMovimientos,
   alVerCuentas,
+  alArqueo,
   fraseRevision,
   motor,
 }: {
@@ -20,6 +21,8 @@ export function PantallaRegistrar({
   alConsultarHoy: () => void;
   alVerMovimientos?: () => void;
   alVerCuentas?: () => void;
+  /** "Traigo 300": abre el arqueo. */
+  alArqueo?: (efectivoReal: number) => void;
   /** Frase de "Por revisar" que se abre para confirmarla. */
   fraseRevision?: string;
   motor?: MotorDictado;
@@ -48,6 +51,7 @@ export function PantallaRegistrar({
         abiertoAlInicio
         {...(alVerMovimientos ? { alVerMovimientos } : {})}
         {...(alVerCuentas ? { alVerCuentas } : {})}
+        {...(alArqueo ? { alArqueo } : {})}
         {...(fraseRevision ? { fraseRevision } : {})}
         {...(motor ? { motor } : {})}
       />

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaCuentas } from '../../src/pantallas/principal';
 
 export default function Cuentas() {
@@ -8,6 +9,7 @@ export default function Cuentas() {
       alAbrirAjustes={() => router.push('/ajustes')}
       alAbrirTarjeta={(id) => router.push({ pathname: '/tarjetas/[id]', params: { id } })}
       alAgregarTarjeta={() => router.push('/tarjetas/nueva')}
+      alContarEfectivo={(cuentaId) => abrirArqueo(router, { cuentaId })}
     />
   );
 }

@@ -13,6 +13,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips } from './Chip';
@@ -110,6 +111,8 @@ export function PantallaMovimientos({
           ))}
         </View>
       ) : null}
+
+      <PorRevisarCapturas alRegistrar={alRegistrar} />
 
       {dias.length === 0 ? (
         <Texto variante="cuerpo" tono="secundario" testID="movimientos-vacio">
