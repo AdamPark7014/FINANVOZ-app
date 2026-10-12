@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Ícono temático de Android 13+: una sola tinta, barras recortadas -->
+  <defs><mask id="m"><rect width="1024" height="1024" fill="#fff"/>
+    <g fill="#000">
+      <rect x="352" y="476" width="72" height="120" rx="36"/><rect x="476" y="410" width="72" height="186" rx="36"/><rect x="600" y="334" width="72" height="262" rx="36"/>
+    </g></mask></defs>
+  <g transform="translate(512 512) scale(0.66) translate(-512 -490)" mask="url(#m)">
+    <path d="M512 212c-176 0-312 118-312 270 0 86 44 162 114 212l-26 118c-4 18 16 31 31 20l120-82c23 4 47 6 73 6 176 0 312-118 312-274S688 212 512 212z" fill="#000"/>
+  </g>
+</svg>
