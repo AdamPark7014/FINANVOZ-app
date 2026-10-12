@@ -8,6 +8,8 @@ export interface PeticionNube {
 
 export interface RespuestaNube {
   readonly status: number;
+  /** Encabezados de la respuesta (`ETag` de las plantillas remotas); opcional en las pruebas. */
+  readonly headers?: { get(nombre: string): string | null };
   json(): Promise<unknown>;
   arrayBuffer(): Promise<ArrayBuffer>;
 }

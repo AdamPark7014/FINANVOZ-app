@@ -1,13 +1,8 @@
 import { compilarPlantillas, type CatalogoPlantillas } from '@cartera/core';
 import sinteticas from '../../../../fixtures/notificaciones/plantillas.ejemplo.json';
+import { catalogoConRemotas, type ArchivoPlantillas } from './plantillas-remotas';
 import reales from './plantillas/reales.json';
 import type { NotificacionCruda } from './tipos';
-
-interface ArchivoPlantillas {
-  readonly version?: number;
-  readonly bancos: readonly unknown[];
-  readonly plantillas: readonly unknown[];
-}
 
 /**
  * Une archivos de plantillas en uno (`07 §3`): los bancos y plantillas de cada archivo en orden, así que las
@@ -52,14 +47,30 @@ export function paquetesConocidos(catalogo: CatalogoPlantillas): string[] {
 }
 
 let catalogoDeLaApp: CatalogoPlantillas | null = null;
+let remotasActivas: ArchivoPlantillas | null = null;
 
 /**
- * Catálogo con el que corre la app: las reales siempre y las sintéticas solo con `__DEV__` (en Node, donde no
- * existe `__DEV__`, también: pruebas y semillas).
+ * Catálogo con el que corre la app: las plantillas remotas activas (`07 §3.1`, ya verificadas) ganan por id de
+ * banco sobre las embebidas; las reales siempre y las sintéticas solo con `__DEV__` (en Node, donde no existe
+ * `__DEV__`, también: pruebas y semillas).
  */
 export function catalogoApp(): CatalogoPlantillas {
-  catalogoDeLaApp ??= catalogoEmbebido(typeof __DEV__ === 'undefined' || __DEV__);
+  if (!catalogoDeLaApp) {
+    const embebidos = typeof __DEV__ === 'undefined' || __DEV__ ? [reales, sinteticas] : [reales];
+    try {
+      catalogoDeLaApp = catalogoConRemotas(embebidos, remotasActivas);
+    } catch {
+      // Una remota que no combina con las embebidas se descarta completa: quedan las embebidas.
+      catalogoDeLaApp = catalogoConRemotas(embebidos, null);
+    }
+  }
   return catalogoDeLaApp;
+}
+
+/** Fija (o quita, con `null`) el archivo remoto verificado que usa `catalogoApp()`. */
+export function fijarPlantillasRemotas(archivo: ArchivoPlantillas | null): void {
+  remotasActivas = archivo;
+  catalogoDeLaApp = null;
 }
 
 /** Nombre visible de un banco del catálogo ("Banco A (débito)"); su id si no trae nombre. */
