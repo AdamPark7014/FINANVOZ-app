@@ -16,6 +16,7 @@ import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
 import type { CoberturaAutomatica } from './cobertura';
+import { responderConsulta, tienePlantilla, type RespuestaConsulta } from './consultas';
 import { configurarCicloPorVoz, type TarjetaEditada, type TarjetaPorAgregar } from './config-tarjetas';
 import {
   anularPorVoz,
@@ -98,9 +99,6 @@ export type MotivoNoSoportado =
 
 export type AccionElegir = 'corregir' | 'anular' | 'pasar_a_meses';
 
-/** Vista a la que lleva una consulta (`06 §6`: las que ya tienen pantalla). */
-export type VistaConsulta = 'hoy_puedes' | 'movimientos' | 'cuentas';
-
 export type ResultadoTexto =
   | {
       readonly resultado: 'registrado';
@@ -115,7 +113,8 @@ export type ResultadoTexto =
     }
   /** "Lo guardé; lo interpreto cuando tengas internet." */
   | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
-  | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
+  /** Consulta tipada (`06 §6`): respuesta en plantilla y el filtro de "Ver movimientos". */
+  | { readonly resultado: 'consulta'; readonly respuesta: RespuestaConsulta }
   /** "¿Me alcanza para unos tenis de 1,500?": la pantalla abre "¿Me alcanza?" y llama `meAlcanza(ctx, consulta)`. */
   | { readonly resultado: 'me_alcanza'; readonly consulta: ConsultaMeAlcanza }
   /** "Traigo 300": abre el arqueo con lo que dijo (`02 §7`); nada se registra sin confirmar (E7). */
@@ -626,18 +625,6 @@ export function aplicarEleccion(
   }
 }
 
-/** Consultas que ya tienen una vista; las demás llegan con su hito (`06 §6`). */
-const VISTA_CONSULTA: Partial<Record<string, VistaConsulta>> = {
-  hoy_puedes: 'hoy_puedes',
-  gasto_total: 'movimientos',
-  gasto_por_categoria: 'movimientos',
-  mayores_gastos: 'movimientos',
-  saldo: 'cuentas',
-  deuda_tarjetas: 'cuentas',
-  por_cobrar: 'cuentas',
-  compromisos: 'cuentas',
-};
-
 /**
  * Aplica una `Interpretacion` ya validada (nivel 0 o nube): resolutor → política de confirmación (`06 §7`) →
  * servicios. Síncrono: todo ocurre en la base local.
@@ -687,12 +674,10 @@ function aplicarInterpretacion(
         }
         throw error;
       }
-    case 'consultar': {
-      const vista = VISTA_CONSULTA[i.consulta.tipo];
-      return vista
-        ? { resultado: 'consulta', consulta: vista }
+    case 'consultar':
+      return tienePlantilla(i.consulta.tipo)
+        ? { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) }
         : { resultado: 'no_soportado', motivo: 'consulta' };
-    }
     case 'aclarar':
       return {
         resultado: 'aclarar',
@@ -723,8 +708,8 @@ function aplicarInterpretacion(
 /** Nivel 0: solo lo que el teléfono ya sabe hacer sin la nube; `null` si hay que preguntarle a la nube. */
 function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
   const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
-  if (i?.intencion === 'consultar' && i.consulta.tipo === 'hoy_puedes') {
-    return { resultado: 'consulta', consulta: 'hoy_puedes' };
+  if (i?.intencion === 'consultar' && tienePlantilla(i.consulta.tipo)) {
+    return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion !== 'registrar') return null;

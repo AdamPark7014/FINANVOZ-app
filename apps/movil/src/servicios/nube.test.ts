@@ -324,18 +324,18 @@ describe('nivel 2 · nube', () => {
     expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000 - 400_000);
   });
 
-  it('consultas que ya tienen vista, aclarar, fuera de alcance y lo que aún no se hace por voz', async () => {
+  it('consultas con plantilla, aclarar, fuera de alcance y lo que aún no se hace por voz', async () => {
     const p = conCuentas();
     const casos: [string, unknown, unknown][] = [
       [
         'cuánto llevo este mes',
         { intencion: 'consultar', consulta: { tipo: 'gasto_total', desde: '2026-10-01', hasta: HOY } },
-        { resultado: 'consulta', consulta: 'movimientos' },
+        { resultado: 'consulta', respuesta: { plantilla: 'gasto_total', texto: 'Este mes llevas $0.' } },
       ],
       [
         'cuánto debo de tarjetas',
         { intencion: 'consultar', consulta: { tipo: 'deuda_tarjetas' } },
-        { resultado: 'consulta', consulta: 'cuentas' },
+        { resultado: 'consulta', respuesta: { plantilla: 'deuda_tarjetas' } },
       ],
       [
         'cuánto pago de suscripciones',

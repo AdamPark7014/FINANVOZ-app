@@ -65,8 +65,15 @@ export {
   type ResultadoCola,
   type ResultadoTexto,
   type ResumenMovimiento,
-  type VistaConsulta,
 } from './registrar';
+export {
+  fechaCorta,
+  PLANTILLAS_CONSULTA,
+  responderConsulta,
+  type LineaConsulta,
+  type PlantillaConsulta,
+  type RespuestaConsulta,
+} from './consultas';
 export { contextoNube, type Conectividad, type NivelNube } from './nube';
 export {
   aplicarCorreccion,
