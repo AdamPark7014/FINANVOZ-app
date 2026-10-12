@@ -7,7 +7,8 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "eval:nlu": "tsx scripts/eval-nlu.ts"
+    "eval:nlu": "tsx scripts/eval-nlu.ts",
+    "generar:proveedor": "tsx scripts/generar-proveedor.ts"
   },
   "dependencies": {
     "@cartera/core": "workspace:*",
