@@ -12,27 +12,35 @@ import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
+import { archivosRespaldoExpo, dependenciasRespaldoExpo } from '../src/respaldo/expo';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
-import { cargarEscenario, obtenerBloqueo, relojFijo, type PuertoEvidencia } from '../src/servicios';
-import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
+import {
+  cargarEscenario,
+  mensajeRestaurado,
+  obtenerBloqueo,
+  relojFijo,
+  type PuertoEvidencia,
+} from '../src/servicios';
+import { abrirSesion, borrarTodoApp, restaurarSesion, type Sesion } from '../src/servicios/sesion';
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
 import { ProveedorSesion, useVista } from '../src/sesion/ProveedorSesion';
-import { Boton, Pantalla, Texto, useTema } from '../src/ui';
+import { Aviso, Boton, Pantalla, Texto, useTema } from '../src/ui';
 
 iniciarSentry();
 
 type Estado =
-  | { tipo: 'lista'; sesion: Sesion; generacion: number }
+  | { tipo: 'lista'; sesion: Sesion; generacion: number; aviso?: string }
   | { tipo: 'trabajando'; generacion: number }
   | { tipo: 'error'; generacion: number };
 
 /** Abre la base cifrada; si falla, la raíz muestra una pantalla amable con "Intentar de nuevo". */
-function intentarAbrir(generacion: number, preparar?: () => Sesion): Estado {
+function intentarAbrir(generacion: number, preparar?: () => Sesion, aviso?: string): Estado {
   try {
-    return { tipo: 'lista', sesion: preparar ? preparar() : abrirSesion(), generacion };
+    const sesion = preparar ? preparar() : abrirSesion();
+    return { tipo: 'lista', sesion, generacion, ...(aviso ? { aviso } : {}) };
   } catch {
     // El error no se muestra ni se registra con detalle: podría llevar rutas o datos (regla 9).
     return { tipo: 'error', generacion };
@@ -55,7 +63,7 @@ export default function Raiz() {
   const evidencia = useMemo(() => crearPuertoEvidenciaExpo(), []);
 
   const reemplazarSesion = useCallback(
-    async (preparar?: () => Sesion) => {
+    async (preparar?: () => Sesion, aviso?: string) => {
       const siguiente = estado.generacion + 1;
       setEstado({ tipo: 'trabajando', generacion: siguiente });
       try {
@@ -64,7 +72,7 @@ export default function Raiz() {
         setEstado({ tipo: 'error', generacion: siguiente });
         return;
       }
-      setEstado(intentarAbrir(siguiente, preparar));
+      setEstado(intentarAbrir(siguiente, preparar, aviso));
     },
     [estado.generacion, sesion],
   );
@@ -72,6 +80,12 @@ export default function Raiz() {
   const control = useMemo<ControlApp>(
     () => ({
       borrarTodo: () => reemplazarSesion(),
+      respaldo: {
+        deps: dependenciasRespaldoExpo,
+        archivos: archivosRespaldoExpo,
+        // El respaldo ya se descifró y se ensayó en memoria: aquí solo se reemplaza la base.
+        restaurar: (listo) => reemplazarSesion(() => restaurarSesion(listo), mensajeRestaurado(listo)),
+      },
       ...(__DEV__
         ? {
             cargarEscenario: (datos: unknown) =>
@@ -124,7 +138,11 @@ export default function Raiz() {
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
           <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
             <ProveedorAnalitica analitica={analitica}>
-              <AppProtegida reiniciada={estado.generacion > 0} evidencia={evidencia} />
+              <AppProtegida
+                reiniciada={estado.generacion > 0}
+                evidencia={evidencia}
+                avisoInicial={estado.aviso ?? null}
+              />
             </ProveedorAnalitica>
           </ProveedorPlan>
         </ProveedorSesion>
@@ -137,8 +155,18 @@ export default function Raiz() {
 const abrirPlan = () => router.push('/plan');
 
 /** Aplica las preferencias de bloqueo guardadas (RF-CFG-03) sobre toda la navegación. */
-function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidencia: PuertoEvidencia | null }) {
+function AppProtegida({
+  reiniciada,
+  evidencia,
+  avisoInicial,
+}: {
+  reiniciada: boolean;
+  evidencia: PuertoEvidencia | null;
+  /** "Listo: recuperé 1,284 movimientos" tras restaurar un respaldo (`02 §19`). */
+  avisoInicial: string | null;
+}) {
   const { esquema } = useTema();
+  const [aviso, setAviso] = useState(avisoInicial);
   // Tras borrar todo (o cargar un escenario) la navegación vuelve al inicio, que decide onboarding o Hoy.
   useEffect(() => {
     if (reiniciada) router.replace('/');
@@ -172,8 +200,10 @@ function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidenci
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="plan" />
           <Stack.Screen name="privacidad" />
+          <Stack.Screen name="restaurar" />
           <Stack.Screen name="terminos" />
         </Stack>
+        <Aviso aviso={aviso ? { id: 'restaurado', mensaje: aviso } : null} alCerrar={() => setAviso(null)} />
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>
     </ProveedorCaptura>

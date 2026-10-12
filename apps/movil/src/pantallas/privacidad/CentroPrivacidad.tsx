@@ -10,6 +10,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
 import { compartirArchivo } from '../ajustes/compartir';
+import { TarjetaRespaldo } from '../respaldo/TarjetaRespaldo';
 import { RESPONSABLE } from '../onboarding/aviso';
 
 const PALABRA_BORRAR = 'BORRAR';
@@ -55,19 +56,23 @@ const PERMISOS: readonly { readonly nombre: string; readonly para: string }[] = 
 
 /**
  * Centro de privacidad (RF-PRI-03, `02 §12`, `08 §2`): qué se guarda, qué sale del teléfono y a quién,
- * permisos, decisiones (estadísticas, captura), exportar (siempre gratis), borrar todo y el aviso.
+ * permisos, decisiones (estadísticas, captura), exportar (siempre gratis), respaldo cifrado (M9), borrar todo y
+ * el aviso.
  */
 export function CentroPrivacidad({
   alVolver,
   alLeerAviso,
   alLeerTerminos,
   alBorrarTodo,
+  alRestaurar,
 }: {
   alVolver: () => void;
   alLeerAviso: () => void;
   alLeerTerminos: () => void;
   /** La raíz cierra la base, destruye la llave y vuelve al onboarding. */
   alBorrarTodo: () => Promise<void>;
+  /** Abre "Restaurar un respaldo" (M9). */
+  alRestaurar: () => void;
 }) {
   const { ctx, refrescar } = useSesion();
   const vista = useVista(obtenerCentroPrivacidad);
@@ -251,6 +256,8 @@ export function CentroPrivacidad({
           </Texto>
         ) : null}
       </Tarjeta>
+
+      <TarjetaRespaldo alRestaurar={alRestaurar} />
 
       <Tarjeta testID="privacidad-borrar">
         <Texto variante="subtitulo">Borrar todo</Texto>

@@ -42,6 +42,11 @@ jest.mock('expo-screen-capture', () => ({
 }));
 // El SDK de Sentry deja temporizadores vivos en jest; sin DSN `iniciarSentry` no hace nada de todos modos.
 jest.mock('../../observabilidad', () => ({ iniciarSentry: jest.fn() }));
+jest.mock('../../respaldo/expo', () => {
+  const { crearRespaldoPrueba } = jest.requireActual('../respaldo/__pruebas__/respaldo');
+  const r = crearRespaldoPrueba();
+  return { dependenciasRespaldoExpo: r.deps, archivosRespaldoExpo: r.archivos };
+});
 
 const RUTAS = {
   _layout: Raiz,

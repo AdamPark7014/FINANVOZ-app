@@ -1,13 +1,25 @@
 import { createContext, useContext, type ReactNode } from 'react';
+import type { ArchivosRespaldo, DependenciasRespaldo, RespaldoListo } from '../servicios';
 
 /**
  * Acciones que solo la raíz puede hacer porque reemplazan la sesión completa: "Borrar todo" (cierra la base,
- * destruye la llave y arranca como recién instalada) y, en builds de desarrollo, cargar un escenario semilla.
+ * destruye la llave y arranca como recién instalada), restaurar un respaldo (M9) y, en builds de desarrollo,
+ * cargar un escenario semilla.
  * La raíz (`app/_layout.tsx`) lo implementa con `servicios/sesion`; las pruebas pasan uno falso.
  */
 export interface ControlApp {
   /** Borra todo y vuelve a abrir una base vacía: la app regresa al onboarding. */
   borrarTodo(): Promise<void>;
+  /**
+   * Respaldo cifrado (M9): dependencias nativas (cripto, almacén, archivos) y el reemplazo de la base por un
+   * respaldo ya ensayado. Ausente en pruebas que no lo usan.
+   */
+  respaldo?: {
+    readonly deps: DependenciasRespaldo;
+    readonly archivos: ArchivosRespaldo;
+    /** Borra todo, importa el respaldo en la base nueva y vuelve al inicio con "Listo: recuperé…". */
+    restaurar(listo: RespaldoListo): Promise<void>;
+  };
   /** Solo `__DEV__`: borra todo y carga `fixtures/escenarios/<id>.json` con el reloj fijo en su `hoy`. */
   cargarEscenario?: (datos: unknown) => Promise<void>;
 }
