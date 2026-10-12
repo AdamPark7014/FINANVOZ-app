@@ -240,6 +240,39 @@ export function construirCuentaDividida(e: {
   };
 }
 
+/**
+ * Caso 31 y E12.2 (M16): un gasto compartido en pareja en el libro de quien lo registra, con las partes ya
+ * repartidas por `repartoPareja` (así el libro coincide con `balancePareja` también en el centavo de un empate).
+ *
+ * - Pagaste tú (`pago` es tu cuenta): tu parte a gasto y la de tu pareja a `contraparte:<pareja>` +
+ *   (`cuenta_dividida`); si tu pareja no pone nada es un `gasto` normal y si tú no pones nada, un
+ *   `prestamo_otorgado` (todo lo pagaste por ella).
+ * - Pagó tu pareja (`pago` omitido): `gasto:<cat> +tu_parte` / `contraparte:<pareja> −tu_parte`
+ *   (`cuenta_dividida`, le debes). Si tu parte es cero no hay nada que registrar: devuelve `null`.
+ */
+export function construirGastoPareja(e: {
+  categoria: string;
+  pareja: string;
+  parteMia: Centavos;
+  partePareja: Centavos;
+  pago?: string;
+}): MovimientoPropuesto | null {
+  const mia = exigirCentavos(e.parteMia, 'parteMia');
+  const suya = exigirCentavos(e.partePareja, 'partePareja');
+  if (mia + suya <= 0) throw new ErrorDominio('monto_invalido', 'el total debe ser mayor que cero');
+  if (e.pago === undefined) return mia > 0 ? par('cuenta_dividida', e.categoria, e.pareja, mia) : null;
+  if (suya === 0) return par('gasto', e.categoria, e.pago, mia);
+  if (mia === 0) return par('prestamo_otorgado', e.pareja, e.pago, suya);
+  return {
+    tipo: 'cuenta_dividida',
+    asientos: [
+      { cuentaId: e.categoria, monto: mia },
+      { cuentaId: e.pareja, monto: suya },
+      { cuentaId: e.pago, monto: -(mia + suya) },
+    ],
+  };
+}
+
 /** Casos 9 y 23: `contraparte:tanda +` / líquida −. Ni gasto ni ingreso. */
 export function construirAportacionTanda(e: {
   tanda: string;

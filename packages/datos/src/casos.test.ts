@@ -11,6 +11,7 @@ import {
   construirConciliacion,
   construirCuentaDividida,
   construirGasto,
+  construirGastoPareja,
   construirIngreso,
   construirLiquidacionMsi,
   construirMsiExistente,
@@ -644,6 +645,34 @@ describe('CA-M1-04 · asientos por caso (04 §4)', () => {
       [C.saldosIniciales, 200000],
       [C.tanda, -200000],
     ]);
+  });
+});
+
+describe('CA-M16-06 · caso 31 de 04 §4 (pareja)', () => {
+  it('31 · Ana pagó el súper de 1,200 con 60/40 y tu parte es 40 % → cuenta_dividida; al saldar, pago_prestamo', () => {
+    nuevaBase();
+    // Tu parte (40 %) sale de repartoPareja con Ana como A al 60 %: 72,000 / 48,000 centavos.
+    const m = construirGastoPareja({
+      categoria: C.super,
+      pareja: C.ana,
+      parteMia: 48000,
+      partePareja: 72000,
+    });
+    if (!m) throw new Error('sin movimiento');
+    const t = registrar(m);
+    expect(t.tipo).toBe('cuenta_dividida');
+    expect(asientos(t)).toEqual([
+      [C.super, 48000],
+      [C.ana, -48000],
+    ]);
+    expect(saldo(C.ana)).toBe(-48000);
+    const saldar = registrar(construirPagoPrestamo({ persona: C.ana, origen: C.bbva, monto: 48000 }));
+    expect(saldar.tipo).toBe('pago_prestamo');
+    expect(asientos(saldar)).toEqual([
+      [C.ana, 48000],
+      [C.bbva, -48000],
+    ]);
+    expect(saldo(C.ana)).toBe(0);
   });
 });
 

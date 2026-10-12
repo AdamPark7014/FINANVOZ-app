@@ -30,12 +30,14 @@ export const C = {
   amigo2: 'amigo2',
   amigo3: 'amigo3',
   tanda: 'tanda_1',
+  ana: 'ana_pareja',
   archivada: 'cuenta_vieja',
   ...CUENTAS_SISTEMA,
   antojos: idCategoria('antojos'),
   comidaFuera: idCategoria('comida_fuera'),
   hogar: idCategoria('hogar'),
   ropa: idCategoria('ropa'),
+  super: idCategoria('super'),
   transporte: idCategoria('transporte'),
   variosEfectivo: idCategoria('varios_efectivo'),
   sueldo: idCategoria('sueldo'),
@@ -66,6 +68,7 @@ function sembrarPlan(db: BetterSQLite3Database): void {
       fila(C.amigo2, 'contraparte', 'persona'),
       fila(C.amigo3, 'contraparte', 'persona'),
       fila(C.tanda, 'contraparte', 'tanda'),
+      fila(C.ana, 'contraparte', 'pareja', { apartarDeuda: 1 }),
       fila(C.archivada, 'activo', 'debito', { liquida: 1, archivada: 1 }),
     ])
     .run();
