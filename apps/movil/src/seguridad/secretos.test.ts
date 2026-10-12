@@ -32,6 +32,8 @@ describe('búsqueda de secretos en el binario (08 §7.1, regla 8)', () => {
       '-----BEGIN PUBLIC KEY-----',
       'goog_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef', // llave pública de RevenueCat (Android)
       'texto normal con sk-8 y AIza corto',
+      // Tabla de textos de Hermes: identificadores pegados que contienen "sk-" a media palabra.
+      `-webkit-mask-size_equals__exportStarjeta-msi-mensualidad-procesar`,
     ].join('\n');
     expect(buscarSecretos(publico)).toEqual([]);
   });

@@ -4,9 +4,10 @@
  * de PostHog (`phc_`), el DSN de Sentry, la llave pública de RevenueCat y la llave pública de plantillas.
  * Lo usa `scripts/buscar-secretos.ts` sobre el bundle exportado (y sobre un APK descomprimido).
  */
+// `sk-` solo al inicio de un token: Hermes junta identificadores en su tabla de textos ("mask-size_…").
 const PATRONES: readonly { nombre: string; patron: RegExp }[] = [
-  { nombre: 'anthropic', patron: /sk-ant-[A-Za-z0-9_-]{20,}/ },
-  { nombre: 'openai', patron: /sk-(?!ant-)(?:proj-|svcacct-)?[A-Za-z0-9_-]{32,}/ },
+  { nombre: 'anthropic', patron: /(?<![A-Za-z0-9])sk-ant-[A-Za-z0-9_-]{20,}/ },
+  { nombre: 'openai', patron: /(?<![A-Za-z0-9])sk-(?!ant-)(?:proj-|svcacct-)?[A-Za-z0-9_-]{32,}/ },
   { nombre: 'google', patron: /AIza[0-9A-Za-z_-]{35}/ },
   { nombre: 'revenuecat_secreta', patron: /\bsk_[A-Za-z0-9]{24,}/ },
   { nombre: 'sentry_token', patron: /sntry[su]_[A-Za-z0-9+/=_-]{20,}/ },

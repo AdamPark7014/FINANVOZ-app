@@ -29,6 +29,7 @@ import { listarOcurrencias, pospuestaHoy } from './ocurrencias';
 import { escribirAjuste, leerAjuste } from './preferencias';
 import { contarPorInterpretar } from './registrar';
 import { ingresoPrincipal } from './programados';
+import { programadosDeTandas, tarjetasTanda, type TarjetaTanda } from './tandas';
 import { cuotasMsiPendientes, tarjetasActivas } from './tarjetas';
 import { pagosQueVencen, tarjetaDelDia, type TarjetaDelDia } from './vista-tarjetas';
 
@@ -132,7 +133,9 @@ export type TarjetaAccion =
   | { readonly tipo: 'por_interpretar'; readonly cantidad: number }
   /** 6. Capturas por revisar (Movimientos → "Por revisar"). */
   | { readonly tipo: 'capturas_por_revisar'; readonly cantidad: number }
-  | { readonly tipo: 'por_asignar'; readonly monto: Centavos };
+  | { readonly tipo: 'por_asignar'; readonly monto: Centavos }
+  /** 2. Tandas (`02 §18`): "¿Ya diste tu tanda?" el día que toca y "Me tocó la tanda" en tu turno. */
+  | TarjetaTanda;
 
 export interface VistaHoy {
   readonly hoy: PlainDate;
@@ -426,9 +429,11 @@ function tarjetasDeAccion(
       opciones: ['ya_la_pague', 'todavia_no'],
     });
   }
-  // 2. Compromiso vencido sin cubrir.
+  // 2. Compromiso vencido sin cubrir; las aportaciones de una tanda llevan su propia tarjeta.
+  const deTandas = programadosDeTandas(ctx);
   for (const o of pendientes) {
-    if (o.tipo !== 'egreso' || o.fecha >= hoy || pospuestaHoy(ctx, o)) continue;
+    if (o.tipo !== 'egreso' || o.fecha >= hoy || pospuestaHoy(ctx, o) || deTandas.has(o.programadoId))
+      continue;
     tarjetas.push({
       tipo: 'compromiso_vencido',
       programadoId: o.programadoId,
@@ -440,6 +445,7 @@ function tarjetasDeAccion(
       opciones: ['ya_la_pague', 'todavia_no', 'ya_no_aplica'],
     });
   }
+  tarjetas.push(...tarjetasTanda(ctx, pendientes));
   // 3. Ingreso que no llegó (de los últimos 31 días) o día de pago sin depósito.
   for (const o of pendientes) {
     if (o.programadoId !== ingresoId || o.fecha > hoy || o.fecha < sumarDias(hoy, -31)) continue;

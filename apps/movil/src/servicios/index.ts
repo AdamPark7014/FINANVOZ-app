@@ -43,6 +43,7 @@ export {
 export {
   aplicarEleccion,
   confirmarCompraMsi,
+  confirmarCuentaDividida,
   confirmarRegistro,
   contarEsperandoConexion,
   descartarPorInterpretar,
@@ -61,6 +62,7 @@ export {
   type OpcionesTexto,
   type OrigenDictado,
   type PropuestaCompraMsi,
+  type PropuestaCuentaDividida,
   type PropuestaMovimiento,
   type ResultadoCola,
   type ResultadoTexto,
@@ -178,7 +180,54 @@ export {
   type VistaHoy,
 } from './hoy';
 export { marcarAvisoVisto, type Aviso } from './avisos';
+export {
+  aportarTanda,
+  cobrarTanda,
+  crearTanda,
+  detalleTanda,
+  EntradaTanda,
+  FRECUENCIAS_TANDA,
+  listarTandas,
+  proponerTanda,
+  reglaDeFrecuencia,
+  todaviaNoCobroTanda,
+  type DetalleTanda,
+  type FrecuenciaTanda,
+  type MovimientoTanda,
+  type PropuestaTanda,
+  type RondaTandaVista,
+  type TandaCreada,
+  type TandaVista,
+  type TandaYaEmpezada,
+  type TarjetaTanda,
+} from './tandas';
 export { crearPersona, fijarApartarDeuda, listarPersonas, registrarPrestamo, type Persona } from './personas';
+export {
+  MAX_PARTES,
+  registrarCuentaDividida,
+  repartoCuentaDividida,
+  type CuentaDivididaRegistrada,
+  type EntradaCuentaDividida,
+  type RepartoVista,
+} from './cuenta-dividida';
+export {
+  borrarDatosCobro,
+  clabeValida,
+  detallePersona,
+  fijarRecordatorioCobro,
+  formatearCelular,
+  formatearClabe,
+  guardarDatosCobro,
+  leerDatosCobro,
+  opcionesRecordatorioCobro,
+  prepararCobro,
+  sincronizarRecordatoriosCobro,
+  type DatosCobro,
+  type DetallePersona,
+  type OpcionRecordatorio,
+  type ResultadoCobro,
+} from './cobros';
+export { PREFIJO_RECORDATORIO_COBRO } from '../avisos/cobros';
 export {
   listarCategorias,
   listarCuentas,

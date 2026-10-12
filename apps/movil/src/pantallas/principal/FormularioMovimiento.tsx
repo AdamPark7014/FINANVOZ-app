@@ -12,11 +12,16 @@ import {
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from '../../ui';
+import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
+import { mensajeCuentaDividida } from '../personas/textos';
 import { GrupoChips, type OpcionChip } from './Chip';
 import { MENSAJE_ERROR_GENERAL, NOMBRE_TIPO, type TipoMovimiento } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
-const TIPOS: readonly TipoMovimiento[] = [
+/** El formulario agrega "Cuenta dividida" (`02 §17`), que tiene su propio formulario con contactos. */
+type TipoFormulario = TipoMovimiento | 'cuenta_dividida';
+
+const TIPOS: readonly TipoFormulario[] = [
   'gasto',
   'ingreso',
   'transferencia',
@@ -26,7 +31,13 @@ const TIPOS: readonly TipoMovimiento[] = [
   'prestamo_recibido',
   'cobro_prestamo',
   'pago_prestamo',
+  'cuenta_dividida',
 ];
+
+const NOMBRE_TIPO_FORMULARIO: Record<TipoFormulario, string> = {
+  ...NOMBRE_TIPO,
+  cuenta_dividida: 'Cuenta dividida',
+};
 
 type Cuenta = { id: string; nombre: string; clase: 'efectivo' | 'liquida' | 'tarjeta' };
 
@@ -91,7 +102,8 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
   const categoriasGasto = useVista((c) => listarCategorias(c, 'gasto'));
   const categoriasIngreso = useVista((c) => listarCategorias(c, 'ingreso'));
 
-  const [tipo, setTipo] = useState<TipoMovimiento>('gasto');
+  const [tipoElegido, setTipo] = useState<TipoFormulario>('gasto');
+  const tipo: TipoMovimiento = tipoElegido === 'cuenta_dividida' ? 'gasto' : tipoElegido;
   const [monto, setMonto] = useState<Centavos | null>(null);
   const [descripcion, setDescripcion] = useState('');
   const [categoria, setCategoria] = useState<string | null>(null);
@@ -120,7 +132,7 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
     campos.categoria === 'gasto' ? categoriasGasto : campos.categoria === 'ingreso' ? categoriasIngreso : [];
   const origenEsTarjeta = cuentas.find((c) => c.id === origenId)?.clase === 'tarjeta';
 
-  const cambiarTipo = (t: TipoMovimiento) => {
+  const cambiarTipo = (t: TipoFormulario) => {
     setTipo(t);
     setCategoria(null);
     setOrigenId(null);
@@ -187,106 +199,132 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
       <View style={{ gap: espacio.xs }}>
         <Texto variante="etiqueta">¿Qué pasó?</Texto>
         <GrupoChips
-          opciones={TIPOS.map((t) => ({ valor: t, etiqueta: NOMBRE_TIPO[t] }))}
-          valor={tipo}
+          opciones={TIPOS.map((t) => ({ valor: t, etiqueta: NOMBRE_TIPO_FORMULARIO[t] }))}
+          valor={tipoElegido}
           alCambiar={cambiarTipo}
           prefijoTestID="tipo"
         />
       </View>
-      <CampoMonto
-        key={`monto-${clave}`}
-        etiqueta="¿Cuánto?"
-        alCambiar={setMonto}
-        error={intentado && (monto === null || monto <= 0) ? 'Escribe un monto mayor a $0.' : null}
-        testID="campo-monto"
-      />
-      <CampoTexto
-        etiqueta="¿En qué? (opcional)"
-        valor={descripcion}
-        alCambiar={setDescripcion}
-        ejemplo="tacos"
-        testID="campo-descripcion"
-      />
-      {campos.categoria ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto variante="etiqueta">Categoría</Texto>
-          <GrupoChips
-            opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
-            valor={categoria}
-            alCambiar={setCategoria}
-            prefijoTestID="categoria"
-          />
-        </View>
-      ) : null}
-      {campos.persona ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto variante="etiqueta">{campos.persona}</Texto>
-          <GrupoChips
-            opciones={personas.map((p) => ({ valor: p.cuentaId, etiqueta: p.nombre }))}
-            valor={personaId}
-            alCambiar={setPersonaId}
-            prefijoTestID="persona"
-          />
-          <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'flex-end' }}>
-            <View style={{ flex: 1 }}>
-              <CampoTexto
-                etiqueta="Agregar persona"
-                valor={nuevaPersona}
-                alCambiar={setNuevaPersona}
-                ejemplo="Mi jefa"
-                alEnviar={agregarPersona}
-                testID="campo-nueva-persona"
-              />
-            </View>
-            <Boton
-              etiqueta="Agregar"
-              variante="secundario"
-              ancho="contenido"
-              alPresionar={agregarPersona}
-              deshabilitado={nuevaPersona.trim() === ''}
-              testID="boton-agregar-persona"
-            />
-          </View>
-        </View>
-      ) : null}
-      {campos.origen ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto variante="etiqueta">{campos.origen.pregunta}</Texto>
-          <GrupoChips
-            opciones={opciones(campos.origen.clases)}
-            valor={origenId}
-            alCambiar={setOrigenId}
-            prefijoTestID="origen"
-          />
-        </View>
-      ) : null}
-      {tipo === 'retiro_efectivo' && origenEsTarjeta ? (
-        <Texto variante="secundario" tono="faltante">
-          Sacar efectivo con tarjeta de crédito suele cobrar comisión e intereses desde el primer día.
-        </Texto>
-      ) : null}
-      {campos.destino ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto variante="etiqueta">{campos.destino.pregunta}</Texto>
-          <GrupoChips
-            opciones={opciones(campos.destino.clases)}
-            valor={destinoId}
-            alCambiar={setDestinoId}
-            prefijoTestID="destino"
-          />
-        </View>
-      ) : null}
-      {intentado && pendiente ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
-          {pendiente}
-        </Texto>
-      ) : null}
-      {error ? (
-        <Texto variante="secundario" tono="faltante">
-          {error}
-        </Texto>
-      ) : null}
-      <Boton etiqueta="Guardar" alPresionar={guardar} testID="boton-guardar-movimiento" />
+      {tipoElegido === 'cuenta_dividida' ? (
+        <FormularioCuentaDividida
+          key={`division-${clave}`}
+          alGuardar={(r) => {
+            registrarEvento({
+              nombre: 'movimiento_registrado',
+              propiedades: { origen: 'formulario', pregunto: false, espacio: 'personal' },
+            });
+            avisarRegistro(
+              mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
+              r.deshacer,
+            );
+            setClave((k) => k + 1);
+            alGuardar?.();
+          }}
+        />
+      ) : (
+        camposDelTipo()
+      )}
     </View>
   );
+
+  function camposDelTipo() {
+    return (
+      <>
+        <CampoMonto
+          key={`monto-${clave}`}
+          etiqueta="¿Cuánto?"
+          alCambiar={setMonto}
+          error={intentado && (monto === null || monto <= 0) ? 'Escribe un monto mayor a $0.' : null}
+          testID="campo-monto"
+        />
+        <CampoTexto
+          etiqueta="¿En qué? (opcional)"
+          valor={descripcion}
+          alCambiar={setDescripcion}
+          ejemplo="tacos"
+          testID="campo-descripcion"
+        />
+        {campos.categoria ? (
+          <View style={{ gap: espacio.xs }}>
+            <Texto variante="etiqueta">Categoría</Texto>
+            <GrupoChips
+              opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
+              valor={categoria}
+              alCambiar={setCategoria}
+              prefijoTestID="categoria"
+            />
+          </View>
+        ) : null}
+        {campos.persona ? (
+          <View style={{ gap: espacio.xs }}>
+            <Texto variante="etiqueta">{campos.persona}</Texto>
+            <GrupoChips
+              opciones={personas.map((p) => ({ valor: p.cuentaId, etiqueta: p.nombre }))}
+              valor={personaId}
+              alCambiar={setPersonaId}
+              prefijoTestID="persona"
+            />
+            <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'flex-end' }}>
+              <View style={{ flex: 1 }}>
+                <CampoTexto
+                  etiqueta="Agregar persona"
+                  valor={nuevaPersona}
+                  alCambiar={setNuevaPersona}
+                  ejemplo="Mi jefa"
+                  alEnviar={agregarPersona}
+                  testID="campo-nueva-persona"
+                />
+              </View>
+              <Boton
+                etiqueta="Agregar"
+                variante="secundario"
+                ancho="contenido"
+                alPresionar={agregarPersona}
+                deshabilitado={nuevaPersona.trim() === ''}
+                testID="boton-agregar-persona"
+              />
+            </View>
+          </View>
+        ) : null}
+        {campos.origen ? (
+          <View style={{ gap: espacio.xs }}>
+            <Texto variante="etiqueta">{campos.origen.pregunta}</Texto>
+            <GrupoChips
+              opciones={opciones(campos.origen.clases)}
+              valor={origenId}
+              alCambiar={setOrigenId}
+              prefijoTestID="origen"
+            />
+          </View>
+        ) : null}
+        {tipo === 'retiro_efectivo' && origenEsTarjeta ? (
+          <Texto variante="secundario" tono="faltante">
+            Sacar efectivo con tarjeta de crédito suele cobrar comisión e intereses desde el primer día.
+          </Texto>
+        ) : null}
+        {campos.destino ? (
+          <View style={{ gap: espacio.xs }}>
+            <Texto variante="etiqueta">{campos.destino.pregunta}</Texto>
+            <GrupoChips
+              opciones={opciones(campos.destino.clases)}
+              valor={destinoId}
+              alCambiar={setDestinoId}
+              prefijoTestID="destino"
+            />
+          </View>
+        ) : null}
+        {intentado && pendiente ? (
+          <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+            {pendiente}
+          </Texto>
+        ) : null}
+        {error ? (
+          <Texto variante="secundario" tono="faltante">
+            {error}
+          </Texto>
+        ) : null}
+        <Boton etiqueta="Guardar" alPresionar={guardar} testID="boton-guardar-movimiento" />
+      </>
+    );
+  }
 }

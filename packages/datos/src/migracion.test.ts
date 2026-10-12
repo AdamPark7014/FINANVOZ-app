@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { ErrorDominio } from '@cartera/core';
 import { abrirBase, C, migrar } from './__pruebas__/base';
-import { TABLAS_0001 } from './esquema';
+import { TABLAS_0001, TABLAS_0002 } from './esquema';
 import {
   CATEGORIAS_GASTO_FIJO,
   CATEGORIAS_GASTO_VARIABLE,
@@ -14,7 +14,8 @@ import {
 } from './semillas';
 import { construirGasto } from '@cartera/core';
 
-const TABLAS = Object.keys(TABLAS_0001).sort();
+const TODAS = { ...TABLAS_0001, ...TABLAS_0002 };
+const TABLAS = Object.keys(TODAS).sort();
 
 function codigo(f: () => unknown): string | undefined {
   try {
@@ -76,7 +77,7 @@ describe('CA-M1-03 · migración 0001_inicial', () => {
 
   it('el esquema Drizzle declara exactamente las columnas del SQL', () => {
     const { cliente } = abrirBase({ vacia: true });
-    for (const [nombre, tabla] of Object.entries(TABLAS_0001)) {
+    for (const [nombre, tabla] of Object.entries(TODAS)) {
       const sqlCols = (cliente.prepare(`PRAGMA table_info(${nombre})`).all() as { name: string }[])
         .map((c) => c.name)
         .sort();
@@ -234,5 +235,49 @@ describe('CA-M1-03 · inmutabilidad por trigger o CHECK', () => {
     expect(vigentes()).toEqual([tx.id]);
     libro.anular(tx.id);
     expect(vigentes()).toEqual([]);
+  });
+});
+
+describe('M8 · migración 0002_tandas', () => {
+  function conTanda() {
+    const base = abrirBase();
+    base.cliente
+      .prepare(
+        `INSERT INTO programado (id, tipo, concepto, monto, regla, desde, hasta)
+         VALUES ('p1', 'egreso', 'Tanda', 50000, '{"tipo":"semanal","dia_semana":5}', '2026-10-16', '2026-12-18')`,
+      )
+      .run();
+    const insertar = (
+      id: string,
+      extra: { participantes?: number; turno?: number; aportacion?: number } = {},
+    ) =>
+      base.cliente
+        .prepare(
+          `INSERT INTO tanda (id, cuenta_id, nombre, aportacion, participantes, turno, regla, inicio, programado_id)
+           VALUES (?, ?, 'Tanda', ?, ?, ?, '{"tipo":"semanal","dia_semana":5}', '2026-10-16', 'p1')`,
+        )
+        .run(id, C.tanda, extra.aportacion ?? 50000, extra.participantes ?? 10, extra.turno ?? 4);
+    return { ...base, insertar };
+  }
+
+  it('crea la tabla tanda con su cuenta y su programado; activa por omisión', () => {
+    const { cliente, insertar } = conTanda();
+    insertar('t1');
+    expect(cliente.prepare('SELECT activa FROM tanda WHERE id = ?').get('t1')).toEqual({ activa: 1 });
+  });
+
+  it('CHECK: aportación > 0, 2–50 participantes y turno dentro de los participantes', () => {
+    const { insertar } = conTanda();
+    expect(() => insertar('a', { aportacion: 0 })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar('b', { participantes: 1, turno: 1 })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar('c', { participantes: 51 })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar('d', { participantes: 5, turno: 6 })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar('e', { turno: 0 })).toThrow(/CHECK constraint failed/);
+  });
+
+  it('una cuenta y un programado pertenecen a una sola tanda', () => {
+    const { insertar } = conTanda();
+    insertar('t1');
+    expect(() => insertar('t2')).toThrow(/UNIQUE constraint failed/);
   });
 });

@@ -32,6 +32,12 @@ import {
   type CompromisoConfigurado,
   type ResumenTransaccion,
 } from './correcciones';
+import {
+  registrarCuentaDividida,
+  resolverParticipantes,
+  type CuentaDivididaRegistrada,
+  type EntradaCuentaDividida,
+} from './cuenta-dividida';
 import { registrarMovimiento, type EntradaMovimiento } from './formulario';
 import {
   pasarAMeses,
@@ -45,6 +51,14 @@ import type { MovimientoVista } from './movimientos';
 import { contextoNube, type NivelNube } from './nube';
 import { contactosInterprete } from './personas';
 import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './preferencias';
+import {
+  aportarTanda,
+  cobrarTanda,
+  proponerTandaPorVoz,
+  tandaUnica,
+  type MovimientoTanda,
+  type PropuestaTanda,
+} from './tandas';
 
 /** Tope del registro optimista (`06 §7`): suma de montos ≤ $5,000. */
 export const TOPE_OPTIMISTA: Centavos = 500_000;
@@ -71,6 +85,26 @@ export interface PropuestaCompraMsi {
   readonly entrada: Omit<EntradaCompraMsi, 'tarjetaId'> & { readonly tarjetaId?: string };
   /** Si falta, las tarjetas de crédito candidatas. */
   readonly faltaTarjeta: Omit<CuentaPorElegir, 'campo'> | null;
+}
+
+/**
+ * Cuenta dividida dictada (`02 §17`): siempre se confirma, con chips de contactos para cada parte ("¿Con
+ * quién?"). Los nombres dichos que coinciden con un contacto ya vienen elegidos.
+ */
+export interface PropuestaCuentaDividida {
+  readonly total: Centavos;
+  /** Partes contándote a ti; `null` si no lo dijo. */
+  readonly partes: number | null;
+  readonly categoria: string;
+  readonly fecha: PlainDate;
+  readonly descripcion: string | null;
+  /** Con qué pagaste (o la cuenta puente "por asignar"); `null` si falta elegirla. */
+  readonly origenId: string | null;
+  readonly faltaOrigen: Omit<CuentaPorElegir, 'campo'> | null;
+  /** Contactos reconocidos entre los nombres dichos. */
+  readonly personaIds: readonly string[];
+  /** Nombres dichos que no son de ningún contacto (o de varios): "¿Lo agrego?". */
+  readonly sinResolver: readonly string[];
 }
 
 /** Cuenta que falta elegir en la tarjeta de confirmación. */
@@ -150,6 +184,15 @@ export type ResultadoTexto =
       readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado';
       readonly propuesta: PropuestaCompraMsi;
     }
+  /** Cuenta dividida dictada: "Guardar" llama `confirmarCuentaDividida` (CA-M8-01). */
+  | { readonly resultado: 'confirmar_division'; readonly propuesta: PropuestaCuentaDividida }
+  | {
+      readonly resultado: 'registrado_division';
+      readonly registro: CuentaDivididaRegistrada;
+      readonly total: Centavos;
+      readonly descripcion: string | null;
+      readonly deshacer: string;
+    }
   /** "Mi Nu corta el 28 y pago el 18" sobre una tarjeta existente. */
   | {
       readonly resultado: 'tarjeta_configurada';
@@ -175,6 +218,14 @@ export type ResultadoTexto =
   | { readonly resultado: 'no_encontrado'; readonly accion: AccionElegir | 'duplicados' }
   | { readonly resultado: 'duplicados'; readonly grupos: readonly (readonly MovimientoVista[])[] }
   | { readonly resultado: 'configurado'; readonly compromiso: CompromisoConfigurado }
+  /** TK01 "entré a una tanda…": formulario prellenado con el calendario de E11; "Guardar" llama `crearTanda`. */
+  | { readonly resultado: 'tanda_por_crear'; readonly propuesta: PropuestaTanda }
+  /** "Di mi tanda" / "me tocó la tanda" (TK02) con una sola tanda activa: ni gasto ni ingreso. */
+  | {
+      readonly resultado: 'registrado_tanda';
+      readonly tipo: 'aportacion_tanda' | 'cobro_tanda';
+      readonly movimiento: MovimientoTanda;
+    }
   | {
       readonly resultado: 'aclarar';
       readonly motivo: Extract<Interpretacion, { intencion: 'aclarar' }>['motivo'];
@@ -194,6 +245,8 @@ export type ResultadoTexto =
 const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'registrado',
   'registrado_msi',
+  'registrado_division',
+  'registrado_tanda',
   'tarjeta_configurada',
   'corregido',
   'anulado',
@@ -411,6 +464,15 @@ function registrarInterpretado(
   cuentas: readonly CuentaResolutor[],
   frase: Frase,
 ): ResultadoTexto | null {
+  const divididas = movimientos.filter((m) => m.tipo === 'cuenta_dividida' || m.division !== undefined);
+  if (divididas.length > 0) {
+    const [unico] = movimientos;
+    // Una cuenta dividida se confirma sola (una frase con varias cosas no se registra por voz).
+    if (movimientos.length > 1 || !unico) return null;
+    return proponerCuentaDividida(ctx, unico, cuentas);
+  }
+  const tanda = registrarTandaInterpretada(ctx, movimientos, cuentas, frase);
+  if (tanda !== undefined) return tanda;
   const msi = movimientos.filter(
     (m) => m.tipo === 'compra_msi' || (m.tipo === 'gasto' && m.msi !== undefined),
   );
@@ -444,6 +506,99 @@ function registrarInterpretado(
     frase.origen,
     frase.fraseId ? { claveBase: `frase:${frase.fraseId}` } : {},
   );
+}
+
+function proponerCuentaDividida(
+  ctx: Contexto,
+  m: Movimiento,
+  cuentas: readonly CuentaResolutor[],
+): ResultadoTexto | null {
+  if ((m.espacio ?? 'personal') !== 'personal' || m.msi || m.contraparte !== undefined) return null;
+  if (m.tipo !== 'cuenta_dividida' && m.tipo !== 'gasto') return null;
+  const r = resolver(m.origen, 'sale', cuentas, true);
+  const aprendida = categoriaAprendida(ctx, null, m.descripcion, 'gasto');
+  let categoria = aprendida ?? m.categoria ?? 'otros_gastos';
+  try {
+    idCategoriaDe(ctx, categoria, 'gasto');
+  } catch {
+    categoria = 'otros_gastos';
+  }
+  const { personaIds, sinResolver } = resolverParticipantes(ctx, m.division?.participantes ?? []);
+  return {
+    resultado: 'confirmar_division',
+    propuesta: {
+      total: m.monto,
+      partes: m.division?.partes ?? null,
+      categoria,
+      fecha: m.fecha,
+      descripcion: m.descripcion ?? null,
+      origenId: 'id' in r ? r.id : null,
+      faltaOrigen: 'id' in r ? null : r.falta,
+      personaIds,
+      sinResolver,
+    },
+  };
+}
+
+/**
+ * "Guardar" de la confirmación de una cuenta dividida dictada (o del formulario): tu parte a gasto y cada amigo
+ * en "Te deben" (CA-M8-01). Devuelve el token de Deshacer. El alias de una cuenta que no se reconoció se aprende.
+ */
+export function confirmarCuentaDividida(
+  ctx: Contexto,
+  entrada: EntradaCuentaDividida,
+  origen: OrigenDictado | 'manual',
+  opciones: { claveIdempotencia?: string; aprender?: { alias: string } } = {},
+): Extract<ResultadoTexto, { resultado: 'registrado_division' }> {
+  exigirConsentimiento(ctx);
+  return enTransaccion(ctx, () => {
+    const registro = registrarCuentaDividida(ctx, entrada, {
+      origen,
+      ...(opciones.claveIdempotencia ? { claveIdempotencia: opciones.claveIdempotencia } : {}),
+    });
+    if (opciones.aprender) aprenderAlias(ctx, opciones.aprender.alias, entrada.origenId);
+    return {
+      resultado: 'registrado_division',
+      registro,
+      total: entrada.total,
+      descripcion: entrada.descripcion?.trim() || null,
+      deshacer: registro.deshacer,
+    };
+  });
+}
+
+/**
+ * Aportación o cobro de tanda dictados (`06 §3`, TK02): con una sola tanda activa, cuenta resuelta y sin
+ * confirmación pendiente (`06 §7`) se registra directo; si no, `null` (va al formulario). `undefined` si la frase
+ * no habla de tandas.
+ */
+function registrarTandaInterpretada(
+  ctx: Contexto,
+  movimientos: readonly Movimiento[],
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto | null | undefined {
+  if (!movimientos.some((m) => m.tipo === 'aportacion_tanda' || m.tipo === 'cobro_tanda')) return undefined;
+  const [m] = movimientos;
+  if (movimientos.length !== 1 || !m || (m.espacio ?? 'personal') !== 'personal') return null;
+  if (m.tipo !== 'aportacion_tanda' && m.tipo !== 'cobro_tanda') return null;
+  if (m.aproximado || m.monto > TOPE_OPTIMISTA) return null;
+  const tandaId = tandaUnica(ctx);
+  if (!tandaId) return null;
+  const esCobro = m.tipo === 'cobro_tanda';
+  const r = resolver(esCobro ? m.destino : m.origen, esCobro ? 'entra' : 'sale', cuentas, true);
+  if (!('id' in r)) return null;
+  const comunes = {
+    tandaId,
+    cuentaId: r.id,
+    monto: m.monto,
+    origen: frase.origen,
+    ...(frase.fraseId ? { claveIdempotencia: `frase:${frase.fraseId}:0` } : {}),
+  };
+  const movimiento = esCobro
+    ? cobrarTanda(ctx, { ...comunes, fecha: m.fecha })
+    : aportarTanda(ctx, { ...comunes, fechaPago: m.fecha });
+  return { resultado: 'registrado_tanda', tipo: m.tipo, movimiento };
 }
 
 function registrarMsiInterpretado(
@@ -672,6 +827,12 @@ function aplicarInterpretacion(
       if (i.ajuste.tipo === 'tarjeta_ciclo') {
         const r = configurarCicloPorVoz(ctx, i.ajuste);
         return r.resultado === 'tarjeta_configurada' ? { ...r, deshacer: r.editada.deshacer } : r;
+      }
+      if (i.ajuste.tipo === 'tanda') {
+        const propuesta = proponerTandaPorVoz(ctx, i.ajuste, frase.fecha);
+        return propuesta
+          ? { resultado: 'tanda_por_crear', propuesta }
+          : { resultado: 'no_soportado', motivo: 'ajuste' };
       }
       if (i.ajuste.tipo !== 'compromiso') return { resultado: 'no_soportado', motivo: 'ajuste' };
       try {
