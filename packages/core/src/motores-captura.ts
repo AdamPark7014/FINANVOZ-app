@@ -43,6 +43,7 @@ export {
   type ResultadoCategoria,
 } from './captura/categorizar';
 export {
+  CATALOGO_SUSCRIPCIONES,
   detectarSuscripciones,
   resumenActivas,
   VENTANA_SUSCRIPCIONES_DIAS,

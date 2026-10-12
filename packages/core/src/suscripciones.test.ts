@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { cargarVectores } from './__pruebas__/vectores';
 import {
+  CATALOGO_SUSCRIPCIONES,
   detectarSuscripciones,
   resumenActivas,
   type GastoSuscripcion,
@@ -89,6 +90,15 @@ describe('E14 detección de suscripciones', () => {
     const b = detectarSuscripciones([...v.gastos].reverse(), v.hoy, v.catalogo);
     expect(v.gastos).toEqual(copia);
     expect(b).toEqual(a);
+  });
+
+  it('el catálogo semilla de suscripciones sale de comercios_mx.json e incluye ICLOUD (E14-02)', () => {
+    expect(CATALOGO_SUSCRIPCIONES).toEqual(
+      expect.arrayContaining(['NETFLIX', 'SPOTIFY', 'DISNEY', 'ICLOUD', 'PRIME VIDEO']),
+    );
+    const v = porId('E14-02');
+    const r = detectarSuscripciones(v.gastos, v.hoy, CATALOGO_SUSCRIPCIONES);
+    expect(r.map(sinRegla)).toEqual(v.esperado);
   });
 
   it('resumen vacío sin activas', () => {

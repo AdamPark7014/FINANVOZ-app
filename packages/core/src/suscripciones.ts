@@ -1,4 +1,5 @@
 /** E14 · Detección de suscripciones (`docs/05-MOTORES.md §E14`). Puro: recibe `hoy`, nunca lee el reloj. */
+import { CATALOGO_SEMILLA } from './captura/categorizar';
 import type { Centavos } from './dinero';
 import { normalizarComercio } from './comercios';
 import { conDia, diaSemana, diferenciaDias, partes, sumarDias, type PlainDate } from './fecha';
@@ -26,6 +27,14 @@ export const VENTANA_SUSCRIPCIONES_DIAS = 400;
 const ANCLAS = 3;
 /** Con el comercio en el catálogo semilla de suscripciones bastan 2 cargos mensuales (E14-02). */
 const CARGOS_MINIMOS_CATALOGO = 2;
+
+/**
+ * Catálogo semilla de suscripciones: los prefijos de la categoría `suscripciones` de `comercios_mx.json`
+ * (`07 §6`), ya normalizados. E14 compara el comercio normalizado exacto (como el oráculo).
+ */
+export const CATALOGO_SUSCRIPCIONES: readonly string[] = CATALOGO_SEMILLA.filter(
+  (e) => e.categoria === 'suscripciones',
+).map((e) => e.prefijo);
 
 /** Gasto vigente (no anulado) con su comercio tal como se capturó. */
 export interface GastoSuscripcion {
