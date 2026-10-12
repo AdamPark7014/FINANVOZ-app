@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código fusionado; falta publicar (pendientes 11 y 12). M1 avanza en paralelo porque lo que falta de M0 es solo externo |
 | M1 · Núcleo | Cerrado | 2026-10-12 | 2026-10-12 | Todos los criterios verificados; PR #4 fusionado |
-| M2 · App base sin conexión | En curso | 2026-10-12 | | Sobre main con M1 fusionado |
+| M2 · App base sin conexión | En curso | 2026-10-12 | | Código completo y probado en Node/jest; cierra con las pruebas en el teléfono (pendiente 13) |
 | M3 · Intérprete en la nube | Pendiente | | | |
 | M4 · Tarjetas, MSI y compromisos | Pendiente | | | |
 | M5 · Captura Android y arqueo | Pendiente | | | |
@@ -114,6 +114,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 10 | Especificación | Cuentas de servicios: Supabase, Expo/EAS, Google Play Console, RevenueCat, Sentry, PostHog, proveedores de LLM; Apple Developer en M14 | Adam | Según el hito que los pida |
 | 11 | M0 | Crear el proyecto de Supabase y desplegar `lista-espera` (pasos en `services/proxy/README.md`) | Adam | M0 |
 | 12 | M0 | Comprar `finanvoz.com` en Cloudflare, crear el proyecto de Pages `finanvoz`, y en GitHub (entorno `produccion`) poner los secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` y las variables `VITE_LISTA_ESPERA_URL` y `VITE_RESPONSABLE_*`; después correr "Publicar calculadora" | Adam | M0, antes del 6 nov |
+| 13 | M2 | Pruebas en el teléfono: build de desarrollo (`pnpm --filter movil android` o EAS), correr Maestro del onboarding y cronometrarlo, abrir la base con `sqlite3` sin llave, biometría y multitarea, definir teléfono de referencia y medir arranque, E4 y nivel 0 (RNF-01) | Adam (con su Android) + Claude por Remote Control | M2 |
 
 ## Verificación por hito
 
@@ -145,6 +146,25 @@ Plan: E1 completo → en paralelo E3/E4/E7, E5/E6/E11/E12, E9 + plantillas + cat
 | CA-M1-06 | `packages/nlu`: los 144 `esperado` validan con Zod y con `esquema.json` (ajv); 36 casos inválidos rechazados por ambos | Cumple |
 | CA-M1-07 | `packages/core/src/captura/*.test.ts`: 12/12 ejemplos personales y 2/2 de negocio; OXXO GAS → gasolina, UBER EATS → comida_fuera | Cumple |
 | CA-M1-08 | `pnpm cobertura:core`: líneas 96.4 % (CI exige ≥ 90 %) | Cumple |
+
+### M2
+
+Plan: esqueleto Expo SDK 57 → en paralelo base cifrada + servicios (Node, better-sqlite3) y diseño, voz, bloqueo y Sentry → en paralelo raíz + onboarding + ajustes y Hoy + registrar + Movimientos + Cuentas → CI con jest-expo y bundle Android de Metro. Lo que solo se comprueba en el teléfono queda en el pendiente 13.
+
+| Criterio | Cómo se verificó | Resultado |
+|---|---|---|
+| CA-M2-01 | `src/pantallas/onboarding/onboarding.test.tsx` recorre O1–O7 con las rutas reales y termina en `/hoy`; flujo de Maestro en `apps/movil/.maestro/onboarding.yaml` | Cumple en pruebas; falta correr Maestro en el emulador y cronometrar (pendiente 13) |
+| CA-M2-02 | `src/servicios/registrar.test.ts` y `src/pantallas/principal/principal.test.tsx` ("coca 25 en efectivo" → −$25, Deshacer restaura; también por voz con motor falso) | Cumple en pruebas; el modo avión se confirma en el teléfono (el registro no usa red) |
+| CA-M2-03 | `src/servicios/hoy.test.ts` y `principal.test.tsx` con la semilla `e4-01`: "$214", "4 días para tu quincena (jue 15)" y desglose de E4-01 | Cumple |
+| CA-M2-04 | `src/privacidad/exportar.test.ts` (JSON con todas las tablas, CSV) y borrar todo (llave nueva, sin datos); `ajustes.test.tsx` (compartir y BORRAR) | Cumple en pruebas; abrir el archivo con `sqlite3` sin llave se comprueba en el teléfono (pendiente 13) |
+| CA-M2-05 | `src/privacidad/consentimiento.test.ts` y `onboarding.test.tsx` (ninguna fila cambia antes de aceptar; evidencia guardada) | Cumple |
+| CA-M2-06 | `src/observabilidad/sentry.test.ts` (Vitest) y la prueba de jest con el SDK real y transporte interceptado | Cumple |
+| CA-M2-07 | — | Pendiente: teléfono de referencia y mediciones (pendiente 13) |
+| CA-M2-08 | `hoy.test.ts` y `principal.test.tsx` con reloj en el 15 oct: día de pago $456 (E4-05); "Sí, ya llegó" → horizonte al vie 30 | Cumple |
+| CA-M2-09 | `hoy.test.ts` y `principal.test.tsx`: $214 con el préstamo apartado (E4-09); al apagar el interruptor sube | Cumple |
+| CA-M2-10 | `principal.test.tsx` y servicios de ocurrencias: Todavía no / Ya la pagué / Ya no aplica | Cumple |
+| CA-M2-11 | `src/seguridad/*.test.ts(x)`: regla de ≥ 1 min con reloj inyectado, cortina y `FLAG_SECURE` con módulos falsos | Cumple en pruebas; biometría y vista previa en blanco se comprueban en el teléfono (pendiente 13) |
+| CA-M2-12 | `src/servicios/onboarding.test.ts` y `onboarding.test.tsx`: "No sé" no resta del saldo y el aviso sale una vez | Cumple |
 
 <!-- Copiar la tabla para cada hito al iniciarlo, con una fila por criterio CA-Mx-NN. -->
 
