@@ -15,7 +15,7 @@ export const INCLUYE_PLUS = [
   '«¿Me alcanza?»: compara pagar de contado, a meses o esperar',
   'Tarjeta del día: con cuál te conviene pagar hoy',
   'Tus meses sin intereses de los próximos 12 meses',
-  'Respuestas a tus preguntas: cuánto llevas gastado, cuánto debes, qué pagos vienen',
+  'Respuestas a tus preguntas: cuánto llevas gastado, cuánto debes, qué pagos vienen y por qué te alcanzó menos',
   `${INTERPRETACIONES_NUBE_MES.plus} frases al mes interpretadas en internet (en Gratis, ${INTERPRETACIONES_NUBE_MES.gratis})`,
 ] as const;
 
