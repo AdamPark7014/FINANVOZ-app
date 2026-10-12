@@ -15,6 +15,7 @@ import {
 import { TarjetaPreguntaCaptura } from '../captura/PreguntasCaptura';
 import { TarjetaArqueo, TarjetaCapturaInactiva } from '../captura/TarjetasCaptura';
 import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
+import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
@@ -53,6 +54,9 @@ export function TarjetasAccion({
           case 'compromiso_vencido':
           case 'ingreso_no_llego':
             return <TarjetaOcurrencia key={`${t.programadoId}:${t.fecha}`} t={t} testID={testID} />;
+          case 'tanda_aportacion':
+          case 'tanda_cobro':
+            return <TarjetaDeTanda key={`${t.tipo}:${t.tandaId}:${t.fecha}`} t={t} testID={testID} />;
           case 'arqueo':
             return (
               <TarjetaArqueo

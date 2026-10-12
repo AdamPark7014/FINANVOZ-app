@@ -165,6 +165,8 @@ function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidenci
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
+          <Stack.Screen name="tandas/index" />
+          <Stack.Screen name="tandas/[id]" />
           <Stack.Screen name="arqueo" />
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="plan" />

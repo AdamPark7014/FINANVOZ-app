@@ -1,0 +1,215 @@
+import { act, fireEvent, screen, within } from '@testing-library/react-native';
+import type { PlainDate, Regla } from '@cartera/core';
+import {
+  aceptarConsentimiento,
+  agregarCuenta,
+  aportarTanda,
+  cobrarTanda,
+  configurarIngreso,
+  crearTanda,
+  detalleTanda,
+  listarOcurrencias,
+  listarTandas,
+} from '../../servicios';
+import { nubeFalsa } from '../../servicios/__pruebas__/nube';
+import { formatearCentavos } from '../../ui';
+import { abrirPruebaPantalla, golden, vector } from '../principal/__pruebas__/base';
+import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
+import { PantallaHoy } from '../principal/PantallaHoy';
+import { PantallaTanda } from './PantallaTanda';
+import { PantallaTandas } from './PantallaTandas';
+
+interface RondaVector {
+  t: number;
+  fecha: PlainDate;
+  en_riesgo: number;
+  aportado: number;
+  por_aportar: number;
+}
+interface VectorE11 {
+  aportacion: number;
+  participantes: number;
+  turno: number;
+  regla: Regla;
+  inicio: PlainDate;
+  hoy?: PlainDate;
+  esperado: unknown;
+}
+
+const textoDe = (testID: string) => {
+  const hijos = screen.getByTestId(testID).props.children as unknown;
+  return Array.isArray(hijos) ? hijos.join('') : String(hijos);
+};
+
+function preparar(hoy: PlainDate) {
+  const p = abrirPruebaPantalla(hoy);
+  aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+  const bbva = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 1_000_000 });
+  const efectivo = agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 100_000 });
+  configurarIngreso(p.ctx, { monto: 1_500_000, regla: { tipo: 'mensual', dia: 1 }, cuentaId: bbva });
+  return { ...p, bbva, efectivo };
+}
+
+const entradaDe = (v: VectorE11) => ({
+  nombre: 'Tanda de la oficina',
+  aportacion: v.aportacion,
+  participantes: v.participantes,
+  turno: v.turno,
+  regla: v.regla,
+  inicio: v.inicio,
+});
+
+describe('Tandas (02 §18)', () => {
+  it('CA-M8-03 · el formulario crea la tanda de E11-01 con su calendario y la ronda 4 como tu turno', () => {
+    const v = vector<VectorE11>('E11-01');
+    const esperado = v.esperado as RondaVector[];
+    const p = preparar('2026-10-16');
+    const alAbrirTanda = jest.fn();
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={alAbrirTanda} />);
+
+    fireEvent.press(screen.getByTestId('tandas-nueva'));
+    fireEvent.changeText(screen.getByTestId('tanda-nombre'), 'Tanda de la oficina');
+    fireEvent.changeText(screen.getByTestId('tanda-aportacion'), '500');
+    fireEvent.press(screen.getByTestId('tanda-frecuencia-semanal'));
+    fireEvent.changeText(screen.getByTestId('tanda-participantes'), '10');
+    fireEvent.changeText(screen.getByTestId('tanda-turno'), '4');
+    // La primera fecha llega prellenada con hoy (vie 16 oct).
+    expect(screen.getByTestId('tanda-inicio').props.value).toBe('16/10/2026');
+    expect(within(screen.getByTestId('tanda-resumen')).getByText(/Cobras \$5,000 el vie 6/)).toBeTruthy();
+    expect(screen.queryByTestId('tanda-ya-empezo')).toBeNull();
+    fireEvent.press(screen.getByTestId('tanda-guardar'));
+
+    const [t] = listarTandas(p.ctx);
+    if (!t) throw new Error('no se guardó la tanda');
+    expect(alAbrirTanda).toHaveBeenCalledWith(t.id);
+    const d = detalleTanda(p.ctx, t.id);
+    expect(d.rondas.map((r) => r.fecha)).toEqual(esperado.map((r) => r.fecha));
+    expect(d.rondas.filter((r) => r.esCobro).map((r) => r.t)).toEqual([4]);
+  });
+
+  it('CA-M8-05 · el detalle muestra el dinero en riesgo de E11-01 después de cada ronda', () => {
+    const v = vector<VectorE11>('E11-01');
+    const esperado = v.esperado as RondaVector[];
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    let vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+
+    // Calendario: tu ronda marcada y lo que arriesgas después de cada una (E11-01 `en_riesgo`).
+    expect(screen.getByText('4. vie 6 · tu turno')).toBeTruthy();
+    for (const r of esperado) {
+      expect(textoDe(`tanda-ronda-${r.t}-riesgo`)).toBe(
+        `Después de esta ronda arriesgas ${formatearCentavos(r.en_riesgo)}`,
+      );
+    }
+    expect(textoDe('tanda-en-riesgo')).toBe('Si la tanda se cae, arriesgas $0');
+
+    // Lo mostrado arriba sigue a lo registrado: ronda por ronda, con el cobro en tu turno.
+    for (const r of esperado) {
+      p.reloj.fijar(r.fecha);
+      aportarTanda(p.ctx, { tandaId, fecha: r.fecha });
+      if (r.t === v.turno) cobrarTanda(p.ctx, { tandaId, cuentaId: p.bbva });
+      vista.unmount();
+      vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+      expect(textoDe('tanda-en-riesgo')).toBe(
+        `Si la tanda se cae, arriesgas ${formatearCentavos(r.en_riesgo)}`,
+      );
+      expect(textoDe('tanda-aportado')).toBe(`Llevas ${formatearCentavos(r.aportado)} aportados`);
+      if (r.t >= v.turno) {
+        expect(textoDe('tanda-por-aportar')).toBe(
+          `Te faltan ${formatearCentavos(r.por_aportar)} por aportar`,
+        );
+      }
+    }
+  });
+
+  it('CA-M8-04 · Hoy pregunta "¿Ya diste tu tanda?"; "Ya la di" pide la cuenta y cubre la ronda', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { programadoId } = crearTanda(p.ctx, entradaDe(v));
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+
+    const tarjeta = screen.getByTestId('tarjeta-accion-0');
+    expect(within(tarjeta).getByText('¿Ya diste tu tanda?')).toBeTruthy();
+    fireEvent.press(within(tarjeta).getByTestId('tarjeta-accion-0-ya-la-di'));
+    fireEvent.press(screen.getByTestId(`tarjeta-accion-0-cuenta-${p.efectivo}`));
+    expect(
+      within(screen.getByTestId('aviso')).getByText('Registré: diste tu tanda $500 · Cartera'),
+    ).toBeTruthy();
+    const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
+    expect(ronda?.estado).toBe('cubierta');
+    expect(screen.queryByText('¿Ya diste tu tanda?')).toBeNull();
+  });
+
+  it('CA-M8-04 · en tu turno, "Me tocó la tanda" registra el cobro y avisa que no es ingreso', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-11-06');
+    const { tandaId, cuentaId } = crearTanda(p.ctx, {
+      ...entradaDe(v),
+      aportacionesHechas: 4,
+      yaCobraste: false,
+    });
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    const cobro = screen.getAllByText('Hoy te toca cobrar tu tanda.');
+    expect(cobro).toHaveLength(1);
+    const testID = screen
+      .getAllByTestId(/^tarjeta-accion-\d$/)
+      .find((n) => within(n).queryByText('Hoy te toca cobrar tu tanda.'))?.props.testID as string;
+    fireEvent.press(screen.getByTestId(`${testID}-me-toco`));
+    fireEvent.press(screen.getByTestId(`${testID}-me-toco-cuenta-${p.bbva}`));
+    expect(
+      within(screen.getByTestId('aviso')).getByText(
+        'Registré: cobraste tu tanda $5,000 · BBVA. Esto es tu dinero de vuelta, no un ingreso.',
+      ),
+    ).toBeTruthy();
+    expect(detalleTanda(p.ctx, tandaId).cobrada).toBe(true);
+    expect(p.ctx.libro.saldo(cuentaId)).toBe(200_000 - 500_000);
+  });
+
+  it('CA-M8-06 · con la primera fecha pasada propone "Llevas 6 aportaciones y ya cobraste: te faltan 4 ($2,000)"', () => {
+    const v = vector<VectorE11>('E11-03');
+    const p = preparar(v.hoy as PlainDate);
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} nuevaAlInicio />);
+    fireEvent.changeText(screen.getByTestId('tanda-aportacion'), '500');
+    fireEvent.press(screen.getByTestId('tanda-frecuencia-semanal'));
+    fireEvent.changeText(screen.getByTestId('tanda-participantes'), '10');
+    fireEvent.changeText(screen.getByTestId('tanda-turno'), '4');
+    fireEvent.changeText(screen.getByTestId('tanda-inicio'), '04/09/2026');
+    expect(textoDe('tanda-ya-empezo-texto')).toBe(
+      'Llevas 6 aportaciones y ya cobraste: te faltan 4 ($2,000). Esas rondas no las vuelvo a apartar.',
+    );
+    expect(screen.getByTestId('tanda-hechas').props.value).toBe('6');
+    fireEvent.press(screen.getByTestId('tanda-guardar'));
+    const [t] = listarTandas(p.ctx);
+    if (!t) throw new Error('no se guardó la tanda');
+    expect(t).toMatchObject({ posicion: -200_000, cobrada: true, aportacionesHechas: 6 });
+  });
+
+  it('TK01 · la frase dictada abre el formulario prellenado y "Guardar tanda" la crea', async () => {
+    const p = preparar('2026-10-11');
+    const caso = golden('TK01');
+    const f = nubeFalsa({ [caso.texto]: caso.esperado });
+    renderConSesion(
+      p.ctx,
+      <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
+      f.nube,
+    );
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), caso.texto);
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+    const tarjeta = screen.getByTestId('tanda-por-crear');
+    expect(within(tarjeta).getByTestId('tanda-participantes').props.value).toBe('10');
+    expect(within(tarjeta).getByTestId('tanda-turno').props.value).toBe('4');
+    expect(within(tarjeta).getByTestId('tanda-inicio').props.value).toBe('15/10/2026');
+    expect(listarTandas(p.ctx)).toEqual([]);
+    fireEvent.press(within(tarjeta).getByTestId('tanda-guardar'));
+    const [t] = listarTandas(p.ctx);
+    expect(t).toMatchObject({ aportacion: 50_000, participantes: 10, turno: 4 });
+    expect(
+      within(screen.getByTestId('aviso')).getByText(
+        'Listo: guardé tu tanda. Aparto cada aportación el día que toca.',
+      ),
+    ).toBeTruthy();
+  });
+});

@@ -10,6 +10,7 @@ export default function Cuentas() {
       alAbrirTarjeta={(id) => router.push({ pathname: '/tarjetas/[id]', params: { id } })}
       alAgregarTarjeta={() => router.push('/tarjetas/nueva')}
       alContarEfectivo={(cuentaId) => abrirArqueo(router, { cuentaId })}
+      alAbrirTandas={() => router.push('/tandas')}
     />
   );
 }

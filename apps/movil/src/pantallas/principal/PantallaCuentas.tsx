@@ -38,12 +38,15 @@ export function PantallaCuentas({
   alAbrirTarjeta,
   alAgregarTarjeta,
   alContarEfectivo,
+  alAbrirTandas,
 }: {
   alAbrirAjustes: () => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
   alAgregarTarjeta?: () => void;
   /** Cuentas → Efectivo → arqueo (`02 §7`). */
   alContarEfectivo?: (cuentaId: string) => void;
+  /** Cuentas → Tandas (`02 §18`). */
+  alAbrirTandas?: () => void;
 }) {
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
@@ -139,6 +142,17 @@ export function PantallaCuentas({
           />
         ))}
       </Seccion>
+
+      {alAbrirTandas ? (
+        <Seccion titulo="Tandas" testID="seccion-tandas">
+          <Boton
+            etiqueta="Ver mis tandas"
+            variante="secundario"
+            alPresionar={alAbrirTandas}
+            testID="boton-tandas"
+          />
+        </Seccion>
+      ) : null}
     </Pantalla>
   );
 }

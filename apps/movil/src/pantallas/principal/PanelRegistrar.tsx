@@ -29,6 +29,8 @@ import {
 } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
 import { mensajeLimite } from '../plan/textos';
+import { FormularioTanda } from '../tandas/FormularioTanda';
+import { mensajeAportacion, mensajeCobro } from '../tandas/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
@@ -55,7 +57,14 @@ import { useAvisoRegistro } from './useAvisoRegistro';
 type ConTarjeta = Extract<
   ResultadoTexto,
   {
-    resultado: 'confirmar' | 'elegir' | 'duplicados' | 'aclarar' | 'confirmar_msi' | 'tarjeta_por_agregar';
+    resultado:
+      | 'confirmar'
+      | 'elegir'
+      | 'duplicados'
+      | 'aclarar'
+      | 'confirmar_msi'
+      | 'tarjeta_por_agregar'
+      | 'tanda_por_crear';
   }
 >;
 
@@ -173,6 +182,15 @@ export function PanelRegistrar({
           contarRegistro(origen);
           avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
           return;
+        case 'registrado_tanda':
+          terminarRevision();
+          setTexto('');
+          contarRegistro(origen);
+          avisarRegistro(
+            r.tipo === 'cobro_tanda' ? mensajeCobro(r.movimiento) : mensajeAportacion(r.movimiento),
+            r.movimiento.deshacer,
+          );
+          return;
         case 'tarjeta_configurada':
           terminarRevision();
           setTexto('');
@@ -184,6 +202,7 @@ export function PanelRegistrar({
         case 'aclarar':
         case 'confirmar_msi':
         case 'tarjeta_por_agregar':
+        case 'tanda_por_crear':
           if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
           return;
@@ -345,6 +364,24 @@ export function PanelRegistrar({
               setTarjeta(null);
               setTexto('');
               avisarRegistro('Listo: agregué tu tarjeta.');
+            }}
+            alCancelar={() => setTarjeta(null)}
+          />
+        </Tarjeta>
+      ) : null}
+      {tarjeta?.datos.resultado === 'tanda_por_crear' ? (
+        <Tarjeta testID="tanda-por-crear">
+          <Texto variante="subtitulo">Revisa tu tanda</Texto>
+          <Texto variante="secundario" tono="secundario">
+            Ya puse lo que me dijiste. Corrige la primera fecha si no es la que te dieron.
+          </Texto>
+          <FormularioTanda
+            prellenado={tarjeta.datos.propuesta}
+            alGuardar={() => {
+              terminarRevision();
+              setTarjeta(null);
+              setTexto('');
+              avisarRegistro('Listo: guardé tu tanda. Aparto cada aportación el día que toca.');
             }}
             alCancelar={() => setTarjeta(null)}
           />
