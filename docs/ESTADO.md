@@ -7,8 +7,8 @@
 | Hito | Estado | Inicio | Cierre | Notas |
 |---|---|---|---|---|
 | M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código fusionado; falta publicar (pendientes 11 y 12). M1 avanza en paralelo porque lo que falta de M0 es solo externo |
-| M1 · Núcleo | En curso | 2026-10-12 | | Todos los criterios verificados; cierra al fusionar su PR |
-| M2 · App base sin conexión | En curso | 2026-10-12 | | Se construye sobre la rama de M1 mientras su PR pasa CI |
+| M1 · Núcleo | Cerrado | 2026-10-12 | 2026-10-12 | Todos los criterios verificados; PR #4 fusionado |
+| M2 · App base sin conexión | En curso | 2026-10-12 | | Sobre main con M1 fusionado |
 | M3 · Intérprete en la nube | Pendiente | | | |
 | M4 · Tarjetas, MSI y compromisos | Pendiente | | | |
 | M5 · Captura Android y arqueo | Pendiente | | | |
