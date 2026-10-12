@@ -27,28 +27,52 @@ const TABLAS = [
 export const FORMATO_EXPORTACION = 'finanvoz-exportacion';
 export const VERSION_EXPORTACION = 1;
 
+/** Versión del esquema de la base = migraciones aplicadas (viaja en la exportación y en el respaldo, E16). */
+export function versionEsquema(ctx: Pick<Contexto, 'db'>): number {
+  return Number(
+    ctx.db.get<{ n: number }>(sql.raw('SELECT count(*) AS n FROM "__drizzle_migrations"'))?.n ?? 0,
+  );
+}
+
+/** Fila tal como sale de SQLite: texto, enteros o nulos (la base no tiene columnas BLOB). */
+export type FilaExportada = Record<string, string | number | null>;
+
+export interface DatosExportados {
+  readonly formato: typeof FORMATO_EXPORTACION;
+  readonly version: typeof VERSION_EXPORTACION;
+  readonly version_esquema: number;
+  readonly generado_en: number;
+  readonly fecha: string;
+  readonly montos: 'centavos';
+  readonly tablas: Record<string, FilaExportada[]>;
+}
+
 /**
- * Exportación completa en JSON: todas las filas de todas las tablas tal como están en la base (dinero en
- * centavos, fechas civiles). Se genera en el teléfono y se comparte con la hoja del sistema; nunca pasa por un
- * servidor. Disponible siempre (también en Gratis).
+ * Exportación completa: todas las filas de todas las tablas tal como están en la base (dinero en centavos,
+ * fechas civiles). Es también el contenido del respaldo cifrado (`05 §E16`).
+ */
+export function datosExportacion(ctx: Contexto): DatosExportados {
+  const tablas: Record<string, FilaExportada[]> = {};
+  for (const t of TABLAS) {
+    tablas[t] = ctx.db.all<FilaExportada>(sql.raw(`SELECT * FROM "${t}" ORDER BY rowid`));
+  }
+  return {
+    formato: FORMATO_EXPORTACION,
+    version: VERSION_EXPORTACION,
+    version_esquema: versionEsquema(ctx),
+    generado_en: ctx.reloj.ahora(),
+    fecha: ctx.reloj.hoy(),
+    montos: 'centavos',
+    tablas,
+  };
+}
+
+/**
+ * Exportación completa en JSON legible (derecho de acceso, `04 §6`). Se genera en el teléfono y se comparte con
+ * la hoja del sistema; nunca pasa por un servidor. Disponible siempre (también en Gratis).
  */
 export function exportarJson(ctx: Contexto): string {
-  const tablas: Record<string, unknown[]> = {};
-  for (const t of TABLAS) {
-    tablas[t] = ctx.db.all(sql.raw(`SELECT * FROM "${t}" ORDER BY rowid`));
-  }
-  return JSON.stringify(
-    {
-      formato: FORMATO_EXPORTACION,
-      version: VERSION_EXPORTACION,
-      generado_en: ctx.reloj.ahora(),
-      fecha: ctx.reloj.hoy(),
-      montos: 'centavos',
-      tablas,
-    },
-    null,
-    2,
-  );
+  return JSON.stringify(datosExportacion(ctx), null, 2);
 }
 
 /** `1234567` → `"12345.67"` sin pasar por punto flotante. */

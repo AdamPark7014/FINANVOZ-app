@@ -4,7 +4,10 @@ import { obtenerConsentimiento } from '../../src/servicios';
 import { useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, Texto } from '../../src/ui';
 
-/** O1 · Bienvenida: la promesa en una frase. Si ya aceptó el aviso (volvió a abrir a medias), sigue en O3. */
+/**
+ * O1 · Bienvenida: la promesa en una frase. Si ya aceptó el aviso (volvió a abrir a medias), sigue en O3. Quien
+ * viene de otro teléfono puede restaurar su respaldo (M9).
+ */
 export default function Bienvenida() {
   const router = useRouter();
   const yaAcepto = useVista((ctx) => obtenerConsentimiento(ctx) !== null);
@@ -15,11 +18,20 @@ export default function Bienvenida() {
       titulo="Sabe cada día cuánto puedes gastar"
       ayuda="Sin quedarte corto antes de tu próximo pago. Te toma unos 4 minutos y todo se queda en tu teléfono."
       pie={
-        <Boton
-          testID="onb-empezar"
-          etiqueta={yaAcepto ? 'Continuar' : 'Empezar'}
-          alPresionar={() => router.push(yaAcepto ? '/onboarding/ingreso' : '/onboarding/consentimiento')}
-        />
+        <>
+          <Boton
+            testID="onb-empezar"
+            etiqueta={yaAcepto ? 'Continuar' : 'Empezar'}
+            alPresionar={() => router.push(yaAcepto ? '/onboarding/ingreso' : '/onboarding/consentimiento')}
+          />
+          {/* Teléfono nuevo (`02 §19`): restaurar un respaldo en lugar de empezar de cero. */}
+          <Boton
+            testID="onb-restaurar"
+            variante="texto"
+            etiqueta="¿Vienes de otro teléfono? Restaurar respaldo"
+            alPresionar={() => router.push('/restaurar')}
+          />
+        </>
       }
     >
       <Texto variante="cuerpo">
