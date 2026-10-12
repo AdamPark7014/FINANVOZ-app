@@ -11,7 +11,7 @@
 | M2 · App base sin conexión | En curso | 2026-10-12 | | Código completo y probado en Node/jest; cierra con las pruebas en el teléfono (pendiente 13) |
 | M3 · Intérprete en la nube | En curso | 2026-10-12 | | Código completo; cierra con el benchmark real (pendiente 14) |
 | M4 · Tarjetas, MSI y compromisos | En curso | 2026-10-12 | | Código completo; falta ver los avisos en el teléfono (pendiente 13) |
-| M5 · Captura Android y arqueo | Pendiente | | | |
+| M5 · Captura Android y arqueo | En curso | 2026-10-12 | |
 | M6 · Simulador y ¿Me alcanza? | Pendiente | | | |
 | M7 · Beta cerrada | Pendiente | | | Al cerrar: decidir M11 (`10 §1`) |
 | M8 · Personas y tandas | Pendiente | | | |
