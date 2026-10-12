@@ -12,6 +12,7 @@ import {
   armarZip,
   configFiscalPrueba,
   CONSULTA_MEDICA,
+  CONSULTA_MEDICA_NUBE,
   deduccionE13,
   uuidDe,
 } from '../../servicios/__pruebas__/fiscal';
@@ -203,15 +204,10 @@ describe('Aviso preventivo (02 §24, CA-M12-04)', () => {
     });
   }
 
-  it('registrar "consulta médica de 800 en efectivo" muestra el aviso; otro gasto lo quita', async () => {
+  it('registrar "consulta médica de 800 en efectivo" sin internet muestra el aviso; otro gasto lo quita', async () => {
     const ctx = preparar({ plus: false, config: false });
-    const f = nubeFalsa({ [CONSULTA_MEDICA.texto]: CONSULTA_MEDICA.interpretacion });
-    renderConSesion(
-      ctx,
-      <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
-      f.nube,
-    );
-    await escribir(CONSULTA_MEDICA.texto);
+    renderConSesion(ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    await escribir(CONSULTA_MEDICA);
     const aviso = await screen.findByTestId('aviso-deducible');
     expect(within(aviso).getByText(AVISO_DEDUCIBLE_EFECTIVO)).toHaveTextContent(
       'Si lo pagas con tarjeta o transferencia y pides factura, lo puedes deducir.',
@@ -220,15 +216,15 @@ describe('Aviso preventivo (02 §24, CA-M12-04)', () => {
     expect(screen.queryByTestId('aviso-deducible')).toBeNull();
   });
 
-  it('"Entendido" lo cierra', async () => {
+  it('"Entendido" lo cierra (frase que interpreta la nube)', async () => {
     const ctx = preparar();
-    const f = nubeFalsa({ [CONSULTA_MEDICA.texto]: CONSULTA_MEDICA.interpretacion });
+    const f = nubeFalsa({ [CONSULTA_MEDICA_NUBE.texto]: CONSULTA_MEDICA_NUBE.interpretacion });
     renderConSesion(
       ctx,
       <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
       f.nube,
     );
-    await escribir(CONSULTA_MEDICA.texto);
+    await escribir(CONSULTA_MEDICA_NUBE.texto);
     fireEvent.press(await screen.findByTestId('aviso-deducible-cerrar'));
     expect(screen.queryByTestId('aviso-deducible')).toBeNull();
   });
