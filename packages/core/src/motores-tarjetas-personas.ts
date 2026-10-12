@@ -2,3 +2,4 @@
 export * from './tarjetas';
 export * from './msi';
 export * from './tandas';
+export * from './cuenta-dividida';
