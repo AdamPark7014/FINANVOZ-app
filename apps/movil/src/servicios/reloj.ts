@@ -7,15 +7,27 @@ import type { Reloj } from './contexto';
  * civil local del usuario; toda la lógica de negocio trabaja con `PlainDate`.
  */
 export function relojDispositivo(): Reloj {
-  return {
-    hoy() {
-      const d = new Date();
-      const mes = String(d.getMonth() + 1).padStart(2, '0');
-      const dia = String(d.getDate()).padStart(2, '0');
-      return `${d.getFullYear()}-${mes}-${dia}`;
-    },
-    ahora: () => Date.now(),
+  const fechaLocal = (d: Date): PlainDate => {
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mes}-${dia}`;
   };
+  return {
+    hoy: () => fechaLocal(new Date()),
+    ahora: () => Date.now(),
+    fechaDe: (instante) => fechaLocal(new Date(instante)),
+  };
+}
+
+/** Desfase de la Ciudad de México (UTC−6, sin horario de verano desde 2022), en minutos. */
+export const DESFASE_CDMX_MIN = -360;
+
+/** Fecha civil de un instante con un desfase fijo respecto de UTC (pruebas y semillas). */
+export function fechaConDesfase(instante: number, desfaseMin: number): PlainDate {
+  const d = new Date(instante + desfaseMin * 60_000);
+  const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dia = String(d.getUTCDate()).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${mes}-${dia}`;
 }
 
 /**
@@ -25,13 +37,19 @@ export function relojDispositivo(): Reloj {
 export function relojFijo(
   hoy: PlainDate,
   inicio = 1_790_000_000_000,
-): Reloj & { fijar(fecha: PlainDate): void } {
+  desfaseMin = DESFASE_CDMX_MIN,
+): Reloj & { fijar(fecha: PlainDate): void; fijarInstante(ms: number): void } {
   if (!esFecha(hoy)) throw new ErrorDominio('fecha_invalida', 'fecha inválida');
   let fecha = hoy;
   let instante = inicio;
   return {
     hoy: () => fecha,
     ahora: () => ++instante,
+    fechaDe: (ms) => fechaConDesfase(ms, desfaseMin),
+    fijarInstante(ms) {
+      if (!Number.isSafeInteger(ms)) throw new ErrorDominio('instante_invalido', 'instante inválido');
+      instante = ms;
+    },
     fijar(nueva) {
       if (!esFecha(nueva)) throw new ErrorDominio('fecha_invalida', 'fecha inválida');
       fecha = nueva;

@@ -8,6 +8,11 @@ import { Libro, type BaseDatos } from '@cartera/datos';
 export interface Reloj {
   hoy(): PlainDate;
   ahora(): number;
+  /**
+   * Fecha civil del usuario para un instante en ms UTC (`cuando` de una notificación, M5). Opcional para no
+   * romper relojes armados a mano; sin ella la captura usa `hoy()`.
+   */
+  fechaDe?(instante: number): PlainDate;
 }
 
 /** Todo lo que necesita un caso de uso: base síncrona, libro, reloj y generador de ids. */

@@ -196,6 +196,38 @@ export function cubrirAutomaticamente(ctx: Contexto, transaccionId: string): Cob
   };
 }
 
+/**
+ * Para una entrada capturada (`07 §5`, `transferencia_recibida` (b)): el programado de ingreso pendiente que
+ * E3.5 cubriría con esa entrada (`cubrir`), o `null`. No escribe nada: la captura registra el `ingreso` con la
+ * categoría del programado y después la cobertura automática lo marca.
+ */
+export function ingresoQueCubriria(
+  ctx: Contexto,
+  movimiento: { fecha: PlainDate; monto: Centavos; cuenta: string },
+): { programadoId: string; categoriaCuentaId: string | null } | null {
+  const pendientes = ctx.db
+    .select({ o: ocurrencia, p: programado })
+    .from(ocurrencia)
+    .innerJoin(programado, eq(programado.id, ocurrencia.programadoId))
+    .where(
+      and(
+        eq(ocurrencia.estado, 'pendiente'),
+        eq(programado.activo, 1),
+        eq(programado.espacio, 'personal'),
+        eq(programado.tipo, 'ingreso'),
+      ),
+    )
+    .all();
+  const elegida = elegirOcurrencia(
+    pendientes.map(({ o, p }) => ({ tipo: 'ingreso', fecha: o.fecha, monto: p.monto, cuenta: p.cuentaId })),
+    { sentido: 'entrada', ...movimiento },
+    similitudComercios,
+  );
+  if (elegida?.decision !== 'cubrir') return null;
+  const { p } = pendientes[elegida.indice] as (typeof pendientes)[number];
+  return { programadoId: p.id, categoriaCuentaId: p.categoriaCuentaId };
+}
+
 /** Pregunta de cobertura pendiente (tarjeta de Hoy "¿Este pago de $4,700 fue tu renta?"). */
 export interface PreguntaCoberturaVista {
   readonly programadoId: string;
