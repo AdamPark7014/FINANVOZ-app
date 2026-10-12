@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "advertencia": "Analizadores SINTÉTICOS de estados de cuenta en PDF (docs/07-CAPTURA.md §8): bancos ficticios cuyos PDF genera fixtures/pdf/generar.mjs. No leen estados de cuenta de ningún banco real; solo entran en builds de desarrollo. Las expresiones se aplican al texto ya normalizado (normalizarTextoPdf): renglones sin espacios dobles.",
+  "analizadores": [
+    {
+      "id": "banco_b.estado.v1",
+      "banco": "banco_b",
+      "nombre": "Banco B",
+      "reconocer": "^BANCO B · ESTADO DE CUENTA",
+      "campos": {
+        "ultimos4": "^Tarjeta de crédito terminación (?<v>\\d{4})$",
+        "periodo": "^Periodo: (?<desde>\\d{2}/\\d{2}/\\d{4}) al (?<hasta>\\d{2}/\\d{2}/\\d{4})$",
+        "corte": "^Fecha de corte: (?<v>\\d{2}/\\d{2}/\\d{4})$",
+        "limite": "^Fecha límite de pago: (?<v>\\d{2}/\\d{2}/\\d{4})$",
+        "limite_credito": "^Límite de crédito: (?<v>\\$[\\d,]+\\.\\d{2})$",
+        "saldo_anterior": "^Saldo anterior: (?<v>-?\\$[\\d,]+\\.\\d{2})$",
+        "saldo_corte": "^Saldo al corte: (?<v>-?\\$[\\d,]+\\.\\d{2})$",
+        "pngi": "^Pago para no generar intereses: (?<v>\\$[\\d,]+\\.\\d{2})$",
+        "pago_minimo": "^Pago mínimo: (?<v>\\$[\\d,]+\\.\\d{2})$",
+        "total_cargos": "^Total de cargos: (?<v>\\$[\\d,]+\\.\\d{2})$",
+        "total_abonos": "^Total de abonos: (?<v>-?\\$[\\d,]+\\.\\d{2})$"
+      },
+      "movimientos": {
+        "inicio": "^MOVIMIENTOS DEL PERIODO$",
+        "fin": "^Total de cargos:",
+        "ignorar": [
+          "^FECHA DESCRIPCIÓN IMPORTE$",
+          "^BANCO B · ESTADO DE CUENTA Página \\d+ de \\d+$",
+          "^Tarjeta de crédito terminación \\d{4}$"
+        ],
+        "renglon": "^(?<fecha>\\d{2}/\\d{2}/\\d{4}) (?<descripcion>.+) (?<monto>-?\\$[\\d,]+\\.\\d{2})$"
+      },
+      "msi": {
+        "inicio": "^COMPRAS A MESES SIN INTERESES$",
+        "fin": "^Este documento es sintético",
+        "ignorar": ["^DESCRIPCIÓN ORIGINAL PENDIENTE MENSUALIDAD NÚM\\.$"],
+        "renglon": "^(?<descripcion>.+) (?<original>\\$[\\d,]+\\.\\d{2}) (?<pendiente>\\$[\\d,]+\\.\\d{2}) (?<cuota>\\$[\\d,]+\\.\\d{2}) (?<numero>\\d+) de (?<plazo>\\d+)$"
+      }
+    },
+    {
+      "id": "banco_e.estado.v1",
+      "banco": "banco_e",
+      "nombre": "Banco E",
+      "reconocer": "^Banco E Estado de cuenta mensual$",
+      "campos": {
+        "ultimos4": "^Número de tarjeta: \\*{4} \\*{4} \\*{4} (?<v>\\d{4})$",
+        "periodo": "^Período: del (?<desde>\\d{2}-[a-z]{3}-\\d{4}) al (?<hasta>\\d{2}-[a-z]{3}-\\d{4})$",
+        "corte": "^Fecha de corte (?<v>\\d{2}-[a-z]{3}-\\d{4})$",
+        "limite": "^Fecha límite de pago (?<v>\\d{2}-[a-z]{3}-\\d{4})$",
+        "limite_credito": "^Límite de crédito (?<v>[\\d,]+\\.\\d{2})$",
+        "saldo_anterior": "^Saldo anterior (?<v>[\\d,]+\\.\\d{2}(?: CR)?)$",
+        "saldo_corte": "^Saldo al corte (?<v>[\\d,]+\\.\\d{2}(?: CR)?)$",
+        "pngi": "^Pago para no generar intereses (?<v>[\\d,]+\\.\\d{2})$",
+        "pago_minimo": "^Pago mínimo (?<v>[\\d,]+\\.\\d{2})$",
+        "total_cargos": "^Total cargos (?<v>[\\d,]+\\.\\d{2})$",
+        "total_abonos": "^Total abonos (?<v>[\\d,]+\\.\\d{2})(?: CR)?$"
+      },
+      "movimientos": {
+        "inicio": "^DETALLE DE MOVIMIENTOS$",
+        "fin": "^Total cargos ",
+        "ignorar": ["^Operación Cargo Concepto Importe$"],
+        "renglon": "^(?<fecha>\\d{2}-[a-z]{3}-\\d{4}) \\d{2}-[a-z]{3}-\\d{4} (?<descripcion>.+) (?<monto>[\\d,]+\\.\\d{2})(?<abono> CR)?$"
+      },
+      "msi": {
+        "inicio": "^MESES SIN INTERESES$",
+        "fin": "^Documento sintético",
+        "ignorar": ["^Compra Concepto Original Saldo Pago del mes Pago$"],
+        "renglon": "^\\d{2}-[a-z]{3}-\\d{4} (?<descripcion>.+) (?<original>[\\d,]+\\.\\d{2}) (?<pendiente>[\\d,]+\\.\\d{2}) (?<cuota>[\\d,]+\\.\\d{2}) (?<numero>\\d+)/(?<plazo>\\d+)$"
+      }
+    },
+    {
+      "id": "banco_f.estado.v1",
+      "banco": "banco_f",
+      "nombre": "Banco F",
+      "reconocer": "^BANCO F\\nRESUMEN DE TU TARJETA DE CRÉDITO$",
+      "campos": {
+        "ultimos4": "^Cuenta: (?<v>\\d{4})$",
+        "periodo": "^Periodo facturado: (?<desde>\\d{1,2} de [a-z]+ de \\d{4}) - (?<hasta>\\d{1,2} de [a-z]+ de \\d{4})$",
+        "corte": "^Corte: (?<v>\\d{1,2} de [a-z]+ de \\d{4})$",
+        "limite": "^Paga a más tardar el: (?<v>\\d{1,2} de [a-z]+ de \\d{4})$",
+        "limite_credito": "^Tu límite de crédito (?<v>\\$ [\\d,]+\\.\\d{2})$",
+        "saldo_anterior": "^Adeudo del periodo anterior (?<v>-?\\$ [\\d,]+\\.\\d{2})$",
+        "saldo_corte": "^Saldo total al corte (?<v>-?\\$ [\\d,]+\\.\\d{2})$",
+        "pngi": "^Para no pagar intereses (?<v>\\$ [\\d,]+\\.\\d{2})$",
+        "pago_minimo": "^Pago mínimo (?<v>\\$ [\\d,]+\\.\\d{2})$"
+      },
+      "movimientos": {
+        "inicio": "^TUS MOVIMIENTOS$",
+        "fin": "^TUS MESES SIN INTERESES$",
+        "renglon": "^(?<fecha>\\d{2} [A-Z]{3}) (?<descripcion>.+) (?<monto>-?\\$ [\\d,]+\\.\\d{2})$"
+      },
+      "msi": {
+        "inicio": "^TUS MESES SIN INTERESES$",
+        "fin": "^Banco F · documento sintético",
+        "renglon": "^(?<descripcion>.+) · Mensualidad (?<numero>\\d+) de (?<plazo>\\d+) · (?<cuota>\\$ [\\d,]+\\.\\d{2}) Resta (?<pendiente>\\$ [\\d,]+\\.\\d{2}) de (?<original>\\$ [\\d,]+\\.\\d{2})$"
+      },
+      "tipos": {
+        "pago": "^PAGO DESDE APP$"
+      }
+    }
+  ]
+}

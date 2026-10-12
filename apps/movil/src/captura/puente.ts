@@ -105,6 +105,8 @@ export interface ModuloCapturaNativo {
   diagnosticoBorrar(): Promise<void>;
   /** M10 (`07 §3.1`): bancos de las plantillas remotas verificadas, `{bancos}` en JSON; `null` las quita. */
   fijarCatalogoRemoto?(json: string | null): Promise<number>;
+  /** M15 (`07 §8`): texto de cada página de un PDF (URI compartida o de la caché del selector). */
+  extraerTextoPdf?(uri: string, contrasena: string | null): Promise<unknown>;
   addListener(evento: 'notificacion', oyente: (n: unknown) => void): Suscripcion;
 }
 
@@ -183,6 +185,26 @@ function soloCampos(n: NotificacionCruda): NotificacionCruda {
   };
 }
 
+/**
+ * Texto de un estado de cuenta en PDF, extraído en el teléfono (`EstadoCuentaPdf.kt`). `no_disponible` sin el
+ * módulo (Jest, Expo Go, iOS) o con un build anterior a M15.
+ */
+export type ResultadoExtraccionPdf =
+  | { readonly tipo: 'texto'; readonly paginas: readonly string[] }
+  | { readonly tipo: 'pide_contrasena' }
+  | { readonly tipo: 'contrasena_incorrecta' }
+  | { readonly tipo: 'invalido' }
+  | { readonly tipo: 'demasiado_grande' }
+  | { readonly tipo: 'no_disponible' };
+
+const esquemaExtraccionPdf = z.discriminatedUnion('resultado', [
+  z.object({ resultado: z.literal('texto'), paginas: z.array(z.string()) }),
+  z.object({ resultado: z.literal('pide_contrasena') }),
+  z.object({ resultado: z.literal('contrasena_incorrecta') }),
+  z.object({ resultado: z.literal('invalido') }),
+  z.object({ resultado: z.literal('demasiado_grande') }),
+]);
+
 const DIAGNOSTICO_VACIO: ResumenDiagnostico = {
   activo: false,
   muestras: false,
@@ -233,6 +255,11 @@ export interface PuenteCaptura {
    * `null` vuelve al embebido. `false` sin módulo o con un build anterior a M10.
    */
   fijarCatalogoRemoto(bancos: readonly unknown[] | null): Promise<boolean>;
+  /**
+   * Extrae en el teléfono el texto de un PDF (`07 §8`): nada sale del teléfono. Un error del módulo o una
+   * respuesta con otra forma cuenta como `invalido`. La contraseña no se guarda.
+   */
+  extraerTextoPdf(uri: string, contrasena?: string | null): Promise<ResultadoExtraccionPdf>;
   diagnostico: {
     resumen(): Promise<ResumenDiagnostico>;
     /** `muestras: true` solo funciona en builds de depuración; en otros lanza. */
@@ -340,6 +367,22 @@ export function crearPuente(cargar: () => ModuloCapturaNativo | null): PuenteCap
       return true;
     },
 
+    async extraerTextoPdf(uri, contrasena = null) {
+      const m = modulo();
+      if (!m || typeof m.extraerTextoPdf !== 'function') return { tipo: 'no_disponible' };
+      let crudo: unknown;
+      try {
+        crudo = await m.extraerTextoPdf(uri, contrasena === '' ? null : contrasena);
+      } catch {
+        return { tipo: 'invalido' };
+      }
+      const r = esquemaExtraccionPdf.safeParse(crudo);
+      if (!r.success) return { tipo: 'invalido' };
+      return r.data.resultado === 'texto'
+        ? { tipo: 'texto', paginas: r.data.paginas }
+        : { tipo: r.data.resultado };
+    },
+
     diagnostico: {
       async resumen() {
         const m = modulo();
@@ -378,3 +421,5 @@ export const ultimoEvento = () => puenteCaptura.ultimoEvento();
 export const estadoServicio = () => puenteCaptura.estadoServicio();
 export const solicitarReconexion = () => puenteCaptura.solicitarReconexion();
 export const capturaDisponible = () => puenteCaptura.disponible();
+export const extraerTextoPdf = (uri: string, contrasena?: string | null) =>
+  puenteCaptura.extraerTextoPdf(uri, contrasena);

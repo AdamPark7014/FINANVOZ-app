@@ -75,3 +75,13 @@ export function tarjetaFixture<T = Record<string, unknown>>(id: string): T {
   if (!t) throw new Error(`no existe la tarjeta ${id}`);
   return t as T;
 }
+
+/** Texto que el teléfono extrae de `fixtures/pdf/<banco>.pdf` (lo comprueba `nucleo-jvm`), como una página. */
+export function paginasEstadoCuenta(banco: string): string[] {
+  return [readFileSync(`${FIXTURES}/pdf/${banco}.txt`, 'utf8')];
+}
+
+/** Lo que el analizador debe leer de ese PDF (`fixtures/pdf/<banco>.json`, CA-M15-01). */
+export function estadoCuentaEsperado<T = Record<string, unknown>>(banco: string): T {
+  return JSON.parse(readFileSync(`${FIXTURES}/pdf/${banco}.json`, 'utf8')) as T;
+}

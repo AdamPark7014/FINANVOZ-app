@@ -1,0 +1,103 @@
+{
+  "analizador": "banco_e.estado.v1",
+  "banco": "banco_e",
+  "nombre_banco": "Banco E",
+  "ultimos4": "4410",
+  "periodo": {
+    "desde": "2026-08-29",
+    "hasta": "2026-09-28"
+  },
+  "corte": "2026-09-28",
+  "limite": "2026-10-18",
+  "limite_credito": 1500000,
+  "saldo_anterior": 200000,
+  "saldo_corte": 278940,
+  "pngi": 278940,
+  "pago_minimo": 35000,
+  "total_cargos": 264840,
+  "total_abonos": 245900,
+  "movimientos": [
+    {
+      "indice": 0,
+      "fecha": "2026-08-30",
+      "descripcion": "MERCADO LIBRE MX",
+      "monto": 45900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 1,
+      "fecha": "2026-09-01",
+      "descripcion": "SU PAGO SPEI RECIBIDO",
+      "monto": 200000,
+      "tipo": "pago"
+    },
+    {
+      "indice": 2,
+      "fecha": "2026-09-03",
+      "descripcion": "BODEGA AURRERA TLAHUAC",
+      "monto": 68730,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 3,
+      "fecha": "2026-09-06",
+      "descripcion": "DIDI FOOD",
+      "monto": 23450,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 4,
+      "fecha": "2026-09-09",
+      "descripcion": "TOTALPLAY SERVICIO",
+      "monto": 59900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 5,
+      "fecha": "2026-09-12",
+      "descripcion": "SEVEN ELEVEN CENTRO",
+      "monto": 4500,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 6,
+      "fecha": "2026-09-15",
+      "descripcion": "FARMACIAS GUADALAJARA",
+      "monto": 18760,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 7,
+      "fecha": "2026-09-19",
+      "descripcion": "DEVOLUCION MERCADO LIBRE",
+      "monto": 45900,
+      "tipo": "abono"
+    },
+    {
+      "indice": 8,
+      "fecha": "2026-09-22",
+      "descripcion": "CABIFY VIAJE",
+      "monto": 15600,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 9,
+      "fecha": "2026-09-27",
+      "descripcion": "CINEMEX ANTARA",
+      "monto": 28000,
+      "tipo": "cargo"
+    }
+  ],
+  "msi": [
+    {
+      "descripcion": "COLCHONES SINTETICOS",
+      "monto_original": 720000,
+      "saldo_pendiente": 480000,
+      "cuota": 60000,
+      "cuota_numero": 4,
+      "cuotas_totales": 12
+    }
+  ],
+  "renglones_sin_leer": 0,
+  "cuadra": true
+}

@@ -53,7 +53,8 @@
               "text/xml",
               "application/xml",
               "application/zip",
-              "application/x-zip-compressed"
+              "application/x-zip-compressed",
+              "application/pdf"
             ],
             "multipleShareMimeTypes": [
               "text/xml",

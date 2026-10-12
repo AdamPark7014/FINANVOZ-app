@@ -14,6 +14,9 @@ repositories {
 
 dependencies {
   testImplementation("junit:junit:4.13.2")
+  // M15: Apache PDFBox 2.0.27 es la versión que porta PdfBox-Android 2.0.27.0 (`android/build.gradle`); prueba
+  // con los PDF sintéticos de fixtures/pdf el mismo extractor (PDFTextStripper ordenado por posición).
+  testImplementation("org.apache.pdfbox:pdfbox:2.0.27")
 }
 
 // Bytecode 17 como en Android, con el JDK que haya (sin descargar toolchains).
@@ -37,8 +40,16 @@ kotlin.sourceSets["android"].kotlin.apply {
   srcDir("../android/src/release/java")
   srcDir("src/stubsExpo/kotlin")
 }
+// PdfBox-Android se publica como AAR: se extrae su classes.jar para compilar `EstadoCuentaPdf.kt` (M15).
+val aarPdfbox by configurations.creating { isTransitive = false }
+val extraerPdfbox by tasks.registering(Copy::class) {
+  from({ zipTree(aarPdfbox.singleFile) }) { include("classes.jar") }
+  into(layout.buildDirectory.dir("pdfbox-android"))
+}
 dependencies {
   "androidCompileOnly"("org.robolectric:android-all:14-robolectric-10818077")
+  aarPdfbox("com.tom-roush:pdfbox-android:2.0.27.0@aar")
+  "androidCompileOnly"(files(layout.buildDirectory.file("pdfbox-android/classes.jar")).builtBy(extraerPdfbox))
 }
 tasks.register("verificarAndroid") {
   group = "verification"
