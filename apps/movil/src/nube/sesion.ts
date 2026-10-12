@@ -23,13 +23,30 @@ const Guardada = z.strictObject({
   /** Vencimiento del access token, ms UTC. */
   vence_en: z.number().int(),
 });
-type Guardada = z.infer<typeof Guardada>;
+export type Guardada = z.infer<typeof Guardada>;
 
 const RespuestaAuth = z.object({
   access_token: z.string().min(1),
   refresh_token: z.string().min(1),
   expires_in: z.number().positive(),
 });
+
+/**
+ * Guarda en el almacén seguro la sesión de una respuesta de Supabase Auth (`/signup`, `/token`, `/verify`).
+ * Devuelve `null` si la respuesta no trae una sesión. La usan esta sesión y la cuenta de respaldo
+ * (`cuenta-respaldo.ts`): al vincular el correo o entrar con él, la sesión de la app pasa a ser la de correo.
+ */
+export function guardarSesionAuth(almacen: AlmacenSeguro, cuerpo: unknown, ahoraMs: number): Guardada | null {
+  const datos = RespuestaAuth.safeParse(cuerpo);
+  if (!datos.success) return null;
+  const guardada: Guardada = {
+    access_token: datos.data.access_token,
+    refresh_token: datos.data.refresh_token,
+    vence_en: ahoraMs + Math.floor(datos.data.expires_in * 1000),
+  };
+  almacen.guardar(CLAVE_SESION_NUBE, JSON.stringify(guardada));
+  return guardada;
+}
 
 export interface OpcionesSesionNube {
   /** `https://<ref>.supabase.co` */
@@ -86,15 +103,7 @@ export function crearSesionNube(opciones: OpcionesSesionNube): SesionNube {
       limite,
     ]).finally(() => clearTimeout(temporizador));
     if (r.status < 200 || r.status >= 300) return null;
-    const datos = RespuestaAuth.safeParse(await r.json().catch(() => null));
-    if (!datos.success) return null;
-    const guardada: Guardada = {
-      access_token: datos.data.access_token,
-      refresh_token: datos.data.refresh_token,
-      vence_en: ahora() + Math.floor(datos.data.expires_in * 1000),
-    };
-    opciones.almacen.guardar(CLAVE_SESION_NUBE, JSON.stringify(guardada));
-    return guardada;
+    return guardarSesionAuth(opciones.almacen, await r.json().catch(() => null), ahora());
   }
 
   async function obtener(renovar: boolean): Promise<string | null> {
