@@ -145,15 +145,18 @@ export function PantallaMovimientos({
               }}
               alExtraordinario={() => {
                 // "Fue algo extraordinario" (`04 §3`, `05 §E8.2`): no cuenta para estimar si llegas.
+                const marcar = !m.extraordinaria;
                 try {
-                  marcarExtraordinaria(ctx, m.id, true);
+                  marcarExtraordinaria(ctx, m.id, marcar);
                   refrescar();
                   mostrar({
-                    mensaje: 'Listo: no lo uso para estimar tus gastos de cada día.',
+                    mensaje: marcar
+                      ? 'Listo: no lo uso para estimar tus gastos de cada día.'
+                      : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
                     accion: {
                       etiqueta: 'Deshacer',
                       alPresionar: () => {
-                        marcarExtraordinaria(ctx, m.id, false);
+                        marcarExtraordinaria(ctx, m.id, !marcar);
                         refrescar();
                       },
                     },
@@ -288,15 +291,31 @@ function FilaMovimiento({
               testID="boton-pasar-a-meses"
             />
           ) : null}
+          {m.tipo === 'gasto' && m.extraordinaria ? (
+            <Texto variante="secundario" tono="secundario" testID="nota-extraordinario">
+              Lo marcaste como extraordinario
+            </Texto>
+          ) : null}
           {m.tipo === 'gasto' && !pasando && !confirmando ? (
-            <Boton
-              etiqueta="Fue algo extraordinario"
-              variante="texto"
-              ancho="contenido"
-              pista="No lo uso para estimar si llegas a tu próximo ingreso"
-              alPresionar={alExtraordinario}
-              testID="boton-extraordinario"
-            />
+            m.extraordinaria ? (
+              <Boton
+                etiqueta="Volver a contarlo"
+                variante="texto"
+                ancho="contenido"
+                pista="Lo vuelvo a usar para estimar si llegas a tu próximo ingreso"
+                alPresionar={alExtraordinario}
+                testID="boton-volver-a-contar"
+              />
+            ) : (
+              <Boton
+                etiqueta="Fue algo extraordinario"
+                variante="texto"
+                ancho="contenido"
+                pista="No lo uso para estimar si llegas a tu próximo ingreso"
+                alPresionar={alExtraordinario}
+                testID="boton-extraordinario"
+              />
+            )
           ) : null}
           {pasando ? null : confirmando ? (
             <View style={{ gap: espacio.s }}>

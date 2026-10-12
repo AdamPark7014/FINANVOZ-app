@@ -193,7 +193,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 16 | M5 | Notificación local agrupada de capturas ("3 movimientos nuevos", cada uno / agrupados / nunca) y tarea en segundo plano que procese la cola | Claude Code | M7 |
 | 17 | M5 | ~~Revisar en el teléfono las transacciones anidadas con expo-sqlite: el driver de Drizzle hace `begin` en cada `db.transaction` de la raíz (solo los `tx` anidados usan savepoints) y servicios y `Libro` llaman `db.transaction` dentro de otra; en better-sqlite3 se anidan solas, en expo-sqlite podrían fallar con "cannot start a transaction within a transaction"~~ Resuelto el 2026-10-12: `apps/movil/src/db/anidar.ts` anida las transacciones de la raíz con savepoints, y las pruebas en Node usan la semántica de expo-sqlite (`transaccionesComoExpo`), con la que 75 pruebas fallaban antes de la corrección | Claude Code | M5 |
 | 18 | M6 | En el teléfono de referencia: medir E8 con K = 1 y N = 10 000 (< 150 ms, CA-M6-02) y ver que Hoy y "¿Me alcanza?" no se congelan mientras calculan; registrar la medición en Mediciones | Adam (con su Android) + Claude por Remote Control | M6 |
-| 19 | M6 | Agregar `extraordinaria` a `MovimientoVista` para que el detalle muestre "Lo marcaste como extraordinario" y ofrezca "Volver a contarlo" en lugar de "Fue algo extraordinario" | Claude Code | M7 |
+| 19 | M6 | ~~Agregar `extraordinaria` a `MovimientoVista` para que el detalle muestre "Lo marcaste como extraordinario" y ofrezca "Volver a contarlo" en lugar de "Fue algo extraordinario"~~ Resuelto el 2026-10-12 en `hito/m6-simulador` | Claude Code | M6 |
 
 ## Verificación por hito
 

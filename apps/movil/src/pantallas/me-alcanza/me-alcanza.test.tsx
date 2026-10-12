@@ -516,6 +516,31 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
     fireEvent.press(within(aviso).getByText('Deshacer'));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
+
+  it('ya marcado, lo dice y ofrece "Volver a contarlo"', () => {
+    const p = e401();
+    registrarMovimiento(p.ctx, {
+      tipo: 'gasto',
+      categoria: 'antojos',
+      origenId: p.efectivo,
+      monto: 250_000,
+      fecha: '2026-10-11',
+      descripcion: 'la boda',
+    });
+    montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    fireEvent.press(screen.getByText('la boda'));
+    fireEvent.press(screen.getByTestId('boton-extraordinario'));
+    expect(screen.getByTestId('nota-extraordinario')).toBeTruthy();
+    expect(screen.queryByTestId('boton-extraordinario')).toBeNull();
+    fireEvent.press(screen.getByTestId('boton-volver-a-contar'));
+    expect(
+      within(screen.getByTestId('aviso')).getByText(
+        'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByTestId('nota-extraordinario')).toBeNull();
+    expect(screen.getByTestId('boton-extraordinario')).toBeTruthy();
+  });
 });
 
 function conEscenarioSinIngreso() {
