@@ -6,6 +6,7 @@ import {
   type OcurrenciaCobertura,
   type SimilitudComercio,
 } from './cobertura';
+import { normalizarComercio, similitud } from './comercios';
 import { cargarVectores } from './__pruebas__/vectores';
 
 interface VectorCobertura {
@@ -19,29 +20,16 @@ interface VectorCobertura {
 const e3 = cargarVectores()['E3'] as Record<string, unknown>;
 const vectores = (e3['cobertura'] as VectorCobertura[] | undefined) ?? [];
 
-/**
- * Doble de prueba de E9.2 (`similitud(normalizarComercio(a), normalizarComercio(b))`): solo la regla
- * de tokens contenidos. En producción se inyecta la de E9.
- */
-const similitudDoble: SimilitudComercio = (a, b) => {
-  const tokens = (s: string) =>
-    s
-      .toUpperCase()
-      .split(/[^A-Z0-9]+/)
-      .filter(Boolean);
-  const ta = tokens(a);
-  const tb = tokens(b);
-  if (ta.length === 0 || tb.length === 0) return 0;
-  const [corto, largo] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
-  return corto.every((t) => largo.includes(t)) ? 1 : 0;
-};
+/** E9.2 real, como se cablea en producción. */
+const similitudComercio: SimilitudComercio = (a, b) =>
+  similitud(normalizarComercio(a), normalizarComercio(b));
 
 describe('E3.5 cubreOcurrencia', () => {
   it('carga los vectores', () => expect(vectores.length).toBeGreaterThan(0));
 
   for (const v of vectores) {
     it(`${v.id} · ${v.descripcion}`, () => {
-      expect(cubreOcurrencia(v.ocurrencia, v.movimiento, similitudDoble)).toBe(v.esperado);
+      expect(cubreOcurrencia(v.ocurrencia, v.movimiento, similitudComercio)).toBe(v.esperado);
     });
   }
 

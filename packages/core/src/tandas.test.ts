@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ErrorDominio } from './errores';
 import { calendarioTanda, posicionTanda, tandaExistente } from './tandas';
-import { proximasFechasPrueba, type ReglaPrueba } from './__pruebas__/proximas-fechas';
+import { proximasFechas, type Regla } from './recurrencia';
 import { cargarVectores } from './__pruebas__/vectores';
 
 interface PosicionVector {
@@ -28,7 +28,7 @@ interface VectorE11 {
   aportacion: number;
   participantes: number;
   turno: number;
-  regla: ReglaPrueba;
+  regla: Regla;
   inicio: string;
   hoy?: string;
   esperado: PosicionVector[] | ExistenteVector;
@@ -53,7 +53,7 @@ describe('E11 tandas', () => {
     if (v.hoy === undefined) {
       it(`${v.id} · calendario, ${v.participantes} participantes, turno ${v.turno}`, () => {
         const esperado = v.esperado as PosicionVector[];
-        const r = calendarioTanda(aTanda(v), proximasFechasPrueba);
+        const r = calendarioTanda(aTanda(v), proximasFechas);
         expect(
           r.posiciones.map((p) => ({
             t: p.t,
@@ -71,7 +71,7 @@ describe('E11 tandas', () => {
       const hoy = v.hoy;
       it(`${v.id} · tanda que ya existía al ${hoy}`, () => {
         const e = v.esperado as ExistenteVector;
-        expect(tandaExistente(aTanda(v), hoy, proximasFechasPrueba)).toEqual({
+        expect(tandaExistente(aTanda(v), hoy, proximasFechas)).toEqual({
           aportacionesHechas: e.aportaciones_hechas,
           yaCobro: e.ya_cobro,
           saldoInicial: e.saldo_inicial,
