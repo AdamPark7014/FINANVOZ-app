@@ -12,6 +12,7 @@ export default function Cuentas() {
       alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
       alContarEfectivo={(cuentaId) => abrirArqueo(router, { cuentaId })}
       alAbrirTandas={() => router.push('/tandas')}
+      alAbrirSuscripciones={() => router.push('/suscripciones')}
     />
   );
 }
