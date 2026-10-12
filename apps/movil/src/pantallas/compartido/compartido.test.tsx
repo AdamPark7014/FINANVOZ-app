@@ -7,14 +7,18 @@ import { almacenEnMemoria } from '../../db/llave';
 import {
   aceptarConsentimiento,
   agregarCuenta,
+  crearGrupoCompartido,
   listarGruposCompartidos,
+  obtenerGrupoCompartido,
   type Contexto,
   type DependenciasCompartido,
 } from '../../servicios';
 import { servidorCompartidoFalso } from '../../servicios/__pruebas__/compartido';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { auditar } from '../__pruebas__/accesibilidad';
+import { crearMotorFalso } from '../principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../principal/__pruebas__/base';
+import { PanelRegistrar } from '../principal/PanelRegistrar';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
@@ -195,6 +199,63 @@ describe('02 §27 · Gastos con tu pareja', () => {
       ).toBeTruthy(),
     );
     B.cerrar();
+  });
+
+  it('dictar "Súper 1,200, pagué yo, 60/40" pide vincularse; con pareja confirma con el resumen y guarda', async () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    en(A, <PanelRegistrar abiertoAlInicio motor={crearMotorFalso().motor} />);
+    const dictar = async (frase: string) => {
+      fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
+      await act(async () => {
+        fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+      });
+    };
+    await dictar('Súper 1,200, pagué yo, 60/40');
+    expect(screen.getByText('Primero vincúlate con tu pareja en Gastos compartidos.')).toBeTruthy();
+
+    const creado = await crearGrupoCompartido(A.ctx, A.deps, 'Beto');
+    if (!creado.ok) throw new Error(creado.error);
+    await dictar('Súper 1,200, pagué yo, 60/40');
+    expect(screen.getByTestId('compartido-resumen').props.children).toBe(
+      'Súper $1,200.00 · pagaste tú · tú 60 % / tu pareja 40 %',
+    );
+    expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).movimientos).toHaveLength(0);
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    fireEvent.press(screen.getByTestId(`compartido-cuenta-${A.cuenta}`));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('compartido-guardar'));
+    });
+    expect(await screen.findByText('Listo: lo agregué a tus gastos compartidos.')).toBeTruthy();
+    expect(screen.queryByTestId('formulario-gasto-compartido')).toBeNull();
+    expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).saldo.texto).toBe(
+      'Beto te debe $480',
+    );
+    A.cerrar();
+  });
+
+  it('con dos grupos y sin decir con quién, primero pregunta', async () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    for (const nombre of ['Beto', 'Caro']) {
+      const r = await crearGrupoCompartido(A.ctx, A.deps, nombre);
+      if (!r.ok) throw new Error(r.error);
+    }
+    en(A, <PanelRegistrar abiertoAlInicio motor={crearMotorFalso().motor} />);
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 400, pagó ella, mitad y mitad');
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+    expect(screen.getByText('¿Con quién lo compartes?')).toBeTruthy();
+    const [, caro] = listarGruposCompartidos(A.ctx, A.deps.almacen);
+    fireEvent.press(screen.getByTestId(`confirmar-compartido-grupo-${caro?.id}`));
+    expect(screen.getByTestId('compartido-resumen').props.children).toBe(
+      'Tacos $400.00 · pagó tu pareja · tú 50 % / tu pareja 50 %',
+    );
+    expect(screen.getByTestId('compartido-quien-otro').props.accessibilityState).toMatchObject({
+      selected: true,
+    });
+    A.cerrar();
   });
 
   it('el QR se dibuja con tramos que cubren cada fila', () => {

@@ -3,10 +3,12 @@ import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
   interpretarReglas,
+  normalizarAlias,
   type CodigoLimite,
   resolverCuenta,
   type ContextoInterprete,
   type CuentaResolutor,
+  type GastoCompartido,
   type Interpretacion,
   type Movimiento,
   type RefCuenta,
@@ -17,6 +19,7 @@ import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
 import type { CoberturaAutomatica } from './cobertura';
+import { gruposAbiertosConNombre } from './compartido';
 import { respuestaSoloPlus, responderConsulta, tienePlantilla, type RespuestaConsulta } from './consultas';
 import { funcionesPlan } from './plan';
 import { configurarCicloPorVoz, type TarjetaEditada, type TarjetaPorAgregar } from './config-tarjetas';
@@ -110,6 +113,24 @@ export interface PropuestaCuentaDividida {
   readonly sinResolver: readonly string[];
 }
 
+/**
+ * Gasto compartido dictado (`02 §27`): siempre se confirma antes de compartirlo; "Guardar" llama
+ * `agregarGastoCompartido`. Lo que no se dijo (quién pagó, con quién si hay varios grupos) lo pregunta la tarjeta.
+ */
+export interface PropuestaGastoCompartido {
+  readonly total: Centavos;
+  readonly descripcion: string | null;
+  readonly categoria: string;
+  readonly fecha: PlainDate;
+  /** `null` si no dijo quién pagó. */
+  readonly pagueYo: boolean | null;
+  /** Tu parte en puntos base: 5000 = mitad y mitad; 6000 = pones 60 %. */
+  readonly miParteBp: number;
+  /** `null` si hay varios grupos abiertos y no quedó claro con quién. */
+  readonly grupoId: string | null;
+  readonly grupos: readonly { readonly id: string; readonly nombre: string }[];
+}
+
 /** Cuenta que falta elegir en la tarjeta de confirmación. */
 export interface CuentaPorElegir {
   readonly campo: 'origenId' | 'destinoId';
@@ -191,6 +212,10 @@ export type ResultadoTexto =
     }
   /** Cuenta dividida dictada: "Guardar" llama `confirmarCuentaDividida` (CA-M8-01). */
   | { readonly resultado: 'confirmar_division'; readonly propuesta: PropuestaCuentaDividida }
+  /** Gasto compartido con la pareja dictado: "Guardar" llama `agregarGastoCompartido` (`02 §27`). */
+  | { readonly resultado: 'confirmar_compartido'; readonly propuesta: PropuestaGastoCompartido }
+  /** Gasto compartido dictado sin ningún grupo abierto: primero hay que vincularse. */
+  | { readonly resultado: 'sin_pareja' }
   | {
       readonly resultado: 'registrado_division';
       readonly registro: CuentaDivididaRegistrada;
@@ -548,6 +573,39 @@ function proponerCuentaDividida(
 }
 
 /**
+ * Gasto compartido dictado (`02 §27`): con un solo grupo abierto (o el que coincide con el nombre dicho) ya va
+ * elegido; con varios, la tarjeta pregunta con quién; sin ninguno, primero hay que vincularse. Nada se escribe hasta
+ * "Guardar".
+ */
+function proponerGastoCompartido(ctx: Contexto, g: GastoCompartido): ResultadoTexto {
+  const grupos = gruposAbiertosConNombre(ctx);
+  if (grupos.length === 0) return { resultado: 'sin_pareja' };
+  const dicho = g.grupo === undefined ? '' : normalizarAlias(g.grupo);
+  const [unico, otro] = dicho === '' ? grupos : grupos.filter((x) => normalizarAlias(x.nombre) === dicho);
+  const aprendida = categoriaAprendida(ctx, null, g.descripcion, 'gasto');
+  let categoria = aprendida ?? g.categoria ?? 'otros_gastos';
+  try {
+    idCategoriaDe(ctx, categoria, 'gasto');
+  } catch {
+    categoria = 'otros_gastos';
+  }
+  const descripcion = g.descripcion?.trim() ?? '';
+  return {
+    resultado: 'confirmar_compartido',
+    propuesta: {
+      total: g.monto,
+      descripcion: descripcion === '' ? null : descripcion.charAt(0).toUpperCase() + descripcion.slice(1),
+      categoria,
+      fecha: g.fecha,
+      pagueYo: g.pagador === undefined ? null : g.pagador === 'yo',
+      miParteBp: (g.mi_parte ?? 50) * 100,
+      grupoId: unico && !otro ? unico.id : null,
+      grupos,
+    },
+  };
+}
+
+/**
  * "Guardar" de la confirmación de una cuenta dividida dictada (o del formulario): tu parte a gasto y cada amigo
  * en "Te deben" (CA-M8-01). Devuelve el token de Deshacer. El alias de una cuenta que no se reconoció se aprende.
  */
@@ -870,6 +928,8 @@ function aplicarInterpretacion(
       };
     case 'fuera_de_alcance':
       return { resultado: 'fuera_de_alcance', motivo: i.motivo ?? null };
+    case 'gasto_compartido':
+      return proponerGastoCompartido(ctx, i.gasto);
     case 'arqueo':
       return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
     case 'simular': {
@@ -894,6 +954,7 @@ function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Fr
     return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
+  if (i?.intencion === 'gasto_compartido') return proponerGastoCompartido(ctx, i.gasto);
   if (i?.intencion !== 'registrar') return null;
   return registrarInterpretado(ctx, i.movimientos, cuentas, frase);
 }

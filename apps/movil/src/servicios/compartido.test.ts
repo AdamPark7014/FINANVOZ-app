@@ -22,8 +22,10 @@ import { aplicarCorreccion } from './correcciones';
 import { anularMovimiento } from './formulario';
 import { deudasConPersonas } from './hoy';
 import { agregarCuenta } from './onboarding';
+import { registrarTexto } from './registrar';
 import { abrirPrueba, vector, type Prueba } from './__pruebas__/base';
 import { depsTelefono, servidorCompartidoFalso } from './__pruebas__/compartido';
+import { nubeFalsa } from './__pruebas__/nube';
 
 type Gasto = { id: string; total: number; pago: 'a' | 'b'; proporcion_a_bp: number; anulado?: boolean };
 type Pago = { id: string; tipo: 'pago'; de: 'a' | 'b'; monto: number };
@@ -354,5 +356,112 @@ describe('CA-M16-06 · volver a vincular', () => {
     expect(await unirseConQr(B2.ctx, B2.deps, codigo.qr, 'Ana')).toMatchObject({ ok: true, nuevo: true });
     expect(obtenerGrupoCompartido(B2.ctx, B2.almacen, t.grupo).saldo.texto).toBe('Ana te debe $5');
     expect(B2.ctx.libro.saldo(CUENTAS_SISTEMA.porAsignar)).toBe(-1000);
+  });
+});
+
+describe('Gasto compartido dictado (02 §27, pendiente 147)', () => {
+  async function dictar(x: Telefono, frase: string) {
+    const r = await registrarTexto(x.ctx, frase, 'voz');
+    if (r.resultado !== 'confirmar_compartido')
+      throw new Error(`se esperaba confirmar, llegó ${r.resultado}`);
+    return r.propuesta;
+  }
+
+  it('sin grupo abierto pide vincularse primero y no escribe nada', async () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    const saldo = A.ctx.libro.saldo(A.bbva);
+    expect(await registrarTexto(A.ctx, 'Súper 1,200, pagué yo, 60/40', 'voz')).toEqual({
+      resultado: 'sin_pareja',
+    });
+    expect(A.ctx.libro.saldo(A.bbva)).toBe(saldo);
+  });
+
+  it('con un grupo: confirma con todo lo dicho y nada se comparte antes de "Guardar"', async () => {
+    const t = await pareja();
+    const saldo = t.A.ctx.libro.saldo(t.A.bbva);
+    const propuesta = await dictar(t.A, 'Súper 1,200, pagué yo, 60/40');
+    expect(propuesta).toEqual({
+      total: 120000,
+      descripcion: 'Súper',
+      categoria: 'super',
+      fecha: '2026-10-11',
+      pagueYo: true,
+      miParteBp: 6000,
+      grupoId: t.grupo,
+      grupos: [{ id: t.grupo, nombre: 'Beto' }],
+    });
+    expect(t.A.ctx.libro.saldo(t.A.bbva)).toBe(saldo);
+    expect(obtenerGrupoCompartido(t.A.ctx, t.A.almacen, t.grupo).movimientos).toHaveLength(0);
+
+    // "Guardar" usa la misma función que el formulario.
+    agregarGastoCompartido(t.A.ctx, t.A.deps, t.grupo, {
+      total: propuesta.total,
+      pagueYo: propuesta.pagueYo ?? true,
+      miParteBp: propuesta.miParteBp,
+      descripcion: propuesta.descripcion ?? '',
+      categoria: propuesta.categoria,
+      cuentaId: t.A.bbva,
+      fecha: propuesta.fecha,
+    });
+    await sincronizarAmbos(t);
+    expect(obtenerGrupoCompartido(t.A.ctx, t.A.almacen, t.grupo).saldo.texto).toBe('Beto te debe $480');
+    expect(obtenerGrupoCompartido(t.B.ctx, t.B.almacen, t.grupo).saldo.texto).toBe('Le debes $480 a Ana');
+    for (const x of [t.A, t.B]) expect(x.ctx.libro.comprobarIntegridad()).toEqual([]);
+  });
+
+  it('pagó la pareja, mitad y mitad por omisión; sin quién pagó queda por preguntar', async () => {
+    const t = await pareja();
+    expect(await dictar(t.A, 'gasto compartido de 500 en gasolina, pagó ella')).toMatchObject({
+      total: 50000,
+      categoria: 'gasolina',
+      pagueYo: false,
+      miParteBp: 5000,
+      grupoId: t.grupo,
+    });
+    expect(await dictar(t.A, 'la renta 8 mil mitad y mitad con mi pareja')).toMatchObject({
+      total: 800000,
+      categoria: 'vivienda',
+      pagueYo: null,
+      miParteBp: 5000,
+    });
+  });
+
+  it('con varios grupos: el nombre dicho elige el grupo; si no lo dijo, se pregunta', async () => {
+    const t = await pareja();
+    const otro = await crearGrupoCompartido(t.A.ctx, t.A.deps, 'Caro');
+    if (!otro.ok) throw new Error(otro.error);
+    const conBeto = await dictar(t.A, 'pagó Beto 300 del cine, 50/50');
+    expect(conBeto).toMatchObject({ total: 30000, pagueYo: false, grupoId: t.grupo });
+    expect(conBeto.grupos.map((g) => g.nombre)).toEqual(['Beto', 'Caro']);
+    expect(await dictar(t.A, 'tacos 400, pagué yo, mitad y mitad')).toMatchObject({
+      grupoId: null,
+      miParteBp: 5000,
+    });
+    // Un nombre que no es de ningún grupo tampoco elige uno al azar.
+    expect((await dictar(t.A, 'pagó Dani 300 del cine, 50/50')).grupoId).toBeNull();
+  });
+
+  it('lo que interpreta la nube llega a la misma confirmación', async () => {
+    const t = await pareja();
+    const frase = 'ayer pagué 1,500 del súper con mi pareja, 70/30';
+    const f = nubeFalsa({
+      [frase]: {
+        intencion: 'gasto_compartido',
+        gasto: {
+          monto: 150000,
+          fecha: '2026-10-10',
+          descripcion: 'súper',
+          categoria: 'super',
+          pagador: 'yo',
+          mi_parte: 70,
+        },
+      },
+    });
+    const r = await registrarTexto(t.A.ctx, frase, 'voz', { nube: f.nube });
+    expect(r).toMatchObject({
+      resultado: 'confirmar_compartido',
+      propuesta: { total: 150000, fecha: '2026-10-10', pagueYo: true, miParteBp: 7000, grupoId: t.grupo },
+    });
   });
 });

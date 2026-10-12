@@ -72,6 +72,7 @@ export {
   type OrigenDictado,
   type PropuestaCompraMsi,
   type PropuestaCuentaDividida,
+  type PropuestaGastoCompartido,
   type PropuestaMovimiento,
   type ResultadoCola,
   type ResultadoTexto,

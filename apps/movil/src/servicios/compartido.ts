@@ -838,10 +838,15 @@ export function obtenerGrupoCompartido(
 
 /** Grupos abiertos (para sincronizar al abrir la pantalla). */
 export function gruposAbiertos(ctx: Contexto): string[] {
+  return gruposAbiertosConNombre(ctx).map((g) => g.id);
+}
+
+/** Grupos abiertos con el nombre de la pareja (para elegir a quién va un gasto dictado). */
+export function gruposAbiertosConNombre(ctx: Contexto): { id: string; nombre: string }[] {
   return ctx.db
-    .select({ id: grupoCompartido.id })
+    .select({ id: grupoCompartido.id, nombre: grupoCompartido.nombre })
     .from(grupoCompartido)
     .where(isNull(grupoCompartido.cerradoEn))
-    .all()
-    .map((g) => g.id);
+    .orderBy(asc(grupoCompartido.creadoEn), asc(grupoCompartido.id))
+    .all();
 }

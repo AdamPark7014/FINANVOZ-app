@@ -1,39 +1,61 @@
 import { useState } from 'react';
 import type { Centavos } from '@cartera/core';
 import { useCompartido } from '../../compartido/ProveedorCompartido';
-import { agregarGastoCompartido, listarCuentas } from '../../servicios';
+import {
+  agregarGastoCompartido,
+  listarCategorias,
+  listarCuentas,
+  type PropuestaGastoCompartido,
+} from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
-import { OPCIONES_CATEGORIA, OPCIONES_REPARTO } from './textos';
+import { etiquetaReparto, OPCIONES_CATEGORIA, OPCIONES_REPARTO, resumenGastoCompartido } from './textos';
 
 type Quien = 'yo' | 'otro';
 
 /**
  * Agregar un gasto compartido (`02 §27`: "Súper 1,200, pagué yo, 60/40"): cuánto, en qué, quién pagó, cómo se
  * reparte y, si pagaste tú, con qué. Se guarda en tu libro al momento y se comparte en la siguiente sincronización.
+ * Con `prellenado` confirma lo dictado: muestra el resumen y nada se guarda hasta "Guardar".
  */
 export function FormularioGastoCompartido({
   grupoId,
   nombrePareja,
+  prellenado,
   alGuardar,
   alCancelar,
 }: {
   grupoId: string;
   nombrePareja: string;
+  prellenado?: PropuestaGastoCompartido;
   alGuardar: () => void;
   alCancelar: () => void;
 }) {
   const { ctx } = useSesion();
   const deps = useCompartido();
   const cuentas = useVista((c) => listarCuentas(c).tienes.filter((x) => x.subtipo !== 'ahorro'));
-  const [total, setTotal] = useState<Centavos | null>(null);
-  const [descripcion, setDescripcion] = useState('');
-  const [categoria, setCategoria] = useState<string | null>('super');
-  const [quien, setQuien] = useState<Quien | null>('yo');
-  const [reparto, setReparto] = useState<number | null>(5000);
+  const categorias = useVista((c) => listarCategorias(c, 'gasto'));
+  const [total, setTotal] = useState<Centavos | null>(prellenado?.total ?? null);
+  const [descripcion, setDescripcion] = useState(prellenado?.descripcion ?? '');
+  const [categoria, setCategoria] = useState<string | null>(prellenado?.categoria ?? 'super');
+  const [quien, setQuien] = useState<Quien | null>(
+    prellenado ? (prellenado.pagueYo === null ? null : prellenado.pagueYo ? 'yo' : 'otro') : 'yo',
+  );
+  const [reparto, setReparto] = useState<number | null>(prellenado?.miParteBp ?? 5000);
   const [cuentaId, setCuentaId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Lo dictado puede traer una categoría o un reparto que no están entre los chips de siempre.
+  const opcionesCategoria = [...OPCIONES_CATEGORIA];
+  if (prellenado && !opcionesCategoria.some((o) => o.valor === prellenado.categoria)) {
+    const nombre = categorias.find((c) => c.slug === prellenado.categoria)?.nombre ?? prellenado.categoria;
+    opcionesCategoria.unshift({ valor: prellenado.categoria, etiqueta: nombre });
+  }
+  const opcionesReparto = [...OPCIONES_REPARTO];
+  if (prellenado && !opcionesReparto.some((o) => o.valor === prellenado.miParteBp)) {
+    opcionesReparto.push({ valor: prellenado.miParteBp, etiqueta: etiquetaReparto(prellenado.miParteBp) });
+  }
 
   const guardar = () => {
     if (total === null || total <= 0) return setError('Escribe cuánto fue el gasto.');
@@ -47,6 +69,7 @@ export function FormularioGastoCompartido({
         descripcion: descripcion.trim(),
         categoria,
         ...(quien === 'yo' && cuentaId ? { cuentaId } : {}),
+        ...(prellenado ? { fecha: prellenado.fecha } : {}),
       });
     } catch {
       return setError(ERROR_GUARDAR);
@@ -57,8 +80,23 @@ export function FormularioGastoCompartido({
 
   return (
     <Tarjeta testID="formulario-gasto-compartido">
-      <Texto variante="subtitulo">Agregar gasto</Texto>
-      <CampoMonto testID="compartido-total" etiqueta="¿Cuánto fue?" alCambiar={setTotal} />
+      <Texto variante="subtitulo">{prellenado ? 'Revisa el gasto compartido' : 'Agregar gasto'}</Texto>
+      {prellenado && total !== null && total > 0 ? (
+        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="compartido-resumen">
+          {resumenGastoCompartido({
+            descripcion: descripcion.trim(),
+            total,
+            pagueYo: quien === null ? null : quien === 'yo',
+            miParteBp: reparto,
+          })}
+        </Texto>
+      ) : null}
+      <CampoMonto
+        testID="compartido-total"
+        etiqueta="¿Cuánto fue?"
+        valorInicial={prellenado?.total ?? null}
+        alCambiar={setTotal}
+      />
       <CampoTexto
         testID="compartido-descripcion"
         etiqueta="¿Qué fue? (opcional)"
@@ -69,7 +107,7 @@ export function FormularioGastoCompartido({
       <Chips
         testID="compartido-categoria"
         etiqueta="Categoría"
-        opciones={OPCIONES_CATEGORIA}
+        opciones={opcionesCategoria}
         valor={categoria}
         alCambiar={setCategoria}
       />
@@ -86,7 +124,7 @@ export function FormularioGastoCompartido({
       <Chips
         testID="compartido-reparto"
         etiqueta="¿Cómo se reparte?"
-        opciones={OPCIONES_REPARTO}
+        opciones={opcionesReparto}
         valor={reparto}
         alCambiar={setReparto}
       />
