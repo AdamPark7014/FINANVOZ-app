@@ -10,7 +10,7 @@
 | M1 · Núcleo | Cerrado | 2026-10-12 | 2026-10-12 | Todos los criterios verificados; PR #4 fusionado |
 | M2 · App base sin conexión | En curso | 2026-10-12 | | Código completo y probado en Node/jest; cierra con las pruebas en el teléfono (pendiente 13) |
 | M3 · Intérprete en la nube | En curso | 2026-10-12 | | Código completo; cierra con el benchmark real (pendiente 14) |
-| M4 · Tarjetas, MSI y compromisos | En curso | 2026-10-12 | |
+| M4 · Tarjetas, MSI y compromisos | En curso | 2026-10-12 | | Código completo; falta ver los avisos en el teléfono (pendiente 13) |
 | M5 · Captura Android y arqueo | Pendiente | | | |
 | M6 · Simulador y ¿Me alcanza? | Pendiente | | | |
 | M7 · Beta cerrada | Pendiente | | | Al cerrar: decidir M11 (`10 §1`) |
@@ -152,7 +152,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 10 | Especificación | Cuentas de servicios: Supabase, Expo/EAS, Google Play Console, RevenueCat, Sentry, PostHog, proveedores de LLM; Apple Developer en M14 | Adam | Según el hito que los pida |
 | 11 | M0 | Crear el proyecto de Supabase y desplegar `lista-espera` (pasos en `services/proxy/README.md`) | Adam | M0 |
 | 12 | M0 | Comprar `finanvoz.com` en Cloudflare, crear el proyecto de Pages `finanvoz`, y en GitHub (entorno `produccion`) poner los secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` y las variables `VITE_LISTA_ESPERA_URL` y `VITE_RESPONSABLE_*`; después correr "Publicar calculadora" | Adam | M0, antes del 6 nov |
-| 13 | M2 | Pruebas en el teléfono: build de desarrollo (`pnpm --filter movil android` o EAS), correr Maestro del onboarding y cronometrarlo, abrir la base con `sqlite3` sin llave, biometría y multitarea, definir teléfono de referencia y medir arranque, E4 y nivel 0 (RNF-01) | Adam (con su Android) + Claude por Remote Control | M2 |
+| 13 | M2 | Pruebas en el teléfono: build de desarrollo (`pnpm --filter movil android` o EAS), correr Maestro del onboarding y cronometrarlo, abrir la base con `sqlite3` sin llave, biometría y multitarea, definir teléfono de referencia y medir arranque, E4 y nivel 0 (RNF-01); M4: ver los avisos de corte y fecha límite con `expo-notifications` | Adam (con su Android) + Claude por Remote Control | M2 |
 | 14 | M3 | Crear el proyecto de Supabase (mismo del pendiente 11), aplicar migraciones, desplegar `nlu-interpretar`, poner las llaves de proveedores (Anthropic, OpenAI, Google) como secretos, y correr el benchmark con `--grabar` (pasos en `services/proxy/README.md`); con eso se elige el modelo y se cierran CA-M3-01 y CA-M3-06 | Adam (cuentas y llaves) + Claude (benchmark y decisión) | M3 |
 
 ## Verificación por hito
