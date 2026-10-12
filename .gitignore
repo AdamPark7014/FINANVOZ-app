@@ -29,3 +29,5 @@ fixtures/nlu/grabaciones/*.tmp
 *.pem
 credentials.json
 *service-account*.json
+.gradle/
+.kotlin/
