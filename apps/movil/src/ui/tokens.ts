@@ -22,7 +22,13 @@ export interface Colores {
   superficie: string;
   /** Superficie elevada o presionada. */
   superficieAlterna: string;
+  /** Borde decorativo de tarjetas y separadores (no identifica un control). */
   borde: string;
+  /**
+   * Borde de controles: campos sin foco, interruptor apagado y opciones sin elegir. ≥ 3:1 contra `fondo`,
+   * `superficie` y `superficieAlterna` (WCAG 1.4.11, contraste de componentes; pase de M13).
+   */
+  bordeControl: string;
   texto: string;
   textoSecundario: string;
   /** Texto deshabilitado; solo para elementos inactivos (exentos de AA). */
@@ -55,6 +61,7 @@ export const colores: Record<EsquemaColor, Colores> = {
     superficie: '#FFFFFF',
     superficieAlterna: '#EDF2F0',
     borde: '#C9D3CF',
+    bordeControl: '#7A8783',
     texto: '#111816',
     textoSecundario: '#4A5652',
     textoDeshabilitado: '#9AA5A1',
@@ -73,6 +80,7 @@ export const colores: Record<EsquemaColor, Colores> = {
     superficie: '#171E1C',
     superficieAlterna: '#212A27',
     borde: '#3A4643',
+    bordeControl: '#6F7D79',
     texto: '#ECF1EF',
     textoSecundario: '#A9B5B1',
     textoDeshabilitado: '#5E6A66',

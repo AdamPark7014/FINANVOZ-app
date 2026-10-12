@@ -58,7 +58,7 @@ describe('WidgetHoy (componente del widget)', () => {
       expect(arbol.props).toMatchObject({
         clickAction: 'OPEN_URI',
         clickActionData: { uri: 'finanvoz:///' },
-        accessibilityLabel: 'Hoy puedes $214 · 4 días',
+        accessibilityLabel: 'Hoy puedes doscientos catorce pesos · 4 días',
       });
     }
   });

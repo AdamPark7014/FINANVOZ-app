@@ -63,7 +63,7 @@ export function CampoTexto({
             backgroundColor: c.superficie,
             borderRadius: radio.m,
             borderWidth: enfocado || conError ? 2 : 1,
-            borderColor: conError ? c.faltante : enfocado ? c.foco : c.borde,
+            borderColor: conError ? c.faltante : enfocado ? c.foco : c.bordeControl,
             paddingHorizontal: espacio.m,
             paddingVertical: espacio.s,
           },

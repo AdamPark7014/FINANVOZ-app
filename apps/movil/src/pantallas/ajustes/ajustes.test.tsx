@@ -2,6 +2,7 @@ import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
+import Ayuda from '../../../app/ayuda';
 import AvisoPrivacidad from '../../../app/aviso-privacidad';
 import Inicio from '../../../app/index';
 import OnboardingLayout from '../../../app/onboarding/_layout';
@@ -15,6 +16,7 @@ import {
 } from '../../servicios';
 import { abrirSesion } from '../../servicios/sesion';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
+import { auditar } from '../__pruebas__/accesibilidad';
 
 /**
  * La raíz real (`app/_layout.tsx`) con la apertura nativa sustituida: cada `abrirSesion` entrega una base nueva
@@ -52,6 +54,7 @@ const RUTAS = {
   _layout: Raiz,
   index: Inicio,
   ajustes: Ajustes,
+  ayuda: Ayuda,
   'aviso-privacidad': AvisoPrivacidad,
   'onboarding/_layout': OnboardingLayout,
   'onboarding/index': Bienvenida,
@@ -109,6 +112,17 @@ describe('ajustes', () => {
     });
     fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
     expect(obtenerBloqueo(ctx).activo).toBe(true);
+  });
+
+  it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
+    const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    fireEvent.press(screen.getByTestId('ajustes-abrir-ayuda'));
+    expect(r.getPathname()).toBe('/ayuda');
+    expect(screen.getByText('¿Cómo calculas mi «hoy puedes»?')).toBeTruthy();
+    expect(screen.getByTestId('ayuda-escribir')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('ayuda-volver'));
+    expect(r.getPathname()).toBe('/ajustes');
   });
 
   // Exportar y borrar todo viven en el centro de privacidad (`pantallas/privacidad/privacidad.test.tsx`).

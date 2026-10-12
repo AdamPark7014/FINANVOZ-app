@@ -208,6 +208,7 @@ export function FormularioCuentaDividida({
               key={p.cuentaId}
               etiqueta={p.nombre}
               seleccionado={elegidas.includes(p.cuentaId)}
+              multiple
               alPresionar={() => alternar(p.cuentaId)}
               testID={`division-persona-${p.cuentaId}`}
             />

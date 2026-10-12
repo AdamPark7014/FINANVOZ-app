@@ -2,6 +2,7 @@
 // La biblioteca recorre el árbol llamando a los componentes como funciones: sin hooks ni React Compiler.
 import { FlexWidget, TextWidget, type HexColor } from 'react-native-android-widget';
 import type { VistaWidget } from '../servicios';
+import { etiquetaHablada } from '../ui/formato';
 import { colores, type EsquemaColor } from '../ui/tokens';
 
 /** Nombre del widget en `app.json` (config plugin) y al pedir una actualización. */
@@ -11,7 +12,8 @@ const hex = (c: string) => c as HexColor;
 
 /**
  * Widget 2×1 "Hoy puedes **$214** · 4 días" (`02 §21`). Sin lógica: pinta la `VistaWidget` de servicios. Todo el
- * widget es un solo toque que abre la app en Hoy; la etiqueta accesible es la línea completa.
+ * widget es un solo toque que abre la app en Hoy; la etiqueta accesible es la línea completa con la cifra en
+ * palabras (`02 §15`, pase de M13).
  */
 export function WidgetHoy({ vista, esquema }: { vista: VistaWidget; esquema: EsquemaColor }) {
   const c = colores[esquema];
@@ -20,7 +22,7 @@ export function WidgetHoy({ vista, esquema }: { vista: VistaWidget; esquema: Esq
     <FlexWidget
       clickAction="OPEN_URI"
       clickActionData={{ uri: vista.enlace }}
-      accessibilityLabel={vista.texto}
+      accessibilityLabel={etiquetaHablada(vista.texto)}
       style={{
         height: 'match_parent',
         width: 'match_parent',

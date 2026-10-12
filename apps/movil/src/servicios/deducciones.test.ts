@@ -220,7 +220,9 @@ describe('CA-M12-03 · deducciones del año con E13.config_prueba', () => {
       ofreceLentes: true,
       lentes: true,
     });
-    expect(v.leyenda).toMatch(/estimación/);
+    expect(v.leyenda).toBe(
+      'Estimación para apartar dinero y preparar tu declaración. No sustituye a tu contador ni presenta declaraciones ante el SAT.',
+    );
   });
 
   it('E13-12: al confirmar el pago del PPD por transferencia, $30,900', () => {
