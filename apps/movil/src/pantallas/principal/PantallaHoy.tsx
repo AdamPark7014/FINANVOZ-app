@@ -7,6 +7,8 @@ import {
   obtenerHoy,
   type Aviso,
   type ConceptoReservado,
+  type ConsultaMeAlcanza,
+  type OpcionesBloques,
   type VistaHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -14,6 +16,7 @@ import { Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto, use
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { PanelRegistrar } from './PanelRegistrar';
+import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';
 import { encabezadoFecha } from './textos';
 
@@ -25,10 +28,21 @@ export interface NavegacionHoy {
   alVerCuentas?: () => void;
   /** Arqueo de efectivo (`02 §7`): desde la tarjeta de Hoy, la insignia o "traigo 300". */
   alAbrirArqueo?: (efectivoReal?: number) => void;
+  /** "¿Me alcanza?" (`02 §9`): con el botón de Hoy (sin consulta) o diciendo "¿me alcanza para…?". */
+  alAbrirMeAlcanza?: (consulta?: ConsultaMeAlcanza) => void;
 }
 
 /** Hoy (02-UX §4): cifra principal, días al ingreso, desglose, tarjetas de acción, avisos y registro. */
-export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; motor?: MotorDictado }) {
+export function PantallaHoy({
+  navegacion,
+  motor,
+  bloques,
+}: {
+  navegacion: NavegacionHoy;
+  motor?: MotorDictado;
+  /** Opciones del cálculo por bloques de la probabilidad (pruebas). */
+  bloques?: Omit<OpcionesBloques, 'senal'>;
+}) {
   const vista = useVista(obtenerHoy);
   const [verDesglose, setVerDesglose] = useState(false);
   return (
@@ -39,6 +53,8 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
       <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
       {vista.estado !== 'sin_ingreso' ? (
         <>
+          {/* Plus en `02 §4`; mientras no hay planes (M10) se muestra a todos (ver ESTADO → Decisiones). */}
+          <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
           <Boton
             etiqueta={
               verDesglose
@@ -88,11 +104,21 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
         </Tarjeta>
       ) : null}
       <InvitacionAvisos />
+      {navegacion.alAbrirMeAlcanza ? (
+        <Boton
+          etiqueta="¿Me alcanza?"
+          variante="secundario"
+          pista="Calcula si te alcanza para una compra"
+          alPresionar={() => navegacion.alAbrirMeAlcanza?.()}
+          testID="boton-me-alcanza"
+        />
+      ) : null}
       <PanelRegistrar
         alMasOpciones={navegacion.alAbrirFormulario}
         alVerMovimientos={navegacion.alVerMovimientos}
         {...(navegacion.alVerCuentas ? { alVerCuentas: navegacion.alVerCuentas } : {})}
         {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
+        {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
         {...(motor ? { motor } : {})}
       />
       {/* Espacio para que el aviso inferior no tape el último botón. */}

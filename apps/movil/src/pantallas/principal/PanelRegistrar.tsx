@@ -6,6 +6,7 @@ import {
   registrarTexto,
   registrarTextoLocal,
   revisarPorInterpretar,
+  type ConsultaMeAlcanza,
   type OrigenDictado,
   type ResultadoTexto,
 } from '../../servicios';
@@ -63,6 +64,7 @@ export function PanelRegistrar({
   alVerCuentas,
   alMasOpciones,
   alArqueo,
+  alMeAlcanza,
   motor,
   abiertoAlInicio = false,
   fraseRevision,
@@ -77,6 +79,8 @@ export function PanelRegistrar({
   alMasOpciones?: () => void;
   /** "Traigo 300": abre el arqueo con esa cantidad (`02 §7`). */
   alArqueo?: (efectivoReal: number) => void;
+  /** "¿Me alcanza para unos tenis de 1,500?": abre "¿Me alcanza?" con la consulta (en memoria, regla 9). */
+  alMeAlcanza?: (consulta: ConsultaMeAlcanza) => void;
   /** Reconocedor de voz inyectable (pruebas). */
   motor?: MotorDictado;
   abiertoAlInicio?: boolean;
@@ -172,6 +176,12 @@ export function PanelRegistrar({
           setTexto('');
           alArqueo?.(r.efectivoReal);
           return;
+        case 'me_alcanza':
+          terminarRevision();
+          setTexto('');
+          if (alMeAlcanza) alMeAlcanza(r.consulta);
+          else setMensaje(MENSAJE_NO_SOPORTADO.consulta);
+          return;
         case 'no_encontrado':
           setMensaje(r.accion === 'duplicados' ? MENSAJE_SIN_DUPLICADOS : MENSAJE_NO_ENCONTRE);
           return;
@@ -186,7 +196,16 @@ export function PanelRegistrar({
           return;
       }
     },
-    [alArqueo, alConsultarHoy, alVerCuentas, alVerMovimientos, avisarRegistro, refrescar, terminarRevision],
+    [
+      alArqueo,
+      alConsultarHoy,
+      alMeAlcanza,
+      alVerCuentas,
+      alVerMovimientos,
+      avisarRegistro,
+      refrescar,
+      terminarRevision,
+    ],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {

@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import type { ConsultaMeAlcanza } from '../../servicios';
 import { Boton, espacio, Pantalla, Texto } from '../../ui';
 import type { MotorDictado } from '../../voz';
 import { FormularioMovimiento } from './FormularioMovimiento';
@@ -14,6 +15,7 @@ export function PantallaRegistrar({
   alVerMovimientos,
   alVerCuentas,
   alArqueo,
+  alMeAlcanza,
   fraseRevision,
   motor,
 }: {
@@ -23,6 +25,8 @@ export function PantallaRegistrar({
   alVerCuentas?: () => void;
   /** "Traigo 300": abre el arqueo. */
   alArqueo?: (efectivoReal: number) => void;
+  /** "¿Me alcanza para…?": abre "¿Me alcanza?". */
+  alMeAlcanza?: (consulta: ConsultaMeAlcanza) => void;
   /** Frase de "Por revisar" que se abre para confirmarla. */
   fraseRevision?: string;
   motor?: MotorDictado;
@@ -52,6 +56,7 @@ export function PantallaRegistrar({
         {...(alVerMovimientos ? { alVerMovimientos } : {})}
         {...(alVerCuentas ? { alVerCuentas } : {})}
         {...(alArqueo ? { alArqueo } : {})}
+        {...(alMeAlcanza ? { alMeAlcanza } : {})}
         {...(fraseRevision ? { fraseRevision } : {})}
         {...(motor ? { motor } : {})}
       />
