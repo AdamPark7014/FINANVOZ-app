@@ -29,6 +29,13 @@
       "when": 1792022400000,
       "tag": "0004_cfdi",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792108800000,
+      "tag": "0005_compartido",
+      "breakpoints": true
     }
   ]
 }

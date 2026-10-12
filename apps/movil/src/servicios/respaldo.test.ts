@@ -269,12 +269,14 @@ describe('respaldo cifrado (M9)', () => {
   it('un respaldo de un esquema anterior (sin la tabla tanda de 0002) se importa y se migra a la versión actual', async () => {
     const p = abrirPrueba('2026-10-11');
     cargarEscenario(p.ctx, escenario('e4-01'));
-    // Lo que exportaba una app con solo 0001_inicial: sin las tablas de 0002 a 0004 y con version_esquema 1.
+    // Lo que exportaba una app con solo 0001_inicial: sin las tablas de 0002 a 0005 y con version_esquema 1.
     const tablas = { ...datosExportacion(p.ctx).tablas };
     delete tablas.tanda;
     delete tablas.suscripcion;
     delete tablas.plantilla_remota;
     delete tablas.cfdi;
+    delete tablas.grupo_compartido;
+    delete tablas.evento_compartido;
     const deps = dependencias();
     const archivo = await conContenido({ ...datosExportacion(p.ctx), version_esquema: 1, tablas }, deps);
 

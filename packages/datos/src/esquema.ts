@@ -310,6 +310,42 @@ export const cfdi = sqliteTable('cfdi', {
 /** Tablas de `0004_cfdi`, por nombre SQL. */
 export const TABLAS_0004 = { cfdi } as const;
 
+/**
+ * `0005_compartido` (M16, `04 §3.2`, E17): un grupo de gastos compartidos con su `contraparte:pareja` y el lugar
+ * (`'a'` o `'b'`) de este teléfono. La llave del grupo vive en el almacén seguro, nunca aquí.
+ */
+export const grupoCompartido = sqliteTable('grupo_compartido', {
+  id: text('id').primaryKey(),
+  nombre: text('nombre').notNull(),
+  contraparteId: text('contraparte_id')
+    .notNull()
+    .unique()
+    .references(() => cuenta.id),
+  miAutor: text('mi_autor').notNull(),
+  creadoEn: integer('creado_en').notNull(),
+  cerradoEn: integer('cerrado_en'),
+});
+
+/** `0005_compartido`: eventos del grupo (E17) ya descifrados; `recibido_en` nulo = pendiente de publicar. */
+export const eventoCompartido = sqliteTable('evento_compartido', {
+  id: text('id').primaryKey(),
+  grupoId: text('grupo_id')
+    .notNull()
+    .references(() => grupoCompartido.id),
+  autor: text('autor').notNull(),
+  creadoEn: integer('creado_en').notNull(),
+  tipo: text('tipo').notNull(),
+  cuerpo: text('cuerpo').notNull(),
+  transaccionId: text('transaccion_id').references(() => transaccion.id),
+  recibidoEn: text('recibido_en'),
+});
+
+/** Tablas de `0005_compartido`, por nombre SQL. */
+export const TABLAS_0005 = {
+  grupo_compartido: grupoCompartido,
+  evento_compartido: eventoCompartido,
+} as const;
+
 /** Tablas de `0001_inicial`, por nombre SQL. */
 export const TABLAS_0001 = {
   contacto,

@@ -25,6 +25,8 @@ const TABLAS = [
   'suscripcion',
   'plantilla_remota',
   'cfdi',
+  'grupo_compartido',
+  'evento_compartido',
 ] as const;
 
 export const FORMATO_EXPORTACION = 'finanvoz-exportacion';
