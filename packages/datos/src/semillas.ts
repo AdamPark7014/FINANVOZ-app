@@ -1,4 +1,4 @@
-import type { Espacio } from './nucleo';
+import type { Espacio } from '@cartera/core';
 
 /** Ids fijos de las cuentas de sistema que inserta `0001_inicial` (`docs/04-DATOS.md §2.1`). */
 export const CUENTAS_SISTEMA = {

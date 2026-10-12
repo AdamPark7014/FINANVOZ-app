@@ -24,7 +24,7 @@ import {
   construirSaldoInicial,
   construirTransferencia,
   type MovimientoPropuesto,
-} from './nucleo';
+} from '@cartera/core';
 
 /**
  * CA-M1-02 · Invariantes I1–I5 de E2 (`docs/05-MOTORES.md §E2`) como propiedades de fast-check con 1,000

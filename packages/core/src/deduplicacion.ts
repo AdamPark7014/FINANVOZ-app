@@ -104,7 +104,9 @@ function esMejor(a: ResultadoDuplicado, b: ResultadoDuplicado): boolean {
 // E9.4 · Transferencias entre cuentas propias
 // ---------------------------------------------------------------------------
 
-export type Espacio = 'personal' | 'negocio';
+import type { Espacio } from './libro/tipos';
+
+export type { Espacio };
 
 export type TipoCapturaTransferencia =
   'transferencia_enviada' | 'transferencia_recibida' | 'pago_recibido_tarjeta';

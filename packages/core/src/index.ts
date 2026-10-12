@@ -17,3 +17,4 @@ export { porcentajeMostrado, redondearPorcentaje } from './porcentaje';
 export * from './motores-ingreso';
 export * from './motores-tarjetas-personas';
 export * from './motores-captura';
+export * from './libro';

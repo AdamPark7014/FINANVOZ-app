@@ -12,7 +12,7 @@ import {
   CUENTAS_SISTEMA,
   idCategoria,
 } from './semillas';
-import { construirGasto } from './nucleo';
+import { construirGasto } from '@cartera/core';
 
 const TABLAS = Object.keys(TABLAS_0001).sort();
 

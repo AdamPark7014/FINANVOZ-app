@@ -10,7 +10,7 @@ import {
   type CuentaParaPatron,
   type Origen,
   type TipoTransaccion,
-} from './nucleo';
+} from '@cartera/core';
 import { asiento, cuenta, transaccion } from './esquema';
 
 /**

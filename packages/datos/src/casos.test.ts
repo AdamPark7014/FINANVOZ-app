@@ -26,7 +26,7 @@ import {
   construirSaldoInicial,
   construirTransferencia,
   type MovimientoPropuesto,
-} from './nucleo';
+} from '@cartera/core';
 
 /**
  * CA-M1-04 · Cada caso de `docs/04-DATOS.md §4` del 1 al 23b, con sus variantes, produce exactamente los

@@ -12,7 +12,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
     "oraculo": "node scripts/oraculo.mjs --verificar",
-    "eval:nlu": "pnpm --filter @cartera/nlu eval:nlu"
+    "eval:nlu": "pnpm --filter @cartera/nlu eval:nlu",
+    "cobertura:core": "vitest run --project core --coverage --coverage.include='packages/core/src/**' --coverage.exclude='**/*.test.ts' --coverage.exclude='**/__pruebas__/**' --coverage.thresholds.lines=90 --coverage.reporter=text-summary"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
