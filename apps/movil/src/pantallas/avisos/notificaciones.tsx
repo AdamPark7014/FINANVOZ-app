@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, type ReactNode } from 're
 import {
   horaDispositivo,
   puertoEnMemoria,
+  sincronizarAvisoRespaldo,
   sincronizarAvisosTarjetas,
   sincronizarRecordatoriosCobro,
   type PuertoNotificaciones,
@@ -86,6 +87,8 @@ export function SincronizarAvisosTarjetas({ hora = horaDispositivo }: { hora?: (
           await sincronizarAvisosTarjetas(ctx, notificaciones.puerto, hora());
           // Recordatorios de cobro (RF-PER-03): se cancelan solos cuando la persona ya te pagó.
           await sincronizarRecordatoriosCobro(ctx, notificaciones.puerto, hora());
+          // "Respaldo pendiente" (M9): a los 14 días sin respaldo y uno por semana; un respaldo nuevo lo recorre.
+          await sincronizarAvisoRespaldo(ctx, notificaciones.puerto, hora());
         } while (estado.current.pendiente);
       } catch {
         // Sin detalle (regla 9): se reintenta en la siguiente escritura o al abrir la app.

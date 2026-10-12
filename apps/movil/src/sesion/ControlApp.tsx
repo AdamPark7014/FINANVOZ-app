@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import type { ArchivosRespaldo, DependenciasRespaldo, RespaldoListo } from '../servicios';
+import type { ArchivosRespaldo, DependenciasRespaldo, NubeRespaldo, RespaldoListo } from '../servicios';
 
 /**
  * Acciones que solo la raíz puede hacer porque reemplazan la sesión completa: "Borrar todo" (cierra la base,
@@ -19,6 +19,13 @@ export interface ControlApp {
     readonly archivos: ArchivosRespaldo;
     /** Borra todo, importa el respaldo en la base nueva y vuelve al inicio con "Listo: recuperé…". */
     restaurar(listo: RespaldoListo): Promise<void>;
+    /**
+     * Respaldo en la nube (cuenta de correo y bucket); `null` si la build no trae Supabase: Ajustes → Respaldo
+     * solo ofrece archivos.
+     */
+    readonly nube?: NubeRespaldo | null;
+    /** Registra o quita la tarea semanal en segundo plano (`respaldo/tarea.ts`). */
+    programarAutomatico?: (activo: boolean) => Promise<void>;
   };
   /** Solo `__DEV__`: borra todo y carga `fixtures/escenarios/<id>.json` con el reloj fijo en su `hoy`. */
   cargarEscenario?: (datos: unknown) => Promise<void>;

@@ -8,7 +8,7 @@ import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
-import { fijarBloqueo, obtenerBloqueo } from '../src/servicios';
+import { fijarBloqueo, obtenerBloqueo, obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../src/ui';
@@ -16,7 +16,7 @@ import { Boton, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../src/ui
 const TOQUES_MENU_DEV = 7;
 
 /**
- * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, privacidad
+ * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, respaldo (M9), privacidad
  * (exportar, borrar todo y el aviso viven en el centro de privacidad, `app/privacidad.tsx`) y versión. En builds
  * de desarrollo, tocar 7 veces la versión abre el menú de escenarios semilla.
  */
@@ -25,6 +25,7 @@ export default function Ajustes() {
   const { ctx, refrescar } = useSesion();
   const control = useControlApp();
   const bloqueo = useVista(obtenerBloqueo);
+  const respaldo = useVista(obtenerRespaldoNube);
   const version = Constants.expoConfig?.version ?? '—';
 
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -77,6 +78,20 @@ export default function Ajustes() {
 
       <SeccionAvisos />
       <SeccionCaptura />
+
+      <Tarjeta testID="ajustes-respaldo">
+        <Texto variante="subtitulo">Respaldo</Texto>
+        <Texto variante="secundario" tono={respaldo.pendiente ? 'faltante' : 'secundario'}>
+          {respaldo.textoUltimo}
+        </Texto>
+        <Boton
+          testID="ajustes-abrir-respaldo"
+          variante="secundario"
+          etiqueta="Respaldar y restaurar"
+          alPresionar={() => router.push('/respaldo')}
+        />
+      </Tarjeta>
+
       <SeccionDatosCobro />
       <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
 

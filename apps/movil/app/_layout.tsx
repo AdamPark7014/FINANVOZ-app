@@ -6,13 +6,15 @@ import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
-import { crearNivelNubeExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
+import { crearNivelNubeExpo, crearNubeRespaldoExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
 import { useEvidenciaConsentimiento } from '../src/nube/useEvidenciaConsentimiento';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
 import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
 import { archivosRespaldoExpo, dependenciasRespaldoExpo } from '../src/respaldo/expo';
+import { programarRespaldoAutomatico } from '../src/respaldo/programar';
+import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/SincronizarRespaldoAutomatico';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
@@ -61,13 +63,15 @@ export default function Raiz() {
   const analitica = useMemo(() => crearAnaliticaExpo(), []);
   // Copia mínima de la evidencia del consentimiento en Supabase (`08 §2`).
   const evidencia = useMemo(() => crearPuertoEvidenciaExpo(), []);
+  // Cuenta de respaldo y bucket de Supabase (M9); `null` sin configuración: solo respaldo en archivo.
+  const nubeRespaldo = useMemo(() => crearNubeRespaldoExpo(), []);
 
   const reemplazarSesion = useCallback(
-    async (preparar?: () => Sesion, aviso?: string) => {
+    async (preparar?: () => Sesion, aviso?: string, conservarSesionNube = false) => {
       const siguiente = estado.generacion + 1;
       setEstado({ tipo: 'trabajando', generacion: siguiente });
       try {
-        await borrarTodoApp(sesion);
+        await borrarTodoApp(sesion, { conservarSesionNube });
       } catch {
         setEstado({ tipo: 'error', generacion: siguiente });
         return;
@@ -83,8 +87,11 @@ export default function Raiz() {
       respaldo: {
         deps: dependenciasRespaldoExpo,
         archivos: archivosRespaldoExpo,
-        // El respaldo ya se descifró y se ensayó en memoria: aquí solo se reemplaza la base.
-        restaurar: (listo) => reemplazarSesion(() => restaurarSesion(listo), mensajeRestaurado(listo)),
+        // El respaldo ya se descifró y se ensayó en memoria: aquí solo se reemplaza la base. La sesión de la nube
+        // (la de correo con la que se bajó el respaldo) se conserva: es identidad, no datos.
+        restaurar: (listo) => reemplazarSesion(() => restaurarSesion(listo), mensajeRestaurado(listo), true),
+        nube: nubeRespaldo,
+        programarAutomatico: programarRespaldoAutomatico,
       },
       ...(__DEV__
         ? {
@@ -104,7 +111,7 @@ export default function Raiz() {
           }
         : {}),
     }),
-    [reemplazarSesion],
+    [reemplazarSesion, nubeRespaldo],
   );
 
   if (estado.tipo !== 'lista') {
@@ -187,6 +194,8 @@ function AppProtegida({
         <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
         {/* Al abrir la app y tras cada cambio (tarjetas, pagos, cortes, preferencias) se reprograman los avisos. */}
         <SincronizarAvisosTarjetas />
+        {/* La tarea semanal queda registrada solo mientras el respaldo automático está encendido. */}
+        <SincronizarRespaldoAutomatico />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
@@ -200,6 +209,7 @@ function AppProtegida({
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="plan" />
           <Stack.Screen name="privacidad" />
+          <Stack.Screen name="respaldo" />
           <Stack.Screen name="restaurar" />
           <Stack.Screen name="terminos" />
         </Stack>

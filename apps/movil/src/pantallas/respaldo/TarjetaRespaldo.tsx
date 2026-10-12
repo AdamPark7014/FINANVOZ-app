@@ -9,7 +9,14 @@ import { FormularioContrasena } from './FormularioContrasena';
  * Respaldo cifrado en el centro de privacidad (M9, `02 §19`): crear o cambiar la contraseña, exportar el
  * `.cartera` por la hoja de compartir y restaurar uno. El archivo va cifrado; la contraseña no se guarda.
  */
-export function TarjetaRespaldo({ alRestaurar }: { alRestaurar: () => void }) {
+export function TarjetaRespaldo({
+  alRestaurar,
+  alCambiarContrasena,
+}: {
+  alRestaurar: () => void;
+  /** Ajustes → Respaldo: avisa a la tarjeta de la nube que ya hay contraseña. */
+  alCambiarContrasena?: () => void;
+}) {
   const { ctx } = useSesion();
   const respaldo = useControlApp().respaldo;
   const [conContrasena, setConContrasena] = useState(() => {
@@ -53,6 +60,7 @@ export function TarjetaRespaldo({ alRestaurar }: { alRestaurar: () => void }) {
           alGuardar={() => {
             setConContrasena(true);
             setEditando(false);
+            alCambiarContrasena?.();
             setMensaje('Listo: guardé tu contraseña de respaldo.');
           }}
           alCancelar={() => setEditando(false)}

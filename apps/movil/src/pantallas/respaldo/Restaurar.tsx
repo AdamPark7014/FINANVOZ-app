@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import {
+  bajarUltimoRespaldo,
+  mensajeErrorNube,
   mensajeErrorRespaldo,
   obtenerCentroPrivacidad,
   prepararRestauracion,
@@ -8,20 +10,26 @@ import {
 } from '../../servicios';
 import { useControlApp } from '../../sesion/ControlApp';
 import { useVista } from '../../sesion/ProveedorSesion';
+import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, CampoTexto, Tarjeta, Texto } from '../../ui';
+import { FlujoCorreo, type CuentaConfirmada } from './FlujoCorreo';
 
 type Paso =
   | { tipo: 'elegir' }
-  | { tipo: 'contrasena'; archivo: Uint8Array }
+  | { tipo: 'nube' }
+  | { tipo: 'contrasena'; archivo: Uint8Array; deLaNube: boolean }
   | { tipo: 'confirmar'; listo: RespaldoListo };
 
 /**
- * Restaurar desde un archivo `.cartera` (M9, `02 §19`): elegir el archivo → contraseña → resumen → restaurar.
+ * Restaurar (M9, `02 §19`): desde la nube (correo → código → el respaldo más reciente) o desde un archivo
+ * `.cartera`; después contraseña → resumen → restaurar.
  * Antes de tocar la base, el respaldo se descifra, se valida y se ensaya en memoria; contraseña equivocada y
  * archivo dañado dan el mismo mensaje, a propósito.
  */
 export function Restaurar({ alVolver }: { alVolver: () => void }) {
   const respaldo = useControlApp().respaldo;
+  const nube = respaldo?.nube ?? null;
+  const { reidentificar } = usePlanTienda();
   const tieneDatos = useVista((ctx) => {
     const g = obtenerCentroPrivacidad(ctx).guardado;
     return g.cuentas + g.movimientos > 0;
@@ -37,9 +45,25 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
     setTrabajando(true);
     try {
       const archivo = await respaldo.archivos.elegir();
-      if (archivo) setPaso({ tipo: 'contrasena', archivo });
+      if (archivo) setPaso({ tipo: 'contrasena', archivo, deLaNube: false });
     } catch (e) {
       setError(mensajeErrorRespaldo(e));
+    } finally {
+      setTrabajando(false);
+    }
+  };
+
+  /** Ya entró con el correo: baja el respaldo más reciente de esa cuenta. */
+  const bajar = async (r: CuentaConfirmada) => {
+    if (!nube) return;
+    // Las compras de Plus siguen al usuario de ese correo (pendiente 58).
+    if (r.cambioUsuario) void reidentificar();
+    setError(null);
+    setTrabajando(true);
+    try {
+      const bajado = await bajarUltimoRespaldo(nube.respaldos);
+      if (bajado.ok) setPaso({ tipo: 'contrasena', archivo: bajado.bytes, deLaNube: true });
+      else setError(mensajeErrorNube(bajado.error));
     } finally {
       setTrabajando(false);
     }
@@ -79,22 +103,65 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
       />
       <Texto variante="titulo">Restaurar un respaldo</Texto>
       <Texto variante="cuerpo" tono="secundario">
-        Recupera tus cuentas, movimientos y ajustes desde un archivo .cartera que exportaste antes.
+        {nube
+          ? 'Recupera tus cuentas, movimientos y ajustes desde tu respaldo en la nube o desde un archivo .cartera.'
+          : 'Recupera tus cuentas, movimientos y ajustes desde un archivo .cartera que exportaste antes.'}
       </Texto>
       {!respaldo ? (
         <Texto variante="cuerpo">Restaurar no está disponible en esta versión de la app.</Texto>
       ) : (
         <Tarjeta testID="restaurar-paso">
           {paso.tipo === 'elegir' ? (
-            <Boton
-              testID="restaurar-elegir"
-              etiqueta="Elegir archivo"
-              cargando={trabajando}
-              deshabilitado={trabajando}
-              alPresionar={() => void elegir()}
-            />
+            <>
+              {nube ? (
+                <Boton
+                  testID="restaurar-nube"
+                  etiqueta="Desde la nube"
+                  deshabilitado={trabajando}
+                  alPresionar={() => {
+                    setError(null);
+                    setPaso({ tipo: 'nube' });
+                  }}
+                />
+              ) : null}
+              <Boton
+                testID="restaurar-elegir"
+                variante={nube ? 'secundario' : 'primario'}
+                etiqueta={nube ? 'Desde un archivo' : 'Elegir archivo'}
+                cargando={trabajando}
+                deshabilitado={trabajando}
+                alPresionar={() => void elegir()}
+              />
+            </>
+          ) : paso.tipo === 'nube' ? (
+            <>
+              <Texto variante="secundario" tono="secundario">
+                Escribe el correo de tu cuenta de respaldo. Te mando un código para entrar.
+              </Texto>
+              {trabajando ? (
+                <Texto variante="cuerpo" tono="secundario" testID="restaurar-bajando">
+                  Bajando tu respaldo…
+                </Texto>
+              ) : nube ? (
+                <FlujoCorreo cuenta={nube.cuenta} soloEntrar alConfirmar={(r) => void bajar(r)} />
+              ) : null}
+              <Boton
+                variante="texto"
+                etiqueta="Volver a elegir"
+                deshabilitado={trabajando}
+                alPresionar={() => {
+                  setError(null);
+                  setPaso({ tipo: 'elegir' });
+                }}
+              />
+            </>
           ) : paso.tipo === 'contrasena' ? (
             <>
+              {paso.deLaNube ? (
+                <Texto variante="cuerpo" testID="restaurar-encontre">
+                  Encontré tu respaldo más reciente. Escribe su contraseña.
+                </Texto>
+              ) : null}
               <CampoTexto
                 testID="restaurar-contrasena"
                 etiqueta="Contraseña del respaldo"
@@ -113,7 +180,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               />
               <Boton
                 variante="texto"
-                etiqueta="Elegir otro archivo"
+                etiqueta={paso.deLaNube ? 'Volver a elegir' : 'Elegir otro archivo'}
                 deshabilitado={trabajando}
                 alPresionar={() => {
                   setError(null);
