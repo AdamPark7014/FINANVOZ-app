@@ -32,3 +32,20 @@ export {
   type ResultadoLibre,
   type TarjetaLibre,
 } from './libre';
+// E7 · Arqueo de efectivo y corte de caja
+export {
+  arqueo,
+  CATEGORIA_VARIOS_EFECTIVO,
+  CATEGORIA_VENTAS,
+  CATEGORIAS_ARQUEO,
+  corteDeCaja,
+  UMBRAL_REPARTO_ARQUEO,
+  type AccionArqueo,
+  type AccionCorte,
+  type EntradaArqueo,
+  type EntradaCorteDeCaja,
+  type GastoHistorial,
+  type Propuesta,
+  type ResultadoArqueo,
+  type ResultadoCorteDeCaja,
+} from './arqueo';
