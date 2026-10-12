@@ -1,0 +1,8 @@
+Primera versión pública de Finanvoz.
+• Tu «hoy puedes»: cuánto puedes gastar hoy hasta tu próximo ingreso.
+• Captura automática con los avisos de tu banco, registro por voz y por texto.
+• Efectivo con arqueo, tarjetas con corte y fecha límite, meses sin intereses.
+• Préstamos, tandas, suscripciones y widget.
+• Respaldo cifrado para cambiar de teléfono.
+• Plus: probabilidad de llegar, «¿Me alcanza?» y deducciones con tus facturas.
+• Ayuda en Ajustes › Ayuda.

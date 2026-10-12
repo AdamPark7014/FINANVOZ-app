@@ -1,0 +1,37 @@
+Finanvoz te dice cada día cuánto puedes gastar hoy sin quedarte corto antes de tu próximo ingreso. Anota tus compras con los avisos de tu banco, dictando o escribiendo, y lleva tu efectivo, tus tarjetas y tus meses sin intereses en un solo lugar.
+
+TU «HOY PUEDES»
+Suma lo que tienes en efectivo, débito y billeteras. Le quita lo que ya está comprometido antes de tu próximo ingreso: pagos fijos, lo que debes de tus tarjetas, las cuotas de meses que vencen y lo que le debes a otras personas. También aparta tu colchón. Lo que queda se reparte entre los días que faltan. Toca la cifra para ver de dónde sale.
+
+ANOTA SIN ESCRIBIR
+• Captura automática en Android: lee los avisos de las apps de banco que tú elijas y anota tus compras, retiros y transferencias. Las demás notificaciones se ignoran en tu teléfono y no se guardan.
+• Dicta o escribe como hablas: «tacos 80 en efectivo», «le pasé 200 a mi hermana».
+• Lo que no entienda queda en Por revisar para que lo confirmes.
+
+EFECTIVO EN ORDEN
+Cada tanto te pide contar lo que traes. Si falta dinero, reparte la diferencia según tus gastos en efectivo y tú lo ajustas antes de confirmar.
+
+TARJETAS Y MESES SIN INTERESES
+Día de corte, fecha límite y pago para no generar intereses de cada tarjeta. Pasa a meses una compra, agrega los meses que ya tenías y liquídalos cuando quieras. Te avisa antes de la fecha límite.
+
+TAMBIÉN
+• Lo que te deben y lo que debes a otras personas, tandas y cobros.
+• Suscripciones que se cobran cada mes.
+• Widget con tu «hoy puedes».
+• Respaldo cifrado con una contraseña que solo tú conoces, para cambiar de teléfono.
+• Funciona sin internet para anotar y ver tu día.
+
+PLUS
+Con Plus agregas la probabilidad de llegar a tu próximo pago, «¿Me alcanza?» para comparar pagar de contado, a meses o esperar, la tarjeta del día, tus meses de los próximos 12 meses, respuestas a tus preguntas sobre tu dinero, deducciones personales con tus facturas y más frases interpretadas en internet. Prueba gratis de 14 días. El cobro lo hace Google Play y lo cancelas ahí; si no sigues con Plus, vuelves a Gratis sin perder ningún dato.
+
+TU PRIVACIDAD
+• Tus cuentas, saldos y movimientos se guardan cifrados en tu teléfono. No salen de ahí, salvo dentro del respaldo cifrado si lo activas.
+• Los avisos de tu banco se procesan en tu teléfono y no se envían a nuestros servidores.
+• Las frases que la app no entiende sola se envían a nuestro servidor y a un proveedor de inteligencia artificial para interpretarlas, y no se guardan. Con Plus, cuando haces una pregunta libre también van los resultados que hacen falta para responderte, como totales y nombres cortos de tus cuentas.
+• Los reportes de errores no llevan montos, comercios, nombres ni lo que dictas. Las estadísticas de uso son opcionales.
+• Descarga tus datos o bórralos todos cuando quieras desde Ajustes › Privacidad.
+
+IMPORTANTE
+Finanvoz no es una institución financiera ni asesor de inversiones. Las cifras son estimaciones con la información que registras y no garantizan resultados. Finanvoz no mueve dinero, no ofrece crédito, no se conecta a tus cuentas con tus claves del banco, no emite facturas ni presenta declaraciones. Las deducciones son una estimación para preparar tu declaración: no sustituyen a tu contador.
+
+¿Dudas? En la app: Ajustes › Ayuda, o escríbenos a gerencia@nexara.com.mx.
