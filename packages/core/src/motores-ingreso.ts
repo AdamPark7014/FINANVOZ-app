@@ -21,3 +21,14 @@ export {
   type OcurrenciaCobertura,
   type SimilitudComercio,
 } from './cobertura';
+// E4 · Dinero libre y "hoy puedes gastar"
+export {
+  dineroLibre,
+  puedesRetirar,
+  type CuotaMsiLibre,
+  type DesgloseReservado,
+  type DeudaPersonaLibre,
+  type EntradaLibre,
+  type ResultadoLibre,
+  type TarjetaLibre,
+} from './libre';
