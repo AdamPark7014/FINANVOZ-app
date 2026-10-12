@@ -85,9 +85,6 @@ export type ProblemaIntegridad =
 /** Clave de la reversa de `id`: determinista, así una anulación repetida choca con `UNIQUE`. */
 export const claveReversa = (id: string): string => `reversa:${id}`;
 
-/** Toda fecha civil `'YYYY-MM-DD'` es ≤ que esta: `saldo` sin `hasta` suma todos los asientos. */
-const SIN_LIMITE = '9999-12-31';
-
 const p = (nombre: string) => sql.placeholder(nombre);
 
 /**
@@ -121,6 +118,13 @@ function prepararConsultas(db: BaseDatos) {
       .select()
       .from(cuenta)
       .where(eq(cuenta.id, p('id')))
+      .prepare(),
+    // Saldo a hoy (sin fecha de corte): todo asiento cuenta, así que no hace falta unir con `transaccion`; con
+    // el índice `asiento_cuenta` es ~5 veces más rápido en un libro grande (RNF-01, pase de M13).
+    saldoTotal: db
+      .select({ suma: sql<number>`coalesce(sum(${asiento.monto}), 0)` })
+      .from(asiento)
+      .where(eq(asiento.cuentaId, p('cuenta')))
       .prepare(),
     saldo: db
       .select({ suma: sql<number>`coalesce(sum(${asiento.monto}), 0)` })
@@ -203,7 +207,10 @@ export class Libro {
 
   /** E2 regla 3: Σ de todos los asientos de la cuenta con `fecha ≤ hasta` (sin filtrar reversas). */
   saldo(cuentaId: string, hasta?: PlainDate): Centavos {
-    const fila = this.q.saldo.get({ cuenta: cuentaId, hasta: hasta ?? SIN_LIMITE });
+    const fila =
+      hasta === undefined
+        ? this.q.saldoTotal.get({ cuenta: cuentaId })
+        : this.q.saldo.get({ cuenta: cuentaId, hasta });
     return Number(fila?.suma ?? 0);
   }
 

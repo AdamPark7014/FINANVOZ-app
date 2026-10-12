@@ -31,6 +31,8 @@ describe('CA-M6-02 · rendimiento de E8 (Node)', () => {
       tiempos.push(performance.now() - t0);
     }
     tiempos.sort((a, b) => a - b);
+    // Solo el tiempo (regla 9); se registra en docs/ESTADO.md → Mediciones.
+    console.info(`RNF-01 (Node): E8 K = 1, N = 10 000, mediana ${tiempos[3]?.toFixed(1)} ms`);
     expect(tiempos[3]).toBeLessThan(50);
   });
 
