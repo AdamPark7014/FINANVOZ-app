@@ -50,6 +50,11 @@ export interface DatosExportados {
   readonly fecha: string;
   readonly montos: 'centavos';
   readonly tablas: Record<string, FilaExportada[]>;
+  /**
+   * Llaves de los grupos compartidos (`{grupo_id: llave en base64}`, E17). Solo dentro del respaldo cifrado
+   * (`05 §E16`); la exportación en claro nunca las lleva.
+   */
+  readonly llaves_compartidas?: Readonly<Record<string, string>>;
 }
 
 /**

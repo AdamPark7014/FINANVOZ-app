@@ -11,6 +11,7 @@ import type { BaseAbierta, PuertoSqlite } from '../db/abrir';
 import { almacenEnMemoria, type AlmacenSeguro } from '../db/llave';
 import { datosExportacion, type DatosExportados } from '../privacidad/exportar';
 import { guardarLlaveRespaldo, leerLlaveRespaldo } from '../respaldo/llave';
+import { llavesParaRespaldo, restaurarLlaves } from '../compartido/llaves';
 import { restaurarEnBaseNueva, validarDatosRespaldo } from '../respaldo/importar';
 import type { Contexto } from './contexto';
 import { etiquetaDiaMes } from './formato';
@@ -86,7 +87,10 @@ export async function generarRespaldo(
   const llave = leerLlaveRespaldo(deps.almacen);
   if (!llave) throw new ErrorDominio('respaldo_sin_contrasena', 'primero crea la contraseña de respaldo');
   const datos = datosExportacion(ctx);
-  return escribirRespaldo(deps.cripto, llave, JSON.stringify(datos), {
+  // Las llaves de los grupos compartidos viajan solo aquí, dentro del archivo cifrado (E16, E17).
+  const llaves = llavesParaRespaldo(deps.almacen);
+  const contenido = Object.keys(llaves).length > 0 ? { ...datos, llaves_compartidas: llaves } : datos;
+  return escribirRespaldo(deps.cripto, llave, JSON.stringify(contenido), {
     creadoEn: new Date(datos.generado_en).toISOString().replace(/\.\d{3}Z$/, 'Z'),
     versionEsquema: datos.version_esquema,
   });
@@ -150,6 +154,7 @@ export function restaurarRespaldo(
     datos: listo.datos,
   });
   guardarLlaveRespaldo(deps.almacen, listo.llave);
+  if (listo.datos.llaves_compartidas) restaurarLlaves(deps.almacen, listo.datos.llaves_compartidas);
   return base;
 }
 

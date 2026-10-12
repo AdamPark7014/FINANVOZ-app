@@ -24,6 +24,13 @@ export const DatosRespaldo = z.strictObject({
   fecha: z.string(),
   montos: z.literal('centavos'),
   tablas: z.record(z.string(), z.array(z.record(z.string(), Valor))),
+  /** Llaves de grupos compartidos (E17): 32 bytes en base64 por `grupo_id`. */
+  llaves_compartidas: z
+    .record(
+      z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+      z.string().regex(/^[A-Za-z0-9+/]{43}=$/),
+    )
+    .optional(),
 });
 
 function invalido(): ErrorDominio {
