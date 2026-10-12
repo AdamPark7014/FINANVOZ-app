@@ -1,0 +1,19 @@
+{
+  "name": "@cartera/nlu",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@cartera/core": "workspace:*",
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "tsx": "^4.23.15"
+  }
+}
