@@ -20,6 +20,7 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { idCategoriaDe } from './catalogo';
 import { cubrirAutomaticamente, liberarOcurrencias, type CoberturaAutomatica } from './cobertura';
 import { enTransaccion, type Contexto } from './contexto';
+import { esSaludEnEfectivo } from './deducciones';
 import { anularCuotasDelPlan, preguntaTrasPago, type PreguntaLiquidar } from './msi';
 
 const { transaccion } = esquema;
@@ -65,6 +66,8 @@ export interface MovimientoRegistrado {
   readonly cobertura: CoberturaAutomatica | null;
   /** Un pago que dejó saldo a favor con meses activos: "¿Este pago fue para liquidar tus meses?". */
   readonly preguntaLiquidar: PreguntaLiquidar | null;
+  /** Gasto de salud en efectivo: aviso preventivo de deducciones (`02 §24`). */
+  readonly avisoDeducible: boolean;
 }
 
 /**
@@ -157,7 +160,13 @@ export function registrarMovimiento(
     const despues = nueva
       ? trasRegistrar(ctx, tx.id, opciones.cubrir === false ? { cubrir: false } : {})
       : { cobertura: null, preguntaLiquidar: null };
-    return { transaccionId: tx.id, deshacer: tx.id, fecha, ...despues };
+    return {
+      transaccionId: tx.id,
+      deshacer: tx.id,
+      fecha,
+      ...despues,
+      avisoDeducible: esSaludEnEfectivo(ctx, e),
+    };
   });
 }
 

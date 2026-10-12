@@ -19,6 +19,8 @@ import {
   TEXTO_MOTIVO_EXCLUSION,
   type VistaDeducciones,
 } from './deducciones';
+import { listarCuentas } from './cuentas';
+import { registrarMovimiento } from './formulario';
 import { registrarTexto } from './registrar';
 import { cargarEscenario } from './semilla';
 import { abrirPrueba, escenario } from './__pruebas__/base';
@@ -350,5 +352,20 @@ describe('CA-M12-04 · aviso preventivo al registrar salud en efectivo', () => {
     const coca = await registrarTexto(ctx, 'coca 25 en efectivo', 'texto');
     if (coca.resultado !== 'registrado') throw new Error(coca.resultado);
     expect(coca.movimientos[0]?.avisoDeducible).toBe(false);
+  });
+
+  it('también desde el formulario: salud en efectivo sí, salud con tarjeta no', () => {
+    const { ctx } = conSemilla();
+    const cuentas = listarCuentas(ctx).tienes;
+    const efectivo = cuentas.find((c) => c.subtipo === 'efectivo')?.id as string;
+    const debito = cuentas.find((c) => c.subtipo === 'debito')?.id as string;
+    const salud = (origenId: string) =>
+      registrarMovimiento(ctx, { tipo: 'gasto', monto: 80_000, categoria: 'salud', origenId }).avisoDeducible;
+    expect(salud(efectivo)).toBe(true);
+    expect(salud(debito)).toBe(false);
+    expect(
+      registrarMovimiento(ctx, { tipo: 'gasto', monto: 2_500, categoria: 'antojos', origenId: efectivo })
+        .avisoDeducible,
+    ).toBe(false);
   });
 });

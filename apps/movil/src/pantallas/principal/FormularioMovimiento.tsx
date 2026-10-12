@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import type { Centavos } from '@cartera/core';
 import {
+  AVISO_DEDUCIBLE_EFECTIVO,
   crearPersona,
   listarCategorias,
   listarCuentas,
@@ -170,7 +171,11 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
         propiedades: { origen: 'formulario', pregunto: false, espacio: 'personal' },
       });
       const nombre = descripcion.trim() || NOMBRE_TIPO[tipo];
-      avisarRegistro(`Registré: ${nombre} ${formatearCentavos(monto)}`, r.deshacer);
+      const registrado = `Registré: ${nombre} ${formatearCentavos(monto)}`;
+      avisarRegistro(
+        r.avisoDeducible ? `${registrado}. ${AVISO_DEDUCIBLE_EFECTIVO}` : registrado,
+        r.deshacer,
+      );
       setMonto(null);
       setDescripcion('');
       setIntentado(false);
