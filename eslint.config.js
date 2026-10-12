@@ -64,6 +64,21 @@ export default tseslint.config(
     },
   },
   {
+    // packages/fiscal corre en el teléfono (Hermes) y en Node: lectura pura, sin módulos de Node ni reloj.
+    files: ['packages/fiscal/src/**/*.ts'],
+    ignores: ['packages/fiscal/src/**/*.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [{ regex: '^node:', message: 'packages/fiscal corre en Hermes: sin módulos de Node.' }] },
+      ],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Date', property: 'now', message: 'La lectura de CFDI no depende del reloj (regla 5).' },
+      ],
+    },
+  },
+  {
     files: ['apps/calculadora/src/**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.browser } },
     plugins: { 'react-hooks': reactHooks },
