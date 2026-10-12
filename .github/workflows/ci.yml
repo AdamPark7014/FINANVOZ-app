@@ -25,6 +25,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm --filter movil test:app
+      - name: Bundle Android de la app (Metro)
+        run: pnpm --filter movil exec expo export --platform android --output-dir dist
       - run: node scripts/oraculo.mjs --verificar
       - run: pnpm eval:nlu --nivel reglas
       # CA-M1-08: cobertura de líneas de packages/core ≥ 90 %.

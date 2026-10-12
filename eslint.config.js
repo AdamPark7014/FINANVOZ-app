@@ -4,7 +4,19 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['.claude/**', '**/dist/**', '**/coverage/**', '**/node_modules/**', 'fixtures/**', 'docs/**'] },
+  {
+    ignores: [
+      '.claude/**',
+      '**/dist/**',
+      '**/coverage/**',
+      '**/node_modules/**',
+      'fixtures/**',
+      'docs/**',
+      'apps/movil/.expo/**',
+      'apps/movil/android/**',
+      'apps/movil/expo-env.d.ts',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
@@ -39,6 +51,33 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser } },
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
+  },
+  {
+    files: ['apps/movil/{app,src}/**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks },
+    rules: reactHooks.configs.recommended.rules,
+  },
+  {
+    // La UI pasa por servicios/ (03 §4): ni la base ni el repositorio se importan desde pantallas o componentes.
+    files: ['apps/movil/app/**/*.{ts,tsx}', 'apps/movil/src/ui/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@cartera/datos', '**/db/**', '**/src/db'],
+              message: 'La UI pasa por servicios/ (03 §4).',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/movil/*.config.js', 'apps/movil/babel.config.js'],
+    languageOptions: { sourceType: 'commonjs', globals: { ...globals.node } },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   {
     files: ['services/proxy/supabase/functions/**/*.ts'],
