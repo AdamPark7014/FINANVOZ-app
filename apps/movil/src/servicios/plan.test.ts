@@ -46,6 +46,7 @@ describe('plan (RF-PAG-01)', () => {
       meAlcanza: false,
       compromisoMsi12Meses: false,
       consultas: false,
+      explicar: false,
       interpretacionesNubeMes: 30,
     });
   });
@@ -68,6 +69,7 @@ describe('plan (RF-PAG-01)', () => {
       meAlcanza: true,
       compromisoMsi12Meses: true,
       consultas: true,
+      explicar: true,
       interpretacionesNubeMes: 300,
     });
   });
@@ -193,6 +195,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar la cuenta vuelve a Gratis 
       meAlcanza: false,
       compromisoMsi12Meses: false,
       consultas: false,
+      explicar: false,
       interpretacionesNubeMes: 30,
     });
   });

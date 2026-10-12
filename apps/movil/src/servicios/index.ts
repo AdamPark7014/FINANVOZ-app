@@ -76,6 +76,14 @@ export {
   type PlantillaConsulta,
   type RespuestaConsulta,
 } from './consultas';
+export {
+  AVISO_SIN_EXPLICACION,
+  explicar,
+  LLAMADAS_MAXIMAS_EXPLICAR,
+  PIE_EXPLICAR,
+  type OpcionesExplicar,
+  type RespuestaExplicar,
+} from './explicar';
 export { contextoNube, type Conectividad, type NivelNube } from './nube';
 export {
   aplicarCorreccion,
