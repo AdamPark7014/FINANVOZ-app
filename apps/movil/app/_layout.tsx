@@ -159,6 +159,7 @@ function AppProtegida({ reiniciada, evidencia }: { reiniciada: boolean; evidenci
           <Stack.Screen name="arqueo" />
           <Stack.Screen name="me-alcanza" />
           <Stack.Screen name="privacidad" />
+          <Stack.Screen name="terminos" />
         </Stack>
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>

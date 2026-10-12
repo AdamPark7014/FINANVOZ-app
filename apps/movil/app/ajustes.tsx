@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
+import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
 import { fijarBloqueo, obtenerBloqueo } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
@@ -91,6 +92,20 @@ export default function Ajustes() {
             {mensaje}
           </Texto>
         ) : null}
+      </Tarjeta>
+
+      <Tarjeta testID="ajustes-acerca">
+        <Texto variante="subtitulo">Acerca de</Texto>
+        <Texto variante="secundario" tono="secundario">
+          {TEXTO_NO_ASESORIA}
+        </Texto>
+        <Boton
+          testID="ajustes-terminos"
+          variante="texto"
+          ancho="contenido"
+          etiqueta="Leer los términos de uso"
+          alPresionar={() => router.push('/terminos')}
+        />
       </Tarjeta>
 
       <Pressable

@@ -239,6 +239,10 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
+    // Texto fijo de `08 §1`.
+    expect(textoDe('me-alcanza-no-asesoria')).toMatch(
+      /^Finanvoz no es una institución financiera ni asesor de inversiones\./,
+    );
 
     // "Cómo lo calculé" se despliega con las líneas de servicios.
     expect(screen.queryByTestId('como-lo-calcule')).toBeNull();

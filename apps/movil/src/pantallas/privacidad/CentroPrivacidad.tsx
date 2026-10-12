@@ -60,10 +60,12 @@ const PERMISOS: readonly { readonly nombre: string; readonly para: string }[] = 
 export function CentroPrivacidad({
   alVolver,
   alLeerAviso,
+  alLeerTerminos,
   alBorrarTodo,
 }: {
   alVolver: () => void;
   alLeerAviso: () => void;
+  alLeerTerminos: () => void;
   /** La raíz cierra la base, destruye la llave y vuelve al onboarding. */
   alBorrarTodo: () => Promise<void>;
 }) {
@@ -232,6 +234,13 @@ export function CentroPrivacidad({
           ancho="contenido"
           etiqueta="Leer el aviso de privacidad"
           alPresionar={alLeerAviso}
+        />
+        <Boton
+          testID="privacidad-terminos"
+          variante="texto"
+          ancho="contenido"
+          etiqueta="Leer los términos de uso"
+          alPresionar={alLeerTerminos}
         />
         <Texto variante="secundario" tono="secundario">
           {`Para ejercer tus derechos o revocar tu consentimiento también puedes escribir a ${RESPONSABLE.correo}.`}

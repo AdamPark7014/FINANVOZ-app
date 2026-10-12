@@ -12,6 +12,7 @@ import {
   type VistaMeAlcanza,
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
+import { TEXTO_NO_ASESORIA } from '../privacidad/legales';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, CampoMonto, CampoTexto, espacio, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
@@ -369,6 +370,10 @@ function Resultado({
           {n.texto}
         </Texto>
       ))}
+      {/* Texto fijo de `08 §1`. */}
+      <Texto variante="secundario" tono="secundario" testID="me-alcanza-no-asesoria">
+        {TEXTO_NO_ASESORIA}
+      </Texto>
 
       <Boton
         etiqueta={verCalculo ? 'Ocultar cómo lo calculé' : 'Cómo lo calculé'}

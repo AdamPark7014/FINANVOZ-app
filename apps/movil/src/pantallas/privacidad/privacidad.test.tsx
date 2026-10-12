@@ -7,6 +7,7 @@ import Inicio from '../../../app/index';
 import OnboardingLayout from '../../../app/onboarding/_layout';
 import Bienvenida from '../../../app/onboarding/index';
 import Privacidad from '../../../app/privacidad';
+import Terminos from '../../../app/terminos';
 import {
   aceptarConsentimiento,
   agregarEfectivo,
@@ -49,6 +50,7 @@ const RUTAS = {
   ajustes: Ajustes,
   privacidad: Privacidad,
   'aviso-privacidad': AvisoPrivacidad,
+  terminos: Terminos,
   'onboarding/_layout': OnboardingLayout,
   'onboarding/index': Bienvenida,
   '(tabs)/hoy': () => <Text testID="pestana-hoy">Hoy</Text>,
@@ -132,6 +134,25 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/privacidad' });
     fireEvent.press(screen.getByTestId('privacidad-aviso'));
     expect(r.getPathname()).toBe('/aviso-privacidad');
+  });
+
+  it('lleva a los términos de uso con el texto de 08 §1; Ajustes muestra el texto fijo en "Acerca de"', () => {
+    const r = renderRouter(RUTAS, { initialUrl: '/privacidad' });
+    fireEvent.press(screen.getByTestId('privacidad-terminos'));
+    expect(r.getPathname()).toBe('/terminos');
+    expect(
+      screen.getByText(
+        'Finanvoz no es una institución financiera ni asesor de inversiones. Las cifras son estimaciones con la información que registras y no garantizan resultados.',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByText(/no mueve dinero, no ofrece crédito/)).toBeTruthy();
+    expect(screen.getByText(/gerencia@nexara\.com\.mx/)).toBeTruthy();
+
+    r.unmount();
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(screen.getByTestId('ajustes-acerca')).toHaveTextContent(
+      /Finanvoz no es una institución financiera ni asesor de inversiones/,
+    );
   });
 
   it('exporta JSON y CSV con la hoja de compartir', async () => {
