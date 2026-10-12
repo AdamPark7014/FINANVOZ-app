@@ -15,6 +15,8 @@ export default tseslint.config(
       'apps/movil/.expo/**',
       'apps/movil/android/**',
       'apps/movil/expo-env.d.ts',
+      'modules/captura-android/android/**',
+      'modules/captura-android/nucleo-jvm/**',
     ],
   },
   js.configs.recommended,
@@ -76,6 +78,11 @@ export default tseslint.config(
   },
   {
     files: ['apps/movil/*.config.js', 'apps/movil/babel.config.js'],
+    languageOptions: { sourceType: 'commonjs', globals: { ...globals.node } },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['modules/captura-android/app.plugin.js', 'modules/captura-android/plugin/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { ...globals.node } },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
