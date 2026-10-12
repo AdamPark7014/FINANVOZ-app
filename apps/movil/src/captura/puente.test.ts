@@ -215,6 +215,44 @@ describe('catálogo remoto en el módulo nativo (M10, 07 §3.1)', () => {
   });
 });
 
+describe('texto de estados de cuenta en PDF (M15, 07 §8)', () => {
+  const con = (extraer: (uri: string, contrasena: string | null) => Promise<unknown>) =>
+    crearPuente(() => ({ ...crearNativoFalso().nativo, extraerTextoPdf: vi.fn(extraer) }));
+
+  it('devuelve las páginas y pasa la contraseña (vacía = ninguna)', async () => {
+    const extraer = vi.fn(async (): Promise<unknown> => ({ resultado: 'texto', paginas: ['a', 'b'] }));
+    const p = crearPuente(() => ({ ...crearNativoFalso().nativo, extraerTextoPdf: extraer }));
+    expect(await p.extraerTextoPdf('content://x')).toEqual({ tipo: 'texto', paginas: ['a', 'b'] });
+    await p.extraerTextoPdf('content://x', '');
+    await p.extraerTextoPdf('content://x', 'clave');
+    expect(extraer.mock.calls).toEqual([
+      ['content://x', null],
+      ['content://x', null],
+      ['content://x', 'clave'],
+    ]);
+  });
+
+  it.each(['pide_contrasena', 'contrasena_incorrecta', 'invalido', 'demasiado_grande'] as const)(
+    '%s',
+    async (resultado) => {
+      expect(await con(async () => ({ resultado })).extraerTextoPdf('u')).toEqual({ tipo: resultado });
+    },
+  );
+
+  it('un error del módulo o una forma rara es inválido; sin la función, no disponible', async () => {
+    expect(await con(async () => Promise.reject(new Error('x'))).extraerTextoPdf('u')).toEqual({
+      tipo: 'invalido',
+    });
+    expect(await con(async () => ({ resultado: 'texto', paginas: [1] })).extraerTextoPdf('u')).toEqual({
+      tipo: 'invalido',
+    });
+    expect(await crearPuente(() => crearNativoFalso().nativo).extraerTextoPdf('u')).toEqual({
+      tipo: 'no_disponible',
+    });
+    expect(await crearPuente(() => null).extraerTextoPdf('u')).toEqual({ tipo: 'no_disponible' });
+  });
+});
+
 describe('puente de captura sin módulo nativo (Jest, Expo Go, iOS)', () => {
   it('degrada sin lanzar', async () => {
     const p = crearPuente(() => null);

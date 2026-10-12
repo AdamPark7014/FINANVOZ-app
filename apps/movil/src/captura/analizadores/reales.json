@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "advertencia": "Analizadores de estados de cuenta de bancos reales (docs/07-CAPTURA.md §8). Agregar un banco = agregar aquí su analizador (la versión nueva antes que la vieja) y probarlo con el texto de un estado de cuenta real ANONIMIZADO fuera del repositorio; nunca se suben estados de cuenta reales.",
+  "analizadores": []
+}

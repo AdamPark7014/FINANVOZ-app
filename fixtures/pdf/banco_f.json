@@ -1,0 +1,82 @@
+{
+  "analizador": "banco_f.estado.v1",
+  "banco": "banco_f",
+  "nombre_banco": "Banco F",
+  "ultimos4": "1022",
+  "periodo": {
+    "desde": "2026-09-01",
+    "hasta": "2026-09-30"
+  },
+  "corte": "2026-09-30",
+  "limite": "2026-10-20",
+  "limite_credito": 1000000,
+  "saldo_anterior": 290000,
+  "saldo_corte": 356367,
+  "pngi": 356367,
+  "pago_minimo": 42000,
+  "total_cargos": null,
+  "total_abonos": null,
+  "movimientos": [
+    {
+      "indice": 0,
+      "fecha": "2026-09-02",
+      "descripcion": "PANADERÍA LA ESPIGA",
+      "monto": 8640,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 1,
+      "fecha": "2026-09-04",
+      "descripcion": "CAFÉ DEL BOSQUE",
+      "monto": 7200,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 2,
+      "fecha": "2026-09-05",
+      "descripcion": "PAGO DESDE APP",
+      "monto": 290000,
+      "tipo": "pago"
+    },
+    {
+      "indice": 3,
+      "fecha": "2026-09-10",
+      "descripcion": "SUPERMERCADO SINTÉTICO",
+      "monto": 132015,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 4,
+      "fecha": "2026-09-17",
+      "descripcion": "INTERESES ORDINARIOS",
+      "monto": 3512,
+      "tipo": "comision"
+    },
+    {
+      "indice": 5,
+      "fecha": "2026-09-21",
+      "descripcion": "ÓPTICA DE PRUEBA",
+      "monto": 95000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 6,
+      "fecha": "2026-09-29",
+      "descripcion": "GASOLINERA ÑANDÚ",
+      "monto": 60000,
+      "tipo": "cargo"
+    }
+  ],
+  "msi": [
+    {
+      "descripcion": "MUEBLERIA EJEMPLO",
+      "monto_original": 300000,
+      "saldo_pendiente": 200000,
+      "cuota": 50000,
+      "cuota_numero": 2,
+      "cuotas_totales": 6
+    }
+  ],
+  "renglones_sin_leer": 0,
+  "cuadra": null
+}

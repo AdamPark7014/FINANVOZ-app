@@ -1,0 +1,28 @@
+Banco E Estado de cuenta mensual
+Número de tarjeta: **** **** **** 4410
+Período: del 29-ago-2026 al 28-sep-2026
+Fecha de corte 28-sep-2026
+Fecha límite de pago 18-oct-2026
+Límite de crédito 15,000.00
+Saldo anterior 2,000.00
+Saldo al corte 2,789.40
+Pago para no generar intereses 2,789.40
+Pago mínimo 350.00
+DETALLE DE MOVIMIENTOS
+Operación Cargo Concepto Importe
+30-ago-2026 31-ago-2026 MERCADO LIBRE MX 459.00
+01-sep-2026 02-sep-2026 SU PAGO SPEI RECIBIDO 2,000.00 CR
+03-sep-2026 04-sep-2026 BODEGA AURRERA TLAHUAC 687.30
+06-sep-2026 07-sep-2026 DIDI FOOD 234.50
+09-sep-2026 10-sep-2026 TOTALPLAY SERVICIO 599.00
+12-sep-2026 13-sep-2026 SEVEN ELEVEN CENTRO 45.00
+15-sep-2026 16-sep-2026 FARMACIAS GUADALAJARA 187.60
+19-sep-2026 20-sep-2026 DEVOLUCION MERCADO LIBRE 459.00 CR
+22-sep-2026 23-sep-2026 CABIFY VIAJE 156.00
+27-sep-2026 28-sep-2026 CINEMEX ANTARA 280.00
+Total cargos 2,648.40
+Total abonos 2,459.00 CR
+MESES SIN INTERESES
+Compra Concepto Original Saldo Pago del mes Pago
+15-jun-2026 COLCHONES SINTETICOS 7,200.00 4,800.00 600.00 4/12
+Documento sintético para pruebas.

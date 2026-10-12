@@ -141,6 +141,11 @@ class CapturaModule : Module() {
     AsyncFunction("diagnosticoBorrar") {
       Captura.diagnostico(contexto).borrarDatos(System.currentTimeMillis())
     }
+
+    // M15 (`07 §8`): texto de un estado de cuenta en PDF, leído en el teléfono. La contraseña no se guarda.
+    AsyncFunction("extraerTextoPdf") { uri: String, contrasena: String? ->
+      EstadoCuentaPdf.extraer(contexto, uri, contrasena).aMapa()
+    }
   }
 }
 

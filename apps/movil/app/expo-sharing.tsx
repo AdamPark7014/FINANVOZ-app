@@ -1,22 +1,40 @@
 import { useRouter } from 'expo-router';
 import { useIncomingShare, type SharePayload } from 'expo-sharing';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { extraerTextoPdf } from '../src/captura/puente';
 import { ImportarCompartidas } from '../src/pantallas/deducciones';
 import { leerArchivo, nombreDeUri } from '../src/pantallas/deducciones/expo';
+import { esPdfCompartido, LeerEstadoCuenta } from '../src/pantallas/estados-cuenta';
 import type { ArchivoCfdi } from '../src/servicios';
 import { Pantalla, Texto } from '../src/ui';
 
+type Carga = SharePayload & {
+  contentUri?: string | null;
+  contentMimeType?: string | null;
+  originalName?: string | null;
+};
+
 /**
- * Hoja de compartir de Android → Finanvoz (M12, `02 §24`): `expo-sharing` abre la app en `finanvoz://expo-sharing`
- * con los XML o ZIP compartidos (filtros del plugin en `app.json`). Se leen una vez, se importan y se limpian.
+ * Hoja de compartir de Android → Finanvoz: `expo-sharing` abre la app en `finanvoz://expo-sharing` con lo
+ * compartido (filtros del plugin en `app.json`). Un PDF es un estado de cuenta (M15, `02 §26`) y se lee en el
+ * teléfono; los XML o ZIP son facturas (M12, `02 §24`). Se leen una vez y se limpian.
  */
 export default function Compartido() {
   const router = useRouter();
   const { sharedPayloads, resolvedSharedPayloads, isResolving, clearSharedPayloads } = useIncomingShare();
+  const cargas = useMemo<Carga[]>(
+    () => (resolvedSharedPayloads.length > 0 ? resolvedSharedPayloads : sharedPayloads),
+    [resolvedSharedPayloads, sharedPayloads],
+  );
+  // Se decide una sola vez, al terminar de resolver: al limpiar lo compartido, la pantalla no cambia de flujo.
+  const [pdf, setPdf] = useState<string | null | undefined>(undefined);
+  if (!isResolving && pdf === undefined) {
+    const carga = cargas.find((p) => p.shareType !== 'text' && p.shareType !== 'url' && esPdfCompartido(p));
+    setPdf(carga ? (carga.contentUri ?? carga.value) : null);
+  }
+
   const listos = useRef<Promise<ArchivoCfdi[]> | null>(null);
   const leer = useCallback(() => {
-    const cargas: (SharePayload & { contentUri?: string | null; originalName?: string | null })[] =
-      resolvedSharedPayloads.length > 0 ? resolvedSharedPayloads : sharedPayloads;
     listos.current ??= Promise.all(
       cargas
         .filter((p) => p.shareType !== 'text' && p.shareType !== 'url')
@@ -27,14 +45,30 @@ export default function Compartido() {
       // Ya leído, se limpia: si la app vuelve a abrirse, no se importa dos veces.
     ).finally(clearSharedPayloads);
     return listos.current;
-  }, [clearSharedPayloads, resolvedSharedPayloads, sharedPayloads]);
-  if (isResolving) {
+  }, [cargas, clearSharedPayloads]);
+
+  const extraer = useCallback(
+    // Con contraseña se vuelve a leer la misma URI; lo compartido se limpia desde la primera lectura.
+    (contrasena: string | null) => extraerTextoPdf(pdf ?? '', contrasena).finally(clearSharedPayloads),
+    [clearSharedPayloads, pdf],
+  );
+
+  if (isResolving || pdf === undefined) {
     return (
       <Pantalla bordes={['top', 'left', 'right', 'bottom']}>
         <Texto variante="cuerpo" tono="secundario">
-          Leyendo tus facturas…
+          Leyendo lo que compartiste…
         </Texto>
       </Pantalla>
+    );
+  }
+  if (pdf !== null) {
+    return (
+      <LeerEstadoCuenta
+        extraer={extraer}
+        alVerTarjeta={(id) => router.replace({ pathname: '/tarjetas/[id]', params: { id } })}
+        alSalir={() => router.replace('/')}
+      />
     );
   }
   return <ImportarCompartidas leer={leer} alVerDeducciones={() => router.replace('/deducciones')} />;

@@ -15,6 +15,9 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `plantillas-firmadas/` | Copia congelada de plantillas firmada con Ed25519 (llave **pública** de prueba de RFC 8032) y `kat.json` | Verificación de plantillas remotas (M10) |
 | `respaldo/` | Archivo de respaldo de ejemplo, su versión alterada y `kat.json` (scrypt + AES-256-GCM), verificados con Python y Node | Respaldo cifrado (M9) |
 | `cfdi/*.xml` | 9 CFDI **sintéticos** (8 versión 4.0 y uno 3.3 que debe rechazarse) | E13: lectura de CFDI y deducciones (M12) |
+| `pdf/generar.mjs` | Genera los estados de cuenta en PDF **sintéticos** de M15 y, de los mismos datos, su texto (`.txt`) y lo que debe leerse (`.json`); `--verificar` comprueba que los archivos coinciden byte a byte | `packages/core` (prueba) |
+| `pdf/banco_{b,e,f}.pdf`, `.txt`, `.json` | Tres bancos ficticios: Banco B (42 movimientos en dos páginas, CA-M15-02), Banco E (dos fechas por renglón, abonos `CR`) y Banco F (fechas sin año, acentos, kerning); `banco_e.protegido.pdf` (contraseña `PRUEBA2026`) y `escaneado.pdf` (solo una imagen) | `nucleo-jvm` (PDFBox extrae el `.txt`), `packages/core` (CA-M15-01), `apps/movil` (CA-M15-02 y 03) |
+| `pdf/analizadores.ejemplo.json` | Analizadores **sintéticos** de esos tres bancos (`07 §8`); solo en builds de desarrollo | `packages/core`, `apps/movil` |
 | `escenarios/*.json` | Estados de usuario para cargar en la app de desarrollo y verificar pantallas: `e4-01`, `e5-10`, `e-captura`, `e-negocio` | Cargador de semillas de `apps/movil` |
 
 ## Cómo usar los vectores
@@ -38,6 +41,10 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 ## Notificaciones con `adb` (builds de depuración)
 
 `adb shell cmd notification post -S bigtext -t '<título>' <banco_id> '<texto>'` publica desde `com.android.shell` con la etiqueta `<banco_id>`; el build de depuración la trata como si viniera del primer paquete de ese banco en `plantillas.ejemplo.json` (`docs/07-CAPTURA.md §2.5`). Escapa `$` según tu shell.
+
+## Estados de cuenta en PDF (`pdf/`)
+
+Nunca se suben estados de cuenta reales. Para cambiar un PDF sintético se cambian los datos de `pdf/generar.mjs` y se regenera con `node fixtures/pdf/generar.mjs`; el `.json` sale de los mismos datos, no del analizador. Para probarlo en el teléfono, comparte el PDF con Finanvoz desde Archivos (build de desarrollo, escenario `e5-10`: las tarjetas terminan en 8812, 4410 y 1022).
 
 ## Cambiar un vector
 

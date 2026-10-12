@@ -463,3 +463,17 @@ export {
   type TipoDeduccionVista,
   type VistaDeducciones,
 } from './deducciones';
+export {
+  ajustarSaldoConEstado,
+  analizarEstadoCuentaPdf,
+  guardarEstadoCuenta,
+  type AnalisisEstadoCuenta,
+  type DecisionesEstado,
+  type LecturaEstadoCuenta,
+  type OpcionesEstado,
+  type PropuestaConciliacionEstado,
+  type RenglonDudoso,
+  type RenglonEstado,
+  type ResultadoGuardarEstado,
+  type TarjetaEstado,
+} from './estados-cuenta';
