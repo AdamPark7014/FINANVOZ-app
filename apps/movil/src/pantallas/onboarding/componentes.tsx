@@ -50,7 +50,7 @@ export function Chips<T extends string | number>({
                 paddingHorizontal: espacio.l,
                 borderRadius: radio.pastilla,
                 borderWidth: activo ? 2 : 1,
-                borderColor: activo ? c.acentoTexto : c.borde,
+                borderColor: activo ? c.acentoTexto : c.bordeControl,
                 backgroundColor: activo ? c.superficieAlterna : c.superficie,
               }}
             >

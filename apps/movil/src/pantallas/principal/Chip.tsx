@@ -32,7 +32,7 @@ export function Chip({
         justifyContent: 'center',
         borderRadius: radio.pastilla,
         borderWidth: seleccionado ? 2 : 1,
-        borderColor: seleccionado ? c.acentoTexto : c.borde,
+        borderColor: seleccionado ? c.acentoTexto : c.bordeControl,
         backgroundColor: seleccionado ? c.superficieAlterna : pressed ? c.superficieAlterna : c.superficie,
       })}
     >

@@ -45,7 +45,15 @@ function resumen(texto: string): string {
   return texto.length > 60 ? `${texto.slice(0, 57)}…` : texto;
 }
 
-export function auditar(raiz: Nodo | Nodo[] | null): Hallazgo[] {
+export interface OpcionesAuditoria {
+  /**
+   * M13 (RNF-08): además, todo lo tocable y todo campo traen `accessibilityLabel` propia (no basta el texto
+   * de los hijos, que TalkBack puede leer en otro orden o junto con íconos), y todo lo tocable trae rol.
+   */
+  readonly etiquetaExplicita?: boolean;
+}
+
+export function auditar(raiz: Nodo | Nodo[] | null, opciones: OpcionesAuditoria = {}): Hallazgo[] {
   const hallazgos: Hallazgo[] = [];
   const agregar = (regla: string, donde: string) => hallazgos.push({ regla, donde: resumen(donde) });
 
@@ -97,6 +105,8 @@ export function auditar(raiz: Nodo | Nodo[] | null): Hallazgo[] {
       const nombre = etiquetaPropia ?? texto;
       if (!rol || !ROLES_TOCABLES.has(rol)) agregar('tocable sin rol', nombre || String(p.testID ?? ''));
       if (!nombre.trim()) agregar('tocable sin nombre', String(p.testID ?? ''));
+      if (opciones.etiquetaExplicita && !etiquetaPropia)
+        agregar('tocable sin accessibilityLabel', nombre || String(p.testID ?? ''));
       if (tieneCifra(nombre)) agregar('tocable con cifra sin leer', nombre);
       const e = estilo(p);
       const alto = Math.max(Number(e.minHeight ?? 0), Number(e.height ?? 0));

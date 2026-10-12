@@ -56,7 +56,7 @@ export function Interruptor({
         // La fila ya expone el control; el Switch no se anuncia por separado.
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
-        trackColor={{ true: c.acento, false: c.borde }}
+        trackColor={{ true: c.acento, false: c.bordeControl }}
         thumbColor={c.superficie}
       />
     </Pressable>
