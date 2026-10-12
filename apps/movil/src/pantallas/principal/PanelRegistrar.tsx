@@ -29,6 +29,8 @@ import {
 } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
 import { mensajeLimite } from '../plan/textos';
+import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
+import { mensajeCuentaDividida, TITULO_CONFIRMAR_DIVISION } from '../personas/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
@@ -55,7 +57,14 @@ import { useAvisoRegistro } from './useAvisoRegistro';
 type ConTarjeta = Extract<
   ResultadoTexto,
   {
-    resultado: 'confirmar' | 'elegir' | 'duplicados' | 'aclarar' | 'confirmar_msi' | 'tarjeta_por_agregar';
+    resultado:
+      | 'confirmar'
+      | 'elegir'
+      | 'duplicados'
+      | 'aclarar'
+      | 'confirmar_msi'
+      | 'confirmar_division'
+      | 'tarjeta_por_agregar';
   }
 >;
 
@@ -173,6 +182,15 @@ export function PanelRegistrar({
           contarRegistro(origen);
           avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
           return;
+        case 'registrado_division':
+          terminarRevision();
+          setTexto('');
+          contarRegistro(origen);
+          avisarRegistro(
+            mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
+            r.deshacer,
+          );
+          return;
         case 'tarjeta_configurada':
           terminarRevision();
           setTexto('');
@@ -183,6 +201,7 @@ export function PanelRegistrar({
         case 'duplicados':
         case 'aclarar':
         case 'confirmar_msi':
+        case 'confirmar_division':
         case 'tarjeta_por_agregar':
           if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
@@ -327,6 +346,17 @@ export function PanelRegistrar({
           alGuardar={(r) => mostrar(r, tarjeta.origen)}
           alCancelar={() => setTarjeta(null)}
         />
+      ) : null}
+      {tarjeta?.datos.resultado === 'confirmar_division' ? (
+        <Tarjeta testID="confirmacion-division">
+          <Texto variante="subtitulo">{TITULO_CONFIRMAR_DIVISION}</Texto>
+          <FormularioCuentaDividida
+            prellenado={tarjeta.datos.propuesta}
+            origen={tarjeta.origen}
+            alGuardar={(r) => mostrar(r, tarjeta.origen)}
+            alCancelar={() => setTarjeta(null)}
+          />
+        </Tarjeta>
       ) : null}
       {tarjeta?.datos.resultado === 'tarjeta_por_agregar' ? (
         <Tarjeta testID="tarjeta-por-agregar">

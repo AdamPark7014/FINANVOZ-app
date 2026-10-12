@@ -182,6 +182,7 @@ export type ResultadoTexto =
       readonly resultado: 'registrado_division';
       readonly registro: CuentaDivididaRegistrada;
       readonly total: Centavos;
+      readonly descripcion: string | null;
       readonly deshacer: string;
     }
   /** "Mi Nu corta el 28 y pago el 18" sobre una tarjeta existente. */
@@ -537,7 +538,13 @@ export function confirmarCuentaDividida(
       ...(opciones.claveIdempotencia ? { claveIdempotencia: opciones.claveIdempotencia } : {}),
     });
     if (opciones.aprender) aprenderAlias(ctx, opciones.aprender.alias, entrada.origenId);
-    return { resultado: 'registrado_division', registro, total: entrada.total, deshacer: registro.deshacer };
+    return {
+      resultado: 'registrado_division',
+      registro,
+      total: entrada.total,
+      descripcion: entrada.descripcion?.trim() || null,
+      deshacer: registro.deshacer,
+    };
   });
 }
 

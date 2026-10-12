@@ -38,8 +38,11 @@ export function PantallaCuentas({
   alAbrirTarjeta,
   alAgregarTarjeta,
   alContarEfectivo,
+  alAbrirPersona,
 }: {
   alAbrirAjustes: () => void;
+  /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
+  alAbrirPersona?: (personaId: string) => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
   alAgregarTarjeta?: () => void;
   /** Cuentas → Efectivo → arqueo (`02 §7`). */
@@ -123,6 +126,9 @@ export function PantallaCuentas({
               titulo={p.nombre}
               subtitulo={null}
               centavos={p.saldo}
+              {...(alAbrirPersona
+                ? { accion: { etiqueta: 'Cobrar', alPresionar: () => alAbrirPersona(p.id) } }
+                : {})}
             />
           ))}
         </Seccion>
