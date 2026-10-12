@@ -215,6 +215,63 @@ export function deudasConPersonas(ctx: Contexto) {
  */
 export function obtenerHoy(ctx: Contexto): VistaHoy {
   procesarApertura(ctx);
+  const {
+    hoy,
+    ingreso,
+    variable,
+    h,
+    pendientes,
+    compromisos,
+    tarjetas,
+    pagosPlaneados,
+    cuotas,
+    deudas,
+    l,
+    colchon,
+    r,
+  } = calcularLibre(ctx);
+
+  // Mismo criterio de E4 para listar lo reservado.
+  const finEf = maxFecha(h.fin_efectivo, sumarDias(hoy, 1));
+  const nombreTarjeta = new Map(tarjetas.map((t) => [t.cuentaId, t.nombre]));
+  const conPlan = (id: string, modo: 'totalero' | 'plan') =>
+    modo === 'plan' && (pagosPlaneados.get(id)?.length ?? 0) > 0;
+  const reservadoDetalle: ConceptoReservado[] = [
+    ...tarjetas
+      .filter((t) => t.saldoRevolvente > 0 && !conPlan(t.cuentaId, t.modo))
+      .map((t) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: t.saldoRevolvente, fecha: null })),
+    ...tarjetas
+      .filter((t) => conPlan(t.cuentaId, t.modo))
+      .flatMap((t) =>
+        (pagosPlaneados.get(t.cuentaId) ?? [])
+          .filter((p) => p.fecha < finEf)
+          .map((p) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: p.monto, fecha: p.fecha })),
+      ),
+    ...compromisos
+      .filter((o) => o.fecha < finEf)
+      .map((o) => ({ tipo: 'compromiso' as const, concepto: o.concepto, monto: o.monto, fecha: o.fecha })),
+    ...cuotas
+      .filter((c) => c.limite < finEf)
+      .map((c) => ({
+        tipo: 'msi' as const,
+        concepto: nombreTarjeta.get(c.tarjetaId) ?? '',
+        monto: c.monto,
+        fecha: c.limite,
+      })),
+    ...deudas
+      .filter((d) => d.apartar)
+      .map((d) => ({ tipo: 'persona' as const, concepto: d.nombre, monto: d.monto, fecha: null })),
+  ];
+
+  return armarVistaHoy(ctx, { hoy, ingreso, variable, h, pendientes, l, colchon, r, reservadoDetalle });
+}
+
+/**
+ * E3.3 + E4 sin efectos (quien llama ya corrió `procesarApertura`): horizonte con las ocurrencias de ingreso ya
+ * recibidas y dinero libre con L, colchón, compromisos pendientes (incluidos los vencidos), tarjetas, cuotas MSI
+ * y deudas con personas. Lo usan Hoy y el simulador (E8: `E₀ = libre`).
+ */
+export function calcularLibre(ctx: Contexto) {
   const hoy = ctx.reloj.hoy();
   const ingreso = ingresoPrincipal(ctx);
   const variable = esIngresoVariable(ctx);
@@ -269,37 +326,33 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
     deudas_personas: deudas.map((d) => ({ contraparte: d.id, monto: d.monto, apartar: d.apartar })),
   });
 
-  // Mismo criterio de E4 para listar lo reservado.
-  const finEf = maxFecha(h.fin_efectivo, sumarDias(hoy, 1));
-  const nombreTarjeta = new Map(tarjetas.map((t) => [t.cuentaId, t.nombre]));
-  const conPlan = (id: string, modo: 'totalero' | 'plan') =>
-    modo === 'plan' && (pagosPlaneados.get(id)?.length ?? 0) > 0;
-  const reservadoDetalle: ConceptoReservado[] = [
-    ...tarjetas
-      .filter((t) => t.saldoRevolvente > 0 && !conPlan(t.cuentaId, t.modo))
-      .map((t) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: t.saldoRevolvente, fecha: null })),
-    ...tarjetas
-      .filter((t) => conPlan(t.cuentaId, t.modo))
-      .flatMap((t) =>
-        (pagosPlaneados.get(t.cuentaId) ?? [])
-          .filter((p) => p.fecha < finEf)
-          .map((p) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: p.monto, fecha: p.fecha })),
-      ),
-    ...compromisos
-      .filter((o) => o.fecha < finEf)
-      .map((o) => ({ tipo: 'compromiso' as const, concepto: o.concepto, monto: o.monto, fecha: o.fecha })),
-    ...cuotas
-      .filter((c) => c.limite < finEf)
-      .map((c) => ({
-        tipo: 'msi' as const,
-        concepto: nombreTarjeta.get(c.tarjetaId) ?? '',
-        monto: c.monto,
-        fecha: c.limite,
-      })),
-    ...deudas
-      .filter((d) => d.apartar)
-      .map((d) => ({ tipo: 'persona' as const, concepto: d.nombre, monto: d.monto, fecha: null })),
-  ];
+  return {
+    hoy,
+    ingreso,
+    variable,
+    recibidas,
+    h,
+    pendientes,
+    compromisos,
+    tarjetas,
+    pagosPlaneados,
+    cuotas,
+    deudas,
+    l,
+    colchon,
+    r,
+  };
+}
+
+export type CalculoLibre = ReturnType<typeof calcularLibre>;
+
+function armarVistaHoy(
+  ctx: Contexto,
+  d: Pick<CalculoLibre, 'hoy' | 'ingreso' | 'variable' | 'h' | 'pendientes' | 'l' | 'colchon' | 'r'> & {
+    reservadoDetalle: ConceptoReservado[];
+  },
+): VistaHoy {
+  const { hoy, ingreso, variable, h, pendientes, l, colchon, r, reservadoDetalle } = d;
 
   const estado: EstadoHoy = !ingreso && !variable ? 'sin_ingreso' : r.libre < 0 ? 'libre_negativo' : h.estado;
   const concepto = ingreso?.concepto ?? 'quincena';

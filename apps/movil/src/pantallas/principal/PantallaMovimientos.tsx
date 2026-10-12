@@ -8,6 +8,7 @@ import {
   listarMovimientos,
   listarPorInterpretar,
   listarTarjetas,
+  marcarExtraordinaria,
   pasarAMeses,
   type MovimientoVista,
 } from '../../servicios';
@@ -142,6 +143,28 @@ export function PantallaMovimientos({
                   mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
                 }
               }}
+              alExtraordinario={() => {
+                // "Fue algo extraordinario" (`04 §3`, `05 §E8.2`): no cuenta para estimar si llegas.
+                const marcar = !m.extraordinaria;
+                try {
+                  marcarExtraordinaria(ctx, m.id, marcar);
+                  refrescar();
+                  mostrar({
+                    mensaje: marcar
+                      ? 'Listo: no lo uso para estimar tus gastos de cada día.'
+                      : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+                    accion: {
+                      etiqueta: 'Deshacer',
+                      alPresionar: () => {
+                        marcarExtraordinaria(ctx, m.id, !marcar);
+                        refrescar();
+                      },
+                    },
+                  });
+                } catch {
+                  mostrar({ mensaje: MENSAJE_ERROR_GENERAL });
+                }
+              }}
             />
           ))}
         </View>
@@ -214,12 +237,14 @@ function FilaMovimiento({
   aMeses,
   alTocar,
   alAnular,
+  alExtraordinario,
 }: {
   m: MovimientoVista;
   abierto: boolean;
   aMeses: boolean;
   alTocar: () => void;
   alAnular: () => void;
+  alExtraordinario: () => void;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [pasando, setPasando] = useState(false);
@@ -265,6 +290,32 @@ function FilaMovimiento({
               alPresionar={() => setPasando(true)}
               testID="boton-pasar-a-meses"
             />
+          ) : null}
+          {m.tipo === 'gasto' && m.extraordinaria ? (
+            <Texto variante="secundario" tono="secundario" testID="nota-extraordinario">
+              Lo marcaste como extraordinario
+            </Texto>
+          ) : null}
+          {m.tipo === 'gasto' && !pasando && !confirmando ? (
+            m.extraordinaria ? (
+              <Boton
+                etiqueta="Volver a contarlo"
+                variante="texto"
+                ancho="contenido"
+                pista="Lo vuelvo a usar para estimar si llegas a tu próximo ingreso"
+                alPresionar={alExtraordinario}
+                testID="boton-volver-a-contar"
+              />
+            ) : (
+              <Boton
+                etiqueta="Fue algo extraordinario"
+                variante="texto"
+                ancho="contenido"
+                pista="No lo uso para estimar si llegas a tu próximo ingreso"
+                alPresionar={alExtraordinario}
+                testID="boton-extraordinario"
+              />
+            )
           ) : null}
           {pasando ? null : confirmando ? (
             <View style={{ gap: espacio.s }}>

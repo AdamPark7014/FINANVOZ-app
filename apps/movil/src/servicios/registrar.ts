@@ -37,6 +37,7 @@ import {
   type EntradaCompraMsi,
   type PreguntaLiquidar,
 } from './msi';
+import type { ConsultaMeAlcanza } from './me-alcanza';
 import type { MovimientoVista } from './movimientos';
 import { contextoNube, type NivelNube } from './nube';
 import { contactosInterprete } from './personas';
@@ -115,6 +116,8 @@ export type ResultadoTexto =
   /** "Lo guardé; lo interpreto cuando tengas internet." */
   | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
   | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
+  /** "¿Me alcanza para unos tenis de 1,500?": la pantalla abre "¿Me alcanza?" y llama `meAlcanza(ctx, consulta)`. */
+  | { readonly resultado: 'me_alcanza'; readonly consulta: ConsultaMeAlcanza }
   /** "Traigo 300": abre el arqueo con lo que dijo (`02 §7`); nada se registra sin confirmar (E7). */
   | { readonly resultado: 'arqueo'; readonly efectivoReal: Centavos }
   | {
@@ -190,6 +193,7 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'pasar_a_meses',
   'configurado',
   'consulta',
+  'me_alcanza',
 ]);
 
 function tipoResolutor(c: CuentaPropia): CuentaResolutor['tipo'] | null {
@@ -701,8 +705,18 @@ function aplicarInterpretacion(
       return { resultado: 'fuera_de_alcance', motivo: i.motivo ?? null };
     case 'arqueo':
       return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
-    case 'simular':
-      return { resultado: 'no_soportado', motivo: 'intencion' };
+    case 'simular': {
+      const { precio, descripcion, meses, fecha } = i.compra;
+      return {
+        resultado: 'me_alcanza',
+        consulta: {
+          precio,
+          ...(descripcion !== undefined ? { descripcion } : {}),
+          ...(meses !== undefined ? { meses } : {}),
+          ...(fecha !== undefined ? { fecha } : {}),
+        },
+      };
+    }
   }
 }
 

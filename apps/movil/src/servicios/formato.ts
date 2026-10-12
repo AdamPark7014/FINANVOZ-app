@@ -18,3 +18,45 @@ export function etiquetaDiaMes(fecha: PlainDate): string {
 export function dias(n: number): string {
   return n === 1 ? '1 día' : `${n} días`;
 }
+
+const DIAS_LARGOS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'] as const;
+const MESES_LARGOS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+] as const;
+
+/** "jueves". */
+export function diaLargo(fecha: PlainDate): string {
+  return DIAS_LARGOS[diaSemana(fecha) - 1] as string;
+}
+
+/** "enero". */
+export function mesLargo(fecha: PlainDate): string {
+  return MESES_LARGOS[partes(fecha).mes - 1] as string;
+}
+
+/** "10,000". */
+export function miles(n: number): string {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/**
+ * Cifra para frases armadas en servicios ("Comprometes $500 al mes"): `$1,500` sin centavos si son .00 y
+ * `$1,099.90` con ellos (mismo criterio que `ui/formato` en modo `auto`).
+ */
+export function pesos(centavos: number): string {
+  const abs = Math.abs(centavos);
+  const resto = abs % 100;
+  const texto = `$${miles(Math.floor(abs / 100))}${resto === 0 ? '' : `.${String(resto).padStart(2, '0')}`}`;
+  return centavos < 0 ? `−${texto}` : texto;
+}

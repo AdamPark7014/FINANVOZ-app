@@ -1,0 +1,50 @@
+// E8 · Simulador probabilístico (`docs/05-MOTORES.md §E8`).
+export { fnv1a32, mulberry32, semillaDelDia, VERSION_SIMULADOR } from './prng';
+export {
+  claseDia,
+  construirHistorial,
+  construirPools,
+  DIAS_ESTIMACION_INICIAL,
+  estadoDatos,
+  MIN_DIAS_HISTORIAL,
+  MIN_DIAS_POOL,
+  VENTANA_HISTORIAL,
+  type ClaseDia,
+  type DiaHistorial,
+  type EstadoDatos,
+  type Pools,
+  type TransaccionHistorial,
+} from './historial';
+export {
+  correrCompleto,
+  crearSimulacion,
+  cuantil,
+  simular,
+  type EntradaSimulacion,
+  type HorizonteSimulacion,
+  type Paso,
+  type ResultadoSimulacion,
+} from './simulacion';
+export {
+  cargosDe,
+  compararEscenarios,
+  construirHorizontes,
+  crearComparacion,
+  DIAS_VENTANA_N_COMPLETO,
+  EMPATE_BP,
+  generarEscenarios,
+  MESES_POR_OMISION,
+  N_VENTANA_CORTA,
+  N_VENTANA_LARGA,
+  TOPE_MESES_VENTANA,
+  UMBRAL_PRECIO_MSI,
+  type CompromisoFechado,
+  type EntradaComparacion,
+  type Escenario,
+  type EscenarioCompra,
+  type EscenariosGenerados,
+  type NotaEscenarios,
+  type ResultadoComparacion,
+  type ResultadoEscenario,
+} from './escenarios';
+export { brier, BRIER_OBJETIVO, probabilidadBp, type PrediccionCerrada } from './calibracion';

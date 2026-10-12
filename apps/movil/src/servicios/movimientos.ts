@@ -26,6 +26,8 @@ export interface MovimientoVista {
   readonly llegaA: readonly string[];
   readonly categoria: string | null;
   readonly porRevisar: boolean;
+  /** Marcado como "Fue algo extraordinario": no cuenta para estimar el gasto diario (`05 §E8.2`). */
+  readonly extraordinaria: boolean;
   readonly insignias: readonly Insignia[];
   /** Movimiento al que reemplazó (corrección, `04 §4`); su historial sale de `historialMovimiento`. */
   readonly reemplazaA: string | null;
@@ -127,6 +129,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
       llegaA: propias.filter((a) => a.monto > 0).map((a) => a.c.nombre),
       categoria: categoria?.nombre ?? null,
       porRevisar: t.porRevisar === 1,
+      extraordinaria: t.extraordinaria === 1,
       insignias,
       reemplazaA: t.reemplazaA,
     });
