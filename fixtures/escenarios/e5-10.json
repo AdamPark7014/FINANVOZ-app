@@ -1,0 +1,18 @@
+{
+  "id": "e5-10",
+  "descripcion": "Tres tarjetas del vector E5. Sin historial de compras con crédito, la tarjeta del día usa $500 y debe ser Banamex Oro ••8812 con 50 días para pagar.",
+  "hoy": "2026-10-11",
+  "colchon": 0,
+  "ingreso": { "concepto": "quincena", "monto": 650000, "regla": { "tipo": "quincenal_15_ultimo", "ajuste": "anterior" }, "ultimo_recibido": "2026-09-30" },
+  "cuentas": [
+    { "clave": "efectivo", "subtipo": "efectivo", "nombre": "Cartera", "saldo": 50000, "alias": ["efectivo"] },
+    { "clave": "oro", "subtipo": "tarjeta_credito", "nombre": "Banamex Oro ••8812", "ultimos4": "8812", "saldo": 120000, "alias": ["banamex", "oro"],
+      "tarjeta": { "dia_corte": 10, "dias_para_pagar": 20, "limite_credito": 3000000, "modo": "totalero" } },
+    { "clave": "nu", "subtipo": "tarjeta_credito", "nombre": "Nu ••4410", "ultimos4": "4410", "saldo": 200000, "alias": ["nu"],
+      "tarjeta": { "dia_corte": 28, "dia_limite_pago": 18, "limite_credito": 1500000, "modo": "totalero" } },
+    { "clave": "azul", "subtipo": "tarjeta_credito", "nombre": "BBVA Azul ••1022", "ultimos4": "1022", "saldo": 290000, "alias": ["azul"],
+      "tarjeta": { "dia_corte": 31, "dias_para_pagar": 20, "limite_credito": 1000000, "modo": "totalero" } }
+  ],
+  "compromisos_unicos": [],
+  "esperado": { "tarjeta_del_dia": "oro", "dias_financiamiento": 50 }
+}

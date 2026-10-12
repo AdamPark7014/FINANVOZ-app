@@ -1,0 +1,15 @@
+# Finales de línea LF en todo el repositorio, también en Windows.
+* text=auto eol=lf
+
+# Archivos cuyos bytes exactos importan (firmas, hashes, cifrado): sin conversión.
+fixtures/plantillas-firmadas/** -text
+fixtures/respaldo/** -text
+*.cartera binary
+
+# Binarios comunes
+*.png binary
+*.jpg binary
+*.pdf binary
+*.zip binary
+*.apk binary
+*.aab binary

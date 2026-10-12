@@ -1,0 +1,22 @@
+{
+  "descripcion": "Plantillas firmadas con Ed25519 (docs/07-CAPTURA.md §3.1). Llave del vector 1 de RFC 8032: es PÚBLICA y solo sirve para pruebas; nunca se usa en producción.",
+  "rfc8032_prueba_1": {
+    "llave_secreta_hex": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+    "llave_publica_hex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+    "mensaje_hex": "",
+    "firma_hex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+  },
+  "archivo": "fixtures/plantillas-firmadas/plantillas.json",
+  "firma_archivo": "fixtures/plantillas-firmadas/plantillas.json.sig",
+  "firma_base64": "0zDRArU6xj4lCgBhR7lesDPPJVPPTU+dDL4DmkgwZQ/5R7Lhh6cH26ZuRBpSjEYf7tWC/K2J3NjnWpv3745YAQ==",
+  "llave_publica_hex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+  "sha256_archivo": "1fa7234506a0e23694c65fb3f794d871611146691ec5c60f7470d57248defec0",
+  "pruebas": [
+    "El archivo con su firma se acepta.",
+    "El mismo archivo con un byte cambiado se rechaza (firma_invalida).",
+    "Una firma válida con otra llave pública se rechaza.",
+    "Una versión menor o igual a la instalada se ignora aunque la firma sea válida."
+  ],
+  "nota": "Copia de plantillas.ejemplo.json con version 2 y los campos emitido_en y version_minima_app (docs/07-CAPTURA.md §3.1), para probar que una versión mayor que la embebida (1) se acepta. No la edites: si necesitas otra, fírmala con node scripts/firmar-plantillas.mjs <archivo> --llave-prueba y actualiza este archivo.",
+  "version_embebida_en_las_pruebas": 1
+}

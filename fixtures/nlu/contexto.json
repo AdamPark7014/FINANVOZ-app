@@ -1,0 +1,122 @@
+{
+  "descripcion": "Usuario ficticio contra el que se evalúa el golden set. Tiene un espacio personal y uno de negocio (una tienda). El parser recibe este contexto (alias, contactos, catálogo, fechas) igual que en producción.",
+  "fecha_referencia": "2026-10-11",
+  "dia_semana_referencia": "domingo",
+  "zona_horaria": "America/Mexico_City",
+  "espacios": ["personal", "negocio"],
+  "negocio": {"nombre": "Tienda de abarrotes", "regimen": "resico_pf", "cobra_iva": false},
+  "ingreso": {
+    "regla": {"tipo": "quincenal_15_ultimo", "ajuste": "anterior"},
+    "monto": 800000,
+    "ultimo_ingreso": "2026-09-30",
+    "proximo_ingreso": "2026-10-15"
+  },
+  "cuentas": [
+    {
+      "id": "cta_efectivo",
+      "tipo": "efectivo",
+      "nombre": "Cartera",
+      "alias": ["efectivo", "cash", "cartera", "efe", "billetes"],
+      "espacio": "personal"
+    },
+    {
+      "id": "cta_bbva",
+      "tipo": "debito",
+      "nombre": "BBVA Débito ••5521",
+      "alias": ["bbva", "debito bbva", "nomina"],
+      "espacio": "personal"
+    },
+    {
+      "id": "cta_mercado_pago",
+      "tipo": "debito",
+      "nombre": "Mercado Pago",
+      "alias": ["mercado pago", "mp"],
+      "espacio": "personal"
+    },
+    {
+      "id": "tarj_nu_4410",
+      "tipo": "credito",
+      "nombre": "Nu ••4410",
+      "alias": ["nu", "morada", "nubank"],
+      "espacio": "personal"
+    },
+    {
+      "id": "tarj_banamex_8812",
+      "tipo": "credito",
+      "nombre": "Banamex Oro ••8812",
+      "alias": ["banamex", "oro"],
+      "espacio": "personal"
+    },
+    {
+      "id": "cta_caja_tienda",
+      "tipo": "efectivo",
+      "nombre": "Caja de la tienda",
+      "espacio": "negocio",
+      "alias": ["caja", "tienda", "caja de la tienda"]
+    },
+    {
+      "id": "cta_banorte_negocio",
+      "tipo": "debito",
+      "nombre": "Banorte del negocio ••7730",
+      "espacio": "negocio",
+      "alias": ["banorte", "negocio", "cuenta del negocio"]
+    }
+  ],
+  "contactos": [
+    {"id": "ctc_mama", "nombre": "Mamá", "alias": ["jefa", "mama"]},
+    {"id": "ctc_juan", "nombre": "Juan", "alias": ["juan"]},
+    {"id": "ctc_caro", "nombre": "Carolina", "alias": ["caro", "carolina"]}
+  ],
+  "clientes": [{"id": "cli_mari", "nombre": "Doña Mari", "alias": ["dona mari", "mari"], "espacio": "negocio"}],
+  "categorias": {
+    "gasto": [
+      "comida_fuera",
+      "antojos",
+      "super",
+      "transporte",
+      "gasolina",
+      "entretenimiento",
+      "ropa",
+      "hogar",
+      "cuidado_personal",
+      "salud",
+      "mascotas",
+      "regalos",
+      "apoyo_familiar",
+      "viajes",
+      "tecnologia",
+      "deporte",
+      "otros_gastos",
+      "vivienda",
+      "servicios",
+      "suscripciones",
+      "educacion",
+      "comisiones_intereses"
+    ],
+    "ingreso": ["sueldo", "honorarios", "ventas", "regalo_recibido", "reembolso", "rendimientos", "otros_ingresos"],
+    "grupos": {
+      "comida": ["comida_fuera", "antojos", "super"],
+      "movilidad": ["transporte", "gasolina"],
+      "casa": ["vivienda", "servicios", "hogar"]
+    },
+    "negocio": {
+      "ingreso": ["ventas", "servicios_prestados", "otros_ingresos"],
+      "gasto": [
+        "mercancia",
+        "insumos",
+        "renta_local",
+        "servicios",
+        "sueldos_ayudantes",
+        "publicidad",
+        "comisiones_intereses",
+        "transporte",
+        "equipo",
+        "mantenimiento",
+        "impuestos",
+        "otros_impuestos",
+        "otros_gastos"
+      ]
+    }
+  },
+  "normalizacion_alias": "minúsculas, sin acentos, todo lo que no sea letra o número → espacio, se eliminan las palabras: la el los las mi mis de del con tarjeta cuenta; espacios simples"
+}

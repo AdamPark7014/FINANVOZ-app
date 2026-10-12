@@ -1,0 +1,122 @@
+{
+  "version": 2,
+  "emitido_en": "2026-10-11T18:00:00Z",
+  "version_minima_app": "1.0.0",
+  "advertencia": "FORMATOS SINTÉTICOS. Sirven para probar el motor de plantillas y el flujo de captura. No reproducen el texto de ningún banco real. Las plantillas reales se escriben en el hito M5 a partir de notificaciones reales capturadas en el teléfono de desarrollo (modo diagnóstico, docs/07-CAPTURA.md §4).",
+  "bancos": [
+    {
+      "id": "banco_a",
+      "nombre": "Banco A (débito)",
+      "paquetes_android": [
+        "mx.ejemplo.bancoa"
+      ]
+    },
+    {
+      "id": "banco_b",
+      "nombre": "Banco B (crédito)",
+      "paquetes_android": [
+        "mx.ejemplo.bancob"
+      ]
+    },
+    {
+      "id": "billetera_c",
+      "nombre": "Billetera C",
+      "paquetes_android": [
+        "mx.ejemplo.billeterac"
+      ]
+    },
+    {
+      "id": "cobros_d",
+      "nombre": "Cobros D (terminal de cobro, espacio negocio)",
+      "paquetes_android": [
+        "mx.ejemplo.cobrosd"
+      ]
+    }
+  ],
+  "plantillas": [
+    {
+      "id": "banco_a.ignorar_promocion.v1",
+      "banco": "banco_a",
+      "tipo": "ignorar",
+      "campo": "titulo+texto",
+      "patron": "(?:aprovecha|promoci[oó]n|meses sin intereses en tus compras)"
+    },
+    {
+      "id": "banco_a.compra.v1",
+      "banco": "banco_a",
+      "tipo": "cargo",
+      "campo": "texto",
+      "patron": "^Compraste \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) en (?<comercio>.+?) con tu tarjeta \\*{3}(?<ultimos4>\\d{4})\\.?$"
+    },
+    {
+      "id": "banco_a.retiro.v1",
+      "banco": "banco_a",
+      "tipo": "retiro",
+      "campo": "texto",
+      "patron": "^Retiraste \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) en cajero (?<comercio>.+?) con tu tarjeta \\*{3}(?<ultimos4>\\d{4})\\.?$"
+    },
+    {
+      "id": "banco_a.spei_recibida.v1",
+      "banco": "banco_a",
+      "tipo": "transferencia_recibida",
+      "campo": "texto",
+      "patron": "^Recibiste una transferencia de \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) de (?<contraparte>.+?)\\.?$"
+    },
+    {
+      "id": "banco_a.spei_enviada.v1",
+      "banco": "banco_a",
+      "tipo": "transferencia_enviada",
+      "campo": "texto",
+      "patron": "^Enviaste \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) a (?<contraparte>.+?)\\.?$"
+    },
+    {
+      "id": "banco_b.cargo.v1",
+      "banco": "banco_b",
+      "tipo": "cargo",
+      "campo": "texto",
+      "patron": "^Se realizó un cargo de \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) en (?<comercio>.+?) con tu tarjeta con terminación (?<ultimos4>\\d{4})\\.?$"
+    },
+    {
+      "id": "banco_b.devolucion.v1",
+      "banco": "banco_b",
+      "tipo": "devolucion",
+      "campo": "texto",
+      "patron": "^Se abonó una devolución de \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) de (?<comercio>.+?) a tu tarjeta con terminación (?<ultimos4>\\d{4})\\.?$"
+    },
+    {
+      "id": "banco_b.pago_recibido.v1",
+      "banco": "banco_b",
+      "tipo": "pago_recibido_tarjeta",
+      "campo": "titulo+texto",
+      "patron": "terminación (?<ultimos4>\\d{4}).*?Recibimos tu pago de \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?)"
+    },
+    {
+      "id": "billetera_c.pago.v1",
+      "banco": "billetera_c",
+      "tipo": "cargo",
+      "campo": "texto",
+      "patron": "^Pagaste \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) a (?<comercio>.+?)$"
+    },
+    {
+      "id": "billetera_c.ingreso.v1",
+      "banco": "billetera_c",
+      "tipo": "transferencia_recibida",
+      "campo": "texto",
+      "patron": "^Ingresaste \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) a tu cuenta$"
+    },
+    {
+      "id": "cobros_d.cobro.v1",
+      "banco": "cobros_d",
+      "tipo": "cobro_recibido",
+      "campo": "texto",
+      "patron": "^Cobro aprobado por \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?)\\. Tu venta #\\d+ ya está en tu saldo\\.?$"
+    },
+    {
+      "id": "cobros_d.liquidacion.v1",
+      "banco": "cobros_d",
+      "tipo": "transferencia_enviada",
+      "campo": "texto",
+      "patron": "^Depositamos \\$(?<monto>[\\d,]+(?:\\.\\d{1,2})?) a tu cuenta con terminación (?<destino4>\\d{4})\\.?$"
+    }
+  ]
+}

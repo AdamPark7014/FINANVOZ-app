@@ -1,0 +1,60 @@
+{
+  "id": "e-captura",
+  "descripcion": "Recorrido completo de captura (docs/07-CAPTURA.md §5) con las 12 notificaciones sintéticas de fixtures/notificaciones/ejemplos.jsonl. Se publican en orden de id, una por minuto desde el 11 oct 2026 a las 10:00 (hora del centro); 'cuando' = la hora de publicación.",
+  "hoy": "2026-10-11",
+  "zona_horaria": "America/Mexico_City",
+  "colchon": 0,
+  "ingreso": { "concepto": "quincena", "monto": 650000, "cuenta": "banco_a", "regla": { "tipo": "quincenal_15_ultimo", "ajuste": "anterior" }, "ultimo_recibido": "2026-09-30" },
+  "cuentas": [
+    { "clave": "efectivo", "subtipo": "efectivo", "nombre": "Cartera", "saldo": 50000, "alias": ["efectivo"] },
+    { "clave": "banco_a", "subtipo": "debito", "nombre": "Banco A ••5521", "institucion": "banco_a", "ultimos4": "5521", "saldo": 1000000, "alias": ["banco a"] },
+    { "clave": "banco_b", "subtipo": "tarjeta_credito", "nombre": "Banco B ••8812", "institucion": "banco_b", "ultimos4": "8812", "saldo": 420000, "alias": ["banco b"],
+      "tarjeta": { "dia_corte": 10, "dias_para_pagar": 20, "limite_credito": 3000000, "modo": "totalero" } },
+    { "clave": "billetera_c", "subtipo": "billetera", "nombre": "Billetera C", "institucion": "billetera_c", "saldo": 100000, "alias": ["billetera"] }
+  ],
+  "contactos": [
+    { "clave": "caro", "nombre": "Carolina Pérez López", "alias": ["caro"], "te_debe": 30000 }
+  ],
+  "compromisos_unicos": [],
+  "captura": {
+    "apps_autorizadas": ["mx.ejemplo.bancoa", "mx.ejemplo.bancob", "mx.ejemplo.billeterac"],
+    "plantillas": "fixtures/notificaciones/plantillas.ejemplo.json",
+    "notificaciones": "fixtures/notificaciones/ejemplos.jsonl",
+    "adb": "En build de depuración: adb shell cmd notification post -S bigtext -t '<titulo>' <banco_id> '<texto>' con banco_id = banco_a, banco_b o billetera_c según el paquete (docs/07-CAPTURA.md §2.5)."
+  },
+  "esperado": {
+    "por_notificacion": [
+      { "id": "N-01", "captura": "vinculada", "movimiento": { "tipo": "gasto", "monto": 25000, "cuenta": "banco_a", "categoria": "antojos" }, "por_revisar": false },
+      { "id": "N-02", "captura": "vinculada", "movimiento": { "tipo": "retiro_efectivo", "monto": 50000, "de": "banco_a", "a": "efectivo" }, "por_revisar": false },
+      { "id": "N-03", "captura": "vinculada", "movimiento": { "tipo": "cobro_prestamo", "monto": 30000, "cuenta": "banco_a", "contraparte": "caro" }, "por_revisar": false },
+      { "id": "N-04", "captura": "vinculada", "movimiento": { "tipo": "transferencia_pendiente", "monto": 420000, "de": "banco_a", "a": "activo:transito" }, "nota": "Temporal: N-08 la reemplaza", "por_revisar": false },
+      { "id": "N-05", "captura": "descartada", "movimiento": null },
+      { "id": "N-06", "captura": "vinculada", "movimiento": { "tipo": "gasto", "monto": 183000, "cuenta": "banco_b", "categoria": "super" }, "por_revisar": true, "chip": "¿Fue a meses?" },
+      { "id": "N-07", "captura": "vinculada", "movimiento": { "tipo": "reembolso", "monto": 19900, "cuenta": "banco_b", "contra": "ingreso:reembolso" }, "por_revisar": false, "nota": "No hay cargo original de TIENDA EN LINEA en 60 días" },
+      { "id": "N-08", "captura": "vinculada", "movimiento": { "tipo": "pago_tarjeta", "monto": 420000, "de": "banco_a", "a": "banco_b" }, "reemplaza": "N-04", "por_revisar": false },
+      { "id": "N-09", "captura": "vinculada", "movimiento": { "tipo": "gasto", "monto": 9600, "cuenta": "billetera_c", "categoria": "transporte" }, "por_revisar": false },
+      { "id": "N-10", "captura": "vinculada", "movimiento": { "tipo": "ingreso", "monto": 200000, "cuenta": "billetera_c", "categoria": "otros_ingresos" }, "por_revisar": true },
+      { "id": "N-11", "captura": "no_reconocida", "movimiento": null, "por_revisar": true },
+      { "id": "N-12", "captura": "vinculada", "movimiento": { "tipo": "gasto", "monto": 109990, "cuenta": "banco_a", "categoria": null }, "por_revisar": true, "nota": "AUDIO TECH no está en el catálogo semilla: la tarjeta pregunta la categoría" }
+    ],
+    "saldos_finales": {
+      "convencion": "Como en el resto del archivo: tarjetas en deuda positiva; contactos en lo que te deben.",
+      "efectivo": 100000,
+      "banco_a": 425010,
+      "billetera_c": 290400,
+      "banco_b": 163100,
+      "caro": 0,
+      "activo:transito": 0,
+      "pasivo:por_asignar": 0,
+      "activo:por_asignar_entradas": 0
+    },
+    "transacciones_vigentes_desde_capturas": 9,
+    "por_revisar": ["N-06", "N-10", "N-11", "N-12"],
+    "no_reconocidas_por_banco": { "banco_b": 1 },
+    "invariantes": [
+      "La comprobación de integridad de docs/04-DATOS.md §3 devuelve vacío.",
+      "Procesar otra vez la misma cola no crea capturas ni movimientos nuevos (huella).",
+      "Si N-08 llega antes que N-04, el resultado final es idéntico; entre ambas, activo:transito vale −420000 y resta del dinero libre."
+    ]
+  }
+}

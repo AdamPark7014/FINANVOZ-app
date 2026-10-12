@@ -1,0 +1,29 @@
+{
+  "descripcion": "Vector de conocimiento para el formato de respaldo (docs/05-MOTORES.md §E16). Parámetros de scrypt de PRUEBA (N=16384) para que la prueba sea rápida; el formato es el mismo que en producción.",
+  "archivo": "fixtures/respaldo/ejemplo.cartera",
+  "archivo_alterado": "fixtures/respaldo/ejemplo-alterado.cartera",
+  "contrasena": "correcto caballo batería grapa",
+  "clave_hex": "fa4215f3b2d21a2538589aaaca238c680197b916a60d72b268cda582c177508b",
+  "encabezado": {
+    "formato": "cartera-respaldo",
+    "version": 1,
+    "kdf": {
+      "alg": "scrypt",
+      "n": 16384,
+      "r": 8,
+      "p": 1,
+      "sal_b64": "AAECAwQFBgcICQoLDA0ODw=="
+    },
+    "cifrado": {
+      "alg": "AES-256-GCM",
+      "nonce_b64": "Dw4NDAsKCQgHBgUE"
+    },
+    "creado_en": "2026-10-11T18:00:00Z",
+    "version_esquema": 1,
+    "contenido": "json+gzip"
+  },
+  "encabezado_bytes_utf8": "{\"cifrado\":{\"alg\":\"AES-256-GCM\",\"nonce_b64\":\"Dw4NDAsKCQgHBgUE\"},\"contenido\":\"json+gzip\",\"creado_en\":\"2026-10-11T18:00:00Z\",\"formato\":\"cartera-respaldo\",\"kdf\":{\"alg\":\"scrypt\",\"n\":16384,\"p\":1,\"r\":8,\"sal_b64\":\"AAECAwQFBgcICQoLDA0ODw==\"},\"version\":1,\"version_esquema\":1}",
+  "contenido_descomprimido": "{\"formato\":\"cartera-exportacion\",\"version\":1,\"cuentas\":[],\"transacciones\":[],\"nota\":\"ejemplo mínimo\"}",
+  "sha256_archivo": "ecf412e90b89f666ef4f75f4a31dd85285d58994da77bd2f71014d58a31f3de9",
+  "esperado_alterado": "respaldo_corrupto_o_contrasena_incorrecta"
+}

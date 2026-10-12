@@ -1,0 +1,490 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cartera.app/esquemas/interpretacion.json",
+  "title": "Interpretacion",
+  "description": "Salida del intérprete de lenguaje (reglas o LLM). Fuente canónica: packages/nlu/src/esquema.ts (Zod); este archivo debe coincidir y se usa para validar fixtures. NO es el esquema que se envía al proveedor de LLM: ese es una proyección simplificada (docs/06-NLU.md §10.1).",
+  "oneOf": [
+    {"$ref": "#/$defs/registrar"},
+    {"$ref": "#/$defs/corregir"},
+    {"$ref": "#/$defs/anular"},
+    {"$ref": "#/$defs/revisar_duplicados"},
+    {"$ref": "#/$defs/arqueo"},
+    {"$ref": "#/$defs/consultar"},
+    {"$ref": "#/$defs/simular"},
+    {"$ref": "#/$defs/configurar"},
+    {"$ref": "#/$defs/aclarar"},
+    {"$ref": "#/$defs/fuera_de_alcance"}
+  ],
+  "$defs": {
+    "fecha": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "centavos": {"type": "integer", "minimum": 1},
+    "centavos0": {"type": "integer", "minimum": 0},
+    "texto": {"type": "string", "minLength": 1, "maxLength": 120},
+    "categoria": {
+      "enum": [
+        "comida_fuera",
+        "antojos",
+        "super",
+        "transporte",
+        "gasolina",
+        "entretenimiento",
+        "ropa",
+        "hogar",
+        "cuidado_personal",
+        "salud",
+        "mascotas",
+        "regalos",
+        "apoyo_familiar",
+        "viajes",
+        "tecnologia",
+        "deporte",
+        "otros_gastos",
+        "vivienda",
+        "servicios",
+        "suscripciones",
+        "educacion",
+        "comisiones_intereses",
+        "sueldo",
+        "honorarios",
+        "ventas",
+        "regalo_recibido",
+        "reembolso",
+        "rendimientos",
+        "otros_ingresos",
+        "servicios_prestados",
+        "mercancia",
+        "insumos",
+        "renta_local",
+        "sueldos_ayudantes",
+        "publicidad",
+        "equipo",
+        "mantenimiento",
+        "impuestos",
+        "otros_impuestos"
+      ]
+    },
+    "categoriaConsulta": {"anyOf": [{"$ref": "#/$defs/categoria"}, {"enum": ["comida", "movilidad", "casa"]}]},
+    "refCuenta": {
+      "type": "object",
+      "properties": {
+        "tipo": {"enum": ["efectivo", "debito", "credito", "tarjeta", "desconocido"]},
+        "alias": {"$ref": "#/$defs/texto"}
+      },
+      "required": ["tipo"],
+      "additionalProperties": false
+    },
+    "rango": {
+      "type": "object",
+      "properties": {"desde": {"$ref": "#/$defs/fecha"}, "hasta": {"$ref": "#/$defs/fecha"}},
+      "required": ["desde", "hasta"],
+      "additionalProperties": false
+    },
+    "msi": {
+      "type": "object",
+      "properties": {"meses": {"type": "integer", "minimum": 2, "maximum": 48}},
+      "required": ["meses"],
+      "additionalProperties": false
+    },
+    "ajusteFinDeSemana": {"enum": ["anterior", "siguiente", "ninguno"]},
+    "reglaQuincenal15Ultimo": {
+      "type": "object",
+      "properties": {"tipo": {"const": "quincenal_15_ultimo"}, "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}},
+      "required": ["tipo"],
+      "additionalProperties": false
+    },
+    "reglaQuincenalDias": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "quincenal_dias"},
+        "dias": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1, "maximum": 31},
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}
+      },
+      "required": ["tipo", "dias"],
+      "additionalProperties": false
+    },
+    "reglaMensual": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "mensual"},
+        "dia": {"type": "integer", "minimum": 1, "maximum": 31},
+        "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}
+      },
+      "required": ["tipo", "dia"],
+      "additionalProperties": false
+    },
+    "reglaSemanal": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "semanal"},
+        "dia_semana": {"type": "integer", "minimum": 1, "maximum": 7},
+        "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}
+      },
+      "required": ["tipo", "dia_semana"],
+      "additionalProperties": false
+    },
+    "reglaCatorcenal": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "catorcenal"},
+        "ancla": {"$ref": "#/$defs/fecha"},
+        "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}
+      },
+      "required": ["tipo", "ancla"],
+      "additionalProperties": false
+    },
+    "reglaUnica": {
+      "type": "object",
+      "properties": {"tipo": {"const": "unica"}, "fecha": {"$ref": "#/$defs/fecha"}},
+      "required": ["tipo", "fecha"],
+      "additionalProperties": false
+    },
+    "reglaRecurrente": {
+      "oneOf": [
+        {"$ref": "#/$defs/reglaQuincenal15Ultimo"},
+        {"$ref": "#/$defs/reglaQuincenalDias"},
+        {"$ref": "#/$defs/reglaMensual"},
+        {"$ref": "#/$defs/reglaSemanal"},
+        {"$ref": "#/$defs/reglaCatorcenal"},
+        {"$ref": "#/$defs/reglaAnual"}
+      ]
+    },
+    "regla": {"oneOf": [{"$ref": "#/$defs/reglaRecurrente"}, {"$ref": "#/$defs/reglaUnica"}]},
+    "movimiento": {
+      "type": "object",
+      "properties": {
+        "tipo": {
+          "enum": [
+            "gasto",
+            "ingreso",
+            "transferencia",
+            "retiro_efectivo",
+            "pago_tarjeta",
+            "prestamo_otorgado",
+            "cobro_prestamo",
+            "prestamo_recibido",
+            "pago_prestamo",
+            "compra_msi",
+            "cuenta_dividida",
+            "aportacion_tanda",
+            "cobro_tanda",
+            "retiro_dueno",
+            "aportacion_dueno"
+          ]
+        },
+        "monto": {"$ref": "#/$defs/centavos"},
+        "fecha": {"$ref": "#/$defs/fecha"},
+        "descripcion": {"$ref": "#/$defs/texto"},
+        "categoria": {"$ref": "#/$defs/categoria"},
+        "espacio": {"enum": ["personal", "negocio"]},
+        "origen": {"$ref": "#/$defs/refCuenta"},
+        "destino": {"$ref": "#/$defs/refCuenta"},
+        "contraparte": {"$ref": "#/$defs/texto"},
+        "msi": {"$ref": "#/$defs/msi"},
+        "division": {
+          "type": "object",
+          "properties": {
+            "partes": {"type": "integer", "minimum": 2, "maximum": 50},
+            "participantes": {"type": "array", "items": {"$ref": "#/$defs/texto"}}
+          },
+          "required": ["partes"],
+          "additionalProperties": false
+        },
+        "aproximado": {"type": "boolean"}
+      },
+      "required": ["tipo", "monto", "fecha"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {"categoria": {"$ref": "#/$defs/categoriaNegocioExclusiva"}},
+            "required": ["categoria"]
+          },
+          "then": {"properties": {"espacio": {"const": "negocio"}}, "required": ["espacio"]}
+        }
+      ]
+    },
+    "referencia": {
+      "type": "object",
+      "properties": {
+        "ultimo": {"type": "boolean"},
+        "texto": {"$ref": "#/$defs/texto"},
+        "fecha": {"$ref": "#/$defs/fecha"},
+        "monto": {"$ref": "#/$defs/centavos"}
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "registrar": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "registrar"},
+        "movimientos": {"type": "array", "items": {"$ref": "#/$defs/movimiento"}, "minItems": 1, "maxItems": 10}
+      },
+      "required": ["intencion", "movimientos"],
+      "additionalProperties": false
+    },
+    "corregir": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "corregir"},
+        "objetivo": {"$ref": "#/$defs/referencia"},
+        "cambios": {
+          "type": "object",
+          "properties": {
+            "monto": {"$ref": "#/$defs/centavos"},
+            "fecha": {"$ref": "#/$defs/fecha"},
+            "categoria": {"$ref": "#/$defs/categoria"},
+            "origen": {"$ref": "#/$defs/refCuenta"},
+            "descripcion": {"$ref": "#/$defs/texto"},
+            "msi": {"$ref": "#/$defs/msi"}
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        }
+      },
+      "required": ["intencion", "objetivo", "cambios"],
+      "additionalProperties": false
+    },
+    "anular": {
+      "type": "object",
+      "properties": {"intencion": {"const": "anular"}, "objetivo": {"$ref": "#/$defs/referencia"}},
+      "required": ["intencion", "objetivo"],
+      "additionalProperties": false
+    },
+    "revisar_duplicados": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "revisar_duplicados"},
+        "filtro": {
+          "type": "object",
+          "properties": {"texto": {"$ref": "#/$defs/texto"}, "fecha": {"$ref": "#/$defs/fecha"}},
+          "additionalProperties": false
+        }
+      },
+      "required": ["intencion", "filtro"],
+      "additionalProperties": false
+    },
+    "arqueo": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "arqueo"},
+        "efectivo_real": {"$ref": "#/$defs/centavos0"},
+        "aproximado": {"type": "boolean"}
+      },
+      "required": ["intencion", "efectivo_real"],
+      "additionalProperties": false
+    },
+    "consultar": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "consultar"},
+        "consulta": {
+          "type": "object",
+          "properties": {
+            "tipo": {
+              "enum": [
+                "hoy_puedes",
+                "gasto_total",
+                "gasto_por_categoria",
+                "saldo",
+                "deuda_tarjetas",
+                "compromisos",
+                "por_cobrar",
+                "comparar_periodos",
+                "mayores_gastos",
+                "suscripciones",
+                "explicar",
+                "impuestos",
+                "deducciones",
+                "puedo_retirar"
+              ]
+            },
+            "desde": {"$ref": "#/$defs/fecha"},
+            "hasta": {"$ref": "#/$defs/fecha"},
+            "categoria": {"$ref": "#/$defs/categoriaConsulta"},
+            "alias": {"$ref": "#/$defs/texto"},
+            "contraparte": {"$ref": "#/$defs/texto"},
+            "actual": {"$ref": "#/$defs/rango"},
+            "anterior": {"$ref": "#/$defs/rango"},
+            "limite": {"type": "integer", "minimum": 1, "maximum": 20},
+            "pregunta": {"$ref": "#/$defs/texto"}
+          },
+          "required": ["tipo"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["intencion", "consulta"],
+      "additionalProperties": false
+    },
+    "simular": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "simular"},
+        "compra": {
+          "type": "object",
+          "properties": {
+            "precio": {"$ref": "#/$defs/centavos"},
+            "descripcion": {"$ref": "#/$defs/texto"},
+            "meses": {"type": "integer", "minimum": 2, "maximum": 48},
+            "fecha": {"$ref": "#/$defs/fecha"}
+          },
+          "required": ["precio"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["intencion", "compra"],
+      "additionalProperties": false
+    },
+    "ajusteTarjetaCiclo": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "tarjeta_ciclo"},
+        "alias": {"$ref": "#/$defs/texto"},
+        "dia_corte": {"type": "integer", "minimum": 1, "maximum": 31},
+        "dia_limite_pago": {"type": "integer", "minimum": 1, "maximum": 31},
+        "dias_para_pagar": {"type": "integer", "minimum": 1, "maximum": 60}
+      },
+      "required": ["tipo"],
+      "additionalProperties": false
+    },
+    "ajusteColchon": {
+      "type": "object",
+      "properties": {"tipo": {"const": "colchon"}, "monto": {"$ref": "#/$defs/centavos0"}},
+      "required": ["tipo", "monto"],
+      "additionalProperties": false
+    },
+    "ajusteIngresoRecurrente": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "ingreso_recurrente"},
+        "monto": {"$ref": "#/$defs/centavos"},
+        "regla": {"$ref": "#/$defs/reglaRecurrente"}
+      },
+      "required": ["tipo"],
+      "additionalProperties": false
+    },
+    "ajusteSaldoCuenta": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "saldo_cuenta"},
+        "alias": {"$ref": "#/$defs/texto"},
+        "monto": {"$ref": "#/$defs/centavos0"}
+      },
+      "required": ["tipo", "monto"],
+      "additionalProperties": false
+    },
+    "ajusteCompromiso": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "compromiso"},
+        "concepto": {"$ref": "#/$defs/texto"},
+        "monto": {"$ref": "#/$defs/centavos"},
+        "categoria": {"$ref": "#/$defs/categoria"},
+        "regla": {"$ref": "#/$defs/regla"},
+        "espacio": {"enum": ["personal", "negocio"]}
+      },
+      "required": ["tipo", "monto", "regla"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {"categoria": {"$ref": "#/$defs/categoriaNegocioExclusiva"}},
+            "required": ["categoria"]
+          },
+          "then": {"properties": {"espacio": {"const": "negocio"}}, "required": ["espacio"]}
+        }
+      ]
+    },
+    "ajusteTanda": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "tanda"},
+        "aportacion": {"$ref": "#/$defs/centavos"},
+        "participantes": {"type": "integer", "minimum": 2, "maximum": 50},
+        "turno": {"type": "integer", "minimum": 1, "maximum": 50},
+        "regla": {"$ref": "#/$defs/reglaRecurrente"},
+        "inicio": {"$ref": "#/$defs/fecha"}
+      },
+      "required": ["tipo", "aportacion", "participantes", "turno", "regla"],
+      "additionalProperties": false
+    },
+    "configurar": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "configurar"},
+        "ajuste": {
+          "oneOf": [
+            {"$ref": "#/$defs/ajusteTarjetaCiclo"},
+            {"$ref": "#/$defs/ajusteColchon"},
+            {"$ref": "#/$defs/ajusteIngresoRecurrente"},
+            {"$ref": "#/$defs/ajusteSaldoCuenta"},
+            {"$ref": "#/$defs/ajusteCompromiso"},
+            {"$ref": "#/$defs/ajusteTanda"}
+          ]
+        }
+      },
+      "required": ["intencion", "ajuste"],
+      "additionalProperties": false
+    },
+    "aclarar": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "aclarar"},
+        "motivo": {
+          "enum": [
+            "monto_faltante",
+            "monto_ambiguo",
+            "tipo_ambiguo",
+            "fecha_ambigua",
+            "referencia_ambigua",
+            "no_entendi"
+          ]
+        },
+        "pregunta": {"$ref": "#/$defs/texto"},
+        "opciones": {"type": "array", "items": {"$ref": "#/$defs/texto"}, "maxItems": 4},
+        "parcial": {"type": "object"}
+      },
+      "required": ["intencion", "motivo", "pregunta"],
+      "additionalProperties": false
+    },
+    "fuera_de_alcance": {
+      "type": "object",
+      "properties": {
+        "intencion": {"const": "fuera_de_alcance"},
+        "motivo": {"enum": ["mueve_dinero", "asesoria_inversion", "ajeno", "instrucciones"]}
+      },
+      "required": ["intencion"],
+      "additionalProperties": false
+    },
+    "reglaAnual": {
+      "type": "object",
+      "properties": {
+        "tipo": {"const": "anual"},
+        "mes": {"type": "integer", "minimum": 1, "maximum": 12},
+        "dia": {"type": "integer", "minimum": 1, "maximum": 31},
+        "ajuste": {"$ref": "#/$defs/ajusteFinDeSemana"}
+      },
+      "required": ["tipo", "mes", "dia"],
+      "additionalProperties": false
+    },
+    "categoriaNegocioExclusiva": {
+      "enum": [
+        "servicios_prestados",
+        "mercancia",
+        "insumos",
+        "renta_local",
+        "sueldos_ayudantes",
+        "publicidad",
+        "equipo",
+        "mantenimiento",
+        "impuestos",
+        "otros_impuestos"
+      ]
+    }
+  }
+}

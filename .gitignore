@@ -1,0 +1,31 @@
+node_modules/
+.pnpm-store/
+dist/
+build/
+coverage/
+.turbo/
+.expo/
+.expo-shared/
+# Carpetas nativas generadas por Expo (CNG). Solo las de la app: el módulo
+# modules/captura-android/android/ SÍ se versiona.
+/apps/movil/android/
+/apps/movil/ios/
+*.apk
+*.aab
+*.ipa
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+.DS_Store
+__pycache__/
+fixtures/nlu/grabaciones/*.tmp
+# Llaves y credenciales (nunca en el repositorio)
+*.jks
+*.keystore
+*.p8
+*.p12
+*.pem
+credentials.json
+*service-account*.json

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CFDI SINTÉTICO para pruebas: RFC, sellos, certificados y UUID son ficticios. No es un comprobante válido ante el SAT. -->
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="4.0" Serie="A" Folio="1" Fecha="2026-06-01T08:30:00" FormaPago="04" SubTotal="7758.62" Moneda="MXN" Total="9000.00" TipoDeComprobante="I" Exportacion="01" MetodoPago="PUE" LugarExpedicion="72000" NoCertificado="00000000000000000000" Sello="SINTETICO" Certificado="SINTETICO">
+  <cfdi:Emisor Rfc="EEE050505EE5" Nombre="ASEGURADORA FICTICIA" RegimenFiscal="612"/>
+  <cfdi:Receptor Rfc="PEPJ800101AB1" Nombre="JUANA PEREZ PEREZ" DomicilioFiscalReceptor="72000" RegimenFiscalReceptor="605" UsoCFDI="D07"/>
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="84131600" Cantidad="1" ClaveUnidad="E48" Descripcion="Prima seguro de gastos médicos" ValorUnitario="7758.62" Importe="7758.62" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="7758.62" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1241.38"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosTrasladados="1241.38">
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="7758.62" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1241.38"/>
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+  <cfdi:Complemento>
+    <tfd:TimbreFiscalDigital Version="1.1" UUID="5a1b2c3d-0000-4000-8000-000000000006" FechaTimbrado="2026-06-01T08:30:00" RfcProvCertif="AAA010101AAA" SelloCFD="SINTETICO" NoCertificadoSAT="00000000000000000000" SelloSAT="SINTETICO"/>
+  </cfdi:Complemento>
+</cfdi:Comprobante>

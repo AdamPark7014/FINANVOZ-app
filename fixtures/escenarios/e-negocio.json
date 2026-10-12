@@ -1,0 +1,133 @@
+{
+  "id": "e-negocio",
+  "descripcion": "Tienda de abarrotes en RESICO (docs/10-NEGOCIO.md). Reproduce E4-10 en el espacio negocio: 'Puedes retirar hasta $15,900' con impuestos apartados por $4,100 (E15-02 + E15-09).",
+  "hoy": "2026-10-11",
+  "zona_horaria": "America/Mexico_City",
+  "espacios": {
+    "personal": {
+      "colchon": 20000,
+      "ingreso": {
+        "modo": "programado",
+        "concepto": "sueldo del dueño",
+        "monto": 800000,
+        "regla": {"tipo": "quincenal_15_ultimo", "ajuste": "anterior"},
+        "ultimo_recibido": "2026-09-30"
+      },
+      "cuentas": [
+        {
+          "clave": "efectivo",
+          "subtipo": "efectivo",
+          "nombre": "Cartera",
+          "saldo": 60000,
+          "alias": ["efectivo"]
+        },
+        {
+          "clave": "bbva",
+          "subtipo": "debito",
+          "nombre": "BBVA Débito ••5521",
+          "ultimos4": "5521",
+          "saldo": 300000,
+          "alias": ["bbva"]
+        }
+      ]
+    },
+    "negocio": {
+      "nombre": "Tienda de abarrotes",
+      "regimen": "resico_pf",
+      "cobra_iva": false,
+      "colchon": 500000,
+      "horizonte_dias": 30,
+      "cuentas": [
+        {
+          "clave": "caja",
+          "subtipo": "efectivo",
+          "nombre": "Caja de la tienda",
+          "saldo": 200000,
+          "alias": ["caja", "tienda"]
+        },
+        {
+          "clave": "banorte",
+          "subtipo": "debito",
+          "nombre": "Banorte del negocio ••7730",
+          "institucion": "banco_e",
+          "ultimos4": "7730",
+          "saldo": 3800000,
+          "alias": ["banorte", "negocio"]
+        },
+        {
+          "clave": "cobros_d",
+          "subtipo": "billetera",
+          "nombre": "Cobros D",
+          "institucion": "cobros_d",
+          "saldo": 500000,
+          "alias": ["terminal", "cobros"],
+          "comision_bp": 350
+        }
+      ],
+      "compromisos_unicos": [
+        {
+          "concepto": "proveedor de refrescos",
+          "fecha": "2026-10-20",
+          "monto": 1200000,
+          "cuenta": "banorte",
+          "categoria": "mercancia"
+        },
+        {
+          "concepto": "renta del local",
+          "fecha": "2026-11-01",
+          "monto": 800000,
+          "cuenta": "banorte",
+          "categoria": "renta_local"
+        }
+      ],
+      "ventas_registradas": [
+        {"periodo": "2026-09", "cuenta": "banorte", "total": 6000000, "iva": 0, "pagado": false},
+        {"periodo": "2026-10", "cuenta": "banorte", "total": 16000000, "iva": 0}
+      ],
+      "gastos_registrados": [
+        {"periodo": "2026-09", "cuenta": "banorte", "total": 5500000, "categoria": "mercancia"},
+        {"periodo": "2026-10", "cuenta": "banorte", "total": 14700000, "categoria": "mercancia"}
+      ]
+    }
+  },
+  "captura": {
+    "apps_autorizadas": ["mx.ejemplo.cobrosd"],
+    "plantillas": "fixtures/notificaciones/plantillas.ejemplo.json",
+    "notificaciones": "fixtures/notificaciones/negocio.ejemplos.jsonl"
+  },
+  "esperado": {
+    "negocio_antes_de_capturas": {
+      "vector": "E4-10",
+      "impuestos_apartados": 410000,
+      "libre": 1590000,
+      "texto": "Puedes retirar hasta $15,900",
+      "desglose_reservado": {"compromisos": 2000000, "impuestos": 410000}
+    },
+    "personal_no_cambia": "El espacio personal se calcula aparte: ni la caja ni Banorte entran en su dinero libre.",
+    "por_notificacion": [
+      {
+        "id": "N-20",
+        "movimiento": {"tipo": "ingreso", "monto": 58000, "cuenta": "cobros_d", "categoria": "ventas", "espacio": "negocio"},
+        "comision": {
+          "tipo": "gasto",
+          "monto": 2030,
+          "cuenta": "cobros_d",
+          "categoria": "comisiones_intereses",
+          "nota": "redondear(58000 · 350 / 10000) = 2030 (04 §4, caso 30)"
+        }
+      },
+      {
+        "id": "N-21",
+        "movimiento": {"tipo": "transferencia_pendiente", "monto": 152000, "de": "cobros_d", "a": "activo:transito"},
+        "nota": "Sin notificación del banco destino en 24 h: se pregunta; 'A Banorte del negocio' la vuelve transferencia a ••7730 (destino4)."
+      }
+    ],
+    "despues_de_N-20": "La venta de $580 sube la base de octubre a $160,580 (2.0 %): el apartado de octubre pasa de $3,200 a $3,212 (redondeado a pesos).",
+    "saldos_finales": {
+      "convencion": "Saldos después de cargar la semilla y procesar N-20 y N-21.",
+      "negocio": {"caja": 200000, "banorte": 3800000, "cobros_d": 403970, "activo:transito": 152000},
+      "personal": {"efectivo": 60000, "bbva": 300000}
+    },
+    "carga": "Ventas y gastos registrados se crean en banorte con fecha del último día de su periodo (el periodo en curso, con fecha hoy − 1); el saldo inicial de banorte se fecha 2026-09-01 y vale saldo − ventas + gastos (3,800,000 − 22,000,000 + 20,200,000 = 2,000,000), así que al terminar de cargar vale lo del archivo."
+  }
+}

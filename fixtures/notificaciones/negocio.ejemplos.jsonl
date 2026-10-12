@@ -1,0 +1,2 @@
+{"id":"N-20","paquete":"mx.ejemplo.cobrosd","titulo":"Venta","texto":"Cobro aprobado por $580.00. Tu venta #4521 ya está en tu saldo.","esperado":{"plantilla":"cobros_d.cobro.v1","tipo":"cobro_recibido","monto":58000}}
+{"id":"N-21","paquete":"mx.ejemplo.cobrosd","titulo":"Depósito","texto":"Depositamos $1,520.00 a tu cuenta con terminación 7730.","esperado":{"plantilla":"cobros_d.liquidacion.v1","tipo":"transferencia_enviada","monto":152000,"destino4":"7730"}}
