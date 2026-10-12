@@ -14,4 +14,14 @@ export {
   type ResultadoNube,
   type Transporte,
 } from './cliente';
+export {
+  crearClienteTurno,
+  RUTA_TURNO,
+  type ClienteTurno,
+  type LlamadaHerramienta,
+  type MensajeTurno,
+  type OpcionesClienteTurno,
+  type ResultadoTurno,
+  type SalidaTurno,
+} from './turno';
 export { contextoMinimo, type CuentaApp, type DatosContexto } from './contexto-minimo';
