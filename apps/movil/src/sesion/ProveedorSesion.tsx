@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { Contexto } from '../servicios';
+import type { Contexto, NivelNube } from '../servicios';
 
 /**
  * Contexto de servicios para las pantallas. La raíz abre la sesión (`servicios/sesion`) y la pasa aquí; las
@@ -11,14 +11,24 @@ export interface ValorSesion {
   readonly version: number;
   /** Llamar después de cualquier escritura (registrar, deshacer, cubrir, ajustes). */
   readonly refrescar: () => void;
+  /** Nivel 2 del intérprete; `null` sin configuración de Supabase (las frases quedan "por interpretar"). */
+  readonly nube: NivelNube | null;
 }
 
 const SesionContexto = createContext<ValorSesion | null>(null);
 
-export function ProveedorSesion({ ctx, children }: { ctx: Contexto; children: ReactNode }) {
+export function ProveedorSesion({
+  ctx,
+  nube = null,
+  children,
+}: {
+  ctx: Contexto;
+  nube?: NivelNube | null;
+  children: ReactNode;
+}) {
   const [version, setVersion] = useState(0);
   const refrescar = useCallback(() => setVersion((v) => v + 1), []);
-  const valor = useMemo(() => ({ ctx, version, refrescar }), [ctx, version, refrescar]);
+  const valor = useMemo(() => ({ ctx, version, refrescar, nube }), [ctx, version, refrescar, nube]);
   return <SesionContexto.Provider value={valor}>{children}</SesionContexto.Provider>;
 }
 

@@ -82,6 +82,16 @@ export function fijarApartarDeuda(ctx: Contexto, personaCuentaId: string, aparta
   });
 }
 
+/** Alias normalizados de cada contacto, para el contexto del intérprete (`06 §4`). */
+export function contactosInterprete(ctx: Contexto): string[][] {
+  const porContacto = new Map<string, string[]>();
+  const filas = ctx.db.select().from(aliasContacto).orderBy(asc(aliasContacto.aliasNormalizado)).all();
+  for (const a of filas) {
+    porContacto.set(a.contactoId, [...(porContacto.get(a.contactoId) ?? []), a.aliasNormalizado]);
+  }
+  return [...porContacto.values()];
+}
+
 type TipoPrestamo = 'prestamo_recibido' | 'prestamo_otorgado' | 'pago_prestamo' | 'cobro_prestamo';
 
 /**

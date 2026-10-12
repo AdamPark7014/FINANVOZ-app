@@ -1,11 +1,12 @@
 import type { BaseAbierta, PuertoSqlite } from '../db/abrir';
 import { CLAVE_LLAVE_BASE, type AlmacenSeguro } from '../db/llave';
+import { CLAVE_SESION_NUBE } from '../nube/sesion';
 
 /**
- * Llaves del almacén seguro que borra "Borrar todo". Hoy solo la de la base; la del respaldo (M9) y las de grupos
- * compartidos (M16) se suman aquí.
+ * Llaves del almacén seguro que borra "Borrar todo": la de la base y los tokens de la sesión anónima del proxy
+ * (M3); la del respaldo (M9) y las de grupos compartidos (M16) se suman aquí.
  */
-export const LLAVES_ALMACEN: readonly string[] = [CLAVE_LLAVE_BASE];
+export const LLAVES_ALMACEN: readonly string[] = [CLAVE_LLAVE_BASE, CLAVE_SESION_NUBE];
 
 /**
  * "Borrar todo" (derecho de cancelación, `04 §6`): cierra la base, destruye la llave en el almacén seguro (sin

@@ -36,7 +36,7 @@ function huella(p: ReturnType<typeof abrirPrueba>): Record<string, number> {
 }
 
 describe('consentimiento con evidencia', () => {
-  it('CA-M2-05 · sin aceptar no se escribe ningún dato; al aceptar queda la evidencia local', () => {
+  it('CA-M2-05 · sin aceptar no se escribe ningún dato; al aceptar queda la evidencia local', async () => {
     const p = abrirPrueba();
     const antes = huella(p);
     for (const t of TABLAS_DE_USUARIO) expect(antes[t]).toBe(0);
@@ -57,8 +57,6 @@ describe('consentimiento con evidencia', () => {
       () => fijarColchon(p.ctx, 10_000),
       () => fijarBloqueo(p.ctx, { activo: true }),
       () => crearPersona(p.ctx, { nombre: 'Juan' }),
-      () => registrarTexto(p.ctx, 'coca 25 en efectivo'),
-      () => registrarTexto(p.ctx, 'frase que no entiende el nivel cero'),
       () =>
         registrarMovimiento(p.ctx, {
           tipo: 'gasto',
@@ -69,6 +67,9 @@ describe('consentimiento con evidencia', () => {
     ];
     for (const intento of intentos) {
       expect(intento).toThrow(expect.objectContaining({ codigo: 'sin_consentimiento' }));
+    }
+    for (const frase of ['coca 25 en efectivo', 'frase que no entiende el nivel cero']) {
+      await expect(registrarTexto(p.ctx, frase)).rejects.toMatchObject({ codigo: 'sin_consentimiento' });
     }
     expect(huella(p)).toEqual(antes);
     expect(obtenerConsentimiento(p.ctx)).toBeNull();

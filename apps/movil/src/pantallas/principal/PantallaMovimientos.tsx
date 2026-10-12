@@ -4,6 +4,7 @@ import {
   anularMovimiento,
   descartarPorInterpretar,
   etiquetaDiaMes,
+  historialMovimiento,
   listarMovimientos,
   listarPorInterpretar,
   type MovimientoVista,
@@ -11,16 +12,24 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { useMostrarAviso } from './ProveedorAvisos';
-import { MENSAJE_ERROR_GENERAL, NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO } from './textos';
+import { MENSAJE_ERROR_GENERAL, NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO, resumenMovimiento } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
   automatico: 'automático',
   estimado: 'estimado',
   por_asignar: 'por asignar',
+  corregido: 'corregido',
 };
 
 /** Movimientos (02-UX §10): por revisar arriba, luego agrupados por día; tocar uno muestra el detalle. */
-export function PantallaMovimientos({ alRegistrar }: { alRegistrar: () => void }) {
+export function PantallaMovimientos({
+  alRegistrar,
+  alRevisar,
+}: {
+  alRegistrar: () => void;
+  /** Abre Registrar con una frase que la nube ya entendió pero necesita confirmación. */
+  alRevisar?: (fraseId: string) => void;
+}) {
   const dias = useVista((ctx) => listarMovimientos(ctx));
   const porRevisar = useVista(listarPorInterpretar);
   const { ctx, refrescar } = useSesion();
@@ -52,12 +61,24 @@ export function PantallaMovimientos({ alRegistrar }: { alRegistrar: () => void }
           <Texto variante="secundario" tono="secundario">
             Las interpreto cuando tengas internet. Si ya lo registraste a mano, descártala.
           </Texto>
+          {/* Las que ya entendí pero necesitan que confirmes algo llevan "Revisar". */}
           {porRevisar.map((f) => (
             <Tarjeta key={f.id} testID={`por-revisar-${f.id}`}>
               <Texto variante="cuerpo">{`«${f.texto}»`}</Texto>
               <Texto variante="secundario" tono="secundario">
-                {`${etiquetaDiaMes(f.fecha)} · ${f.origen === 'voz' ? 'dictado' : 'escrito'}`}
+                {`${etiquetaDiaMes(f.fecha)} · ${f.origen === 'voz' ? 'dictado' : 'escrito'}${
+                  f.estado === 'revisar' ? ' · necesita que la revises' : ''
+                }`}
               </Texto>
+              {f.estado === 'revisar' && alRevisar ? (
+                <Boton
+                  etiqueta="Revisar"
+                  variante="secundario"
+                  ancho="contenido"
+                  alPresionar={() => alRevisar(f.id)}
+                  testID={`revisar-${f.id}`}
+                />
+              ) : null}
               <Boton
                 etiqueta="Descartar"
                 variante="texto"
@@ -153,6 +174,7 @@ function FilaMovimiento({
             <Texto variante="secundario">{`Llegó a: ${m.llegaA.join(', ')}`}</Texto>
           ) : null}
           {m.categoria ? <Texto variante="secundario">{`Categoría: ${m.categoria}`}</Texto> : null}
+          {m.reemplazaA ? <Historial id={m.id} /> : null}
           <Texto variante="secundario" tono="secundario">
             {`${NOMBRE_ORIGEN[m.origen] ?? 'Registrado'} · ${etiquetaDiaMes(m.fecha)}`}
           </Texto>
@@ -174,5 +196,23 @@ function FilaMovimiento({
         </View>
       ) : null}
     </Tarjeta>
+  );
+}
+
+/** Historial de un movimiento corregido (CA-M3-03): cómo estaba antes de cada cambio. */
+function Historial({ id }: { id: string }) {
+  const versiones = useVista((ctx) => historialMovimiento(ctx, id));
+  if (versiones.length === 0) return null;
+  return (
+    <View style={{ gap: espacio.xxs }} testID={`historial-${id}`}>
+      <Texto variante="secundario" tono="secundario">
+        Lo corregiste. Antes:
+      </Texto>
+      {versiones.map((v) => (
+        <Texto key={v.transaccionId} variante="secundario" tono="secundario">
+          {`${resumenMovimiento(v)} · ${etiquetaDiaMes(v.fecha)}`}
+        </Texto>
+      ))}
+    </View>
   );
 }
