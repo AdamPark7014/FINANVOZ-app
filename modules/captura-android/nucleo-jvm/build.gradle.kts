@@ -27,6 +27,25 @@ kotlin {
   sourceSets["main"].kotlin.srcDir("../android/src/main/java/com/finanvoz/captura/nucleo")
 }
 
+// Verificación opcional de las clases de Android (servicio, módulo, adaptador): las compila
+// contra el framework de Android de Robolectric (android-all, API 34) y firmas mínimas de
+// expo-modules-core (src/stubsExpo). No ejecuta nada; detecta errores de tipos o de API.
+//   gradle -p modules/captura-android/nucleo-jvm verificarAndroid   (descarga ~140 MB la primera vez)
+val android by sourceSets.creating
+kotlin.sourceSets["android"].kotlin.apply {
+  srcDir("../android/src/main/java")
+  srcDir("../android/src/release/java")
+  srcDir("src/stubsExpo/kotlin")
+}
+dependencies {
+  "androidCompileOnly"("org.robolectric:android-all:14-robolectric-10818077")
+}
+tasks.register("verificarAndroid") {
+  group = "verification"
+  description = "Compila el código Android del módulo contra android-all y firmas de Expo."
+  dependsOn("compileAndroidKotlin")
+}
+
 tasks.test {
   // Raíz del módulo y del repositorio, para leer los catálogos y fixtures/ reales.
   systemProperty("captura.modulo", projectDir.parentFile.absolutePath)

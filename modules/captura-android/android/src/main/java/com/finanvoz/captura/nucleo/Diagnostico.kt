@@ -57,6 +57,9 @@ class Diagnostico(
 ) {
   private val candado = Any()
 
+  /** El servicio consulta el estado con cada notificación: se lee del disco una sola vez. */
+  private var cache: Map<*, *>? = null
+
   val activo: Boolean get() = synchronized(candado) { estado()["activo"] == true }
 
   val muestrasActivas: Boolean
@@ -163,15 +166,25 @@ class Diagnostico(
   }
 
   private fun estado(): Map<*, *> {
-    val t = resumenAlmacen.leer() ?: return emptyMap<String, Any?>()
-    return try {
-      Json.leer(t) as? Map<*, *> ?: emptyMap<String, Any?>()
-    } catch (e: Json.ErrorJson) {
+    cache?.let { return it }
+    val t = resumenAlmacen.leer()
+    val leido = if (t == null) {
       emptyMap<String, Any?>()
+    } else {
+      try {
+        Json.leer(t) as? Map<*, *> ?: emptyMap<String, Any?>()
+      } catch (e: Json.ErrorJson) {
+        emptyMap<String, Any?>()
+      }
     }
+    cache = leido
+    return leido
   }
 
-  private fun guardar(m: Map<*, *>) = resumenAlmacen.escribir(Json.escribir(m))
+  private fun guardar(m: Map<*, *>) {
+    resumenAlmacen.escribir(Json.escribir(m))
+    cache = m
+  }
 
   companion object {
     const val MAX_MUESTRAS = 500

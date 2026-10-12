@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- El servicio y <queries> los inyecta el config plugin en el manifiesto de la app
+       (plugin/con-captura.js, docs/07-CAPTURA.md §2.1). -->
+</manifest>
