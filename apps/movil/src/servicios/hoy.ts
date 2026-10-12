@@ -11,15 +11,22 @@ import {
   type EstadoHorizonte,
   type PlainDate,
 } from '@cartera/core';
+import { z } from 'zod';
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
+import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { esIngresoVariable, obtenerColchon } from './ajustes';
+import { procesarApertura } from './apertura';
 import { avisosPendientes, type Aviso } from './avisos';
+import { preguntasCoberturaPendientes } from './cobertura';
 import type { Contexto } from './contexto';
 import { dias as textoDias, etiquetaFecha } from './formato';
-import { listarOcurrencias, materializarOcurrencias, pospuestaHoy } from './ocurrencias';
+import { preguntasLiquidarPendientes, type PlanPorLiquidar } from './msi';
+import { listarOcurrencias, pospuestaHoy } from './ocurrencias';
+import { escribirAjuste, leerAjuste } from './preferencias';
 import { contarPorInterpretar } from './registrar';
 import { ingresoPrincipal } from './programados';
 import { cuotasMsiPendientes, tarjetasActivas } from './tarjetas';
+import { pagosQueVencen, tarjetaDelDia, type TarjetaDelDia } from './vista-tarjetas';
 
 const { cuenta } = esquema;
 
@@ -37,6 +44,48 @@ export interface ConceptoReservado {
 
 /** Tarjetas de acción (`02 §4.1`), ya en orden de prioridad. */
 export type TarjetaAccion =
+  | {
+      /** 1. Pago de tarjeta que vence en ≤ 3 días (o ya venció) con PNGI pendiente. */
+      readonly tipo: 'pago_tarjeta';
+      readonly tarjetaId: string;
+      readonly nombre: string;
+      readonly corte: PlainDate;
+      readonly limite: PlainDate;
+      /** "jue 30" */
+      readonly etiquetaFecha: string;
+      /** Pago para no generar intereses (E5.3). */
+      readonly pngi: Centavos;
+      readonly cuando: 'por_vencer' | 'vencido';
+      /** "Tu Banamex Oro ••8812 vence el jue 30." */
+      readonly texto: string;
+      /** "Ya la pagué" → `pagarTarjeta` (pide la cuenta); "Todavía no" → `todaviaNoPagoTarjeta`. */
+      readonly opciones: readonly ['ya_la_pague', 'todavia_no'];
+    }
+  | {
+      /** 5. Un pago con monto distinto al de un pago fijo (E3.5 `preguntar`). */
+      readonly tipo: 'confirmar_cobertura';
+      readonly programadoId: string;
+      readonly fecha: PlainDate;
+      readonly etiquetaFecha: string;
+      readonly transaccionId: string;
+      readonly concepto: string;
+      readonly montoProgramado: Centavos;
+      readonly montoMovimiento: Centavos;
+      /** "¿Este pago fue la renta?" */
+      readonly pregunta: string;
+      /** "Sí" → `confirmarCobertura`; "No" → `rechazarCobertura`. */
+      readonly opciones: readonly ['si', 'no'];
+    }
+  | {
+      /** 5. "¿Este pago fue para liquidar tus meses?" (`02 §8`, CA-M4-10). */
+      readonly tipo: 'liquidar_msi';
+      readonly tarjetaId: string;
+      readonly tarjeta: string;
+      readonly saldoAFavor: Centavos;
+      readonly pregunta: string;
+      /** Un chip por plan ("Sí, la tele" → `liquidarMsi(planId)`) y "No" (`noEraParaLiquidar`). */
+      readonly planes: readonly PlanPorLiquidar[];
+    }
   | {
       readonly tipo: 'compromiso_vencido';
       readonly programadoId: string;
@@ -94,6 +143,8 @@ export interface VistaHoy {
   /** Máximo dos visibles (`02 §4.1`). */
   readonly tarjetasAccion: readonly TarjetaAccion[];
   readonly avisos: readonly Aviso[];
+  /** Tarjeta del día (RF-HOY-04, Plus en la UI): `null` con menos de 2 tarjetas elegibles. */
+  readonly tarjetaDelDia: TarjetaDelDia | null;
 }
 
 /** L (`04 §2.2`): líquidas activas + `min(0, por_asignar)` + `min(0, tránsito)` del espacio personal. */
@@ -140,7 +191,7 @@ export function deudasConPersonas(ctx: Contexto) {
  * personas. Todas las cifras salen de `packages/core`.
  */
 export function obtenerHoy(ctx: Contexto): VistaHoy {
-  materializarOcurrencias(ctx);
+  procesarApertura(ctx);
   const hoy = ctx.reloj.hoy();
   const ingreso = ingresoPrincipal(ctx);
   const variable = esIngresoVariable(ctx);
@@ -161,6 +212,15 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
   const pendientes = listarOcurrencias(ctx, { estado: 'pendiente' });
   const compromisos = pendientes.filter((o) => o.tipo === 'egreso' && o.tarjetaId === null);
   const tarjetas = tarjetasActivas(ctx);
+  // RF-TAR-06: los pagos planeados (pendientes) de cada tarjeta en modo plan con programados activos.
+  const pagosPlaneados = new Map<string, { fecha: PlainDate; monto: Centavos }[]>();
+  for (const o of pendientes) {
+    if (o.tipo !== 'egreso' || o.tarjetaId === null) continue;
+    pagosPlaneados.set(o.tarjetaId, [
+      ...(pagosPlaneados.get(o.tarjetaId) ?? []),
+      { fecha: o.fecha, monto: o.monto },
+    ]);
+  }
   const cuotas = cuotasMsiPendientes(ctx);
   const deudas = deudasConPersonas(ctx);
   const l = liquidez(ctx);
@@ -172,8 +232,16 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
     liquidez: l,
     colchon,
     compromisos: compromisos.map((o) => ({ concepto: o.concepto, fecha: o.fecha, monto: o.monto })),
-    // M2 no tiene pagos planeados (RF-TAR-06, M4): una tarjeta en plan reserva su deuda completa (E4-08).
-    tarjetas: tarjetas.map((t) => ({ id: t.cuentaId, modo: t.modo, saldo_revolvente: t.saldoRevolvente })),
+    // En plan con pagos planeados: E4 reserva los del horizonte; sin ellos, la deuda completa (E4-08).
+    tarjetas: tarjetas.map((t) => {
+      const pagos = t.modo === 'plan' ? pagosPlaneados.get(t.cuentaId) : undefined;
+      return {
+        id: t.cuentaId,
+        modo: t.modo,
+        saldo_revolvente: t.saldoRevolvente,
+        ...(pagos ? { pagos_planeados: pagos } : {}),
+      };
+    }),
     cuotas_msi_no_facturadas: cuotas.map((c) => ({ plan: c.planId, fecha_limite: c.limite, monto: c.monto })),
     deudas_personas: deudas.map((d) => ({ contraparte: d.id, monto: d.monto, apartar: d.apartar })),
   });
@@ -181,10 +249,19 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
   // Mismo criterio de E4 para listar lo reservado.
   const finEf = maxFecha(h.fin_efectivo, sumarDias(hoy, 1));
   const nombreTarjeta = new Map(tarjetas.map((t) => [t.cuentaId, t.nombre]));
+  const conPlan = (id: string, modo: 'totalero' | 'plan') =>
+    modo === 'plan' && (pagosPlaneados.get(id)?.length ?? 0) > 0;
   const reservadoDetalle: ConceptoReservado[] = [
     ...tarjetas
-      .filter((t) => t.saldoRevolvente > 0)
+      .filter((t) => t.saldoRevolvente > 0 && !conPlan(t.cuentaId, t.modo))
       .map((t) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: t.saldoRevolvente, fecha: null })),
+    ...tarjetas
+      .filter((t) => conPlan(t.cuentaId, t.modo))
+      .flatMap((t) =>
+        (pagosPlaneados.get(t.cuentaId) ?? [])
+          .filter((p) => p.fecha < finEf)
+          .map((p) => ({ tipo: 'tarjeta' as const, concepto: t.nombre, monto: p.monto, fecha: p.fecha })),
+      ),
     ...compromisos
       .filter((o) => o.fecha < finEf)
       .map((o) => ({ tipo: 'compromiso' as const, concepto: o.concepto, monto: o.monto, fecha: o.fecha })),
@@ -239,6 +316,7 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
     reservadoDetalle,
     tarjetasAccion: tarjetasDeAccion(ctx, hoy, pendientes, ingreso?.id ?? null).slice(0, 2),
     avisos: avisosPendientes(ctx),
+    tarjetaDelDia: tarjetaDelDia(ctx),
   };
 }
 
@@ -249,7 +327,28 @@ function tarjetasDeAccion(
   ingresoId: string | null,
 ): TarjetaAccion[] {
   const tarjetas: TarjetaAccion[] = [];
-  // 1. Pago de tarjeta que vence en ≤ 3 días: llega con el cierre de cortes (M4).
+  // 1. Pago de tarjeta que vence en ≤ 3 días (con PNGI pendiente del último corte).
+  for (const v of pagosQueVencen(ctx)) {
+    if (pagoPospuestoHoy(ctx, v.tarjetaId, v.corte)) continue;
+    const etiqueta = etiquetaFecha(v.limite);
+    tarjetas.push({
+      tipo: 'pago_tarjeta',
+      tarjetaId: v.tarjetaId,
+      nombre: v.nombre,
+      corte: v.corte,
+      limite: v.limite,
+      etiquetaFecha: etiqueta,
+      pngi: v.pngi,
+      cuando: v.cuando,
+      texto:
+        v.cuando === 'vencido'
+          ? `La fecha límite de tu ${v.nombre} fue el ${etiqueta}.`
+          : v.limite === hoy
+            ? `Hoy es la fecha límite de tu ${v.nombre}.`
+            : `Tu ${v.nombre} vence el ${etiqueta}.`,
+      opciones: ['ya_la_pague', 'todavia_no'],
+    });
+  }
   // 2. Compromiso vencido sin cubrir.
   for (const o of pendientes) {
     if (o.tipo !== 'egreso' || o.fecha >= hoy || pospuestaHoy(ctx, o)) continue;
@@ -285,7 +384,32 @@ function tarjetasDeAccion(
       opciones: ['ya_llego', 'todavia_no', 'no_me_pagan'],
     });
   }
-  // 4–5. Arqueo y preguntas de captura: M5. 6. Frases por interpretar ("Por revisar").
+  // 4. Arqueo: M5. 5. Preguntas: cobertura con monto distinto (E3.5) y liquidar meses (E6.2).
+  for (const q of preguntasCoberturaPendientes(ctx)) {
+    tarjetas.push({
+      tipo: 'confirmar_cobertura',
+      programadoId: q.programadoId,
+      fecha: q.fecha,
+      etiquetaFecha: etiquetaFecha(q.fecha),
+      transaccionId: q.transaccionId,
+      concepto: q.concepto,
+      montoProgramado: q.montoProgramado,
+      montoMovimiento: q.montoMovimiento,
+      pregunta: `¿Este pago fue ${articulo(q.concepto)}?`,
+      opciones: ['si', 'no'],
+    });
+  }
+  for (const q of preguntasLiquidarPendientes(ctx)) {
+    tarjetas.push({
+      tipo: 'liquidar_msi',
+      tarjetaId: q.tarjetaId,
+      tarjeta: q.tarjeta,
+      saldoAFavor: q.saldoAFavor,
+      pregunta: q.pregunta,
+      planes: q.planes,
+    });
+  }
+  // 6. Frases por interpretar ("Por revisar").
   const cantidad = contarPorInterpretar(ctx);
   if (cantidad > 0) tarjetas.push({ tipo: 'por_interpretar', cantidad });
   // 7. Gastos por asignar.
@@ -300,4 +424,17 @@ function articulo(concepto: string): string {
   if (c === '') return concepto;
   const femenino = /(a|ión|z|d)$/.test(c) && !/^(agua|día|mapa)$/.test(c);
   return `${femenino ? 'la' : 'el'} ${c}`;
+}
+
+const PagoPospuesto = z.strictObject({ fecha: z.string() });
+const clavePagoPospuesto = (tarjetaId: string, corte: PlainDate) => `pospuesta_tarjeta:${tarjetaId}:${corte}`;
+
+function pagoPospuestoHoy(ctx: Contexto, tarjetaId: string, corte: PlainDate): boolean {
+  return leerAjuste(ctx, clavePagoPospuesto(tarjetaId, corte), PagoPospuesto)?.fecha === ctx.reloj.hoy();
+}
+
+/** "Todavía no" en el pago de tarjeta que vence: se oculta el resto del día y vuelve a salir mañana. */
+export function todaviaNoPagoTarjeta(ctx: Contexto, e: { tarjetaId: string; corte: PlainDate }): void {
+  exigirConsentimiento(ctx);
+  escribirAjuste(ctx, clavePagoPospuesto(e.tarjetaId, e.corte), PagoPospuesto, { fecha: ctx.reloj.hoy() });
 }
