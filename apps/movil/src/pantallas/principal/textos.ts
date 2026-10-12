@@ -145,3 +145,12 @@ export function encabezadoFecha(diaSemana: string, diaMes: string): string {
   const mes = diaMes.split(' ')[1] ?? '';
   return capitalizar(`${diaSemana} ${mes}`.trim());
 }
+
+// ——— Modo explicar (`02 §22`) ———
+
+export const MENSAJE_EXPLICANDO = 'Revisando tus datos…';
+export const MENSAJE_EXPLICAR_SIN_RED =
+  'Necesito internet para responderte eso. Pregúntame de nuevo cuando tengas conexión.';
+export const MENSAJE_EXPLICAR_ERROR = 'No pude responderte ahora. Pregúntame de nuevo en un rato.';
+export const MENSAJE_EXPLICAR_SOLO_PLUS =
+  'Preguntarme lo que quieras sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.';

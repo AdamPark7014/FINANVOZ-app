@@ -159,6 +159,8 @@ export type ResultadoTexto =
   | { readonly resultado: 'consulta'; readonly respuesta: RespuestaConsulta }
   /** "¿Me alcanza para unos tenis de 1,500?": la pantalla abre "¿Me alcanza?" y llama `meAlcanza(ctx, consulta)`. */
   | { readonly resultado: 'me_alcanza'; readonly consulta: ConsultaMeAlcanza }
+  /** Pregunta abierta (Q13, `06 §6`): la pantalla llama `explicar(ctx, pregunta, { nube })` (Plus). */
+  | { readonly resultado: 'explicar'; readonly pregunta: string }
   /** "Traigo 300": abre el arqueo con lo que dijo (`02 §7`); nada se registra sin confirmar (E7). */
   | { readonly resultado: 'arqueo'; readonly efectivoReal: Centavos }
   | {
@@ -254,6 +256,7 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'configurado',
   'consulta',
   'me_alcanza',
+  'explicar',
 ]);
 
 function tipoResolutor(c: CuentaPropia): CuentaResolutor['tipo'] | null {
@@ -844,6 +847,10 @@ function aplicarInterpretacion(
         throw error;
       }
     case 'consultar':
+      // El modo explicar necesita red y varias vueltas: la pantalla lo resuelve con `explicar` (que revisa Plus).
+      if (i.consulta.tipo === 'explicar') {
+        return { resultado: 'explicar', pregunta: i.consulta.pregunta ?? frase.texto };
+      }
       if (!tienePlantilla(i.consulta.tipo)) return { resultado: 'no_soportado', motivo: 'consulta' };
       // "Hoy puedes" es de Gratis; las demás consultas, de Plus (`01 §11`).
       if (i.consulta.tipo !== 'hoy_puedes' && !funcionesPlan(ctx).consultas)

@@ -61,6 +61,8 @@ export interface FuncionesPlan {
   readonly compromisoMsi12Meses: boolean;
   /** Consultas tipadas (RF-CON-01) salvo "¿cuánto puedo gastar hoy?", que es el "hoy puedes" de Gratis. */
   readonly consultas: boolean;
+  /** Modo explicar: preguntas abiertas con herramientas (RF-CON-02, `02 §22`). */
+  readonly explicar: boolean;
   readonly interpretacionesNubeMes: number;
 }
 
@@ -139,6 +141,7 @@ export function funcionesPlan(ctx: Contexto): FuncionesPlan {
     meAlcanza: plus,
     compromisoMsi12Meses: plus,
     consultas: plus,
+    explicar: plus,
     interpretacionesNubeMes: INTERPRETACIONES_NUBE_MES[plus ? 'plus' : 'gratis'],
   };
 }

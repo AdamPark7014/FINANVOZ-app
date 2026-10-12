@@ -73,7 +73,8 @@ const numero = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v 
 type Objeto = Record<string, unknown>;
 const esObjeto = (v: unknown): v is Objeto => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-async function enviar(
+/** POST JSON al proveedor con la señal de tiempo; ante error lanza `FallaProveedor` sin leer el cuerpo. */
+export async function enviar(
   fetchFn: Fetch,
   url: string,
   encabezados: Record<string, string>,

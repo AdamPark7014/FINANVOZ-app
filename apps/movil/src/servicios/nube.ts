@@ -1,5 +1,11 @@
 import type { PlainDate } from '@cartera/core';
-import { contextoMinimo, type ClienteNube, type ContextoInterprete, type CuentaApp } from '@cartera/nlu';
+import {
+  contextoMinimo,
+  type ClienteNube,
+  type ClienteTurno,
+  type ContextoInterprete,
+  type CuentaApp,
+} from '@cartera/nlu';
 import { cuentasPropias } from './catalogo';
 import type { Contexto } from './contexto';
 import { listarOcurrencias } from './ocurrencias';
@@ -20,6 +26,8 @@ export interface Conectividad {
  */
 export interface NivelNube {
   readonly cliente: ClienteNube;
+  /** Modo explicar (`POST /llm/turno`, M10); sin él, la app no responde preguntas abiertas. */
+  readonly turno?: ClienteTurno;
   readonly conectividad: Conectividad;
   /** Id del usuario anónimo de Supabase (para asociarle las compras de Plus, M7); `null` sin sesión. */
   readonly usuarioId?: () => Promise<string | null>;

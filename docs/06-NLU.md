@@ -230,6 +230,8 @@ Cada `consulta.tipo` corresponde a una función de solo lectura en `servicios/co
 
 Modo `explicar`: el proxy reenvía mensajes y definiciones de herramientas; el **teléfono** ejecuta las herramientas y devuelve solo resultados agregados; máximo 3 llamadas por pregunta; toda cifra de la respuesta debe aparecer en algún resultado de herramienta (validación en el teléfono; si falla, se muestra la respuesta en plantilla).
 
+Detalle (M10): las herramientas son `hoy`, `gasto`, `mayores_gastos`, `comparar_periodos`, `saldos`, `tarjetas`, `compromisos` y `por_cobrar` (`packages/nlu/src/explicar/herramientas.ts`); cada resultado es la respuesta en plantilla de la consulta (`{texto, lineas}`, sin ids). El sistema vive fijo en el proxy y, con 3 resultados, el proxy ya no ofrece herramientas. La validación compara cada número en forma canónica (`$1850` = `$1,850`) y rechaza además cantidades con letras ("doce", "mil", "la mitad") y la respuesta vacía. La plantilla de respaldo son las respuestas de lo consultado (o, sin consultas, `comparar_periodos` y `mayores_gastos`). Es de Plus: el proxy responde 403 `solo_plus` en Gratis y cada turno cuenta en el cupo de interpretaciones.
+
 ## 7. Política de confirmación
 
 **Registro optimista con "Deshacer"** cuando se cumplen todas: `intencion = registrar`; cada cuenta resuelta (`cuenta` o `por_asignar`, sin `aproximado`); ningún movimiento `aproximado`; ningún `gasto` con categoría `impuestos` (su confirmación elige el periodo que se paga, `05 §E15`); suma de montos ≤ $5,000. Si no, tarjeta de confirmación.
