@@ -12,6 +12,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import type { MotorDictado } from '../../voz';
+import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { PanelRegistrar } from './PanelRegistrar';
 import { TarjetasAccion } from './TarjetasAccion';
 import { encabezadoFecha } from './textos';
@@ -54,6 +55,17 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
       ) : null}
       <AvisosUnaVez avisos={vista.avisos} />
       <TarjetasAccion tarjetas={vista.tarjetasAccion} alVerMovimientos={navegacion.alVerMovimientos} />
+      {vista.tarjetaDelDia ? (
+        <Tarjeta testID="tarjeta-del-dia">
+          <Texto variante="etiqueta" tono="secundario">
+            Tarjeta del día
+          </Texto>
+          <Texto variante="cuerpo" testID="tarjeta-del-dia-texto">
+            {vista.tarjetaDelDia.texto}
+          </Texto>
+        </Tarjeta>
+      ) : null}
+      <InvitacionAvisos />
       <PanelRegistrar
         alMasOpciones={navegacion.alAbrirFormulario}
         alVerMovimientos={navegacion.alVerMovimientos}
