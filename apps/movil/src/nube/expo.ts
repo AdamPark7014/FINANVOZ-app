@@ -10,6 +10,7 @@ import type { NivelNube } from '../servicios';
 import { leerConfigNube } from './config';
 import { conectividadExpo } from './conectividad';
 import { crearSesionNube } from './sesion';
+import { usuarioDeToken } from './token';
 
 export function crearNivelNubeExpo(): NivelNube | null {
   const config = leerConfigNube(Constants.expoConfig?.extra);
@@ -22,5 +23,9 @@ export function crearNivelNubeExpo(): NivelNube | null {
   return {
     cliente: crearClienteNube({ url: config.url, obtenerToken: (o) => sesion.obtenerToken(o) }),
     conectividad: conectividadExpo,
+    usuarioId: async () => {
+      const token = await sesion.obtenerToken();
+      return token ? usuarioDeToken(token) : null;
+    },
   };
 }
