@@ -21,11 +21,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm --filter movil test:app
+      # Núcleo Kotlin de la captura (filtro de lista blanca, cola, diagnóstico): CA-M5-02 a nivel lógico.
+      - run: gradle -p modules/captura-android/nucleo-jvm test
       - name: Bundle Android de la app (Metro)
         run: pnpm --filter movil exec expo export --platform android --output-dir dist
       - run: node scripts/oraculo.mjs --verificar
