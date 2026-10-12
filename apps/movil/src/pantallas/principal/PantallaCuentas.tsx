@@ -41,6 +41,7 @@ export function PantallaCuentas({
   alAbrirPersona,
   alAbrirTandas,
   alAbrirSuscripciones,
+  alAbrirDeducciones,
 }: {
   alAbrirAjustes: () => void;
   /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
@@ -53,6 +54,8 @@ export function PantallaCuentas({
   alAbrirTandas?: () => void;
   /** Cuentas → Suscripciones (`02 §20`). */
   alAbrirSuscripciones?: () => void;
+  /** Personal → Deducciones (`02 §24`): sin negocio, el espacio personal es Cuentas. */
+  alAbrirDeducciones?: () => void;
 }) {
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
@@ -170,6 +173,17 @@ export function PantallaCuentas({
             variante="secundario"
             alPresionar={alAbrirSuscripciones}
             testID="boton-suscripciones"
+          />
+        </Seccion>
+      ) : null}
+
+      {alAbrirDeducciones ? (
+        <Seccion titulo="Deducciones" testID="seccion-deducciones">
+          <Boton
+            etiqueta="Ver mis deducciones del año"
+            variante="secundario"
+            alPresionar={alAbrirDeducciones}
+            testID="boton-deducciones"
           />
         </Seccion>
       ) : null}
