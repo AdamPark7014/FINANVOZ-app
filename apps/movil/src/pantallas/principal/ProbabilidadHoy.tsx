@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import {
+  horaDispositivo,
   leerProbabilidadHoy,
   obtenerProbabilidadHoy,
+  sincronizarAvisoRiesgo,
   type OpcionesBloques,
   type VistaProbabilidadHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Barra, espacio, Texto, useTema } from '../../ui';
+import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
+import { useNotificaciones } from '../avisos/notificaciones';
+
+/** Aviso de riesgo en Hoy (P < 50 %, `02 §13`): sin cifras nuevas, solo qué significa la probabilidad. */
+export const TEXTO_RIESGO =
+  'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
 
 /**
  * Probabilidad de llegar sin tocar el colchón (RF-HOY-02, `02 §4`) debajo de la cifra de Hoy. Si ya está
@@ -15,8 +22,16 @@ import { Barra, espacio, Texto, useTema } from '../../ui';
  * segundo plano (`obtenerProbabilidadHoy`) con un indicador discreto: la pantalla nunca espera. Al salir de Hoy
  * o al cambiar el libro, el cálculo en curso se cancela.
  */
-export function ProbabilidadHoy({ bloques }: { bloques?: Omit<OpcionesBloques, 'senal'> }) {
+export function ProbabilidadHoy({
+  bloques,
+  hora = horaDispositivo,
+}: {
+  bloques?: Omit<OpcionesBloques, 'senal'>;
+  /** Hora local para programar el aviso de riesgo (pruebas). */
+  hora?: () => string;
+}) {
   const { ctx, version } = useSesion();
+  const notificaciones = useNotificaciones();
   const { c } = useTema();
   const leida = useVista(leerProbabilidadHoy);
   const [calculada, setCalculada] = useState<{ version: number; vista: VistaProbabilidadHoy } | null>(null);
@@ -38,6 +53,23 @@ export function ProbabilidadHoy({ bloques }: { bloques?: Omit<OpcionesBloques, '
   }, [ctx, version, leida]);
 
   const vista = leida ?? (calculada?.version === version ? calculada.vista : null);
+  const lista = vista !== null;
+
+  // Con la probabilidad de hoy lista, replanea el aviso local de riesgo (1 por horizonte). Sin permiso, nada.
+  useEffect(() => {
+    if (!lista || !notificaciones) return;
+    let vigente = true;
+    notificaciones
+      .permiso()
+      .then((p) =>
+        vigente && p === 'concedido' ? sincronizarAvisoRiesgo(ctx, notificaciones.puerto, hora()) : null,
+      )
+      // Sin detalle (regla 9): se reintenta con el siguiente cálculo.
+      .catch(() => undefined);
+    return () => {
+      vigente = false;
+    };
+  }, [ctx, version, lista, notificaciones, hora]);
 
   if (!vista) {
     return (
@@ -75,6 +107,13 @@ export function ProbabilidadHoy({ bloques }: { bloques?: Omit<OpcionesBloques, '
         <Texto variante="secundario" tono="secundario" testID="probabilidad-etiqueta">
           {vista.etiqueta}
         </Texto>
+      ) : null}
+      {vista.riesgo ? (
+        <Tarjeta testID="aviso-riesgo">
+          <Texto variante="secundario" accessibilityLiveRegion="polite">
+            {TEXTO_RIESGO}
+          </Texto>
+        </Tarjeta>
       ) : null}
     </View>
   );

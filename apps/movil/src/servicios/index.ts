@@ -156,6 +156,8 @@ export {
   type PuertoNotificaciones,
 } from '../avisos/puerto';
 export type { AvisoPlaneado, HorarioSilencioso } from '../avisos/planificar';
+export { planAvisoRiesgo, sincronizarAvisoRiesgo } from './aviso-riesgo';
+export { PREFIJO_AVISO_RIESGO, type AvisoRiesgo } from '../avisos/riesgo';
 export {
   confirmarIngresoRecibido,
   cubrirConMovimiento,

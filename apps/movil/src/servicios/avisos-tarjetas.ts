@@ -23,6 +23,8 @@ const PreferenciasAvisos = z.strictObject({
   hora: Hora,
   corte: z.boolean(),
   fecha_limite: z.boolean(),
+  // M7: sin la clave (preferencias guardadas antes), encendido como dice `02 §13`.
+  riesgo: z.boolean().optional(),
 });
 
 export interface PreferenciasAvisos {
@@ -33,6 +35,8 @@ export interface PreferenciasAvisos {
   readonly corte: boolean;
   /** "Fecha límite de pago" 3 días antes con el PNGI (encendido por defecto). */
   readonly fechaLimite: boolean;
+  /** "Riesgo de no llegar": P < 50 % (encendido por defecto, `02 §13`). */
+  readonly riesgo: boolean;
 }
 
 const CLAVE = 'avisos_tarjetas';
@@ -40,16 +44,23 @@ const CLAVE = 'avisos_tarjetas';
 export function obtenerPreferenciasAvisos(ctx: Contexto): PreferenciasAvisos {
   const g = leerAjuste(ctx, CLAVE, PreferenciasAvisos);
   return g
-    ? { silencio: g.silencio, hora: g.hora, corte: g.corte, fechaLimite: g.fecha_limite }
+    ? {
+        silencio: g.silencio,
+        hora: g.hora,
+        corte: g.corte,
+        fechaLimite: g.fecha_limite,
+        riesgo: g.riesgo ?? true,
+      }
     : {
         silencio: HORARIO_SILENCIOSO_POR_OMISION,
         hora: HORA_AVISOS_POR_OMISION,
         corte: true,
         fechaLimite: true,
+        riesgo: true,
       };
 }
 
-/** Ajustes → Avisos: horario silencioso (22:00–08:00 por omisión), hora y qué avisos de tarjeta salen. */
+/** Ajustes → Avisos: horario silencioso (22:00–08:00 por omisión), hora y qué avisos salen. */
 export function fijarPreferenciasAvisos(
   ctx: Contexto,
   cambios: Partial<PreferenciasAvisos>,
@@ -61,6 +72,7 @@ export function fijarPreferenciasAvisos(
     hora: nuevas.hora,
     corte: nuevas.corte,
     fecha_limite: nuevas.fechaLimite,
+    riesgo: nuevas.riesgo,
   });
   if (!r.success) throw new ErrorDominio('avisos_invalidos', 'revisa el horario de los avisos');
   escribirAjuste(ctx, CLAVE, PreferenciasAvisos, r.data);
