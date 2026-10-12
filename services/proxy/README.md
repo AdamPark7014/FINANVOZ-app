@@ -210,3 +210,18 @@ Errores `{ "error": "<código>" }`: los de `/nlu/interpretar` más **403 `solo_p
 4. Prueba de humo: con la sesión anónima de un usuario Gratis, `curl -X POST https://<ref>.supabase.co/functions/v1/llm-turno -H "Authorization: Bearer <token>" -H 'content-type: application/json' -d '{"mensajes":[{"rol":"usuario","texto":"¿en qué gasto más?"}],"herramientas":[{"nombre":"mayores_gastos","descripcion":"Top de gastos","parametros":{"type":"object","properties":{}}}]}'` responde 403 `solo_plus`; con un usuario en `derechos` como `plus`, 200 con `salida.tipo = "herramientas"`.
 
 Registros: `{"endpoint":"/llm/turno","codigo":"herramientas"|"respuesta"|<error>, …}` con hash de usuario, proveedor, modelo, tokens, latencia y llamadas; nunca la pregunta, argumentos, resultados ni el texto del modelo.
+## M10 · Plantillas remotas firmadas (bucket público `plantillas`)
+
+Sin Edge Function (`docs/07-CAPTURA.md §3.1`): la app baja `https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json` (con `If-None-Match`) y `plantillas.json.sig`, y verifica la firma Ed25519 con las llaves públicas del build (`EXPO_PUBLIC_PLANTILLAS_LLAVES`). El bucket no necesita ser confiable, solo estar disponible.
+
+| Archivo | Qué hace |
+|---|---|
+| `migrations/20261110000001_plantillas.sql` | Bucket público `plantillas` (1 MB, JSON o texto). Sin políticas de INSERT, UPDATE ni DELETE: ningún JWT sube ni borra; se publica desde el panel o con la service role |
+| `_shared/plantillas/bucket.test.ts` | La migración en PGlite: `anon` y `authenticated` (anónimo o de correo) no suben, cambian ni borran plantillas |
+
+Publicar una versión nueva:
+
+1. Copia el archivo de plantillas con `version` mayor que la publicada y `version_minima_app` ≤ la versión de la app que lo debe usar.
+2. Firma **fuera del repositorio**, en la computadora donde vive la llave privada: `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX=<64 hex> node scripts/firmar-plantillas.mjs plantillas.json` (escribe `plantillas.json.sig` e imprime la llave pública, que debe estar en `EXPO_PUBLIC_PLANTILLAS_LLAVES`, y el SHA-256).
+3. Sube los dos archivos al bucket `plantillas` (Storage → plantillas → Upload, reemplazando), uno tras otro. Mientras no coinciden, la app rechaza el archivo (`firma_invalida`), conserva lo que tiene y lo vuelve a intentar al día siguiente.
+4. Comprueba: `curl -s https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json | sha256sum` da el SHA-256 que imprimió el script.

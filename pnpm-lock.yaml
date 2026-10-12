@@ -90,6 +90,12 @@ importers:
       '@cartera/respaldo':
         specifier: workspace:*
         version: link:../../packages/respaldo
+      '@noble/curves':
+        specifier: 2.4.0
+        version: 2.4.0
+      '@noble/hashes':
+        specifier: 2.4.0
+        version: 2.4.0
       '@sentry/react-native':
         specifier: ~7.11.0
         version: 7.11.0(expo@57.0.27)(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.87.1(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -1342,6 +1348,10 @@ packages:
     engines: {node: ^22.20 || ^24.12 || >=25}
     cpu: [x64]
     os: [linux]
+
+  '@noble/curves@2.4.0':
+    resolution: {integrity: sha512-P4/62zrgfH33CneE3Dn4WhJVA22YUU0eR51wKIan4NVRvwsA0YnPTwWGpNbpuacSujmSFLvyzpyuR30+fbq2Ew==}
+    engines: {node: '>= 20.19.0'}
 
   '@noble/hashes@2.4.0':
     resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
@@ -7164,6 +7174,10 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@noble/curves@2.4.0':
+    dependencies:
+      '@noble/hashes': 2.4.0
 
   '@noble/hashes@2.4.0': {}
 

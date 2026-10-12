@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buscarSecretos } from './secretos';
 
@@ -36,5 +39,51 @@ describe('búsqueda de secretos en el binario (08 §7.1, regla 8)', () => {
       `-webkit-mask-size_equals__exportStarjeta-msi-mensualidad-procesar`,
     ].join('\n');
     expect(buscarSecretos(publico)).toEqual([]);
+  });
+});
+
+describe('llave de prueba de plantillas en el binario (CA-M10-04)', () => {
+  const kat = JSON.parse(
+    readFileSync(
+      fileURLToPath(new URL('../../../../fixtures/plantillas-firmadas/kat.json', import.meta.url)),
+      'utf8',
+    ),
+  ) as { rfc8032_prueba_1: { llave_publica_hex: string; llave_secreta_hex: string } };
+  const { llave_publica_hex: publica, llave_secreta_hex: secreta } = kat.rfc8032_prueba_1;
+  const bytes = Buffer.from(publica, 'hex');
+
+  it.each([
+    ['hex en minúsculas (como la inlinea Metro desde EXPO_PUBLIC_PLANTILLAS_LLAVES)', `"prueba:${publica}"`],
+    ['hex en mayúsculas', `x=${publica.toUpperCase()};`],
+    ['base64', `k="${bytes.toString('base64')}"`],
+    ['base64url sin relleno', `k='${bytes.toString('base64url')}'`],
+    ['lista de bytes', `new Uint8Array([${[...bytes].join(', ')}])`],
+    ['la llave secreta del vector', `"${secreta}"`],
+  ])('detecta la llave en %s', (_forma, contenido) => {
+    expect(buscarSecretos(contenido)).toEqual(['llave_prueba_plantillas']);
+  });
+
+  it('no confunde otras llaves ni hashes de 32 bytes', () => {
+    const otra = 'fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025'; // vector 2 de RFC 8032
+    const contenido = [otra, `${publica}00`, publica.slice(2), 'a'.repeat(43) + '='].join('\n');
+    expect(buscarSecretos(contenido)).toEqual([]);
+  });
+
+  it('el código y la configuración de la app no la traen (el bundle se revisa en CI tras expo export)', () => {
+    const app = fileURLToPath(new URL('../../', import.meta.url));
+    const textos: string[] = [];
+    const recorrer = (dir: string) => {
+      for (const nombre of readdirSync(dir)) {
+        const ruta = join(dir, nombre);
+        if (statSync(ruta).isDirectory()) recorrer(ruta);
+        else if (/\.(tsx?|json|js)$/.test(nombre) && !/\.test\.tsx?$/.test(nombre)) {
+          textos.push(readFileSync(ruta, 'utf8'));
+        }
+      }
+    };
+    recorrer(join(app, 'src'));
+    recorrer(join(app, 'app'));
+    textos.push(readFileSync(join(app, 'app.json'), 'utf8'));
+    expect(textos.filter((t) => buscarSecretos(t).includes('llave_prueba_plantillas'))).toEqual([]);
   });
 });

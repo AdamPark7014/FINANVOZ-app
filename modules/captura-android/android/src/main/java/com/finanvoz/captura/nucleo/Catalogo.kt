@@ -20,6 +20,16 @@ class Catalogo(val bancos: List<Banco>) {
 
   operator fun plus(otro: Catalogo): Catalogo = Catalogo(bancos + otro.bancos)
 
+  /**
+   * Este catálogo (el de plantillas remotas verificadas en JS, `07 §3.1`) encima de [base]: gana por id de
+   * banco y por paquete; de [base] quedan los bancos que no trae ni reclama.
+   */
+  fun sobre(base: Catalogo): Catalogo {
+    val ids = bancos.map { it.id }.toSet()
+    val reclamados = paquetes
+    return Catalogo(bancos + base.bancos.filter { b -> b.id !in ids && b.paquetes.none { it in reclamados } })
+  }
+
   companion object {
     private val PAQUETE = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$")
 
@@ -41,5 +51,29 @@ class Catalogo(val bancos: List<Banco>) {
         },
       )
     }
+  }
+}
+
+/**
+ * Bancos de las plantillas remotas (M10, `07 §3.1`) que JS ya verificó con Ed25519. Se guardan en
+ * almacenamiento privado para que el servicio los use aunque la app no esté abierta. Un archivo ilegible se
+ * ignora (queda el embebido); uno inválido al fijarlo es un error y no reemplaza al anterior.
+ */
+class CatalogoRemoto(private val almacen: AlmacenTexto) {
+  fun leer(): Catalogo? = try {
+    almacen.leer()?.let { Catalogo.deJson(it) }
+  } catch (e: Json.ErrorJson) {
+    null
+  }
+
+  /** Valida y guarda `{bancos: [...]}`; `null` lo borra. Devuelve cuántos bancos quedaron. */
+  fun fijar(json: String?): Int {
+    if (json == null) {
+      almacen.borrar()
+      return 0
+    }
+    val catalogo = Catalogo.deJson(json)
+    almacen.escribir(json)
+    return catalogo.bancos.size
   }
 }

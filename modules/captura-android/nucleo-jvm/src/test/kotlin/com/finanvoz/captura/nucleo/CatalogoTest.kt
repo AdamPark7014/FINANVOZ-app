@@ -61,6 +61,52 @@ class CatalogoTest {
   }
 
   @Test
+  fun `el catalogo remoto gana por id y por paquete sobre el embebido`() {
+    val embebido = Catalogo(
+      listOf(
+        Banco("banco_a", "Viejo", listOf("mx.ejemplo.bancoa")),
+        Banco("alias_b", "Alias", listOf("mx.ejemplo.bancob")),
+        Banco("solo_embebido", "Solo", listOf("mx.ejemplo.solo")),
+      ),
+    )
+    val remoto = Catalogo.deJson(File(raizRepo(), "fixtures/plantillas-firmadas/plantillas.json").readText())
+    val c = remoto.sobre(embebido)
+    assertEquals("Banco A (débito)", c.bancoDe("mx.ejemplo.bancoa")?.nombre)
+    assertEquals("banco_b", c.bancoDe("mx.ejemplo.bancob")?.id)
+    assertEquals("solo_embebido", c.bancoDe("mx.ejemplo.solo")?.id)
+    assertEquals(listOf("banco_a", "banco_b", "billetera_c", "cobros_d", "solo_embebido"), c.bancos.map { it.id })
+    // Un paquete nuevo de la remota puede entrar a la lista blanca.
+    val marcados = setOf("mx.ejemplo.cobrosd", "com.whatsapp")
+    assertEquals(emptySet<String>(), Filtro(marcados, Catalogo(emptyList())).efectivos)
+    assertEquals(setOf("mx.ejemplo.cobrosd"), Filtro(marcados, remoto.sobre(Catalogo(emptyList()))).efectivos)
+  }
+
+  @Test
+  fun `el catalogo remoto se guarda, se lee, se borra y uno invalido no reemplaza al anterior`() {
+    val dir = java.nio.file.Files.createTempDirectory("catalogo").toFile()
+    try {
+      val remoto = CatalogoRemoto(ArchivoTexto(File(dir, "catalogo.remoto.json")))
+      assertEquals(null, remoto.leer())
+      val json = "{\"bancos\":[{\"id\":\"nuevo\",\"nombre\":\"Nuevo\",\"paquetes_android\":[\"mx.nuevo.app\"]}]}"
+      assertEquals(1, remoto.fijar(json))
+      assertEquals(listOf("nuevo"), remoto.leer()?.bancos?.map { it.id })
+      try {
+        remoto.fijar("{\"bancos\":[{\"id\":\"x\",\"nombre\":\"X\",\"paquetes_android\":[\"sinpunto\"]}]}")
+        throw AssertionError("debió rechazarse")
+      } catch (e: Json.ErrorJson) {
+        // esperado
+      }
+      assertEquals(listOf("nuevo"), remoto.leer()?.bancos?.map { it.id })
+      File(dir, "catalogo.remoto.json").writeText("{roto")
+      assertEquals(null, remoto.leer())
+      assertEquals(0, remoto.fijar(null))
+      assertEquals(null, remoto.leer())
+    } finally {
+      dir.deleteRecursively()
+    }
+  }
+
+  @Test
   fun `la lista blanca efectiva es lo marcado dentro del catalogo`() {
     val f = Filtro(setOf("mx.ejemplo.bancoa", "com.whatsapp"), CATALOGO_PRUEBA)
     assertEquals(setOf("mx.ejemplo.bancoa"), f.efectivos)

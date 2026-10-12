@@ -48,7 +48,7 @@ flowchart LR
 | Avisos | `expo-notifications` (solo locales) | Sin servidor de push |
 | Tareas en segundo plano | `expo-background-task` | Cortes, ocurrencias, respaldo automático, plantillas remotas |
 | Captura Android | Expo Module propio en Kotlin + config plugin | Control total del filtrado nativo (RF-CAP-02) |
-| Criptografía (M9, M10) | Primitivas nativas: scrypt, AES-256-GCM, Ed25519 y aleatorios seguros. Elegida en el spike de M9 (`docs/ESTADO.md`): scrypt con `react-native-quick-crypto` (en JS puro `n = 2^17` no cabe en 3 s sin JIT); AES-256-GCM y aleatorios con `expo-crypto`. Ed25519 (M10) por decidir entre quick-crypto y `@noble/curves` | Respaldo cifrado y plantillas firmadas; `packages/respaldo` recibe la criptografía inyectada para probarla en Node |
+| Criptografía (M9, M10) | Primitivas nativas: scrypt, AES-256-GCM, Ed25519 y aleatorios seguros. Elegida en el spike de M9 (`docs/ESTADO.md`): scrypt con `react-native-quick-crypto` (en JS puro `n = 2^17` no cabe en 3 s sin JIT); AES-256-GCM y aleatorios con `expo-crypto`. Ed25519 (M10, solo verificar) con `@noble/curves`: JS puro y auditado, el mismo código en Node y en Hermes; verificar un archivo al día no necesita velocidad nativa | Respaldo cifrado y plantillas firmadas; `packages/respaldo` recibe la criptografía inyectada para probarla en Node |
 | Archivos | `expo-sharing`, `expo-document-picker`, `expo-print` (PDF desde HTML), `fflate` (zip/gzip en JS) | Exportar, respaldo, paquete para el contador |
 | XML (M12) | Lector XML en JS puro sin evaluación de entidades externas (candidata: `fast-xml-parser`) | CFDI; sin riesgo XXE |
 | Widget (M10) | `react-native-android-widget` con config plugin (spike en M10) | "Hoy puedes" en la pantalla de inicio |

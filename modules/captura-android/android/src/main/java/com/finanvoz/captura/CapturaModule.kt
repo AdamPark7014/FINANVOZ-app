@@ -2,6 +2,7 @@ package com.finanvoz.captura
 
 import android.content.Context
 import android.os.Bundle
+import com.finanvoz.captura.nucleo.Json
 import com.finanvoz.captura.nucleo.NotificacionCruda
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
@@ -37,6 +38,9 @@ class NotificacionRegistro : Record {
 
 class MuestrasNoPermitidas :
   CodedException("ERR_CAPTURA_MUESTRAS", "Las muestras del modo diagnóstico solo existen en builds de depuración", null)
+
+class CatalogoRemotoInvalido :
+  CodedException("ERR_CAPTURA_CATALOGO_REMOTO", "El catálogo de bancos remoto no es válido", null)
 
 /**
  * Módulo `CapturaAndroid` (`07 §2.3`). El puente tipado está en
@@ -109,6 +113,14 @@ class CapturaModule : Module() {
 
     AsyncFunction("solicitarReconexion") {
       Captura.solicitarReconexion(contexto)
+    }
+
+    AsyncFunction("fijarCatalogoRemoto") { json: String? ->
+      try {
+        Captura.fijarCatalogoRemoto(contexto, json)
+      } catch (e: Json.ErrorJson) {
+        throw CatalogoRemotoInvalido()
+      }
     }
 
     AsyncFunction("diagnosticoResumen") {
