@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Finanvoz",
+    "slug": "finanvoz",
+    "scheme": "finanvoz",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icono.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.finanvoz.app",
+      "allowBackup": false,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-primer-plano.png",
+        "monochromeImage": "./assets/android-monocromo.png",
+        "backgroundColor": "#0A6B57"
+      },
+      "permissions": ["android.permission.RECORD_AUDIO", "android.permission.USE_BIOMETRIC"],
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-sqlite", { "useSQLCipher": true }],
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        { "faceIDPermission": "Finanvoz usa tu biometría para desbloquear la app." }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Finanvoz usa el micrófono para registrar lo que dictas.",
+          "speechRecognitionPermission": "Finanvoz convierte tu voz en texto para registrar movimientos.",
+          "androidSpeechServicePackages": ["com.google.android.as", "com.google.android.googlequicksearchbox"]
+        }
+      ],
+      "@sentry/react-native"
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}

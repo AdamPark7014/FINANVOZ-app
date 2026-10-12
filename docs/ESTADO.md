@@ -7,8 +7,8 @@
 | Hito | Estado | Inicio | Cierre | Notas |
 |---|---|---|---|---|
 | M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código fusionado; falta publicar (pendientes 11 y 12). M1 avanza en paralelo porque lo que falta de M0 es solo externo |
-| M1 · Núcleo | En curso | 2026-10-12 | | Todos los criterios verificados; cierra al fusionar su PR |
-| M2 · App base sin conexión | Pendiente | | | |
+| M1 · Núcleo | Cerrado | 2026-10-12 | 2026-10-12 | Todos los criterios verificados; PR #4 fusionado |
+| M2 · App base sin conexión | En curso | 2026-10-12 | | Código completo y probado en Node/jest; cierra con las pruebas en el teléfono (pendiente 13) |
 | M3 · Intérprete en la nube | Pendiente | | | |
 | M4 · Tarjetas, MSI y compromisos | Pendiente | | | |
 | M5 · Captura Android y arqueo | Pendiente | | | |
@@ -82,6 +82,21 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 2026-10-12 | M1 | `reemplazar` con una clave ya usada por otra transacción → `clave_duplicada`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | Cuentas de sistema y categorías con ids fijos legibles (`sis:personal:<x>`, `cat:personal:<slug>`) en vez de UUIDv7, para insertarlas en la migración. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | Pasan a servicios (M2): marcar `plan_msi.estado = 'liquidado'` (caso 6e) y crear ocurrencias pasadas como `omitida` (caso 23b). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M2 | Llave de SQLCipher cruda (`PRAGMA key = "x'…'"`, 32 bytes, sin PBKDF2) aplicada antes de cualquier consulta; las migraciones de `packages/datos` se embeben en `apps/movil/src/db/migraciones.generado.ts` (`pnpm --filter movil migraciones`, una prueba falla si no coincide con los `.sql` y el journal) y las aplica un corredor síncrono propio compatible con `__drizzle_migrations` | La llave ya es aleatoria (derivarla solo cuesta tiempo de arranque); el migrador de Drizzle para expo-sqlite es asíncrono y el de Node lee archivos; uno propio corre igual en la app y en Node | `04 §7`, `04 §8` |
+| 2026-10-12 | M2 | Sin migración nueva en M2: evidencia del consentimiento, colchón, bloqueo, modo ingreso variable, estado del onboarding, avisos de una vez, "Todavía no" del día y frases "por interpretar" viven en `ajuste` (una fila por clave, JSON validado con Zod) | `ajuste` ya existe para esto; una tabla nueva habría corrido la numeración planeada de `04 §3.2` | `04 §3`, `04 §3.2` |
+| 2026-10-12 | M2 | Consentimiento: todo caso de uso que escribe datos del usuario exige la evidencia (`ErrorDominio('sin_consentimiento')`); abrir la base y migrar (catálogo y cuentas de sistema) sí ocurre antes. Evidencia: `{version: '2026-10-m2', aceptado_en, fecha, datos_financieros, estadisticas, medio}` y no se reescribe | CA-M2-05 y RF-PRI-01 hablan de datos del usuario; el catálogo no lo es | `08`, `02 §3` |
+| 2026-10-12 | M2 | E3.3 en servicios: `recibidas` = ocurrencias del ingreso cubiertas u omitidas ("Este periodo no me pagan") más las fechas anteriores al alta del ingreso | Sin eso, configurar la quincena un día después de cobrar la marcaría como retrasada; el saldo que dio la persona ya la incluye | `05 §E3.3` |
+| 2026-10-12 | M2 | M2 solo tiene cobertura manual (la automática es M4): "Sí, ya llegó" registra el ingreso prellenado y cubre la ocurrencia (CA-M2-08); "Ya está registrado" cubre con un movimiento existente. La tarjeta del ingreso sale también el día de pago, no solo con retraso. Un ingreso dictado no mueve el horizonte hasta M4 | `09` M2 dice cobertura manual; sin la tarjeta el día de pago no habría forma de recalcular | `02 §4.1`, `05 §E3.5` |
+| 2026-10-12 | M2 | "Todavía no" oculta la tarjeta de acción el resto del día y vuelve a preguntar mañana; la ocurrencia sigue pendiente y reservada | La especificación no dice cuándo volver a preguntar; mientras no se responda sigue reservada | `02 §4.1` |
+| 2026-10-12 | M2 | Tarjeta en O4: "Sí, ya lo incluye" resta los meses del saldo sin bajar de 0 (si el saldo es menor, cuenta la deuda de meses completa); "No" y "No sé" no restan; "No sé" deja un aviso que Hoy muestra hasta que la UI llama `marcarAvisoVisto`. Pagos planeados de tarjetas en plan: M4 (en M2 una tarjeta en plan reserva su deuda completa, E4-08) | Ante la duda, contar de más lo que se debe (regla 12) | `02 §3.1`, `05 §E4` |
+| 2026-10-12 | M2 | Cuotas MSI existentes sin cierre de cortes (M4): todas siguen "no facturadas" y E4 reserva las de límite dentro del horizonte | El cierre de cortes es de M4; así cada cuota se cuenta una sola vez | `05 §E6` |
+| 2026-10-12 | M2 | Registro por texto: nivel 0 sin categoría → `otros_gastos` / `otros_ingresos`; cualquier intención que no sea registrar o "cuánto puedo gastar" (incluido el arqueo, M5) queda "por interpretar"; las cuentas de ahorro no entran al resolutor; el token de Deshacer es la lista de ids anulables | Opciones conservadoras dentro del alcance de M2 | `06 §5`, `06 §7`, `02 §5` |
+| 2026-10-12 | M2 | Tarjetas de acción en M2: compromiso vencido, ingreso que no llegó o día de pago, frases por interpretar y gastos por asignar (máximo dos). Pago de tarjeta que vence (M4), arqueo y captura (M5) llegan con su hito | Dependen de datos que M2 no genera | `02 §4.1` |
+| 2026-10-12 | M2 | Cargador de semillas: consentimiento con `medio: 'semilla'`, alta de tarjetas en `hoy − 1`, compromisos únicos con `desde = min(fecha, hoy − 1)`; rechaza `e-negocio` (M11) y bases con datos. `pnpm --filter movil semilla <id>` escribe `apps/movil/.semillas/<id>.db` (sin cifrar, datos sintéticos) y muestra Hoy junto al `esperado`; en el teléfono la UI llama `cargarEscenario` solo con `__DEV__` | El script de Node no puede abrir la base cifrada del teléfono | `fixtures/README.md` |
+| 2026-10-12 | M2 | Exportar: JSON con todas las tablas tal cual (centavos; una prueba exige que estén todas) y CSV RFC 4180 con una fila por transacción vigente (sin saldos iniciales ni anuladas), monto en pesos con punto decimal, `sale_de` y `llega_a` | La especificación no fija columnas; se evita jerga contable | `04 §6` |
+| 2026-10-12 | M2 | Pantallas principales: "Registrar" (dictado, texto y formulario) es la ruta `/registrar` del grupo de pestañas sin pestaña propia (se abre desde Hoy y Movimientos); el botón de voz y "Escribir" viven en Hoy. "Ya la pagué" y "Sí, ya llegó" registran directo con el monto y la cuenta del programado y ofrecen Deshacer (si el programado no tiene cuenta, se pregunta con chips) en vez de abrir una confirmación prellenada; "Ya está registrado" queda para M4. El aviso de una vez se marca visto al mostrarse y sigue en pantalla hasta "Entendido". "Dime cada cuándo te pagan" lleva a Ajustes | Menos toques con el mismo resultado y Deshacer de 5 s; ninguna opción infla el dinero libre | `02 §2`, `02 §4.1`, `02 §5` |
+| 2026-10-12 | M2 | Onboarding (pantallas): cada paso guarda al continuar (no hay borrador en memoria); O3 abre en Quincena con fin de semana "Antes" (la respuesta más probable primero, `02 §1`) y muestra el próximo pago; O4 crea el efectivo en $0 si se deja vacío; la tarjeta exige todos los campos de `02 §3.1` (sin saldo no se crea) y "¿El saldo ya los incluye?" solo aparece con meses; O5 usa regla mensual (monto y día del mes); O6 solo anuncia "Disponible pronto" sin pedir permisos. El dictado en O4 ("tengo una Nu que corta el 28…") queda para después de M3 | Menos campos para cumplir ≤ 4 min; contar de menos el efectivo nunca infla el día | `02 §3`, `02 §3.1` |
+| 2026-10-12 | M2 | Raíz: `app/index.tsx` decide (sin consentimiento o sin onboarding → `/onboarding`, si no → `/hoy`); las pestañas no tienen `index`. "Borrar todo" pide escribir BORRAR, llama `borrarTodoApp` y reabre una base nueva (vuelve al onboarding). Menú de escenarios: tocar 7 veces la versión en Ajustes (solo `__DEV__`); el reloj queda fijo en el `hoy` del escenario hasta el próximo arranque en frío. Aviso de privacidad de la app en `/aviso-privacidad` (texto en `src/pantallas/onboarding/aviso.ts`, sujeto a la revisión legal pendiente) | Confirmación fuerte para una acción irreversible; el menú no existe en producción | `02 §12`, `08 §2` |
 
 ## Pendientes
 
@@ -99,6 +114,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 10 | Especificación | Cuentas de servicios: Supabase, Expo/EAS, Google Play Console, RevenueCat, Sentry, PostHog, proveedores de LLM; Apple Developer en M14 | Adam | Según el hito que los pida |
 | 11 | M0 | Crear el proyecto de Supabase y desplegar `lista-espera` (pasos en `services/proxy/README.md`) | Adam | M0 |
 | 12 | M0 | Comprar `finanvoz.com` en Cloudflare, crear el proyecto de Pages `finanvoz`, y en GitHub (entorno `produccion`) poner los secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` y las variables `VITE_LISTA_ESPERA_URL` y `VITE_RESPONSABLE_*`; después correr "Publicar calculadora" | Adam | M0, antes del 6 nov |
+| 13 | M2 | Pruebas en el teléfono: build de desarrollo (`pnpm --filter movil android` o EAS), correr Maestro del onboarding y cronometrarlo, abrir la base con `sqlite3` sin llave, biometría y multitarea, definir teléfono de referencia y medir arranque, E4 y nivel 0 (RNF-01) | Adam (con su Android) + Claude por Remote Control | M2 |
 
 ## Verificación por hito
 
@@ -130,6 +146,25 @@ Plan: E1 completo → en paralelo E3/E4/E7, E5/E6/E11/E12, E9 + plantillas + cat
 | CA-M1-06 | `packages/nlu`: los 144 `esperado` validan con Zod y con `esquema.json` (ajv); 36 casos inválidos rechazados por ambos | Cumple |
 | CA-M1-07 | `packages/core/src/captura/*.test.ts`: 12/12 ejemplos personales y 2/2 de negocio; OXXO GAS → gasolina, UBER EATS → comida_fuera | Cumple |
 | CA-M1-08 | `pnpm cobertura:core`: líneas 96.4 % (CI exige ≥ 90 %) | Cumple |
+
+### M2
+
+Plan: esqueleto Expo SDK 57 → en paralelo base cifrada + servicios (Node, better-sqlite3) y diseño, voz, bloqueo y Sentry → en paralelo raíz + onboarding + ajustes y Hoy + registrar + Movimientos + Cuentas → CI con jest-expo y bundle Android de Metro. Lo que solo se comprueba en el teléfono queda en el pendiente 13.
+
+| Criterio | Cómo se verificó | Resultado |
+|---|---|---|
+| CA-M2-01 | `src/pantallas/onboarding/onboarding.test.tsx` recorre O1–O7 con las rutas reales y termina en `/hoy`; flujo de Maestro en `apps/movil/.maestro/onboarding.yaml` | Cumple en pruebas; falta correr Maestro en el emulador y cronometrar (pendiente 13) |
+| CA-M2-02 | `src/servicios/registrar.test.ts` y `src/pantallas/principal/principal.test.tsx` ("coca 25 en efectivo" → −$25, Deshacer restaura; también por voz con motor falso) | Cumple en pruebas; el modo avión se confirma en el teléfono (el registro no usa red) |
+| CA-M2-03 | `src/servicios/hoy.test.ts` y `principal.test.tsx` con la semilla `e4-01`: "$214", "4 días para tu quincena (jue 15)" y desglose de E4-01 | Cumple |
+| CA-M2-04 | `src/privacidad/exportar.test.ts` (JSON con todas las tablas, CSV) y borrar todo (llave nueva, sin datos); `ajustes.test.tsx` (compartir y BORRAR) | Cumple en pruebas; abrir el archivo con `sqlite3` sin llave se comprueba en el teléfono (pendiente 13) |
+| CA-M2-05 | `src/privacidad/consentimiento.test.ts` y `onboarding.test.tsx` (ninguna fila cambia antes de aceptar; evidencia guardada) | Cumple |
+| CA-M2-06 | `src/observabilidad/sentry.test.ts` (Vitest) y la prueba de jest con el SDK real y transporte interceptado | Cumple |
+| CA-M2-07 | — | Pendiente: teléfono de referencia y mediciones (pendiente 13) |
+| CA-M2-08 | `hoy.test.ts` y `principal.test.tsx` con reloj en el 15 oct: día de pago $456 (E4-05); "Sí, ya llegó" → horizonte al vie 30 | Cumple |
+| CA-M2-09 | `hoy.test.ts` y `principal.test.tsx`: $214 con el préstamo apartado (E4-09); al apagar el interruptor sube | Cumple |
+| CA-M2-10 | `principal.test.tsx` y servicios de ocurrencias: Todavía no / Ya la pagué / Ya no aplica | Cumple |
+| CA-M2-11 | `src/seguridad/*.test.ts(x)`: regla de ≥ 1 min con reloj inyectado, cortina y `FLAG_SECURE` con módulos falsos | Cumple en pruebas; biometría y vista previa en blanco se comprueban en el teléfono (pendiente 13) |
+| CA-M2-12 | `src/servicios/onboarding.test.ts` y `onboarding.test.tsx`: "No sé" no resta del saldo y el aviso sale una vez | Cumple |
 
 <!-- Copiar la tabla para cada hito al iniciarlo, con una fila por criterio CA-Mx-NN. -->
 
