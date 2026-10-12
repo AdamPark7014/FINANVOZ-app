@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { ErrorDominio } from '@cartera/core';
 import { abrirBase, C, migrar } from './__pruebas__/base';
-import { TABLAS_0001, TABLAS_0002, TABLAS_0003 } from './esquema';
+import { TABLAS_0001, TABLAS_0002, TABLAS_0003, TABLAS_0004 } from './esquema';
 import {
   CATEGORIAS_GASTO_FIJO,
   CATEGORIAS_GASTO_VARIABLE,
@@ -14,7 +14,7 @@ import {
 } from './semillas';
 import { construirGasto } from '@cartera/core';
 
-const TODAS = { ...TABLAS_0001, ...TABLAS_0002, ...TABLAS_0003 };
+const TODAS = { ...TABLAS_0001, ...TABLAS_0002, ...TABLAS_0003, ...TABLAS_0004 };
 const TABLAS = Object.keys(TODAS).sort();
 
 function codigo(f: () => unknown): string | undefined {
@@ -279,5 +279,56 @@ describe('M8 · migración 0002_tandas', () => {
     const { insertar } = conTanda();
     insertar('t1');
     expect(() => insertar('t2')).toThrow(/UNIQUE constraint failed/);
+  });
+});
+
+describe('M12 · migración 0004_cfdi', () => {
+  const insertar = (
+    cliente: ReturnType<typeof abrirBase>['cliente'],
+    uuid: string,
+    extra: { fecha?: string; total?: number; estatus?: string; transaccion?: string | null } = {},
+  ) =>
+    cliente
+      .prepare(
+        `INSERT INTO cfdi (uuid, xml, emisor_rfc, receptor_rfc, fecha, tipo_comprobante, total, iva, estatus,
+                           transaccion_id, importado_en)
+         VALUES (?, '<x/>', 'AAA010101AAA', 'PEPJ800101AB1', ?, 'I', ?, 0, ?, ?, 0)`,
+      )
+      .run(
+        uuid,
+        extra.fecha ?? '2026-03-14',
+        extra.total ?? 150000,
+        extra.estatus ?? 'desconocido',
+        extra.transaccion ?? null,
+      );
+
+  it('crea la tabla cfdi con estatus desconocido y etiquetas vacías por omisión', () => {
+    const { cliente } = abrirBase();
+    insertar(cliente, '5A1B2C3D-0000-4000-8000-000000000001');
+    expect(cliente.prepare('SELECT estatus, etiquetas FROM cfdi').get()).toEqual({
+      estatus: 'desconocido',
+      etiquetas: '{}',
+    });
+  });
+
+  it('el UUID es la llave y va en mayúsculas: la misma factura no entra dos veces', () => {
+    const { cliente } = abrirBase();
+    insertar(cliente, '5A1B2C3D-0000-4000-8000-000000000001');
+    expect(() => insertar(cliente, '5A1B2C3D-0000-4000-8000-000000000001')).toThrow(
+      /UNIQUE constraint failed/,
+    );
+    expect(() => insertar(cliente, '5a1b2c3d-0000-4000-8000-000000000009')).toThrow(
+      /CHECK constraint failed/,
+    );
+  });
+
+  it('CHECK: estatus, fecha civil, montos no negativos y transacción existente', () => {
+    const { cliente } = abrirBase();
+    expect(() => insertar(cliente, 'A', { estatus: 'pagado' })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar(cliente, 'B', { fecha: '2026-3-1' })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar(cliente, 'C', { total: -1 })).toThrow(/CHECK constraint failed/);
+    expect(() => insertar(cliente, 'D', { transaccion: 'no-existe' })).toThrow(
+      /FOREIGN KEY constraint failed/,
+    );
   });
 });

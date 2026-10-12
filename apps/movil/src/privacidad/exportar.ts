@@ -24,6 +24,7 @@ const TABLAS = [
   'tanda',
   'suscripcion',
   'plantilla_remota',
+  'cfdi',
 ] as const;
 
 export const FORMATO_EXPORTACION = 'finanvoz-exportacion';

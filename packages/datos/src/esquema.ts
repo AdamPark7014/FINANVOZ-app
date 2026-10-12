@@ -285,6 +285,31 @@ export const plantillaRemota = sqliteTable('plantilla_remota', {
 /** Tablas de `0003_suscripciones`, por nombre SQL. */
 export const TABLAS_0003 = { suscripcion, plantilla_remota: plantillaRemota } as const;
 
+/**
+ * `0004_cfdi` (M12, `04 §3.2` y `§3.3`): facturas CFDI 4.0 importadas, con el XML completo, lo que E13 necesita
+ * para filtrar y las etiquetas del usuario (alumno, nivel, lentes, pago confirmado de un PPD) en JSON.
+ */
+export const cfdi = sqliteTable('cfdi', {
+  uuid: text('uuid').primaryKey(),
+  xml: text('xml').notNull(),
+  emisorRfc: text('emisor_rfc').notNull(),
+  receptorRfc: text('receptor_rfc').notNull(),
+  fecha: text('fecha').notNull(),
+  tipoComprobante: text('tipo_comprobante').notNull(),
+  usoCfdi: text('uso_cfdi'),
+  formaPago: text('forma_pago'),
+  metodoPago: text('metodo_pago'),
+  total: integer('total').notNull(),
+  iva: integer('iva').notNull(),
+  estatus: text('estatus').notNull().default('desconocido'),
+  etiquetas: text('etiquetas').notNull().default('{}'),
+  transaccionId: text('transaccion_id').references(() => transaccion.id),
+  importadoEn: integer('importado_en').notNull(),
+});
+
+/** Tablas de `0004_cfdi`, por nombre SQL. */
+export const TABLAS_0004 = { cfdi } as const;
+
 /** Tablas de `0001_inicial`, por nombre SQL. */
 export const TABLAS_0001 = {
   contacto,
