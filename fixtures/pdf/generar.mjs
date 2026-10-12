@@ -5,10 +5,11 @@
 //
 //   <banco>.pdf   el PDF (PDF 1.4 sin comprimir, Helvetica con WinAnsiEncoding, sin fechas de creación)
 //   <banco>.txt   el texto que debe salir del PDF, ya normalizado (renglones con un espacio entre columnas)
+//   <banco>.json  lo que el analizador del banco debe leer (CA-M15-01). Sale de los mismos datos que el PDF, no
+//                 del analizador: es el contrato contra el que se prueba `packages/core`.
 //
-// El JSON esperado de cada analizador (`<banco>.json`) NO lo escribe este script: se escribe a mano a partir del
-// documento y es el contrato de CA-M15-01. Las pruebas comprueban que este script reproduce byte a byte los PDF
-// y los .txt del repositorio (Vitest) y que PDFBox extrae de cada PDF exactamente su .txt (JVM, `nucleo-jvm`).
+// Las pruebas comprueban que este script reproduce byte a byte los archivos del repositorio (Vitest), que PDFBox
+// extrae de cada PDF exactamente su .txt (JVM, `nucleo-jvm`) y que el analizador lee de cada .txt su .json.
 //
 //   node fixtures/pdf/generar.mjs            escribe los archivos
 //   node fixtures/pdf/generar.mjs --verificar  falla si algún archivo difiere de lo que generaría
@@ -514,6 +515,45 @@ function textoEsperado(paginas) {
     .join('\n')}\n`;
 }
 
+/** Lo que debe leer el analizador (`EstadoCuentaLeido` en snake_case), directo de los datos del estado. */
+function jsonEsperado(banco, nombre, e, conTotales) {
+  const t = totales(e);
+  const json = {
+    analizador: `${banco}.estado.v1`,
+    banco,
+    nombre_banco: nombre,
+    ultimos4: e.ultimos4,
+    periodo: { desde: e.desde, hasta: e.hasta },
+    corte: e.hasta,
+    limite: e.limite,
+    limite_credito: e.limiteCredito,
+    saldo_anterior: e.saldoAnterior,
+    saldo_corte: t.saldoCorte,
+    pngi: t.saldoCorte,
+    pago_minimo: e.pagoMinimo,
+    total_cargos: conTotales ? t.cargos : null,
+    total_abonos: conTotales ? t.abonos : null,
+    movimientos: e.movimientos.map(([fecha, descripcion, monto, tipo], indice) => ({
+      indice,
+      fecha,
+      descripcion,
+      monto,
+      tipo,
+    })),
+    msi: e.msi.map((p) => ({
+      descripcion: p.descripcion,
+      monto_original: p.original,
+      saldo_pendiente: pendienteMsi(p),
+      cuota: cuotaMsi(p),
+      cuota_numero: p.n,
+      cuotas_totales: p.total,
+    })),
+    renglones_sin_leer: 0,
+    cuadra: conTotales ? true : null,
+  };
+  return Buffer.from(`${JSON.stringify(json, null, 2)}\n`, 'utf8');
+}
+
 export function generar() {
   const b = documentoB();
   const e = documentoE();
@@ -521,11 +561,14 @@ export function generar() {
   return {
     'banco_b.pdf': escribirPdf(b, { semilla: 'banco_b' }),
     'banco_b.txt': Buffer.from(textoEsperado(b), 'utf8'),
+    'banco_b.json': jsonEsperado('banco_b', 'Banco B', BANCO_B, true),
     'banco_e.pdf': escribirPdf(e, { semilla: 'banco_e' }),
     'banco_e.txt': Buffer.from(textoEsperado(e), 'utf8'),
+    'banco_e.json': jsonEsperado('banco_e', 'Banco E', BANCO_E, true),
     'banco_e.protegido.pdf': escribirPdf(e, { semilla: 'banco_e', contrasena: CONTRASENA_PRUEBA }),
     'banco_f.pdf': escribirPdf(f, { semilla: 'banco_f' }),
     'banco_f.txt': Buffer.from(textoEsperado(f), 'utf8'),
+    'banco_f.json': jsonEsperado('banco_f', 'Banco F', BANCO_F, false),
     'escaneado.pdf': escribirPdf([[]], { semilla: 'escaneado', escaneado: true }),
   };
 }

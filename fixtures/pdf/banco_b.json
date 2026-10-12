@@ -1,0 +1,335 @@
+{
+  "analizador": "banco_b.estado.v1",
+  "banco": "banco_b",
+  "nombre_banco": "Banco B",
+  "ultimos4": "8812",
+  "periodo": {
+    "desde": "2026-09-11",
+    "hasta": "2026-10-10"
+  },
+  "corte": "2026-10-10",
+  "limite": "2026-10-30",
+  "limite_credito": 3000000,
+  "saldo_anterior": 1248035,
+  "saldo_corte": 1402195,
+  "pngi": 1402195,
+  "pago_minimo": 95000,
+  "total_cargos": 2159160,
+  "total_abonos": 2205000,
+  "movimientos": [
+    {
+      "indice": 0,
+      "fecha": "2026-09-11",
+      "descripcion": "OXXO REFORMA 4521",
+      "monto": 8950,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 1,
+      "fecha": "2026-09-12",
+      "descripcion": "WALMART EXPRESS NARVARTE",
+      "monto": 124530,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 2,
+      "fecha": "2026-09-12",
+      "descripcion": "UBER TRIP",
+      "monto": 8700,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 3,
+      "fecha": "2026-09-13",
+      "descripcion": "STARBUCKS INSURGENTES",
+      "monto": 9800,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 4,
+      "fecha": "2026-09-14",
+      "descripcion": "PEMEX ESTACION 2231",
+      "monto": 90000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 5,
+      "fecha": "2026-09-15",
+      "descripcion": "SU PAGO GRACIAS",
+      "monto": 1200000,
+      "tipo": "pago"
+    },
+    {
+      "indice": 6,
+      "fecha": "2026-09-15",
+      "descripcion": "NETFLIX COM",
+      "monto": 29900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 7,
+      "fecha": "2026-09-16",
+      "descripcion": "SORIANA HIPER COYOACAN",
+      "monto": 153275,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 8,
+      "fecha": "2026-09-17",
+      "descripcion": "FARMACIA DEL AHORRO",
+      "monto": 31240,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 9,
+      "fecha": "2026-09-18",
+      "descripcion": "RAPPI RESTAURANTE",
+      "monto": 24590,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 10,
+      "fecha": "2026-09-19",
+      "descripcion": "CINEPOLIS PERISUR",
+      "monto": 36000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 11,
+      "fecha": "2026-09-20",
+      "descripcion": "LIVERPOOL INSURGENTES",
+      "monto": 189900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 12,
+      "fecha": "2026-09-20",
+      "descripcion": "UBER TRIP",
+      "monto": 11250,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 13,
+      "fecha": "2026-09-21",
+      "descripcion": "OXXO REFORMA 4521",
+      "monto": 5600,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 14,
+      "fecha": "2026-09-22",
+      "descripcion": "SPOTIFY",
+      "monto": 12900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 15,
+      "fecha": "2026-09-23",
+      "descripcion": "COSTCO SATELITE",
+      "monto": 241060,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 16,
+      "fecha": "2026-09-24",
+      "descripcion": "DEVOLUCION LIVERPOOL",
+      "monto": 45000,
+      "tipo": "abono"
+    },
+    {
+      "indice": 17,
+      "fecha": "2026-09-24",
+      "descripcion": "GASOLINERA G500",
+      "monto": 75000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 18,
+      "fecha": "2026-09-25",
+      "descripcion": "TACOS EL GUERO",
+      "monto": 18500,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 19,
+      "fecha": "2026-09-26",
+      "descripcion": "AMAZON MX MARKETPLACE",
+      "monto": 64900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 20,
+      "fecha": "2026-09-27",
+      "descripcion": "SANBORNS CENTRO",
+      "monto": 42080,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 21,
+      "fecha": "2026-09-28",
+      "descripcion": "UBER EATS",
+      "monto": 27840,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 22,
+      "fecha": "2026-09-29",
+      "descripcion": "CHEDRAUI SELECTO",
+      "monto": 110420,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 23,
+      "fecha": "2026-09-30",
+      "descripcion": "TELCEL RECARGA",
+      "monto": 20000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 24,
+      "fecha": "2026-09-30",
+      "descripcion": "SU PAGO GRACIAS",
+      "monto": 950000,
+      "tipo": "pago"
+    },
+    {
+      "indice": 25,
+      "fecha": "2026-10-01",
+      "descripcion": "STARBUCKS INSURGENTES",
+      "monto": 10400,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 26,
+      "fecha": "2026-10-02",
+      "descripcion": "HOME DEPOT TLALPAN",
+      "monto": 127600,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 27,
+      "fecha": "2026-10-02",
+      "descripcion": "OXXO REFORMA 4521",
+      "monto": 7450,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 28,
+      "fecha": "2026-10-03",
+      "descripcion": "SUPERAMA DEL VALLE",
+      "monto": 86510,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 29,
+      "fecha": "2026-10-04",
+      "descripcion": "DIDI VIAJE",
+      "monto": 9600,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 30,
+      "fecha": "2026-10-04",
+      "descripcion": "PETCO MASCOTAS",
+      "monto": 54000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 31,
+      "fecha": "2026-10-05",
+      "descripcion": "GANDHI LIBRERIA",
+      "monto": 38900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 32,
+      "fecha": "2026-10-05",
+      "descripcion": "CAFETERIA LA PARROQUIA",
+      "monto": 21500,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 33,
+      "fecha": "2026-10-06",
+      "descripcion": "LA COMER UNIVERSIDAD",
+      "monto": 98045,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 34,
+      "fecha": "2026-10-06",
+      "descripcion": "SMART FIT",
+      "monto": 49900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 35,
+      "fecha": "2026-10-07",
+      "descripcion": "OXXO GAS 2231",
+      "monto": 65000,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 36,
+      "fecha": "2026-10-07",
+      "descripcion": "VIPS RESTAURANTE",
+      "monto": 34200,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 37,
+      "fecha": "2026-10-08",
+      "descripcion": "BONIFICACION PROMOCION",
+      "monto": 10000,
+      "tipo": "abono"
+    },
+    {
+      "indice": 38,
+      "fecha": "2026-10-08",
+      "descripcion": "ZARA PERISUR",
+      "monto": 129900,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 39,
+      "fecha": "2026-10-09",
+      "descripcion": "UBER TRIP",
+      "monto": 14320,
+      "tipo": "cargo"
+    },
+    {
+      "indice": 40,
+      "fecha": "2026-10-10",
+      "descripcion": "COMISION ANUALIDAD",
+      "monto": 65000,
+      "tipo": "comision"
+    },
+    {
+      "indice": 41,
+      "fecha": "2026-10-10",
+      "descripcion": "IVA COMISION ANUALIDAD",
+      "monto": 10400,
+      "tipo": "comision"
+    }
+  ],
+  "msi": [
+    {
+      "descripcion": "TIENDA DEPARTAMENTAL EJEMPLO",
+      "monto_original": 1200000,
+      "saldo_pendiente": 900000,
+      "cuota": 100000,
+      "cuota_numero": 3,
+      "cuotas_totales": 12
+    },
+    {
+      "descripcion": "ELECTRONICA SINTETICA",
+      "monto_original": 600000,
+      "saldo_pendiente": 500000,
+      "cuota": 100000,
+      "cuota_numero": 1,
+      "cuotas_totales": 6
+    }
+  ],
+  "renglones_sin_leer": 0,
+  "cuadra": true
+}

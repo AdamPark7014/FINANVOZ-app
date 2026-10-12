@@ -1,4 +1,4 @@
-/** Barril de E9 (comercios y deduplicación), del motor de captura (`docs/07-CAPTURA.md §3 y §6`) y de E14 (suscripciones). */
+/** Barril de E9 (comercios y deduplicación), del motor de captura (`docs/07-CAPTURA.md §3, §6 y §8`) y de E14 (suscripciones). */
 export { jaro, jaroWinkler, normalizarComercio, similitud } from './comercios';
 export {
   CUENTA_POR_ASIGNAR,
@@ -52,3 +52,38 @@ export {
   type ResumenSuscripciones,
   type Suscripcion,
 } from './suscripciones';
+export {
+  analizarEstadoCuenta,
+  CAMPOS_ESTADO,
+  CARACTERES_MINIMOS_POR_PAGINA,
+  compilarAnalizadores,
+  deudaDeMovimiento,
+  esPdfEscaneado,
+  leerEstadoCuentaPdf,
+  normalizarParaTipo,
+  normalizarTextoPdf,
+  parsearFechaEstado,
+  parsearMontoEstado,
+  TIPOS_POR_OMISION,
+  type AnalizadorCompilado,
+  type AnalizadorEstado,
+  type CampoEstado,
+  type CatalogoAnalizadores,
+  type EstadoCuentaLeido,
+  type FaltaEstado,
+  type LecturaEstado,
+  type MovimientoEstado,
+  type MsiEstado,
+  type SeccionAnalizador,
+  type TipoMovimientoEstado,
+} from './captura/estados-cuenta';
+export {
+  completarConEstado,
+  deudaComparableAlCorte,
+  DIAS_EN_CAMINO,
+  sentidoDeRenglon,
+  type DecisionRenglon,
+  type EntradaCompletar,
+  type EntradaSaldoComparable,
+  type MovimientoExistente,
+} from './captura/conciliar-estado';
