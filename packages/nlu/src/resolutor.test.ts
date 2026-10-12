@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { cargarContexto, cargarVectoresResolver } from './eval/fixtures';
 import { normalizarAlias } from './normalizar';
 import { resolverCuenta, type RefResolutor } from './resolutor';
-import { jaroWinkler } from './similitud';
+import { jaroWinkler } from '@cartera/core';
 
 const vectores = cargarVectoresResolver();
 const { cuentas } = cargarContexto();

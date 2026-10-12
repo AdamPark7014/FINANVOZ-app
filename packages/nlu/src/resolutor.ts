@@ -1,6 +1,6 @@
 import type { Espacio } from './esquema';
 import { normalizarAlias } from './normalizar';
-import { jaroWinkler } from './similitud';
+import { jaroWinkler } from '@cartera/core';
 
 /** Tipo de cuenta propia. `billetera` cuenta como débito para el resolutor (§5, paso 1). */
 export type TipoCuenta = 'efectivo' | 'debito' | 'credito' | 'billetera';
