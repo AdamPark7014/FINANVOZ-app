@@ -7,7 +7,7 @@ import { escribirAjuste, leerAjuste } from '../servicios/preferencias';
  * Versión del aviso de privacidad simplificado y del texto de consentimiento de O2 (`02 §3`, `08`). Cambia
  * cuando cambia el texto: la evidencia guarda la versión que la persona aceptó.
  */
-export const VERSION_CONSENTIMIENTO = '2026-10-m2';
+export const VERSION_CONSENTIMIENTO = '2026-10-m7';
 
 const CLAVE = 'consentimiento';
 

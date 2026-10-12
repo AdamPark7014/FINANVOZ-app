@@ -11,6 +11,8 @@ import {
   type VistaEscenarioMeAlcanza,
   type VistaMeAlcanza,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
+import { TEXTO_NO_ASESORIA } from '../privacidad/legales';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, CampoMonto, CampoTexto, espacio, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
@@ -64,6 +66,7 @@ export function PantallaMeAlcanza({
   bloques?: Omit<OpcionesBloques, 'senal' | 'alProgreso'>;
 }) {
   const { ctx } = useSesion();
+  const registrarEvento = useAnalitica();
   const [estado, setEstado] = useState<Estado>(
     consultaInicial
       ? { tipo: 'calculando', consulta: consultaInicial, progresoBp: 0 }
@@ -107,14 +110,25 @@ export function PantallaMeAlcanza({
           }),
         )
         .then((vista) => {
-          if (!actual.aborted) setEstado({ tipo: 'listo', vista });
+          if (actual.aborted) return;
+          setEstado({ tipo: 'listo', vista });
+          // Cuántos escenarios y el tipo recomendado; nunca el precio ni la descripción (`03 §8`).
+          if (vista.estado === 'ok') {
+            registrarEvento({
+              nombre: 'simulacion_vista',
+              propiedades: {
+                escenarios: vista.escenarios.length,
+                recomendado_tipo: vista.recomendado.tipo,
+              },
+            });
+          }
         })
         .catch(() => {
           // Cancelado (la pantalla ya cambió) o fallido: sin detalle en logs (regla 9).
           if (!actual.aborted) setEstado({ tipo: 'error', consulta });
         });
     },
-    [ctx, calcular, bloques],
+    [ctx, calcular, bloques, registrarEvento],
   );
 
   const iniciar = (consulta: ConsultaMeAlcanza) => {
@@ -356,6 +370,10 @@ function Resultado({
           {n.texto}
         </Texto>
       ))}
+      {/* Texto fijo de `08 §1`. */}
+      <Texto variante="secundario" tono="secundario" testID="me-alcanza-no-asesoria">
+        {TEXTO_NO_ASESORIA}
+      </Texto>
 
       <Boton
         etiqueta={verCalculo ? 'Ocultar cómo lo calculé' : 'Cómo lo calculé'}

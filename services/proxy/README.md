@@ -117,3 +117,7 @@ Respuestas: 200 `{ "resultado": "aplicado" | "duplicado" | "antiguo" | "sin_usua
 4. En RevenueCat → Project settings → Integrations → Webhooks: URL `https://<ref>.supabase.co/functions/v1/webhooks-revenuecat`, encabezado de autorización `Bearer <el mismo secreto>`, ambientes producción y sandbox (los probadores con licencia de Play compran en sandbox). "Send test event" debe responder 200 `ignorado`.
 5. En RevenueCat el derecho (Entitlement) se llama **`plus`** y agrupa los productos mensual y anual con la prueba de 14 días configurada en Play Console.
 6. La app se identifica en RevenueCat con el id de su sesión anónima de Supabase, así el evento llega al mismo `usuario_id` que usa el intérprete.
+
+## M7 · Evidencia del consentimiento
+
+`migrations/20261020000100_consentimiento.sql` crea `consentimiento (usuario_id, version_aviso, aceptado_en, recibido_en)` (`08 §2`). No hay función: la app inserta con PostgREST (`POST /rest/v1/consentimiento`, llave `anon` + JWT de la sesión anónima). La RLS solo deja insertar la evidencia propia (`usuario_id` lo pone `auth.uid()`); nadie con la llave `anon` puede leerla, cambiarla ni borrarla. Se aplica con `supabase db push`. Para consultarla (por ejemplo, ante una solicitud ARCO): `select * from consentimiento where usuario_id = '<uuid>';` en el editor SQL. La prueba con PGlite está en `functions/_shared/consentimiento.test.ts`.

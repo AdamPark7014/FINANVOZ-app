@@ -1,4 +1,4 @@
-import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
@@ -13,9 +13,8 @@ import {
   obtenerBloqueo,
   type Contexto,
 } from '../../servicios';
-import { abrirSesion, borrarTodoApp } from '../../servicios/sesion';
+import { abrirSesion } from '../../servicios/sesion';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
-import { compartirArchivo } from './compartir';
 
 /**
  * La raíz real (`app/_layout.tsx`) con la apertura nativa sustituida: cada `abrirSesion` entrega una base nueva
@@ -43,7 +42,6 @@ jest.mock('expo-screen-capture', () => ({
 }));
 // El SDK de Sentry deja temporizadores vivos en jest; sin DSN `iniciarSentry` no hace nada de todos modos.
 jest.mock('../../observabilidad', () => ({ iniciarSentry: jest.fn() }));
-jest.mock('./compartir', () => ({ compartirArchivo: jest.fn(async () => {}) }));
 
 const RUTAS = {
   _layout: Raiz,
@@ -65,12 +63,6 @@ function ctxInicial(): Contexto {
   const primera = mockAbiertas[0];
   if (!primera) throw new Error('no se abrió ninguna sesión');
   return primera.ctx;
-}
-
-function llamada(n: number) {
-  const args = jest.mocked(compartirArchivo).mock.calls[n];
-  if (!args) throw new Error(`compartirArchivo no se llamó ${n + 1} veces`);
-  return args[0];
 }
 
 afterEach(() => {
@@ -114,35 +106,5 @@ describe('ajustes', () => {
     expect(obtenerBloqueo(ctx).activo).toBe(true);
   });
 
-  it('exporta JSON y CSV con la hoja de compartir', async () => {
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
-    fireEvent.press(screen.getByTestId('ajustes-exportar-json'));
-    await waitFor(() => expect(compartirArchivo).toHaveBeenCalledTimes(1));
-    const json = llamada(0);
-    expect(json).toMatchObject({ nombre: 'finanvoz-datos.json', tipoMime: 'application/json' });
-    expect(JSON.parse(json.contenido)).toMatchObject({ formato: 'finanvoz-exportacion' });
-
-    await waitFor(() => expect(screen.getByTestId('ajustes-exportar-csv')).not.toBeDisabled());
-    fireEvent.press(screen.getByTestId('ajustes-exportar-csv'));
-    await waitFor(() => expect(compartirArchivo).toHaveBeenCalledTimes(2));
-    expect(llamada(1)).toMatchObject({
-      nombre: 'finanvoz-movimientos.csv',
-      tipoMime: 'text/csv',
-    });
-  });
-
-  it('borrar todo pide escribir BORRAR y después vuelve al onboarding con una base nueva', async () => {
-    const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
-    fireEvent.press(screen.getByTestId('ajustes-borrar-iniciar'));
-    fireEvent.press(screen.getByTestId('ajustes-borrar-confirmar'));
-    expect(borrarTodoApp).not.toHaveBeenCalled();
-
-    fireEvent.changeText(screen.getByTestId('ajustes-borrar-palabra'), 'borrar');
-    fireEvent.press(screen.getByTestId('ajustes-borrar-confirmar'));
-    await waitFor(() => expect(r.getPathname()).toBe('/onboarding'));
-    expect(borrarTodoApp).toHaveBeenCalledTimes(1);
-    expect(jest.mocked(borrarTodoApp).mock.calls[0]?.[0]?.ctx).toBe(ctxInicial());
-    expect(abrirSesion).toHaveBeenCalledTimes(2);
-    expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
-  });
+  // Exportar y borrar todo viven en el centro de privacidad (`pantallas/privacidad/privacidad.test.tsx`).
 });

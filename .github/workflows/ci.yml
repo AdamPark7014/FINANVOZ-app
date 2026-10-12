@@ -37,6 +37,8 @@ jobs:
       - run: gradle -p modules/captura-android/nucleo-jvm test
       - name: Bundle Android de la app (Metro)
         run: pnpm --filter movil exec expo export --platform android --output-dir dist
+      # 08 §7.1: ninguna llave de proveedor dentro del bundle.
+      - run: pnpm --filter movil secretos dist
       - run: node scripts/oraculo.mjs --verificar
       - run: pnpm eval:nlu --nivel reglas
       # CA-M3-06: reproduce el reporte del nivel nube con las grabaciones (sin red ni llaves).

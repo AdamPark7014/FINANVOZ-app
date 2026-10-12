@@ -1,4 +1,5 @@
 import { Pressable, Switch, View } from 'react-native';
+import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
 import { espacio, OBJETIVO_TACTIL_MIN } from '../tokens';
 import { Texto } from './Texto';
@@ -29,7 +30,7 @@ export function Interruptor({
       onPress={() => alCambiar(!valor)}
       disabled={deshabilitado}
       accessibilityRole="switch"
-      accessibilityLabel={etiqueta}
+      accessibilityLabel={etiquetaHablada(etiqueta)}
       accessibilityHint={descripcion}
       accessibilityState={{ checked: valor, disabled: deshabilitado }}
       style={{

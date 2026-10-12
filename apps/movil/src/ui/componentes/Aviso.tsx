@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
 import { DURACION_AVISO_MS, espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
 
@@ -69,6 +70,7 @@ export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: Aviso
         onPress={alPresionarMensaje}
         disabled={!alPresionarMensaje}
         accessibilityRole={alPresionarMensaje ? 'button' : 'text'}
+        accessibilityLabel={etiquetaHablada(mensaje)}
         {...(alPresionarMensaje ? { accessibilityHint: 'Abre el detalle para editarlo' } : {})}
         style={{ flex: 1, minHeight: OBJETIVO_TACTIL_MIN, justifyContent: 'center' }}
       >
