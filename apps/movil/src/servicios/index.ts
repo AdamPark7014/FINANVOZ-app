@@ -255,6 +255,7 @@ export {
   type OpcionesBloques,
   type SenalCancelacion,
 } from './bloques';
+export { marcarExtraordinaria } from './historial';
 export {
   ETIQUETA_ESTIMACION_INICIAL,
   leerProbabilidadHoy,
