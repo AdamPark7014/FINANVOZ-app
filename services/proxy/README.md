@@ -121,3 +121,52 @@ Respuestas: 200 `{ "resultado": "aplicado" | "duplicado" | "antiguo" | "sin_usua
 ## M7 · Evidencia del consentimiento
 
 `migrations/20261020000100_consentimiento.sql` crea `consentimiento (usuario_id, version_aviso, aceptado_en, recibido_en)` (`08 §2`). No hay función: la app inserta con PostgREST (`POST /rest/v1/consentimiento`, llave `anon` + JWT de la sesión anónima). La RLS solo deja insertar la evidencia propia (`usuario_id` lo pone `auth.uid()`); nadie con la llave `anon` puede leerla, cambiarla ni borrarla. Se aplica con `supabase db push`. Para consultarla (por ejemplo, ante una solicitud ARCO): `select * from consentimiento where usuario_id = '<uuid>';` en el editor SQL. La prueba con PGlite está en `functions/_shared/consentimiento.test.ts`.
+
+## M9 · `respaldo` (`POST /respaldo/url`, `GET /respaldo/lista`, `DELETE /respaldo/cuenta`)
+
+Respaldo en la nube (`docs/03-ARQUITECTURA.md §5.7`, `08 §2.2`). El servidor solo guarda blobs `.cartera` cifrados en el teléfono (E16) que **no puede abrir**: no hay tabla de metadatos ni se lee el contenido. Una sola Edge Function, **`respaldo`**, con tres rutas: `https://<ref>.supabase.co/functions/v1/respaldo/url|lista|cuenta`. La lógica está en `supabase/functions/_shared/respaldo/manejador.ts` (Vitest con Storage en memoria); `respaldo/index.ts` solo conecta Supabase.
+
+| Archivo | Qué hace |
+|---|---|
+| `migrations/20261101000000_respaldo.sql` | Bucket privado `respaldos` (12.5 MB por archivo, `application/octet-stream`) y RLS en `storage.objects`: leer, subir y borrar solo bajo `<auth.uid()>/` y solo con sesión de correo (`is_anonymous = false`); subir solo con el nombre `AAAAMMDDTHHMMSSZ-v<n>.cartera`; sin UPDATE |
+| `_shared/respaldo/manejador.ts` | JWT → sesión de correo → ruta. Nombres, retención (4 más recientes), URLs firmadas y borrado de la cuenta. Registra solo `endpoint` y `operacion:resultado` |
+| `_shared/respaldo/rls.test.ts` | La migración real en PGlite: una cuenta no lista, baja, sube ni borra lo de otra; una sesión anónima no toca el bucket (CA-M9-05) |
+| `_shared/respaldo/contrato-cliente.test.ts` | El cliente de la app (`apps/movil/src/nube/respaldo-nube.ts`) contra el manejador |
+
+### Contrato
+
+Siempre con `Authorization: Bearer <JWT de una sesión de correo>`; con la sesión anónima responde 403 `sin_correo`.
+
+| Ruta | Entrada | Respuesta 200 |
+|---|---|---|
+| `POST /respaldo/url` | `{"operacion":"subir","version":1}` | `{nombre, url, tamano_maximo}`: el servidor pone el nombre (`20261012T153000Z-v1.cartera`, hora UTC del servidor) bajo `<usuario>/`; la app hace `PUT` de los bytes a `url` (firmada por Supabase, vale 2 h, no sobrescribe). Antes de firmar poda a 4 |
+| `POST /respaldo/url` | `{"operacion":"bajar","nombre":"20261012T153000Z-v1.cartera"}` | `{nombre, url}`: URL firmada de 5 min para `GET`. Un nombre que no está en la lista del usuario es 404 |
+| `GET /respaldo/lista` | — | `{respaldos: [{nombre, tamano, creado_en, version}]}`, el más reciente primero; deja solo los 4 más recientes (la app la llama después de subir) |
+| `DELETE /respaldo/cuenta` | — | `{resultado: "borrada"}`: borra **todos** los archivos de `<usuario>/` y, solo si no queda ninguno, el usuario de Auth (su correo; `derechos`, `consentimiento` y conteos se van en cascada). Si algo falla responde 500 y la app reintenta |
+
+Errores `{ "error": "<código>" }`: 400 `solicitud_invalida`, 401 `no_autorizado`, 403 `sin_correo`, 404 `no_encontrado` o `ruta`, 405 `metodo`, 409 `ocupado` (otro respaldo del mismo segundo), 503 `sin_configurar`, 500 `error_interno`.
+
+### Cuenta de respaldo (Supabase Auth)
+
+La app no crea otro usuario: **vincula** el correo al usuario anónimo que ya tiene (`apps/movil/src/nube/cuenta-respaldo.ts`): `PUT /auth/v1/user {email}` con su JWT manda el código y `POST /auth/v1/verify {type:"email_change"}` lo confirma; el `usuario_id` no cambia, así que conserva Plus, cupo y consentimiento. En un teléfono nuevo (o si el correo ya tiene cuenta) Auth responde `email_exists` y la app **entra** con `POST /auth/v1/otp {create_user:false}` + `verify {type:"email"}` al usuario original.
+
+### Desplegar
+
+1. `supabase db push` aplica `20261101000000_respaldo.sql` (crea el bucket y las políticas). En Storage debe aparecer `respaldos` como privado.
+2. Authentication → Sign In / Providers → **Email**: activo, con "Confirm email" activo. Deja **Anonymous sign-ins** activo (M3).
+3. Authentication → Emails → SMTP: configura un SMTP propio (el integrado de Supabase manda muy pocos correos por hora y no es para producción). En Rate Limits, sube "emails per hour" a lo que permita el SMTP.
+4. Authentication → Emails → Templates. Los dos llevan el código (`{{ .Token }}`), no el enlace:
+   - **Change Email Address** (vincular). Asunto: `Tu código para activar el respaldo: {{ .Token }}`. Cuerpo:
+     ```html
+     <p>Tu código para activar el respaldo en la nube es:</p>
+     <p style="font-size:28px;letter-spacing:4px"><strong>{{ .Token }}</strong></p>
+     <p>Escríbelo en la app. Vence en 10 minutos. Si no lo pediste, ignora este correo.</p>
+     ```
+   - **Magic Link** (entrar en otro teléfono). Asunto: `Tu código para restaurar tu respaldo: {{ .Token }}`. Mismo cuerpo con "para entrar a tu respaldo".
+   En Authentication → Providers → Email: "Email OTP Length" = 6 y "Email OTP Expiration" = 600 s.
+5. `supabase functions deploy respaldo` (con la verificación de JWT del gateway activa; no uses `--no-verify-jwt`). No necesita secretos propios: usa `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, que inyecta Supabase.
+6. Prueba de humo: con el `access_token` de una sesión anónima, `curl https://<ref>.supabase.co/functions/v1/respaldo/lista -H "Authorization: Bearer <token>"` responde 403 `sin_correo`; sin el encabezado, 401. Con el token de una sesión de correo responde `{"respaldos":[]}`.
+
+Registros: en Logs → Edge Functions cada petición deja `{"usuario_hash":null,"endpoint":"/respaldo/lista","codigo":"lista:ok","estado_http":200}`: nunca el usuario, el correo, nombres de archivo, URLs ni tamaños.
+
+Solicitud ARCO o baja manual de una cuenta: usa `DELETE /respaldo/cuenta` con su sesión o, desde el panel, borra primero la carpeta `respaldos/<usuario>/` en Storage y después el usuario en Authentication (borrar solo el usuario deja sus archivos).

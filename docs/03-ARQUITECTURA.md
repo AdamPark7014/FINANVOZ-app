@@ -146,7 +146,7 @@ Al abrir la app y en la tarea diaria: por cada tarjeta, los cortes de `cortesAPr
 ### 5.7 Respaldo (M9)
 
 - **Manual:** exportar `.cartera` (E16) con la hoja de compartir; importar con el selector de archivos.
-- **Automático (opcional):** requiere crear una cuenta de respaldo con correo y código (Supabase Auth, OTP) y una contraseña de cifrado. De la contraseña se deriva una llave que se guarda en el almacén seguro (E16): la contraseña no se guarda y la tarea en segundo plano cifra con la llave sin pedirla. Una vez por semana y con Wi-Fi, la tarea genera el `.cartera` y lo sube a `respaldos/<usuario>/<fecha>.cartera` (Storage con RLS: cada usuario solo ve los suyos); se conservan los 4 más recientes.
+- **Automático (opcional):** requiere crear una cuenta de respaldo con correo y código (Supabase Auth, OTP) y una contraseña de cifrado. De la contraseña se deriva una llave que se guarda en el almacén seguro (E16): la contraseña no se guarda y la tarea en segundo plano cifra con la llave sin pedirla. Una vez por semana y con Wi-Fi, la tarea genera el `.cartera` y lo sube a `respaldos/<usuario>/<AAAAMMDDTHHMMSSZ>-v<version>.cartera` (nombre que pone el servidor) (Storage con RLS: cada usuario solo ve los suyos); se conservan los 4 más recientes.
 - **Restaurar en otro teléfono:** entrar con el correo → elegir respaldo → contraseña → importar en una base nueva → comprobación de integridad → la app queda como estaba.
 
 ### 5.8 Plantillas remotas (M10)
@@ -172,8 +172,9 @@ Acceso: las funciones de `/compartido/*` (`§6`) verifican la pertenencia y el e
 | `POST /nlu/interpretar` | `{texto, contexto_min, version_esquema}` (`06 §4`) | `{interpretacion, proveedor, modelo, tokens_entrada, tokens_salida, latencia_ms}` |
 | `POST /llm/turno` (M10) | `{mensajes, herramientas}` | mensaje del asistente o llamada a herramienta; sin estado |
 | `POST /webhooks/revenuecat` | evento firmado | actualiza `derechos` |
-| `POST /respaldo/url` (M9) | `{operacion: 'subir' \| 'bajar', nombre}` con sesión de correo | URL firmada de Storage de 5 min |
-| `GET /respaldo/lista` (M9) | sesión de correo | `[{nombre, tamano, creado_en}]` |
+| `POST /respaldo/url` (M9) | `{operacion: 'subir', version}` o `{operacion: 'bajar', nombre}` con sesión de correo | `{nombre, url}`: al subir, el servidor pone el nombre (`<AAAAMMDDTHHMMSSZ>-v<version>.cartera`) y la URL firmada de subida la fija Supabase (2 h, sin sobrescribir); al bajar, URL firmada de 5 min |
+| `GET /respaldo/lista` (M9) | sesión de correo | `[{nombre, tamano, creado_en, version}]`; deja solo los 4 más recientes |
+| `DELETE /respaldo/cuenta` (M9) | sesión de correo | borra todos los archivos del usuario y después su usuario de Auth (correo incluido) |
 | `POST /compartido/grupos` (M16) | sesión | `{grupo_id, codigo_union}` (el código va en el QR con la llave; el servidor guarda solo su hash; vence en 10 min) |
 | `POST /compartido/codigo` (M16) | `{grupo_id}` de un miembro | código nuevo de un solo uso para el **otro** lugar del grupo ("Volver a vincular", E17) |
 | `POST /compartido/unirse` (M16) | `{grupo_id, codigo_union}` | alta como `'b'` (grupo nuevo) o reemplazo de la sesión del lugar que indica el código; el código deja de servir |
