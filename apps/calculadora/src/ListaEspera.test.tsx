@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('./config', () => ({
-  MARCA: 'Alcanzi',
+  MARCA: 'Finanvoz',
   VERSION_AVISO: 'prueba',
   LISTA_ESPERA_URL: 'https://ejemplo.supabase.co/functions/v1/lista-espera',
   RESPONSABLE: {

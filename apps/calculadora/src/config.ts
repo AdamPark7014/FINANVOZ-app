@@ -1,5 +1,5 @@
 /** Nombre comercial propuesto; "Cartera" sigue siendo el nombre de trabajo del repositorio (ESTADO, pendiente 5). */
-export const MARCA = 'Alcanzi';
+export const MARCA = 'Finanvoz';
 
 /** Cambia cuando cambie el texto del aviso; se guarda con cada consentimiento. */
 export const VERSION_AVISO = '2026-10-12';

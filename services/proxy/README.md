@@ -9,7 +9,7 @@ Supabase: Edge Functions (Deno) y migraciones. Las llaves de proveedores viven s
 3. `supabase db push` aplica `supabase/migrations/`.
 4. Secretos de la función:
    ```
-   supabase secrets set LISTA_ESPERA_SAL=<64 caracteres aleatorios> CALCULADORA_ORIGEN=https://alcanzi.com
+   supabase secrets set LISTA_ESPERA_SAL=<64 caracteres aleatorios> CALCULADORA_ORIGEN=https://finanvoz.com
    ```
 5. `supabase functions deploy lista-espera --no-verify-jwt` (la llama la web pública sin sesión).
 6. La URL queda en `https://<ref>.supabase.co/functions/v1/lista-espera`: ponla en `VITE_LISTA_ESPERA_URL` del despliegue de la calculadora.
