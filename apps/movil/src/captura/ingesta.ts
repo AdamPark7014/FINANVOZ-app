@@ -73,7 +73,7 @@ export async function procesarColaCaptura(
 ): Promise<ResultadoCola> {
   const cola = await puente.leerCola();
   const resultados = await ingerirNotificaciones(ctx, cola, opciones);
-  if (cola.length > 0) await puente.confirmarProcesadas(cola.map((n) => n.clave));
+  if (cola.length > 0) await puente.confirmarProcesadas(cola);
   const nuevas = resultados.filter((r) => r.nueva);
   return {
     leidas: cola.length,

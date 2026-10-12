@@ -39,6 +39,7 @@ import { enTransaccion, type Contexto } from './contexto';
 import { aplicarCorreccion } from './correcciones';
 import { trasRegistrar } from './formulario';
 import { pasarAMeses, type PasadoAMeses } from './msi';
+import { agregarCuenta } from './onboarding';
 
 const { transaccion, cuenta } = esquema;
 
@@ -565,6 +566,41 @@ export function asociarCuentaCaptura(ctx: Contexto, capturaId: string, cuentaId:
       internos.guardar(ctx, otra.id, { estado: 'interpretada', datos: resto });
       avanzar(ctx, otra.id);
     }
+  });
+}
+
+/**
+ * "Detecté una cuenta ••4321 de Banco A. ¿La agrego?" con el saldo de hoy (`02 §6`): el saldo que la persona ve
+ * en su app ya incluye los movimientos que estaban esperando cuenta, así que el saldo inicial los descuenta para
+ * no contarlos dos veces (un depósito contado dos veces inflaría el dinero libre, regla 12). Después se asocia.
+ */
+export function agregarCuentaDesdeCaptura(
+  ctx: Contexto,
+  capturaId: string,
+  entrada: { nombre: string; saldoHoy: Centavos },
+): string {
+  exigirConsentimiento(ctx);
+  return enTransaccion(ctx, () => {
+    const c = leerCaptura(ctx, capturaId);
+    if (c.estado !== 'interpretada' || c.datos.espera?.tipo !== 'cuenta') {
+      throw new ErrorDominio('pregunta_inexistente', 'esa captura ya tiene cuenta');
+    }
+    let efecto = 0;
+    for (const o of capturasEn(ctx, ['interpretada'])) {
+      if (o.datos.espera?.tipo !== 'cuenta' || o.datos.banco !== c.datos.banco) continue;
+      if (o.datos.ultimos4 !== c.datos.ultimos4) continue;
+      const sentido = internos.sentidoDe(o.datos.tipo);
+      const monto = o.datos.monto ?? 0;
+      efecto += sentido === 'entrada' ? monto : sentido === 'salida' ? -monto : 0;
+    }
+    const cuentaId = agregarCuenta(ctx, {
+      subtipo: 'debito',
+      nombre: entrada.nombre,
+      saldo: Math.max(0, entrada.saldoHoy - efecto),
+      ...(c.datos.ultimos4 !== undefined ? { ultimos4: c.datos.ultimos4 } : {}),
+    });
+    asociarCuentaCaptura(ctx, capturaId, cuentaId);
+    return cuentaId;
   });
 }
 

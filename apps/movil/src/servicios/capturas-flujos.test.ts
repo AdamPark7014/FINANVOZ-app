@@ -16,6 +16,7 @@ import { obtenerHoy } from './hoy';
 import { listarOcurrencias } from './ocurrencias';
 import { agregarTarjetaCredito } from './onboarding';
 import {
+  agregarCuentaDesdeCaptura,
   asociarCuentaCaptura,
   confirmarCaptura,
   fueAMeses,
@@ -406,6 +407,26 @@ describe('cuenta, categorías y "¿Fue a meses?"', () => {
       depuracion: true,
     });
     expect(dep?.estado).toBe('vinculada');
+  });
+
+  it('cuenta nueva con el saldo de hoy: los movimientos en espera no se cuentan dos veces', async () => {
+    const p = conEscenario('e-captura', (d) => {
+      d['cuentas'] = (d['cuentas'] as { clave: string }[]).filter((c) => c.clave !== 'billetera_c');
+    });
+    const resultados = await ingerirNotificaciones(
+      p.ctx,
+      [cruda(ejemplo('N-09'), INICIO_E_CAPTURA), cruda(ejemplo('N-10'), INICIO_E_CAPTURA + MINUTO)],
+      opcionesPrueba,
+    );
+    expect(resultados.map((r) => r.espera)).toEqual(['cuenta', 'cuenta']);
+    // En su app ve $3,000: ya incluye el ingreso de $2,000 y el pago de $96.
+    const id = agregarCuentaDesdeCaptura(p.ctx, resultados[1]?.capturaId as string, {
+      nombre: 'Billetera C',
+      saldoHoy: 300_000,
+    });
+    expect(p.ctx.libro.saldo(id)).toBe(300_000);
+    expect(preguntasCaptura(p.ctx, opcionesPrueba.catalogo)).toEqual([]);
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
   it('el catálogo de producción no trae las plantillas sintéticas', () => {

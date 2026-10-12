@@ -39,8 +39,8 @@ export function cruda(
     clave: `0|${e.paquete}|1|${e.id}|10123`,
     etiqueta: null,
     paquete: e.paquete,
-    titulo: e.titulo,
-    texto: e.texto,
+    titulo: e.titulo ?? '',
+    texto: e.texto ?? '',
     publicada_en: cuando,
     cuando,
   };

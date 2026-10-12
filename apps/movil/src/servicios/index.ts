@@ -200,6 +200,7 @@ export {
   type ResultadoCaptura,
 } from './capturas';
 export {
+  agregarCuentaDesdeCaptura,
   asociarCuentaCaptura,
   confirmarCaptura,
   descartarCaptura,

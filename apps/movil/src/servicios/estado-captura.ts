@@ -112,7 +112,8 @@ export function desactivarCaptura(ctx: Contexto): void {
 export function registrarSenalesCaptura(
   ctx: Contexto,
   s: {
-    permiso?: 'concedido' | 'denegado';
+    /** `no_disponible` (sin módulo nativo) no cambia lo guardado. */
+    permiso?: 'concedido' | 'denegado' | 'no_disponible';
     appsInstaladas?: readonly string[];
     ultimoEvento?: number | null;
   },
@@ -124,7 +125,7 @@ export function registrarSenalesCaptura(
       : Math.max(g.ultimo_evento ?? 0, s.ultimoEvento);
   escribir(ctx, {
     ...g,
-    ...(s.permiso ? { permiso: s.permiso } : {}),
+    ...(s.permiso && s.permiso !== 'no_disponible' ? { permiso: s.permiso } : {}),
     ...(s.appsInstaladas ? { apps_instaladas: [...new Set(s.appsInstaladas)].sort() } : {}),
     ultimo_evento: ultimo,
   });
