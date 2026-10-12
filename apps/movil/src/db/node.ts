@@ -9,6 +9,7 @@ import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import type { BaseDatos } from '@cartera/datos';
 import type { PuertoSqlite } from './abrir';
+import { transaccionesComoExpo } from './anidar';
 
 /** Puerto sobre un archivo (o `:memory:`; en memoria `eliminarArchivo` no hace nada). */
 export function puertoNode(archivo = ':memory:'): PuertoSqlite {
@@ -19,7 +20,8 @@ export function puertoNode(archivo = ':memory:'): PuertoSqlite {
         ejecutar: (sentencia) => {
           cliente.exec(sentencia);
         },
-        drizzle: () => drizzle({ client: cliente }) as unknown as BaseDatos,
+        // Con la semántica de transacciones de expo-sqlite, para que las pruebas vean lo mismo que el teléfono.
+        drizzle: () => transaccionesComoExpo(drizzle({ client: cliente }) as unknown as BaseDatos),
         cerrar: () => cliente.close(),
       };
     },

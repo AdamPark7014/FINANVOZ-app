@@ -184,8 +184,8 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-pagos-lista')).toHaveTextContent(/Renta/);
     tocar('onb-pagos-continuar');
 
-    // O6: solo "Disponible pronto".
-    expect(screen.getByTestId('onb-captura-pronto')).toHaveTextContent(/Disponible pronto/);
+    // O6: sin módulo nativo, "No disponible en este teléfono".
+    expect(screen.getByTestId('onb-captura-pronto')).toHaveTextContent(/No disponible en este teléfono/);
     tocar('onb-captura-continuar');
 
     // O7: sugerencia del 10 % del ingreso ya escrita.

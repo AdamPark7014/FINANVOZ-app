@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "advertencia": "Plantillas de bancos reales (docs/07-CAPTURA.md §4). Agregar un banco = agregar aquí su entrada en bancos, sus plantillas (la versión nueva antes que la vieja) y en reales.ejemplos.jsonl un ejemplo anonimizado por plantilla; la prueba de plantillas exige que cada plantilla tenga al menos un ejemplo y que cada ejemplo dé lo esperado.",
+  "bancos": [],
+  "plantillas": []
+}

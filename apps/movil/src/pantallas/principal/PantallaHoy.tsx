@@ -23,6 +23,8 @@ export interface NavegacionHoy {
   alAbrirFormulario: () => void;
   /** Consultas por voz de saldos, deudas y compromisos. */
   alVerCuentas?: () => void;
+  /** Arqueo de efectivo (`02 §7`): desde la tarjeta de Hoy, la insignia o "traigo 300". */
+  alAbrirArqueo?: (efectivoReal?: number) => void;
 }
 
 /** Hoy (02-UX §4): cifra principal, días al ingreso, desglose, tarjetas de acción, avisos y registro. */
@@ -53,8 +55,28 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
           {verDesglose ? <Desglose vista={vista} /> : null}
         </>
       ) : null}
+      {vista.efectivoMenosPreciso ? (
+        <Tarjeta testID="efectivo-menos-preciso">
+          <Texto variante="secundario">
+            Tu efectivo es menos preciso: hace más de una semana que no lo cuentas.
+          </Texto>
+          {navegacion.alAbrirArqueo ? (
+            <Boton
+              etiqueta="Contar mi efectivo"
+              variante="texto"
+              ancho="contenido"
+              alPresionar={() => navegacion.alAbrirArqueo?.()}
+              testID="boton-contar-efectivo"
+            />
+          ) : null}
+        </Tarjeta>
+      ) : null}
       <AvisosUnaVez avisos={vista.avisos} />
-      <TarjetasAccion tarjetas={vista.tarjetasAccion} alVerMovimientos={navegacion.alVerMovimientos} />
+      <TarjetasAccion
+        tarjetas={vista.tarjetasAccion}
+        alVerMovimientos={navegacion.alVerMovimientos}
+        {...(navegacion.alAbrirArqueo ? { alAbrirArqueo: () => navegacion.alAbrirArqueo?.() } : {})}
+      />
       {vista.tarjetaDelDia ? (
         <Tarjeta testID="tarjeta-del-dia">
           <Texto variante="etiqueta" tono="secundario">
@@ -70,6 +92,7 @@ export function PantallaHoy({ navegacion, motor }: { navegacion: NavegacionHoy; 
         alMasOpciones={navegacion.alAbrirFormulario}
         alVerMovimientos={navegacion.alVerMovimientos}
         {...(navegacion.alVerCuentas ? { alVerCuentas: navegacion.alVerCuentas } : {})}
+        {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
         {...(motor ? { motor } : {})}
       />
       {/* Espacio para que el aviso inferior no tape el último botón. */}

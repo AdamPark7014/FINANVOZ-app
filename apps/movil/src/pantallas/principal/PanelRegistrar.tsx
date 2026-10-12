@@ -62,6 +62,7 @@ export function PanelRegistrar({
   alVerMovimientos,
   alVerCuentas,
   alMasOpciones,
+  alArqueo,
   motor,
   abiertoAlInicio = false,
   fraseRevision,
@@ -74,6 +75,8 @@ export function PanelRegistrar({
   alVerCuentas?: () => void;
   /** Abre el formulario completo de movimiento. */
   alMasOpciones?: () => void;
+  /** "Traigo 300": abre el arqueo con esa cantidad (`02 §7`). */
+  alArqueo?: (efectivoReal: number) => void;
   /** Reconocedor de voz inyectable (pruebas). */
   motor?: MotorDictado;
   abiertoAlInicio?: boolean;
@@ -164,6 +167,11 @@ export function PanelRegistrar({
           else if (r.consulta === 'cuentas') alVerCuentas?.();
           else alConsultarHoy?.();
           return;
+        case 'arqueo':
+          terminarRevision();
+          setTexto('');
+          alArqueo?.(r.efectivoReal);
+          return;
         case 'no_encontrado':
           setMensaje(r.accion === 'duplicados' ? MENSAJE_SIN_DUPLICADOS : MENSAJE_NO_ENCONTRE);
           return;
@@ -178,7 +186,7 @@ export function PanelRegistrar({
           return;
       }
     },
-    [alConsultarHoy, alVerCuentas, alVerMovimientos, avisarRegistro, refrescar, terminarRevision],
+    [alArqueo, alConsultarHoy, alVerCuentas, alVerMovimientos, avisarRegistro, refrescar, terminarRevision],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {

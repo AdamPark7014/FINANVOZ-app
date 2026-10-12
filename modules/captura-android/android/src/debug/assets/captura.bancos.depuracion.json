@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "advertencia": "Solo builds de depuración. Bancos sintéticos de fixtures/notificaciones/plantillas.ejemplo.json (una prueba exige que coincidan). La etiqueta de `adb shell cmd notification post` (banco_a, banco_b, billetera_c, cobros_d) se mapea al primer paquete del banco.",
+  "bancos": [
+    { "id": "banco_a", "nombre": "Banco A (débito)", "paquetes_android": ["mx.ejemplo.bancoa"] },
+    { "id": "banco_b", "nombre": "Banco B (crédito)", "paquetes_android": ["mx.ejemplo.bancob"] },
+    { "id": "billetera_c", "nombre": "Billetera C", "paquetes_android": ["mx.ejemplo.billeterac"] },
+    { "id": "cobros_d", "nombre": "Cobros D (terminal de cobro, espacio negocio)", "paquetes_android": ["mx.ejemplo.cobrosd"] }
+  ]
+}

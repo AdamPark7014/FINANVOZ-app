@@ -15,9 +15,13 @@ import { z } from 'zod';
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { esIngresoVariable, obtenerColchon } from './ajustes';
+import { catalogoApp } from '../captura/catalogo';
 import { procesarApertura } from './apertura';
+import { arqueoPendiente, efectivoMenosPreciso, type ArqueoPendiente } from './arqueo';
 import { avisosPendientes, type Aviso } from './avisos';
 import { preguntasCoberturaPendientes } from './cobertura';
+import { capturaInactiva } from './estado-captura';
+import { listarCapturasPorRevisar, preguntasCaptura, type PreguntaCaptura } from './preguntas-captura';
 import type { Contexto } from './contexto';
 import { dias as textoDias, etiquetaFecha } from './formato';
 import { preguntasLiquidarPendientes, type PlanPorLiquidar } from './msi';
@@ -110,7 +114,24 @@ export type TarjetaAccion =
       readonly pregunta: string;
       readonly opciones: readonly ['ya_llego', 'todavia_no', 'no_me_pagan'];
     }
+  | ({
+      /** 4. Arqueo pendiente: "Deberías traer $640 en efectivo. ¿Cuánto traes?" (`02 §7`). */
+      readonly tipo: 'arqueo';
+      /** "$640" (exacto, un toque) u "Otra cantidad" (abre el arqueo); con por asignar viejos, abre el paso 1. */
+      readonly opciones: readonly ['exacto', 'otra_cantidad', 'ahora_no'];
+    } & ArqueoPendiente)
+  | {
+      /** 5. RF-CAP-07: "No he visto notificaciones de tu banco en 3 días." */
+      readonly tipo: 'captura_inactiva';
+    }
+  | {
+      /** 5. Preguntas de captura (`02 §6`): salida sin pareja, pago sin origen, ¿Fue a meses?, cuenta nueva… */
+      readonly tipo: 'pregunta_captura';
+      readonly pregunta: PreguntaCaptura;
+    }
   | { readonly tipo: 'por_interpretar'; readonly cantidad: number }
+  /** 6. Capturas por revisar (Movimientos → "Por revisar"). */
+  | { readonly tipo: 'capturas_por_revisar'; readonly cantidad: number }
   | { readonly tipo: 'por_asignar'; readonly monto: Centavos };
 
 export interface VistaHoy {
@@ -145,6 +166,8 @@ export interface VistaHoy {
   readonly avisos: readonly Aviso[];
   /** Tarjeta del día (RF-HOY-04, Plus en la UI): `null` con menos de 2 tarjetas elegibles. */
   readonly tarjetaDelDia: TarjetaDelDia | null;
+  /** Insignia "menos preciso": efectivo sin arqueo por más de 7 días (`02 §4.2`); tocarla abre el arqueo. */
+  readonly efectivoMenosPreciso: boolean;
 }
 
 /** L (`04 §2.2`): líquidas activas + `min(0, por_asignar)` + `min(0, tránsito)` del espacio personal. */
@@ -317,6 +340,7 @@ export function obtenerHoy(ctx: Contexto): VistaHoy {
     tarjetasAccion: tarjetasDeAccion(ctx, hoy, pendientes, ingreso?.id ?? null).slice(0, 2),
     avisos: avisosPendientes(ctx),
     tarjetaDelDia: tarjetaDelDia(ctx),
+    efectivoMenosPreciso: efectivoMenosPreciso(ctx),
   };
 }
 
@@ -384,7 +408,15 @@ function tarjetasDeAccion(
       opciones: ['ya_llego', 'todavia_no', 'no_me_pagan'],
     });
   }
-  // 4. Arqueo: M5. 5. Preguntas: cobertura con monto distinto (E3.5) y liquidar meses (E6.2).
+  // 4. Arqueo pendiente (`02 §7`).
+  const arqueo = arqueoPendiente(ctx);
+  if (arqueo) tarjetas.push({ tipo: 'arqueo', ...arqueo, opciones: ['exacto', 'otra_cantidad', 'ahora_no'] });
+  // 5. Preguntas: captura inactiva y de captura (`02 §6`), cobertura con monto distinto (E3.5) y liquidar
+  // meses (E6.2).
+  if (capturaInactiva(ctx)) tarjetas.push({ tipo: 'captura_inactiva' });
+  const catalogo = catalogoApp();
+  for (const pregunta of preguntasCaptura(ctx, catalogo))
+    tarjetas.push({ tipo: 'pregunta_captura', pregunta });
   for (const q of preguntasCoberturaPendientes(ctx)) {
     tarjetas.push({
       tipo: 'confirmar_cobertura',
@@ -412,6 +444,10 @@ function tarjetasDeAccion(
   // 6. Frases por interpretar ("Por revisar").
   const cantidad = contarPorInterpretar(ctx);
   if (cantidad > 0) tarjetas.push({ tipo: 'por_interpretar', cantidad });
+  const porRevisar = listarCapturasPorRevisar(ctx, catalogo).filter(
+    (c) => !c.motivos.includes('fue_a_meses'),
+  );
+  if (porRevisar.length > 0) tarjetas.push({ tipo: 'capturas_por_revisar', cantidad: porRevisar.length });
   // 7. Gastos por asignar.
   const porAsignar = -ctx.libro.saldo(CUENTAS_SISTEMA.porAsignar);
   if (porAsignar > 0) tarjetas.push({ tipo: 'por_asignar', monto: porAsignar });

@@ -24,11 +24,18 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-sqlite", { "useSQLCipher": true }],
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
       "expo-secure-store",
       [
         "expo-local-authentication",
-        { "faceIDPermission": "Finanvoz usa tu biometría para desbloquear la app." }
+        {
+          "faceIDPermission": "Finanvoz usa tu biometría para desbloquear la app."
+        }
       ],
       [
         "expo-speech-recognition",
@@ -38,9 +45,17 @@
           "androidSpeechServicePackages": ["com.google.android.as", "com.google.android.googlequicksearchbox"]
         }
       ],
-      ["expo-notifications", { "color": "#0A6B57" }],
-      "@sentry/react-native"
+      [
+        "expo-notifications",
+        {
+          "color": "#0A6B57"
+        }
+      ],
+      "@sentry/react-native",
+      "@cartera/captura-android"
     ],
-    "experiments": { "typedRoutes": true }
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

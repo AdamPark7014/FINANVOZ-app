@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { compartirArchivo } from '../src/pantallas/ajustes/compartir';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
+import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { exportarCsv, exportarJson, fijarBloqueo, obtenerBloqueo } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
@@ -110,6 +111,7 @@ export default function Ajustes() {
       </Tarjeta>
 
       <SeccionAvisos />
+      <SeccionCaptura />
 
       <Tarjeta>
         <Texto variante="subtitulo">Privacidad</Texto>

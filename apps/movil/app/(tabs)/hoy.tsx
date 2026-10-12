@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaHoy } from '../../src/pantallas/principal';
 
 export default function Hoy() {
@@ -11,6 +12,8 @@ export default function Hoy() {
         alConfigurarIngreso: () => router.push('/ajustes'),
         alAbrirFormulario: () => router.navigate('/registrar'),
         alVerCuentas: () => router.navigate('/cuentas'),
+        alAbrirArqueo: (efectivoReal) =>
+          abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
       }}
     />
   );

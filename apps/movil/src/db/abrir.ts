@@ -1,4 +1,5 @@
 import type { BaseDatos } from '@cartera/datos';
+import { conTransaccionesAnidables } from './anidar';
 import { obtenerOCrearLlave, pragmaLlave, type AlmacenSeguro } from './llave';
 import { migrar, type MigracionEmbebida } from './migrar';
 import { MIGRACIONES } from './migraciones.generado';
@@ -42,7 +43,7 @@ export function abrirBaseCifrada(opciones: {
   try {
     cliente.ejecutar(pragmaLlave(llave));
     cliente.ejecutar('PRAGMA foreign_keys = ON');
-    const db = cliente.drizzle();
+    const db = conTransaccionesAnidables(cliente.drizzle());
     migrar(db, opciones.migraciones ?? MIGRACIONES);
     return { db, cerrar: () => cliente.cerrar() };
   } catch (error) {

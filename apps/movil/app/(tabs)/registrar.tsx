@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaRegistrar } from '../../src/pantallas/principal';
 
 export default function Registrar() {
@@ -14,6 +15,7 @@ export default function Registrar() {
       alConsultarHoy={() => router.navigate('/hoy')}
       alVerMovimientos={() => router.navigate('/movimientos')}
       alVerCuentas={() => router.navigate('/cuentas')}
+      alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
       {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}
     />
   );

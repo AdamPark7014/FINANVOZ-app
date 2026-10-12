@@ -1,3 +1,4 @@
+import { purgarTextosCaptura } from './capturas';
 import type { Contexto } from './contexto';
 import { procesarCortes, type CorteCerrado } from './cortes';
 import { procesarIntencionesMeses, type PasadoAMeses } from './msi';
@@ -18,5 +19,7 @@ export function procesarApertura(ctx: Contexto): ResultadoApertura {
   const ocurrenciasCreadas = materializarOcurrencias(ctx);
   const cortesCerrados = procesarCortes(ctx);
   const pasadosAMeses = procesarIntencionesMeses(ctx);
+  // Texto crudo de capturas: solo 30 días en el teléfono (`04 §6`).
+  purgarTextosCaptura(ctx);
   return { ocurrenciasCreadas, cortesCerrados, pasadosAMeses };
 }
