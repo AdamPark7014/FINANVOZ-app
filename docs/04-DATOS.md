@@ -371,7 +371,7 @@ Cada una es un archivo nuevo en `packages/datos/migraciones/` y llega con su hit
 
 | Migración | Hito | Contenido |
 |---|---|---|
-| `0002_tandas` | M8 | `tanda (id, cuenta_id → contraparte:tanda, nombre, aportacion, participantes, turno, regla JSON, inicio, programado_id, activa)` |
+| `0002_tandas` | M8 | `tanda (id, cuenta_id → contraparte:tanda UNIQUE, nombre, aportacion > 0, participantes 2–50, turno 1–participantes, regla JSON, inicio, programado_id UNIQUE, activa)` |
 | `0003_suscripciones` | M10 | `suscripcion (comercio_normalizado PK, periodicidad, monto_tipico, ultimo_cargo, estado CHECK IN ('detectada','compromiso','ignorada'), programado_id, actualizada_en)` y `plantilla_remota (version PK, sha256, firma, recibida_en, activa)` |
 | `0004_negocio` | M11 | Categorías del negocio; `fiscal_movimiento (transaccion_id PK, iva, retencion_isr, retencion_iva, cfdi_uuid, con_cfdi)`; `impuesto_periodo (espacio, periodo 'YYYY-MM', modo, estimado_ajustado, estado CHECK IN ('estimado','pagado'), pago_transaccion_id, PRIMARY KEY (espacio, periodo))` |
 | `0005_cfdi` | M12 | `cfdi (uuid PK, xml TEXT, emisor_rfc, receptor_rfc, fecha, tipo_comprobante, uso_cfdi, forma_pago, metodo_pago, total, iva, estatus CHECK IN ('vigente','cancelado','desconocido'), etiquetas JSON, transaccion_id, importado_en)` |
