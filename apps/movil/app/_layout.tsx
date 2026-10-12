@@ -11,6 +11,8 @@ import { iniciarSentry } from '../src/observabilidad';
 import { crearNotificacionesExpo } from '../src/pantallas/avisos/expo';
 import { ProveedorNotificaciones, SincronizarAvisosTarjetas } from '../src/pantallas/avisos/notificaciones';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
+import { crearComprasExpo } from '../src/suscripciones/expo';
+import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import { cargarEscenario, obtenerBloqueo, relojFijo } from '../src/servicios';
 import { abrirSesion, borrarTodoApp, type Sesion } from '../src/servicios/sesion';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
@@ -42,6 +44,8 @@ export default function Raiz() {
   const nube = useMemo(() => crearNivelNubeExpo(), []);
   // Avisos locales de corte y fecha límite (`02 §13`); nada de push.
   const notificaciones = useMemo(() => crearNotificacionesExpo(), []);
+  // Compras de Plus con RevenueCat (M7); `null` sin llave en producción (la cuenta queda en Gratis).
+  const compras = useMemo(() => crearComprasExpo(), []);
 
   const reemplazarSesion = useCallback(
     async (preparar?: () => Sesion) => {
@@ -111,12 +115,17 @@ export default function Raiz() {
       {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
       <ProveedorNotificaciones notificaciones={notificaciones}>
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
-          <AppProtegida reiniciada={estado.generacion > 0} />
+          <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
+            <AppProtegida reiniciada={estado.generacion > 0} />
+          </ProveedorPlan>
         </ProveedorSesion>
       </ProveedorNotificaciones>
     </ProveedorControlApp>
   );
 }
+
+/** Pantalla del plan, desde cualquier candado "· Plus". */
+const abrirPlan = () => router.push('/plan');
 
 /** Aplica las preferencias de bloqueo guardadas (RF-CFG-03) sobre toda la navegación. */
 function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
@@ -144,6 +153,7 @@ function AppProtegida({ reiniciada }: { reiniciada: boolean }) {
           <Stack.Screen name="tarjetas/nueva" />
           <Stack.Screen name="arqueo" />
           <Stack.Screen name="me-alcanza" />
+          <Stack.Screen name="plan" />
         </Stack>
         <CortinaBloqueo bloqueo={bloqueo} />
       </View>

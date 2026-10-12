@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import {
   etiquetaDiaMes,
   etiquetaFecha,
+  funcionesPlan,
   marcarAvisoVisto,
   obtenerHoy,
   type Aviso,
@@ -15,6 +16,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
+import { CandadoPlus } from '../plan/CandadoPlus';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';
@@ -44,6 +46,7 @@ export function PantallaHoy({
   bloques?: Omit<OpcionesBloques, 'senal'>;
 }) {
   const vista = useVista(obtenerHoy);
+  const plus = useVista(funcionesPlan);
   const [verDesglose, setVerDesglose] = useState(false);
   return (
     <Pantalla testID="pantalla-hoy">
@@ -53,8 +56,12 @@ export function PantallaHoy({
       <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
       {vista.estado !== 'sin_ingreso' ? (
         <>
-          {/* Plus en `02 §4`; mientras no hay planes (M10) se muestra a todos (ver ESTADO → Decisiones). */}
-          <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
+          {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad. */}
+          {plus.probabilidad ? (
+            <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
+          ) : (
+            <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
+          )}
           <Boton
             etiqueta={
               verDesglose
@@ -93,7 +100,7 @@ export function PantallaHoy({
         alVerMovimientos={navegacion.alVerMovimientos}
         {...(navegacion.alAbrirArqueo ? { alAbrirArqueo: () => navegacion.alAbrirArqueo?.() } : {})}
       />
-      {vista.tarjetaDelDia ? (
+      {plus.tarjetaDelDia && vista.tarjetaDelDia ? (
         <Tarjeta testID="tarjeta-del-dia">
           <Texto variante="etiqueta" tono="secundario">
             Tarjeta del día

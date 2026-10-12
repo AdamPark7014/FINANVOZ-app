@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import {
   contarEsperandoConexion,
   descartarPorInterpretar,
+  obtenerPlan,
   registrarTexto,
   registrarTextoLocal,
   revisarPorInterpretar,
@@ -23,6 +24,7 @@ import {
   useTema,
 } from '../../ui';
 import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
+import { mensajeLimite } from '../plan/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
@@ -91,6 +93,7 @@ export function PanelRegistrar({
   const { c } = useTema();
   const avisarRegistro = useAvisoRegistro();
   const esperando = useVista(contarEsperandoConexion);
+  const plan = useVista(obtenerPlan).plan;
   const [escribiendo, setEscribiendo] = useState(abiertoAlInicio);
   const [texto, setTexto] = useState('');
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -161,7 +164,7 @@ export function PanelRegistrar({
           return;
         case 'por_interpretar':
           setTexto('');
-          setMensaje(MENSAJE_GUARDADA[r.motivo]);
+          setMensaje((r.limite ? mensajeLimite(r.limite, plan) : null) ?? MENSAJE_GUARDADA[r.motivo]);
           refrescar();
           return;
         case 'consulta':
@@ -203,6 +206,7 @@ export function PanelRegistrar({
       alVerCuentas,
       alVerMovimientos,
       avisarRegistro,
+      plan,
       refrescar,
       terminarRevision,
     ],

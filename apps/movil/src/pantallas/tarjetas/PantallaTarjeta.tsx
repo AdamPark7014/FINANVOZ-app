@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import {
   detalleTarjeta,
   etiquetaDiaMes,
+  funcionesPlan,
   listarTarjetas,
   type DetalleTarjeta,
   type EstadoCuentaVista,
@@ -11,6 +12,7 @@ import {
 } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { CandadoPlus } from '../plan/CandadoPlus';
 import { NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { Dato, FormularioPago, PreguntaLiquidarMeses, Seccion } from './componentes';
 import { CorregirSaldo, EditarTarjeta } from './EditarTarjeta';
@@ -40,6 +42,7 @@ export function PantallaTarjeta({ tarjetaId, alVolver }: { tarjetaId: string; al
 
 function Detalle({ tarjetaId, alVolver }: { tarjetaId: string; alVolver: () => void }) {
   const d = useVista((ctx) => detalleTarjeta(ctx, tarjetaId));
+  const plus = useVista(funcionesPlan);
   const [panel, setPanel] = useState<Panel>(null);
   const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
 
@@ -90,7 +93,12 @@ function Detalle({ tarjetaId, alVolver }: { tarjetaId: string; alVolver: () => v
       )}
 
       <SeccionMeses planes={d.planes} />
-      <CompromisoMeses meses={d.compromiso12Meses} />
+      {/* Plus (`02 §8`): en Gratis los meses siguen en "Meses sin intereses"; solo se oculta el calendario. */}
+      {plus.compromisoMsi12Meses ? (
+        <CompromisoMeses meses={d.compromiso12Meses} />
+      ) : d.compromiso12Meses.some((m) => m.monto > 0) ? (
+        <CandadoPlus texto="Ver tus meses de los próximos 12 meses" testID="candado-compromiso-12-meses" />
+      ) : null}
 
       {d.modo === 'plan' ? <PagosPlaneados d={d} /> : null}
 
