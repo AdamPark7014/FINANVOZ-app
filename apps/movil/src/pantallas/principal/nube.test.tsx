@@ -201,11 +201,7 @@ describe('Registrar con la nube', () => {
     screen.unmount();
     renderConSesion(
       p.ctx,
-      <PantallaRegistrar
-        alCerrar={jest.fn()}
-        alConsultarHoy={jest.fn()}
-        fraseRevision={frase?.id as string}
-      />,
+      <PantallaRegistrar alCerrar={jest.fn()} fraseRevision={frase?.id as string} />,
       p.nube,
     );
     await screen.findByTestId('confirmacion-registro');

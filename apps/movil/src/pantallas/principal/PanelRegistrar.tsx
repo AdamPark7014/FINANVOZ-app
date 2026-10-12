@@ -7,7 +7,9 @@ import {
   registrarTextoLocal,
   revisarPorInterpretar,
   type ConsultaMeAlcanza,
+  type FiltroMovimientos,
   type OrigenDictado,
+  type RespuestaConsulta,
   type ResultadoTexto,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -27,6 +29,7 @@ import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
+import { TarjetaConsulta } from './TarjetaConsulta';
 import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
 import {
   MENSAJE_GUARDADA,
@@ -59,9 +62,7 @@ type ConTarjeta = Extract<
  * discreto dice cuántas frases esperan internet.
  */
 export function PanelRegistrar({
-  alConsultarHoy,
   alVerMovimientos,
-  alVerCuentas,
   alMasOpciones,
   alArqueo,
   alMeAlcanza,
@@ -69,12 +70,8 @@ export function PanelRegistrar({
   abiertoAlInicio = false,
   fraseRevision,
 }: {
-  /** "¿Cuánto puedo gastar hoy?": lleva a Hoy (o no hace nada si ya estás ahí). */
-  alConsultarHoy?: () => void;
-  /** Consultas de gasto: llevan a Movimientos. */
-  alVerMovimientos?: () => void;
-  /** Saldos, deudas y compromisos: llevan a Cuentas. */
-  alVerCuentas?: () => void;
+  /** "Ver movimientos" de una consulta (`06 §6`): abre Movimientos con su filtro. */
+  alVerMovimientos?: (filtro: FiltroMovimientos) => void;
   /** Abre el formulario completo de movimiento. */
   alMasOpciones?: () => void;
   /** "Traigo 300": abre el arqueo con esa cantidad (`02 §7`). */
@@ -97,6 +94,7 @@ export function PanelRegistrar({
   // Al abrir una frase para revisarla se empieza interpretando (la ruta vuelve a montar el panel por frase).
   const [interpretando, setInterpretando] = useState(fraseRevision !== undefined);
   const [tarjeta, setTarjeta] = useState<{ datos: ConTarjeta; origen: OrigenDictado } | null>(null);
+  const [respuesta, setRespuesta] = useState<RespuestaConsulta | null>(null);
   const enRevision = useRef<string | null>(null);
 
   /** La frase en revisión ya no hace falta: se quitó de "Por revisar". */
@@ -115,6 +113,7 @@ export function PanelRegistrar({
   const mostrar = useCallback(
     (r: ResultadoTexto, origen: OrigenDictado) => {
       setTarjeta(null);
+      setRespuesta(null);
       switch (r.resultado) {
         case 'registrado':
           terminarRevision();
@@ -167,9 +166,7 @@ export function PanelRegistrar({
         case 'consulta':
           terminarRevision();
           setTexto('');
-          if (r.consulta === 'movimientos') alVerMovimientos?.();
-          else if (r.consulta === 'cuentas') alVerCuentas?.();
-          else alConsultarHoy?.();
+          setRespuesta(r.respuesta);
           return;
         case 'arqueo':
           terminarRevision();
@@ -196,16 +193,7 @@ export function PanelRegistrar({
           return;
       }
     },
-    [
-      alArqueo,
-      alConsultarHoy,
-      alMeAlcanza,
-      alVerCuentas,
-      alVerMovimientos,
-      avisarRegistro,
-      refrescar,
-      terminarRevision,
-    ],
+    [alArqueo, alMeAlcanza, avisarRegistro, refrescar, terminarRevision],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {
@@ -213,6 +201,7 @@ export function PanelRegistrar({
     if (limpio === '' || interpretando) return;
     setMensaje(null);
     setTarjeta(null);
+    setRespuesta(null);
     let local: ResultadoTexto | null;
     try {
       local = registrarTextoLocal(ctx, limpio, origen);
@@ -265,6 +254,13 @@ export function PanelRegistrar({
 
   return (
     <View style={{ gap: espacio.m }} testID="panel-registrar">
+      {respuesta ? (
+        <TarjetaConsulta
+          respuesta={respuesta}
+          {...(alVerMovimientos ? { alVerMovimientos } : {})}
+          alCerrar={() => setRespuesta(null)}
+        />
+      ) : null}
       {tarjeta?.datos.resultado === 'confirmar' ? (
         <ConfirmacionRegistro
           propuestas={tarjeta.datos.propuestas}

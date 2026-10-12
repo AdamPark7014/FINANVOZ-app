@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import type { ConsultaMeAlcanza } from '../../servicios';
+import type { ConsultaMeAlcanza, FiltroMovimientos } from '../../servicios';
 import { Boton, espacio, Pantalla, Texto } from '../../ui';
 import type { MotorDictado } from '../../voz';
 import { FormularioMovimiento } from './FormularioMovimiento';
@@ -11,18 +11,15 @@ import { PanelRegistrar } from './PanelRegistrar';
  */
 export function PantallaRegistrar({
   alCerrar,
-  alConsultarHoy,
   alVerMovimientos,
-  alVerCuentas,
   alArqueo,
   alMeAlcanza,
   fraseRevision,
   motor,
 }: {
   alCerrar: () => void;
-  alConsultarHoy: () => void;
-  alVerMovimientos?: () => void;
-  alVerCuentas?: () => void;
+  /** "Ver movimientos" de una consulta: abre Movimientos con su filtro. */
+  alVerMovimientos?: (filtro: FiltroMovimientos) => void;
   /** "Traigo 300": abre el arqueo. */
   alArqueo?: (efectivoReal: number) => void;
   /** "¿Me alcanza para…?": abre "¿Me alcanza?". */
@@ -51,10 +48,8 @@ export function PantallaRegistrar({
         />
       </View>
       <PanelRegistrar
-        alConsultarHoy={alConsultarHoy}
         abiertoAlInicio
         {...(alVerMovimientos ? { alVerMovimientos } : {})}
-        {...(alVerCuentas ? { alVerCuentas } : {})}
         {...(alArqueo ? { alArqueo } : {})}
         {...(alMeAlcanza ? { alMeAlcanza } : {})}
         {...(fraseRevision ? { fraseRevision } : {})}

@@ -329,7 +329,7 @@ describe('Registrar', () => {
     renderConSesion(
       p.ctx,
       <>
-        <PantallaRegistrar alCerrar={alCerrar} alConsultarHoy={jest.fn()} motor={crearMotorFalso().motor} />
+        <PantallaRegistrar alCerrar={alCerrar} motor={crearMotorFalso().motor} />
         <PantallaCuentas alAbrirAjustes={jest.fn()} />
       </>,
     );

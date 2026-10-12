@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
-import { PantallaRegistrar } from '../../src/pantallas/principal';
+import { PantallaRegistrar, paramsDeFiltro } from '../../src/pantallas/principal';
 
 export default function Registrar() {
   const router = useRouter();
@@ -13,9 +13,9 @@ export default function Registrar() {
       // `key`: revisar otra frase vuelve a montar el panel.
       key={frase ?? 'nueva'}
       alCerrar={cerrar}
-      alConsultarHoy={() => router.navigate('/hoy')}
-      alVerMovimientos={() => router.navigate('/movimientos')}
-      alVerCuentas={() => router.navigate('/cuentas')}
+      alVerMovimientos={(filtro) =>
+        router.navigate({ pathname: '/movimientos', params: paramsDeFiltro(filtro) })
+      }
       alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
       alMeAlcanza={(consulta) => abrirMeAlcanza(router, consulta)}
       {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}

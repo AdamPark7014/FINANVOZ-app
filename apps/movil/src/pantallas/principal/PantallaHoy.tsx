@@ -8,6 +8,7 @@ import {
   type Aviso,
   type ConceptoReservado,
   type ConsultaMeAlcanza,
+  type FiltroMovimientos,
   type OpcionesBloques,
   type VistaHoy,
 } from '../../servicios';
@@ -21,11 +22,10 @@ import { TarjetasAccion } from './TarjetasAccion';
 import { encabezadoFecha } from './textos';
 
 export interface NavegacionHoy {
-  alVerMovimientos: () => void;
+  /** Movimientos; con filtro desde "Ver movimientos" de una consulta (`06 §6`). */
+  alVerMovimientos: (filtro?: FiltroMovimientos) => void;
   alConfigurarIngreso: () => void;
   alAbrirFormulario: () => void;
-  /** Consultas por voz de saldos, deudas y compromisos. */
-  alVerCuentas?: () => void;
   /** Arqueo de efectivo (`02 §7`): desde la tarjeta de Hoy, la insignia o "traigo 300". */
   alAbrirArqueo?: (efectivoReal?: number) => void;
   /** "¿Me alcanza?" (`02 §9`): con el botón de Hoy (sin consulta) o diciendo "¿me alcanza para…?". */
@@ -90,7 +90,7 @@ export function PantallaHoy({
       <AvisosUnaVez avisos={vista.avisos} />
       <TarjetasAccion
         tarjetas={vista.tarjetasAccion}
-        alVerMovimientos={navegacion.alVerMovimientos}
+        alVerMovimientos={() => navegacion.alVerMovimientos()}
         {...(navegacion.alAbrirArqueo ? { alAbrirArqueo: () => navegacion.alAbrirArqueo?.() } : {})}
       />
       {vista.tarjetaDelDia ? (
@@ -115,8 +115,7 @@ export function PantallaHoy({
       ) : null}
       <PanelRegistrar
         alMasOpciones={navegacion.alAbrirFormulario}
-        alVerMovimientos={navegacion.alVerMovimientos}
-        {...(navegacion.alVerCuentas ? { alVerCuentas: navegacion.alVerCuentas } : {})}
+        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
         {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
         {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
         {...(motor ? { motor } : {})}
