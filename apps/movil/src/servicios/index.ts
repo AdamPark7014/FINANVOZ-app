@@ -187,6 +187,9 @@ export {
   type MovimientoVista,
 } from './movimientos';
 export { exportarCsv, exportarJson } from '../privacidad/exportar';
+export { estadisticasActivas, fijarEstadisticas } from '../privacidad/estadisticas';
+export { obtenerCentroPrivacidad, type VistaCentroPrivacidad } from '../privacidad/centro';
+export { bucketLatencia, type EventoAnalitica } from '../analitica/eventos';
 export { cargarEscenario, type EscenarioCargado } from './semilla';
 export {
   avanzar as avanzarCaptura,
