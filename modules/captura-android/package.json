@@ -1,0 +1,13 @@
+{
+  "name": "@cartera/captura-android",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Expo Module (Kotlin) con el NotificationListenerService de la captura y su config plugin. El puente tipado vive en apps/movil/src/captura/puente.ts.",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test:jvm": "gradle -p nucleo-jvm test"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "~57.0.10"
+  }
+}

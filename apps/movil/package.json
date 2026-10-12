@@ -12,6 +12,7 @@
     "migraciones": "tsx scripts/generar-migraciones.ts"
   },
   "dependencies": {
+    "@cartera/captura-android": "workspace:*",
     "@cartera/core": "workspace:*",
     "@cartera/datos": "workspace:*",
     "@cartera/nlu": "workspace:*",

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "advertencia": "Paquetes candidatos sin confirmar en dispositivos reales (confirmado: false). Confirmar cada uno con `adb shell pm list packages` durante el spike S2 (docs/spikes/S1-S2.md) y corregir aquí; el config plugin genera <queries> con esta lista.",
+  "bancos": [
+    { "id": "bbva_mx", "nombre": "BBVA México", "paquetes_android": ["com.bancomer.mbanking"], "confirmado": false },
+    { "id": "banorte", "nombre": "Banorte", "paquetes_android": ["mx.com.banorte.banortemovil"], "confirmado": false },
+    { "id": "santander_mx", "nombre": "Santander México", "paquetes_android": ["mx.bancosantander.supermovil"], "confirmado": false },
+    { "id": "banamex", "nombre": "Banamex", "paquetes_android": ["com.citibanamex.banamexmobile"], "confirmado": false },
+    { "id": "hsbc_mx", "nombre": "HSBC México", "paquetes_android": ["mx.com.hsbc.hsbcmexico"], "confirmado": false },
+    { "id": "scotiabank_mx", "nombre": "Scotiabank México", "paquetes_android": ["com.scotiabank.mx.scotiamovil"], "confirmado": false },
+    { "id": "banco_azteca", "nombre": "Banco Azteca", "paquetes_android": ["com.bancoazteca.bazdigitalmovil"], "confirmado": false },
+    { "id": "bancoppel", "nombre": "BanCoppel", "paquetes_android": ["com.bancoppel.bancoppelmovil"], "confirmado": false },
+    { "id": "nu_mx", "nombre": "Nu México", "paquetes_android": ["com.nu.production"], "confirmado": false },
+    { "id": "hey_banco", "nombre": "Hey Banco", "paquetes_android": ["com.heybanco.app"], "confirmado": false },
+    { "id": "mercado_pago", "nombre": "Mercado Pago", "paquetes_android": ["com.mercadopago.wallet"], "confirmado": false },
+    { "id": "spin_oxxo", "nombre": "Spin by OXXO", "paquetes_android": ["com.spinbyoxxo.app"], "confirmado": false },
+    { "id": "klar", "nombre": "Klar", "paquetes_android": ["mx.klar.app"], "confirmado": false },
+    { "id": "stori", "nombre": "Stori", "paquetes_android": ["com.stori.app"], "confirmado": false }
+  ]
+}

@@ -75,6 +75,9 @@ importers:
 
   apps/movil:
     dependencies:
+      '@cartera/captura-android':
+        specifier: workspace:*
+        version: link:../../modules/captura-android
       '@cartera/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -190,6 +193,12 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  modules/captura-android:
+    dependencies:
+      '@expo/config-plugins':
+        specifier: ~57.0.10
+        version: 57.0.10(typescript@5.9.3)
 
   packages/core: {}
 
