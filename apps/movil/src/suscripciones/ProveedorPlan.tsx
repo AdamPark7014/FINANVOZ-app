@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import { obtenerPlan, sincronizarPlan, type EstadoTienda } from '../servicios';
 import { useSesion } from '../sesion/ProveedorSesion';
+import { reidentificarCompras } from './reidentificar';
 import type { AdaptadorCompras } from './tipos';
 
 export interface ValorPlan {
@@ -8,9 +9,15 @@ export interface ValorPlan {
   readonly compras: AdaptadorCompras | null;
   /** Abre la pantalla del plan (candados "· Plus"); `null` si no hay navegación (pruebas de una pantalla). */
   readonly abrirPlan: (() => void) | null;
+  /**
+   * Tras entrar con el correo de respaldo o borrar la cuenta de respaldo (cambia el usuario del proxy): las
+   * compras pasan al usuario nuevo (pendiente 58). Nunca rechaza; sin tienda o sin red no hace nada.
+   */
+  readonly reidentificar: () => Promise<void>;
 }
 
-const PlanContexto = createContext<ValorPlan>({ compras: null, abrirPlan: null });
+const sinTienda = async () => {};
+const PlanContexto = createContext<ValorPlan>({ compras: null, abrirPlan: null, reidentificar: sinTienda });
 
 /**
  * Tienda y navegación al plan para toda la app. Al montar, y cada vez que la tienda avisa un cambio, guarda el
@@ -66,7 +73,17 @@ export function ProveedorPlan({
     };
   }, [compras, ctx, nube, refrescar]);
 
-  const valor = useMemo(() => ({ compras, abrirPlan }), [compras, abrirPlan]);
+  const reidentificar = useCallback(async () => {
+    if (!compras || !nube?.usuarioId) return;
+    try {
+      await reidentificarCompras(compras, await nube.usuarioId(), ctx);
+      refrescar();
+    } catch {
+      // Sin red o tienda caída: al abrir la app y al reconectar se vuelve a identificar.
+    }
+  }, [compras, nube, ctx, refrescar]);
+
+  const valor = useMemo(() => ({ compras, abrirPlan, reidentificar }), [compras, abrirPlan, reidentificar]);
   return <PlanContexto.Provider value={valor}>{children}</PlanContexto.Provider>;
 }
 
