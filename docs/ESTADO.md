@@ -6,8 +6,8 @@
 
 | Hito | Estado | Inicio | Cierre | Notas |
 |---|---|---|---|---|
-| M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código listo; falta publicar (Pendientes 1, 11 y 12) |
-| M1 · Núcleo | Pendiente | | | |
+| M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código fusionado; falta publicar (pendientes 11 y 12). M1 avanza en paralelo porque lo que falta de M0 es solo externo |
+| M1 · Núcleo | En curso | 2026-10-12 | | Todos los criterios verificados; cierra al fusionar su PR |
 | M2 · App base sin conexión | Pendiente | | | |
 | M3 · Intérprete en la nube | Pendiente | | | |
 | M4 · Tarjetas, MSI y compromisos | Pendiente | | | |
@@ -49,6 +49,39 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 2026-10-12 | M0 | Despliegue estático en Cloudflare Pages con flujo manual que falla si faltan los datos del responsable (`verificar-publicacion`) | Adam comprará el dominio en Cloudflare; el bloqueo hace cumplir CA-M0-07 | `.github/workflows/publicar-calculadora.yml` |
 | 2026-10-12 | M0 | Los datos del responsable y la URL de la lista de espera entran como variables `VITE_*` del despliegue, no en el código | Se pueden definir sin tocar el código y el aviso muestra "[pendiente de definir]" en desarrollo | `apps/calculadora/src/config.ts` |
 | 2026-10-12 | M0 | Responsable del aviso: NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V. (NEXARA), con el domicilio y correo de su aviso oficial; los datos fiscales y legales los confirmó Adam | Adam lo eligió en el hilo del proyecto | `08 §2`, `apps/calculadora/src/responsable.json` |
+| 2026-10-12 | M1 | E3.5 recibe la similitud de comercio (E9.2) inyectada; sin ella el comercio no coincide y el egreso sigue reservado (regla 12). Se cablea `(a,b)=>similitud(normalizarComercio(a),normalizarComercio(b))`; E3-36 se prueba con E9 real. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E3.3 sin próximo ingreso conocido: horizonte fijo de 30 días con estado `ingreso_variable` (la especificación no lo define y el oráculo falla). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E3.5 desempate final: índice menor; diferencias relativas comparadas con multiplicación cruzada entera. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E4 recibe tarjetas y MSI como entradas simples; `puedesRetirar(r)=max(0,libre)` para el negocio. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E4: liquidez, saldo_revolvente e impuestos_estimados pueden ser negativos (impuestos negativos = 0); el resto, centavos ≥ 0. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E7: saldo_contable puede ser negativo; efectivo_real, marcados e historial ≥ 0; categorías por monto desc y luego slug. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E11 recibe `proximasFechas` (E3.2) inyectado; las pruebas usan el E3 real. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E5.2: tarjetas con límite 0 se omiten; sin tarjeta totalera → `sin_credito_disponible` (como el oráculo). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E5: configuración exige exactamente uno de diasParaPagar/diaLimitePago, días 1–31; si no, `tarjeta_invalida`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E11 `yaCobro` = aportaciones ≥ turno. E12 `balancePareja`: los pagos de liquidación anulados tampoco cuentan. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Plantilla que coincide sin monto válido → `no_reconocida` sin plantilla (va a "Por revisar"). Paquete desconocido → `no_reconocida`, `banco: null`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Se rechazan expresiones con banderas g o y; una plantilla inválida rechaza el archivo completo (`plantillas_invalidas`). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Prefijos del catálogo normalizados con E9.1 al cargar ("7 ELEVEN" → "ELEVEN"); "SAM'S CLUB" normaliza a "SAM CLUB" y no coincide con el prefijo SAMS (se dejó como dice la especificación). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `regla_comercio` del usuario: coincidencia exacta del comercio normalizado, antes del catálogo semilla. El catálogo solo da categorías personales (negocio en M11). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `elegirMovimiento` (sin vector): menor diferencia de días, luego mayor similitud, luego orden de registro. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `emparejarTransferencias` devuelve `pagoTarjeta` solo para parejas entre espacios (como el oráculo); quien llama filtra a 24 h. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Frase sin verbo: todas las palabras de la descripción deben estar en el diccionario (06 §9 pide al menos una); evita leer "vendí tacos 80" como gasto. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | El nivel 0 se rinde (null) con fecha relativa, palabra de pago, deuda o tanda, negocio, alias de cuenta o contacto/cliente; esos casos van al nivel nube. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Cuenta en la frase: alias exacto (con o sin "la") y todas las cuentas con ese alias del mismo tipo; pago de tarjeta exige que todas sean de crédito. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Palabras de dos categorías → sin categoría; entradas de dos palabras ganan ("youtube premium" = suscripción). Plurales no listados no coinciden. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Montos: máximo 2 decimales y 9 dígitos enteros; un solo número por frase; monto 0 solo en arqueo. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | "Me cayó la quincena" → ingreso sin cuenta ni categoría. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Zod rechaza fechas inexistentes (2026-02-30) que el JSON Schema acepta por patrón; una prueba documenta la diferencia. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `billetera` cuenta como débito en el resolutor (06 §5 paso 1). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Eval: alias comparados normalizados; participantes normalizados y sin orden; el reporte no imprime texto dictado ni montos. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | La reversa conserva la fecha de la original (I3 vale para todo `hasta`); su clave de idempotencia es `reversa:{id}` y hereda el origen. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `anular` se permite con cuentas archivadas; solo `registrar` las rechaza. `registrar` rechaza tipo `reversa`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `transito` no es cuenta propia de `gasto` ni `pago_tarjeta` hasta M11. `ajuste_arqueo` exige `estimada = 1`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `cuenta_dividida`: el centavo extra de un reparto desigual va a la parte del usuario (no infla lo que otros deben). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `saldo_inicial` y `conciliacion`: exactamente dos asientos contra la cuenta de capital correspondiente. `reembolso` solo acredita gastos o `ingreso:reembolso`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | `reemplazar` con una clave ya usada por otra transacción → `clave_duplicada`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Cuentas de sistema y categorías con ids fijos legibles (`sis:personal:<x>`, `cat:personal:<slug>`) en vez de UUIDv7, para insertarlas en la migración. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | Pasan a servicios (M2): marcar `plan_msi.estado = 'liquidado'` (caso 6e) y crear ocurrencias pasadas como `omitida` (caso 23b). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 
 ## Pendientes
 
@@ -82,6 +115,21 @@ Plan: monorepo (pnpm, TS estricto, ESLint, Prettier, Vitest) → `packages/core`
 | CA-M0-05 | Cliente: `ListaEspera.test.tsx` (sin consentimiento y correo inválido no envían). Servidor: `services/proxy/.../lista-espera.test.ts` y límite de 5 por hora en `registrar_lista_espera` | Cumple en código; el límite en la base, pendiente de verificación manual al desplegar (6 envíos seguidos → el sexto responde 429) |
 | CA-M0-06 | — | Pendiente: requiere pendientes 11 y 12 |
 | CA-M0-07 | Responsable en `apps/calculadora/src/responsable.json` (NEXARA). Montos fuera de la red: `Calculadora.test.tsx` · "calcular no hace ninguna petición de red" y prueba con navegador (0 peticiones al llenar la calculadora). Aviso con finalidades, encargados y baja en `Aviso.tsx` | Cumple en código; falta revisar la pestaña de red en el sitio publicado |
+
+### M1
+
+Plan: E1 completo → en paralelo E3/E4/E7, E5/E6/E11/E12, E9 + plantillas + catálogo, E2 + `packages/datos`, `packages/nlu` → integración en `@cartera/core` → cobertura y CI.
+
+| Criterio | Cómo se verificó | Resultado |
+|---|---|---|
+| CA-M1-01 | `pnpm test`: un `it` por id en `packages/core/src/*.test.ts` (E1, E3, E4, E5, E6, E7, E9, E11, E12) y `packages/nlu/src/resolutor.test.ts` (NLU_resolver: 16 + 6) | Cumple |
+| CA-M1-02 | `packages/datos/src/libro.propiedades.test.ts`: I1–I5 con `numRuns: 1000` sobre el `Libro` real en SQLite | Cumple |
+| CA-M1-03 | `packages/datos/src/migracion.test.ts`: 17 tablas, vista, 5 triggers; fallan UPDATE/DELETE de asiento, cambiar fecha o tipo, anular dos veces y anular una reversa | Cumple |
+| CA-M1-04 | `packages/datos/src/casos.test.ts`: casos 1–23b con variantes; patrón incorrecto rechazado; `comprobarIntegridad()` vacío tras cada prueba | Cumple |
+| CA-M1-05 | `pnpm eval:nlu --nivel reglas`: cobertura 16/16, precisión 17/17 (100 %) | Cumple |
+| CA-M1-06 | `packages/nlu`: los 144 `esperado` validan con Zod y con `esquema.json` (ajv); 36 casos inválidos rechazados por ambos | Cumple |
+| CA-M1-07 | `packages/core/src/captura/*.test.ts`: 12/12 ejemplos personales y 2/2 de negocio; OXXO GAS → gasolina, UBER EATS → comida_fuera | Cumple |
+| CA-M1-08 | `pnpm cobertura:core`: líneas 96.4 % (CI exige ≥ 90 %) | Cumple |
 
 <!-- Copiar la tabla para cada hito al iniciarlo, con una fila por criterio CA-Mx-NN. -->
 
