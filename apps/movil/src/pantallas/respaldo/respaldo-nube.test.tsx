@@ -81,6 +81,8 @@ jest.mock('../../nube/expo', () => {
     }),
     crearPuertoEvidenciaExpo: () => null,
     crearNubeRespaldoExpo: () => estado.telefono,
+    // Sin gastos compartidos en esta prueba: la raíz no registra su tarea ni sincroniza.
+    crearClienteCompartidoExpo: () => null,
   };
 });
 jest.mock('../../suscripciones/expo', () => {

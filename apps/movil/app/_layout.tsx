@@ -6,6 +6,10 @@ import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
+import { dependenciasCompartidoExpo } from '../src/compartido/expo';
+import { programarSincronizacionCompartido } from '../src/compartido/programar';
+import { SincronizarCompartido } from '../src/compartido/SincronizarCompartido';
+import { conectividadExpo } from '../src/nube/conectividad';
 import { crearNivelNubeExpo, crearNubeRespaldoExpo, crearPuertoEvidenciaExpo } from '../src/nube/expo';
 import { useEvidenciaConsentimiento } from '../src/nube/useEvidenciaConsentimiento';
 import { useProcesarCola } from '../src/nube/useProcesarCola';
@@ -199,6 +203,12 @@ function AppProtegida({
         <SincronizarRespaldoAutomatico />
         {/* El widget "Hoy puedes" se vuelve a pintar tras cada escritura (≤ 5 s con la app abierta, `02 §21`). */}
         <SincronizarWidget />
+        {/* Gastos compartidos: tarea en segundo plano mientras haya un grupo abierto y sincronizar al volver la red. */}
+        <SincronizarCompartido
+          deps={dependenciasCompartidoExpo()}
+          conectividad={conectividadExpo}
+          programar={programarSincronizacionCompartido}
+        />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
