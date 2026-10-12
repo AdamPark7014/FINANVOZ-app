@@ -4,7 +4,8 @@ import { join } from 'node:path';
 import { sql } from 'drizzle-orm';
 import { afterEach, describe, expect, it } from 'vitest';
 import { abrirBaseCifrada } from '../db/abrir';
-import { CLAVE_LLAVE_BASE } from '../db/llave';
+import { almacenEnMemoria, CLAVE_LLAVE_BASE } from '../db/llave';
+import { CLAVE_SESION_NUBE } from '../nube/sesion';
 import { aleatorioNode, puertoNode } from '../db/node';
 import { obtenerBloqueo, fijarBloqueo, onboardingCompletado } from '../servicios/ajustes';
 import { crearContexto } from '../servicios/contexto';
@@ -14,7 +15,7 @@ import { registrarTexto } from '../servicios/registrar';
 import { relojFijo } from '../servicios/reloj';
 import { cargarEscenario } from '../servicios/semilla';
 import { abrirPrueba, escenario } from '../servicios/__pruebas__/base';
-import { borrarTodo } from './borrar';
+import { borrarTodo, LLAVES_ALMACEN } from './borrar';
 import { obtenerConsentimiento } from './consentimiento';
 import { COLUMNAS_CSV, exportarCsv, exportarJson, TABLAS_EXPORTADAS } from './exportar';
 
@@ -113,5 +114,14 @@ describe('exportar y borrar todo', () => {
       )?.n,
     ).toBe(0);
     base.cerrar();
+  });
+
+  it('M9 · restaurar borra todo menos la sesión de la nube; "Borrar todo" también la borra', async () => {
+    const almacen = almacenEnMemoria();
+    for (const llave of LLAVES_ALMACEN) almacen.guardar(llave, 'x');
+    await borrarTodo({ base: null, puerto: puertoNode(), almacen, conservarSesionNube: true });
+    expect(LLAVES_ALMACEN.filter((l) => almacen.obtener(l) !== null)).toEqual([CLAVE_SESION_NUBE]);
+    await borrarTodo({ base: null, puerto: puertoNode(), almacen });
+    expect(LLAVES_ALMACEN.filter((l) => almacen.obtener(l) !== null)).toEqual([]);
   });
 });

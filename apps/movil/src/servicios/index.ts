@@ -271,6 +271,35 @@ export {
   type ProblemaContrasena,
   type RespaldoListo,
 } from './respaldo';
+export {
+  bajarUltimoRespaldo,
+  borrarCuentaRespaldo,
+  confirmarCodigoRespaldo,
+  DIAS_RESPALDO_AUTOMATICO,
+  ejecutarRespaldoAutomatico,
+  fijarRespaldoAutomatico,
+  mensajeErrorNube,
+  motivoRespaldoAutomatico,
+  obtenerRespaldoNube,
+  planAvisoRespaldo,
+  registrarRespaldoRestaurado,
+  respaldarEnNube,
+  sincronizarAvisoRespaldo,
+  type CuentaRespaldo,
+  type ErrorCuenta,
+  type ErrorRespaldar,
+  type ErrorRespaldoNube,
+  type ModoCodigo,
+  type MotivoSinRespaldo,
+  type NubeRespaldo,
+  type RespaldoNube,
+  type RespaldoRemoto,
+  type ResultadoAutomatico,
+  type ResultadoRespaldar,
+  type TipoRed,
+  type VistaRespaldoNube,
+} from './respaldo-nube';
+export { PREFIJO_AVISO_RESPALDO } from '../avisos/respaldo';
 export { bucketLatencia, type EventoAnalitica } from '../analitica/eventos';
 export { cargarEscenario, type EscenarioCargado } from './semilla';
 export {

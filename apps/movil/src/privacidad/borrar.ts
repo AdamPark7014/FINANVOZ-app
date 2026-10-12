@@ -19,8 +19,16 @@ export async function borrarTodo(opciones: {
   base: BaseAbierta | null;
   puerto: PuertoSqlite;
   almacen: AlmacenSeguro;
+  /**
+   * Restaurar un respaldo (M9) reemplaza los datos pero no la identidad: conserva la sesión de la nube (la de
+   * correo con la que se acaba de entrar para bajar el respaldo), así el automático sigue sin pedirla otra vez.
+   */
+  conservarSesionNube?: boolean;
 }): Promise<void> {
   opciones.base?.cerrar();
-  for (const llave of LLAVES_ALMACEN) await opciones.almacen.borrar(llave);
+  for (const llave of LLAVES_ALMACEN) {
+    if (opciones.conservarSesionNube && llave === CLAVE_SESION_NUBE) continue;
+    await opciones.almacen.borrar(llave);
+  }
   opciones.puerto.eliminarArchivo();
 }

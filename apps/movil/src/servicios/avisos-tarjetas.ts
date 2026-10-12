@@ -25,6 +25,8 @@ const PreferenciasAvisos = z.strictObject({
   fecha_limite: z.boolean(),
   // M7: sin la clave (preferencias guardadas antes), encendido como dice `02 §13`.
   riesgo: z.boolean().optional(),
+  // M9: igual, sin la clave queda encendido ("Respaldo pendiente", `02 §13`).
+  respaldo: z.boolean().optional(),
 });
 
 export interface PreferenciasAvisos {
@@ -37,6 +39,8 @@ export interface PreferenciasAvisos {
   readonly fechaLimite: boolean;
   /** "Riesgo de no llegar": P < 50 % (encendido por defecto, `02 §13`). */
   readonly riesgo: boolean;
+  /** "Respaldo pendiente": 14 días sin respaldo (encendido por defecto, `02 §13`). */
+  readonly respaldo: boolean;
 }
 
 const CLAVE = 'avisos_tarjetas';
@@ -50,6 +54,7 @@ export function obtenerPreferenciasAvisos(ctx: Contexto): PreferenciasAvisos {
         corte: g.corte,
         fechaLimite: g.fecha_limite,
         riesgo: g.riesgo ?? true,
+        respaldo: g.respaldo ?? true,
       }
     : {
         silencio: HORARIO_SILENCIOSO_POR_OMISION,
@@ -57,6 +62,7 @@ export function obtenerPreferenciasAvisos(ctx: Contexto): PreferenciasAvisos {
         corte: true,
         fechaLimite: true,
         riesgo: true,
+        respaldo: true,
       };
 }
 
@@ -73,6 +79,7 @@ export function fijarPreferenciasAvisos(
     corte: nuevas.corte,
     fecha_limite: nuevas.fechaLimite,
     riesgo: nuevas.riesgo,
+    respaldo: nuevas.respaldo,
   });
   if (!r.success) throw new ErrorDominio('avisos_invalidos', 'revisa el horario de los avisos');
   escribirAjuste(ctx, CLAVE, PreferenciasAvisos, r.data);
