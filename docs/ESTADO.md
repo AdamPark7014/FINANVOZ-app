@@ -9,7 +9,7 @@
 | M0 · Calculadora pública | En curso | 2026-10-12 | | Fecha comprometida: antes del 6 nov 2026. Código fusionado; falta publicar (pendientes 11 y 12). M1 avanza en paralelo porque lo que falta de M0 es solo externo |
 | M1 · Núcleo | Cerrado | 2026-10-12 | 2026-10-12 | Todos los criterios verificados; PR #4 fusionado |
 | M2 · App base sin conexión | En curso | 2026-10-12 | | Código completo y probado en Node/jest; cierra con las pruebas en el teléfono (pendiente 13) |
-| M3 · Intérprete en la nube | En curso | 2026-10-12 | |
+| M3 · Intérprete en la nube | En curso | 2026-10-12 | | Código completo; cierra con el benchmark real (pendiente 14) |
 | M4 · Tarjetas, MSI y compromisos | Pendiente | | | |
 | M5 · Captura Android y arqueo | Pendiente | | | |
 | M6 · Simulador y ¿Me alcanza? | Pendiente | | | |
@@ -134,6 +134,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 11 | M0 | Crear el proyecto de Supabase y desplegar `lista-espera` (pasos en `services/proxy/README.md`) | Adam | M0 |
 | 12 | M0 | Comprar `finanvoz.com` en Cloudflare, crear el proyecto de Pages `finanvoz`, y en GitHub (entorno `produccion`) poner los secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` y las variables `VITE_LISTA_ESPERA_URL` y `VITE_RESPONSABLE_*`; después correr "Publicar calculadora" | Adam | M0, antes del 6 nov |
 | 13 | M2 | Pruebas en el teléfono: build de desarrollo (`pnpm --filter movil android` o EAS), correr Maestro del onboarding y cronometrarlo, abrir la base con `sqlite3` sin llave, biometría y multitarea, definir teléfono de referencia y medir arranque, E4 y nivel 0 (RNF-01) | Adam (con su Android) + Claude por Remote Control | M2 |
+| 14 | M3 | Crear el proyecto de Supabase (mismo del pendiente 11), aplicar migraciones, desplegar `nlu-interpretar`, poner las llaves de proveedores (Anthropic, OpenAI, Google) como secretos, y correr el benchmark con `--grabar` (pasos en `services/proxy/README.md`); con eso se elige el modelo y se cierran CA-M3-01 y CA-M3-06 | Adam (cuentas y llaves) + Claude (benchmark y decisión) | M3 |
 
 ## Verificación por hito
 
@@ -184,6 +185,21 @@ Plan: esqueleto Expo SDK 57 → en paralelo base cifrada + servicios (Node, bett
 | CA-M2-10 | `principal.test.tsx` y servicios de ocurrencias: Todavía no / Ya la pagué / Ya no aplica | Cumple |
 | CA-M2-11 | `src/seguridad/*.test.ts(x)`: regla de ≥ 1 min con reloj inyectado, cortina y `FLAG_SECURE` con módulos falsos | Cumple en pruebas; biometría y vista previa en blanco se comprueban en el teléfono (pendiente 13) |
 | CA-M2-12 | `src/servicios/onboarding.test.ts` y `onboarding.test.tsx`: "No sé" no resta del saldo y el aviso sale una vez | Cumple |
+
+### M3
+
+Plan: en paralelo el proxy (proyección del esquema, adaptadores Anthropic/OpenAI/Google, límites, `nlu-interpretar`, eval nube y offline) y la app (cliente del proxy, nivel 2, cola por interpretar, correcciones, anulaciones, duplicados y compromisos por voz) → prueba de contrato cliente ↔ proxy. Sin llaves de proveedores: todo probado con `fetch` simulado y respuestas de ejemplo.
+
+| Criterio | Cómo se verificó | Resultado |
+|---|---|---|
+| CA-M3-01 | — | Pendiente: benchmark real con llaves (pendiente 14) |
+| CA-M3-02 | `apps/movil/src/servicios/nube.test.ts` y `src/pantallas/principal/nube.test.tsx` con cliente de nube falso: 2 movimientos correctos | Cumple con respuesta simulada; con el modelo real se confirma en el benchmark |
+| CA-M3-03 | `nube.test.ts` y `nube.test.tsx`: reemplazo con `Libro.reemplazar`, Nu vuelve a su valor, efectivo −$80, historial "corregido" | Cumple |
+| CA-M3-04 | `services/proxy/.../nlu/manejador.test.ts` y `limites.test.ts` (migración real en PGlite): 401, 429 por cada límite, registros sin cuerpos | Cumple |
+| CA-M3-05 | `nube.test.ts` y `nube.test.tsx`: la cola se procesa en orden al reconectar y se detiene en la primera falla | Cumple |
+| CA-M3-06 | `pnpm eval:nlu --offline` corre en CI; la reproducción está probada con una grabación sintética | Pendiente: grabaciones reales (pendiente 14) |
+| CA-M3-07 | `packages/nlu/src/esquema-proveedor.test.ts`: palabras clave permitidas por proveedor y los 144 `esperado` validan contra ambas variantes (ajv) | Cumple; la llamada real con 3 frases va con el benchmark (pendiente 14) |
+| CA-M3-08 | `nube.test.ts`: "La renta son 6,500 cada día primero" crea el programado mensual y sus ocurrencias; "me pagaron 2,000" sin destino queda por asignar y no sube el "hoy puedes" | Cumple |
 
 <!-- Copiar la tabla para cada hito al iniciarlo, con una fila por criterio CA-Mx-NN. -->
 
