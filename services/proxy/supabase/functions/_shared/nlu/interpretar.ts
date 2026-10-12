@@ -82,7 +82,8 @@ function leer(texto: string, adaptador: Adaptador, validar: Validador) {
   return validar((json as { interpretacion: unknown }).interpretacion);
 }
 
-async function conTiempo<T>(ms: number, fn: (senal: AbortSignal) => Promise<T>): Promise<T> {
+/** Corre `fn` con un tiempo máximo: al vencer, aborta la señal y lanza `FallaProveedor('tiempo')`. */
+export async function conTiempo<T>(ms: number, fn: (senal: AbortSignal) => Promise<T>): Promise<T> {
   const control = new AbortController();
   const temporizador = setTimeout(() => control.abort(), ms);
   try {
