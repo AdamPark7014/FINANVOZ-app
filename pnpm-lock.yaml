@@ -231,6 +231,9 @@ importers:
       '@electric-sql/pglite':
         specifier: 0.3.16
         version: 0.3.16
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
 
 packages:
 
