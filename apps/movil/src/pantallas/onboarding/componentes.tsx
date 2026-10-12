@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
-import { Pantalla, Texto, espacio, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
+import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
 
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
@@ -41,7 +41,7 @@ export function Chips<T extends string | number>({
               testID={`${testID}-${o.valor}`}
               onPress={() => alCambiar(o.valor)}
               accessibilityRole="radio"
-              accessibilityLabel={o.etiqueta}
+              accessibilityLabel={etiquetaHablada(o.etiqueta)}
               accessibilityState={{ selected: activo, checked: activo }}
               style={{
                 minHeight: OBJETIVO_TACTIL_MIN,
@@ -82,7 +82,7 @@ export function Casilla({
       testID={testID}
       onPress={() => alCambiar(!valor)}
       accessibilityRole="checkbox"
-      accessibilityLabel={etiqueta}
+      accessibilityLabel={etiquetaHablada(etiqueta)}
       accessibilityState={{ checked: valor }}
       style={{ minHeight: OBJETIVO_TACTIL_MIN, flexDirection: 'row', alignItems: 'center', gap: espacio.m }}
     >

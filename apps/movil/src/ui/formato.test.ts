@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { cifraEnPalabras, enteroEnPalabras, formatearCentavos, leerPesos } from './formato';
+import {
+  cifraEnPalabras,
+  enteroEnPalabras,
+  etiquetaHablada,
+  formatearCentavos,
+  leerPesos,
+  type ModoCifra,
+} from './formato';
 
 describe('formatearCentavos', () => {
   it.each([
@@ -80,5 +87,45 @@ describe('palabras para TalkBack', () => {
     [100_000_000, 'auto', 'un millón de pesos'],
   ] as const)('%i (%s) → %s', (c, modo, esperado) => {
     expect(cifraEnPalabras(c, modo)).toBe(esperado);
+  });
+});
+
+describe('etiquetaHablada (02-UX §15: cada cifra dentro de una frase se lee en palabras)', () => {
+  it.each([
+    [
+      'Faltan $315. Lo repartí según tus gastos en efectivo:',
+      'Faltan trescientos quince pesos. Lo repartí según tus gastos en efectivo:',
+    ],
+    [
+      'Deberías traer $1,140 en efectivo. ¿Cuánto traes?',
+      'Deberías traer mil ciento cuarenta pesos en efectivo. ¿Cuánto traes?',
+    ],
+    ['Coca $25 · ayer', 'Coca veinticinco pesos · ayer'],
+    [
+      'Paga $1,099.90 para no generar intereses.',
+      'Paga mil noventa y nueve pesos con noventa centavos para no generar intereses.',
+    ],
+    ['Vas −$374', 'Vas menos trescientos setenta y cuatro pesos'],
+    ['$1,500 y $0.05', 'mil quinientos pesos y cero pesos con cinco centavos'],
+    ['Sin cifras ni 4 días', 'Sin cifras ni 4 días'],
+  ])('%s', (texto, esperado) => {
+    expect(etiquetaHablada(texto)).toBe(esperado);
+  });
+
+  it('propiedad: toda cifra de formatearCentavos se lee como cifraEnPalabras, sin "$" ni dígitos', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: -1e11, max: 1e11 }),
+        fc.constantFrom<ModoCifra>('auto', 'centavos', 'pesos'),
+        (c, modo) => {
+          const texto = formatearCentavos(c, modo);
+          const negativo = texto.startsWith('−');
+          const valor = leerPesos(texto.replace('−', '')) ?? 0;
+          const hablado = etiquetaHablada(`Total ${texto}.`);
+          expect(hablado).not.toMatch(/\$|\d/);
+          expect(hablado).toBe(`Total ${negativo ? 'menos ' : ''}${cifraEnPalabras(valor)}.`);
+        },
+      ),
+    );
   });
 });

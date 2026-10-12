@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TextInput, View, type KeyboardTypeOptions, type TextInputProps } from 'react-native';
+import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
 import { espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
 import { Texto } from './Texto';
@@ -51,7 +52,7 @@ export function CampoTexto({
         onSubmitEditing={alEnviar}
         onFocus={() => setEnfocado(true)}
         onBlur={() => setEnfocado(false)}
-        accessibilityLabel={etiqueta}
+        accessibilityLabel={etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
         {...nativo}
         style={[

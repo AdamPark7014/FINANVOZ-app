@@ -158,3 +158,22 @@ export function cifraEnPalabras(c: Centavos, modo: ModoCifra = 'auto'): string {
   const signo = negativo && (pesos > 0 || resto > 0) ? 'menos ' : '';
   return `${signo}${textoPesos}${textoCentavos}`;
 }
+
+/** Una cifra con el formato de `formatearCentavos` dentro de un texto: `$1,099.90`, `−$374`, `$0.05`. */
+const CIFRA_EN_TEXTO = /([−-])?\$(\d{1,3}(?:,\d{3})*)(?:\.(\d{2}))?/g;
+
+/** ¿El texto trae alguna cifra de dinero con formato de la UI? */
+export function tieneCifra(texto: string): boolean {
+  return /\$\d/.test(texto);
+}
+
+/**
+ * Etiqueta de TalkBack de un texto con cifras (02-UX §15): cada `$1,500` del texto se lee en palabras
+ * ("mil quinientos pesos"), igual que en `Cifra`; el resto queda igual. Solo presentación.
+ */
+export function etiquetaHablada(texto: string): string {
+  return texto.replace(CIFRA_EN_TEXTO, (_, signo: string | undefined, pesos: string, cent?: string) => {
+    const centavos = Number(pesos.replace(/,/g, '')) * 100 + Number(cent ?? '0');
+    return cifraEnPalabras(signo ? -centavos : centavos);
+  });
+}

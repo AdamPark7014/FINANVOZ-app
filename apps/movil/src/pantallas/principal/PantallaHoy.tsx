@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import {
   etiquetaDiaMes,
@@ -12,7 +12,17 @@ import {
   type VistaHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
+import {
+  Boton,
+  Cifra,
+  cifraEnPalabras,
+  espacio,
+  formatearCentavos,
+  Pantalla,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { PanelRegistrar } from './PanelRegistrar';
@@ -195,11 +205,45 @@ function Fila({
   testID?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-      <Texto variante={fuerte ? 'cuerpoFuerte' : 'cuerpo'} style={{ flex: 1 }}>
+    <FilaCifra etiqueta={etiqueta} centavos={centavos}>
+      <Texto variante={fuerte ? 'cuerpoFuerte' : 'cuerpo'} style={ESTILO_CONCEPTO}>
         {etiqueta}
       </Texto>
       <Cifra centavos={centavos} contexto={etiqueta} {...(testID ? { testID } : {})} />
+    </FilaCifra>
+  );
+}
+
+const ESTILO_CONCEPTO = { flexGrow: 1, flexShrink: 1 } as const;
+
+/**
+ * Concepto y monto como un solo elemento de TalkBack ("Libre: ochocientos cincuenta y seis pesos"). Con texto
+ * grande (200 %) la cifra baja de renglón en vez de apretarse: la fila envuelve y la cifra no se encoge.
+ */
+function FilaCifra({
+  etiqueta,
+  centavos,
+  sangria = false,
+  children,
+}: {
+  etiqueta: string;
+  centavos: number;
+  sangria?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${etiqueta}: ${cifraEnPalabras(centavos)}`}
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        columnGap: espacio.s,
+        ...(sangria ? { paddingLeft: espacio.l } : {}),
+      }}
+    >
+      {children}
     </View>
   );
 }
@@ -215,17 +259,17 @@ function Desglose({ vista }: { vista: VistaHoy }) {
         centavos={-vista.reservado}
         testID="desglose-reservado"
       />
-      {vista.reservadoDetalle.map((r, i) => (
-        <View
-          key={i}
-          style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: espacio.l }}
-        >
-          <Texto variante="secundario" tono="secundario" style={{ flex: 1 }}>
-            {`${r.concepto} · ${ROTULO_RESERVADO[r.tipo]}${r.fecha ? ` · ${etiquetaFecha(r.fecha)}` : ''}`}
-          </Texto>
-          <Cifra centavos={r.monto} tamano="secundario" contexto={r.concepto} />
-        </View>
-      ))}
+      {vista.reservadoDetalle.map((r, i) => {
+        const concepto = `${r.concepto} · ${ROTULO_RESERVADO[r.tipo]}${r.fecha ? ` · ${etiquetaFecha(r.fecha)}` : ''}`;
+        return (
+          <FilaCifra key={i} etiqueta={concepto} centavos={r.monto} sangria>
+            <Texto variante="secundario" tono="secundario" style={ESTILO_CONCEPTO}>
+              {concepto}
+            </Texto>
+            <Cifra centavos={r.monto} tamano="secundario" contexto={r.concepto} />
+          </FilaCifra>
+        );
+      })}
       <Fila etiqueta="Colchón" centavos={-vista.colchon} testID="desglose-colchon" />
       <Fila etiqueta="Libre" centavos={vista.libre} fuerte testID="desglose-libre" />
     </Tarjeta>
