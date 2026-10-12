@@ -48,13 +48,14 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 2026-10-12 | M0 | Límite por IP: 5 envíos por hora con una huella SHA-256 de la IP con sal secreta, borrada a las 24 h; campo trampa para bots; la lista se conserva hasta la baja o 12 meses después del lanzamiento | CA-M0-05 pide límite por IP sin guardar la IP; el aviso necesita decir cuánto se guardan los datos | `08 §2.1`, aviso en `apps/calculadora/src/Aviso.tsx` |
 | 2026-10-12 | M0 | Despliegue estático en Cloudflare Pages con flujo manual que falla si faltan los datos del responsable (`verificar-publicacion`) | Adam comprará el dominio en Cloudflare; el bloqueo hace cumplir CA-M0-07 | `.github/workflows/publicar-calculadora.yml` |
 | 2026-10-12 | M0 | Los datos del responsable y la URL de la lista de espera entran como variables `VITE_*` del despliegue, no en el código | Se pueden definir sin tocar el código y el aviso muestra "[pendiente de definir]" en desarrollo | `apps/calculadora/src/config.ts` |
-| 2026-10-12 | M1 | E3.5 recibe la similitud de comercio (E9.2) inyectada; sin ella el comercio no coincide y el egreso sigue reservado (regla 12). Cablear `(a,b)=>similitud(normalizarComercio(a),normalizarComercio(b))`. E3-36 usa un sustituto en la prueba: cambiar a E9 real al integrar. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M0 | Responsable del aviso: NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V. (NEXARA), con el domicilio y correo de su aviso oficial; los datos fiscales y legales los confirmó Adam | Adam lo eligió en el hilo del proyecto | `08 §2`, `apps/calculadora/src/responsable.json` |
+| 2026-10-12 | M1 | E3.5 recibe la similitud de comercio (E9.2) inyectada; sin ella el comercio no coincide y el egreso sigue reservado (regla 12). Se cablea `(a,b)=>similitud(normalizarComercio(a),normalizarComercio(b))`; E3-36 se prueba con E9 real. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E3.3 sin próximo ingreso conocido: horizonte fijo de 30 días con estado `ingreso_variable` (la especificación no lo define y el oráculo falla). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E3.5 desempate final: índice menor; diferencias relativas comparadas con multiplicación cruzada entera. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E4 recibe tarjetas y MSI como entradas simples; `puedesRetirar(r)=max(0,libre)` para el negocio. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E4: liquidez, saldo_revolvente e impuestos_estimados pueden ser negativos (impuestos negativos = 0); el resto, centavos ≥ 0. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E7: saldo_contable puede ser negativo; efectivo_real, marcados e historial ≥ 0; categorías por monto desc y luego slug. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
-| 2026-10-12 | M1 | E11 recibe `proximasFechas` inyectado; pruebas usan sustituto `__pruebas__/proximas-fechas.ts` → cambiar al E3 real al integrar. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
+| 2026-10-12 | M1 | E11 recibe `proximasFechas` (E3.2) inyectado; las pruebas usan el E3 real. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E5.2: tarjetas con límite 0 se omiten; sin tarjeta totalera → `sin_credito_disponible` (como el oráculo). | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E5: configuración exige exactamente uno de diasParaPagar/diaLimitePago, días 1–31; si no, `tarjeta_invalida`. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
 | 2026-10-12 | M1 | E11 `yaCobro` = aportaciones ≥ turno. E12 `balancePareja`: los pagos de liquidación anulados tampoco cuentan. | Hueco o ambigüedad de la especificación; se tomó la opción conservadora | `05`, `04`, `06`, `07` |
@@ -86,7 +87,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 
 | # | Origen | Descripción | Quién | Hito destino |
 |---|---|---|---|---|
-| 1 | Especificación | Definir el responsable del aviso de privacidad: persona física con actividad empresarial o persona moral de ZYNORA TEK, domicilio y correo de contacto | Adam | Antes de publicar M0 |
+| 1 | Especificación | ~~Definir el responsable del aviso de privacidad~~ Resuelto el 2026-10-12: NEXARA (`apps/calculadora/src/responsable.json`) | Adam | Antes de publicar M0 |
 | 2 | Especificación | Confirmar con usuarios reales si la primera cuota MSI se factura en el primer corte posterior (`meses_diferimiento = 0`) en cada banco | Beta | M4 |
 | 3 | Especificación | Plantillas reales de notificaciones (las de `fixtures/` son sintéticas) | Adam + probadores | M5 |
 | 4 | Especificación | Revisión legal del aviso de privacidad y del flujo de consentimiento | Abogado | M7 y M13 |
@@ -112,8 +113,8 @@ Plan: monorepo (pnpm, TS estricto, ESLint, Prettier, Vitest) → `packages/core`
 | CA-M0-03 | `Calculadora.test.tsx` · "CA-M0-03 · E10-03" | Cumple |
 | CA-M0-04 | Lighthouse 12 móvil local: Rendimiento 98, Accesibilidad 100 (2026-10-12); CI lo exige ≥ 90 en cada PR | Cumple |
 | CA-M0-05 | Cliente: `ListaEspera.test.tsx` (sin consentimiento y correo inválido no envían). Servidor: `services/proxy/.../lista-espera.test.ts` y límite de 5 por hora en `registrar_lista_espera` | Cumple en código; el límite en la base, pendiente de verificación manual al desplegar (6 envíos seguidos → el sexto responde 429) |
-| CA-M0-06 | — | Pendiente: requiere pendientes 1, 11 y 12 |
-| CA-M0-07 | Montos fuera de la red: `Calculadora.test.tsx` · "calcular no hace ninguna petición de red" y prueba con navegador (0 peticiones al llenar la calculadora). Aviso con finalidades, encargados y baja en `Aviso.tsx` | Pendiente: identidad del responsable (pendiente 1); el despliegue se bloquea sin ella |
+| CA-M0-06 | — | Pendiente: requiere pendientes 11 y 12 |
+| CA-M0-07 | Responsable en `apps/calculadora/src/responsable.json` (NEXARA). Montos fuera de la red: `Calculadora.test.tsx` · "calcular no hace ninguna petición de red" y prueba con navegador (0 peticiones al llenar la calculadora). Aviso con finalidades, encargados y baja en `Aviso.tsx` | Cumple en código; falta revisar la pestaña de red en el sitio publicado |
 
 ### M1
 
