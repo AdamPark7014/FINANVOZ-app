@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "fuente": "docs/07-CAPTURA.md §6",
+  "categorias": {
+    "gasolina": ["OXXO GAS", "PEMEX", "G500", "SHELL", "MOBIL", "BP"],
+    "antojos": ["OXXO", "SEVEN ELEVEN", "7 ELEVEN", "CIRCLE K", "STARBUCKS"],
+    "super": [
+      "WALMART",
+      "WAL MART",
+      "BODEGA AURRERA",
+      "SORIANA",
+      "CHEDRAUI",
+      "LA COMER",
+      "HEB",
+      "CITY MARKET",
+      "COSTCO",
+      "SAMS"
+    ],
+    "comida_fuera": ["UBER EATS", "DIDI FOOD", "RAPPI"],
+    "transporte": ["UBER", "DIDI", "CABIFY", "METROBUS"],
+    "suscripciones": ["NETFLIX", "SPOTIFY", "DISNEY", "MAX", "PRIME VIDEO", "YOUTUBE", "ICLOUD"],
+    "servicios": ["CFE", "TELMEX", "IZZI", "TOTALPLAY", "MEGACABLE", "TELCEL"],
+    "salud": ["FARMACIAS GUADALAJARA", "FARMACIA DEL AHORRO", "BENAVIDES", "SAN PABLO", "SIMILARES"],
+    "entretenimiento": ["CINEPOLIS", "CINEMEX"],
+    "hogar": ["HOME DEPOT"]
+  }
+}
