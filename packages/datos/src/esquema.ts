@@ -241,6 +241,27 @@ export const auditoria = sqliteTable('auditoria', {
   despues: text('despues'),
 });
 
+/** `0002_tandas` (M8, `04 §3.2`): una tanda, su cuenta `contraparte:tanda` y el programado de sus aportaciones. */
+export const tanda = sqliteTable('tanda', {
+  id: text('id').primaryKey(),
+  cuentaId: text('cuenta_id')
+    .notNull()
+    .references(() => cuenta.id),
+  nombre: text('nombre').notNull(),
+  aportacion: integer('aportacion').notNull(),
+  participantes: integer('participantes').notNull(),
+  turno: integer('turno').notNull(),
+  regla: text('regla').notNull(),
+  inicio: text('inicio').notNull(),
+  programadoId: text('programado_id')
+    .notNull()
+    .references(() => programado.id),
+  activa: integer('activa').notNull().default(1),
+});
+
+/** Tablas de `0002_tandas`, por nombre SQL. */
+export const TABLAS_0002 = { tanda } as const;
+
 /** Tablas de `0001_inicial`, por nombre SQL. */
 export const TABLAS_0001 = {
   contacto,

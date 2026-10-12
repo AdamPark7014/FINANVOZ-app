@@ -21,6 +21,7 @@ const TABLAS = [
   'prediccion',
   'ajuste',
   'auditoria',
+  'tanda',
 ] as const;
 
 export const FORMATO_EXPORTACION = 'finanvoz-exportacion';
