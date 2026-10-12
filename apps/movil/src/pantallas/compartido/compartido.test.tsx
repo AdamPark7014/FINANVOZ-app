@@ -7,13 +7,16 @@ import { almacenEnMemoria } from '../../db/llave';
 import {
   aceptarConsentimiento,
   agregarCuenta,
+  agregarGastoCompartido,
   crearGrupoCompartido,
   listarGruposCompartidos,
+  MENSAJE_MOVIMIENTO_COMPARTIDO,
   obtenerGrupoCompartido,
   type Contexto,
   type DependenciasCompartido,
 } from '../../servicios';
 import { servidorCompartidoFalso } from '../../servicios/__pruebas__/compartido';
+import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { crearMotorFalso } from '../principal/__pruebas__/arnes';
@@ -255,6 +258,40 @@ describe('02 §27 · Gastos con tu pareja', () => {
     expect(screen.getByTestId('compartido-quien-otro').props.accessibilityState).toMatchObject({
       selected: true,
     });
+    A.cerrar();
+  });
+
+  it('pendiente 146 · "borra lo del súper" por voz dice dónde se anula un gasto compartido', async () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    const creado = await crearGrupoCompartido(A.ctx, A.deps, 'Beto');
+    if (!creado.ok) throw new Error(creado.error);
+    agregarGastoCompartido(A.ctx, A.deps, creado.grupoId, {
+      total: 120000,
+      pagueYo: true,
+      miParteBp: 5000,
+      descripcion: 'Súper',
+      categoria: 'super',
+      cuentaId: A.cuenta,
+    });
+    const f = nubeFalsa({ 'borra lo del súper': { intencion: 'anular', objetivo: { texto: 'súper' } } });
+    render(
+      <ProveedorSesion ctx={A.ctx} nube={f.nube}>
+        <ProveedorAvisos>
+          <ProveedorCompartido deps={A.deps}>
+            <PanelRegistrar abiertoAlInicio motor={crearMotorFalso().motor} />
+          </ProveedorCompartido>
+        </ProveedorAvisos>
+      </ProveedorSesion>,
+    );
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'borra lo del súper');
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+    expect(await screen.findByText(MENSAJE_MOVIMIENTO_COMPARTIDO)).toBeTruthy();
+    expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).movimientos).toMatchObject([
+      { titulo: 'Súper', anulado: false },
+    ]);
     A.cerrar();
   });
 

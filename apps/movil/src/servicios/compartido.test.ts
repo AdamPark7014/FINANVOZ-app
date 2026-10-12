@@ -14,6 +14,7 @@ import {
   registrarPagoCompartido,
   salirDelGrupo,
   sincronizarGrupo,
+  sincronizarGruposAbiertos,
   textoSaldo,
   unirseConQr,
   type DependenciasCompartido,
@@ -153,6 +154,29 @@ describe('CA-M16-03 · dos teléfonos con los gastos de E12-20', () => {
     expect(obtenerGrupoCompartido(t.B.ctx, t.B.almacen, t.grupo).saldo.texto).toBe('Le debes $600 a Ana');
   });
 
+  it('pendiente 145 · sincronizar todos los grupos abiertos: uno que falla no detiene a los demás', async () => {
+    const t = await pareja();
+    const otro = await crearGrupoCompartido(t.A.ctx, t.A.deps, 'Caro');
+    if (!otro.ok) throw new Error(otro.error);
+    gastoDeVector(t, { id: 'b1', total: 120000, pago: 'b', proporcion_a_bp: 5000 });
+    // B sin conexión: lo pendiente se queda guardado.
+    t.B.cliente.red.caida = true;
+    expect(await sincronizarGruposAbiertos(t.B.ctx, t.B.deps)).toEqual({ grupos: 1, errores: ['sin_red'] });
+    expect(obtenerGrupoCompartido(t.B.ctx, t.B.almacen, t.grupo).pendientes).toBe(1);
+    t.B.cliente.red.caida = false;
+    expect(await sincronizarGruposAbiertos(t.B.ctx, t.B.deps)).toEqual({ grupos: 1, errores: [] });
+
+    // A perdió la llave de "Caro": ese grupo pide volver a vincular y el de Beto sí se sincroniza.
+    const guardadas = JSON.parse(t.A.almacen.obtener(CLAVE_LLAVES_COMPARTIDO) ?? '{}') as {
+      llaves: Record<string, string>;
+    };
+    const llaves = Object.fromEntries(Object.entries(guardadas.llaves).filter(([g]) => g !== otro.grupoId));
+    t.A.almacen.guardar(CLAVE_LLAVES_COMPARTIDO, JSON.stringify({ ...guardadas, llaves }));
+    expect(await sincronizarGruposAbiertos(t.A.ctx, t.A.deps)).toEqual({ grupos: 2, errores: ['sin_llave'] });
+    expect(obtenerGrupoCompartido(t.A.ctx, t.A.almacen, otro.grupoId).revincular).toBe(true);
+    expect(obtenerGrupoCompartido(t.A.ctx, t.A.almacen, t.grupo).saldo.texto).toBe('Le debes $600 a Beto');
+  });
+
   it('el servidor solo recibe texto cifrado: ni montos ni descripciones', async () => {
     const t = await pareja();
     gastoDeVector(t, { id: 'secreto', total: 123456, pago: 'a', proporcion_a_bp: 5000 });
@@ -189,6 +213,37 @@ describe('Validaciones de agregar, saldar y anular', () => {
     expect(() => aplicarCorreccion(t.A.ctx, tx, { descripcion: 'otra' })).toThrow(
       expect.objectContaining({ codigo: 'movimiento_compartido' }),
     );
+  });
+
+  it('pendiente 146 · "borra lo del súper" por voz responde que se anula desde Gastos compartidos', async () => {
+    const t = await pareja();
+    agregarGastoCompartido(t.A.ctx, t.A.deps, t.grupo, {
+      total: 120000,
+      pagueYo: true,
+      miParteBp: 5000,
+      descripcion: 'Súper',
+      categoria: 'super',
+      cuentaId: t.A.bbva,
+    });
+    const saldo = t.A.ctx.libro.saldo(t.A.bbva);
+    const f = nubeFalsa({
+      'borra lo del súper': { intencion: 'anular', objetivo: { texto: 'súper' } },
+      'no, lo del súper fueron 1,500': {
+        intencion: 'corregir',
+        objetivo: { texto: 'súper' },
+        cambios: { monto: 150000 },
+      },
+    });
+    for (const frase of ['borra lo del súper', 'no, lo del súper fueron 1,500']) {
+      expect(await registrarTexto(t.A.ctx, frase, 'voz', { nube: f.nube })).toEqual({
+        resultado: 'no_soportado',
+        motivo: 'movimiento_compartido',
+      });
+    }
+    expect(t.A.ctx.libro.saldo(t.A.bbva)).toBe(saldo);
+    expect(obtenerGrupoCompartido(t.A.ctx, t.A.almacen, t.grupo).movimientos).toMatchObject([
+      { titulo: 'Súper', anulado: false },
+    ]);
   });
 
   it('una categoría desconocida o un total en cero se rechazan', async () => {
