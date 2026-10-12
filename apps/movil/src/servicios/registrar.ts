@@ -115,6 +115,8 @@ export type ResultadoTexto =
   /** "Lo guardé; lo interpreto cuando tengas internet." */
   | { readonly resultado: 'por_interpretar'; readonly id: string; readonly motivo: MotivoPorInterpretar }
   | { readonly resultado: 'consulta'; readonly consulta: VistaConsulta }
+  /** "Traigo 300": abre el arqueo con lo que dijo (`02 §7`); nada se registra sin confirmar (E7). */
+  | { readonly resultado: 'arqueo'; readonly efectivoReal: Centavos }
   | {
       readonly resultado: 'corregido';
       readonly antes: ResumenTransaccion;
@@ -698,6 +700,7 @@ function aplicarInterpretacion(
     case 'fuera_de_alcance':
       return { resultado: 'fuera_de_alcance', motivo: i.motivo ?? null };
     case 'arqueo':
+      return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
     case 'simular':
       return { resultado: 'no_soportado', motivo: 'intencion' };
   }
@@ -709,6 +712,7 @@ function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Fr
   if (i?.intencion === 'consultar' && i.consulta.tipo === 'hoy_puedes') {
     return { resultado: 'consulta', consulta: 'hoy_puedes' };
   }
+  if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion !== 'registrar') return null;
   return registrarInterpretado(ctx, i.movimientos, cuentas, frase);
 }

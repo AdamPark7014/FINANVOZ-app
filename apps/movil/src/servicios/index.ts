@@ -188,3 +188,62 @@ export {
 } from './movimientos';
 export { exportarCsv, exportarJson } from '../privacidad/exportar';
 export { cargarEscenario, type EscenarioCargado } from './semilla';
+export {
+  avanzar as avanzarCaptura,
+  cuentaEfectivo,
+  leerCaptura,
+  registrarCaptura,
+  UMBRAL_FUE_A_MESES,
+  type CapturaEntrante,
+  type EstadoCaptura,
+  type MotivoRevisar,
+  type ResultadoCaptura,
+} from './capturas';
+export {
+  asociarCuentaCaptura,
+  confirmarCaptura,
+  descartarCaptura,
+  fueAMeses,
+  listarCapturasPorRevisar,
+  marcarNoReconocidaRevisada,
+  noReconocidasPorBanco,
+  preguntasCaptura,
+  responderDuplicado,
+  responderPagoSinOrigen,
+  responderSalidaSinPareja,
+  transaccionesDesdeCapturas,
+  type CapturaPorRevisar,
+  type CuentaOpcion,
+  type MitadCandidata,
+  type MotivoPorRevisar,
+  type PreguntaCaptura,
+  type RespuestaPago,
+  type RespuestaSalida,
+} from './preguntas-captura';
+export {
+  aceptarDivulgacionCaptura,
+  activarCaptura,
+  capturaInactiva,
+  desactivarCaptura,
+  HORAS_CAPTURA_INACTIVA,
+  obtenerEstadoCaptura,
+  registrarSenalesCaptura,
+  type EstadoCapturaVista,
+} from './estado-captura';
+export {
+  arqueoPendiente,
+  calcularArqueo,
+  confirmarArqueo,
+  efectivoMenosPreciso,
+  posponerArqueo,
+  prepararArqueo,
+  type ArqueoConfirmado,
+  type ArqueoPendiente,
+  type CalculoArqueo,
+  type ConfirmacionArqueo,
+  type EntradaArqueo,
+  type GastoPorAsignar,
+  type PropuestaArqueo,
+  type RespuestaSobrante,
+  type VistaArqueo,
+} from './arqueo';

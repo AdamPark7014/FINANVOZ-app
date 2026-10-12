@@ -51,6 +51,17 @@ export function paquetesConocidos(catalogo: CatalogoPlantillas): string[] {
   return catalogo.bancos.flatMap((b) => b.paquetesAndroid);
 }
 
+let catalogoDeLaApp: CatalogoPlantillas | null = null;
+
+/**
+ * Catálogo con el que corre la app: las reales siempre y las sintéticas solo con `__DEV__` (en Node, donde no
+ * existe `__DEV__`, también: pruebas y semillas).
+ */
+export function catalogoApp(): CatalogoPlantillas {
+  catalogoDeLaApp ??= catalogoEmbebido(typeof __DEV__ === 'undefined' || __DEV__);
+  return catalogoDeLaApp;
+}
+
 /** Nombre visible de un banco del catálogo ("Banco A (débito)"); su id si no trae nombre. */
 export function nombreBanco(catalogo: CatalogoPlantillas, banco: string | null): string {
   if (banco === null) return 'tu banco';
