@@ -1,0 +1,11 @@
+# Configuración del proyecto de Supabase que se versiona. Solo lo que no puede depender de recordar
+# una bandera en cada despliegue: estas dos funciones se llaman sin sesión de Supabase.
+project_id = "finanvoz"
+
+# La calculadora pública (sin sesión) y la verificación previa de CORS, que no trae Authorization.
+[functions.lista-espera]
+verify_jwt = false
+
+# RevenueCat no tiene sesión de Supabase: la protege un Bearer con REVENUECAT_WEBHOOK_SECRET.
+[functions.webhooks-revenuecat]
+verify_jwt = false
