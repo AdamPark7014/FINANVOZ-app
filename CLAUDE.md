@@ -78,7 +78,7 @@ pnpm --filter movil semilla e4-01             # solo builds de desarrollo
 - Ante una ambigüedad: toma la opción más conservadora para el usuario, regístrala en `docs/ESTADO.md` → Decisiones y continúa. No inventes requisitos.
 - Esquema de base: solo con migración nueva numerada; nunca edites una aplicada.
 - Dependencias: prefiere Expo SDK y la plataforma; justifica cada dependencia nueva en el commit.
-- Ramas `hito/m<n>-<nombre>`; commits pequeños estilo Conventional Commits con descripción en español: `feat(core): agrega E4 dinero libre`.
+- Todo directo en `main` (sin ramas, worktrees ni PR); commits pequeños estilo Conventional Commits en español: `feat(core): agrega E4 dinero libre`. Antes de cada push: `/verificar` y `git pull --rebase origin main`.
 - Windows: usa `node scripts/oraculo.mjs` (encuentra `py -3`, `python` o `python3`); el repositorio fuerza finales de línea LF (`.gitattributes`).
 
 ## Convenciones de código

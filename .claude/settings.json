@@ -11,9 +11,9 @@
       "Bash(git log *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git switch *)",
-      "Bash(git checkout -b *)",
-      "Bash(git branch --list *)"
+      "Bash(git branch --list *)",
+      "Bash(git pull --rebase origin main*)",
+      "Bash(git push origin main*)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -23,7 +23,11 @@
       "Bash(git push --force*)",
       "Bash(git push * --force*)",
       "Bash(git push -f*)",
-      "Bash(git push * -f*)"
+      "Bash(git push * -f*)",
+      "Bash(git checkout -b *)",
+      "Bash(git switch -c *)",
+      "Bash(git worktree *)",
+      "Bash(gh pr create*)"
     ]
   }
 }

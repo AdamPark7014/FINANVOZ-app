@@ -16,7 +16,7 @@ Si no hay id o no es uno de M0 a M16, detente y pide uno. No sigas sin id válid
 - Solo el alcance de "Entra" del hito. Lo que falte fuera de alcance va a ESTADO → Pendientes.
 - Reglas no negociables de `CLAUDE.md`. Ante una ambigüedad: la opción más conservadora para el usuario, registrada en Decisiones.
 - Pruebas primero con los vectores de `fixtures/` (un caso por `id`).
-- Trabaja en la rama `hito/<id en minúsculas>-<nombre corto>` (por ejemplo `hito/m0-calculadora`), creada desde `main` actualizada. Commits pequeños con Conventional Commits en español. Al cerrar el hito, propone fusionarla a `main` (`git merge --no-ff`) y hazlo solo si el usuario lo aprueba. No hagas push ni abras PR salvo que el usuario lo pida.
+- Trabaja directo en `main` (`git pull --rebase origin main` antes de empezar); no crees ramas, worktrees ni PR. Commits pequeños con Conventional Commits en español, cada uno con `/verificar` en verde; después `git pull --rebase origin main` y `git push origin main`.
 
 ## 1. Preparar
 

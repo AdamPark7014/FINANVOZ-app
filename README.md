@@ -6,7 +6,7 @@ Especificación completa de una app de finanzas personales y de pequeños negoci
 
 | Herramienta | Para qué | Desde |
 |---|---|---|
-| Git | Repositorio y ramas por hito | M0 |
+| Git | Repositorio, solo rama `main` | M0 |
 | Node.js LTS (22 o superior) y pnpm (`npm i -g pnpm`) | Monorepo, pruebas, scripts | M0 |
 | Python 3.10 o superior (solo biblioteca estándar) | Oráculo de vectores (`node scripts/oraculo.mjs` lo encuentra solo; en Windows usa `py -3`) | M0 |
 | Claude Code | Ejecutar los hitos | M0 |

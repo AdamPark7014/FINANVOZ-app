@@ -29,5 +29,19 @@ fixtures/nlu/grabaciones/*.tmp
 *.pem
 credentials.json
 *service-account*.json
+*.key
+*.hex
+google-services.json
+GoogleService-Info.plist
+.npmrc
+.dev.vars
+.wrangler/
+.sentryclirc
+sentry.properties
+services/proxy/supabase/.temp/
+services/proxy/supabase/.branches/
+.claude/settings.local.json
+# Estado local de las herramientas de agentes
+.ai/
 .gradle/
 .kotlin/

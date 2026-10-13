@@ -230,9 +230,9 @@ Presupuestos en RNF-01. Medición: script de perfilado en build de producción s
 
 ## 11. CI/CD
 
-- **PR:** `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm eval:nlu --nivel reglas`, `pnpm eval:nlu --offline` (desde M3) y verificación del oráculo con `node scripts/oraculo.mjs --verificar` (compara como JSON; funciona en Linux, macOS y Windows).
-- **main:** build `preview` con EAS para pruebas internas.
-- **Etiqueta `v*`:** build `production` y envío a la pista de Play con EAS Submit. Promoción manual.
+- **Cada push a `main`** (`ci.yml`): `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm eval:nlu --nivel reglas`, `pnpm eval:nlu --offline` (desde M3) y verificación del oráculo con `node scripts/oraculo.mjs --verificar` (compara como JSON; funciona en Linux, macOS y Windows). No hay PR: todo se trabaja en `main` y `/verificar` va en verde antes de cada push.
+- **main y etiquetas `v*`** (`apk.yml`): APK de prueba firmado con la llave de depuración, artefacto por 14 días; no sirve para Play.
+- **Producción (pendiente):** build `production` con EAS y envío a la pista de Play con EAS Submit, disparado a mano desde `main`. Promoción manual.
 - Actualizaciones OTA (EAS Update) solo para cambios de JS sin cambios de esquema de base ni de módulo nativo.
 
 ## 12. Decisiones (ADR)
