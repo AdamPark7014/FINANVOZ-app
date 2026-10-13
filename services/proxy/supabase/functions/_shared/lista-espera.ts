@@ -67,3 +67,15 @@ export async function huellaIp(ip: string, sal: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', datos);
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
 }
+
+/** Respuesta con CORS para la calculadora. `cuerpo` null = sin cuerpo (obligatorio con 204: Deno y Node rechazan un 204 con cuerpo). */
+export function responder(estado: number, cuerpo: Record<string, unknown> | null, origen: string): Response {
+  const headers: Record<string, string> = {
+    'access-control-allow-origin': origen,
+    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-headers': 'content-type',
+    vary: 'origin',
+  };
+  if (cuerpo !== null) headers['content-type'] = 'application/json';
+  return new Response(cuerpo === null ? null : JSON.stringify(cuerpo), { status: estado, headers });
+}

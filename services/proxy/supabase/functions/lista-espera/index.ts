@@ -3,7 +3,7 @@
 // (las inyecta Supabase), LISTA_ESPERA_SAL (secreto para la huella de IP) y CALCULADORA_ORIGEN.
 // Privacidad (regla 9): no se registra el correo, la IP ni las respuestas en logs.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { huellaIp, ipCliente, validarSolicitud } from '../_shared/lista-espera.ts';
+import { huellaIp, ipCliente, responder as responderCon, validarSolicitud } from '../_shared/lista-espera.ts';
 
 const LIMITE_POR_HORA = 5;
 const TAMANO_MAXIMO = 2048;
@@ -18,21 +18,12 @@ const supabase = createClient(
   },
 );
 
-function responder(estado: number, cuerpo: Record<string, unknown>): Response {
-  return new Response(JSON.stringify(cuerpo), {
-    status: estado,
-    headers: {
-      'content-type': 'application/json',
-      'access-control-allow-origin': origen,
-      'access-control-allow-methods': 'POST, OPTIONS',
-      'access-control-allow-headers': 'content-type',
-      vary: 'origin',
-    },
-  });
+function responder(estado: number, cuerpo: Record<string, unknown> | null): Response {
+  return responderCon(estado, cuerpo, origen);
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return responder(204, {});
+  if (req.method === 'OPTIONS') return responder(204, null);
   if (req.method !== 'POST') return responder(405, { codigo: 'metodo' });
   if (!sal || !origen) return responder(503, { codigo: 'sin_configurar' });
 

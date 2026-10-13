@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { huellaIp, ipCliente, validarSolicitud } from './lista-espera.ts';
+import { huellaIp, ipCliente, responder, validarSolicitud } from './lista-espera.ts';
 
 const valida = {
   correo: ' Ana@Ejemplo.MX ',
@@ -67,5 +67,32 @@ describe('IP', () => {
     expect(a).toMatch(/^[0-9a-f]{64}$/);
     expect(a).not.toContain('203');
     expect(await huellaIp('203.0.113.7', 'sal-2')).not.toBe(a);
+  });
+});
+
+describe('responder', () => {
+  const origen = 'https://finanvoz.com';
+
+  it('la verificación previa de CORS responde 204 sin cuerpo y con los encabezados', async () => {
+    const r = responder(204, null, origen);
+    expect(r.status).toBe(204);
+    expect(r.body).toBeNull();
+    expect(await r.text()).toBe('');
+    expect(r.headers.get('access-control-allow-origin')).toBe(origen);
+    expect(r.headers.get('access-control-allow-methods')).toBe('POST, OPTIONS');
+    expect(r.headers.get('access-control-allow-headers')).toBe('content-type');
+    expect(r.headers.get('content-type')).toBeNull();
+  });
+
+  it('las respuestas con cuerpo van en JSON y con CORS', async () => {
+    const r = responder(429, { codigo: 'limite' }, origen);
+    expect(r.status).toBe(429);
+    expect(r.headers.get('content-type')).toBe('application/json');
+    expect(r.headers.get('access-control-allow-origin')).toBe(origen);
+    expect(await r.json()).toEqual({ codigo: 'limite' });
+  });
+
+  it('un 204 con cuerpo no se puede construir: por eso OPTIONS pasa null', () => {
+    expect(() => new Response('{}', { status: 204 })).toThrow();
   });
 });
