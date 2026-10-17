@@ -29,7 +29,12 @@ describe('Anthropic (Messages API)', () => {
     expect(p.encabezados['x-api-key']).toBe('llave-de-prueba');
     expect(p.encabezados['anthropic-version']).toBe('2023-06-01');
     expect(p.cuerpo.model).toBe('claude-haiku-5-5');
-    expect(p.cuerpo.output_config).toEqual({ format: { type: 'json_schema', schema: esquemas.estandar } });
+    expect(p.cuerpo.output_config).toEqual({
+      effort: 'medium',
+      format: { type: 'json_schema', schema: esquemas.estandar },
+    });
+    expect(p.cuerpo.thinking).toEqual({ type: 'disabled' });
+    expect(p.cuerpo).not.toHaveProperty('temperature');
     expect(p.cuerpo.system).toEqual([
       { type: 'text', text: prompt.sistema, cache_control: { type: 'ephemeral' } },
     ]);
@@ -50,6 +55,13 @@ describe('Anthropic (Messages API)', () => {
     const tools = en(f.peticiones, 0).cuerpo.tools as { input_schema: unknown }[];
     expect(en(tools, 0).input_schema).toEqual(esquemas.estandar);
     expect(en(f.peticiones, 0).cuerpo.tool_choice).toEqual({ type: 'tool', name: 'interpretacion' });
+    expect(en(f.peticiones, 0).cuerpo.output_config).toEqual({ effort: 'medium' });
+  });
+
+  it('un rechazo de seguridad (stop_reason refusal) es falla del servidor para que intente el alterno', async () => {
+    const f = fetchFalso([json({ ...respuestaAnthropic(''), content: [], stop_reason: 'refusal' })]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch });
+    await expect(a.llamar({ prompt, senal: senal() })).rejects.toMatchObject({ tipo: 'servidor' });
   });
 
   it('el reintento agrega la salida anterior y la corrección', async () => {
@@ -76,6 +88,7 @@ describe('OpenAI (Chat Completions)', () => {
     expect(p.encabezados.authorization).toBe('Bearer llave-o');
     expect(p.cuerpo.model).toBe('modelo-mini');
     expect(p.cuerpo.store).toBe(false);
+    expect(p.cuerpo.reasoning_effort).toBe('low');
     expect(p.cuerpo.response_format).toEqual({
       type: 'json_schema',
       json_schema: { name: 'interpretacion', strict: true, schema: esquemas.nulable },
@@ -102,6 +115,7 @@ describe('Google (Gemini generateContent)', () => {
     expect(p.cuerpo.generationConfig).toMatchObject({
       responseMimeType: 'application/json',
       responseJsonSchema: esquemas.estandar,
+      thinkingConfig: { thinkingBudget: 0 },
     });
   });
 });

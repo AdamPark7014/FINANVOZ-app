@@ -8,6 +8,7 @@ import {
   type Fetch,
   MODELO_POR_OMISION,
   type NombreProveedor,
+  PARAMETROS,
 } from '../nlu/proveedores.ts';
 import {
   contarResultados,
@@ -116,10 +117,12 @@ export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
           tool_choice: { type: forzarRespuesta ? 'none' : 'auto' },
           messages,
           thinking: { type: 'disabled' },
+          output_config: { effort: PARAMETROS.anthropic.esfuerzo },
         },
         senal,
       );
       if (!esObjeto(datos)) throw new FallaProveedor('servidor');
+      if (datos.stop_reason === 'refusal') throw new FallaProveedor('servidor');
       const uso = esObjeto(datos.usage) ? datos.usage : {};
       const bloques = Array.isArray(datos.content) ? datos.content.filter(esObjeto) : [];
       const llamadas: LlamadaHerramienta[] = bloques
@@ -189,6 +192,7 @@ export function crearOpenAITurno(c: ConfiguracionTurno): AdaptadorTurno {
           })),
           tool_choice: forzarRespuesta ? 'none' : 'auto',
           max_completion_tokens: TOKENS_SALIDA_MAXIMOS,
+          reasoning_effort: PARAMETROS.openai.esfuerzoRazonamiento,
           store: false,
         },
         senal,
@@ -260,7 +264,10 @@ export function crearGoogleTurno(c: ConfiguracionTurno): AdaptadorTurno {
             },
           ],
           toolConfig: { functionCallingConfig: { mode: forzarRespuesta ? 'NONE' : 'AUTO' } },
-          generationConfig: { maxOutputTokens: TOKENS_SALIDA_MAXIMOS, thinkingConfig: { thinkingBudget: 0 } },
+          generationConfig: {
+            maxOutputTokens: TOKENS_SALIDA_MAXIMOS,
+            thinkingConfig: { thinkingBudget: PARAMETROS.google.presupuestoRazonamiento },
+          },
         },
         senal,
       );
