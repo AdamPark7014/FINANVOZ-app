@@ -18,6 +18,21 @@ export const MODELO_POR_OMISION: Record<NombreProveedor, string> = {
 export const TIEMPO_MAXIMO_MS = 8000;
 const TOKENS_SALIDA_MAXIMOS = 2048;
 
+/**
+ * Parámetros de generación por proveedor, fijados explícitamente para que un cambio de valores por omisión del
+ * proveedor no mueva la latencia ni el costo. El intérprete es extracción a un esquema cerrado: sin razonamiento
+ * extendido en ningún proveedor. Claude Haiku 5.5 no acepta `temperature` distinta de la de omisión (400), así que
+ * no se manda en ningún adaptador; el formato lo garantiza la salida estructurada.
+ */
+export const PARAMETROS = {
+  /** `medium` es el valor por omisión de Haiku 5.5; con el razonamiento apagado solo se acepta hasta `high`. */
+  anthropic: { esfuerzo: 'medium' },
+  /** `low` lo aceptan todos los modelos de razonamiento de OpenAI (el valor por omisión es `medium`). */
+  openai: { esfuerzoRazonamiento: 'low' },
+  /** Gemini Flash razona por omisión: presupuesto 0 lo apaga, igual que en el modo explicar. */
+  google: { presupuestoRazonamiento: 0 },
+} as const;
+
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
 
 /** Turno del reintento por validación: la salida anterior y la corrección pedida. */
@@ -126,6 +141,7 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
         messages: mensajes,
         thinking: { type: 'disabled' },
       };
+      const salidaConfig: Objeto = { effort: PARAMETROS.anthropic.esfuerzo };
       if (modo === 'herramienta') {
         cuerpo.tools = [
           {
@@ -136,8 +152,9 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
         ];
         cuerpo.tool_choice = { type: 'tool', name: 'interpretacion' };
       } else {
-        cuerpo.output_config = { format: { type: 'json_schema', schema: esquemas.estandar } };
+        salidaConfig.format = { type: 'json_schema', schema: esquemas.estandar };
       }
+      cuerpo.output_config = salidaConfig;
       const datos = await enviar(
         c.fetch,
         'https://api.anthropic.com/v1/messages',
@@ -146,6 +163,9 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
         senal,
       );
       if (!esObjeto(datos)) throw new FallaProveedor('servidor');
+      // Haiku 5.5 no tiene respaldo del lado de Anthropic ante un rechazo de seguridad (HTTP 200): se trata como
+      // falla del servidor para que lo intente el proveedor alterno.
+      if (datos.stop_reason === 'refusal') throw new FallaProveedor('servidor');
       const uso = esObjeto(datos.usage) ? datos.usage : {};
       const bloques = Array.isArray(datos.content) ? datos.content.filter(esObjeto) : [];
       const herramienta = bloques.find((b) => b.type === 'tool_use');
@@ -190,6 +210,7 @@ export function crearOpenAI(c: ConfiguracionAdaptador): Adaptador {
           model: modelo,
           messages: mensajes,
           max_completion_tokens: TOKENS_SALIDA_MAXIMOS,
+          reasoning_effort: PARAMETROS.openai.esfuerzoRazonamiento,
           store: false,
           response_format: {
             type: 'json_schema',
@@ -234,6 +255,7 @@ export function crearGoogle(c: ConfiguracionAdaptador): Adaptador {
             responseMimeType: 'application/json',
             responseJsonSchema: esquemas.estandar,
             maxOutputTokens: TOKENS_SALIDA_MAXIMOS,
+            thinkingConfig: { thinkingBudget: PARAMETROS.google.presupuestoRazonamiento },
           },
         },
         senal,

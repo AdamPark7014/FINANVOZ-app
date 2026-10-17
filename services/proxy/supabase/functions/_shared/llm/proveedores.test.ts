@@ -47,6 +47,8 @@ describe('Anthropic (tool_use)', () => {
       { name: 'gasto', description: 'Gasto en un periodo.', input_schema: HERRAMIENTAS[0]?.parametros },
     ]);
     expect(p.tool_choice).toEqual({ type: 'auto' });
+    expect(p.thinking).toEqual({ type: 'disabled' });
+    expect(p.output_config).toEqual({ effort: 'medium' });
     expect(p.messages).toEqual([
       { role: 'user', content: PREGUNTA.rol === 'usuario' ? PREGUNTA.texto : '' },
       {
@@ -84,6 +86,14 @@ describe('Anthropic (tool_use)', () => {
     expect(e).toBeInstanceOf(FallaProveedor);
     expect(String(e)).not.toContain('detalle');
   });
+
+  it('un rechazo de seguridad (stop_reason refusal) es falla del servidor para que intente el alterno', async () => {
+    const f = fetchFalso([json({ ...respuestaAnthropic(''), content: [], stop_reason: 'refusal' })]);
+    const a = crearAnthropicTurno({ llave: 'k', fetch: f.fetch });
+    await expect(a.llamar({ ...base, mensajes: [PREGUNTA], senal: senal() })).rejects.toMatchObject({
+      tipo: 'servidor',
+    });
+  });
 });
 
 describe('OpenAI (tool_calls)', () => {
@@ -107,6 +117,7 @@ describe('OpenAI (tool_calls)', () => {
     });
     const p = en(f.peticiones, 0).cuerpo;
     expect(p.store).toBe(false);
+    expect(p.reasoning_effort).toBe('low');
     expect(p.tool_choice).toBe('auto');
     expect(p.messages).toEqual([
       { role: 'system', content: SISTEMA_EXPLICAR },
