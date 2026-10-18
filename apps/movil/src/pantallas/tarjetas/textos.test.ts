@@ -91,50 +91,26 @@ describe('tarjetas/textos · TalkBack', () => {
 
   it('lista en Cuentas resume deuda, fechas y barra en una etiqueta', () => {
     expect(PISTA_ABRIR_DETALLE_TARJETA).toBe('Abre el detalle de la tarjeta');
-    expect(
-      etiquetaAccesibleTarjetaEnLista(
-        {
-          id: 'tc:oro',
-          tipo: 'tarjeta',
-          nombre: 'Oro',
-          saldo: 120_000,
-          meses: 0,
-          limiteCredito: 3_000_000,
-        },
-        {
-          id: 'tc:oro',
-          nombre: 'Oro',
-          pngi: 0,
-          etiquetaFechaLimite: '30 nov',
-          etiquetaProximoCorte: '10 dic',
-          usoPorcentaje: 4,
-          limiteCredito: 3_000_000,
-          usoBp: 400,
-        } as never,
-      ),
-    ).toMatch(/Debes en Oro.*mil doscientos pesos/);
-    expect(
-      etiquetaAccesibleTarjetaEnLista(
-        {
-          id: 'tc:oro',
-          tipo: 'tarjeta',
-          nombre: 'Oro',
-          saldo: 120_000,
-          meses: 0,
-          limiteCredito: 3_000_000,
-        },
-        {
-          id: 'tc:oro',
-          nombre: 'Oro',
-          pngi: 0,
-          etiquetaFechaLimite: '30 nov',
-          etiquetaProximoCorte: '10 dic',
-          usoPorcentaje: 4,
-          limiteCredito: 3_000_000,
-          usoBp: 400,
-        } as never,
-      ),
-    ).toMatch(/treinta mil pesos\. La marca es el 30 %/);
+    const debes = {
+      id: 'tc:oro',
+      tipo: 'tarjeta' as const,
+      nombre: 'Oro',
+      ultimos4: '8812',
+      saldo: 120_000,
+      meses: 0,
+      limiteCredito: 3_000_000,
+      apartar: null,
+    };
+    const vista = {
+      pngi: 0,
+      etiquetaFechaLimite: '30 nov',
+      etiquetaProximoCorte: '10 dic',
+      usoPorcentaje: 4,
+      limiteCredito: 3_000_000,
+    };
+    const etiqueta = etiquetaAccesibleTarjetaEnLista(debes, vista as never);
+    expect(etiqueta).toMatch(/Debes en Oro.*mil doscientos pesos/);
+    expect(etiqueta).toMatch(/treinta mil pesos\. La marca es el 30 %/);
   });
 
   it('estado de cuenta cerrado resume saldo, pagos y PNGI en palabras', () => {

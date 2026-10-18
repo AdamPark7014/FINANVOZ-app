@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Movimientos · lista:** TalkBack en encabezados de día (`etiquetaEncabezadoDiaMovimientos`); test en `principal.test.tsx`.
+- **Tarjetas · TalkBack lista (Cuentas → Debes):** `etiquetaAccesibleTarjetaEnLista` + `TarjetaCreditoLista`; la fila ya no anuncia solo el nombre (deuda, fechas, PNGI y barra con límite y 30 %).
 
 ## Hecho (acumulado reciente)
 
-- Lista/listitem, intro por revisar, filtro activo, vacíos. Ver `git log`.
+- Ayuda FAQ/correo, captura reactivar, respaldo aviso. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP sin commitear ajeno (`tarjetas/textos.ts`) — no mezclar.
+- WIP paralelo (ajustes, personas, principal fuera de fila tarjeta) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
@@ -25,7 +25,6 @@
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- Widget, GymOS, ConstructionOS.
 - `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
