@@ -30,6 +30,7 @@ import {
   PISTA_CREAR_CODIGO,
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
+  PISTA_ESCRIBIR_NOMBRE_PAREJA,
   PISTA_VOLVER_CUENTAS,
   PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
@@ -223,7 +224,7 @@ export function PantallaCompartidos({
             <Boton
               testID="compartidos-abrir-escaner"
               etiqueta={BTN_ESCANEAR_SU_CODIGO}
-              pista={PISTA_ABRIR_ESCANER}
+              pista={nombre.trim() !== '' ? PISTA_ABRIR_ESCANER : PISTA_ESCRIBIR_NOMBRE_PAREJA}
               cargando={ocupado}
               alPresionar={() => {
                 if (nombre.trim() === '') setError(ERROR_NOMBRE_PAREJA);

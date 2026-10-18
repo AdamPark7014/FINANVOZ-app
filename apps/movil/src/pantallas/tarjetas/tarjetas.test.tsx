@@ -5,6 +5,7 @@ import {
   agregarCuenta,
   agregarPagoFijo,
   detalleTarjeta,
+  listarCuentas,
   etiquetaDiaMes,
   listarOcurrencias,
   procesarApertura,
@@ -48,7 +49,9 @@ import {
   etiquetaAccesiblePlanMsi,
   etiquetaAccesibleBarraUsoTarjeta,
   etiquetaAccesibleEstadoCuentaTarjeta,
+  etiquetaAccesibleTarjetaEnLista,
   etiquetaAccesibleUsoTarjeta,
+  PISTA_ABRIR_DETALLE_TARJETA,
   etiquetaVacioEstadosTarjeta,
   etiquetaSiLiquidar,
   etiquetaVacioMovimientosTarjeta,
@@ -324,6 +327,22 @@ describe('tarjetas/textos · TalkBack', () => {
 });
 
 describe('Tarjetas', () => {
+  it('TalkBack: fila en Cuentas anuncia deuda, fechas y barra de una pieza', () => {
+    const p = e510();
+    const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);
+    const d = listarCuentas(p.ctx).debes.find((x) => x.id === p.oro);
+    if (!t || !d) throw new Error('e5-10 sin Oro en Debes');
+    montar(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTarjeta={jest.fn()} />);
+    expect(screen.getByTestId(`cuenta-${p.oro}`)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleTarjetaEnLista(d, t),
+    );
+    expect(screen.getByTestId(`cuenta-${p.oro}`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_ABRIR_DETALLE_TARJETA,
+    );
+  });
+
   it('TalkBack: volver regresa a Cuentas', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <PantallaTarjeta tarjetaId={p.e.cuentas.nu as string} alVolver={jest.fn()} />);

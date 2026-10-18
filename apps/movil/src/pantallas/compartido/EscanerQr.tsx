@@ -10,6 +10,7 @@ import {
   INSTRUCCION_PERMISO_CAMARA,
   PISTA_CANCELAR_ESCANER,
   PISTA_PERMISO_CAMARA,
+  PISTA_VISTA_CAMARA,
 } from './textos';
 
 /**
@@ -41,6 +42,7 @@ export function EscanerQr({
                 alLeer(r.data);
               }}
               accessibilityLabel={ETIQUETA_VISTA_CAMARA}
+              accessibilityHint={PISTA_VISTA_CAMARA}
             />
           </View>
         </>

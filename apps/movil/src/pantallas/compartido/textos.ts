@@ -55,6 +55,11 @@ export const BTN_PERMITIR_CAMARA = 'Permitir la cámara';
 /** Sin permiso de cámara (`02 §15`). */
 export const PISTA_PERMISO_CAMARA = 'Solo la uso para leer el código QR, sin tomar fotos';
 export const ETIQUETA_VISTA_CAMARA = 'Vista de la cámara para escanear el código';
+/** Cámara activa en unirse (`02 §15`). */
+export const PISTA_VISTA_CAMARA =
+  'Apunta al código QR de tu pareja; al leerlo te unes al grupo automáticamente';
+/** Unirse sin nombre escrito (`02 §15`). */
+export const PISTA_ESCRIBIR_NOMBRE_PAREJA = 'Escribe cómo se llama tu pareja arriba';
 export const BTN_CANCELAR = 'Cancelar';
 /** Cierra el escáner (`02 §15`). */
 export const PISTA_CANCELAR_ESCANER = 'Cierra la cámara y vuelve atrás';

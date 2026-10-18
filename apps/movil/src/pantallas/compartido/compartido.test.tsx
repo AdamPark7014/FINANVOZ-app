@@ -36,12 +36,15 @@ import {
   MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
+  ETIQUETA_VISTA_CAMARA,
   PISTA_ABRIR_ESCANER,
   PISTA_CANCELAR_ESCANER,
   PISTA_CREAR_CODIGO,
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
+  PISTA_ESCRIBIR_NOMBRE_PAREJA,
   PISTA_PERMISO_CAMARA,
+  PISTA_VISTA_CAMARA,
   PISTA_VOLVER_CUENTAS,
   PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
@@ -58,11 +61,20 @@ jest.mock('expo-camera', () => {
   const { Pressable, Text } = jest.requireActual('react-native');
   return {
     useCameraPermissions: () => [{ granted: mockCamaraConcedida }, jest.fn()],
-    CameraView: ({ onBarcodeScanned }: { onBarcodeScanned: (r: { data: string }) => void }) => (
+    CameraView: ({
+      onBarcodeScanned,
+      accessibilityLabel,
+      accessibilityHint,
+    }: {
+      onBarcodeScanned: (r: { data: string }) => void;
+      accessibilityLabel?: string;
+      accessibilityHint?: string;
+    }) => (
       <Pressable
         testID="camara-falsa"
         accessibilityRole="button"
-        accessibilityLabel="Cámara"
+        accessibilityLabel={accessibilityLabel ?? 'Cámara'}
+        accessibilityHint={accessibilityHint}
         onPress={() => onBarcodeScanned({ data: mockQr })}
       >
         <Text>Cámara</Text>
@@ -168,8 +180,12 @@ describe('02 §27 · Gastos con tu pareja', () => {
     fireEvent.press(screen.getByTestId('compartidos-volver'));
     fireEvent.press(screen.getByTestId('compartidos-escanear'));
     expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
-    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp('accessibilityHint', PISTA_ABRIR_ESCANER);
+    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp(
+      'accessibilityHint',
+      PISTA_ESCRIBIR_NOMBRE_PAREJA,
+    );
     fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Ana');
+    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp('accessibilityHint', PISTA_ABRIR_ESCANER);
     fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
     expect(screen.getByTestId('escaner-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ESCANER);
     A.cerrar();
@@ -180,6 +196,13 @@ describe('02 §27 · Gastos con tu pareja', () => {
     render(<EscanerQr alLeer={jest.fn()} alCancelar={jest.fn()} />);
     expect(screen.getByTestId('escaner-permiso')).toHaveProp('accessibilityHint', PISTA_PERMISO_CAMARA);
     mockCamaraConcedida = true;
+  });
+
+  it('escáner con permiso: pista TalkBack en la vista de cámara', () => {
+    mockCamaraConcedida = true;
+    render(<EscanerQr alLeer={jest.fn()} alCancelar={jest.fn()} />);
+    expect(screen.getByTestId('camara-falsa')).toHaveProp('accessibilityLabel', ETIQUETA_VISTA_CAMARA);
+    expect(screen.getByTestId('camara-falsa')).toHaveProp('accessibilityHint', PISTA_VISTA_CAMARA);
   });
 
   it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {
