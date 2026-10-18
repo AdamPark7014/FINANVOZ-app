@@ -88,7 +88,9 @@ export default function Ajustes() {
         pista={PISTA_VOLVER}
         alPresionar={() => router.back()}
       />
-      <Texto variante="titulo">{TITULO}</Texto>
+      <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
+        {TITULO}
+      </Texto>
 
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
       <SeccionColchon />

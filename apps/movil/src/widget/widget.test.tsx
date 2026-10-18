@@ -52,13 +52,13 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
       <PreviaWidget
         vista={VISTA_EJEMPLO_WIDGET}
         esquema="claro"
-        pistaAccesible="Cifras de ejemplo; no muestra tu saldo real."
+        pistaAccesible={PISTA_PREVIA}
       />,
     );
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityRole).toBe('summary');
     expect(previa.props.accessibilityLabel).toBe('Hoy puedes doscientos catorce pesos · 4 días');
-    expect(previa.props.accessibilityHint).toBe('Cifras de ejemplo; no muestra tu saldo real.');
+    expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     const fila = screen.getByText('Hoy puedes').parent;
     expect(fila?.props.importantForAccessibility).toBe('no-hide-descendants');
   });

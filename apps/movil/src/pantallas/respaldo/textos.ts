@@ -44,6 +44,8 @@ export function textoCrearContrasenaTrasCorreo(correo: string): string {
 }
 
 export const BTN_RESPALDAR_AHORA = 'Respaldar ahora';
+/** TalkBack en cuenta de respaldo activa (`02 §19`). */
+export const PISTA_RESPALDAR_AHORA = 'Sube a la nube una copia cifrada de tus datos';
 export const ETIQUETA_RESPALDO_AUTOMATICO = 'Respaldo automático';
 export const DESC_RESPALDO_AUTOMATICO =
   'Cada semana, aunque no abras la app. No te pido la contraseña.';

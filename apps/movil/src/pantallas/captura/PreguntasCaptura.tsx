@@ -427,18 +427,18 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
   const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
   const [agregando, setAgregando] = useState(false);
-  const que = p.sugerencia === 'tarjeta_credito' ? 'una tarjeta' : 'una cuenta';
+  const que =
+    p.sugerencia === 'tarjeta_credito' ? CUENTA_NUEVA_UNA_TARJETA : CUENTA_NUEVA_UNA_CUENTA;
   const titulo = p.ultimos4
-    ? `Detecté ${que} ••${p.ultimos4} de ${p.banco}. ¿La agrego?`
-    : `Llegó un aviso de ${p.banco}. ¿En qué cuenta fue?`;
+    ? tituloCuentaNuevaDetectada(que, p.ultimos4, p.banco)
+    : tituloCuentaNuevaSinUltimos4(p.banco);
   const asociar = (cuentaId: string) =>
-    responder(() => asociarCuentaCaptura(ctx, p.capturaId, cuentaId), 'Listo: ya sé de qué cuenta es.');
-  const preguntaCandidatas = '¿Es alguna de estas?';
+    responder(() => asociarCuentaCaptura(ctx, p.capturaId, cuentaId), AVISO_CUENTA_ASOCIADA);
   return (
     <Marco
       testID={testID}
       titulo={titulo}
-      detalle={`${formatearCentavos(p.monto)} · ${etiquetaFecha(p.fecha)}`}
+      detalle={detalleCuentaNueva(p.monto, etiquetaFecha(p.fecha))}
       error={error}
     >
       {agregando ? (
@@ -453,7 +453,7 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
           <FormularioCuentaCaptura
             testID={`${testID}-form`}
             p={p}
-            alGuardar={() => responder(() => {}, 'Listo: agregué la cuenta.')}
+            alGuardar={() => responder(() => {}, AVISO_CUENTA_AGREGADA)}
             alCancelar={() => setAgregando(false)}
           />
         )
@@ -462,31 +462,31 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
           {p.candidatas.length > 0 ? (
             <View style={{ gap: espacio.xs }}>
               <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-                {preguntaCandidatas}
+                {PREGUNTA_ES_ALGUNA_DE_ESTAS}
               </Texto>
               <GrupoChips
                 opciones={p.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
                 valor={null}
                 alCambiar={asociar}
                 prefijoTestID={`${testID}-cuenta`}
-                etiqueta={preguntaCandidatas}
+                etiqueta={PREGUNTA_ES_ALGUNA_DE_ESTAS}
               />
             </View>
           ) : null}
           <Boton
-            etiqueta={p.ultimos4 ? 'Sí, agrégala' : 'Agregar la cuenta'}
+            etiqueta={p.ultimos4 ? BTN_SI_AGREGALA : BTN_AGREGAR_CUENTA}
             alPresionar={() => setAgregando(true)}
             testID={`${testID}-agregar`}
           />
           <Boton
-            etiqueta="No es mía"
+            etiqueta={BTN_NO_ES_MIA}
             variante="texto"
             alPresionar={() =>
               responder(() => {
                 descartarCaptura(ctx, p.capturaId);
                 // La captura lo atribuyó a una cuenta tuya y no lo era.
                 registrarEvento({ nombre: 'correccion', propiedades: { campo: 'cuenta' } });
-              }, 'Va. No registré ese movimiento.')
+              }, AVISO_CUENTA_NO_MIA)
             }
             testID={`${testID}-no-es-mia`}
           />
@@ -514,8 +514,8 @@ function FormularioTarjetaCaptura({
   return (
     <View style={{ gap: espacio.s }} testID={testID}>
       {campos}
-      <Boton etiqueta="Guardar tarjeta" alPresionar={guardar} testID={`${testID}-guardar`} />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} />
+      <Boton etiqueta={BTN_GUARDAR_TARJETA} alPresionar={guardar} testID={`${testID}-guardar`} />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
     </View>
   );
 }

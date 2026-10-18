@@ -25,6 +25,7 @@ import { borrarTodoApp, restaurarSesion } from '../../servicios/sesion';
 import type { TiendaEnMemoria } from '../../suscripciones/memoria';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
+import { PISTA_RESPALDAR_AHORA } from './textos';
 
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
 let mockPreparar: ((ctx: Contexto) => void) | null = null;
@@ -182,6 +183,7 @@ describe('Ajustes → Respaldo en la nube (M9, 02 §19)', () => {
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena-confirmar'), CONTRASENA);
     fireEvent.press(screen.getByTestId('respaldo-contrasena-guardar'));
     await waitFor(() => expect(screen.getByTestId('respaldo-ahora')).toBeTruthy(), LENTO);
+    expect(screen.getByTestId('respaldo-ahora')).toHaveProp('accessibilityHint', PISTA_RESPALDAR_AHORA);
     expect(screen.getByTestId('respaldo-correo-actual')).toHaveTextContent(`Respaldas con ${CORREO}.`);
     // La tarjeta del archivo también ya ve la contraseña.
     expect(screen.getByTestId('privacidad-respaldo-exportar')).toBeTruthy();

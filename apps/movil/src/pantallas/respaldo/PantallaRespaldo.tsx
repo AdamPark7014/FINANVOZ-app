@@ -33,6 +33,7 @@ import {
   MENSAJE_LISTO_NUBE,
   MENSAJE_NO_GUARDAR_AJUSTE,
   PISTA_BORRAR_CUENTA,
+  PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
   SUBTITULO_NUBE,
   TEXTO_ACTIVAR_NUBE,
@@ -241,6 +242,7 @@ function TarjetaNube({
             cargando={respaldando}
             deshabilitado={respaldando || borrando !== 'no'}
             alPresionar={() => void respaldar()}
+            pista={PISTA_RESPALDAR_AHORA}
           />
           <Interruptor
             testID="respaldo-automatico"
