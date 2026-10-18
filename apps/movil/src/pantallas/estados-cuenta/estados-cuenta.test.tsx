@@ -21,6 +21,7 @@ import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
 import {
   ETIQUETA_AVISO_ESTADO,
   ETIQUETA_EXITO,
+  ETIQUETA_LEYENDO,
   ERROR_CONTRASENA_PDF,
   PISTA_CONTESTAR_DUDOSOS,
   PISTA_ENTENDIDO,
@@ -378,6 +379,7 @@ describe('textos de estado de cuenta', () => {
     expect(PISTA_ENTENDIDO).toMatch(/aviso/i);
     expect(PISTA_ESCRIBE_CONTRASENA).toMatch(/contraseña/i);
     expect(PISTA_CONTESTAR_DUDOSOS).toMatch(/Contesta/i);
+    expect(ETIQUETA_LEYENDO).toMatch(/Leyendo/i);
   });
 
   it('mensajeNoReconocido y tituloNuevos en español de México', () => {
