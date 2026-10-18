@@ -2,6 +2,7 @@ import qrcode from 'qrcode-generator';
 import { usePreventScreenCapture } from 'expo-screen-capture';
 import { useMemo } from 'react';
 import { View } from 'react-native';
+import { ETIQUETA_ACCESIBILIDAD_QR_UNION } from './textos';
 
 /** Módulos del QR (`true` = oscuro), con corrección de errores M. */
 export function matrizQr(texto: string): boolean[][] {
@@ -42,7 +43,7 @@ export function CodigoQr({ texto, testID }: { texto: string; testID?: string }) 
       testID={testID}
       accessible
       accessibilityRole="image"
-      accessibilityLabel="Código QR para unirse a tu grupo compartido"
+      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_QR_UNION}
       style={{ alignSelf: 'center', backgroundColor: CLARO, padding: MARGEN * celda }}
     >
       {matriz.map((fila, r) => (

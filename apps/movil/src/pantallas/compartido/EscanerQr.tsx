@@ -2,6 +2,13 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRef } from 'react';
 import { View } from 'react-native';
 import { Boton, espacio, Texto } from '../../ui';
+import {
+  BTN_CANCELAR,
+  BTN_PERMITIR_CAMARA,
+  ETIQUETA_VISTA_CAMARA,
+  INSTRUCCION_ESCANER_QR,
+  INSTRUCCION_PERMISO_CAMARA,
+} from './textos';
 
 /**
  * Escáner del QR de tu pareja (E17, `02 §27`) con la cámara trasera. Solo lee códigos QR y entrega el texto una
@@ -20,9 +27,7 @@ export function EscanerQr({
     <View style={{ gap: espacio.m }} testID="escaner-qr">
       {permiso?.granted ? (
         <>
-          <Texto variante="cuerpo">
-            Apunta la cámara al código QR que aparece en el teléfono de tu pareja.
-          </Texto>
+          <Texto variante="cuerpo">{INSTRUCCION_ESCANER_QR}</Texto>
           <View style={{ height: 280, borderRadius: espacio.m, overflow: 'hidden' }}>
             <CameraView
               style={{ flex: 1 }}
@@ -33,25 +38,23 @@ export function EscanerQr({
                 leido.current = true;
                 alLeer(r.data);
               }}
-              accessibilityLabel="Vista de la cámara para escanear el código"
+              accessibilityLabel={ETIQUETA_VISTA_CAMARA}
             />
           </View>
         </>
       ) : (
         <>
-          <Texto variante="cuerpo">
-            Para unirte necesito la cámara: solo la uso para leer el código QR de tu pareja, sin tomar fotos.
-          </Texto>
+          <Texto variante="cuerpo">{INSTRUCCION_PERMISO_CAMARA}</Texto>
           <Boton
             testID="escaner-permiso"
-            etiqueta="Permitir la cámara"
+            etiqueta={BTN_PERMITIR_CAMARA}
             alPresionar={() => {
               pedirPermiso().catch(() => {});
             }}
           />
         </>
       )}
-      <Boton testID="escaner-cancelar" etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} />
+      <Boton testID="escaner-cancelar" etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
     </View>
   );
 }
