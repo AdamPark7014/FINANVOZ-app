@@ -37,6 +37,19 @@ node scripts/oraculo.mjs --escribir    # solo tras cambio en 05-MOTORES + oracul
 - **Reproducibilidad:** mulberry32 y FNV-1a en el oráculo dan los mismos bits que Node 22 en `packages/core`. Si una prueba de vector falla, corrige la implementación o el oráculo según `docs/05-MOTORES.md`; no parchees `vectores.json`.
 - **Sin Python local:** puedes **omitir** el oráculo al cerrar tu turno y anotarlo; **CI no lo omite**. Si el script termina con el mensaje de Python no encontrado, instala 3.10+ desde [python.org](https://www.python.org/downloads/) o repite en la máquina que sí lo tenga.
 
+## Semilla en PowerShell (escenarios de la app)
+
+Desde la **raíz del repo**:
+
+```powershell
+pnpm --filter movil semilla e4-01
+```
+
+- Lee `fixtures/escenarios/<id>.json` y usa el mismo `cargarEscenario` que la app de desarrollo.
+- Deja `apps/movil/.semillas/<id>.db` (**omitir en git:** cubierto por `*.db` en `.gitignore`; no uses hash del archivo para validar).
+- Imprime JSON con Hoy y el `esperado` del escenario — compara esos campos, no el `.db`.
+- El CLI vive en `apps/movil/scripts/` (`tsx`); no depende de que pase `pnpm --filter movil typecheck`. Más detalle: `apps/movil/scripts/README.md`.
+
 ## Cómo usar los vectores
 
 - Dinero en centavos; fechas `YYYY-MM-DD`; porcentajes en puntos base.

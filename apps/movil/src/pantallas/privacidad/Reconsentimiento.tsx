@@ -10,6 +10,17 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { AVISO_SIMPLIFICADO } from '../onboarding/aviso';
 import { Casilla, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  BTN_LEER_AVISO_COMPLETO,
+  BTN_RECONSENT_ACEPTAR,
+  BTN_RECONSENT_BORRAR,
+  BTN_RECONSENT_SOLO_LECTURA,
+  CASILLA_ESTADISTICAS_OPCIONAL,
+  CASILLA_RECONSENT_DATOS,
+  introReconsentimiento,
+  PISTA_CASILLA_DATOS_FINANCIEROS,
+  TITULO_RECONSENTIMIENTO,
+} from './textos';
 
 /**
  * Aviso de privacidad actualizado (pendiente 31): aceptar la nueva versión, seguir en solo lectura o borrar todo.
@@ -60,9 +71,9 @@ export function Reconsentimiento({
 
   return (
     <Pantalla testID="reconsentimiento" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo">Actualizamos el aviso de privacidad</Texto>
+      <Texto variante="titulo">{TITULO_RECONSENTIMIENTO}</Texto>
       <Texto variante="secundario" tono="secundario">
-        {`Hay una versión nueva (${VERSION_CONSENTIMIENTO}). Si no la aceptas, puedes seguir viendo y exportando tus datos, pero no registrar movimientos nuevos.`}
+        {introReconsentimiento(VERSION_CONSENTIMIENTO)}
       </Texto>
       <Tarjeta>
         <Texto variante="subtitulo">Aviso de privacidad</Texto>
@@ -77,39 +88,39 @@ export function Reconsentimiento({
           testID="reconsent-aviso-completo"
           variante="texto"
           ancho="contenido"
-          etiqueta="Leer el aviso completo"
+          etiqueta={BTN_LEER_AVISO_COMPLETO}
           alPresionar={() => router.push('/aviso-privacidad')}
         />
       </Tarjeta>
       <Casilla
         testID="reconsent-casilla-datos"
-        etiqueta="Acepto la nueva versión del aviso y que Finanvoz siga guardando y usando mis datos financieros."
+        etiqueta={CASILLA_RECONSENT_DATOS}
         valor={acepta}
         alCambiar={setAcepta}
       />
       <Casilla
         testID="reconsent-casilla-estadisticas"
-        etiqueta="Compartir estadísticas anónimas de uso para mejorar la app (opcional)."
+        etiqueta={CASILLA_ESTADISTICAS_OPCIONAL}
         valor={estadisticas}
         alCambiar={setEstadisticas}
       />
       <Boton
         testID="reconsent-aceptar"
-        etiqueta="Aceptar y continuar"
+        etiqueta={BTN_RECONSENT_ACEPTAR}
         deshabilitado={!acepta}
-        {...(acepta ? {} : { pista: 'Primero marca la casilla de tus datos financieros' })}
+        {...(acepta ? {} : { pista: PISTA_CASILLA_DATOS_FINANCIEROS })}
         alPresionar={aceptar}
       />
       <Boton
         testID="reconsent-solo-lectura"
         variante="secundario"
-        etiqueta="Continuar sin aceptar (solo lectura)"
+        etiqueta={BTN_RECONSENT_SOLO_LECTURA}
         alPresionar={soloLectura}
       />
       <Boton
         testID="reconsent-borrar"
         variante="texto"
-        etiqueta="Borrar todo"
+        etiqueta={BTN_RECONSENT_BORRAR}
         deshabilitado={borrando}
         alPresionar={() => void borrarTodo()}
       />

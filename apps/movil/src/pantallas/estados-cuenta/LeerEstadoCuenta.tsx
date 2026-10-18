@@ -197,10 +197,10 @@ export function LeerEstadoCuenta({
       {estado.tipo === 'ajustado' ? (
         <>
           <Texto variante="cuerpo" testID="estado-ajustado" accessibilityLiveRegion="polite">
-            {`Listo: tu ${estado.nombre} quedó como dice tu banco.`}
+            {mensajeAjustado(estado.nombre)}
           </Texto>
           <Boton
-            etiqueta="Ver la tarjeta"
+            etiqueta={BTN_VER_TARJETA}
             alPresionar={() => alVerTarjeta(estado.tarjetaId)}
             testID="estado-ver-tarjeta"
           />
@@ -216,7 +216,7 @@ function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void;
       <Texto variante="cuerpo" testID={testID} accessibilityLiveRegion="polite">
         {texto}
       </Texto>
-      <Boton etiqueta="Entendido" variante="secundario" alPresionar={alSalir} testID="estado-salir" />
+      <Boton etiqueta={BTN_ENTENDIDO} variante="secundario" alPresionar={alSalir} testID="estado-salir" />
     </>
   );
 }
@@ -246,8 +246,8 @@ function PedirContrasena({
         nativo={{ secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false }}
         testID="estado-contrasena"
       />
-      <Boton etiqueta="Abrir" alPresionar={abrir} deshabilitado={contrasena === ''} testID="estado-abrir" />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+      <Boton etiqueta={BTN_ABRIR} alPresionar={abrir} deshabilitado={contrasena === ''} testID="estado-abrir" />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
     </>
   );
 }
@@ -275,36 +275,20 @@ function Lectura({
       );
     case 'no_reconocido':
       return (
-        <Aviso
-          texto={
-            lectura.bancos.length > 0
-              ? `Todavía no sé leer estados de cuenta de ese banco. Por ahora leo: ${lectura.bancos.join(', ')}.`
-              : 'Todavía no sé leer estados de cuenta de ese banco.'
-          }
-          alSalir={alSalir}
-          testID="estado-no-reconocido"
-        />
+        <Aviso texto={mensajeNoReconocido(lectura.bancos)} alSalir={alSalir} testID="estado-no-reconocido" />
       );
     case 'incompleto':
       return (
-        <Aviso
-          texto={`Es un estado de cuenta de ${lectura.banco}, pero no pude leer todos sus datos. No agregué nada.`}
-          alSalir={alSalir}
-          testID="estado-incompleto"
-        />
+        <Aviso texto={mensajeIncompleto(lectura.banco)} alSalir={alSalir} testID="estado-incompleto" />
       );
     case 'sin_tarjetas':
       return (
-        <Aviso
-          texto={`Es un estado de cuenta de ${lectura.banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`}
-          alSalir={alSalir}
-          testID="estado-sin-tarjetas"
-        />
+        <Aviso texto={mensajeSinTarjetas(lectura.banco)} alSalir={alSalir} testID="estado-sin-tarjetas" />
       );
     case 'anterior_al_alta':
       return (
         <Aviso
-          texto={`Este estado de cuenta (corte ${etiquetaDiaMes(lectura.corte)}) es de antes de que agregaras la ${lectura.tarjeta.nombre}: ya está en el saldo con que la diste de alta.`}
+          texto={mensajeAnteriorAlAlta(lectura.corte, lectura.tarjeta.nombre)}
           alSalir={alSalir}
           testID="estado-anterior"
         />
@@ -312,10 +296,8 @@ function Lectura({
     case 'elegir_tarjeta':
       return (
         <>
-          <Texto variante="cuerpo" testID="estado-elegir">
-            {`¿De qué tarjeta es este estado de cuenta de ${lectura.banco}${
-              lectura.ultimos4 ? ` terminación ${lectura.ultimos4}` : ''
-            } (corte ${etiquetaDiaMes(lectura.corte)})?`}
+          <Texto variante="cuerpo" testID="estado-elegir" accessibilityLiveRegion="polite">
+            {preguntaElegirTarjeta(lectura.banco, lectura.ultimos4, lectura.corte)}
           </Texto>
           {lectura.tarjetas.map((t) => (
             <Boton

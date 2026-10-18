@@ -110,7 +110,7 @@ function Detalle({
         alPresionar={alVolver}
       />
       <View style={{ gap: espacio.xxs }}>
-        <Texto variante="titulo" testID="tarjeta-nombre">
+        <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">
           {d.nombre}
         </Texto>
         <Texto variante="secundario" tono="secundario">
@@ -161,7 +161,7 @@ function Detalle({
         testID="tarjeta-movimientos"
       >
         {d.desdeElCorte.length === 0 ? (
-          <Texto variante="secundario" tono="secundario" testID="tarjeta-movimientos-vacio">
+          <Texto variante="cuerpo" tono="secundario" testID="tarjeta-movimientos-vacio">
             {VACIO_MOVIMIENTOS_TARJETA}
           </Texto>
         ) : null}
@@ -188,7 +188,7 @@ function Detalle({
 
       <Seccion titulo={TITULO_ESTADOS_CUENTA} testID="tarjeta-estados">
         {d.estadosCuenta.length === 0 ? (
-          <Texto variante="secundario" tono="secundario" testID="tarjeta-estados-vacio">
+          <Texto variante="cuerpo" tono="secundario" testID="tarjeta-estados-vacio">
             {textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
           </Texto>
         ) : null}

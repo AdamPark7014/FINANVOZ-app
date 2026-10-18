@@ -266,7 +266,7 @@ describe('recordatorio de cobro', () => {
       fireEvent.press(screen.getByTestId('recordatorio-cobro-2026-10-14'));
     });
     expect(n.vecesPedido()).toBe(1);
-    expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct.'));
+    expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct'));
     expect(n.puerto.lista()).toEqual([
       expect.objectContaining({
         id: `cobro:${p.caro}`,

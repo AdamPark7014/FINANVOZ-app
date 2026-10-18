@@ -8,6 +8,7 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
+import { TIP_CUENTAS_MINIMO } from '../../src/pantallas/onboarding/tips';
 import { agregarCuenta, agregarEfectivo, listarCuentas } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../src/ui';

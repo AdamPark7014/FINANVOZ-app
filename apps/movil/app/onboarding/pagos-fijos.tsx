@@ -8,6 +8,7 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
+import { TIP_PAGOS_SALTAR } from '../../src/pantallas/onboarding/tips';
 import { leerDiaMes } from '../../src/pantallas/onboarding/ingreso';
 import { agregarPagoFijo, PAGOS_FIJOS_SUGERIDOS } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';

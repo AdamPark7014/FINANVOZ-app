@@ -20,14 +20,19 @@ import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips } from './Chip';
+import { EstadoVacio } from './EstadoVacio';
 import { useMostrarAviso } from './ProveedorAvisos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 import {
   NOMBRE_ORIGEN,
   NOMBRE_TIPO_LIBRO,
   resumenMovimiento,
+  PREGUNTA_PASAR_A_MESES,
+  TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
+  TEXTO_POR_REVISAR,
+  TITULO_POR_REVISAR,
 } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
@@ -106,9 +111,9 @@ export function PantallaMovimientos({
 
       {porRevisar.length > 0 ? (
         <View style={{ gap: espacio.s }} testID="por-revisar">
-          <Texto variante="subtitulo">Por revisar</Texto>
+          <Texto variante="subtitulo">{TITULO_POR_REVISAR}</Texto>
           <Texto variante="secundario" tono="secundario">
-            Las interpreto cuando tengas internet. Si ya lo registraste a mano, descártala.
+            {TEXTO_POR_REVISAR}
           </Texto>
           {/* Las que ya entendí pero necesitan que confirmes algo llevan "Revisar". */}
           {porRevisar.map((f) => (
@@ -146,7 +151,7 @@ export function PantallaMovimientos({
 
       {filtro ? (
         <Tarjeta testID="movimientos-filtro">
-          <Texto variante="secundario">Solo los movimientos de tu pregunta.</Texto>
+          <Texto variante="secundario">{TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}</Texto>
           {alQuitarFiltro ? (
             <Boton
               etiqueta="Ver todos"
@@ -160,9 +165,10 @@ export function PantallaMovimientos({
       ) : null}
 
       {dias.length === 0 ? (
-        <Texto variante="cuerpo" tono="secundario" testID="movimientos-vacio">
-          {filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
-        </Texto>
+        <EstadoVacio
+          testID="movimientos-vacio"
+          texto={filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
+        />
       ) : null}
 
       {dias.map((d) => (

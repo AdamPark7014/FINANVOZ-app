@@ -448,7 +448,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
 
       {f.enPagos && f.pagoConfirmado === null && !pagando ? (
         <Boton
-          etiqueta="Ya la pagué"
+          etiqueta={BTN_YA_LA_PAGUE}
           variante="secundario"
           alPresionar={() => setPagando(true)}
           testID={`${id}-ya-la-pague`}
@@ -456,7 +456,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       ) : null}
       {f.enPagos && pagando ? (
         <Chips<FormaPagoConfirmado>
-          etiqueta="¿Cómo la pagaste?"
+          etiqueta={ETIQUETA_FORMA_PAGO}
           opciones={FORMAS_PAGO_CONFIRMADO}
           valor={f.pagoConfirmado}
           alCambiar={(forma) =>
@@ -476,14 +476,14 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       {v.estado !== 'sin_perfil' ? (
         <View style={{ gap: espacio.xxs }}>
           <Boton
-            etiqueta={f.marcadaCancelada ? 'Ya no está cancelada' : 'La cancelaron en el SAT'}
+            etiqueta={f.marcadaCancelada ? BTN_NO_CANCELADA_SAT : BTN_CANCELADA_SAT}
             variante="texto"
             ancho="contenido"
             alPresionar={() => hacer(() => marcarFacturaCancelada(ctx, f.uuid, !f.marcadaCancelada))}
             testID={`${id}-cancelada`}
           />
           <Boton
-            etiqueta="La importé por error"
+            etiqueta={BTN_OCULTAR_FACTURA}
             variante="texto"
             ancho="contenido"
             alPresionar={() => hacer(() => ocultarFacturaImportada(ctx, f.uuid))}
@@ -506,7 +506,7 @@ function FilaFacturaOculta({ f }: { f: FacturaVista }) {
         {[f.textoFecha, f.textoTotal].filter(Boolean).join(' · ')}
       </Texto>
       <Boton
-        etiqueta="Volver a mostrar"
+        etiqueta={BTN_RECUPERAR_FACTURA}
         variante="secundario"
         alPresionar={() => {
           recuperarFactura(ctx, f.uuid);
@@ -550,10 +550,12 @@ export function ImportarCompartidas({
   }, [ctx, leer, refrescar]);
   return (
     <Pantalla testID="importar-compartidas" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo">Importar facturas</Texto>
+      <Texto variante="titulo" testID="importar-titulo">
+        {TITULO_IMPORTAR_COMPARTIDAS}
+      </Texto>
       {estado.tipo === 'leyendo' ? (
-        <Texto variante="cuerpo" tono="secundario">
-          Leyendo tus facturas…
+        <Texto variante="cuerpo" tono="secundario" testID="importar-leyendo">
+          {TEXTO_IMPORTAR_LEYENDO}
         </Texto>
       ) : null}
       {estado.tipo === 'listo' ? <ResultadoImportacionTarjeta r={estado.r} /> : null}
@@ -566,7 +568,7 @@ export function ImportarCompartidas({
       {estado.tipo !== 'leyendo' ? (
         <>
           <Boton
-            etiqueta="Ver mis deducciones"
+            etiqueta={BTN_VER_DEDUCCIONES}
             alPresionar={alVerDeducciones}
             testID="importar-ver-deducciones"
           />

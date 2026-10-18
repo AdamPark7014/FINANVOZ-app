@@ -1,5 +1,5 @@
-import { ErrorDominio } from '@cartera/core';
 import type { TransporteAnalitica } from './cliente';
+import { errorEnvioHttpAnalitica } from './mensajes';
 
 /** Configuración pública de PostHog (`expo.extra` o `EXPO_PUBLIC_POSTHOG_KEY` al compilar). */
 export interface ConfigPosthog {
@@ -48,7 +48,7 @@ export function transportePosthog(
       }),
     });
     if (!respuesta.ok) {
-      throw new ErrorDominio(`analitica_http_${respuesta.status}`, 'la analítica no se pudo enviar');
+      throw errorEnvioHttpAnalitica(respuesta.status);
     }
   };
 }

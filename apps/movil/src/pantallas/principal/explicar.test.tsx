@@ -75,9 +75,12 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
   it('sin internet lo dice', async () => {
     preparar([{ tipo: 'sin_red' }]);
     await escribir(golden('Q13').texto);
-    expect(await screen.findByTestId('mensaje-registro')).toHaveTextContent(
+    const aviso = await screen.findByTestId('mensaje-registro');
+    expect(aviso).toHaveTextContent(
       'Necesito internet para responderte eso. Pregúntame de nuevo cuando tengas conexión.',
     );
+    expect(aviso.props.accessibilityLiveRegion).toBe('polite');
+    expect(aviso.props.accessibilityRole).toBe('alert');
   });
 
   it('con cupo agotado muestra el aviso en la tarjeta explicar, sin Por revisar', async () => {

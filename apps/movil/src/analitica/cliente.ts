@@ -46,7 +46,7 @@ export function crearAnalitica(opciones: {
           propiedades: { ...limpio.propiedades, ...PROPIEDADES_TECNICAS },
         };
         transporte(envio).catch(() => {
-          // Sin reintentos ni registro: la analítica es opcional y el error podría llevar la petición.
+          // Sin reintentos ni logs: la analítica es opcional; el transporte solo lanza códigos técnicos (ver mensajes.ts).
         });
       } catch {
         // Ídem: nunca rompe la pantalla que la llama.

@@ -118,21 +118,21 @@ describe('pantalla del plan', () => {
     const p = e510();
     const tienda = crearComprasEnMemoria({ ahora: () => T0 });
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: tienda });
-    await waitFor(() => expect(screen.getByTestId('plan-oferta-anual')).toBeTruthy());
+    await waitFor(() => expect(screen.getByTestId(ID.oferta('anual'))).toBeTruthy());
     tienda.siguienteCompra('cancelado');
     await act(async () => {
-      fireEvent.press(screen.getByTestId('plan-oferta-anual'));
+      fireEvent.press(screen.getByTestId(ID.oferta('anual')));
     });
-    expect(screen.queryByTestId('plan-mensaje')).toBeNull();
+    expect(screen.queryByTestId(ID.mensaje)).toBeNull();
     tienda.siguienteCompra('error');
     await act(async () => {
-      fireEvent.press(screen.getByTestId('plan-oferta-anual'));
+      fireEvent.press(screen.getByTestId(ID.oferta('anual')));
     });
-    expect(textoDe('plan-mensaje')).toBe('No se completó la compra. No se te cobró nada; intenta de nuevo.');
+    expect(textoDe(ID.mensaje)).toBe(MENSAJE_ERROR_COMPRA);
     await act(async () => {
-      fireEvent.press(screen.getByTestId('plan-restaurar'));
+      fireEvent.press(screen.getByTestId(ID.restaurar));
     });
-    expect(textoDe('plan-mensaje')).toBe('No encontré una suscripción de Plus en tu cuenta de Google.');
+    expect(textoDe(ID.mensaje)).toBe(MENSAJE_RESTAURADO_SIN_PLUS);
     expect(obtenerPlan(p.ctx).plan).toBe('gratis');
   });
 
@@ -140,20 +140,30 @@ describe('pantalla del plan', () => {
     const p = e510();
     const abrir = jest.fn();
     const { unmount } = montar(p.ctx, <SeccionPlan alAbrirPlan={abrir} />);
-    expect(textoDe('ajustes-plan-titulo')).toBe('Plan Gratis');
-    fireEvent.press(screen.getByTestId('ajustes-plan-ver'));
+    expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLAN_GRATIS);
+    fireEvent.press(screen.getByTestId(ID.ajustesPlanVer));
     expect(abrir).toHaveBeenCalled();
     unmount();
     activarPlus(p.ctx);
     montar(p.ctx, <SeccionPlan alAbrirPlan={abrir} />);
-    expect(textoDe('ajustes-plan-titulo')).toBe('Tienes Plus');
+    expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLUS);
   });
 
   it('sin tienda (build sin llave): lo dice y la cuenta sigue en Gratis', () => {
     const p = e510();
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />);
-    expect(screen.getByText('Las suscripciones todavía no están disponibles en esta versión.')).toBeTruthy();
-    expect(screen.queryByTestId('plan-restaurar')).toBeNull();
+    expect(screen.getByTestId(ID.sinTienda)).toHaveTextContent(MENSAJE_SIN_TIENDA);
+    expect(screen.queryByTestId(ID.restaurar)).toBeNull();
+  });
+
+  it('ofertas vacías de Google Play lo explican y permiten reintentar', async () => {
+    const p = e510();
+    const tienda = crearComprasEnMemoria({ ahora: () => T0 });
+    const sinOfertas = { ...tienda, ofertas: async () => [] as const };
+    montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: sinOfertas });
+    await waitFor(() => expect(screen.getByTestId(ID.vacioOfertas)).toBeTruthy());
+    expect(screen.getByTestId(ID.vacioOfertas)).toHaveTextContent(MENSAJE_OFERTAS_VACIAS);
+    expect(screen.getByTestId(ID.intentar)).toBeTruthy();
   });
 
   it('¿Me alcanza? en Gratis explica que es de Plus; en Plus abre la pantalla', () => {
@@ -166,12 +176,12 @@ describe('pantalla del plan', () => {
     );
     const { unmount } = montar(p.ctx, ui, { abrirPlan });
     expect(screen.getByText('¿Me alcanza? es de Plus')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('puerta-plus-conocer'));
+    fireEvent.press(screen.getByTestId(ID.puertaPlusConocer));
     expect(abrirPlan).toHaveBeenCalled();
     unmount();
     activarPlus(p.ctx);
     montar(p.ctx, ui);
-    expect(screen.queryByTestId('puerta-plus')).toBeNull();
+    expect(screen.queryByTestId(ID.puertaPlus)).toBeNull();
   });
 });
 

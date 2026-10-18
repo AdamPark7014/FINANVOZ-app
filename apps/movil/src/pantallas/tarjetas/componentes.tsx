@@ -218,14 +218,14 @@ export function PreguntaLiquidarMeses({
           />
         ))}
         <Boton
-          etiqueta="No"
+          etiqueta={BTN_NO}
           variante="secundario"
           testID={`${testID}-no`}
           alPresionar={() => {
             try {
               noEraParaLiquidar(ctx, pregunta.tarjetaId);
               refrescar();
-              mostrar({ mensaje: 'Va. El saldo a favor se queda en tu tarjeta.' });
+              mostrar({ mensaje: AVISO_SALDO_A_FAVOR_EN_TARJETA });
               alTerminar?.();
             } catch (e) {
               setError(mensajeError(e));

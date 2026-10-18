@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { MENSAJE_TECNICO_ENVIO_HTTP } from './mensajes';
 import { leerConfigPosthog, transportePosthog } from './posthog';
 
 describe('PostHog (adaptador)', () => {
@@ -47,10 +48,10 @@ describe('PostHog (adaptador)', () => {
   it('una respuesta de error se reporta como fallo sin incluir el cuerpo', async () => {
     const enviar = transportePosthog(
       { llave: 'phc_x', host: 'https://us.i.posthog.com' },
-      async () => new Response('nope', { status: 500 }),
+      async () => new Response('nope con $1,099.90 en OXXO', { status: 500 }),
     );
     await expect(
       enviar({ evento: 'app_abierta', idAnonimo: 'x', instante: 'y', propiedades: {} }),
-    ).rejects.toMatchObject({ codigo: 'analitica_http_500' });
+    ).rejects.toMatchObject({ codigo: 'analitica_http_500', message: MENSAJE_TECNICO_ENVIO_HTTP });
   });
 });

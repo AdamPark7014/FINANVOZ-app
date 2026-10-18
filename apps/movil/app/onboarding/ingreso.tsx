@@ -7,6 +7,7 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
+import { TIP_INGRESO_SALTAR } from '../../src/pantallas/onboarding/tips';
 import {
   conceptoIngreso,
   leerDiaMes,

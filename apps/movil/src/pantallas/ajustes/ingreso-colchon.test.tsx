@@ -181,12 +181,10 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       mensajeIngresoGuardado(false, '2026-10-16'),
     );
     expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(
-      new RegExp(
-        lineaResumenIngreso(
-          1_300_000,
-          fraseCuandoTePagan({ tipo: 'semanal', dia_semana: 5, ajuste: 'anterior' }),
-          null,
-        ).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      lineaResumenIngreso(
+        1_300_000,
+        fraseCuandoTePagan({ tipo: 'semanal', dia_semana: 5, ajuste: 'anterior' }),
+        '2026-10-16',
       ),
     );
   });
@@ -269,8 +267,6 @@ describe('Hoy → "Decir cada cuándo me pagan"', () => {
       monto: 1_300_000,
       regla: { tipo: 'quincenal_15_ultimo', ajuste: 'anterior' },
     });
-    expect(screen.getByTestId('aviso')).toHaveTextContent(
-      'Listo: guardé tu ingreso. Tu próximo pago es el jue 15.',
-    );
+    expect(screen.getByTestId('aviso')).toHaveTextContent(mensajeIngresoGuardado(false, '2026-10-15'));
   });
 });

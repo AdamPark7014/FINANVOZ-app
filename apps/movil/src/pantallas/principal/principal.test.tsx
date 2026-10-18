@@ -443,6 +443,25 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
+  it('sin movimientos muestra TEXTO_MOVIMIENTOS_VACIO; filtro vacío muestra TEXTO_MOVIMIENTOS_FILTRO_VACIO', () => {
+    const p = abrirPruebaPantalla();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_VACIO);
+    p.cerrar();
+
+    const p2 = conEscenario('e4-01');
+    renderConSesion(
+      p2.ctx,
+      <PantallaMovimientos
+        alRegistrar={jest.fn()}
+        filtro={{ desde: '2099-01-01', hasta: '2099-01-02' }}
+      />,
+    );
+    expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_FILTRO_VACIO);
+    p2.cerrar();
+  });
+
   it('detalleInicial expande el movimiento al montar la pantalla', () => {
     const p = conEscenario('e4-01');
     const efectivo = p.e.cuentas.efectivo as string;

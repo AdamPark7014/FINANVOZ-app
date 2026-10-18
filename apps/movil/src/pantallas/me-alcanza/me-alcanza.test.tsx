@@ -50,12 +50,19 @@ import {
   BTN_COMO_LO_CALCULE,
   BTN_DESHACER,
   BTN_HACER_OTRA_CUENTA,
+  BTN_LISTO,
   BTN_LO_COMPRE,
+  ERROR_CALCULO,
   ERROR_PRECIO,
+  ETIQUETA_OPCION_RECOMENDADA,
+  ETIQUETA_PROGRESO,
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
+  PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
+  TITULO,
+  etiquetaChipMeses,
 } from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
@@ -227,6 +234,14 @@ function conHistorial() {
 }
 
 describe('¿Me alcanza?', () => {
+  it('el formulario vacío muestra título y chips con copy de textos.ts', () => {
+    const p = e401();
+    montar(p.ctx, <PantallaMeAlcanza calcular={jest.fn()} alCerrar={jest.fn()} />);
+    expect(screen.getByText(TITULO)).toBeTruthy();
+    expect(screen.getByText(PREGUNTA_MSI)).toBeTruthy();
+    expect(screen.getByText(etiquetaChipMeses('6'))).toBeTruthy();
+  });
+
   it('CA-M6-03 · con el resultado de E8-22 muestra "< 1 %", "89 %", "79 %", "90 %" y la recomendación', async () => {
     const p = e401();
     montar(
@@ -248,6 +263,7 @@ describe('¿Me alcanza?', () => {
     expect(textoDe('etiqueta-esperar')).toBe('El jue 15, con tu quincena');
     expect(textoDe('etiqueta-base')).toBe('Sin comprarlos');
     // La recomendada se marca con texto, no solo con color (`02 §15`).
+    expect(screen.getByText(ETIQUETA_OPCION_RECOMENDADA)).toBeTruthy();
     expect(screen.getByTestId('recomendado-msi')).toBeTruthy();
     expect(screen.queryByTestId('recomendado-contado_hoy')).toBeNull();
     expect(screen.getByText('Te quedas corto antes del jueves')).toBeTruthy();
@@ -318,6 +334,7 @@ describe('¿Me alcanza?', () => {
     );
     fireEvent.press(await screen.findByTestId('boton-recuerdamelo'));
     expect(await screen.findByTestId('recordatorio-mensaje')).toBeTruthy();
+    expect(textoDe('recordatorio-mensaje')).toBe(MENSAJE_PERMISO_AVISOS);
     expect(notificaciones.puerto.lista()).toHaveLength(0);
   });
 

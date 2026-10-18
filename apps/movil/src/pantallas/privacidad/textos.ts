@@ -9,7 +9,37 @@ export { VERSION_TERMINOS };
 export const PALABRA_BORRAR = 'BORRAR';
 
 export const TIP_SOLO_LECTURA =
-  'Estás en solo lectura: puedes ver y exportar tus datos, pero no registrar hasta que aceptes el aviso nuevo al abrir la app.';
+  'Estás en solo lectura: puedes ver y exportar tus datos, pero no registrar movimientos nuevos hasta que aceptes el aviso al abrir la app.';
+
+/** Pantalla `/reconsentimiento` cuando sube `VERSION_CONSENTIMIENTO` (`08 §2`, pendiente 31). */
+export const TITULO_RECONSENTIMIENTO = 'Actualizamos el aviso de privacidad';
+
+export function introReconsentimiento(version: string): string {
+  return `Publicamos una versión nueva del aviso (${version}). Si no la aceptas ahora, entras en solo lectura: puedes ver y exportar tus datos, pero no registrar movimientos nuevos hasta que la aceptes al abrir la app.`;
+}
+
+export const CASILLA_RECONSENT_DATOS =
+  'Acepto esta versión del aviso de privacidad y que Finanvoz siga guardando y usando mis datos financieros, como ahí se describe.';
+
+export const CASILLA_ESTADISTICAS_OPCIONAL =
+  'Compartir estadísticas anónimas de uso para mejorar la app (opcional).';
+
+export const BTN_RECONSENT_ACEPTAR = 'Aceptar y continuar';
+export const BTN_RECONSENT_SOLO_LECTURA = 'Continuar en solo lectura';
+export const BTN_RECONSENT_BORRAR = 'Borrar todo';
+export const PISTA_CASILLA_DATOS_FINANCIEROS = 'Primero marca la casilla de tus datos financieros';
+
+/** Desde O2, reconsentimiento o Ajustes: abre `/aviso-privacidad`. */
+export const BTN_LEER_AVISO_COMPLETO = 'Leer el aviso completo';
+
+export const TITULO_AVISO_PRIVACIDAD = 'Aviso de privacidad';
+export const TIP_AVISO_PRIVACIDAD =
+  'Solo lectura: aquí no aceptas el aviso. Para hacerlo, regresa a la pantalla anterior o acéptalo cuando te lo pidamos al abrir la app.';
+export const PISTA_VOLVER = 'Regresa a donde estabas';
+
+export function lineaVersionAviso(version: string): string {
+  return `Versión ${version}`;
+}
 
 export const ETIQUETA_VOLVER = 'Volver';
 export const TITULO_PRIVACIDAD = 'Tu privacidad';

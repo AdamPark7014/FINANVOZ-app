@@ -30,7 +30,18 @@ import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { ElegirCuenta, Seccion } from './componentes';
-import { etiquetaMes, NOMBRE_ESTADO_PLAN, VACIO_MSI_TARJETA } from './textos';
+import {
+  etiquetaMes,
+  mensajeLiquidacionPlan,
+  NOMBRE_ESTADO_PLAN,
+  SUBTITULO_COMPROMISO_MSI,
+  subtituloPagosPlaneados,
+  TITULO_COMPROMISO_MSI,
+  TITULO_MESES_SIN_INTERESES,
+  TITULO_PAGOS_PLANEADOS,
+  textoConfirmarLiquidar,
+  VACIO_MSI_TARJETA,
+} from './textos';
 
 // ——— Meses sin intereses ———
 
@@ -71,7 +82,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
       {activo && confirmando ? (
         <View style={{ gap: espacio.s }}>
           <Texto variante="cuerpo">
-            {`¿Liquidar ${p.descripcion}? Lo que falta, ${formatearCentavos(p.restante)}, pasa a tu próximo pago de la tarjeta.`}
+            {textoConfirmarLiquidar(p.descripcion, formatearCentavos(p.restante))}
           </Texto>
           <Boton
             etiqueta="Sí, liquidar"
@@ -80,7 +91,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
               try {
                 const l = liquidarMsi(ctx, p.id);
                 avisarRegistro(
-                  `Listo: liquidaste ${p.descripcion} (${formatearCentavos(l.monto)}).`,
+                  mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)),
                   l.deshacer,
                 );
               } catch (e) {

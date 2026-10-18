@@ -207,7 +207,7 @@ export function FormularioTanda({
       />
       <CampoTexto
         testID="tanda-participantes"
-        etiqueta="¿Cuántos son?"
+        etiqueta={ETIQUETA_PARTICIPANTES}
         ejemplo="10"
         teclado="number-pad"
         valor={participantes}
@@ -215,7 +215,7 @@ export function FormularioTanda({
       />
       <CampoTexto
         testID="tanda-turno"
-        etiqueta="¿Qué número te toca?"
+        etiqueta={ETIQUETA_TURNO}
         ejemplo="4"
         teclado="number-pad"
         valor={turno}
@@ -223,14 +223,14 @@ export function FormularioTanda({
       />
       <CampoTexto
         testID="tanda-inicio"
-        etiqueta="Primera fecha"
-        ejemplo="16/10/2026"
+        etiqueta={ETIQUETA_PRIMERA_FECHA}
+        ejemplo={EJEMPLO_FECHA}
         valor={inicio}
         alCambiar={setInicio}
       />
       <Chips
         testID="tanda-cuenta"
-        etiqueta="¿De dónde sale tu aportación? (opcional)"
+        etiqueta={ETIQUETA_CUENTA_APORTACION_OPCIONAL}
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={cuentaId}
         alCambiar={setCuentaId}
@@ -238,10 +238,15 @@ export function FormularioTanda({
       {propuesta ? (
         <Tarjeta testID="tanda-resumen">
           <Texto variante="cuerpo">
-            {`Cobras ${formatearCentavos(propuesta.cobro)} el ${etiquetaFecha(propuesta.fechaCobro)} (ronda ${propuesta.turno} de ${propuesta.participantes}).`}
+            {textoResumenCobro(
+              propuesta.cobro,
+              etiquetaFecha(propuesta.fechaCobro),
+              propuesta.turno,
+              propuesta.participantes,
+            )}
           </Texto>
           <Texto variante="secundario" tono="secundario">
-            Cada aportación es un compromiso: la aparto de tu dinero libre el día que toca.
+            {TEXTO_COMPROMISO_APORTACION}
           </Texto>
         </Tarjeta>
       ) : null}

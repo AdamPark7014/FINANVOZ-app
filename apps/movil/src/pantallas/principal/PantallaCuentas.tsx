@@ -21,12 +21,14 @@ import {
   Tarjeta,
   Texto,
 } from '../../ui';
+import { EstadoVacio } from './EstadoVacio';
 import {
   contextoSaldoCompromiso,
   contextoSaldoLeDebes,
   contextoSaldoTarjeta,
   contextoSaldoTeDebe,
   contextoSaldoTienes,
+  SUBTITULO_CUENTAS_COMPROMISOS,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,
@@ -95,7 +97,7 @@ export function PantallaCuentas({
 
       <Seccion titulo="Tienes" testID="seccion-tienes">
         {v.tienes.length === 0 ? (
-          <Vacio texto={TEXTO_CUENTAS_TIENES_VACIO} testID="cuentas-tienes-vacio" />
+          <EstadoVacio texto={TEXTO_CUENTAS_TIENES_VACIO} testID="cuentas-tienes-vacio" />
         ) : null}
         {v.tienes.map((c) => (
           <Fila
@@ -119,7 +121,7 @@ export function PantallaCuentas({
 
       <Seccion titulo="Debes" testID="seccion-debes">
         {v.debes.length === 0 ? (
-          <Vacio texto={TEXTO_CUENTAS_DEBES_VACIO} testID="cuentas-debes-vacio" />
+          <EstadoVacio texto={TEXTO_CUENTAS_DEBES_VACIO} testID="cuentas-debes-vacio" />
         ) : null}
         {v.debes.map((d) =>
           d.tipo === 'tarjeta' ? (
@@ -166,9 +168,9 @@ export function PantallaCuentas({
         </Seccion>
       ) : null}
 
-      <Seccion titulo="Compromisos" subtitulo="Próximos 30 días" testID="seccion-compromisos">
+      <Seccion titulo="Compromisos" subtitulo={SUBTITULO_CUENTAS_COMPROMISOS} testID="seccion-compromisos">
         {v.compromisos.length === 0 ? (
-          <Vacio texto={TEXTO_CUENTAS_COMPROMISOS_VACIO} testID="cuentas-compromisos-vacio" />
+          <EstadoVacio texto={TEXTO_CUENTAS_COMPROMISOS_VACIO} testID="cuentas-compromisos-vacio" />
         ) : null}
         {v.compromisos.map((c) => (
           <Fila
@@ -250,14 +252,6 @@ function Seccion({
       ) : null}
       {children}
     </View>
-  );
-}
-
-function Vacio({ texto, testID }: { texto: string; testID: string }) {
-  return (
-    <Texto variante="cuerpo" tono="secundario" testID={testID}>
-      {texto}
-    </Texto>
   );
 }
 

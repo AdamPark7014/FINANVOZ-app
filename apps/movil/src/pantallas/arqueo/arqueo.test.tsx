@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
-import { conEscenario } from '../principal/__pruebas__/base';
+import { abrirPruebaPantalla, conEscenario } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
 import {
@@ -58,7 +58,7 @@ describe('copy del arqueo (es-MX)', () => {
 
 describe('PantallaArqueo · vacío y errores', () => {
   it('sin cuenta de efectivo muestra el mensaje en arqueo-sin-efectivo', () => {
-    const p = abrirSinEfectivo();
+    const p = abrirPruebaPantalla();
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
     expect(textoDe('arqueo-sin-efectivo')).toBe(TEXTO_SIN_CUENTA_EFECTIVO);
     p.cerrar();
@@ -78,18 +78,9 @@ describe('PantallaArqueo · vacío y errores', () => {
     fireEvent.press(screen.getByTestId('arqueo-otra'));
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '300');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
-    fireEvent.changeText(screen.getByTestId('arqueo-propuesta-alimentacion'), '0');
+    fireEvent.changeText(screen.getByTestId('arqueo-propuesta-varios_efectivo'), '200');
     fireEvent.press(screen.getByTestId('arqueo-confirmar'));
-    expect(textoDe('arqueo-error-propuesta')).toMatch(/deben sumar \$315/);
+    expect(textoDe('arqueo-error-propuesta')).toMatch(/deben sumar \$340/);
     p.cerrar();
   });
 });
-
-/** Libro vacío: no hay cuenta de efectivo hasta que el usuario la agregue. */
-function abrirSinEfectivo() {
-  const p = conEscenario('e4-01');
-  const efectivo = p.e.cuentas['efectivo'] as string;
-  p.ctx.db.run(`DELETE FROM asiento WHERE cuenta_id = ?`, [efectivo]);
-  p.ctx.db.run(`DELETE FROM cuenta WHERE id = ?`, [efectivo]);
-  return p;
-}

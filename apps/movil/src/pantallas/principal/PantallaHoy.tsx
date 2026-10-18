@@ -171,9 +171,11 @@ export function PantallaHoy({
 function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIngreso: () => void }) {
   if (vista.estado === 'sin_ingreso') {
     return (
-      <View style={{ gap: espacio.m }}>
-        <Texto variante="titulo">{vista.mensaje ?? TITULO_SIN_INGRESO}</Texto>
-        <Texto variante="secundario" tono="secundario">
+      <View style={{ gap: espacio.m }} testID="hoy-sin-ingreso">
+        <Texto variante="titulo" testID="hoy-sin-ingreso-titulo">
+          {vista.mensaje ?? TITULO_SIN_INGRESO}
+        </Texto>
+        <Texto variante="secundario" tono="secundario" testID="hoy-sin-ingreso-subtitulo">
           {SUBTITULO_SIN_INGRESO}
         </Texto>
         <Boton
@@ -190,8 +192,16 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
       : 'en los próximos días';
     return (
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="subtitulo">Hoy:</Texto>
-        <Cifra centavos={0} modo="pesos" tamano="heroe" contexto="Hoy puedes gastar" testID="hoy-puedes" />
+        <Texto variante="subtitulo" testID="hoy-libre-negativo-etiqueta">
+          {TITULO_HOY_LIBRE_NEGATIVO}
+        </Texto>
+        <Cifra
+          centavos={0}
+          modo="pesos"
+          tamano="heroe"
+          contexto={CONTEXTO_CIFRA_LIBRE_NEGATIVO}
+          testID="hoy-puedes"
+        />
         <Texto variante="cuerpo" tono="faltante" testID="hoy-secundario">
           {`Te faltan ${formatearCentavos(vista.faltante)} para cubrir lo que viene ${cuando}.`}
         </Texto>
@@ -200,12 +210,14 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
   }
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="subtitulo">Hoy puedes gastar</Texto>
+      <Texto variante="subtitulo" testID="hoy-puedes-etiqueta">
+        {TITULO_HOY_PUEDES_GASTAR}
+      </Texto>
       <Cifra
         centavos={vista.hoyPuedesCentavos}
         modo="pesos"
         tamano="heroe"
-        contexto="Hoy puedes gastar"
+        contexto={CONTEXTO_CIFRA_HOY_PUEDES}
         testID="hoy-puedes"
       />
       {(vista.textoDias ?? vista.mensaje) ? (

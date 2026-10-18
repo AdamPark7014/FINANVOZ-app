@@ -38,31 +38,7 @@ import {
   TEXTO_ACTIVAR_NUBE,
   TEXTO_SESION_VENCIDA,
   TITULO_RESPALDO,
-  textoCrearContrasenaTrasCorreo,
-  textoRespaldasCon,
-} from './textos';
-import {
-  AVISO_BORRAR_CUENTA,
-  AVISO_PENDIENTE,
-  BTN_BORRAR_CUENTA,
-  BTN_BORRAR_CUENTA_CONFIRMAR,
-  BTN_CANCELAR,
-  BTN_RESPALDAR_AHORA,
-  DESC_RESPALDO_AUTOMATICO,
-  DESC_SOLO_WIFI,
-  ETIQUETA_RESPALDO_AUTOMATICO,
-  ETIQUETA_SOLO_WIFI,
-  ETIQUETA_VOLVER,
   mensajeErrorNube,
-  MENSAJE_BORRAR_CUENTA_OK,
-  MENSAJE_CONTRASENA_GUARDADA,
-  MENSAJE_CORREO_CUENTA_OK,
-  MENSAJE_LISTO_NUBE,
-  MENSAJE_NO_GUARDAR_AJUSTE,
-  SUBTITULO_NUBE,
-  TEXTO_ACTIVAR_NUBE,
-  TEXTO_SESION_VENCIDA,
-  TITULO_RESPALDO,
   textoCrearContrasenaTrasCorreo,
   textoRespaldasCon,
 } from './textos';
@@ -90,6 +66,8 @@ export function PantallaRespaldo({
         variante="texto"
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
+        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
       <Texto variante="titulo">{TITULO_RESPALDO}</Texto>
@@ -237,7 +215,7 @@ function TarjetaNube({
       ) : !conContrasena && deps ? (
         <>
           <Texto variante="secundario" tono="secundario">
-            {`Respaldas con ${cuenta.tipo === 'con_correo' ? cuenta.correo : ''}. Ahora crea la contraseña que cifra tus respaldos.`}
+            {cuenta.tipo === 'con_correo' ? textoCrearContrasenaTrasCorreo(cuenta.correo) : TEXTO_ACTIVAR_NUBE}
           </Texto>
           <FormularioContrasena
             deps={deps}
@@ -245,7 +223,7 @@ function TarjetaNube({
             alGuardar={() => {
               setCreada((n) => n + 1);
               alCrearContrasena();
-              setMensaje({ texto: 'Listo: guardé tu contraseña de respaldo.', error: false });
+              setMensaje({ texto: MENSAJE_CONTRASENA_GUARDADA, error: false });
             }}
             alCancelar={() => setMensaje(null)}
           />
@@ -297,7 +275,7 @@ function TarjetaNube({
               <Boton
                 testID="respaldo-borrar-confirmar"
                 variante="secundario"
-                etiqueta="Borrar cuenta"
+                etiqueta={BTN_BORRAR_CUENTA_CONFIRMAR}
                 cargando={borrando === 'borrando'}
                 deshabilitado={borrando === 'borrando'}
                 alPresionar={() => void borrar()}
@@ -322,6 +300,10 @@ function TarjetaNube({
           {mensaje.texto}
         </Texto>
       ) : null}
+    </Tarjeta>
+  );
+}
+null}
     </Tarjeta>
   );
 }
