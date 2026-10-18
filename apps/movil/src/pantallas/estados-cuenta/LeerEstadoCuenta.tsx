@@ -50,7 +50,7 @@ import {
   NOMBRE_TIPO_RENGLON,
   preguntaConciliacion,
   preguntaElegirTarjeta,
-  preguntaMismoMovimiento,
+  preguntaEsMismoMovimiento,
   resumenEstado,
   tituloNuevos,
   TITULO_DUDOSOS,
@@ -145,7 +145,9 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
+      <Texto variante="titulo" accessibilityRole="header">
+        {TITULO_PANTALLA}
+      </Texto>
       {estado.tipo === 'leyendo' ? (
         <Texto variante="cuerpo" tono="secundario" testID="estado-leyendo" accessibilityLiveRegion="polite">
           {MENSAJE_LEYENDO}

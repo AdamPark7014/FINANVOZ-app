@@ -175,12 +175,12 @@ describe('Tandas (02 §18)', () => {
     expect(cobro).toHaveLength(1);
     const testID = screen
       .getAllByTestId(/^tarjeta-accion-\d$/)
-      .find((n) => within(n).queryByText('Hoy te toca cobrar tu tanda.'))?.props.testID as string;
+      .find((n) => within(n).queryByText(PREGUNTA_HOY_COBRO))?.props.testID as string;
     fireEvent.press(screen.getByTestId(`${testID}-me-toco`));
     fireEvent.press(screen.getByTestId(`${testID}-me-toco-cuenta-${p.bbva}`));
     expect(
       within(screen.getByTestId('aviso')).getByText(
-        'Registré: cobraste tu tanda $5,000 · BBVA. Esto es tu dinero de vuelta, no un ingreso.',
+        mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
       ),
     ).toBeTruthy();
     expect(detalleTanda(p.ctx, tandaId).cobrada).toBe(true);
@@ -197,7 +197,12 @@ describe('Tandas (02 §18)', () => {
     fireEvent.changeText(screen.getByTestId('tanda-turno'), '4');
     fireEvent.changeText(screen.getByTestId('tanda-inicio'), '04/09/2026');
     expect(textoDe('tanda-ya-empezo-texto')).toBe(
-      'Llevas 6 aportaciones y ya cobraste: te faltan 4 ($2,000). Esas rondas no las vuelvo a apartar.',
+      textoYaEmpezoCompleto({
+        aportacionesHechas: 6,
+        yaCobraste: true,
+        faltan: 4,
+        porAportar: 200_000,
+      }),
     );
     expect(screen.getByTestId('tanda-hechas').props.value).toBe('6');
     fireEvent.press(screen.getByTestId('tanda-guardar'));

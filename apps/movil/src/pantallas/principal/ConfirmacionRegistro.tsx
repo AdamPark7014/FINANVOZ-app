@@ -94,7 +94,7 @@ export function ConfirmacionRegistro({
 
   return (
     <Tarjeta testID="confirmacion-registro">
-      <Texto variante="subtitulo">{TITULO[motivo]}</Texto>
+      <Texto variante="subtitulo">{TITULO_CONFIRMAR_REGISTRO[motivo]}</Texto>
       {propuestas.map((p, i) => (
         <View key={i} style={{ gap: espacio.s }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
@@ -104,7 +104,7 @@ export function ConfirmacionRegistro({
             <Cifra centavos={p.entrada.monto} />
           </View>
           {p.faltan.map((f) => {
-            const leyenda = pregunta(f);
+            const leyenda = preguntaCuentaConfirmacionRegistro(f);
             return (
               <View key={f.campo} style={{ gap: espacio.xs }}>
                 <Texto
@@ -133,14 +133,14 @@ export function ConfirmacionRegistro({
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Guardar"
+        etiqueta={ETIQUETA_GUARDAR}
         alPresionar={guardar}
         deshabilitado={!completo}
         pista={completo ? undefined : PISTA_ELEGIR_CUENTA_CONFIRMACION}
         testID="boton-guardar-confirmacion"
       />
       <Boton
-        etiqueta="Cancelar"
+        etiqueta={ETIQUETA_CANCELAR}
         variante="texto"
         alPresionar={alCancelar}
         testID="boton-cancelar-confirmacion"

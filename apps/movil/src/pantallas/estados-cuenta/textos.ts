@@ -16,9 +16,13 @@ export const CHIP_OTRO = 'Es otro';
 
 export const TITULO_DUDOSOS = '¿Ya los tenías?';
 
-export const MENSAJE_NO_CUADRA =
+export const AVISO_NO_CUADRA =
   'Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.';
-export const MENSAJE_FALTAN_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
+
+export const PISTA_CONTESTAR_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
+
+/** Cuando el PDF cuadra pero no hay renglones nuevos que marcar (`02 §26`). */
+export const TEXTO_SIN_NUEVOS = 'No hay movimientos nuevos que revisar.';
 
 /** TalkBack: agrupa el resumen tras leer el PDF. */
 export const ETIQUETA_RESUMEN_ESTADO = 'Resumen del estado de cuenta';
@@ -50,6 +54,97 @@ export const MENSAJE_DEMASIADO_GRANDE =
   'Ese PDF es demasiado grande para leerlo en el teléfono. Comparte solo el estado de cuenta del mes.';
 export const MENSAJE_NO_DISPONIBLE = 'Por ahora solo puedo leer estados de cuenta en Android.';
 export const MENSAJE_ERROR_GUARDAR = 'No pude guardar los movimientos. Intenta de nuevo.';
+
+export const ETIQUETA_MOVIMIENTO_DESCONOCIDO = 'un movimiento';
+
+export const MENSAJE_NO_RECONOCIDO_SIN_LISTA = 'Todavía no sé leer estados de cuenta de ese banco.';
+
+/** Banco no soportado aún (`07 §8`). */
+export function mensajeNoReconocido(bancos: readonly string[]): string {
+  if (bancos.length === 0) return MENSAJE_NO_RECONOCIDO_SIN_LISTA;
+  return `${MENSAJE_NO_RECONOCIDO_SIN_LISTA} Por ahora leo: ${bancos.join(', ')}.`;
+}
+
+export function mensajeIncompleto(banco: string): string {
+  return `Es un estado de cuenta de ${banco}, pero no pude leer todos sus datos. No agregué nada.`;
+}
+
+export function mensajeSinTarjetas(banco: string): string {
+  return `Es un estado de cuenta de ${banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`;
+}
+
+export function mensajeAnteriorAlAlta(corte: PlainDate, nombreTarjeta: string): string {
+  return `Este estado de cuenta (corte ${etiquetaDiaMes(corte)}) es de antes de que agregaras la ${nombreTarjeta}: ya está en el saldo con que la diste de alta.`;
+}
+
+export function preguntaElegirTarjeta(
+  banco: string,
+  ultimos4: string | null | undefined,
+  corte: PlainDate,
+): string {
+  const term = ultimos4 ? ` terminación ${ultimos4}` : '';
+  return `¿De qué tarjeta es este estado de cuenta de ${banco}${term} (corte ${etiquetaDiaMes(corte)})?`;
+}
+
+export function etiquetaBotonTarjeta(nombre: string, ultimos4: string | null | undefined): string {
+  return ultimos4 ? `${nombre} ••${ultimos4}` : nombre;
+}
+
+export function tituloNuevos(cantidad: number): string {
+  return cantidad === 1 ? 'El que no tenía' : 'Los que no tenía';
+}
+
+export function mensajeRenglonesSinLeer(cantidad: number): string {
+  return cantidad === 1
+    ? '1 renglón no lo pude leer; revísalo en tu PDF.'
+    : `${cantidad} renglones no los pude leer; revísalos en tu PDF.`;
+}
+
+export function mensajeAnteriores(cantidad: number): string {
+  return cantidad === 1
+    ? '1 es de antes de que agregaras la tarjeta; ya está en su saldo.'
+    : `${cantidad} son de antes de que agregaras la tarjeta; ya están en su saldo.`;
+}
+
+export function etiquetaChipsDudoso(descripcion: string): string {
+  return `¿${descripcion} ya lo tenías?`;
+}
+
+export function textoMovimientoExistente(
+  descripcion: string | null | undefined,
+  fecha: PlainDate,
+  monto: Centavos,
+): string {
+  const titulo = descripcion ?? ETIQUETA_MOVIMIENTO_DESCONOCIDO;
+  return `${titulo} del ${etiquetaDiaMes(fecha)} por ${formatearCentavos(monto)}`;
+}
+
+export function preguntaMismoMovimiento(
+  descripcion: string | null | undefined,
+  fecha: PlainDate,
+  monto: Centavos,
+): string {
+  return `¿Es el mismo que ya tenías: ${textoMovimientoExistente(descripcion, fecha, monto)}?`;
+}
+
+export function etiquetaRenglonEstado(r: RenglonEstado): string {
+  return `${NOMBRE_TIPO_RENGLON[r.tipo]}: ${r.descripcion} · ${etiquetaDiaMes(r.fecha)} · ${formatearCentavos(r.monto)}`;
+}
+
+export function lineaEncabezadoDudoso(descripcion: string, fecha: PlainDate): string {
+  return `${descripcion} · ${etiquetaDiaMes(fecha)}`;
+}
+
+export function mensajeAjustado(nombreTarjeta: string): string {
+  return `Listo: tu ${nombreTarjeta} quedó como dice tu banco.`;
+}
+
+export function mensajeGuardado(agregados: number, nombreTarjeta: string): string {
+  if (agregados === 0) return `No agregué nada: tu ${nombreTarjeta} ya tenía todo.`;
+  return agregados === 1
+    ? `Agregué 1 movimiento a tu ${nombreTarjeta}.`
+    : `Agregué ${agregados} movimientos a tu ${nombreTarjeta}.`;
+}
 
 /** "3 no los tenía" · "1 no lo tenía". */
 function noLosTenia(n: number): string {
@@ -90,83 +185,3 @@ export const NOMBRE_TIPO_RENGLON = {
   pago: 'Pago a la tarjeta',
   abono: 'Bonificación',
 } as const;
-
-export function tituloNuevos(cantidad: number): string {
-  return cantidad === 1 ? 'El que no tenía' : 'Los que no tenía';
-}
-
-export function mensajeRenglonesSinLeer(cantidad: number): string {
-  return cantidad === 1
-    ? '1 renglón no lo pude leer; revísalo en tu PDF.'
-    : `${cantidad} renglones no los pude leer; revísalos en tu PDF.`;
-}
-
-export function mensajeAnteriores(cantidad: number): string {
-  return cantidad === 1
-    ? '1 es de antes de que agregaras la tarjeta; ya está en su saldo.'
-    : `${cantidad} son de antes de que agregaras la tarjeta; ya están en su saldo.`;
-}
-
-export function mensajeGuardado(agregados: number, nombreTarjeta: string): string {
-  if (agregados === 0) return `No agregué nada: tu ${nombreTarjeta} ya tenía todo.`;
-  return agregados === 1
-    ? `Agregué 1 movimiento a tu ${nombreTarjeta}.`
-    : `Agregué ${agregados} movimientos a tu ${nombreTarjeta}.`;
-}
-
-export function mensajeAjustado(nombreTarjeta: string): string {
-  return `Listo: tu ${nombreTarjeta} quedó como dice tu banco.`;
-}
-
-/** Banco no soportado aún (`07 §8`). */
-export function mensajeNoReconocido(bancos: readonly string[]): string {
-  return bancos.length > 0
-    ? `Todavía no sé leer estados de cuenta de ese banco. Por ahora leo: ${bancos.join(', ')}.`
-    : 'Todavía no sé leer estados de cuenta de ese banco.';
-}
-
-export function mensajeIncompleto(banco: string): string {
-  return `Es un estado de cuenta de ${banco}, pero no pude leer todos sus datos. No agregué nada.`;
-}
-
-export function mensajeSinTarjetas(banco: string): string {
-  return `Es un estado de cuenta de ${banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`;
-}
-
-export function mensajeAnteriorAlAlta(corte: PlainDate, nombreTarjeta: string): string {
-  return `Este estado de cuenta (corte ${etiquetaDiaMes(corte)}) es de antes de que agregaras la ${nombreTarjeta}: ya está en el saldo con que la diste de alta.`;
-}
-
-export function preguntaElegirTarjeta(
-  banco: string,
-  ultimos4: string | null | undefined,
-  corte: PlainDate,
-): string {
-  const term = ultimos4 ? ` terminación ${ultimos4}` : '';
-  return `¿De qué tarjeta es este estado de cuenta de ${banco}${term} (corte ${etiquetaDiaMes(corte)})?`;
-}
-
-export function etiquetaBotonTarjeta(nombre: string, ultimos4: string | null | undefined): string {
-  return ultimos4 ? `${nombre} ••${ultimos4}` : nombre;
-}
-
-export function etiquetaChipsDudoso(descripcion: string): string {
-  return `¿${descripcion} ya lo tenías?`;
-}
-
-export function textoMovimientoExistente(
-  descripcion: string | null | undefined,
-  fecha: PlainDate,
-  monto: Centavos,
-): string {
-  const titulo = descripcion ?? 'un movimiento';
-  return `${titulo} del ${etiquetaDiaMes(fecha)} por ${formatearCentavos(monto)}`;
-}
-
-export function preguntaMismoMovimiento(
-  descripcion: string | null | undefined,
-  fecha: PlainDate,
-  monto: Centavos,
-): string {
-  return `¿Es el mismo que ya tenías: ${textoMovimientoExistente(descripcion, fecha, monto)}?`;
-}

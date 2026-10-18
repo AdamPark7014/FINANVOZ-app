@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react-native';
 import { aceptarConsentimiento, agregarCuenta } from '../../src/servicios';
-import { crearMotorFalso, renderConSesion } from '../../src/pantallas/principal/__pruebas__/arnes';
+import { renderConSesion } from '../../src/pantallas/principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../../src/pantallas/principal/__pruebas__/base';
 import Hoy from './hoy';
 import { SUBTITULO_SIN_INGRESO, TITULO_SIN_INGRESO, TEST_ID_TAB_HOY } from './hoy-textos';

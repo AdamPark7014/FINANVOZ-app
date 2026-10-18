@@ -45,7 +45,7 @@ export function TarjetaConsulta({
         {respuesta.soloPlus ? (
           abrirPlan ? (
             <Boton
-              etiqueta="Ver Plus"
+              etiqueta={BTN_VER_PLUS}
               variante="secundario"
               ancho="contenido"
               alPresionar={abrirPlan}
@@ -54,7 +54,7 @@ export function TarjetaConsulta({
           ) : null
         ) : alVerMovimientos ? (
           <Boton
-            etiqueta="Ver movimientos"
+            etiqueta={BTN_VER_MOVIMIENTOS}
             variante="secundario"
             ancho="contenido"
             alPresionar={() => alVerMovimientos(respuesta.filtro)}

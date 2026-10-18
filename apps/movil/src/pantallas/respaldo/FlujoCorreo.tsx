@@ -96,11 +96,11 @@ export function FlujoCorreo({
   ) : (
     <>
       <Texto variante="secundario" tono="secundario" testID="respaldo-codigo-enviado">
-        {`Te mandé un código a ${correo.trim().toLowerCase()}. Escríbelo aquí.`}
+        {textoCodigoEnviado(correo)}
       </Texto>
       <CampoTexto
         testID="respaldo-codigo"
-        etiqueta="Código de 6 dígitos"
+        etiqueta={ETIQUETA_CODIGO}
         valor={codigo}
         alCambiar={setCodigo}
         teclado="number-pad"
@@ -110,7 +110,7 @@ export function FlujoCorreo({
       />
       <Boton
         testID="respaldo-confirmar-codigo"
-        etiqueta="Confirmar"
+        etiqueta={BTN_CONFIRMAR}
         cargando={trabajando}
         deshabilitado={trabajando || codigo.trim() === ''}
         alPresionar={() => void confirmar(modo)}
