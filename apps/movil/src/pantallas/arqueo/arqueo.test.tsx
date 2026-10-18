@@ -90,6 +90,7 @@ describe('PantallaArqueo · vacío y errores', () => {
       etiquetaVacioSinEfectivo(),
     );
     expect(screen.getByTestId('boton-cerrar-arqueo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
+    expect(screen.getByTestId('boton-cerrar-arqueo')).toHaveProp('accessibilityHint', PISTA_CERRAR);
     p.cerrar();
   });
 
@@ -114,7 +115,9 @@ describe('PantallaArqueo · vacío y errores', () => {
     const sobrante = screen.queryByTestId('arqueo-sobrante-no_se');
     if (sobrante) fireEvent.press(sobrante);
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(textoDe('arqueo-mensaje-hecho')).toBe(mensajeCuadra());
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
+    expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityHint', PISTA_LISTO);
     fireEvent.press(screen.getByTestId('arqueo-listo'));
     expect(alCerrar).toHaveBeenCalled();
     p.cerrar();
@@ -124,11 +127,27 @@ describe('PantallaArqueo · vacío y errores', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
     fireEvent.press(screen.getByTestId('arqueo-otra'));
+    expect(screen.getByTestId('arqueo-calcular')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '300');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
     fireEvent.changeText(screen.getByTestId('arqueo-propuesta-varios_efectivo'), '200');
+    expect(screen.getByTestId('arqueo-confirmar')).toHaveProp('accessibilityHint', PISTA_CONFIRMAR);
     fireEvent.press(screen.getByTestId('arqueo-confirmar'));
     expect(textoDe('arqueo-error-propuesta')).toMatch(/deben sumar \$340/);
+    expect(screen.getByTestId('arqueo-error-propuesta')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('arqueo-error-propuesta')).toHaveProp('accessibilityRole', 'alert');
     p.cerrar();
+  });
+
+  it('TalkBack pistas en paso marcar y continuar', () => {
+    const p = abrirPruebaPantalla();
+    const e = conEscenario('e4-01');
+    renderConSesion(e.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    const continuar = screen.queryByTestId('arqueo-continuar');
+    if (continuar) {
+      expect(continuar).toHaveProp('accessibilityHint', PISTA_CONTINUAR);
+    }
+    p.cerrar();
+    e.cerrar();
   });
 });

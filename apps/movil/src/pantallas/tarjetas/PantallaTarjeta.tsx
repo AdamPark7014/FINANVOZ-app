@@ -36,6 +36,7 @@ import {
   ETIQUETA_PROXIMO_CORTE,
   ETIQUETA_SALDO_A_FAVOR,
   etiquetaAccesibleBarraUsoTarjeta,
+  etiquetaAccesibleEstadoCuentaTarjeta,
   etiquetaAccesibleMovimientoTarjeta,
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
@@ -325,18 +326,33 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
 }
 
 function EstadoCuenta({ e }: { e: EstadoCuentaVista }) {
+  const fechaCorte = etiquetaDiaMes(e.corte);
+  const fechaLimite = etiquetaDiaMes(e.limite);
   return (
     <Tarjeta testID={`estado-${e.corte}`}>
-      <Texto variante="cuerpoFuerte">{tituloEstadoCuenta(etiquetaDiaMes(e.corte))}</Texto>
-      <Dato
-        etiqueta={etiquetaSaldoAlCorte(e.saldoCorte)}
-        valor={formatearCentavos(Math.abs(e.saldoCorte))}
-      />
-      <Dato etiqueta={ETIQUETA_PAGADO_DESDE_CORTE} valor={formatearCentavos(e.pagosPosteriores)} />
-      <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(e.pngi)} />
-      <Texto variante="secundario" tono="secundario">
-        {textoFechaLimiteEstado(etiquetaDiaMes(e.limite))}
-      </Texto>
+      <View
+        accessible
+        accessibilityLabel={etiquetaAccesibleEstadoCuentaTarjeta(
+          fechaCorte,
+          e.saldoCorte,
+          e.pagosPosteriores,
+          e.pngi,
+          fechaLimite,
+        )}
+      >
+        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Texto variante="cuerpoFuerte">{tituloEstadoCuenta(fechaCorte)}</Texto>
+          <Dato
+            etiqueta={etiquetaSaldoAlCorte(e.saldoCorte)}
+            valor={formatearCentavos(Math.abs(e.saldoCorte))}
+          />
+          <Dato etiqueta={ETIQUETA_PAGADO_DESDE_CORTE} valor={formatearCentavos(e.pagosPosteriores)} />
+          <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(e.pngi)} />
+          <Texto variante="secundario" tono="secundario">
+            {textoFechaLimiteEstado(fechaLimite)}
+          </Texto>
+        </View>
+      </View>
     </Tarjeta>
   );
 }

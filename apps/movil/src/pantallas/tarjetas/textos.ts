@@ -188,6 +188,24 @@ export function textoFechaLimiteEstado(fechaLimite: string): string {
   return `Fecha límite: ${fechaLimite}`;
 }
 
+/** TalkBack: tarjeta de un corte cerrado en el historial del detalle. */
+export function etiquetaAccesibleEstadoCuentaTarjeta(
+  fechaCorte: string,
+  saldoCorte: Centavos,
+  pagosPosteriores: Centavos,
+  pngi: Centavos,
+  fechaLimite: string,
+): string {
+  const saldoEtiqueta = etiquetaSaldoAlCorte(saldoCorte);
+  return [
+    tituloEstadoCuenta(fechaCorte),
+    `${saldoEtiqueta}: ${cifraEnPalabras(Math.abs(saldoCorte) as Centavos, 'pesos')}`,
+    `${ETIQUETA_PAGADO_DESDE_CORTE}: ${cifraEnPalabras(pagosPosteriores, 'pesos')}`,
+    `${ETIQUETA_PNGI}: ${cifraEnPalabras(pngi, 'pesos')}`,
+    textoFechaLimiteEstado(fechaLimite),
+  ].join('. ');
+}
+
 /** Meses sin intereses y pagos planeados (`02 §8`). */
 export const TITULO_MESES_SIN_INTERESES = 'Meses sin intereses';
 export const TITULO_COMPROMISO_MSI = 'Lo que pagarás en meses sin intereses';
