@@ -122,7 +122,7 @@ export function ListaEspera() {
         {MARCA} es una app que te lo dice: le hablas, registra tus gastos y te avisa si llegas a la quincena.
         Anótate para la beta.
       </p>
-      <form onSubmit={enviar} noValidate>
+      <form onSubmit={enviar} noValidate aria-label="Formulario para anotarte en la lista de espera">
         <div className="campo">
           <label htmlFor={`${id}-correo`}>Tu correo</label>
           <input
@@ -207,7 +207,16 @@ export function ListaEspera() {
             Recibimos varios intentos desde tu conexión. Intenta de nuevo en una hora.
           </p>
         )}
-        <button type="submit" disabled={envio === 'enviando'}>
+        <button
+          type="submit"
+          disabled={envio === 'enviando'}
+          aria-busy={envio === 'enviando' || undefined}
+          aria-label={
+            envio === 'enviando'
+              ? 'Enviando tu solicitud a la lista de espera'
+              : 'Anotarme en la lista de espera de la beta'
+          }
+        >
           {envio === 'enviando' ? 'Anotando…' : 'Anotarme'}
         </button>
       </form>
