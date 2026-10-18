@@ -155,6 +155,17 @@ describe('EstadoVacio', () => {
     expect(vacio).toHaveTextContent('Aún no hay movimientos.');
     expect(vacio.props.accessibilityLiveRegion).toBe('polite');
   });
+
+  it('etiquetaAccesible sobrescribe el label de TalkBack', () => {
+    render(
+      <EstadoVacio
+        texto="No debes nada."
+        testID="vacio"
+        etiquetaAccesible="Debes. No debes nada."
+      />,
+    );
+    expect(screen.getByTestId('vacio')).toHaveProp('accessibilityLabel', 'Debes. No debes nada.');
+  });
 });
 
 describe('CampoMonto', () => {

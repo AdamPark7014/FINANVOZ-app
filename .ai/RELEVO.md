@@ -6,27 +6,29 @@
 
 ## Hecho en este turno
 
-- **Tabs:** prueba de `_layout` verifica `accessibilityRole` `tab` en cada botón de la barra (TalkBack §15).
-- **Colchón O7:** `sugerenciaMontoColchon10` compartida con Ajustes; copy deducciones/ayuda tuteo.
+- **Deducciones (fiscal, `02 §24`):** copy pulido en `deducciones/textos.ts` (Plus, vacío, importar, ocultas); `MENSAJE_SIN_PARAMETROS` en `servicios/deducciones.ts`; FAQ facturas en `ayuda/textos.ts`; botón Cuentas centralizado (`BTN_DEDUCCIONES_CUENTAS`).
+- **Salvado previo:** WIP tabs/hoy/suscripciones en commit `64608c7` (relevo salvar).
 
 ## Hecho (acumulado reciente)
 
-- Captura copy centralizado, Chip TalkBack, Cuentas vacíos, `pestanas-textos`. Ver `git log`.
+- Onboarding/tabs/captura/widget TalkBack y copy (commits `3e3ef97`, `64608c7`, etc.). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP rescate `Chip.test.tsx` (`c6e1566`).
+- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Integrar o descartar rescate Chip.test.
+2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
