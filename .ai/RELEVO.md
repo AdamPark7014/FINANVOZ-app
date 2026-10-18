@@ -6,21 +6,23 @@
 
 ## Hecho en este turno
 
-- **Personas:** `PISTA_GUARDAR_PAGO` en Guardar del panel «Ya me pagó» (TalkBack `02 §19`); prueba en `personas.test.tsx`.
-- **Acumulado:** `PISTA_COBRAR`, `PISTA_YA_ME_PAGO`, `PISTA_VOLVER`; `PISTA_CALCULAR` en ¿Me alcanza? (`89f4685`).
+- **Persona a11y:** `etiquetaVacioMovimientosPersona`; vacío de movimientos con `EstadoVacio` + live region; test en `personas.test.tsx`.
+
+## Hecho (acumulado reciente)
+
+- Estado cuenta / Movimientos / Cuentas EstadoVacio TalkBack, tabs a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en ayuda/onboarding/tandas (no mezclar sin revisar).
-- Typecheck móvil: otros TS pendientes.
+- WIP: `PreguntasCaptura`, principal (`PanelRegistrar`), `PantallaTanda.tsx`.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Descartar o commitear WIP ayuda/onboarding limpio.
-3. Recordatorio cobrar: pista TalkBack si otro pase M13.
+2. Cerrar WIP captura/respaldo/tanda sin pisar.
+3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
 
