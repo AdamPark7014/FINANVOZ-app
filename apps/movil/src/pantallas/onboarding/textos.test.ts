@@ -59,6 +59,10 @@ describe('textos de onboarding', () => {
     expect(etiquetaProgresoOnboarding(3)).toBe('Paso 3 de 7 del recorrido inicial');
   });
 
+  it('TalkBack del consejo antepone «Consejo»', () => {
+    expect(etiquetaTipOnboarding(TIP_INGRESO_SALTAR)).toBe(`Consejo: ${TIP_INGRESO_SALTAR}`);
+  });
+
   it('O3 y O4 cumplen 02 §14: tuteo y sin exclamación', () => {
     for (const texto of [TITULO_INGRESO, TIP_INGRESO_SALTAR, TITULO_CUENTAS, TIP_CUENTAS_MINIMO]) {
       expect(texto).not.toMatch(/!/);

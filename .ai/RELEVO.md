@@ -1,7 +1,7 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-17
+- **Fecha:** 2026-10-18
 - **Rama:** main
 
 ## Hecho en este turno

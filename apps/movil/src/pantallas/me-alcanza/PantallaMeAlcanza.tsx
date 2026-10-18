@@ -214,7 +214,7 @@ export function PantallaMeAlcanza({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo" testID="me-alcanza-titulo">
+        <Texto variante="titulo" testID="me-alcanza-encabezado">
           {TITULO}
         </Texto>
         <Boton

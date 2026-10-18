@@ -181,7 +181,7 @@ export function ActivarCaptura({
             >
               {paso.denegado ? PERMISO_DENEGADO : PERMISO_INSTRUCCION}
             </Texto>
-            <Texto variante="secundario" tono="secundario">
+            <Texto variante="secundario" tono="secundario" accessibilityElementsHidden>
               {PERMISO_AYUDA_ANDROID}
             </Texto>
           </Tarjeta>

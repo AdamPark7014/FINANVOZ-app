@@ -444,7 +444,7 @@ describe('¿Me alcanza?', () => {
   it('TalkBack en cabecera y acciones del formulario (`02 §19`)', () => {
     const p = e401();
     montar(p.ctx, <PantallaMeAlcanza alCerrar={jest.fn()} />);
-    expect(screen.getByTestId('me-alcanza-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('me-alcanza-encabezado')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-cerrar-me-alcanza')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
     expect(screen.getByTestId('boton-calcular-me-alcanza')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
   });
