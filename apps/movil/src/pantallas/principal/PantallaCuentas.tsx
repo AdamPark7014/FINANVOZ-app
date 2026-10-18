@@ -180,25 +180,27 @@ export function PantallaCuentas({
 
       {v.teDeben.length > 0 ? (
         <Seccion titulo="Te deben" testID="seccion-te-deben">
-          {v.teDeben.map((p) => (
-            <Fila
-              key={p.id}
-              testID={`te-debe-${p.id}`}
-              titulo={p.nombre}
-              subtitulo={null}
-              centavos={p.saldo}
-              contextoSaldo={contextoSaldoTeDebe(p.nombre)}
-              {...(alAbrirPersona
-                ? {
-                    accion: {
-                      etiqueta: 'Cobrar',
-                      etiquetaAccesible: `Cobrar a ${p.nombre}`,
-                      alPresionar: () => alAbrirPersona(p.id),
-                    },
-                  }
-                : {})}
-            />
-          ))}
+          <View accessibilityRole="list" testID="seccion-te-deben-lista" style={{ gap: espacio.s }}>
+            {v.teDeben.map((p) => (
+              <Fila
+                key={p.id}
+                testID={`te-debe-${p.id}`}
+                titulo={p.nombre}
+                subtitulo={null}
+                centavos={p.saldo}
+                contextoSaldo={contextoSaldoTeDebe(p.nombre)}
+                {...(alAbrirPersona
+                  ? {
+                      accion: {
+                        etiqueta: 'Cobrar',
+                        etiquetaAccesible: `Cobrar a ${p.nombre}`,
+                        alPresionar: () => alAbrirPersona(p.id),
+                      },
+                    }
+                  : {})}
+              />
+            ))}
+          </View>
         </Seccion>
       ) : null}
 
@@ -210,16 +212,20 @@ export function PantallaCuentas({
             etiquetaAccesible={etiquetaVacioCuentasCompromisos()}
           />
         ) : null}
-        {v.compromisos.map((c) => (
-          <Fila
-            key={`${c.programadoId}:${c.fecha}`}
-            testID={`compromiso-${c.programadoId}`}
-            titulo={c.concepto}
-            subtitulo={etiquetaFecha(c.fecha)}
-            centavos={c.monto}
-            contextoSaldo={contextoSaldoCompromiso(c.concepto, etiquetaFecha(c.fecha))}
-          />
-        ))}
+        {v.compromisos.length > 0 ? (
+          <View accessibilityRole="list" testID="seccion-compromisos-lista" style={{ gap: espacio.s }}>
+            {v.compromisos.map((c) => (
+              <Fila
+                key={`${c.programadoId}:${c.fecha}`}
+                testID={`compromiso-${c.programadoId}`}
+                titulo={c.concepto}
+                subtitulo={etiquetaFecha(c.fecha)}
+                centavos={c.monto}
+                contextoSaldo={contextoSaldoCompromiso(c.concepto, etiquetaFecha(c.fecha))}
+              />
+            ))}
+          </View>
+        ) : null}
       </Seccion>
 
       {alAbrirTandas ? (

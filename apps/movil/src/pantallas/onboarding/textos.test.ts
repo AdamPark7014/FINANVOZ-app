@@ -11,6 +11,7 @@ import {
   ERROR_GUARDAR,
   ERROR_PAGO_FIJO_INCOMPLETO,
   etiquetaProgresoOnboarding,
+  etiquetaTipOnboarding,
   PASOS_ONBOARDING,
   PISTA_MARCAR_CASILLA_DATOS,
   TITULO_BIENVENIDA,

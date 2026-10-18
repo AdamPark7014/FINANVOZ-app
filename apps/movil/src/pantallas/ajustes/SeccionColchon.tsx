@@ -59,7 +59,9 @@ export function SeccionColchon() {
 
   return (
     <Tarjeta testID="ajustes-colchon">
-      <Texto variante="subtitulo">{SECCION_COLCHON}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-colchon-titulo" accessibilityRole="header">
+        {SECCION_COLCHON}
+      </Texto>
       {editando ? (
         <>
           <CampoMonto

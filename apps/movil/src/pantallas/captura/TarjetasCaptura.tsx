@@ -56,13 +56,13 @@ export function TarjetaArqueo({
       } else posponerArqueo(ctx);
       refrescar();
       mostrar({
-        mensaje: o === 'exacto' ? 'Listo: tu efectivo cuadra.' : 'Va. Te pregunto mañana.',
+        mensaje: o === 'exacto' ? mensajeCuadra() : MENSAJE_POSPONER,
       });
     } catch (e) {
       setError(mensajeError(e));
     }
   };
-  const pregunta = `Deberías traer ${exacto} en efectivo. ¿Cuánto traes?`;
+  const pregunta = textoDeberiasTraer(t.saldo);
   return (
     <Tarjeta testID={testID}>
       <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
@@ -71,11 +71,16 @@ export function TarjetaArqueo({
       {t.conPorAsignar ? (
         <View style={{ gap: espacio.s }}>
           <Texto variante="secundario" tono="secundario">
-            Antes revisemos unos gastos que no sé con qué pagaste.
+            {AYUDA_POR_ASIGNAR}
           </Texto>
-          <Boton etiqueta="Contar mi efectivo" alPresionar={alAbrirArqueo} testID={`${testID}-abrir`} />
           <Boton
-            etiqueta="Ahora no"
+            etiqueta={TITULO}
+            etiquetaAccesible={ACCESIBILIDAD_ABRIR}
+            alPresionar={alAbrirArqueo}
+            testID={`${testID}-abrir`}
+          />
+          <Boton
+            etiqueta={AHORA_NO}
             variante="texto"
             alPresionar={() => elegir('ahora_no')}
             testID={`${testID}-ahora_no`}
@@ -85,8 +90,8 @@ export function TarjetaArqueo({
         <GrupoChips
           opciones={[
             { valor: 'exacto', etiqueta: exacto },
-            { valor: 'otra_cantidad', etiqueta: 'Otra cantidad' },
-            { valor: 'ahora_no', etiqueta: 'Ahora no' },
+            { valor: 'otra_cantidad', etiqueta: ETIQUETA_OTRA_CANTIDAD },
+            { valor: 'ahora_no', etiqueta: AHORA_NO },
           ]}
           valor={null}
           alCambiar={elegir}

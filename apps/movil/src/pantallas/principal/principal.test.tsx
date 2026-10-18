@@ -29,6 +29,7 @@ import {
   etiquetaVacioCuentasTienes,
   etiquetaFiltroMovimientosActivo,
   etiquetaVacioMovimientos,
+  TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
   MENSAJE_ANULADO_MOVIMIENTO,

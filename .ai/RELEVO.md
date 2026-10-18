@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Tarjetas:** botón volver del detalle expone `PISTA_VOLVER` (TalkBack alineado con la prueba y con Tandas/Suscripciones).
+- **Deducciones importar:** `importar-titulo` con `accessibilityRole="header"` + aserción en `deducciones.test.tsx` (TalkBack §15).
 
 ## Hecho (acumulado reciente)
 
-- Deducciones leftover, widget PreviaWidget, ayuda TalkBack. Ver `git log`.
+- Movimientos/Cuentas headers, captura/personas vacíos, onboarding tips, suscripciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Volver sin tarjeta (`tarjeta-no-encontrada`) si conviene la misma pista.
+2. Headers TalkBack en pantallas restantes (Registrar, etc.) si hace falta.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar

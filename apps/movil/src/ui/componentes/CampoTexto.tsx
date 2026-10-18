@@ -36,6 +36,7 @@ export function CampoTexto({
   autoFocus,
   alEnviar,
   deshabilitado = false,
+  etiquetaAccesible,
   nativo,
   testID,
 }: CampoTextoProps) {

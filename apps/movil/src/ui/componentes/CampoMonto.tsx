@@ -1,6 +1,6 @@
 import type { Centavos } from '@cartera/core';
 import { useState } from 'react';
-import { formatearCentavos, leerPesos } from '../formato';
+import { etiquetaCampoMonto, formatearCentavos, leerPesos } from '../formato';
 import { CampoTexto } from './CampoTexto';
 
 export interface CampoMontoProps {

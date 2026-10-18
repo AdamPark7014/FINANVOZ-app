@@ -21,7 +21,9 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
   const configurado = vista.ingresoVariable || vista.ingreso !== null;
   return (
     <Tarjeta testID="ajustes-ingreso">
-      <Texto variante="subtitulo">{SECCION_INGRESO}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-ingreso-titulo" accessibilityRole="header">
+        {SECCION_INGRESO}
+      </Texto>
       <Texto variante="secundario" tono="secundario" testID="ajustes-ingreso-resumen">
         {resumenIngreso(vista, ctx.reloj.hoy())}
       </Texto>

@@ -135,6 +135,12 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       'accessibilityLabel',
       'Apartar un colchón',
     );
+    expect(screen.getByTestId('ajustes-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-colchon-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
+      'accessibilityHint',
+      'Abre el formulario para cambiar cuánto y cada cuándo te pagan',
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
   });
 

@@ -36,7 +36,7 @@ export const TEXTO_INGRESO_VARIABLE =
   'Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.';
 export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
-export const RESUMEN_SIN_INGRESO = 'Todavía no me dices cada cuándo te pagan.';
+export const RESUMEN_SIN_INGRESO = 'Aún no me dices cada cuándo te pagan.';
 export const RESUMEN_INGRESO_VARIABLE = 'Tu ingreso varía: reparto tu dinero libre en 30 días.';
 
 function nombreDia(dia: DiaSemana): string {

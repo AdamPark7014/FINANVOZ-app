@@ -82,6 +82,7 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
       ctx,
       <ImportarCompartidas leer={() => new Promise(() => {})} alVerDeducciones={jest.fn()} />,
     );
+    expect(screen.getByTestId('importar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('importar-leyendo')).toHaveProp('accessibilityLiveRegion', 'polite');
   });
 

@@ -29,6 +29,7 @@ import { leerDiaMes } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { ElegirCuenta, Seccion } from './componentes';
 import {
   etiquetaMes,
