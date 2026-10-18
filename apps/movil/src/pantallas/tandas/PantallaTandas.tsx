@@ -77,7 +77,12 @@ export function PantallaTandas({
               />
             </Tarjeta>
           ))}
-          <Boton testID="tandas-nueva" etiqueta={ETIQUETA_NUEVA_TANDA} alPresionar={() => setNueva(true)} />
+          <Boton
+            testID="tandas-nueva"
+            etiqueta={ETIQUETA_NUEVA_TANDA}
+            alPresionar={() => setNueva(true)}
+            pista={PISTA_NUEVA_TANDA}
+          />
         </>
       )}
     </Pantalla>

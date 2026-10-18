@@ -114,7 +114,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         <Tarjeta>
           <Texto variante="cuerpo">{textoProximaAportacion(d.proxima.etiqueta)}</Texto>
           {ya.elegir ?? (
-            <Boton testID="tanda-ya-la-di" etiqueta={ETIQUETA_YA_LA_DI} alPresionar={() => ya.dar()} />
+            <Boton
+              testID="tanda-ya-la-di"
+              etiqueta={ETIQUETA_YA_LA_LA_DI}
+              alPresionar={() => ya.dar()}
+              pista={PISTA_YA_LA_DI}
+            />
           )}
           {ya.error ? (
             <Texto variante="secundario" tono="faltante">
