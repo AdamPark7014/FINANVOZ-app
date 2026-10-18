@@ -6,21 +6,20 @@
 
 ## Hecho en este turno
 
-- **Ajustes › Ingreso y Colchón:** ya en `682a231` — headers TalkBack en secciones, copy `RESUMEN_SIN_INGRESO`, tests hints/títulos; pistas y `EditarIngreso` header en commits previos (`8088eb3`, `fddf40f`).
+- **Skip micro polish:** `main` ya en remoto con TalkBack Cuentas/Tandas (`dc79d22`), `EstadoVacio` (`6b51610`). Sin diff nuevo; push no necesario.
 
 ## Hecho (acumulado reciente)
 
-- Hoy alert TalkBack `71d133a`, Cuentas/captura `682a231`. Ver `git log`.
+- Ajustes ingreso/colchón `682a231`, Hoy alert `71d133a`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: ProbabilidadHoy, tandas/tarjetas tests, RELEVO sin commitear.
 - CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. No mezclar WIP local ajeno.
+2. Pista volver en detalle grupo compartido si conviene.
 
 ## No tocar
 
