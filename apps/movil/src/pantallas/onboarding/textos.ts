@@ -34,6 +34,8 @@ export const CASILLA_ESTADISTICAS_OPCIONAL =
 
 /** O3 · Ingreso */
 export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
+export const TIP_INGRESO_SALTAR =
+  'Si todavía no quieres poner tu ingreso, toca «Saltar por ahora»; lo configuras cuando quieras en Ajustes › Ingreso.';
 export const BTN_ONB_SALTAR = 'Saltar por ahora';
 export const PISTA_INGRESO_SALTAR = 'Calcularé tu día con los próximos 30 días';
 export const CUERPO_INGRESO_VARIABLE =
@@ -84,6 +86,8 @@ export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
 export const AYUDA_PAGO_VARIABLE =
   'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
 export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
+export const TIP_PAGOS_SALTAR =
+  'Si hoy no quieres registrar pagos fijos, toca «Saltar por ahora»; los agregas cuando quieras desde Hoy.';
 
 export function etiquetaAgregarPago(concepto: string): string {
   return `Agregar ${concepto}`;
@@ -96,6 +100,8 @@ export const AYUDA_COLCHON_ONB =
 export const ETIQUETA_COLCHON = 'Tu colchón';
 export const BTN_VER_MI_DIA = 'Ver mi día';
 export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
+export const TIP_COLCHON_SIN_POR_AHORA =
+  'Si hoy no quieres apartar nada, toca «Sin colchón por ahora»; lo configuras cuando quieras en Ajustes › Colchón.';
 
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
