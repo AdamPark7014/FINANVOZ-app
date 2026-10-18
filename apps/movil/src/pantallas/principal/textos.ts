@@ -9,6 +9,7 @@ import {
   MENSAJE_MOVIMIENTO_COMPARTIDO,
   MENSAJE_NO_ENTENDI,
   mensajeError,
+  type AccionElegir,
   type CompromisoConfigurado,
   type CuentaPorElegir,
   type EntradaMovimiento,
@@ -139,6 +140,31 @@ export function preguntaCuentaConfirmacionRegistro(f: CuentaPorElegir): string {
 
 export const ETIQUETA_GUARDAR = 'Guardar';
 export const ETIQUETA_CANCELAR = 'Cancelar';
+export const ETIQUETA_BORRAR = 'Borrar';
+
+/** Elegir movimiento, duplicados o aclarar (`06 §7`, `TarjetasInterpretacion`). */
+export const TITULO_ELEGIR_MOVIMIENTO: Record<AccionElegir, string> = {
+  corregir: '¿Cuál quieres corregir?',
+  anular: '¿Cuál quieres borrar?',
+  pasar_a_meses: '¿Cuál pasaste a meses?',
+};
+
+export function preguntaCuentaElegirMovimiento(falta: { motivo: string; alias?: string | null }): string {
+  if (falta.motivo === 'no_encontrada' && falta.alias) {
+    return `No tengo una cuenta «${falta.alias}». ¿Cuál fue?`;
+  }
+  return '¿Con qué cuenta fue?';
+}
+
+export function etiquetaBotonElegirMovimiento(accion: AccionElegir): string {
+  return accion === 'anular' ? ETIQUETA_BORRAR : ETIQUETA_GUARDAR;
+}
+
+export const TITULO_DUPLICADOS = 'Estos se parecen. ¿Alguno está repetido?';
+export const BTN_BORRAR_DUPLICADO = 'Borrar este';
+export const BTN_DUPLICADOS_OK = 'Están bien';
+export const TEXTO_ACLARAR_SIN_OPCIONES = 'Dímelo otra vez con ese dato.';
+export const MOVIMIENTO_SIN_NOMBRE = 'Movimiento';
 
 export const MENSAJE_NO_ENCONTRE = 'No encontré ese movimiento.';
 export const MENSAJE_SIN_DUPLICADOS = 'No vi movimientos repetidos.';

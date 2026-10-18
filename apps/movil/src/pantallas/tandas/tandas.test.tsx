@@ -162,12 +162,9 @@ describe('Tandas (02 §18)', () => {
     expect(within(tarjeta).getByText(PREGUNTA_YA_DISTE)).toBeTruthy();
     fireEvent.press(within(tarjeta).getByTestId('tarjeta-accion-0-ya-la-di'));
     fireEvent.press(screen.getByTestId(`tarjeta-accion-0-cuenta-${p.efectivo}`));
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
-        { hidden: true },
-      ),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(
+      mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
+    );
     const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
     expect(ronda?.estado).toBe('cubierta');
     expect(screen.queryByText(PREGUNTA_YA_DISTE)).toBeNull();
@@ -189,12 +186,18 @@ describe('Tandas (02 §18)', () => {
       .find((n) => within(n).queryByText(PREGUNTA_HOY_COBRO))?.props.testID as string;
     fireEvent.press(screen.getByTestId(`${testID}-me-toco`));
     fireEvent.press(screen.getByTestId(`${testID}-me-toco-cuenta-${p.bbva}`));
+<<<<<<< Updated upstream
     expect(
       within(screen.getByTestId('aviso')).getByText(
         mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
         { hidden: true },
       ),
     ).toBeTruthy();
+=======
+    expect(screen.getByTestId('aviso')).toHaveTextContent(
+      mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
+    );
+>>>>>>> Stashed changes
     expect(detalleTanda(p.ctx, tandaId).cobrada).toBe(true);
     expect(p.ctx.libro.saldo(cuentaId)).toBe(200_000 - 500_000);
   });
@@ -212,6 +215,7 @@ describe('Tandas (02 §18)', () => {
       textoYaEmpezoCompleto({
         aportacionesHechas: 6,
         yaCobraste: true,
+        saldoInicial: -200_000,
         faltan: 4,
         porAportar: 200_000,
       }),

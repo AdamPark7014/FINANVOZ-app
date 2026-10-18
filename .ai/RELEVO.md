@@ -6,28 +6,28 @@
 
 ## Hecho en este turno
 
-- **estados-cuenta:** copy centralizado en `textos.ts` (botones, avisos, vacío `TEXTO_SIN_NUEVOS`, helpers); `LeerEstadoCuenta` con `EstadoVacio`, live regions y etiquetas TalkBack; prueba de aviso a11y + título.
+- **test(movil): tandas** — aserciones de aviso en Hoy (aportación/cobro) unificadas con `toHaveTextContent` en `tandas.test.tsx`, alineadas al resto del archivo.
 
 ## Hecho (acumulado reciente)
 
-Ver `git log` (deducciones, suscripciones, tabs, Ayuda/Ajustes alias, etc.).
+- Pulir UI principal, tarjetas, suscripciones, barrels copy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en otras pantallas (tarjetas, tandas, respaldo…) — no mezclar sin pedido.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno (`TarjetasInterpretacion.tsx`, `principal/textos.ts`, estados-cuenta, PanelRegistrar) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Push de commits locales en main si procede.
+2. Push `main` si hace falta.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `apps/movil/src/pantallas/tandas/textos.ts` sin commitear de turnos ajenos salvo pedido.
+- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 

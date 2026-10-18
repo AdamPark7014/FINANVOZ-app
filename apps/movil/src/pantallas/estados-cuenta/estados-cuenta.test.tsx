@@ -19,12 +19,15 @@ import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { esPdfCompartido } from './compartido';
 import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
 import {
+  ETIQUETA_AVISO_ESTADO,
   ERROR_CONTRASENA_PDF,
   mensajeGuardado,
   mensajeNoReconocido,
   MENSAJE_ESCANEADO,
+  MENSAJE_INVALIDO,
   TEXTO_SIN_NUEVOS,
   tituloNuevos,
+  TITULO_PANTALLA,
 } from './textos';
 
 const PDF = join(__dirname, '../../../../../fixtures/pdf');
@@ -116,6 +119,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     const { ctx, oro } = preparar();
     const extraer = jest.fn(async () => texto(PAGINAS_B));
     const v = montar(ctx, extraer);
+    expect(screen.getByTestId('estado-cuenta-titulo')).toHaveTextContent(TITULO_PANTALLA);
     expect(await screen.findByTestId('estado-resumen-texto')).toHaveTextContent(
       'Leí tu estado de cuenta de la Oro (corte 10 oct): 42 movimientos; 3 no los tenía; el saldo al corte coincide',
     );
@@ -227,6 +231,14 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toStrictEqual([]);
     await presionar('estado-salir');
     expect(v.alSalir).toHaveBeenCalled();
+  });
+
+  it('avisos de error usan etiqueta TalkBack', async () => {
+    const { ctx } = preparar();
+    montar(ctx, async () => ({ tipo: 'invalido' }));
+    const aviso = await screen.findByTestId('estado-error');
+    expect(aviso).toHaveTextContent(MENSAJE_INVALIDO);
+    expect(aviso.props.accessibilityLabel).toBe(`${ETIQUETA_AVISO_ESTADO}: ${MENSAJE_INVALIDO}`);
   });
 
   it('banco desconocido, archivo inválido, demasiado grande, sin módulo y error al leer', async () => {

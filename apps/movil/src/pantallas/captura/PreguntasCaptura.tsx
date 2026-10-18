@@ -92,7 +92,9 @@ function Marco({
 }) {
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{titulo}</Texto>
+      <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {titulo}
+      </Texto>
       <Texto variante="secundario" tono="secundario">
         {detalle}
       </Texto>

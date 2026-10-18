@@ -12,20 +12,25 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
-import { NOMBRE_TIPO_LIBRO } from './textos';
+import {
+  BTN_BORRAR_DUPLICADO,
+  BTN_DUPLICADOS_OK,
+  ETIQUETA_CANCELAR,
+  etiquetaBotonElegirMovimiento,
+  MOVIMIENTO_SIN_NOMBRE,
+  NOMBRE_TIPO_LIBRO,
+  preguntaCuentaElegirMovimiento,
+  TEXTO_ACLARAR_SIN_OPCIONES,
+  TITULO_DUPLICADOS,
+  TITULO_ELEGIR_MOVIMIENTO,
+} from './textos';
 
 type Elegir = Extract<ResultadoTexto, { resultado: 'elegir' }>;
 type Duplicados = Extract<ResultadoTexto, { resultado: 'duplicados' }>;
 type Aclarar = Extract<ResultadoTexto, { resultado: 'aclarar' }>;
 
-const TITULO_ELEGIR: Record<AccionElegir, string> = {
-  corregir: '¿Cuál quieres corregir?',
-  anular: '¿Cuál quieres borrar?',
-  pasar_a_meses: '¿Cuál pasaste a meses?',
-};
-
 function nombre(m: MovimientoVista): string {
-  return m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
+  return m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_NOMBRE;
 }
 
 /** "Tacos $80 · 11 oct · Nu" */
@@ -88,7 +93,7 @@ export function TarjetaElegir({
 
   return (
     <Tarjeta testID="tarjeta-elegir">
-      <Texto variante="subtitulo">{TITULO_ELEGIR[datos.accion]}</Texto>
+      <Texto variante="subtitulo">{TITULO_ELEGIR_MOVIMIENTO[datos.accion]}</Texto>
       <GrupoChips
         opciones={datos.candidatos.map((m) => ({ valor: m.id, etiqueta: etiquetaMovimiento(m) }))}
         valor={movimiento}
@@ -98,9 +103,7 @@ export function TarjetaElegir({
       {falta ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" tono="secundario">
-            {falta.motivo === 'no_encontrada' && falta.alias
-              ? `No tengo una cuenta «${falta.alias}». ¿Cuál fue?`
-              : '¿Con qué cuenta fue?'}
+            {preguntaCuentaElegirMovimiento(falta)}
           </Texto>
           <GrupoChips
             opciones={falta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
@@ -116,12 +119,17 @@ export function TarjetaElegir({
         </Texto>
       ) : null}
       <Boton
-        etiqueta={datos.accion === 'anular' ? 'Borrar' : 'Guardar'}
+        etiqueta={etiquetaBotonElegirMovimiento(datos.accion)}
         alPresionar={guardar}
         deshabilitado={!completo}
         testID="boton-guardar-eleccion"
       />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="boton-cancelar-eleccion" />
+      <Boton
+        etiqueta={ETIQUETA_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID="boton-cancelar-eleccion"
+      />
     </Tarjeta>
   );
 }
@@ -142,7 +150,7 @@ export function TarjetaDuplicados({
   const [error, setError] = useState<string | null>(null);
   return (
     <Tarjeta testID="tarjeta-duplicados">
-      <Texto variante="subtitulo">Estos se parecen. ¿Alguno está repetido?</Texto>
+      <Texto variante="subtitulo">{TITULO_DUPLICADOS}</Texto>
       {datos.grupos.map((grupo, g) => (
         <View key={g} style={{ gap: espacio.s }}>
           {grupo.map((m) => (
