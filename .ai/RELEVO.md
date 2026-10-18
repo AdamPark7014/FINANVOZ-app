@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Personas · TalkBack recordatorio:** `PISTA_QUITAR_RECORDATORIO` en el botón quitar; mensaje sin permiso de avisos con rol `alert`; tests en `personas.test.tsx`.
+- **Personas · TalkBack datos para cobrar:** `PISTA_GUARDAR_DATOS_COBRO`, `PISTA_GUARDAR_Y_COBRAR` y cancelar en `FormularioDatosCobro`; error CLABE/celular con rol `alert`; tests en `personas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Tarjetas historial estado de cuenta, tandas archivada, ayuda, captura, widget. Ver `git log`.
+- Recordatorio quitar/alert, tarjetas historial, tandas, ayuda, captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, arqueo, tarjetas, captura, me-alcanza) — no mezclar en commits ajenos.
+- WIP paralelo (onboarding, arqueo, tarjetas, suscripciones) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
