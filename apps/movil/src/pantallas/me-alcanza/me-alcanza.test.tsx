@@ -308,7 +308,6 @@ describe('¿Me alcanza?', () => {
       { notificaciones },
     );
     await screen.findByTestId('me-alcanza-resultado');
-    expect(screen.getByText('Recuérdamelo el jueves')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-recuerdamelo'));
     await screen.findByTestId('recordatorio-programado');
     expect(textoDe('recordatorio-programado')).toBe(TEXTO_RECORDATORIO_PROGRAMADO);

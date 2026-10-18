@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **ayuda/textos.ts:** alias `SECCION_AYUDA`, `TEXTO_AYUDA` y `BTN_AYUDA` alineados con el reexport en `ajustes/textos.ts` (tests e `index` ya los usaban).
+- **movil/estados-cuenta:** carpeta completa — copy en `textos.ts`, `LeerEstadoCuenta` sin cadenas inline, barrel exporta `textos`; pruebas `estados-cuenta.test.tsx` OK.
 
 ## Hecho (acumulado reciente)
 
-- CTAs ¿Me alcanza?; deducciones copy; alias Ayuda/Ajustes. Ver `git log`.
+- Copy movil (suscripciones, deducciones, privacidad, ayuda). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear (captura, estados-cuenta, tarjetas, suscripciones…) — no mezclado.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno (me-alcanza, movimientos, respaldo, tandas) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP ajeno si Adam lo pide.
+2. Commits pequeños del WIP ajeno o siguiente carpeta con copy inline.
 
 ## No tocar
 
