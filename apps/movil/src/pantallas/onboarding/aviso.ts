@@ -16,6 +16,7 @@ export const AVISO_SIMPLIFICADO: readonly string[] = [
   'Lo que anotas sobre tu dinero (cuentas, saldos, tarjetas, pagos y movimientos) se guarda cifrado solo en tu teléfono.',
   'Lo usamos para decirte cuánto puedes gastar hoy y recordarte tus pagos.',
   'Las frases que la app no entiende sola se envían para interpretarlas y no se guardan.',
+  'Con Plus, si haces preguntas abiertas sobre tu dinero, enviamos tu pregunta y resúmenes agregados (montos formateados y nombres cortos de categorías o cuentas) al proveedor de inteligencia artificial para redactar la respuesta; no enviamos tu libro completo ni se guarda allí.',
   'Si la app falla, enviamos un reporte del error sin montos, nombres ni comercios.',
   'Las estadísticas de uso son opcionales y están apagadas si no las aceptas.',
   'Puedes descargar tus datos o borrarlos todos cuando quieras desde Ajustes › Privacidad.',
@@ -40,6 +41,7 @@ export const AVISO_COMPLETO: readonly SeccionAviso[] = [
       'Los datos sobre tu dinero que tú anotas: cuentas, saldos, tarjetas, compras a meses, ingresos, pagos fijos, movimientos y personas a quienes les prestas o que te prestan (solo el nombre que escribes). Son datos financieros y patrimoniales: los tratamos solo con tu consentimiento expreso.',
       'Si activas la captura automática, el texto de los avisos de las apps de banco que elijas. Se procesa en tu teléfono y no se envía a nuestros servidores.',
       'Las frases que dictas o escribes cuando la app no las entiende sola, para interpretarlas.',
+      'Si tienes Plus y usas las preguntas abiertas sobre tu dinero: la pregunta que escribes o dictas y los resúmenes agregados que la app calcula en tu teléfono a partir de tu libro (textos con montos formateados y nombres cortos de categorías, cuentas o periodos; no movimientos uno por uno).',
       'Un identificador anónimo de la app, la versión de este aviso que aceptaste y la fecha y hora en que lo aceptaste.',
       'Reportes de errores de la app, sin montos, comercios, nombres ni lo que dictas.',
       'Si las aceptas, estadísticas anónimas de uso: qué funciones usas, nunca montos, comercios, nombres ni lo que dictas.',
@@ -55,7 +57,7 @@ export const AVISO_COMPLETO: readonly SeccionAviso[] = [
   {
     titulo: 'Para qué los usamos',
     parrafos: [
-      'Finalidades necesarias: decirte cuánto puedes gastar hoy, qué pagos vienen y cómo van tus tarjetas; interpretar lo que dictas o escribes; corregir fallas de la app; y, si compras Plus, darte sus funciones.',
+      'Finalidades necesarias: decirte cuánto puedes gastar hoy, qué pagos vienen y cómo van tus tarjetas; interpretar lo que dictas o escribes; corregir fallas de la app; y, si compras Plus, darte sus funciones (incluidas las preguntas abiertas, enviando solo tu pregunta y resúmenes agregados al proveedor de inteligencia artificial para redactar la respuesta).',
       'Finalidades opcionales: estadísticas anónimas de uso para mejorar la app. Solo se usan si las aceptas y puedes negarte o apagarlas cuando quieras en Ajustes › Privacidad sin perder ninguna función.',
       'No vendemos tus datos ni los usamos para publicidad.',
     ],
@@ -65,7 +67,7 @@ export const AVISO_COMPLETO: readonly SeccionAviso[] = [
     parrafos: [
       'Estos servicios los tratan por cuenta nuestra, como encargados, y algunos en servidores fuera de México:',
       'Supabase: la sesión anónima de la app, la cuenta de tus interpretaciones del mes y la evidencia de que aceptaste este aviso.',
-      'Un proveedor de inteligencia artificial: interpreta al momento las frases que la app no entiende sola, sin guardarlas.',
+      'Un proveedor de inteligencia artificial: interpreta al momento las frases que la app no entiende sola; y, con Plus, recibe tu pregunta y los resultados agregados de las consultas que la app ya hizo en tu teléfono (montos formateados y nombres cortos). En ambos casos el tratamiento es al momento y no guarda esos textos.',
       'Sentry: reportes de errores ya limpios.',
       'PostHog: estadísticas anónimas de uso, solo si las aceptas.',
       'Google Play y RevenueCat: tu suscripción, si compras Plus.',

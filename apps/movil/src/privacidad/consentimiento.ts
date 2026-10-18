@@ -7,7 +7,7 @@ import { borrarAjuste, escribirAjuste, leerAjuste } from '../servicios/preferenc
  * Versión del aviso de privacidad simplificado y del texto de consentimiento de O2 (`02 §3`, `08`). Cambia
  * cuando cambia el texto: la evidencia guarda la versión que la persona aceptó.
  */
-export const VERSION_CONSENTIMIENTO = '2026-10-m7';
+export const VERSION_CONSENTIMIENTO = '2026-10-m8';
 
 const CLAVE = 'consentimiento';
 const CLAVE_HISTORIAL = 'consentimiento_historial';
@@ -40,7 +40,7 @@ const SoloLecturaConsentimiento = z.strictObject({
 });
 export type SoloLecturaConsentimiento = z.infer<typeof SoloLecturaConsentimiento>;
 
-/** Orden de versiones `YYYY-MM-mN` (p. ej. `2026-10-m7`). */
+/** Orden de versiones `YYYY-MM-mN` (p. ej. `2026-10-m8`). */
 export function compararVersionAviso(a: string, b: string): number {
   const partes = (v: string) => {
     const m = /^(\d{4})-(\d{2})-m(\d+)$/.exec(v);

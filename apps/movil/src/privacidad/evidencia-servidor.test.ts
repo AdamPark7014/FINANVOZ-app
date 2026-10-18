@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { abrirPrueba } from '../servicios/__pruebas__/base';
-import { aceptarConsentimiento } from './consentimiento';
+import { aceptarConsentimiento, VERSION_CONSENTIMIENTO } from './consentimiento';
 import {
   crearPuertoEvidencia,
   evidenciaPendiente,
@@ -56,7 +56,7 @@ describe('evidencia del consentimiento en el servidor (08 §2, §7.1)', () => {
     expect(evidenciaPendiente(p.ctx)).toBe(true);
     expect(await sincronizarEvidencia(p.ctx, { enviar })).toBe(true);
     expect(enviar).toHaveBeenLastCalledWith(
-      expect.objectContaining({ version_aviso: '2026-10-m7' }),
+      expect.objectContaining({ version_aviso: VERSION_CONSENTIMIENTO }),
     );
     p.base.cerrar();
   });
@@ -75,7 +75,7 @@ describe('evidencia del consentimiento en el servidor (08 §2, §7.1)', () => {
       sesion: { obtenerToken },
       transporte,
     });
-    const cuerpo = { version_aviso: '2026-10-m7', aceptado_en: '2026-10-11T16:00:00.000Z' };
+    const cuerpo = { version_aviso: VERSION_CONSENTIMIENTO, aceptado_en: '2026-10-11T16:00:00.000Z' };
     expect(await puerto.enviar(cuerpo)).toBe(true);
     expect(llamadas).toHaveLength(2);
     const [url, init] = llamadas[1] as [string, RequestInit];

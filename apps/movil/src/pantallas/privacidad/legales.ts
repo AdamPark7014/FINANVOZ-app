@@ -9,7 +9,7 @@ export const TEXTO_NO_ASESORIA =
   'Finanvoz no es una institución financiera ni asesor de inversiones. Las cifras son estimaciones con la información que registras y no garantizan resultados.';
 
 /** Versión de los términos de uso; cambia cuando cambia el texto. Pendiente la revisión legal (ESTADO). */
-export const VERSION_TERMINOS = '2026-10-m7';
+export const VERSION_TERMINOS = '2026-10-m8';
 
 /** Términos de uso de la beta con el texto de `08 §1` (checklist §7.1). */
 export const TERMINOS: readonly SeccionAviso[] = [
@@ -36,7 +36,7 @@ export const TERMINOS: readonly SeccionAviso[] = [
   {
     titulo: 'Planes',
     parrafos: [
-      'Registrar, ver y descargar tus datos es gratis siempre. Plus agrega funciones de análisis; su precio, periodo, prueba gratuita y forma de cancelar se muestran antes de comprar y el cobro lo hace la tienda. Si cancelas o termina la prueba, vuelves a Gratis sin perder tus datos.',
+      'Registrar, ver y descargar tus datos es gratis siempre. Plus agrega funciones de análisis, incluidas preguntas abiertas sobre tu dinero: la app calcula en tu teléfono resúmenes agregados (montos formateados y nombres cortos) y, con tu pregunta, los envía a un proveedor de inteligencia artificial para redactar la respuesta; no envía tu libro completo. El precio, periodo, prueba gratuita y forma de cancelar se muestran antes de comprar y el cobro lo hace la tienda. Si cancelas o termina la prueba, vuelves a Gratis sin perder tus datos.',
     ],
   },
   {
