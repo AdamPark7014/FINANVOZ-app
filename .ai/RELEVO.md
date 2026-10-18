@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Ajustes · Datos para cobrar y Avisos:** `PISTA_*` en botones Agregar/Cambiar/Borrar, Permitir avisos y Guardar horario; tests en `personas.test.tsx` y `riesgo.test.tsx`.
+- **Captura · TalkBack reactivar:** `etiquetaCuerpoReactivarCaptura` en cuerpo de `TarjetaReactivarCaptura`; tests en `captura.test.tsx` y `textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Ficha persona, respaldo TalkBack, captura, tandas. Ver `git log`.
+- Intro/guía/pistas captura por revisar e inactiva, respaldo, ayuda. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, arqueo, ayuda, respaldo) — no mezclar en commits ajenos.
+- WIP paralelo (ajustes, personas, principal, ayuda) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `PISTA` en CTA Tandas desde Cuentas (`boton-tandas`).
+2. TalkBack `ActivarCaptura` «Ahora no» o CTA Tandas (`boton-tandas`).
 
 ## No tocar
 
