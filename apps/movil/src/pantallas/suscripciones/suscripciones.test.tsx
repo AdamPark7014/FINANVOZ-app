@@ -52,6 +52,7 @@ describe('Suscripciones (02 §20)', () => {
   it('Volver tiene pista TalkBack', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(screen.getByTestId('suscripciones-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('suscripciones-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
