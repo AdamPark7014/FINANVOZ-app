@@ -97,6 +97,14 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId('tandas-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 
+  it('Volver en el detalle tiene pista TalkBack', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
+  });
+
   it('sin tandas lo explica y deja crear una nueva', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);

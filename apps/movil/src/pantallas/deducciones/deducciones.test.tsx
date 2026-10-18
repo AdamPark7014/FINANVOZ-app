@@ -218,6 +218,8 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar({ plus: false });
     renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
     expect(screen.getByTestId('puerta-plus')).toBeTruthy();
+    expect(screen.getByText(TITULO_PUERTA_PLUS)).toBeTruthy();
+    expect(screen.getByText(DESCRIPCION_PUERTA_PLUS)).toBeTruthy();
     expect(screen.queryByTestId('pantalla-deducciones')).toBeNull();
   });
 
@@ -225,6 +227,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar();
     const alAbrir = jest.fn();
     renderConSesion(ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirDeducciones={alAbrir} />);
+    expect(screen.getByText(BTN_DEDUCCIONES_CUENTAS)).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-deducciones'));
     expect(alAbrir).toHaveBeenCalled();
   });

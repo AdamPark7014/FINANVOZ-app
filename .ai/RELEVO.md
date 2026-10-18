@@ -6,25 +6,21 @@
 
 ## Hecho en este turno
 
-- **Personas:** `persona-movimientos-titulo` con rol header; prueba en `personas.test.tsx`.
-- **Tandas:** `tandas-titulo` con `accessibilityRole="header"` (paridad con test).
-- **Onboarding:** tips O3–O7 viven en `textos.ts`; `tips.ts` reexporta sin ciclo con `textos`.
-- **Principal:** aserción de cuentas usa `listarCuentas` con nombre real del escenario.
+- **Cuentas:** botón Tandas usa `BTN_TANDAS_CUENTAS` en `tandas/textos.ts` (simétrico a suscripciones, deducciones y compartidos).
 
 ## Hecho (acumulado reciente)
 
-- Tabs TalkBack, deducciones copy, PreviaWidget, captura. Ver `git log`.
+- Onboarding O5/O7 copy, tabs TalkBack, personas/widget tests. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar tips O2/O6 en `textos` si se quiere un solo módulo.
+2. Centralizar inline restante en `PantallaCuentas` (`Ajustes`, tarjetas) si conviene.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar

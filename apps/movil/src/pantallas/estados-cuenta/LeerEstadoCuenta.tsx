@@ -400,7 +400,11 @@ function Revisar({
           ))}
         </View>
       ) : (
-        <EstadoVacio texto={TEXTO_SIN_NUEVOS} testID="estado-sin-nuevos" />
+        <EstadoVacio
+          texto={TEXTO_SIN_NUEVOS}
+          testID="estado-sin-nuevos"
+          etiquetaAccesible={etiquetaVacioSinNuevosEstado()}
+        />
       )}
 
       {a.dudosos.length > 0 ? (
