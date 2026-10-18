@@ -1,4 +1,6 @@
 /** Copy de deducciones (`02 §24`, `08 §1`, tuteo); las cifras vienen de motores, no de aquí. */
+import { etiquetaHablada } from '../../ui/formato';
+
 export { AVISO_DEDUCIBLE_EFECTIVO, LEYENDA_ESTIMACION, MENSAJE_SIN_PARAMETROS } from '../../servicios/deducciones';
 
 export const ETIQUETA_VOLVER = 'Volver';
@@ -26,7 +28,10 @@ export const ETIQUETA_BASE_GRAVABLE = 'Base gravable (opcional)';
 export const AYUDA_BASE_GRAVABLE = 'Viene en tu constancia de sueldos o te la da tu contador.';
 export const ETIQUETA_GUARDAR = 'Guardar';
 export const ETIQUETA_CANCELAR = 'Cancelar';
+export const PISTA_GUARDAR_PERFIL = 'Guarda tu RFC e ingresos en este teléfono';
+export const PISTA_CANCELAR_PERFIL = 'Cierra sin guardar tu perfil fiscal';
 export const BTN_CAMBIAR_PERFIL = 'Cambiar mi RFC o mis ingresos';
+export const PISTA_CAMBIAR_PERFIL = 'Vuelve a editar tu RFC o tus ingresos del año';
 
 export const BTN_IMPORTAR_FACTURAS = 'Importar facturas (XML o ZIP)';
 /** TalkBack: acción principal de la pantalla (`02 §15`). */
@@ -69,22 +74,47 @@ export const BTN_VER_DEDUCCIONES = 'Ver mis deducciones';
 /** Entrada desde Cuentas (`02 §24`). */
 export const BTN_DEDUCCIONES_CUENTAS = 'Ver mis deducciones del año';
 export const ETIQUETA_IMPORTACION_LISTO = 'Listo';
+export const PISTA_LISTO_IMPORTACION = 'Cierra el resumen de la importación';
+export const PISTA_VER_DEDUCCIONES = 'Abre tus deducciones del año';
 
 /** Detalle por factura. */
 export const ETIQUETA_COLEGIATURA_DE_QUIEN = '¿De quién es la colegiatura?';
 export const ETIQUETA_NIVEL = 'Nivel';
 export const BTN_GUARDAR_ALUMNO_NIVEL = 'Guardar alumno y nivel';
+export const PISTA_GUARDAR_ALUMNO_NIVEL = 'Guarda el nombre del alumno y su nivel escolar';
 export const ETIQUETA_LENTES = 'Son lentes ópticos';
 export const DESC_LENTES = 'En el año, los lentes tienen tope aparte del resto de salud.';
 export const ETIQUETA_BENEFICIARIO_LENTES = '¿De quién son?';
 export const BTN_YA_LA_PAGUE = 'Ya la pagué';
+export const PISTA_YA_LA_PAGUE = 'Indica cómo pagaste esta factura en pagos';
 export const ETIQUETA_FORMA_PAGO = '¿Cómo la pagaste?';
 export const BTN_CANCELADA_SAT = 'La cancelaron en el SAT';
+export const PISTA_MARCAR_CANCELADA_SAT = 'Marca que el SAT canceló esta factura';
 export const BTN_NO_CANCELADA_SAT = 'Ya no está cancelada';
+export const PISTA_QUITAR_CANCELADA_SAT = 'Quita la marca de cancelada en el SAT';
 export const BTN_OCULTAR_FACTURA = 'La importé por error';
+export const PISTA_OCULTAR_FACTURA = 'Quita la factura de tu lista sin borrar el archivo';
 export const BTN_RECUPERAR_FACTURA = 'Volver a mostrar';
+export const PISTA_RECUPERAR_FACTURA = 'Vuelve a incluir la factura en tu estimación';
 
 export const ESTADO_DEDUCIBLE = 'Deducible';
 
 /** TalkBack: la leyenda `LEYENDA_ESTIMACION` (`08 §1`). */
 export const ETIQUETA_LEYENDA_ESTIMACION = 'Aviso sobre estimaciones fiscales';
+
+/** Resumen de una factura en lista (`02 §15`: montos en palabras). */
+export function etiquetaAccesibleFactura(
+  emisor: string,
+  partes: readonly string[],
+  estado: string | null,
+): string {
+  const detalle = partes.filter(Boolean).join(' · ');
+  const lineas = [emisor, etiquetaHablada(detalle)];
+  if (estado) lineas.push(etiquetaHablada(estado));
+  return lineas.join('. ');
+}
+
+export function etiquetaAccesibleFacturaOculta(emisor: string, partes: readonly string[]): string {
+  const detalle = partes.filter(Boolean).join(' · ');
+  return `${emisor}. ${etiquetaHablada(detalle)}. Importada por error`;
+}

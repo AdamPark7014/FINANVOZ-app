@@ -22,6 +22,7 @@ import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones'
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   BTN_DEDUCCIONES_CUENTAS,
+  BTN_NO_CANCELADA_SAT,
   DESCRIPCION_PUERTA_PLUS,
   ETIQUETA_LEYENDA_ESTIMACION,
   LEYENDA_ESTIMACION,
@@ -37,6 +38,16 @@ import {
   TITULO_TUS_FACTURAS,
   PISTA_IMPORTAR_FACTURAS,
   PISTA_VOLVER,
+  PISTA_GUARDAR_PERFIL,
+  PISTA_CANCELAR_PERFIL,
+  PISTA_CAMBIAR_PERFIL,
+  PISTA_LISTO_IMPORTACION,
+  PISTA_VER_DEDUCCIONES,
+  PISTA_GUARDAR_ALUMNO_NIVEL,
+  PISTA_YA_LA_PAGUE,
+  PISTA_MARCAR_CANCELADA_SAT,
+  PISTA_OCULTAR_FACTURA,
+  PISTA_RECUPERAR_FACTURA,
   tituloPantallaDeducciones,
 } from './textos';
 
@@ -109,6 +120,18 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
     expect(leer).toHaveBeenCalledTimes(2);
   });
 
+  it('tras importar por compartir, Ver mis deducciones tiene pista TalkBack', async () => {
+    const ctx = preparar();
+    renderConSesion(
+      ctx,
+      <ImportarCompartidas leer={async () => [zipFixture()]} alVerDeducciones={jest.fn()} />,
+    );
+    expect(await screen.findByTestId('importar-ver-deducciones')).toHaveProp(
+      'accessibilityHint',
+      PISTA_VER_DEDUCCIONES,
+    );
+  });
+
   it('si no llegó ningún archivo o no se pudo leer, lo dice', async () => {
     const ctx = preparar();
     const r = renderConSesion(
@@ -140,6 +163,37 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
       PISTA_IMPORTAR_FACTURAS,
     );
     expect(screen.getByTestId('deducciones-tus-facturas')).toHaveProp('accessibilityRole', 'header');
+  });
+
+  it('TalkBack micro: pistas en perfil, importación y acciones de factura (`02 §19`)', async () => {
+    const ctx = preparar();
+    renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    expect(screen.getByTestId('perfil-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PERFIL);
+    llenarPerfil('PEPJ800101AB1', '300,000');
+    await importarDesdePantalla();
+    expect(screen.getByTestId('importacion-listo')).toHaveProp('accessibilityHint', PISTA_LISTO_IMPORTACION);
+    fireEvent.press(screen.getByTestId('importacion-listo'));
+    expect(screen.getByTestId('deducciones-editar-perfil')).toHaveProp('accessibilityHint', PISTA_CAMBIAR_PERFIL);
+    fireEvent.press(screen.getByTestId('deducciones-editar-perfil'));
+    expect(screen.getByTestId('perfil-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_PERFIL);
+    fireEvent.press(screen.getByTestId('perfil-cancelar'));
+
+    const dentista = uuidDe('c01_dentista_debito.xml');
+    const id = `factura-${dentista}`;
+    expect(screen.getByTestId(`${id}-cancelada`)).toHaveProp('accessibilityHint', PISTA_MARCAR_CANCELADA_SAT);
+    expect(screen.getByTestId(`${id}-ocultar`)).toHaveProp('accessibilityHint', PISTA_OCULTAR_FACTURA);
+
+    const hospital = uuidDe('c08_hospital_ppd.xml');
+    expect(screen.getByTestId(`factura-${hospital}-ya-la-pague`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_YA_LA_PAGUE,
+    );
+  });
+
+  it('pistas TalkBack de botones en tuteo', () => {
+    expect(PISTA_GUARDAR_PERFIL).toMatch(/Guarda/i);
+    expect(PISTA_VER_DEDUCCIONES).toMatch(/Abre/i);
+    expect(PISTA_YA_LA_PAGUE).toMatch(/pagaste/i);
   });
 
   it('sin facturas del ejercicio lo explica', () => {
@@ -185,6 +239,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
         fireEvent.press(screen.getByTestId(`${id}-guardar-alumno`));
       }
     }
+    expect(screen.getByTestId('deducciones-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('deducciones-titulo')).toBe('Llevas $25,900 deducibles en 2026 (estimación)');
     expect(textoDe('deducciones-tipo-D01')).toBe('Médicos, dentista y hospital: $4,000');
     expect(textoDe('deducciones-tipo-D07')).toBe('Seguros de gastos médicos: $9,000');
@@ -210,8 +265,14 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     expect(textoDe('deducciones-titulo')).toBe('Llevas $30,900 deducibles en 2026 (estimación)');
     expect(screen.queryByTestId(`no-deducible-${hospital}`)).toBeNull();
     expect(textoDe(`factura-${hospital}-pagada`)).toBe('Pagada con transferencia');
+    const dentistaId = uuidDe('c01_dentista_debito.xml');
+    const resumenDentista = within(screen.getByTestId(`factura-${dentistaId}`)).getByLabelText(
+      /^CLINICA DENTAL FICTICIA\./,
+    );
+    expect(resumenDentista.props.accessibilityLabel).toMatch(/pesos/i);
+    expect(resumenDentista.props.accessibilityLabel).not.toMatch(/\$/);
     // Todo lo tocable con rol y nombre, sin texto que se corte (`02 §15`).
-    expect(auditar(screen.toJSON())).toEqual([]);
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
   });
 
   it('con base gravable dice cuánto ISR podrías pagar de menos', async () => {
@@ -266,12 +327,16 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const dentista = uuidDe('c01_dentista_debito.xml');
     const lentes = uuidDe('c03_lentes_tarjeta.xml');
     fireEvent.press(screen.getByTestId(`factura-${dentista}-cancelada`));
-    expect(textoDe(`factura-${dentista}-estado`)).toMatch(/cancelada/i);
+    expect(screen.getByLabelText(BTN_NO_CANCELADA_SAT)).toBeTruthy();
 
     fireEvent.press(screen.getByTestId(`factura-${dentista}-ocultar`));
     expect(screen.queryByTestId(`factura-${dentista}`)).toBeNull();
     expect(screen.getByTestId('deducciones-ocultas-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('deducciones-ocultas-ayuda')).toBe(TEXTO_FACTURAS_OCULTAS);
+    expect(screen.getByTestId(`factura-oculta-${dentista}-recuperar`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_RECUPERAR_FACTURA,
+    );
     fireEvent.press(screen.getByTestId(`factura-oculta-${dentista}-recuperar`));
     expect(screen.getByTestId(`factura-${dentista}`)).toBeTruthy();
 

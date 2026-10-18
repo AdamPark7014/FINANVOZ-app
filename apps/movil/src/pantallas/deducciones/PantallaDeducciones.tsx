@@ -50,6 +50,8 @@ import {
   BTN_VER_DEDUCCIONES,
   BTN_YA_LA_PAGUE,
   DESCRIPCION_PUERTA_PLUS,
+  etiquetaAccesibleFactura,
+  etiquetaAccesibleFacturaOculta,
   ERROR_INGRESOS,
   ERROR_RFC,
   EJEMPLO_RFC,
@@ -67,6 +69,17 @@ import {
   ETIQUETA_BASE_GRAVABLE,
   ETIQUETA_VOLVER,
   PISTA_VOLVER,
+  PISTA_GUARDAR_PERFIL,
+  PISTA_CANCELAR_PERFIL,
+  PISTA_CAMBIAR_PERFIL,
+  PISTA_LISTO_IMPORTACION,
+  PISTA_VER_DEDUCCIONES,
+  PISTA_GUARDAR_ALUMNO_NIVEL,
+  PISTA_YA_LA_PAGUE,
+  PISTA_MARCAR_CANCELADA_SAT,
+  PISTA_QUITAR_CANCELADA_SAT,
+  PISTA_OCULTAR_FACTURA,
+  PISTA_RECUPERAR_FACTURA,
   ESTADO_DEDUCIBLE,
   ETIQUETA_LEYENDA_ESTIMACION,
   LEYENDA_ESTIMACION,
@@ -230,6 +243,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
           variante="texto"
           ancho="contenido"
           alPresionar={() => setEditando(true)}
+          pista={PISTA_CAMBIAR_PERFIL}
         />
       ) : null}
       {v.estado === 'listo' || v.estado === 'sin_parametros' ? <AvisoFiscalEstimacion /> : null}
@@ -255,7 +269,12 @@ function AvisoFiscalEstimacion() {
 function Estimacion({ v }: { v: Extract<VistaDeducciones, { estado: 'listo' }> }) {
   return (
     <Tarjeta testID="deducciones-estimacion">
-      <Texto variante="subtitulo" testID="deducciones-titulo" accessibilityLiveRegion="polite">
+      <Texto
+        variante="subtitulo"
+        testID="deducciones-titulo"
+        accessibilityRole="header"
+        accessibilityLiveRegion="polite"
+      >
         {v.titulo}
       </Texto>
       {v.porTipo.map((t) => (
@@ -273,7 +292,7 @@ function Estimacion({ v }: { v: Extract<VistaDeducciones, { estado: 'listo' }> }
       </Texto>
       {v.noDeducibles.length > 0 ? (
         <View style={{ gap: espacio.xs }} testID="deducciones-no-deducibles">
-          <Texto variante="etiqueta" testID="deducciones-no-deducibles-titulo">
+          <Texto variante="etiqueta" testID="deducciones-no-deducibles-titulo" accessibilityRole="header">
             {ETIQUETA_NO_DEDUCIBLES}
           </Texto>
           {v.noDeducibles.map((f) => (
@@ -344,13 +363,19 @@ function FormularioPerfil({
         testID="perfil-base"
       />
       <MensajeError texto={error} />
-      <Boton etiqueta={ETIQUETA_GUARDAR} alPresionar={guardar} testID="perfil-guardar" />
+      <Boton
+        etiqueta={ETIQUETA_GUARDAR}
+        alPresionar={guardar}
+        testID="perfil-guardar"
+        pista={PISTA_GUARDAR_PERFIL}
+      />
       {alCancelar ? (
         <Boton
           etiqueta={ETIQUETA_CANCELAR}
           variante="texto"
           alPresionar={alCancelar}
           testID="perfil-cancelar"
+          pista={PISTA_CANCELAR_PERFIL}
         />
       ) : null}
     </Tarjeta>
@@ -382,6 +407,7 @@ export function ResultadoImportacionTarjeta({
           ancho="contenido"
           alPresionar={alCerrar}
           testID="importacion-listo"
+          pista={PISTA_LISTO_IMPORTACION}
         />
       ) : null}
     </Tarjeta>
@@ -413,13 +439,37 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
         : null;
   return (
     <Tarjeta testID={id}>
-      <View style={{ gap: espacio.xxs }}>
-        <Texto variante="cuerpoFuerte">{f.emisor}</Texto>
-        <Texto variante="secundario" tono="secundario">
+      <View
+        accessible
+        accessibilityLabel={etiquetaAccesibleFactura(
+          f.emisor,
+          [f.textoFecha, f.textoTotal, f.tipo],
+          estado,
+        )}
+        style={{ gap: espacio.xxs }}
+      >
+        <Texto
+          variante="cuerpoFuerte"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {f.emisor}
+        </Texto>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {[f.textoFecha, f.textoTotal, f.tipo].filter(Boolean).join(' · ')}
         </Texto>
         {estado ? (
-          <Texto variante="secundario" testID={`${id}-estado`}>
+          <Texto
+            variante="secundario"
+            testID={`${id}-estado`}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
             {estado}
           </Texto>
         ) : null}
@@ -446,6 +496,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
             deshabilitado={alumno.trim() === '' || nivel === null}
             alPresionar={() => nivel && hacer(() => asignarAlumnoNivel(ctx, f.uuid, alumno, nivel))}
             testID={`${id}-guardar-alumno`}
+            pista={PISTA_GUARDAR_ALUMNO_NIVEL}
           />
         </View>
       ) : null}
@@ -477,6 +528,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
           variante="secundario"
           alPresionar={() => setPagando(true)}
           testID={`${id}-ya-la-pague`}
+          pista={PISTA_YA_LA_PAGUE}
         />
       ) : null}
       {f.enPagos && pagando ? (
@@ -506,6 +558,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
             ancho="contenido"
             alPresionar={() => hacer(() => marcarFacturaCancelada(ctx, f.uuid, !f.marcadaCancelada))}
             testID={`${id}-cancelada`}
+            pista={f.marcadaCancelada ? PISTA_QUITAR_CANCELADA_SAT : PISTA_MARCAR_CANCELADA_SAT}
           />
           <Boton
             etiqueta={BTN_OCULTAR_FACTURA}
@@ -513,6 +566,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
             ancho="contenido"
             alPresionar={() => hacer(() => ocultarFacturaImportada(ctx, f.uuid))}
             testID={`${id}-ocultar`}
+            pista={PISTA_OCULTAR_FACTURA}
           />
         </View>
       ) : null}
@@ -526,10 +580,26 @@ function FilaFacturaOculta({ f }: { f: FacturaVista }) {
   const id = `factura-oculta-${f.uuid}`;
   return (
     <Tarjeta testID={id}>
-      <Texto variante="cuerpoFuerte">{f.emisor}</Texto>
-      <Texto variante="secundario" tono="secundario">
-        {[f.textoFecha, f.textoTotal].filter(Boolean).join(' · ')}
-      </Texto>
+      <View
+        accessible
+        accessibilityLabel={etiquetaAccesibleFacturaOculta(f.emisor, [f.textoFecha, f.textoTotal])}
+      >
+        <Texto
+          variante="cuerpoFuerte"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {f.emisor}
+        </Texto>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {[f.textoFecha, f.textoTotal].filter(Boolean).join(' · ')}
+        </Texto>
+      </View>
       <Boton
         etiqueta={BTN_RECUPERAR_FACTURA}
         variante="secundario"
@@ -538,6 +608,7 @@ function FilaFacturaOculta({ f }: { f: FacturaVista }) {
           refrescar();
         }}
         testID={`${id}-recuperar`}
+        pista={PISTA_RECUPERAR_FACTURA}
       />
     </Tarjeta>
   );
@@ -603,6 +674,7 @@ export function ImportarCompartidas({
             etiqueta={BTN_VER_DEDUCCIONES}
             alPresionar={alVerDeducciones}
             testID="importar-ver-deducciones"
+            pista={PISTA_VER_DEDUCCIONES}
           />
           <AvisoFiscalEstimacion />
         </>
