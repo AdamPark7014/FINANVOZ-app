@@ -4,6 +4,7 @@ import {
   cifraEnPalabras,
   enteroEnPalabras,
   etiquetaCampoMonto,
+  etiquetaEstadoVacio,
   etiquetaHablada,
   formatearCentavos,
   leerPesos,

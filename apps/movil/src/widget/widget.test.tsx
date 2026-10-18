@@ -86,7 +86,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     expect(previa.props.accessibilityLabel).not.toMatch(/\$|\d/);
     expect(JSON.stringify(screen.toJSON())).not.toMatch(/\$|214/);
-    expect(auditar(screen.toJSON())).toEqual([]);
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
     const soloTextoVista = within(previa).getByTestId('previa-widget-solo-texto', {
       includeHiddenElements: true,
     });

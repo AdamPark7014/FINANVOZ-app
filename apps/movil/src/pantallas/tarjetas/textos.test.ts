@@ -68,12 +68,12 @@ describe('tarjetas/textos · TalkBack', () => {
   it('filas del resumen y movimientos leen etiqueta y valor', () => {
     expect(etiquetaAccesibleDato('Próximo corte', '28 oct')).toBe('Próximo corte: 28 oct');
     expect(etiquetaAccesibleUsoTarjeta(42)).toBe('Usas 42 % de tu límite');
-    expect(
-      etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', '$150.00', true),
-    ).toBe('Oxxo, 12 oct, gasto $150.00');
-    expect(
-      etiquetaAccesibleMovimientoTarjeta('Pago', '1 nov', '$2,000.00', false),
-    ).toBe('Pago, 1 nov, abono $2,000.00');
+    expect(etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', 15_000, true)).toBe(
+      'Oxxo, 12 oct, gasto ciento cincuenta pesos',
+    );
+    expect(etiquetaAccesibleMovimientoTarjeta('Pago', '1 nov', 200_000, false)).toBe(
+      'Pago, 1 nov, abono dos mil pesos',
+    );
   });
 
   it('plan MSI describe cuota y cuotas restantes', () => {

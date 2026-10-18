@@ -23,6 +23,7 @@ describe('captura/textos', () => {
   it('etiquetas TalkBack incluyen el título de sección', () => {
     expect(etiquetaVacioCapturasPorRevisar()).toMatch(/Capturas por revisar/);
     expect(etiquetaPermisoCaptura(false)).toMatch(/Acceso a notificaciones/);
+    expect(etiquetaPermisoCaptura(false)).toMatch(/ajustes restringidos/);
     expect(etiquetaPermisoCaptura(true)).toMatch(/Ajustes del teléfono/);
   });
 });
