@@ -21,6 +21,7 @@ import {
   Tarjeta,
   Texto,
 } from '../../ui';
+import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
 import { EstadoVacio } from './EstadoVacio';
 import {
   contextoSaldoCompromiso,

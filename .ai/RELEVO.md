@@ -6,24 +6,24 @@
 
 ## Hecho en este turno
 
-- **Pestañas (`pestanas-textos`):** botones con rol `tab` y etiqueta «Pestaña …»; contenedores de ruta con `ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA` (sin prefijo duplicado en TalkBack).
-- **`_layout` / pruebas:** mocks de rutas sin repetir títulos de pestaña; `pestanas-textos.test.tsx` alinea `barraPestanas`, testID y props de contenedor.
+- **(tabs) a11y:** `ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA` (sin prefijo "Pestaña") en contenedores de ruta; barra con `tabBarAccessibilityRole: tab` y etiquetas `Pestaña …`; rutas usan `propsContenedorPestana` / `propsContenedorRegistrar`; tests `_layout` y `hoy`.
 
 ## Hecho (acumulado reciente)
 
-- Widget/captura/respaldo pistas TalkBack, onboarding copy, Chip, EstadoVacio/Boton/Campo. Ver `git log`.
+- widget/captura a11y, ajustes header, Chip. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en disco (onboarding, captura, cuentas, widget) — revisar `git status` antes de reescribir.
+- WIP local (turno anterior, sin commitear): `PreguntasCaptura`, principal (`PanelRegistrar`, `textos.ts`, tests), `.ai/RELEVO.md` mezclado.
+- WIP: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE`).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajeno a pestañas si sigue sucio.
-3. Centralizar copy O3–O7 restante en `textos.ts` por pantalla.
+2. Cerrar WIP captura/respaldo/tanda y principal sin pisar.
+3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
 
