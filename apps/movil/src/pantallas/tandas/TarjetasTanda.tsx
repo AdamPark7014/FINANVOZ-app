@@ -43,7 +43,12 @@ function TarjetaAportacion({
       </Texto>
       {ya.elegir ?? (
         <View style={{ gap: espacio.s }}>
-          <Boton etiqueta={ETIQUETA_YA_LA_DI} alPresionar={() => ya.dar()} testID={`${testID}-ya-la-di`} />
+          <Boton
+            etiqueta={ETIQUETA_YA_LA_DI}
+            alPresionar={() => ya.dar()}
+            testID={`${testID}-ya-la-di`}
+            pista={PISTA_YA_LA_DI}
+          />
           <Boton
             etiqueta={ETIQUETA_TODAVIA_NO}
             variante="secundario"
