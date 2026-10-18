@@ -6,24 +6,23 @@
 
 ## Hecho en este turno
 
-- **Personas:** `PISTA_YA_ME_PAGO` en «Ya me pagó»; antes `PISTA_COBRAR`, `PISTA_VOLVER` (TalkBack `02 §19`); pruebas en `personas.test.tsx`.
-- **¿Me alcanza?:** `PISTA_CALCULAR` en Calcular (`89f4685`).
+- **PreviaWidget:** prueba «ocultar montos» alinea vista real, label hablado y `within` + `includeHiddenElements` (TalkBack simétrico con fila con cifra).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding/tabs/captura/widget/deducciones/arqueo TalkBack y copy. Ver `git log`.
+- Fiscal deducciones, TalkBack headers, tabs/onboarding/widget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP en disco (personas, onboarding) — no mezclar sin leer diff.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
-3. Recordatorio cobrar / más CTAs personas si otro pase M13.
+2. M11 negocio + paquete contador cuando toque el hito.
+3. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
 
 ## No tocar
 
