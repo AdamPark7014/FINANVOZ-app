@@ -1,31 +1,33 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-18
+- **Fecha:** 2026-10-17
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Suscripciones:** prueba Cuentas → Suscripciones verifica `accessibilityLabel` de `boton-suscripciones` (`d49ab80`).
+- **Tarjetas:** botón volver del detalle expone `PISTA_VOLVER` (TalkBack alineado con la prueba y con Tandas/Suscripciones).
 
 ## Hecho (acumulado reciente)
 
-- Movimientos test día header, riesgo Hoy alert, widget PreviaWidget. Ver `git log`.
+- Deducciones leftover, widget PreviaWidget, ayuda TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local posible en disco — `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Limpiar stashes WIP viejos si ya están en main.
+2. Volver sin tarjeta (`tarjeta-no-encontrada`) si conviene la misma pista.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
