@@ -36,6 +36,7 @@ import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
+import { FormularioTarjetaNueva } from './FormularioTarjetaNueva';
 import { PantallaTarjeta } from './PantallaTarjeta';
 import {
   AYUDA_SALDO_A_FAVOR,
@@ -52,6 +53,7 @@ import {
   etiquetaAccesibleSaldoAFavorDetalle,
   etiquetaAccesibleTarjetaEnLista,
   etiquetaAccesibleUsoTarjeta,
+  etiquetaAvisoNoSeIncluyeMsi,
   PISTA_ABRIR_DETALLE_TARJETA,
   PISTA_GUARDAR_PAGO_TARJETA,
   PISTA_PAGAR_TARJETA,
@@ -330,6 +332,19 @@ describe('tarjetas/textos · TalkBack', () => {
 });
 
 describe('Tarjetas', () => {
+  it('TalkBack: aviso «No sé» en saldo incluye meses es región viva', () => {
+    const p = conEscenario('e4-01');
+    montar(p.ctx, <FormularioTarjetaNueva alGuardar={jest.fn()} alCancelar={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('tarjeta-msi-si'));
+    fireEvent.press(screen.getByTestId('tarjeta-incluye-no_se'));
+    expect(screen.getByTestId('tarjeta-no-se-ayuda')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAvisoNoSeIncluyeMsi(),
+    );
+    expect(screen.getByTestId('tarjeta-no-se-ayuda')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('tarjeta-no-se-ayuda')).toHaveProp('importantForAccessibility', 'yes');
+  });
+
   it('TalkBack: fila en Cuentas anuncia deuda, fechas y barra de una pieza', () => {
     const p = e510();
     const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);

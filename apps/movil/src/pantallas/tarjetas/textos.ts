@@ -339,6 +339,15 @@ export function etiquetaSiLiquidar(descripcion: string): string {
   return `Sí, ${descripcion}`;
 }
 
+/** Copy al elegir «No sé» en «¿El saldo ya incluye los meses?» (`02 §3.1`, CA-M2-12). */
+export const AVISO_NO_SE_INCLUYE_MSI =
+  'No lo resto: puede que cuente de más lo que debes, nunca de menos. Compáralo con tu próximo estado de cuenta.';
+
+/** TalkBack: aviso dinámico tras elegir «No sé» en el formulario de tarjeta nueva. */
+export function etiquetaAvisoNoSeIncluyeMsi(): string {
+  return `Aviso: ${AVISO_NO_SE_INCLUYE_MSI}`;
+}
+
 /** TalkBack: fila etiqueta + valor en el resumen. */
 export function etiquetaAccesibleDato(etiqueta: string, valor: string): string {
   return `${etiqueta}: ${valor}`;

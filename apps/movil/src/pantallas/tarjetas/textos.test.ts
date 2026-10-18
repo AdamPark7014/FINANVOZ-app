@@ -16,6 +16,7 @@ import {
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   etiquetaVacioMsiTarjeta,
+  etiquetaAvisoNoSeIncluyeMsi,
   etiquetaSiLiquidar,
   mensajePagoPlaneadoApartado,
   preguntaTarjetaConfirmarMsi,
@@ -54,6 +55,11 @@ describe('tarjetas/textos · confirmar MSI', () => {
 
   it('etiqueta accesible de liquidar repite la descripción del plan', () => {
     expect(etiquetaSiLiquidar('la tele')).toBe('Sí, la tele');
+  });
+
+  it('aviso «No sé» en saldo incluye meses antepone Aviso para TalkBack', () => {
+    expect(etiquetaAvisoNoSeIncluyeMsi()).toMatch(/^Aviso:/);
+    expect(etiquetaAvisoNoSeIncluyeMsi()).toMatch(/estado de cuenta/);
   });
 });
 

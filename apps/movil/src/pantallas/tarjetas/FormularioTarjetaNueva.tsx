@@ -11,7 +11,11 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
-import { BTN_CANCELAR } from './textos';
+import {
+  AVISO_NO_SE_INCLUYE_MSI,
+  BTN_CANCELAR,
+  etiquetaAvisoNoSeIncluyeMsi,
+} from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 type SiNo = 'si' | 'no';
@@ -259,9 +263,16 @@ export function useFormularioTarjeta({
             alCambiar={setIncluye}
           />
           {incluye === 'no_se' ? (
-            <Texto variante="secundario" tono="secundario" testID="tarjeta-no-se-ayuda">
-              No lo resto: puede que cuente de más lo que debes, nunca de menos. Compáralo con tu próximo
-              estado de cuenta.
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              testID="tarjeta-no-se-ayuda"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              importantForAccessibility="yes"
+              accessibilityLabel={etiquetaAvisoNoSeIncluyeMsi()}
+            >
+              {AVISO_NO_SE_INCLUYE_MSI}
             </Texto>
           ) : null}
         </>
