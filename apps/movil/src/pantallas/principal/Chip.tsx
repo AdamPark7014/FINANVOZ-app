@@ -8,7 +8,7 @@ export interface OpcionChip<T extends string> {
 
 /**
  * Opción tocable de una pregunta (02-UX §1.2: una pregunta a la vez, con opciones tocables). Por omisión es de
- * selección única (TalkBack la anuncia como opción de radio); con `multiple`, como casilla (pendiente 35).
+ * selección única (TalkBack: `accessibilityLabel` propia; el texto visible no se anuncia aparte); con `multiple`, casilla.
  */
 export function Chip({
   etiqueta,
