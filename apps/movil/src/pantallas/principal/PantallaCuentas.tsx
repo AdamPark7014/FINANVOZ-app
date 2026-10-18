@@ -100,6 +100,7 @@ export function PantallaCuentas({
         <Boton
           etiqueta={BTN_AJUSTES_CUENTAS}
           etiquetaAccesible={BTN_AJUSTES_CUENTAS_ACCESIBLE}
+          pista="Abre la pantalla de Ajustes"
           variante="texto"
           ancho="contenido"
           alPresionar={alAbrirAjustes}
@@ -147,6 +148,9 @@ export function PantallaCuentas({
             texto={TEXTO_CUENTAS_DEBES_VACIO}
             testID="cuentas-debes-vacio"
             etiquetaAccesible={etiquetaVacioCuentasDebes()}
+            {...(alAgregarTarjeta
+              ? { pistaCta: `Más abajo, botón ${BTN_AGREGAR_TARJETA_CREDITO.toLowerCase()}` }
+              : {})}
           />
         ) : null}
         {v.debes.length > 0 ? (
@@ -207,7 +211,12 @@ export function PantallaCuentas({
         </Seccion>
       ) : null}
 
-      <Seccion titulo="Compromisos" subtitulo={SUBTITULO_CUENTAS_COMPROMISOS} testID="seccion-compromisos">
+      <Seccion
+        titulo="Compromisos"
+        subtitulo={SUBTITULO_CUENTAS_COMPROMISOS}
+        tituloAccesible={`Compromisos, ${SUBTITULO_CUENTAS_COMPROMISOS.toLowerCase()}`}
+        testID="seccion-compromisos"
+      >
         {v.compromisos.length === 0 ? (
           <EstadoVacio
             texto={TEXTO_CUENTAS_COMPROMISOS_VACIO}
@@ -281,21 +290,39 @@ export function PantallaCuentas({
 function Seccion({
   titulo,
   subtitulo,
+  tituloAccesible,
   children,
   testID,
 }: {
   titulo: string;
   subtitulo?: string;
+  /** TalkBack: título y subtítulo en una sola frase (`02 §15`). */
+  tituloAccesible?: string;
   children: ReactNode;
   testID: string;
 }) {
   return (
     <View style={{ gap: espacio.s }} testID={testID}>
-      <Texto variante="subtitulo" testID={`${testID}-titulo`} accessibilityRole="header">
+      <Texto
+        variante="subtitulo"
+        testID={`${testID}-titulo`}
+        accessibilityRole="header"
+        {...(tituloAccesible ? { accessibilityLabel: tituloAccesible } : {})}
+      >
         {titulo}
       </Texto>
       {subtitulo ? (
-        <Texto variante="secundario" tono="secundario" testID={`${testID}-subtitulo`}>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID={`${testID}-subtitulo`}
+          {...(tituloAccesible
+            ? {
+                accessibilityElementsHidden: true,
+                importantForAccessibility: 'no-hide-descendants',
+              }
+            : {})}
+        >
           {subtitulo}
         </Texto>
       ) : null}

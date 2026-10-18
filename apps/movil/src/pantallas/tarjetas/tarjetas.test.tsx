@@ -49,9 +49,12 @@ import {
   etiquetaAccesiblePlanMsi,
   etiquetaAccesibleBarraUsoTarjeta,
   etiquetaAccesibleEstadoCuentaTarjeta,
+  etiquetaAccesibleSaldoAFavorDetalle,
   etiquetaAccesibleTarjetaEnLista,
   etiquetaAccesibleUsoTarjeta,
   PISTA_ABRIR_DETALLE_TARJETA,
+  PISTA_GUARDAR_PAGO_TARJETA,
+  PISTA_PAGAR_TARJETA,
   etiquetaVacioEstadosTarjeta,
   etiquetaSiLiquidar,
   etiquetaVacioMovimientosTarjeta,
@@ -347,6 +350,36 @@ describe('Tarjetas', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <PantallaTarjeta tarjetaId={p.e.cuentas.nu as string} alVolver={jest.fn()} />);
     expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
+  it('TalkBack: Pagar y Guardar pago guían el flujo en el detalle', () => {
+    const p = e510();
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tarjeta-pagar')).toHaveProp('accessibilityHint', PISTA_PAGAR_TARJETA);
+    fireEvent.press(screen.getByTestId('tarjeta-pagar'));
+    expect(screen.getByTestId('pagar-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO_TARJETA);
+  });
+
+  it('TalkBack: saldo a favor en el resumen anuncia monto y que no suma a dinero libre', () => {
+    const p = e510();
+    const bbva = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 2_000_000 });
+    registrarCompraMsi(p.ctx, {
+      tarjetaId: p.oro,
+      monto: 600_000,
+      meses: 6,
+      categoria: 'hogar',
+      descripcion: 'la tele',
+    });
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('tarjeta-pagar'));
+    fireEvent.changeText(screen.getByTestId('pagar-monto'), '7,000');
+    fireEvent.press(screen.getByTestId(`pagar-origen-${bbva}`));
+    fireEvent.press(screen.getByTestId('pagar-guardar'));
+    expect(screen.getByTestId('tarjeta-saldo-a-favor')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleSaldoAFavorDetalle(580_000),
+    );
+    expect(etiquetaAccesibleSaldoAFavorDetalle(580_000)).toContain(AYUDA_SALDO_A_FAVOR);
   });
 
   it('TalkBack: barra de uso anuncia límite y marca; el pie visual no se repite', () => {

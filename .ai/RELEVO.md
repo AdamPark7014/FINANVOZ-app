@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **PantallaCuentas TalkBack:** pista en engrane Ajustes; `pistaCta` en Debes vacío hacia «Agregar tarjeta»; encabezado Compromisos agrupa «Próximos 30 días».
+- **GrupoChips TalkBack:** `accessibilityHint` en el radiogroup («Elige una opción» / «Seleccionado: …»); fila con `alignItems: 'center'`.
 
 ## Hecho (acumulado reciente)
 
-- ActivarCaptura, PreviaWidget, captura Hoy. Ver `git log`.
+- Chip/Boton hints, PreviaWidget, suscripciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en disco (onboarding, ajustes, captura, suscripciones, tandas, UI Chip, principal.test, etc.) — **no mezclar ni commitear sin revisar**.
+- WIP pantallas (`ayuda/`, `me-alcanza/`, `tarjetas/`, etc.) — turno anterior, no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Salvar o cerrar WIP paralelo; TalkBack hints en CTAs secundarios de Cuentas (Tandas, compartidos) si hace falta.
+2. TalkBack aviso retiro tarjeta en formulario movimiento o `CampoMonto` deshabilitado.
 
 ## No tocar
 

@@ -6,9 +6,13 @@ import {
   etiquetaAccesibleEstadoCuentaTarjeta,
   etiquetaAccesiblePlanMsi,
   etiquetaAccesibleBarraUsoTarjeta,
+  etiquetaAccesibleSaldoAFavorDetalle,
   etiquetaAccesibleTarjetaEnLista,
   etiquetaAccesibleUsoTarjeta,
+  AYUDA_SALDO_A_FAVOR,
   PISTA_ABRIR_DETALLE_TARJETA,
+  PISTA_GUARDAR_PAGO_TARJETA,
+  PISTA_PAGAR_TARJETA,
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   etiquetaVacioMsiTarjeta,
@@ -67,6 +71,14 @@ describe('tarjetas/textos · TalkBack', () => {
     expect(PISTA_VOLVER).toBe('Regresa a Cuentas');
     expect(ACCESIBILIDAD_TARJETA_NO_ENCONTRADA).toMatch(/Volver/);
     expect(ACCESIBILIDAD_TARJETA_NO_ENCONTRADA).toMatch(/Cuentas/);
+  });
+
+  it('pagar en el detalle y saldo a favor incluyen pista y aviso E4-07', () => {
+    expect(PISTA_PAGAR_TARJETA).toMatch(/cuenta/i);
+    expect(PISTA_GUARDAR_PAGO_TARJETA).toMatch(/libro/i);
+    expect(etiquetaAccesibleSaldoAFavorDetalle(580_000)).toBe(
+      `Saldo a favor: cinco mil ochocientos pesos. ${AYUDA_SALDO_A_FAVOR}`,
+    );
   });
 
   it('filas del resumen y movimientos leen etiqueta y valor', () => {

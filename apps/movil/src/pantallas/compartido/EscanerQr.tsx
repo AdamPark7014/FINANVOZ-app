@@ -30,7 +30,9 @@ export function EscanerQr({
     <View style={{ gap: espacio.m }} testID="escaner-qr">
       {permiso?.granted ? (
         <>
-          <Texto variante="cuerpo">{INSTRUCCION_ESCANER_QR}</Texto>
+          <Texto variante="cuerpo" importantForAccessibility="no">
+            {INSTRUCCION_ESCANER_QR}
+          </Texto>
           <View style={{ height: 280, borderRadius: espacio.m, overflow: 'hidden' }}>
             <CameraView
               style={{ flex: 1 }}
@@ -48,10 +50,13 @@ export function EscanerQr({
         </>
       ) : (
         <>
-          <Texto variante="cuerpo">{INSTRUCCION_PERMISO_CAMARA}</Texto>
+          <Texto variante="cuerpo" importantForAccessibility="no">
+            {INSTRUCCION_PERMISO_CAMARA}
+          </Texto>
           <Boton
             testID="escaner-permiso"
             etiqueta={BTN_PERMITIR_CAMARA}
+            etiquetaAccesible={INSTRUCCION_PERMISO_CAMARA}
             pista={PISTA_PERMISO_CAMARA}
             alPresionar={() => {
               pedirPermiso().catch(() => {});
