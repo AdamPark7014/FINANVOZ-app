@@ -6,7 +6,11 @@ export {
   TITULO_SIN_INGRESO,
 } from '../../src/pantallas/principal/textos';
 
-export { ETIQUETA_ACCESIBILIDAD_PESTANA, TEST_ID_PANTALLA_PESTANA } from './pestanas-textos';
+export {
+  ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA,
+  ETIQUETA_ACCESIBILIDAD_PESTANA,
+  TEST_ID_PANTALLA_PESTANA,
+} from './pestanas-textos';
 
 import { TEST_ID_PANTALLA_PESTANA } from './pestanas-textos';
 

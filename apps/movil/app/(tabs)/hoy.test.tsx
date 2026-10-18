@@ -3,7 +3,7 @@ import { aceptarConsentimiento, agregarCuenta } from '../../src/servicios';
 import { renderConSesion } from '../../src/pantallas/principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../../src/pantallas/principal/__pruebas__/base';
 import Hoy from './hoy';
-import { ETIQUETA_ACCESIBILIDAD_PESTANA } from './pestanas-textos';
+import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from './pestanas-textos';
 import {
   SUBTITULO_SIN_INGRESO,
   TEST_ID_HOY_SIN_INGRESO,
@@ -35,7 +35,7 @@ describe('pestaña Hoy (ruta)', () => {
     renderConSesion(p.ctx, <Hoy />);
     expect(screen.getByTestId(TEST_ID_TAB_HOY)).toHaveProp(
       'accessibilityLabel',
-      ETIQUETA_ACCESIBILIDAD_PESTANA.hoy,
+      ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA.hoy,
     );
     expect(screen.getByTestId('pantalla-hoy')).toBeTruthy();
     expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.contenedor)).toBeTruthy();

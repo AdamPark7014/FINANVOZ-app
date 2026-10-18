@@ -126,7 +126,7 @@ export default function Ingreso() {
           {frecuencia === 'semanal' ? (
             <Chips
               testID="onb-dia-semana"
-              etiqueta="¿Qué día te pagan?"
+              etiqueta={ETIQUETA_DIA_SEMANA_INGRESO}
               opciones={OPCIONES_DIA_SEMANA}
               valor={diaSemana}
               alCambiar={setDiaSemana}
@@ -135,7 +135,7 @@ export default function Ingreso() {
           {frecuencia === 'catorcenal' ? (
             <Chips
               testID="onb-ancla"
-              etiqueta="¿Cuándo te pagan la próxima vez?"
+              etiqueta={ETIQUETA_PROXIMA_VEZ_INGRESO}
               opciones={fechas}
               valor={ancla}
               alCambiar={setAncla}
@@ -144,8 +144,8 @@ export default function Ingreso() {
           {frecuencia === 'mensual' ? (
             <CampoTexto
               testID="onb-dia-mes"
-              etiqueta="¿Qué día del mes te pagan?"
-              ejemplo="30"
+              etiqueta={ETIQUETA_DIA_MES_INGRESO}
+              ejemplo={EJEMPLO_DIA_MES_INGRESO}
               teclado="number-pad"
               valor={diaMesTexto}
               alCambiar={setDiaMesTexto}

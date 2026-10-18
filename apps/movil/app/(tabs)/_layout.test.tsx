@@ -2,7 +2,12 @@ import { renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import { barraPestanas } from '../../src/ui';
 import LayoutPestanas, { ETIQUETA_ACCESIBILIDAD_PESTANA } from './_layout';
-import { TEST_ID_PANTALLA_REGISTRAR, testIdBotonPestana } from './pestanas-textos';
+import {
+  ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA,
+  ROL_ACCESIBILIDAD_BOTON_PESTANA,
+  TEST_ID_PANTALLA_REGISTRAR,
+  testIdBotonPestana,
+} from './pestanas-textos';
 
 const RUTAS = {
   '(tabs)/_layout': LayoutPestanas,
@@ -16,6 +21,8 @@ describe('LayoutPestanas', () => {
   it('pestanas-textos alinea botones con barraPestanas', () => {
     for (const { ruta } of barraPestanas.pestanas) {
       expect(testIdBotonPestana(ruta)).toBe(`pestana-${ruta}`);
+      expect(ETIQUETA_ACCESIBILIDAD_PESTANA[ruta]).toMatch(/^Pestaña /);
+      expect(ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA[ruta]).not.toMatch(/^Pestaña /);
     }
     expect(TEST_ID_PANTALLA_REGISTRAR).toBe('tab-registrar');
   });

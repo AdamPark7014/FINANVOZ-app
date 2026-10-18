@@ -70,7 +70,9 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
+      <Texto testID="suscripciones-titulo" variante="titulo" accessibilityRole="header">
+        {TITULO_PANTALLA}
+      </Texto>
       {v.activas.length > 0 ? (
         <Texto variante="secundario" tono="secundario" testID="suscripciones-ayuda">
           {PISTA_AYUDA}

@@ -84,11 +84,11 @@ describe('preguntas de captura en Hoy', () => {
     expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).toContain('pregunta_captura');
 
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
-    expect(screen.getByText(tituloSalidaSinPareja(420_000))).toBeTruthy();
+    expect(screen.getByText(tituloSalidaSinPareja(420_000), { hidden: true })).toBeTruthy();
     fireEvent.press(screen.getByText(ETIQUETA_SALIDA_CUENTA));
     fireEvent.press(screen.getByText(ETIQUETA_CUENTA_EXTERNA));
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.transito)).toBe(0);
-    expect(screen.queryByText(tituloSalidaSinPareja(420_000))).toBeNull();
+    expect(screen.queryByText(tituloSalidaSinPareja(420_000), { hidden: true })).toBeNull();
     p.cerrar();
   });
 
@@ -100,8 +100,8 @@ describe('preguntas de captura en Hoy', () => {
     };
     await ingerirNotificaciones(p.ctx, [n], opciones);
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
-    expect(screen.getByText(/Detecté una tarjeta ••4321 de Banco B/)).toBeTruthy();
-    fireEvent.press(screen.getByText(BTN_NO_ES_MIA));
+    expect(screen.getByText(/Detecté una tarjeta ••4321 de Banco B/, { hidden: true })).toBeTruthy();
+    fireEvent.press(screen.getByText(BTN_NO_ES_MIA, { hidden: true }));
     expect(screen.queryByText(/Detecté una tarjeta/)).toBeNull();
     expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).not.toContain('pregunta_captura');
     p.cerrar();

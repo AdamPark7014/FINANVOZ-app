@@ -175,7 +175,13 @@ export function PantallaCuentas({
               centavos={p.saldo}
               contextoSaldo={contextoSaldoTeDebe(p.nombre)}
               {...(alAbrirPersona
-                ? { accion: { etiqueta: 'Cobrar', alPresionar: () => alAbrirPersona(p.id) } }
+                ? {
+                    accion: {
+                      etiqueta: 'Cobrar',
+                      etiquetaAccesible: `Cobrar a ${p.nombre}`,
+                      alPresionar: () => alAbrirPersona(p.id),
+                    },
+                  }
                 : {})}
             />
           ))}
@@ -288,7 +294,7 @@ function Fila({
   centavos: number;
   contextoSaldo: string;
   testID?: string;
-  accion?: { etiqueta: string; alPresionar: () => void };
+  accion?: { etiqueta: string; etiquetaAccesible?: string; alPresionar: () => void };
 }) {
   return (
     <Tarjeta {...(testID ? { testID } : {})}>
@@ -313,6 +319,7 @@ function Fila({
           variante="texto"
           ancho="contenido"
           alPresionar={accion.alPresionar}
+          {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
           {...(testID ? { testID: `${testID}-accion` } : {})}
         />
       ) : null}
