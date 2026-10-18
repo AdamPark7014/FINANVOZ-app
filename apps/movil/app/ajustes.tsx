@@ -198,9 +198,9 @@ function MenuDesarrollo({ cargar }: { cargar: (datos: unknown) => Promise<void> 
   const [error, setError] = useState<string | null>(null);
   return (
     <Tarjeta testID="ajustes-dev">
-      <Texto variante="subtitulo">Desarrollo · escenarios</Texto>
+      <Texto variante="subtitulo">{SECCION_DEV}</Texto>
       <Texto variante="secundario" tono="secundario">
-        Borra todo y carga el escenario. El reloj queda fijo en su fecha hasta cerrar la app.
+        {TEXTO_DEV}
       </Texto>
       <View style={{ gap: espacio.s }}>
         {ESCENARIOS_DEV.map((e) => (
@@ -208,15 +208,15 @@ function MenuDesarrollo({ cargar }: { cargar: (datos: unknown) => Promise<void> 
             key={e.id}
             testID={`ajustes-dev-${e.id}`}
             variante="secundario"
-            etiqueta={`Cargar ${e.id}`}
+            etiqueta={etiquetaCargarEscenario(e.id)}
             alPresionar={() => {
-              cargar(e.cargar()).catch(() => setError(`No pude cargar ${e.id}.`));
+              cargar(e.cargar()).catch(() => setError(mensajeErrorCargarEscenario(e.id)));
             }}
           />
         ))}
       </View>
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}
