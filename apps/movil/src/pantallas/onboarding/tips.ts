@@ -1,7 +1,6 @@
 /**
  * Consejos de onboarding en español de México (`02 §14`): una frase, tuteo, sin tecnicismos.
  * Las pantallas en `app/onboarding/` pueden pasarlos a `PasoOnboarding` como `tip`.
- * O3–O5 y O7 viven en `textos.ts`; aquí solo reexportamos para imports legacy.
  */
 
 /** O2 · Consentimiento: nada se persiste hasta aceptar (CA-M2-05). */
