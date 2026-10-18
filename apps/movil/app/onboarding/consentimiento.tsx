@@ -55,7 +55,7 @@ export default function Consentimiento() {
           testID="onb-aceptar"
           etiqueta={BTN_ACEPTAR_CONTINUAR}
           deshabilitado={!acepta}
-          {...(acepta ? {} : { pista: PISTA_MARCAR_CASILLA_DATOS })}
+          pista={acepta ? PISTA_ONB_CONTINUAR : PISTA_MARCAR_CASILLA_DATOS}
           alPresionar={aceptar}
         />
       }

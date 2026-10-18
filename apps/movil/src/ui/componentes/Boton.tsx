@@ -51,7 +51,7 @@ export function Boton({
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
       accessibilityHint={pista ?? (cargando ? 'Espera, termina de cargar' : undefined)}
       accessibilityState={{ disabled: inactivo, busy: cargando }}
-      hitSlop={variante === 'texto' ? hitSlopTactil : undefined}
+      hitSlop={variante === 'texto' || ancho === 'contenido' ? hitSlopTactil : undefined}
       style={({ pressed }) => [
         {
           minHeight: OBJETIVO_TACTIL_MIN,

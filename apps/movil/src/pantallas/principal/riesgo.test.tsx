@@ -16,7 +16,6 @@ import {
   ProbabilidadHoy,
   TEXTO_RIESGO,
 } from './ProbabilidadHoy';
-import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
 

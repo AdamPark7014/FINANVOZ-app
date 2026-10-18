@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from '../../src/pantallas/captura/ActivarCaptura';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
-import { TIP_CAPTURA_AHORA_NO } from '../../src/pantallas/onboarding/tips';
+import { TIP_CAPTURA_AHORA_NO } from '../../src/pantallas/onboarding/textos';
 
 /**
  * O6 · Captura automática (`02 §3`): la divulgación destacada de `08 §3.1` antes de abrir el ajuste del sistema.

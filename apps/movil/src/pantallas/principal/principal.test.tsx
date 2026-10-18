@@ -236,8 +236,13 @@ describe('Hoy', () => {
     const nav = navegacionFalsa();
     renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
     expect(screen.getByTestId('hoy-sin-ingreso')).toBeTruthy();
+    expect(screen.getByTestId('hoy-sin-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('hoy-sin-ingreso-titulo')).toHaveTextContent(TITULO_SIN_INGRESO);
     expect(screen.getByTestId('hoy-sin-ingreso-subtitulo')).toHaveTextContent(SUBTITULO_SIN_INGRESO);
+    expect(screen.getByTestId('boton-configurar-ingreso')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONFIGURAR_INGRESO_HOY,
+    );
     fireEvent.press(screen.getByTestId('boton-configurar-ingreso'));
     expect(nav.alConfigurarIngreso).toHaveBeenCalled();
   });
@@ -547,6 +552,7 @@ describe('Movimientos', () => {
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     expect(screen.getByTestId('movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_VACIO);
+    expect(screen.getByTestId('movimientos-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('movimientos-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioMovimientos(false),
     );

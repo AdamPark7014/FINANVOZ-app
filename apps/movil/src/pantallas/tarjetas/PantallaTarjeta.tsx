@@ -90,7 +90,12 @@ export function PantallaTarjeta({
           alPresionar={alVolver}
           pista={PISTA_VOLVER}
         />
-        <Texto variante="cuerpo" tono="secundario" testID="tarjeta-no-encontrada">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="tarjeta-no-encontrada"
+          accessibilityLabel={ACCESIBILIDAD_TARJETA_NO_ENCONTRADA}
+        >
           {TEXTO_TARJETA_NO_ENCONTRADA}
         </Texto>
       </Pantalla>

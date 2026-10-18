@@ -112,8 +112,13 @@ describe('etiquetaCampoMonto', () => {
     ['Monto', '', 'Monto en pesos'],
     ['Saldo', '1,500.50', 'Saldo en pesos, mil quinientos pesos con cincuenta centavos'],
     ['Pago $500', '500', 'Pago quinientos pesos en pesos, quinientos pesos'],
+    ['Monto', '1,099.90', 'Monto en pesos, mil noventa y nueve pesos con noventa centavos'],
   ])('%s + %j → %s', (etiqueta, texto, esperado) => {
     expect(etiquetaCampoMonto(etiqueta, texto)).toBe(esperado);
+  });
+
+  it('texto inválido no inventa cifras (solo el nombre del campo)', () => {
+    expect(etiquetaCampoMonto('Monto', '12.345')).toBe('Monto en pesos');
   });
 });
 

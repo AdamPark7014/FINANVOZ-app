@@ -76,6 +76,9 @@ describe('PantallaArqueo · vacío y errores', () => {
     expect(screen.getByTestId('arqueo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('arqueo-sin-efectivo')).toBe(TEXTO_SIN_CUENTA_EFECTIVO);
     expect(screen.getByTestId('arqueo-sin-efectivo')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('arqueo-sin-efectivo').props.accessibilityLabel).toBe(
+      etiquetaVacioSinEfectivo(),
+    );
     expect(screen.getByTestId('boton-cerrar-arqueo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
     p.cerrar();
   });

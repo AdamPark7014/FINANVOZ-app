@@ -83,7 +83,7 @@ export function CampoTexto({
         ]}
       />
       {conError ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+        <Texto variante="secundario" tono="faltante" accessibilityRole="alert" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : ayuda ? (

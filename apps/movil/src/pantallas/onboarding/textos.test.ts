@@ -81,4 +81,9 @@ describe('textos de onboarding', () => {
     expect(TIP_PAGOS_SALTAR).toMatch(/«Saltar por ahora»/);
     expect(TIP_COLCHON_SIN_POR_AHORA).toMatch(/«Sin colchón por ahora»/);
   });
+
+  it('O6 tip de captura se reexporta desde textos', () => {
+    expect(TIP_CAPTURA_AHORA_NO).toMatch(/«Ahora no»/);
+    expect(TIP_CAPTURA_AHORA_NO).toMatch(/Ajustes › Captura/);
+  });
 });

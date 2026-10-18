@@ -291,6 +291,10 @@ describe('Tarjetas', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <PantallaTarjeta tarjetaId="contraparte:tarjeta:inexistente" alVolver={jest.fn()} />);
     expect(screen.getByTestId('tarjeta-no-encontrada')).toHaveTextContent(TEXTO_TARJETA_NO_ENCONTRADA);
+    expect(screen.getByTestId('tarjeta-no-encontrada')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_TARJETA_NO_ENCONTRADA,
+    );
     expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 

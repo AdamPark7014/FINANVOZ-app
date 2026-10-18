@@ -1,3 +1,4 @@
+import { etiquetaHablada } from '../formato';
 import { Texto } from './Texto';
 
 /**

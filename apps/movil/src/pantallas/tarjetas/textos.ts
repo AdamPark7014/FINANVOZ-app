@@ -79,6 +79,7 @@ export const NOMBRE_ESTADO_PLAN = {
 export const BTN_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';
 export const TEXTO_TARJETA_NO_ENCONTRADA = 'No encontré esa tarjeta.';
+export const ACCESIBILIDAD_TARJETA_NO_ENCONTRADA = TEXTO_TARJETA_NO_ENCONTRADA;
 export const TITULO_PAGAR_TARJETA = 'Pagar tarjeta';
 export const BTN_PAGAR = 'Pagar';
 export const CANDADO_COMPROMISO_12_MESES = 'Ver tus meses de los próximos 12 meses';

@@ -6,24 +6,28 @@
 
 ## Hecho en este turno
 
-- **Skip micro polish:** `main` ya en remoto con TalkBack Cuentas/Tandas (`dc79d22`), `EstadoVacio` (`6b51610`). Sin diff nuevo; push no necesario.
+- **PreviaWidget (widget/previa día):** verificado en `origin/main` — testIDs `previa-widget-*`, `ajustes-widget-previa-etiqueta`, TalkBack con `etiquetaAccesibleWidget`, `auditar()` y etiqueta sin `$`/dígitos al ocultar montos.
 
 ## Hecho (acumulado reciente)
 
-- Ajustes ingreso/colchón `682a231`, Hoy alert `71d133a`. Ver `git log`.
+- `6ef147b` / `aaf0f92` widget TalkBack; personas/cuentas/captura polish paralelo.
 
 ## A medias — CUIDADO
 
-- CI Windows, M0: Adam.
+- Working tree: tarjetas/EstadoVacio sin commitear — otro hilo.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Pista volver en detalle grupo compartido si conviene.
+2. Rescatar WIP tarjetas si aplica.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

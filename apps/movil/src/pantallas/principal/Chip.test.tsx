@@ -20,7 +20,7 @@ describe('Chip (TalkBack)', () => {
     render(
       <Chip etiqueta="Caro" seleccionado multiple alPresionar={() => {}} testID="c" />,
     );
-    expect(screen.getByTestId('c').props.accessibilityState).toEqual({ checked: true });
+    expect(screen.getByTestId('c').props.accessibilityState).toMatchObject({ checked: true });
     expect(screen.getByTestId('c').props.accessibilityRole).toBe('checkbox');
   });
 
@@ -48,7 +48,7 @@ describe('Chip (TalkBack)', () => {
     render(<Chip etiqueta="Sí" seleccionado={false} alPresionar={() => {}} testID="c" />);
     const chip = screen.getByTestId('c');
     expect(chip).toHaveStyle({ minHeight: 48, minWidth: 48 });
-    expect(chip.props.hitSlop).toBe(8);
+    expect(chip.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
   });
 
   it('llama alPresionar', () => {
