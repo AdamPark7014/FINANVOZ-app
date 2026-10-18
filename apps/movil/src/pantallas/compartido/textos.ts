@@ -52,8 +52,12 @@ export const INSTRUCCION_ESCANER_QR =
 export const INSTRUCCION_PERMISO_CAMARA =
   'Para unirte necesito la cámara: solo la uso para leer el código QR de tu pareja, sin tomar fotos.';
 export const BTN_PERMITIR_CAMARA = 'Permitir la cámara';
+/** Sin permiso de cámara (`02 §15`). */
+export const PISTA_PERMISO_CAMARA = 'Solo la uso para leer el código QR, sin tomar fotos';
 export const ETIQUETA_VISTA_CAMARA = 'Vista de la cámara para escanear el código';
 export const BTN_CANCELAR = 'Cancelar';
+/** Cierra el escáner (`02 §15`). */
+export const PISTA_CANCELAR_ESCANER = 'Cierra la cámara y vuelve atrás';
 
 export const BTN_VOLVER_A_VINCULAR = 'Volver a vincular';
 export const BTN_AGREGAR_GASTO = 'Agregar gasto';

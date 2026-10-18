@@ -170,9 +170,15 @@ describe('CA-M8-02 · Cobrar', () => {
     });
     expect(compartir).not.toHaveBeenCalled();
     expect(screen.getByTestId('persona-pedir-datos')).toBeTruthy();
+    expect(screen.getByTestId('persona-pedir-datos-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(TITULO_PEDIR_DATOS_COBRO)).toBeTruthy();
     expect(screen.getByTestId('boton-guardar-datos-cobro')).toHaveProp(
       'accessibilityHint',
       PISTA_GUARDAR_Y_COBRAR,
+    );
+    expect(screen.getByTestId('boton-cancelar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_DATOS_COBRO,
     );
 
     // Una CLABE con el dígito de control mal no se guarda.
