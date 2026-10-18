@@ -3,7 +3,7 @@ import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
-import { PantallaRegistrar, paramsDeFiltro } from '../../src/pantallas/principal';
+import { PantallaRegistrar, paramsDeDetalle, paramsDeFiltro } from '../../src/pantallas/principal';
 
 export default function Registrar() {
   const router = useRouter();
@@ -18,6 +18,9 @@ export default function Registrar() {
         alCerrar={cerrar}
         alVerMovimientos={(filtro) =>
           router.navigate({ pathname: '/movimientos', params: paramsDeFiltro(filtro) })
+        }
+        alVerMovimiento={(transaccionId) =>
+          router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) })
         }
         alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
         alMeAlcanza={(consulta) => abrirMeAlcanza(router, consulta)}

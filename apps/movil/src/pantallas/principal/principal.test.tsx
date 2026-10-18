@@ -248,6 +248,21 @@ describe('Registrar', () => {
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
     expect(textoDe(`monto-${mov?.id}`)).toBe('−$25');
 
+    const nav = navegacionFalsa();
+    p.cerrar();
+    renderConSesion(
+      p.ctx,
+      <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />,
+    );
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 50 en efectivo');
+    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    const aviso2 = screen.getByTestId('aviso');
+    fireEvent.press(within(aviso2).getByText(/^Registré: Tacos \$50 · .+ · Cartera$/));
+    expect(nav.alVerMovimiento).toHaveBeenCalledWith(
+      listarMovimientos(p.ctx)[0]?.movimientos[0]?.id,
+    );
+
     fireEvent.press(within(aviso).getByText('Deshacer'));
     expect(screen.queryByTestId('aviso')).toBeNull();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');

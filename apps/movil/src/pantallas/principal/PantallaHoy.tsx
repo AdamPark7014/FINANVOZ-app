@@ -37,6 +37,8 @@ import { encabezadoFecha } from './textos';
 export interface NavegacionHoy {
   /** Movimientos; con filtro desde "Ver movimientos" de una consulta (`06 §6`). */
   alVerMovimientos: (filtro?: FiltroMovimientos) => void;
+  /** Detalle de un movimiento recién registrado (aviso "Registré…", `02 §5`). */
+  alVerMovimiento?: (transaccionId: string) => void;
   alConfigurarIngreso: () => void;
   alAbrirFormulario: () => void;
   /** Arqueo de efectivo (`02 §7`): desde la tarjeta de Hoy, la insignia o "traigo 300". */
@@ -74,6 +76,7 @@ export function PantallaHoy({
             fijo
             alMasOpciones={navegacion.alAbrirFormulario}
             alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
+            {...(navegacion.alVerMovimiento ? { alVerMovimiento: navegacion.alVerMovimiento } : {})}
             {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
             {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
             {...(motor ? { motor } : {})}

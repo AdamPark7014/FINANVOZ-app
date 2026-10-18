@@ -37,6 +37,7 @@ export function crearMotorFalso() {
 
 export const navegacionFalsa = () => ({
   alVerMovimientos: jest.fn(),
+  alVerMovimiento: jest.fn(),
   alConfigurarIngreso: jest.fn(),
   alAbrirFormulario: jest.fn(),
 });

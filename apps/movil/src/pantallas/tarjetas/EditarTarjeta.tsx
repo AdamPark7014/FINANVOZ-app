@@ -185,7 +185,9 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
           try {
             const r = corregirSaldoTarjeta(ctx, d.id, sentido === 'debo' ? monto : -monto);
             if (r.transaccionId) {
-              avisarRegistro(`Listo: corregí el saldo de tu ${d.nombre}.`, r.transaccionId);
+              avisarRegistro(`Listo: corregí el saldo de tu ${d.nombre}.`, {
+                transaccionId: r.transaccionId,
+              });
             } else {
               mostrar({ mensaje: 'Ese ya era el saldo. No cambié nada.' });
             }

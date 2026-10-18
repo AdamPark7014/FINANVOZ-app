@@ -107,6 +107,7 @@ type ConTarjeta = Extract<
  */
 export function PanelRegistrar({
   alVerMovimientos,
+  alVerMovimiento,
   alMasOpciones,
   alArqueo,
   alMeAlcanza,
@@ -117,6 +118,8 @@ export function PanelRegistrar({
 }: {
   /** "Ver movimientos" de una consulta (`06 §6`): abre Movimientos con su filtro. */
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
+  /** Tocar el aviso "Registré…" abre el detalle del movimiento (`02 §5`). */
+  alVerMovimiento?: (transaccionId: string) => void;
   /** Abre el formulario completo de movimiento. */
   alMasOpciones?: () => void;
   /** "Traigo 300": abre el arqueo con esa cantidad (`02 §7`). */
@@ -134,7 +137,7 @@ export function PanelRegistrar({
   const { ctx, refrescar, nube } = useSesion();
   const { c } = useTema();
   const { height: altoVentana } = useWindowDimensions();
-  const avisarRegistro = useAvisoRegistro();
+  const avisarRegistro = useAvisoRegistro(alVerMovimiento);
   const esperando = useVista(contarEsperandoConexion);
   const plan = useVista(obtenerPlan).plan;
   const [escribiendo, setEscribiendo] = useState(abiertoAlInicio);
@@ -210,17 +213,26 @@ export function PanelRegistrar({
           setTexto('');
           contarRegistro(origen);
           setAvisoDeducible(r.movimientos.some((m) => m.avisoDeducible));
-          avisarRegistro(mensajeRegistrado(r.movimientos), r.deshacer);
+          avisarRegistro(mensajeRegistrado(r.movimientos), {
+            deshacer: r.deshacer,
+            transaccionId: r.movimientos[0]?.transaccionId,
+          });
           return;
         case 'corregido':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeCorregido(r.antes, r.despues), r.deshacer);
+          avisarRegistro(mensajeCorregido(r.antes, r.despues), {
+            deshacer: r.deshacer,
+            transaccionId: r.despues.transaccionId,
+          });
           return;
         case 'anulado':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeAnulado(r.movimiento), r.deshacer);
+          avisarRegistro(mensajeAnulado(r.movimiento), {
+            deshacer: r.deshacer,
+            transaccionId: r.movimiento.transaccionId,
+          });
           return;
         case 'configurado':
           terminarRevision();
@@ -230,13 +242,19 @@ export function PanelRegistrar({
         case 'pasar_a_meses':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses), r.deshacer);
+          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses), {
+            deshacer: r.deshacer,
+            transaccionId: r.movimiento.transaccionId,
+          });
           return;
         case 'registrado_msi':
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
-          avisarRegistro(mensajeCompraMsi(r.compra), r.deshacer);
+          avisarRegistro(mensajeCompraMsi(r.compra), {
+            deshacer: r.deshacer,
+            transaccionId: r.compra.transaccionId,
+          });
           return;
         case 'registrado_division':
           terminarRevision();
@@ -244,7 +262,7 @@ export function PanelRegistrar({
           contarRegistro(origen);
           avisarRegistro(
             mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
-            r.deshacer,
+            { deshacer: r.deshacer, transaccionId: r.registro.transaccionId },
           );
           return;
         case 'registrado_tanda':
@@ -253,7 +271,10 @@ export function PanelRegistrar({
           contarRegistro(origen);
           avisarRegistro(
             r.tipo === 'cobro_tanda' ? mensajeCobro(r.movimiento) : mensajeAportacion(r.movimiento),
-            r.movimiento.deshacer,
+            {
+              deshacer: r.movimiento.deshacer,
+              transaccionId: r.movimiento.transaccionId,
+            },
           );
           return;
         case 'tarjeta_configurada':
@@ -331,6 +352,7 @@ export function PanelRegistrar({
     [
       alArqueo,
       alMeAlcanza,
+      alVerMovimiento,
       avisarNoEntendi,
       avisarRegistro,
       contarRegistro,

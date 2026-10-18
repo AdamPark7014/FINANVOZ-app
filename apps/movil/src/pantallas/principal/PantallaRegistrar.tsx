@@ -12,6 +12,7 @@ import { PanelRegistrar } from './PanelRegistrar';
 export function PantallaRegistrar({
   alCerrar,
   alVerMovimientos,
+  alVerMovimiento,
   alArqueo,
   alMeAlcanza,
   fraseRevision,
@@ -20,6 +21,8 @@ export function PantallaRegistrar({
   alCerrar: () => void;
   /** "Ver movimientos" de una consulta: abre Movimientos con su filtro. */
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
+  /** Tocar el aviso "Registré…" abre el detalle del movimiento. */
+  alVerMovimiento?: (transaccionId: string) => void;
   /** "Traigo 300": abre el arqueo. */
   alArqueo?: (efectivoReal: number) => void;
   /** "¿Me alcanza para…?": abre "¿Me alcanza?". */
@@ -50,13 +53,17 @@ export function PantallaRegistrar({
       <PanelRegistrar
         abiertoAlInicio
         {...(alVerMovimientos ? { alVerMovimientos } : {})}
+        {...(alVerMovimiento ? { alVerMovimiento } : {})}
         {...(alArqueo ? { alArqueo } : {})}
         {...(alMeAlcanza ? { alMeAlcanza } : {})}
         {...(fraseRevision ? { fraseRevision } : {})}
         {...(motor ? { motor } : {})}
       />
       <Texto variante="subtitulo">O llena los datos</Texto>
-      <FormularioMovimiento alGuardar={alCerrar} />
+      <FormularioMovimiento
+        alGuardar={alCerrar}
+        {...(alVerMovimiento ? { alVerMovimiento } : {})}
+      />
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import {
   anularMovimiento,
@@ -38,6 +38,7 @@ export function PantallaMovimientos({
   filtro = null,
   alQuitarFiltro,
   alAbrirPersona,
+  detalleInicial = null,
 }: {
   alRegistrar: () => void;
   /** Abre Registrar con una frase que la nube ya entendió pero necesita confirmación. */
@@ -47,6 +48,8 @@ export function PantallaMovimientos({
   alQuitarFiltro?: () => void;
   /** Detalle del movimiento → persona (`02 §17`, pendiente 34). */
   alAbrirPersona?: (personaId: string) => void;
+  /** Id de transacción a expandir al entrar (p. ej. desde el aviso "Registré…"). */
+  detalleInicial?: string | null;
 }) {
   const { ctx, version, refrescar } = useSesion();
   const claveFiltro = JSON.stringify(filtro ?? {});
@@ -70,7 +73,11 @@ export function PantallaMovimientos({
       ),
   );
   const mostrar = useMostrarAviso();
-  const [abierto, setAbierto] = useState<string | null>(null);
+  const [abierto, setAbierto] = useState<string | null>(detalleInicial);
+
+  useEffect(() => {
+    if (detalleInicial) setAbierto(detalleInicial);
+  }, [detalleInicial]);
 
   return (
     <Pantalla testID="pantalla-movimientos">
@@ -166,6 +173,7 @@ export function PantallaMovimientos({
               abierto={abierto === m.id}
               aMeses={conTarjeta.has(m.id)}
               {...(alAbrirPersona ? { alAbrirPersona } : {})}
+              alAbrirDetalle={(id) => setAbierto(id)}
               alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
               alAnular={() => {
                 try {
@@ -215,9 +223,17 @@ function titulo(m: MovimientoVista): string {
 const MESES_COMUNES = ['3', '6', '9', '12', '18', '24'] as const;
 
 /** "Pasar a meses" (CA-M4-09): cuántos meses y Guardar; el cargo se reemplaza por la compra a meses. */
-function PasarAMeses({ m, alTerminar }: { m: MovimientoVista; alTerminar: () => void }) {
+function PasarAMeses({
+  m,
+  alTerminar,
+  alAbrirDetalle,
+}: {
+  m: MovimientoVista;
+  alTerminar: () => void;
+  alAbrirDetalle: (transaccionId: string) => void;
+}) {
   const { ctx } = useSesion();
-  const avisarRegistro = useAvisoRegistro();
+  const avisarRegistro = useAvisoRegistro(alAbrirDetalle);
   const [meses, setMeses] = useState<string | null>(null);
   const [otro, setOtro] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -226,7 +242,7 @@ function PasarAMeses({ m, alTerminar }: { m: MovimientoVista; alTerminar: () => 
     if (n === null) return setError('Elige los meses, de 2 a 48.');
     try {
       const r = pasarAMeses(ctx, m.id, n);
-      avisarRegistro(mensajeCompraMsi(r), r.deshacer);
+      avisarRegistro(mensajeCompraMsi(r), { deshacer: r.deshacer, transaccionId: r.transaccionId });
       alTerminar();
     } catch (e) {
       setError(mensajeError(e));
@@ -273,6 +289,7 @@ function FilaMovimiento({
   alAnular,
   alExtraordinario,
   alAbrirPersona,
+  alAbrirDetalle,
 }: {
   m: MovimientoVista;
   abierto: boolean;
@@ -281,6 +298,7 @@ function FilaMovimiento({
   alAnular: () => void;
   alExtraordinario: () => void;
   alAbrirPersona?: (personaId: string) => void;
+  alAbrirDetalle: (transaccionId: string) => void;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [pasando, setPasando] = useState(false);
@@ -329,7 +347,9 @@ function FilaMovimiento({
           <Texto variante="secundario" tono="secundario">
             {`${NOMBRE_ORIGEN[m.origen] ?? 'Registrado'} · ${etiquetaDiaMes(m.fecha)}`}
           </Texto>
-          {pasando ? <PasarAMeses m={m} alTerminar={() => setPasando(false)} /> : null}
+          {pasando ? (
+            <PasarAMeses m={m} alTerminar={() => setPasando(false)} alAbrirDetalle={alAbrirDetalle} />
+          ) : null}
           {aMeses && !pasando && !confirmando ? (
             <Boton
               etiqueta="Pasar a meses"

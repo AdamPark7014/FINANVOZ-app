@@ -4,7 +4,7 @@ import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacion';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
-import { PantallaHoy, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
+import { PantallaHoy, paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
 
 export default function Hoy() {
   const router = useRouter();
@@ -18,6 +18,8 @@ export default function Hoy() {
         navegacion={{
           alVerMovimientos: (filtro) =>
             router.navigate({ pathname: '/movimientos', params: filtro ? paramsDeFiltro(filtro) : {} }),
+          alVerMovimiento: (transaccionId) =>
+            router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) }),
           // Directo a Ajustes › Ingreso (02-UX §12); al guardar regresa aquí.
           alConfigurarIngreso: () => router.push('/ajustes/ingreso'),
           alAbrirFormulario: () => router.navigate('/registrar'),

@@ -94,10 +94,16 @@ const CAMPOS: Record<
  * Formulario de movimiento (02-UX §1.1: la última vía, después de captura y dictado) para los tipos que origina
  * el usuario en M2. Al guardar aparece el aviso con "Deshacer".
  */
-export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) {
+export function FormularioMovimiento({
+  alGuardar,
+  alVerMovimiento,
+}: {
+  alGuardar?: () => void;
+  alVerMovimiento?: (transaccionId: string) => void;
+}) {
   const { ctx, refrescar } = useSesion();
   const registrarEvento = useAnalitica();
-  const avisarRegistro = useAvisoRegistro();
+  const avisarRegistro = useAvisoRegistro(alVerMovimiento);
   const vistaCuentas = useVista(listarCuentas);
   const personas = useVista(listarPersonas);
   const categoriasGasto = useVista((c) => listarCategorias(c, 'gasto'));
@@ -172,10 +178,10 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
       });
       const nombre = descripcion.trim() || NOMBRE_TIPO[tipo];
       const registrado = `Registré: ${nombre} ${formatearCentavos(monto)}`;
-      avisarRegistro(
-        r.avisoDeducible ? `${registrado}. ${AVISO_DEDUCIBLE_EFECTIVO}` : registrado,
-        r.deshacer,
-      );
+      avisarRegistro(r.avisoDeducible ? `${registrado}. ${AVISO_DEDUCIBLE_EFECTIVO}` : registrado, {
+        deshacer: r.deshacer,
+        transaccionId: r.transaccionId,
+      });
       setMonto(null);
       setDescripcion('');
       setIntentado(false);
@@ -220,7 +226,7 @@ export function FormularioMovimiento({ alGuardar }: { alGuardar?: () => void }) 
             });
             avisarRegistro(
               mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
-              r.deshacer,
+              { deshacer: r.deshacer, transaccionId: r.registro.transaccionId },
             );
             setClave((k) => k + 1);
             alGuardar?.();
