@@ -2,9 +2,22 @@ import { useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
 import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto, useTema } from '../../ui';
 import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES, type PreguntaFrecuente } from './preguntas';
+import {
+  ACCESIBILIDAD_ESCRIBIR_CORREO,
+  ACCESIBILIDAD_VOLVER,
+  BTN_ESCRIBIR_CORREO,
+  CONTACTO_TITULO,
+  ETIQUETA_VOLVER,
+  INTRO,
+  mensajeSinAppCorreo,
+  PISTA_ESCRIBIR_CORREO,
+  pistaPreguntaFrecuente,
+  textoCuerpoContacto,
+  TITULO,
+} from './textos';
 
 /**
- * Ayuda (CA-M13-04): las preguntas frecuentes de `preguntas.ts` (se abren una a una) y el correo de contacto.
+ * Ayuda (CA-M13-04): las preguntas frecuentes de `textos.ts` (se abren una a una) y el correo de contacto.
  * El correo se abre con `mailto:` y solo el asunto: la persona decide qué contar (regla 9). Si el teléfono no
  * tiene app de correo, se muestra la dirección para escribirla a mano.
  */
@@ -30,12 +43,15 @@ export function PantallaAyuda({
         testID="ayuda-volver"
         variante="texto"
         ancho="contenido"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
+        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">Ayuda</Texto>
-      <Texto variante="cuerpo" tono="secundario">
-        Toca una pregunta para ver la respuesta.
+      <Texto variante="titulo" testID="ayuda-titulo">
+        {TITULO}
+      </Texto>
+      <Texto variante="cuerpo" tono="secundario" testID="ayuda-intro">
+        {INTRO}
       </Texto>
 
       <View style={{ gap: espacio.s }} testID="ayuda-preguntas">
@@ -50,15 +66,18 @@ export function PantallaAyuda({
       </View>
 
       <Tarjeta testID="ayuda-contacto">
-        <Texto variante="subtitulo">¿No encontraste tu respuesta?</Texto>
-        <Texto variante="cuerpo">
-          {`Escríbenos a ${CORREO_AYUDA}. Cuéntanos qué pasó; no mandes contraseñas ni datos de tarjetas.`}
+        <Texto variante="subtitulo" testID="ayuda-contacto-titulo">
+          {CONTACTO_TITULO}
+        </Texto>
+        <Texto variante="cuerpo" testID="ayuda-contacto-cuerpo">
+          {textoCuerpoContacto(CORREO_AYUDA)}
         </Texto>
         <Boton
           testID="ayuda-escribir"
           variante="secundario"
-          etiqueta="Escribir un correo"
-          pista="Abre tu app de correo"
+          etiqueta={BTN_ESCRIBIR_CORREO}
+          etiquetaAccesible={ACCESIBILIDAD_ESCRIBIR_CORREO}
+          pista={PISTA_ESCRIBIR_CORREO}
           alPresionar={escribir}
         />
         {sinCorreo ? (
@@ -68,7 +87,7 @@ export function PantallaAyuda({
             accessibilityLiveRegion="polite"
             testID="ayuda-sin-correo"
           >
-            {`No encontré una app de correo en tu teléfono. Escríbenos desde tu correo a ${CORREO_AYUDA}.`}
+            {mensajeSinAppCorreo(CORREO_AYUDA)}
           </Texto>
         ) : null}
       </Tarjeta>
@@ -85,6 +104,7 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         onPress={alTocar}
         accessibilityRole="button"
         accessibilityLabel={p.pregunta}
+        accessibilityHint={pistaPreguntaFrecuente(abierta)}
         accessibilityState={{ expanded: abierta }}
         style={({ pressed }) => ({
           minHeight: OBJETIVO_TACTIL_MIN,
