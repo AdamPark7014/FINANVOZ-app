@@ -49,6 +49,9 @@ import {
   PISTA_REGISTRAR_MOVIMIENTO,
   PISTA_VER_DESGLOSE,
   PISTA_VER_TODOS_MOVIMIENTOS,
+  PISTA_AGREGAR_TARJETA_CREDITO,
+  PISTA_COBRAR_DESDE_CUENTAS,
+  PISTA_CONTAR_EFECTIVO,
   contextoSaldoCompromiso,
   contextoSaldoTarjeta,
   contextoSaldoTienes,
@@ -445,6 +448,45 @@ describe('Cuentas', () => {
       etiquetaVacioCuentasCompromisos(),
     );
     p.cerrar();
+  });
+
+  it('Agregar tarjeta, Contar efectivo y Cobrar traen accessibilityHint (`02 §15`)', () => {
+    const p = conEscenario('e4-01');
+    const efectivo = p.e.cuentas.efectivo as string;
+    renderConSesion(
+      p.ctx,
+      <PantallaCuentas
+        alAbrirAjustes={jest.fn()}
+        alContarEfectivo={jest.fn()}
+        alAgregarTarjeta={jest.fn()}
+      />,
+    );
+    expect(screen.getByTestId(`cuenta-${efectivo}-accion`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONTAR_EFECTIVO,
+    );
+    expect(screen.getByTestId('boton-agregar-tarjeta')).toHaveProp(
+      'accessibilityHint',
+      PISTA_AGREGAR_TARJETA_CREDITO,
+    );
+    p.cerrar();
+
+    const q = conEscenario('e4-01');
+    const caro = crearPersona(q.ctx, { nombre: 'Caro' });
+    registrarCuentaDividida(q.ctx, {
+      total: 40_000,
+      partes: 1,
+      personaIds: [caro],
+      origenId: q.e.cuentas.nu as string,
+      categoria: 'comida_fuera',
+      fecha: '2026-10-10',
+    });
+    renderConSesion(q.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={jest.fn()} />);
+    expect(screen.getByTestId(`te-debe-${caro}-accion`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_COBRAR_DESDE_CUENTAS,
+    );
+    q.cerrar();
   });
 
   it('CA-M2-09 · con el préstamo de la jefa apartado Hoy sigue en $214; al apagar el interruptor sube', () => {
