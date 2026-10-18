@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **movil/tarjetas:** copy en `textos.ts` (detalle, pago, MSI, vacíos); `Dato` accesible + título `header`; empty `tarjeta-meses-vacio`; `BTN_CANCELAR` unificado; barrel `index.ts`; pruebas vacío/a11y en `tarjetas.test.tsx`.
+- **ayuda/textos.ts:** alias `SECCION_AYUDA`, `TEXTO_AYUDA` y `BTN_AYUDA` alineados con el reexport en `ajustes/textos.ts` (tests e `index` ya los usaban).
 
 ## Hecho (acumulado reciente)
 
-- Oleadas copy movil (Ajustes, plan, captura, suscripciones, ayuda). Ver `git log`.
+- CTAs ¿Me alcanza?; deducciones copy; alias Ayuda/Ajustes. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (principal, estados-cuenta, avisos, captura) — no mezclar.
-- Varios tests en `tarjetas.test.tsx` (Hoy/Cuentas) fallan por copy/testIDs fuera de tarjetas.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP local sin commitear (captura, estados-cuenta, tarjetas, suscripciones…) — no mezclado.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Estabilizar tests tarjetas/Hoy si hace falta en CI.
+2. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 

@@ -10,7 +10,6 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
-import { BTN_CANCELAR } from './textos';
 import {
   APOYO_CONFIRMAR_MSI,
   BTN_CANCELAR,
