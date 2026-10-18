@@ -188,7 +188,9 @@ function Detalle({
 
       {panel === 'datos' ? (
         <Tarjeta testID="persona-pedir-datos">
-          <Texto variante="subtitulo">{TITULO_PEDIR_DATOS_COBRO}</Texto>
+          <Texto variante="subtitulo" testID="persona-pedir-datos-titulo" accessibilityRole="header">
+            {TITULO_PEDIR_DATOS_COBRO}
+          </Texto>
           <Texto variante="secundario" tono="secundario">
             {AYUDA_PEDIR_DATOS_COBRO}
           </Texto>
@@ -279,7 +281,9 @@ function YaMePago({
 
   return (
     <Tarjeta testID="persona-ya-me-pago">
-      <Texto variante="subtitulo">{TITULO_YA_ME_PAGO}</Texto>
+      <Texto variante="subtitulo" testID="persona-ya-me-pago-titulo" accessibilityRole="header">
+        {TITULO_YA_ME_PAGO}
+      </Texto>
       <CampoMonto etiqueta={ETIQUETA_MONTO} valorInicial={saldo} alCambiar={setMonto} testID="pago-persona-monto" />
       <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
         {ETIQUETA_A_DONDE_LLEGO}
@@ -292,12 +296,24 @@ function YaMePago({
         etiqueta={ETIQUETA_A_DONDE_LLEGO}
       />
       {intentado && faltante ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="persona-ya-me-pago-faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {faltante}
         </Texto>
       ) : null}
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="persona-ya-me-pago-error"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Texto>
       ) : null}

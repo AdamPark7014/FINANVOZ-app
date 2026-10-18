@@ -9,6 +9,8 @@ export { mensajeErrorCompartido } from '../../servicios';
 export const ETIQUETA_VOLVER = 'Volver';
 /** Botón Volver en la lista de grupos (vuelve a Cuentas). */
 export const PISTA_VOLVER_CUENTAS = 'Regresa a Cuentas';
+/** Volver desde crear, escanear o el código QR. */
+export const PISTA_VOLVER_LISTA = 'Regresa a la lista de grupos';
 export const TITULO_GASTOS_COMPARTIDOS = 'Gastos compartidos';
 /** Entrada desde Cuentas (`02 §27`). */
 export const BTN_COMPARTIDOS_CUENTAS = 'Gastos con tu pareja';
@@ -30,7 +32,11 @@ export const BTN_ESCANEAR_CODIGO = 'Escanear código';
 export const PISTA_ESCANEAR_CODIGO = 'Lee el código QR que aparece en el teléfono de tu pareja';
 export const BTN_ESCANEAR_SU_CODIGO = 'Escanear su código';
 export const BTN_CREAR_CODIGO = 'Crear código';
+/** Tras escribir el nombre de tu pareja (`02 §15`). */
+export const PISTA_CREAR_CODIGO = 'Genera el código QR para que tu pareja te escanee';
 export const BTN_LISTO = 'Listo';
+/** Antes de abrir la cámara en unirse (`02 §15`). */
+export const PISTA_ABRIR_ESCANER = 'Abre la cámara para leer el código QR de tu pareja';
 export const ETIQUETA_NOMBRE_PAREJA = '¿Cómo se llama tu pareja?';
 export const AYUDA_NOMBRE_PAREJA = 'Solo se guarda en tu teléfono.';
 export const ERROR_NOMBRE_PAREJA = 'Escribe cómo se llama tu pareja.';
