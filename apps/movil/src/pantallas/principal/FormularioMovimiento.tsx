@@ -21,6 +21,7 @@ import {
   BTN_AGREGAR_PERSONA,
   BTN_GUARDAR_MOVIMIENTO,
   CAMPOS_FORMULARIO_MOVIMIENTO,
+  PISTA_GUARDAR_MOVIMIENTO,
   EJEMPLO_DESCRIPCION,
   EJEMPLO_NUEVA_PERSONA,
   ERROR_CUENTAS_DISTINTAS,
@@ -317,6 +318,7 @@ export function FormularioMovimiento({
         <Boton
           etiqueta={BTN_GUARDAR_MOVIMIENTO}
           alPresionar={guardar}
+          pista={PISTA_GUARDAR_MOVIMIENTO}
           testID="boton-guardar-movimiento"
         />
       </>

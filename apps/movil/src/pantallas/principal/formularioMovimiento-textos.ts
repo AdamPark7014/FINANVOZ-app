@@ -17,6 +17,8 @@ export const ETIQUETA_AGREGAR_PERSONA = 'Agregar persona';
 export const EJEMPLO_NUEVA_PERSONA = 'Mi jefa';
 export const BTN_AGREGAR_PERSONA = 'Agregar';
 export const BTN_GUARDAR_MOVIMIENTO = 'Guardar';
+/** TalkBack al guardar desde el formulario manual (`02 §19`). */
+export const PISTA_GUARDAR_MOVIMIENTO = 'Registra el movimiento en tu libro';
 
 export const ERROR_MONTO_CERO = 'Escribe un monto mayor a $0.';
 export const ERROR_ELEGIR_CATEGORIA = 'Elige una categoría.';
