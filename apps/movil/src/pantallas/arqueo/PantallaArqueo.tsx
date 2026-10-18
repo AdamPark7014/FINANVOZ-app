@@ -17,6 +17,7 @@ import { Casilla, Chips } from '../onboarding/componentes';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
+  ACCESIBILIDAD_CERRAR,
   CERRAR,
   CONFIRMAR,
   CONTINUAR,
@@ -76,6 +77,7 @@ export function PantallaArqueo({
         <Texto variante="titulo">{TITULO}</Texto>
         <Boton
           etiqueta={CERRAR}
+          etiquetaAccesible={ACCESIBILIDAD_CERRAR}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
@@ -89,7 +91,12 @@ export function PantallaArqueo({
           alCerrar={alCerrar}
         />
       ) : (
-        <Texto variante="cuerpo" tono="secundario" testID="arqueo-sin-efectivo">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="arqueo-sin-efectivo"
+          accessibilityLiveRegion="polite"
+        >
           {TEXTO_SIN_CUENTA_EFECTIVO}
         </Texto>
       )}

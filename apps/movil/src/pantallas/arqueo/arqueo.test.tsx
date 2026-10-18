@@ -4,6 +4,7 @@ import { abrirPruebaPantalla, conEscenario } from '../principal/__pruebas__/base
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
 import {
+  ACCESIBILIDAD_CERRAR,
   ETIQUETA_GASTO_SIN_DESCRIPCION,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,
@@ -61,6 +62,8 @@ describe('PantallaArqueo · vacío y errores', () => {
     const p = abrirPruebaPantalla();
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
     expect(textoDe('arqueo-sin-efectivo')).toBe(TEXTO_SIN_CUENTA_EFECTIVO);
+    expect(screen.getByTestId('arqueo-sin-efectivo')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('boton-cerrar-arqueo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
     p.cerrar();
   });
 

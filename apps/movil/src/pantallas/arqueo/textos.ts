@@ -5,6 +5,8 @@ import { formatearCentavos } from '../../ui';
 
 export const TITULO = 'Contar mi efectivo';
 export const CERRAR = 'Cerrar';
+/** TalkBack: más contexto que el botón «Cerrar». */
+export const ACCESIBILIDAD_CERRAR = 'Cerrar conteo de efectivo';
 export const LISTO = 'Listo';
 export const CONTINUAR = 'Continuar';
 export const CONFIRMAR = 'Confirmar';
