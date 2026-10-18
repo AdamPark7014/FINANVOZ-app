@@ -207,8 +207,11 @@ export function enlaceAnaliticaCorreccion(registrar: ((evento: EventoAnalitica) 
 function notificarCorreccionAnalitica(
   registrar: ((evento: EventoAnalitica) => void) | undefined,
   cambios: CambiosResueltos,
+  origen: OrigenCorreccion | undefined,
 ): void {
-  const emitir = registrar ?? registrarEventoCorreccion;
+  const emitir =
+    registrar ??
+    (origen === 'voz' || origen === 'texto' ? registrarEventoCorreccion : null);
   if (!emitir) return;
   for (const campo of camposCorreccionAnalitica(cambios)) {
     try {
@@ -307,7 +310,7 @@ export function aplicarCorreccion(
       deshacer: `r:${r.nueva.id}:${transaccionId}`,
     };
   });
-  notificarCorreccionAnalitica(opciones.registrarEvento, cambios);
+  notificarCorreccionAnalitica(opciones.registrarEvento, cambios, opciones.origen);
   return resultado;
 }
 
