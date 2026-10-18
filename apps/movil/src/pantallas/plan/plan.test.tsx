@@ -90,7 +90,7 @@ describe('pantalla del plan', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('plan-oferta-mensual'));
     });
-    expect(textoDe('plan-mensaje')).toBe('¡Listo! Ya tienes Plus.');
+    expect(textoDe('plan-mensaje')).toBe('Listo. Ya tienes Plus.');
     expect(textoDe('plan-titulo')).toBe('Tienes Plus · prueba gratis');
     expect(textoDe('plan-detalle')).toBe('Te quedan 14 días de prueba; el 25 oct empieza el cobro.');
     expect(screen.getByTestId('plan-administrar')).toBeTruthy();

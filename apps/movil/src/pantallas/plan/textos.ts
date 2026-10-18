@@ -9,13 +9,26 @@ import type { OfertaPlus } from '../../suscripciones/tipos';
 
 /** Redacción del plan (`01 §11`, `02 §14`): tuteo, sin tecnicismos; los precios los pone la tienda. */
 
+export const TITULO_PANTALLA = 'Finanvoz Plus';
+export const SECCION_INCLUYE = 'Plus incluye';
+export const SECCION_AJUSTES = 'Plan';
+export const ETIQUETA_VOLVER = 'Volver';
+export const ETIQUETA_VER_PLANES = 'Ver planes';
+export const ETIQUETA_CONOCER_PLUS = 'Conocer Plus';
+export const ETIQUETA_ADMINISTRAR = 'Administrar en Google Play';
+export const ETIQUETA_RESTAURAR = 'Restaurar compras';
+export const ETIQUETA_INTENTAR = 'Intentar de nuevo';
+export const CARGANDO_OFERTAS = 'Cargando planes…';
+export const NOTA_COMPRA_SIMULADA =
+  'Compra simulada: esta build de desarrollo no tiene tienda y no cobra nada.';
+
 /** Solo lo que ya existe en la app; lo que llega en hitos futuros no se promete aquí. */
 export const INCLUYE_PLUS = [
   'Probabilidad de llegar a tu próximo pago sin tocar tu colchón',
   '«¿Me alcanza?»: compara pagar de contado, a meses o esperar',
   'Tarjeta del día: con cuál te conviene pagar hoy',
   'Tus meses sin intereses de los próximos 12 meses',
-  'Respuestas a tus preguntas: cuánto llevas gastado, cuánto debes, qué pagos vienen y por qué te alcanzó menos',
+  'Pregúntame lo que quieras sobre tu dinero y te explico el porqué: cuánto llevas gastado, cuánto debes y qué pagos vienen',
   'Deducciones personales: con tus facturas, cuánto llevas deducible en el año y cuánto ISR podrías ahorrar',
   `${INTERPRETACIONES_NUBE_MES.plus} frases al mes interpretadas en internet (en Gratis, ${INTERPRETACIONES_NUBE_MES.gratis})`,
 ] as const;
@@ -32,7 +45,7 @@ export const MENSAJE_ERROR_COMPRA = 'No se completó la compra. No se te cobró 
 export const MENSAJE_PENDIENTE =
   'Tu pago quedó pendiente en Google Play. Cuando se confirme, se activa Plus.';
 export const MENSAJE_RESTAURADO_SIN_PLUS = 'No encontré una suscripción de Plus en tu cuenta de Google.';
-export const MENSAJE_LISTO = '¡Listo! Ya tienes Plus.';
+export const MENSAJE_LISTO = 'Listo. Ya tienes Plus.';
 
 /** "Tienes Plus · prueba gratis" y su detalle. */
 export function resumenPlan(v: VistaPlan): { titulo: string; detalle: string | null } {

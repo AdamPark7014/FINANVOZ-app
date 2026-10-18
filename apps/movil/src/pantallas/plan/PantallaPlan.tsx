@@ -6,7 +6,13 @@ import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import type { OfertaPlus } from '../../suscripciones/tipos';
 import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import {
+  CARGANDO_OFERTAS,
   etiquetaOferta,
+  ETIQUETA_ADMINISTRAR,
+  ETIQUETA_INTENTAR,
+  ETIQUETA_RESTAURAR,
+  ETIQUETA_VER_PLANES,
+  ETIQUETA_VOLVER,
   INCLUYE_GRATIS,
   INCLUYE_PLUS,
   MENSAJE_ERROR_COMPRA,
@@ -15,8 +21,12 @@ import {
   MENSAJE_PENDIENTE,
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
+  NOTA_COMPRA_SIMULADA,
   NOTA_TIENDA,
   resumenPlan,
+  SECCION_AJUSTES,
+  SECCION_INCLUYE,
+  TITULO_PANTALLA,
 } from './textos';
 
 type Ofertas = { tipo: 'cargando' } | { tipo: 'listas'; ofertas: readonly OfertaPlus[] } | { tipo: 'error' };
@@ -95,13 +105,13 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   return (
     <Pantalla testID="pantalla-plan" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
         testID="plan-volver"
       />
-      <Texto variante="titulo">Finanvoz Plus</Texto>
+      <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
 
       <Tarjeta testID="plan-actual">
         <Texto variante="subtitulo" testID="plan-titulo">

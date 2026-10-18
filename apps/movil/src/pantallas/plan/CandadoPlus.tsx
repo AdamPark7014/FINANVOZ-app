@@ -4,6 +4,7 @@ import { funcionesPlan, type FuncionesPlan } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto } from '../../ui';
+import { ETIQUETA_CONOCER_PLUS, ETIQUETA_VOLVER } from './textos';
 
 /**
  * Candado discreto de una función de Plus (`02 §4`: "Ver probabilidad · Plus"). Tocarlo abre la pantalla del plan;
