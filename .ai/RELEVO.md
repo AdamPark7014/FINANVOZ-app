@@ -6,24 +6,23 @@
 
 ## Hecho en este turno
 
-- **(tabs) a11y:** `ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA` (sin prefijo "Pestaña") en contenedores de ruta; barra con `tabBarAccessibilityRole: tab` y etiquetas `Pestaña …`; rutas usan `propsContenedorPestana` / `propsContenedorRegistrar`; tests `_layout` y `hoy`.
+- **Tabs:** prueba de `_layout` verifica `accessibilityRole` `tab` en cada botón de la barra (TalkBack §15).
+- **Colchón O7:** `sugerenciaMontoColchon10` compartida con Ajustes; copy deducciones/ayuda tuteo.
 
 ## Hecho (acumulado reciente)
 
-- widget/captura a11y, ajustes header, Chip. Ver `git log`.
+- Captura copy centralizado, Chip TalkBack, Cuentas vacíos, `pestanas-textos`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local (turno anterior, sin commitear): `PreguntasCaptura`, principal (`PanelRegistrar`, `textos.ts`, tests), `.ai/RELEVO.md` mezclado.
-- WIP: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE`).
+- WIP rescate `Chip.test.tsx` (`c6e1566`).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP captura/respaldo/tanda y principal sin pisar.
-3. Centralizar copy O3–O7 en `textos.ts`.
+2. Integrar o descartar rescate Chip.test.
 
 ## No tocar
 

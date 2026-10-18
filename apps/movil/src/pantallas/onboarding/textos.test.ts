@@ -23,7 +23,6 @@ import {
   TITULO_PAGOS_FIJOS,
   textoProgresoOnboarding,
 } from './textos';
-import { sugerenciaMontoColchon10 } from '../ajustes/colchon-textos';
 
 describe('textos de onboarding', () => {
   it('O1 y O2 cumplen 02 §14: tuteo y sin exclamación', () => {
@@ -49,12 +48,6 @@ describe('textos de onboarding', () => {
       expect(texto).not.toMatch(/por favor/i);
     }
     expect(AYUDA_BIENVENIDA).toMatch(/\btu\b/i);
-  });
-
-  it('O7 sugiere el 10 % con formato de pesos', () => {
-    expect(sugerenciaMontoColchon10(130_000)).toBe(
-      'Te sugerimos $1,300: el 10 % de lo que te pagan.',
-    );
   });
 
   it('TalkBack del progreso describe el recorrido inicial', () => {

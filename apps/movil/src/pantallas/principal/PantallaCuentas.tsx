@@ -245,7 +245,7 @@ export function PantallaCuentas({
       {alAbrirDeducciones ? (
         <Seccion titulo="Deducciones" testID="seccion-deducciones">
           <Boton
-            etiqueta="Ver mis deducciones del año"
+            etiqueta={BTN_DEDUCCIONES_CUENTAS}
             variante="secundario"
             alPresionar={alAbrirDeducciones}
             testID="boton-deducciones"
