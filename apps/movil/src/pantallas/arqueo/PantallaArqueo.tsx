@@ -14,7 +14,7 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips } from '../onboarding/componentes';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
   CERRAR,
@@ -194,8 +194,12 @@ function Arqueo({
 
       {paso === 'cantidad' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-cantidad">
-          <Texto variante="subtitulo" testID="arqueo-esperado">
-            {textoDeberiasTraer(esperado)}
+          {(() => {
+            const preguntaCantidad = textoDeberiasTraer(esperado);
+            return (
+              <>
+          <Texto variant="subtitulo" testID="arqueo-esperado" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaCantidad}
           </Texto>
           <GrupoChips
             opciones={[
@@ -205,7 +209,11 @@ function Arqueo({
             valor={otra ? 'otra' : null}
             alCambiar={(v) => (v === 'exacto' ? calcular(esperado) : setOtra(true))}
             prefijoTestID="arqueo"
+            etiqueta={preguntaCantidad}
           />
+              </>
+            );
+          })()}
           {otra ? (
             <>
               <CampoMonto

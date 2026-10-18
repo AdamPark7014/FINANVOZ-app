@@ -328,7 +328,13 @@ describe('Registrar', () => {
     });
     expect(screen.queryByTestId('aviso')).toBeNull();
 
-    fireEvent.press(within(tarjeta).getByTestId(`elegir-0-origenId-${nu}`));
+    const chipNu = within(tarjeta).getByTestId(`elegir-0-origenId-${nu}`);
+    expect(chipNu.props.accessibilityLabel).toBe('Nu ••4410');
+    expect(chipNu.props.accessibilityRole).toBe('radio');
+    expect(screen.getByLabelText('¿De qué cuenta salió?')).toBeTruthy();
+
+    fireEvent.press(chipNu);
+    expect(chipNu.props.accessibilityState).toMatchObject({ selected: true });
     fireEvent.press(screen.getByTestId('boton-guardar-confirmacion'));
     expect(screen.queryByTestId('confirmacion-registro')).toBeNull();
     expect(

@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
+import { BTN_ONBOARDING_RESTAURAR } from '../../src/pantallas/respaldo';
 import { obtenerConsentimiento } from '../../src/servicios';
 import { useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, Texto } from '../../src/ui';
@@ -28,7 +29,7 @@ export default function Bienvenida() {
           <Boton
             testID="onb-restaurar"
             variante="texto"
-            etiqueta="¿Vienes de otro teléfono? Restaurar respaldo"
+            etiqueta={BTN_ONBOARDING_RESTAURAR}
             alPresionar={() => router.push('/restaurar')}
           />
         </>

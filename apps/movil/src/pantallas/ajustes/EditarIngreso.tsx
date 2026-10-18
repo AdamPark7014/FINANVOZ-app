@@ -8,11 +8,12 @@ import {
   ETIQUETA_GUARDAR,
   ETIQUETA_VOLVER,
   INTRO_EDITAR,
+  mensajeIngresoGuardado,
   PISTA_GUARDAR,
   PISTA_VOLVER,
   TITULO_EDITAR,
 } from './ingreso-textos';
-import { mensajeIngresoGuardado, valoresDeIngreso } from './ingreso';
+import { valoresDeIngreso } from './ingreso';
 
 /**
  * Ajustes › Ingreso (`02 §12`, incluye el modo ingreso variable): las preguntas de O3 con lo que ya está guardado.

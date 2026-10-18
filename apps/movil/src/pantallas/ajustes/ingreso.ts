@@ -4,12 +4,9 @@ import { type FinDeSemana, type Frecuencia } from '../onboarding/ingreso';
 import {
   fraseCuandoTePagan,
   lineaResumenIngreso,
-  mensajeIngresoGuardado,
   RESUMEN_INGRESO_VARIABLE,
   RESUMEN_SIN_INGRESO,
 } from './ingreso-textos';
-
-export { mensajeIngresoGuardado };
 
 /**
  * Ajustes › Ingreso (`02 §12`): las mismas respuestas de O3 (`onboarding/ingreso.ts`) leídas del ingreso guardado,

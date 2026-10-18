@@ -25,8 +25,10 @@ import {
   MENSAJE_IMPORTAR_ERROR,
   MENSAJE_SIN_PARAMETROS,
   PEDIR_PERFIL,
+  TEXTO_FACTURAS_OCULTAS,
   TEXTO_FACTURAS_VACIO,
   TEXTO_IMPORTAR_VACIO,
+  TITULO_TUS_FACTURAS,
   tituloPantallaDeducciones,
 } from './textos';
 
@@ -111,6 +113,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar();
     renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
     llenarPerfil('PEPJ800101AB1', '300,000');
+    expect(screen.getByTestId('deducciones-tus-facturas')).toHaveTextContent(TITULO_TUS_FACTURAS);
     expect(textoDe('deducciones-sin-facturas')).toBe(TEXTO_FACTURAS_VACIO);
     expect(screen.queryByTestId(/^factura-/)).toBeNull();
   });
@@ -223,6 +226,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     fireEvent.press(screen.getByTestId(`factura-${dentista}-ocultar`));
     expect(screen.queryByTestId(`factura-${dentista}`)).toBeNull();
     expect(screen.getByTestId('deducciones-ocultas-titulo')).toBeTruthy();
+    expect(textoDe('deducciones-ocultas-ayuda')).toBe(TEXTO_FACTURAS_OCULTAS);
     fireEvent.press(screen.getByTestId(`factura-oculta-${dentista}-recuperar`));
     expect(screen.getByTestId(`factura-${dentista}`)).toBeTruthy();
 

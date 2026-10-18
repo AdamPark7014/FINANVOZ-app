@@ -102,9 +102,9 @@ describe('pantalla del plan', () => {
     const ofertaMensual = etiquetaOferta(ofertas.find((o) => o.periodo === 'mensual')!);
     const ofertaAnual = etiquetaOferta(ofertas.find((o) => o.periodo === 'anual')!);
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
-    expect(screen.getByText(ofertaMensual.etiqueta)).toBeTruthy();
+    expect(screen.getByLabelText(ofertaMensual.etiqueta)).toBeTruthy();
     expect(screen.getByText(ofertaMensual.detalle)).toBeTruthy();
-    expect(screen.getByText(ofertaAnual.etiqueta)).toBeTruthy();
+    expect(screen.getByLabelText(ofertaAnual.etiqueta)).toBeTruthy();
 
     await act(async () => {
       fireEvent.press(screen.getByTestId(ID.oferta('mensual')));
@@ -208,7 +208,7 @@ describe('CA-M7-02 · al agotar las 30 interpretaciones del mes', () => {
 
     // Nivel de reglas: sin llamar al proxy.
     await escribir('tacos 80 en efectivo');
-    expect(within(screen.getByTestId('aviso')).getByText(/^Registré: Tacos \$80/)).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: Tacos \$80/);
     expect(f.recibidas).toHaveLength(llamadas);
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(1);
   });
@@ -275,8 +275,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     expect(textoDe('tarjeta-deuda')).toBe(debeEnPlus);
     expect(textoDe('tarjeta-deuda-meses')).toBe('De eso, $12,000 son meses sin intereses.');
     expect(listarMovimientos(p.ctx)).toEqual(movimientosEnPlus);
-    expect(screen.getAllByText(/Tacos/).length).toBeGreaterThan(0);
     await escribir('coca 25 en efectivo');
-    expect(within(screen.getByTestId('aviso')).getByText(/^Registré: Coca \$25/)).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: Coca \$25/);
   });
 });

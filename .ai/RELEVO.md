@@ -6,16 +6,16 @@
 
 ## Hecho en este turno
 
-- **ui:** defaults a11y — texto visible oculto al lector en `Boton`, `Interruptor`, `Aviso`; `CampoTexto` con `accessibilityState.invalid`; `Barra` con `accessibilityValue`; tests `tieneCifra`, `Barra`, hint del interruptor; JSDoc; README accesibilidad. Commit `f2370e1` (+ `592edba`, `376d74d`).
+- **movil/privacidad:** copy en `textos.ts`; barrel `pantallas/privacidad/index.ts`; rutas `privacidad`, `terminos`, `reconsentimiento` y `aviso-privacidad` importan desde el barrel; pruebas `textos.test.ts` y `reconsentimiento-textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Tips onboarding O3–O5; copy privacidad/plan/respaldo. Ver `git log`.
+- Oleadas copy/a11y (principal, onboarding, tandas, widget). Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (hoy, onboarding, deducciones, principal, respaldo, tandas, tarjetas, explicar…) — otro turno; no mezclar.
+- WIP local sin commitear (ingreso, arqueo, estados-cuenta, principal) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
@@ -27,7 +27,6 @@
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- Working tree ajeno sin commitear salvo el pedido explícito del turno.
 
 ## Estimación rápida
 

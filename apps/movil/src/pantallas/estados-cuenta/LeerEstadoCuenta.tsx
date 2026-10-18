@@ -15,7 +15,9 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import {
+  AVISO_NO_CUADRA,
   AYUDA_PDF_ESCANEADO,
   BTN_ABRIR,
   BTN_AJUSTAR,
@@ -27,7 +29,9 @@ import {
   CHIP_MISMO,
   CHIP_OTRO,
   ERROR_CONTRASENA_PDF,
+  ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
+  ETIQUETA_RESUMEN_ESTADO,
   etiquetaBotonTarjeta,
   etiquetaChipsDudoso,
   mensajeAjustado,
@@ -42,16 +46,16 @@ import {
   MENSAJE_DEMASIADO_GRANDE,
   MENSAJE_ERROR_GUARDAR,
   MENSAJE_ESCANEADO,
-  MENSAJE_FALTAN_DUDOSOS,
   MENSAJE_INVALIDO,
   MENSAJE_LEYENDO,
-  MENSAJE_NO_CUADRA,
   MENSAJE_NO_DISPONIBLE,
   NOMBRE_TIPO_RENGLON,
+  PISTA_CONTESTAR_DUDOSOS,
   preguntaConciliacion,
   preguntaElegirTarjeta,
-  preguntaEsMismoMovimiento,
+  preguntaMismoMovimiento,
   resumenEstado,
+  TEXTO_SIN_NUEVOS,
   tituloNuevos,
   TITULO_DUDOSOS,
   TITULO_PANTALLA,
@@ -214,7 +218,12 @@ export function LeerEstadoCuenta({
 function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void; testID: string }) {
   return (
     <>
-      <Texto variante="cuerpo" testID={testID} accessibilityLiveRegion="polite">
+      <Texto
+        variante="cuerpo"
+        testID={testID}
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}. ${texto}`}
+      >
         {texto}
       </Texto>
       <Boton etiqueta={BTN_ENTENDIDO} variante="secundario" alPresionar={alSalir} testID="estado-salir" />
@@ -344,7 +353,12 @@ function Revisar({
   return (
     <>
       <Tarjeta testID="estado-resumen">
-        <Texto variante="cuerpo" testID="estado-resumen-texto" accessibilityLiveRegion="polite">
+        <Texto
+          variante="cuerpo"
+          testID="estado-resumen-texto"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={`${ETIQUETA_RESUMEN_ESTADO}. ${resumenEstado(a)}`}
+        >
           {resumenEstado(a)}
         </Texto>
         {a.cuadra === false ? (

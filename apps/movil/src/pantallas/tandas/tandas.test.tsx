@@ -19,15 +19,25 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaTanda } from './PantallaTanda';
 import { PantallaTandas } from './PantallaTandas';
 import {
+  EJEMPLO_NOMBRE_TANDA,
   ETIQUETA_GUARDAR_TANDA,
   MENSAJE_TANDA_GUARDADA,
   MENSAJE_TODAVIA_NO_APORTACION,
   MENSAJE_TODAVIA_NO_COBRO,
+  PREGUNTA_HOY_COBRO,
+  PREGUNTA_YA_DISTE,
+  TEXTO_NO_ES_INGRESO,
   TEXTO_TANDA_NO_ENCONTRADA,
+  TEXTO_TANDAS_VACIO,
+  TITULO_TANDAS,
+  mensajeAportacion,
+  mensajeCobro,
+  textoAportado,
   textoDespuesRondaRiesgo,
   textoEnRiesgo,
-  textoAportado,
+  textoLineaRonda,
   textoPorAportar,
+  textoYaEmpezoCompleto,
 } from './textos';
 
 interface RondaVector {

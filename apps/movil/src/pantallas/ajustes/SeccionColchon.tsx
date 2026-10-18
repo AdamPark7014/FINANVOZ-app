@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { colchonSugerido, fijarColchon, obtenerAjustes } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Tarjeta, Texto } from '../../ui';
-import { ERROR_GUARDAR } from '../onboarding/componentes';
 import {
   ayudaColchon,
   AYUDA_SIN_SUGERENCIA,

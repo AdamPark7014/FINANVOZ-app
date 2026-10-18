@@ -22,7 +22,7 @@ export function navegacionDesdeCuentas(router: Router): ComponentProps<typeof Pa
 
 /**
  * Pestaña Cuentas (`02 §11`): Tienes · Debes · Compromisos. Sin datos, `PantallaCuentas` muestra
- * `TEXTO_CUENTAS_TIENES_VACIO`, `TEXTO_CUENTAS_DEBES_VACIO` y `TEXTO_CUENTAS_COMPROMISOS_VACIO`.
+ * `TEXTO_CUENTAS_*_VACIO` (`cuentas-tienes-vacio`, `cuentas-debes-vacio`, `cuentas-compromisos-vacio`).
  */
 export default function Cuentas() {
   const router = useRouter();

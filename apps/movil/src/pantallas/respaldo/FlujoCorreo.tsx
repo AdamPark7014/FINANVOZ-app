@@ -118,7 +118,7 @@ export function FlujoCorreo({
       <Boton
         variante="texto"
         ancho="contenido"
-        etiqueta="Usar otro correo"
+        etiqueta={BTN_USAR_OTRO_CORREO}
         deshabilitado={trabajando}
         alPresionar={() => {
           setError(null);

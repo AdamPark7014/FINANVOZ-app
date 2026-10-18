@@ -6,6 +6,12 @@ export interface OpcionChip<T extends string> {
   readonly etiqueta: string;
 }
 
+/** Pregunta visible arriba del grupo; TalkBack usa `etiqueta` en `GrupoChips`. */
+export const OCULTAR_ETIQUETA_VISIBLE = {
+  accessibilityElementsHidden: true,
+  importantForAccessibility: 'no-hide-descendants' as const,
+};
+
 /**
  * Opción tocable de una pregunta (02-UX §1.2: una pregunta a la vez, con opciones tocables). Por omisión es de
  * selección única (TalkBack: `accessibilityLabel` propia; el texto visible no se anuncia aparte); con `multiple`, casilla.
