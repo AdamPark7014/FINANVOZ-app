@@ -82,6 +82,7 @@ export function PantallaPersona({
           variante="texto"
           ancho="contenido"
           alPresionar={alVolver}
+          pista={PISTA_VOLVER}
         />
         <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
           {TEXTO_PERSONA_NO_ENCONTRADA}
@@ -128,6 +129,7 @@ function Detalle({
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER}
       />
       <Texto variante="titulo" testID="persona-nombre">
         {d.nombre}
