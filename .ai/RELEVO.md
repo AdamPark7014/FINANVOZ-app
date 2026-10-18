@@ -6,12 +6,11 @@
 
 ## Hecho en este turno
 
-- **Ayuda · TalkBack (acordeón/correo):** FAQ lee cada párrafo al expandir; contacto y aviso sin app con correo en palabras — commits `d6237c9` … `27cd18d` en main.
-- **Captura · TalkBack reactivar:** `etiquetaCuerpoReactivarCaptura` (commits paralelos en main).
+- **O3 ingreso · TalkBack:** `PISTA_COMPLETAR_INGRESO` en Continuar deshabilitado; test en flujo O2→O3.
 
 ## Hecho (acumulado reciente)
 
-- Intro/guía/pistas captura, respaldo, personas. Ver `git log`.
+- Ayuda, captura, consentimiento aviso completo, respaldo. Ver `git log`.
 
 ## A medias — CUIDADO
 
