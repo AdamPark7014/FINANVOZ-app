@@ -67,7 +67,10 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     );
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityRole).toBe('summary');
-    expect(previa.props.accessibilityLabel).toBe('Hoy puedes doscientos catorce pesos · 4 días');
+    expect(previa.props.accessibilityLabel).toBe(
+      'Vista previa. Hoy puedes doscientos catorce pesos · 4 días',
+    );
+    expect(previa.props.accessibilityLiveRegion).toBe('polite');
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     const fila = within(previa).getByTestId('previa-widget-fila', { includeHiddenElements: true });
     expect(fila.props.accessibilityElementsHidden).toBe(true);
@@ -85,7 +88,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     );
     render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
     const previa = screen.getByTestId('previa-widget');
-    expect(previa.props.accessibilityLabel).toBe('Toca para ver tu día');
+    expect(previa.props.accessibilityLabel).toBe('Vista previa. Toca para ver tu día');
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     expect(previa.props.accessibilityLabel).not.toMatch(/\$|\d/);
     expect(JSON.stringify(screen.toJSON())).not.toMatch(/\$|214/);
