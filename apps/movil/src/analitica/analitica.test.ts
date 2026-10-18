@@ -185,7 +185,7 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       fc.constantFrom(...SENSIBLES),
       fc.string(),
       fc.integer(),
-      fc.double(),
+      fc.double({ noNaN: true, noDefaultInfinity: true }),
       fc.boolean(),
       fc.constantFrom(
         'voz',
@@ -205,19 +205,30 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
         'plantilla',
       ),
     );
+    const entradaAleatoria = fc.tuple(
+      fc.constantFrom(...nombres),
+      fc.dictionary(fc.constantFrom(...claves), valor),
+    );
+    /** Mezcla casos válidos de la lista blanca: evita corridas donde el fuzz solo descarta (flake ~1–2 % con 500 runs). */
+    const entradaValida = fc.constantFrom(
+      ...VALIDOS.map((e) => [e.nombre, e.propiedades] as const),
+    );
+    let enviosEnPropiedad = 0;
     fc.assert(
       fc.property(
-        fc.constantFrom(...nombres),
-        fc.dictionary(fc.constantFrom(...claves), valor),
-        (nombre, propiedades) => {
+        fc.oneof({ weight: 3, arbitrary: entradaValida }, { weight: 7, arbitrary: entradaAleatoria }),
+        ([nombre, propiedades]) => {
           const antes = p.enviados.length;
           p.analitica.registrar(p.ctx, { nombre, propiedades } as unknown as EventoAnalitica);
-          for (const enviado of p.enviados.slice(antes)) {
+          const nuevos = p.enviados.slice(antes);
+          enviosEnPropiedad += nuevos.length;
+          for (const enviado of nuevos) {
             const forma = EVENTOS_PERMITIDOS[enviado.evento as keyof typeof EVENTOS_PERMITIDOS];
             expect(forma).toBeDefined();
             const permitidas = new Set([...Object.keys(forma.shape), ...Object.keys(PROPIEDADES_TECNICAS)]);
             for (const k of Object.keys(enviado.propiedades)) expect(permitidas).toContain(k);
-            const json = JSON.stringify(enviado).toLowerCase();
+            // Solo payload del evento (no UUID ni instante: subcadenas hex pueden coincidir con dígitos de ejemplo).
+            const json = JSON.stringify({ evento: enviado.evento, propiedades: enviado.propiedades }).toLowerCase();
             for (const s of SENSIBLES) expect(json).not.toContain(s.toLowerCase());
             // Ningún número con forma de monto: solo pasos y conteos chicos (la versión de plantillas, ≤ 999).
             for (const [k, v] of Object.entries(enviado.propiedades)) {
@@ -229,8 +240,7 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       ),
       { numRuns: 500 },
     );
-    // Control: la propiedad no es vacía, algunos eventos válidos sí salieron.
-    expect(p.enviados.length).toBeGreaterThan(0);
+    expect(enviosEnPropiedad).toBeGreaterThan(0);
     p.base.cerrar();
   });
 
