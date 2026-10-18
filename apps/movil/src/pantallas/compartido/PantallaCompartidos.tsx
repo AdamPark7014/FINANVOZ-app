@@ -192,6 +192,7 @@ export function PantallaCompartidos({
           <Boton
             testID="compartidos-crear-codigo"
             etiqueta={BTN_CREAR_CODIGO}
+            pista={PISTA_CREAR_CODIGO}
             cargando={ocupado}
             alPresionar={() => void crear()}
           />
@@ -222,6 +223,7 @@ export function PantallaCompartidos({
             <Boton
               testID="compartidos-abrir-escaner"
               etiqueta={BTN_ESCANEAR_SU_CODIGO}
+              pista={PISTA_ABRIR_ESCANER}
               cargando={ocupado}
               alPresionar={() => {
                 if (nombre.trim() === '') setError(ERROR_NOMBRE_PAREJA);

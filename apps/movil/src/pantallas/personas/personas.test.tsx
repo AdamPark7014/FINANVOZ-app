@@ -382,6 +382,10 @@ describe('estados vacíos (es-MX)', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <FormularioCuentaDividida alGuardar={jest.fn()} />);
     expect(textoDe('division-contactos-vacio')).toBe(TEXTO_CONTACTOS_VACIO);
+    expect(screen.getByTestId('boton-guardar-division')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_DIVISION,
+    );
   });
 });
 

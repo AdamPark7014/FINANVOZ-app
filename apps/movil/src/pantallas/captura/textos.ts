@@ -14,6 +14,11 @@ export function etiquetaVacioCapturasPorRevisar(): string {
   return `${TITULO_CAPTURAS_POR_REVISAR}. ${TEXTO_CAPTURAS_POR_REVISAR_VACIO}`;
 }
 
+/** TalkBack: título de sección + intro cuando hay pendientes (`02 §15`). */
+export function etiquetaIntroCapturasPorRevisar(): string {
+  return `${TITULO_CAPTURAS_POR_REVISAR}. ${INTRO_CAPTURAS_POR_REVISAR}`;
+}
+
 /** TalkBack en CTAs de capturas por revisar (`02 §6`, `02 §15`). */
 export const PISTA_REGISTRAR_AVISO = 'Abre el formulario para anotar este aviso a mano';
 export const PISTA_YA_REGISTRE_AVISO = 'Quita este aviso de la lista; ya lo anotaste';

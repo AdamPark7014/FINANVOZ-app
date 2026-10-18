@@ -69,6 +69,10 @@ export function textoFaltanPersonas(faltan: number, llevas: number): string {
 
 export const TITULO_CONFIRMAR_DIVISION = '¿Con quién dividiste la cuenta?';
 
+/** TalkBack al guardar cuenta dividida (`02 §19`). */
+export const PISTA_GUARDAR_DIVISION = 'Registra la cuenta dividida y cuánto te debe cada quien';
+export const PISTA_CANCELAR_DIVISION = 'Cierra sin registrar la cuenta dividida';
+
 export const MENSAJES_DATOS_COBRO: Record<string, string> = {
   datos_cobro_vacios: 'Escribe tu celular o tu CLABE.',
   celular_invalido: 'El celular debe tener 10 dígitos.',

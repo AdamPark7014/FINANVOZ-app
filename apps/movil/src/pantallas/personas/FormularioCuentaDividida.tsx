@@ -24,6 +24,8 @@ import {
   ERROR_DIVISION_TOTAL,
   ETIQUETA_CATEGORIA_PARTE,
   ETIQUETA_ORIGEN_DIVISION,
+  PISTA_CANCELAR_DIVISION,
+  PISTA_GUARDAR_DIVISION,
   TEXTO_CONTACTOS_VACIO,
   textoFaltanPersonas,
 } from './textos';
@@ -306,12 +308,18 @@ export function FormularioCuentaDividida({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar" alPresionar={guardar} testID="boton-guardar-division" />
+      <Boton
+        etiqueta="Guardar"
+        alPresionar={guardar}
+        pista={PISTA_GUARDAR_DIVISION}
+        testID="boton-guardar-division"
+      />
       {alCancelar ? (
         <Boton
           etiqueta="Cancelar"
           variante="texto"
           alPresionar={alCancelar}
+          pista={PISTA_CANCELAR_DIVISION}
           testID="boton-cancelar-division"
         />
       ) : null}

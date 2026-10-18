@@ -57,7 +57,13 @@ export function EscanerQr({
           />
         </>
       )}
-      <Boton testID="escaner-cancelar" etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
+      <Boton
+        testID="escaner-cancelar"
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        pista={PISTA_CANCELAR_ESCANER}
+        alPresionar={alCancelar}
+      />
     </View>
   );
 }
