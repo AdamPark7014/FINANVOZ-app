@@ -66,6 +66,10 @@ export const BTN_CAMBIAR_DATOS = 'Cambiar los datos';
 /** TalkBack tras fallo de cálculo (`02 §19`). */
 export const PISTA_CAMBIAR_DATOS_ME_ALCANZA = 'Vuelve al formulario para editar precio o meses';
 export const BTN_LISTO = 'Listo';
+/** TalkBack: cierra cuando aún no hay bastante historial. */
+export const ACCESIBILIDAD_LISTO = 'Listo, cerrar simulación ¿Me alcanza?';
+/** TalkBack en vacío de datos insuficientes (`02 §19`). */
+export const PISTA_LISTO = 'Cierra la pantalla y vuelve a donde estabas';
 export const BTN_COMO_LO_CALCULE = 'Cómo lo calculé';
 export const BTN_OCULTAR_COMO_LO_CALCULE = 'Ocultar cómo lo calculé';
 export const BTN_VER_MOVIMIENTOS = 'Ver los movimientos';

@@ -48,6 +48,7 @@ import { abrirMeAlcanza, tomarConsultaPendiente } from '.';
 import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
 import {
   ACCESIBILIDAD_CERRAR,
+  ACCESIBILIDAD_LISTO,
   AYUDA_DATOS_INSUFICIENTES,
   BTN_CALCULAR,
   BTN_COMO_LO_CALCULE,
@@ -64,6 +65,7 @@ import {
   PISTA_CALCULAR,
   PISTA_CAMBIAR_DATOS_ME_ALCANZA,
   PISTA_CANCELAR,
+  PISTA_LISTO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
@@ -486,7 +488,11 @@ describe('¿Me alcanza?', () => {
       etiquetaVacioDatosInsuficientes(),
     );
     expect(screen.getByText('Una compra de $1,500')).toBeTruthy();
-    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toBeTruthy();
+    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_LISTO,
+    );
+    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toHaveProp('accessibilityHint', PISTA_LISTO);
   });
 
   it('si el cálculo falla, muestra el error y permite reintentar', async () => {

@@ -18,6 +18,8 @@ export const ETIQUETA_GUARDAR_Y_COBRAR = 'Guardar y cobrar';
 export const ETIQUETA_MONTO = 'Monto';
 export const ETIQUETA_A_DONDE_LLEGO = '¿A dónde te llegó?';
 export const ETIQUETA_QUITAR_RECORDATORIO = 'Quitar recordatorio';
+/** TalkBack al quitar un aviso de cobro programado (`02 §19`). */
+export const PISTA_QUITAR_RECORDATORIO = 'Cancela el aviso que programaste para cobrar';
 
 export const TITULO_MOVIMIENTOS = 'Movimientos';
 export const TITULO_PEDIR_DATOS_COBRO = '¿A dónde te pagan?';

@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Arqueo TalkBack:** `PISTA_*` en CTAs (cerrar, continuar, calcular, confirmar, listo); live region + rol `alert` en errores; pistas en tarjeta Hoy (abrir/posponer). Live region al cuadrar ya estaba en `arqueo-mensaje-hecho`.
+- **PantallaTanda archivada:** `ACCESIBILIDAD_TANDA_ARCHIVADA` + test en flujo archivar.
 
 ## Hecho (acumulado reciente)
 
-- O3 onboarding, capturas, movimientos, widget, tandas. Ver `git log`.
+- Cancelar/edición/cobro/formulario tandas, ayuda Volver, captura, widget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo — `git status` antes de editar.
-- CI Windows, M0 / EAS: Adam.
+- WIP paralelo (onboarding, captura, me-alcanza, movimientos) — no mezclar en commits ajenos.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Typecheck rojo ajeno (tarjetas/semilla) si toca CI.
+2. `PISTA` en CTA Tandas desde Cuentas (`boton-tandas`).
 
 ## No tocar
 

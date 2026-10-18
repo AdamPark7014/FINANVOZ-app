@@ -25,6 +25,7 @@ import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
 import {
   ACCESIBILIDAD_CERRAR,
+  ACCESIBILIDAD_LISTO,
   AYUDA_DATOS_INSUFICIENTES,
   etiquetaVacioDatosInsuficientes,
   BTN_CALCULAR,
@@ -58,6 +59,7 @@ import {
   PISTA_CALCULAR,
   PISTA_CAMBIAR_DATOS_ME_ALCANZA,
   PISTA_CANCELAR,
+  PISTA_LISTO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
   SUFIJO_ACCESIBILIDAD_RECOMENDADA,
@@ -350,6 +352,8 @@ export function PantallaMeAlcanza({
             etiqueta={BTN_LISTO}
             variante="secundario"
             alPresionar={alCerrar}
+            etiquetaAccesible={ACCESIBILIDAD_LISTO}
+            pista={PISTA_LISTO}
             testID="boton-listo-datos-insuficientes"
           />
         </View>

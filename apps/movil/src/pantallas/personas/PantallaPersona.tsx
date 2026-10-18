@@ -32,6 +32,7 @@ import {
   ETIQUETA_GUARDAR_Y_COBRAR,
   ETIQUETA_MONTO,
   ETIQUETA_QUITAR_RECORDATORIO,
+  PISTA_QUITAR_RECORDATORIO,
   ETIQUETA_VOLVER,
   PISTA_VOLVER,
   ETIQUETA_YA_ME_PAGO,
@@ -354,6 +355,7 @@ function Recordatorio({
             variante="texto"
             ancho="contenido"
             alPresionar={() => void fijar(null)}
+            pista={PISTA_QUITAR_RECORDATORIO}
             testID="boton-quitar-recordatorio"
           />
         </>
