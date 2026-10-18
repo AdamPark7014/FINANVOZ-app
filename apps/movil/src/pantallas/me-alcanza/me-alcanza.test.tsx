@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
+import { AccessibilityInfo } from 'react-native';
 import {
   compararEscenarios,
   generarEscenarios,
@@ -49,15 +50,18 @@ import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
 import {
   ACCESIBILIDAD_CERRAR,
   ACCESIBILIDAD_LISTO,
+  anuncioDatosInsuficientes,
+  anuncioResultadoOk,
   AYUDA_DATOS_INSUFICIENTES,
   BTN_CALCULAR,
+  ETIQUETA_CALCULANDO,
   BTN_COMO_LO_CALCULE,
   BTN_DESHACER,
   ERROR_CALCULO,
   ERROR_PRECIO,
   ETIQUETA_OPCION_RECOMENDADA,
   ETIQUETA_PROGRESO,
-  SUFIJO_ACCESIBILIDAD_RECOMENDADA,
+  etiquetaEscenarioAccesible,
   etiquetaVacioDatosInsuficientes,
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
@@ -256,6 +260,26 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByRole('button', { name: etiquetaHablada(BTN_CALCULAR) })).toBeTruthy();
   });
 
+  it('anuncia el resultado con TalkBack activo al terminar el cálculo', async () => {
+    jest.spyOn(AccessibilityInfo, 'isScreenReaderEnabled').mockResolvedValue(true);
+    const anunciar = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+    const p = e401();
+    montar(
+      p.ctx,
+      <PantallaMeAlcanza
+        consultaInicial={{ precio: 150_000, descripcion: 'unos tenis' }}
+        calcular={inyectar(vistaE822())}
+        alCerrar={jest.fn()}
+      />,
+    );
+    await screen.findByTestId('me-alcanza-resultado');
+    await waitFor(() => {
+      expect(anunciar).toHaveBeenCalledWith(
+        anuncioResultadoOk('Unos tenis de $1,500', 'Puedes. Lo más seguro: a 3 MSI con la Oro', null),
+      );
+    });
+  });
+
   it('CA-M6-03 · con el resultado de E8-22 muestra "< 1 %", "89 %", "79 %", "90 %" y la recomendación', async () => {
     const p = e401();
     montar(
@@ -267,6 +291,14 @@ describe('¿Me alcanza?', () => {
       />,
     );
     await screen.findByTestId('me-alcanza-resultado');
+    const anuncio = anuncioResultadoOk(
+      'Unos tenis de $1,500',
+      'Puedes. Lo más seguro: a 3 MSI con la Oro',
+      null,
+    );
+    expect(screen.getByTestId('me-alcanza-anuncio')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('me-alcanza-anuncio').props.accessibilityLabel).toBe(anuncio);
+    expect(screen.getByTestId('me-alcanza-frase')).toHaveProp('importantForAccessibility', 'no');
     expect(textoDe('me-alcanza-titulo')).toBe('Unos tenis de $1,500');
     expect(textoDe('me-alcanza-frase')).toBe('Puedes. Lo más seguro: a 3 MSI con la Oro');
     expect(textoDe('porcentaje-contado_hoy')).toBe('< 1 %');
@@ -276,7 +308,16 @@ describe('¿Me alcanza?', () => {
     expect(textoDe('etiqueta-msi')).toBe('A 3 MSI con la Oro');
     expect(textoDe('etiqueta-esperar')).toBe('El jue 15, con tu quincena');
     expect(textoDe('etiqueta-base')).toBe('Sin comprarlos');
-    expect(screen.getByLabelText(`A 3 MSI con la Oro: 89 %${SUFIJO_ACCESIBILIDAD_RECOMENDADA}`)).toBeTruthy();
+    expect(
+      screen.getByLabelText(
+        etiquetaEscenarioAccesible({
+          etiqueta: 'A 3 MSI con la Oro',
+          porcentaje: '89 %',
+          recomendado: true,
+          detalle: 'Comprometes $500 al mes hasta enero',
+        }),
+      ),
+    ).toBeTruthy();
     expect(screen.getByTestId('etiqueta-msi')).toHaveProp('importantForAccessibility', 'no');
     expect(screen.getByTestId('porcentaje-msi')).toHaveProp('importantForAccessibility', 'no');
     // La recomendada se marca con texto, no solo con color (`02 §15`).
@@ -451,6 +492,8 @@ describe('¿Me alcanza?', () => {
       />,
     );
     expect(screen.getByTestId('me-alcanza-calculando')).toBeTruthy();
+    expect(screen.getByTestId('me-alcanza-calculando-aviso').props.accessibilityLabel).toBe(ETIQUETA_CALCULANDO);
+    expect(screen.getByTestId('me-alcanza-calculando-aviso')).toHaveProp('accessibilityLiveRegion', 'polite');
     // Primer bloque hecho: el cálculo espera para ceder el hilo.
     await waitFor(() => expect(pendientes.length).toBeGreaterThan(0));
     await waitFor(() =>

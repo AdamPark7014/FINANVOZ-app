@@ -31,6 +31,8 @@ import {
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
   PISTA_ESCRIBIR_NOMBRE_PAREJA,
+  PISTA_ABRIR_GRUPO,
+  PISTA_LISTO_TRAS_QR,
   PISTA_VOLVER_CUENTAS,
   PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
@@ -147,6 +149,7 @@ export function PantallaCompartidos({
               testID={`compartido-${g.id}`}
               alPresionar={() => alAbrirGrupo(g.id)}
               etiquetaAccesible={etiquetaHablada(`${g.nombre}. ${g.avisoCierre ?? g.saldo.texto}`)}
+              pista={PISTA_ABRIR_GRUPO}
             >
               <Texto variante="cuerpoFuerte">{g.nombre}</Texto>
               <Texto variante="secundario" accessibilityLabel={etiquetaHablada(g.saldo.texto)}>
@@ -204,7 +207,12 @@ export function PantallaCompartidos({
         <>
           <Texto variante="cuerpo">{instruccionQrTrasCrear(modo.nombre)}</Texto>
           <CodigoQr texto={modo.qr} testID="compartidos-qr" />
-          <Boton testID="compartidos-listo" etiqueta={BTN_LISTO} alPresionar={() => alAbrirGrupo(modo.grupoId)} />
+          <Boton
+            testID="compartidos-listo"
+            etiqueta={BTN_LISTO}
+            pista={PISTA_LISTO_TRAS_QR}
+            alPresionar={() => alAbrirGrupo(modo.grupoId)}
+          />
         </>
       ) : null}
 

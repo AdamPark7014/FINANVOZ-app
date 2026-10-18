@@ -20,7 +20,11 @@ import { esPdfCompartido } from './compartido';
 import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
 import {
   ETIQUETA_AVISO_ESTADO,
+  ETIQUETA_EXITO,
   ERROR_CONTRASENA_PDF,
+  PISTA_CONTESTAR_DUDOSOS,
+  PISTA_ENTENDIDO,
+  PISTA_ESCRIBE_CONTRASENA,
   mensajeGuardado,
   mensajeNoReconocido,
   MENSAJE_ESCANEADO,
@@ -121,6 +125,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     const extraer = jest.fn(async () => texto(PAGINAS_B));
     const v = montar(ctx, extraer);
     expect(screen.getByTestId('estado-cuenta-titulo')).toHaveTextContent(TITULO_PANTALLA);
+    expect(screen.getByTestId('estado-cuenta-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(await screen.findByTestId('estado-resumen-texto')).toHaveTextContent(
       'Leí tu estado de cuenta de la Oro (corte 10 oct): 42 movimientos; 3 no los tenía; el saldo al corte coincide',
     );
@@ -131,6 +136,9 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
 
     await presionar('estado-guardar');
     expect(screen.getByTestId('estado-guardado')).toHaveTextContent('Agregué 3 movimientos a tu Oro.');
+    expect(screen.getByTestId('estado-guardado').props.accessibilityLabel).toBe(
+      `${ETIQUETA_EXITO}. Agregué 3 movimientos a tu Oro.`,
+    );
     expect(screen.queryByTestId('estado-conciliacion')).toBeNull();
     await presionar('estado-ver-tarjeta');
     expect(v.alVerTarjeta).toHaveBeenCalledWith(oro);
@@ -196,6 +204,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
       /¿Es el mismo que ya tenías: SORIANA del 18 sep por \$1,532\.75\?/,
     );
     expect(screen.getByTestId('estado-guardar').props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByTestId('estado-guardar')).toHaveProp('accessibilityHint', PISTA_CONTESTAR_DUDOSOS);
     fireEvent.press(screen.getByTestId('estado-dudoso-7-mismo'));
     expect(screen.getByTestId('estado-guardar').props.accessibilityState).toMatchObject({ disabled: false });
     expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toStrictEqual([]);
@@ -216,6 +225,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     montar(ctx, extraer);
     expect(await screen.findByTestId('estado-contrasena')).toBeTruthy();
     expect(screen.getByTestId('estado-abrir').props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByTestId('estado-abrir')).toHaveProp('accessibilityHint', PISTA_ESCRIBE_CONTRASENA);
     fireEvent.changeText(screen.getByTestId('estado-contrasena'), 'otra');
     await presionar('estado-abrir');
     expect(screen.getByTestId('estado-contrasena').props.accessibilityHint).toBe(ERROR_CONTRASENA_PDF);
@@ -243,6 +253,9 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     const aviso = await screen.findByTestId('estado-error');
     expect(aviso).toHaveTextContent(MENSAJE_INVALIDO);
     expect(aviso.props.accessibilityLabel).toBe(`${ETIQUETA_AVISO_ESTADO}. ${MENSAJE_INVALIDO}`);
+    expect(aviso).toHaveProp('accessibilityRole', 'alert');
+    expect(aviso).toHaveProp('accessibilityLiveRegion', 'assertive');
+    expect(screen.getByTestId('estado-salir')).toHaveProp('accessibilityHint', PISTA_ENTENDIDO);
   });
 
   it('banco desconocido, archivo inválido, demasiado grande, sin módulo y error al leer', async () => {

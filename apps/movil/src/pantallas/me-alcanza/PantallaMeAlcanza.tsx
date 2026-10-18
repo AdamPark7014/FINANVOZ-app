@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { AccessibilityInfo, View } from 'react-native';
 import {
   ConsultaMeAlcanza,
   deshacer,
@@ -27,6 +27,9 @@ import {
   ACCESIBILIDAD_CERRAR,
   ACCESIBILIDAD_LISTO,
   AYUDA_DATOS_INSUFICIENTES,
+  anuncioDatosInsuficientes,
+  anuncioResultadoOk,
+  etiquetaEscenarioAccesible,
   etiquetaVacioDatosInsuficientes,
   BTN_CALCULAR,
   BTN_CAMBIAR_DATOS,
@@ -51,6 +54,7 @@ import {
   ETIQUETA_MSI_TU_DIME,
   ETIQUETA_OPCION_RECOMENDADA,
   ETIQUETA_PRECIO,
+  ETIQUETA_CALCULANDO,
   ETIQUETA_PROGRESO,
   MENSAJE_AVISO_RECORDATORIO,
   MENSAJE_CANCELADO,
@@ -68,7 +72,6 @@ import {
   PISTA_VER_MOVIMIENTOS,
   pistaLoCompre,
   PREGUNTA_MSI,
-  SUFIJO_ACCESIBILIDAD_RECOMENDADA,
   TEXTO_CALCULANDO,
   TEXTO_PARCIAL_HORIZONTE,
   TEXTO_RECORDATORIO_PROGRAMADO,
@@ -92,6 +95,33 @@ type Estado =
 
 const MESES = ['3', '6', '9', '12', '18', '24'] as const;
 type OpcionMeses = 'sin' | (typeof MESES)[number] | 'otro';
+
+/** Anuncia el resultado o el fallo cuando TalkBack está activo (`02 §19`). */
+function useAnunciarEstado(estado: Estado) {
+  useEffect(() => {
+    let anuncio: string | null = null;
+    if (estado.tipo === 'listo') {
+      if (estado.vista.estado === 'ok') {
+        anuncio = anuncioResultadoOk(estado.vista.titulo, estado.vista.frase, estado.vista.etiqueta ?? null);
+      } else if (estado.vista.estado === 'datos_insuficientes') {
+        anuncio = anuncioDatosInsuficientes(estado.vista.titulo, estado.vista.mensaje);
+      }
+    } else if (estado.tipo === 'error') {
+      anuncio = ERROR_CALCULO;
+    }
+    if (!anuncio) return;
+    let vigente = true;
+    AccessibilityInfo.isScreenReaderEnabled()
+      .then((lector) => {
+        if (!vigente || lector !== true) return;
+        AccessibilityInfo.announceForAccessibility(anuncio);
+      })
+      .catch(() => undefined);
+    return () => {
+      vigente = false;
+    };
+  }, [estado]);
+}
 
 /**
  * "¿Me alcanza?" (RF-SIM-01, `02 §9`): formulario (precio, qué es y meses), cálculo por bloques con progreso y
@@ -137,6 +167,8 @@ export function PantallaMeAlcanza({
   );
   const [error, setError] = useState<string | null>(null);
   const senal = useRef<{ aborted: boolean } | null>(null);
+
+  useAnunciarEstado(estado);
 
   /** Corre el cálculo fuera del render (después de pintar "calculando") y cancela el anterior. */
   const lanzar = useCallback(
@@ -297,8 +329,17 @@ export function PantallaMeAlcanza({
       ) : null}
 
       {estado.tipo === 'calculando' ? (
-        <View style={{ gap: espacio.m }} testID="me-alcanza-calculando" accessibilityLiveRegion="polite">
-          <Texto variante="cuerpo">{TEXTO_CALCULANDO}</Texto>
+        <View style={{ gap: espacio.m }} testID="me-alcanza-calculando">
+          <View
+            accessible
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={ETIQUETA_CALCULANDO}
+            testID="me-alcanza-calculando-aviso"
+          >
+            <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
+              {TEXTO_CALCULANDO}
+            </Texto>
+          </View>
           <Barra
             llenoBp={estado.progresoBp}
             etiquetaAccesible={ETIQUETA_PROGRESO}
@@ -342,10 +383,30 @@ export function PantallaMeAlcanza({
 
       {estado.tipo === 'listo' && estado.vista.estado === 'datos_insuficientes' ? (
         <View style={{ gap: espacio.m }} testID="me-alcanza-datos-insuficientes">
-          <Texto variante="subtitulo">{estado.vista.titulo}</Texto>
-          <Texto variante="cuerpo" testID="me-alcanza-mensaje">
-            {estado.vista.mensaje}
-          </Texto>
+          <View
+            accessible
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={anuncioDatosInsuficientes(estado.vista.titulo, estado.vista.mensaje)}
+            testID="me-alcanza-anuncio-vacio"
+            style={{ gap: espacio.xs }}
+          >
+            <Texto
+              variante="subtitulo"
+              accessibilityRole="header"
+              importantForAccessibility="no"
+              testID="me-alcanza-titulo-vacio"
+            >
+              {estado.vista.titulo}
+            </Texto>
+            <Texto
+              variante="cuerpo"
+              testID="me-alcanza-mensaje"
+              accessibilityRole="alert"
+              importantForAccessibility="no"
+            >
+              {estado.vista.mensaje}
+            </Texto>
+          </View>
           <Texto
             variante="secundario"
             tono="secundario"
@@ -440,15 +501,26 @@ function Resultado({
 
   return (
     <View style={{ gap: espacio.m }} testID="me-alcanza-resultado">
-      <View style={{ gap: espacio.xs }}>
-        <Texto variante="subtitulo" testID="me-alcanza-titulo">
+      <View
+        accessible
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={anuncioResultadoOk(vista.titulo, vista.frase, vista.etiqueta ?? null)}
+        testID="me-alcanza-anuncio"
+        style={{ gap: espacio.xs }}
+      >
+        <Texto variante="subtitulo" testID="me-alcanza-titulo" importantForAccessibility="no">
           {vista.titulo}
         </Texto>
-        <Texto variante="cuerpoFuerte" accessibilityLiveRegion="polite" testID="me-alcanza-frase">
+        <Texto variante="cuerpoFuerte" testID="me-alcanza-frase" importantForAccessibility="no">
           {vista.frase}
         </Texto>
         {vista.etiqueta ? (
-          <Texto variante="secundario" tono="secundario" testID="me-alcanza-etiqueta">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="me-alcanza-etiqueta"
+            importantForAccessibility="no"
+          >
             {vista.etiqueta}
           </Texto>
         ) : null}
@@ -555,7 +627,13 @@ function FilaEscenario({
     >
       <View
         accessible
-        accessibilityLabel={`${e.etiqueta}: ${e.porcentaje}${e.recomendado ? SUFIJO_ACCESIBILIDAD_RECOMENDADA : ''}`}
+        accessibilityLabel={etiquetaEscenarioAccesible({
+          etiqueta: e.etiqueta,
+          porcentaje: e.porcentaje,
+          recomendado: e.recomendado,
+          ...(e.detalle ? { detalle: e.detalle } : {}),
+          ...(e.parcial ? { parcial: true } : {}),
+        })}
         style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
       >
         <Texto variante="cuerpoFuerte" style={{ flex: 1 }} testID={`etiqueta-${e.tipo}`} importantForAccessibility="no">
@@ -566,17 +644,22 @@ function FilaEscenario({
         </Texto>
       </View>
       {e.recomendado ? (
-        <Texto variante="etiqueta" tono="acento" testID={`recomendado-${e.tipo}`}>
+        <Texto
+          variante="etiqueta"
+          tono="acento"
+          testID={`recomendado-${e.tipo}`}
+          importantForAccessibility="no"
+        >
           {ETIQUETA_OPCION_RECOMENDADA}
         </Texto>
       ) : null}
       {e.detalle ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
           {e.detalle}
         </Texto>
       ) : null}
       {e.parcial ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
           {TEXTO_PARCIAL_HORIZONTE}
         </Texto>
       ) : null}
@@ -586,7 +669,9 @@ function FilaEscenario({
             variante="secundario"
             tono="acento"
             testID={`comprado-${e.tipo}`}
+            accessibilityRole="text"
             accessibilityLiveRegion="polite"
+            accessibilityLabel={TEXTO_YA_LO_REGISTRE}
           >
             {TEXTO_YA_LO_REGISTRE}
           </Texto>

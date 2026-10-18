@@ -13,6 +13,9 @@ import { Boton, CampoTexto, espacio, Texto } from '../../ui';
 import { mensajeError } from '../principal/textos';
 import {
   AYUDA_DATOS_COBRO,
+  ETIQUETA_CANCELAR,
+  ETIQUETA_CELULAR_COBRO,
+  ETIQUETA_CLABE_COBRO,
   MENSAJES_DATOS_COBRO,
   PISTA_CANCELAR_DATOS_COBRO,
   PISTA_GUARDAR_DATOS_COBRO,
@@ -58,7 +61,7 @@ export function FormularioDatosCobro({
         {AYUDA_DATOS_COBRO}
       </Texto>
       <CampoTexto
-        etiqueta="Tu celular (para DiMo)"
+        etiqueta={ETIQUETA_CELULAR_COBRO}
         valor={celular}
         alCambiar={setCelular}
         ejemplo="22 1234 5678"
@@ -66,7 +69,7 @@ export function FormularioDatosCobro({
         testID="campo-celular-cobro"
       />
       <CampoTexto
-        etiqueta="Tu CLABE"
+        etiqueta={ETIQUETA_CLABE_COBRO}
         valor={clabe}
         alCambiar={setClabe}
         ejemplo="18 dígitos"
@@ -92,7 +95,7 @@ export function FormularioDatosCobro({
       />
       {alCancelar ? (
         <Boton
-          etiqueta="Cancelar"
+          etiqueta={ETIQUETA_CANCELAR}
           variante="texto"
           alPresionar={alCancelar}
           pista={PISTA_CANCELAR_DATOS_COBRO}

@@ -17,11 +17,43 @@ export function etiquetaChipMeses(meses: string): string {
 }
 
 export const TEXTO_CALCULANDO = 'Estoy revisando tus opciones…';
+/** TalkBack mientras calcula (`02 §19`): mismo copy que el texto visible. */
+export const ETIQUETA_CALCULANDO = TEXTO_CALCULANDO;
 export const ETIQUETA_PROGRESO = 'Avance del cálculo';
 
 export const ETIQUETA_OPCION_RECOMENDADA = 'Lo más seguro';
 export const SUFIJO_ACCESIBILIDAD_RECOMENDADA = ', lo más seguro';
 export const TEXTO_PARCIAL_HORIZONTE = 'Algunos pagos caen después de 2 años: no los revisé.';
+
+/**
+ * Una línea al terminar el cálculo (`02 §19`); el detalle de escenarios se explora en pantalla.
+ * Solo se usa con `AccessibilityInfo.announceForAccessibility` y el resumen accesible.
+ */
+export function anuncioResultadoOk(titulo: string, frase: string, etiqueta: string | null): string {
+  const partes = [titulo, frase];
+  if (etiqueta) partes.push(etiqueta);
+  return partes.join('. ');
+}
+
+/** TalkBack cuando aún no hay bastante historial (`02 §19`). */
+export function anuncioDatosInsuficientes(titulo: string, mensaje: string): string {
+  return `${titulo}. ${mensaje}`;
+}
+
+/** TalkBack al leer un escenario: etiqueta, probabilidad, recomendación y notas cortas. */
+export function etiquetaEscenarioAccesible(e: {
+  readonly etiqueta: string;
+  readonly porcentaje: string;
+  readonly recomendado: boolean;
+  readonly detalle?: string;
+  readonly parcial?: boolean;
+}): string {
+  let s = `${e.etiqueta}: ${e.porcentaje}`;
+  if (e.recomendado) s += SUFIJO_ACCESIBILIDAD_RECOMENDADA;
+  if (e.detalle) s += `. ${e.detalle}`;
+  if (e.parcial) s += `. ${TEXTO_PARCIAL_HORIZONTE}`;
+  return s;
+}
 
 /** Pie cuando aún no hay bastante historial de gastos (vacío / datos insuficientes). */
 export const AYUDA_DATOS_INSUFICIENTES =

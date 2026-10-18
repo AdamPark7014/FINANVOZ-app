@@ -41,6 +41,8 @@ import {
   PISTA_GUARDAR_DIVISION,
   PISTA_GUARDAR_PAGO,
   PISTA_GUARDAR_Y_COBRAR,
+  PISTA_MAS_PARTES,
+  PISTA_MENOS_PARTES,
   PISTA_QUITAR_RECORDATORIO,
   PISTA_VOLVER,
   TITULO_PEDIR_DATOS_COBRO,
@@ -118,6 +120,8 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     expect(textoDe('division-faltan')).toBe('Elige 3 personas (llevas 0).');
     expect(screen.getByTestId('division-faltan')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('division-partes')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('division-menos')).toHaveProp('accessibilityHint', PISTA_MENOS_PARTES);
+    expect(screen.getByTestId('division-mas')).toHaveProp('accessibilityHint', PISTA_MAS_PARTES);
     expect(screen.getByTestId(`division-origen-${p.nu}`).props.accessibilityState).toMatchObject({
       selected: true,
     });
@@ -181,6 +185,7 @@ describe('CA-M8-02 · Cobrar', () => {
     expect(textoDe('persona-saldo')).toBe('$300');
     expect(screen.getByTestId('boton-cobrar')).toHaveProp('accessibilityHint', PISTA_COBRAR);
     expect(screen.getByTestId('boton-ya-me-pago')).toHaveProp('accessibilityHint', PISTA_YA_ME_PAGO);
+    expect(screen.getByTestId('boton-ya-me-pago')).toHaveProp('accessibilityState', { expanded: false });
 
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-cobrar'));
@@ -242,6 +247,7 @@ describe('CA-M8-02 · Cobrar', () => {
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
+    expect(screen.getByTestId('boton-ya-me-pago')).toHaveProp('accessibilityState', { expanded: true });
     expect(screen.getByTestId('persona-ya-me-pago-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(TITULO_YA_ME_PAGO)).toBeTruthy();
     expect(screen.getByTestId('boton-guardar-pago-persona')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO);
@@ -333,6 +339,7 @@ describe('recordatorio de cobro', () => {
       'accessibilityLiveRegion',
       'polite',
     );
+    expect(screen.getByTestId('persona-recordatorio-fecha')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-quitar-recordatorio')).toHaveProp(
       'accessibilityHint',
       PISTA_QUITAR_RECORDATORIO,
@@ -399,7 +406,13 @@ describe('estados vacíos (es-MX)', () => {
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
     expect(screen.getByTestId('persona-nombre')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('persona-saldo-etiqueta')).toHaveProp(
+      'importantForAccessibility',
+      'no-hide-descendants',
+    );
     expect(textoDe('persona-tip-te-deben')).toBe(TIP_SALDO_TE_DEBEN);
+    expect(screen.getByTestId('persona-tip-te-deben')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('persona-movimientos-lista')).toHaveProp('accessibilityRole', 'list');
   });
 
   it('cuenta dividida sin contactos', () => {

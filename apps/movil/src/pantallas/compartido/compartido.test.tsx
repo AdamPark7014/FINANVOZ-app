@@ -47,6 +47,9 @@ import {
   PISTA_GUARDAR_GASTO_COMPARTIDO,
   PISTA_PERMISO_CAMARA,
   PISTA_VISTA_CAMARA,
+  PISTA_AGREGAR_GASTO,
+  PISTA_LISTO_TRAS_QR,
+  PISTA_VOLVER_GRUPO,
   PISTA_VOLVER_CUENTAS,
   PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
@@ -172,6 +175,19 @@ describe('02 §27 · Gastos con tu pareja', () => {
     A.cerrar();
   });
 
+  it('TalkBack Listo tras QR y detalle del grupo', async () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('compartidos-crear'));
+    fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Beto');
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('compartidos-crear-codigo'));
+    });
+    expect(screen.getByTestId('compartidos-listo')).toHaveProp('accessibilityHint', PISTA_LISTO_TRAS_QR);
+    A.cerrar();
+  });
+
   it('TalkBack en flujos crear y escanear (`02 §19`)', () => {
     const servidor = servidorCompartidoFalso();
     const A = telefono(servidor, 'usuario-a');
@@ -237,6 +253,9 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const b = en(B, <PantallaGrupoCompartido grupoId={grupo} alVolver={jest.fn()} />);
     await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Están a mano'));
     expect(screen.getByTestId('grupo-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('grupo-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_GRUPO);
+    expect(screen.getByTestId('grupo-lo-compartido-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('grupo-agregar')).toHaveProp('accessibilityHint', PISTA_AGREGAR_GASTO);
     expect(screen.getByTestId('grupo-movimientos-vacio')).toHaveTextContent(TEXTO_GRUPO_MOVIMIENTOS_VACIO);
     expect(screen.getByTestId('grupo-movimientos-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioGrupoMovimientos(),
@@ -293,7 +312,9 @@ describe('02 §27 · Gastos con tu pareja', () => {
     a.unmount();
 
     const b = en(B, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
-    await waitFor(() => expect(screen.getByText('Ana cerró el grupo compartido')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByLabelText(/Ana cerró el grupo compartido/)).toBeTruthy(),
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     b.unmount();
     A.cerrar();
@@ -339,6 +360,9 @@ describe('02 §27 · Gastos con tu pareja', () => {
       'Súper $1,200.00 · pagaste tú · tú 60 % / tu pareja 40 %',
     );
     expect(screen.getByTestId('compartido-resumen')).toHaveProp('importantForAccessibility', 'yes');
+    expect(screen.getByTestId('compartido-resumen').props.accessibilityLabel).not.toMatch(/\$/);
+    expect(screen.getByTestId('compartido-resumen').props.accessibilityLabel).toMatch(/mil doscientos/i);
+    expect(screen.getByTestId('compartido-formulario-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('compartido-guardar')).toHaveProp(
       'accessibilityHint',
       PISTA_GUARDAR_GASTO_COMPARTIDO,
@@ -369,7 +393,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
-    expect(screen.getByText(ETIQUETA_CON_QUIEN_COMPARTES)).toBeTruthy();
+    expect(screen.getByTestId('confirmar-compartido-titulo')).toHaveTextContent(ETIQUETA_CON_QUIEN_COMPARTES);
     const [, caro] = listarGruposCompartidos(A.ctx, A.deps.almacen);
     fireEvent.press(screen.getByTestId(`confirmar-compartido-grupo-${caro?.id}`));
     expect(screen.getByTestId('compartido-resumen').props.children).toBe(

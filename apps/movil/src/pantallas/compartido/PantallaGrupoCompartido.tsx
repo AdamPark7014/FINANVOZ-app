@@ -32,6 +32,17 @@ import {
   BTN_REGISTRAR_PAGO,
   BTN_SALDAR,
   BTN_VOLVER_A_VINCULAR,
+  PISTA_AGREGAR_GASTO,
+  PISTA_ANULAR_MOVIMIENTO,
+  PISTA_CANCELAR_PANEL,
+  PISTA_CONFIRMAR_SALIR_GRUPO,
+  PISTA_DEJAR_DE_COMPARTIR,
+  PISTA_MOSTRAR_CODIGO,
+  PISTA_REGISTRAR_PAGO,
+  PISTA_SALDAR,
+  PISTA_VOLVER_A_VINCULAR,
+  PISTA_VOLVER_GRUPO,
+  PISTA_VOLVER_PANEL_GRUPO,
   ETIQUETA_A_DONDE_LLEGO,
   ETIQUETA_ANULADO,
   ETIQUETA_CON_QUE_PAGASTE,
@@ -174,6 +185,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
+        pista={panel === 'ninguno' ? PISTA_VOLVER_GRUPO : PISTA_VOLVER_PANEL_GRUPO}
         alPresionar={panel === 'ninguno' ? alVolver : () => setPanel('ninguno')}
       />
       <Texto variante="titulo" testID="grupo-titulo" accessibilityRole="header">
@@ -183,12 +195,22 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         {g.saldo.texto}
       </Texto>
       {g.avisoCierre ? (
-        <Texto variante="cuerpo" testID="grupo-aviso-cierre">
+        <Texto
+          variante="cuerpo"
+          testID="grupo-aviso-cierre"
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+        >
           {g.avisoCierre}
         </Texto>
       ) : null}
       {g.pendientes > 0 ? (
-        <Texto variante="secundario" tono="secundario" testID="grupo-pendientes">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="grupo-pendientes"
+          accessibilityLabel={etiquetaHablada(textoPendientesCompartir(g.pendientes))}
+        >
           {textoPendientesCompartir(g.pendientes)}
         </Texto>
       ) : null}
@@ -200,6 +222,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           <Boton
             testID="grupo-revincular-escanear"
             etiqueta={BTN_VOLVER_A_VINCULAR}
+            pista={PISTA_VOLVER_A_VINCULAR}
             alPresionar={() => setPanel('revincular')}
           />
         </Tarjeta>
@@ -236,7 +259,12 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
               alCambiar={setCuentaPago}
             />
           ) : null}
-          <Boton testID="grupo-saldar-confirmar" etiqueta={BTN_REGISTRAR_PAGO} alPresionar={saldar} />
+          <Boton
+            testID="grupo-saldar-confirmar"
+            etiqueta={BTN_REGISTRAR_PAGO}
+            pista={PISTA_REGISTRAR_PAGO}
+            alPresionar={saldar}
+          />
         </Tarjeta>
       ) : null}
 
@@ -253,6 +281,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           <Boton
             testID="grupo-salir-confirmar"
             etiqueta={BTN_DEJAR_DE_COMPARTIR}
+            pista={PISTA_CONFIRMAR_SALIR_GRUPO}
             cargando={ocupado}
             alPresionar={() => {
               void conResultado(() => salirDelGrupo(ctx, deps, grupoId)).then((ok) => {
@@ -264,6 +293,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
             testID="grupo-salir-cancelar"
             etiqueta={BTN_CANCELAR}
             variante="texto"
+            pista={PISTA_CANCELAR_PANEL}
             alPresionar={() => setPanel('ninguno')}
           />
         </Tarjeta>
@@ -271,12 +301,18 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
       {g.abierto && panel === 'ninguno' && !g.revincular ? (
         <>
-          <Boton testID="grupo-agregar" etiqueta={BTN_AGREGAR_GASTO} alPresionar={() => setPanel('agregar')} />
+          <Boton
+            testID="grupo-agregar"
+            etiqueta={BTN_AGREGAR_GASTO}
+            pista={PISTA_AGREGAR_GASTO}
+            alPresionar={() => setPanel('agregar')}
+          />
           {g.saldo.debe !== null ? (
             <Boton
               testID="grupo-saldar-abrir"
               etiqueta={BTN_SALDAR}
               variante="secundario"
+              pista={PISTA_SALDAR}
               alPresionar={() => setPanel('saldar')}
             />
           ) : null}
@@ -284,6 +320,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
             testID="grupo-mostrar-codigo"
             etiqueta={BTN_MOSTRAR_CODIGO}
             variante="secundario"
+            pista={PISTA_MOSTRAR_CODIGO}
             cargando={ocupado}
             alPresionar={() => {
               setOcupado(true);
@@ -302,7 +339,9 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         </>
       ) : null}
 
-      <Texto variante="subtitulo">{TITULO_LO_COMPARTIDO}</Texto>
+      <Texto variante="subtitulo" testID="grupo-lo-compartido-titulo" accessibilityRole="header">
+        {TITULO_LO_COMPARTIDO}
+      </Texto>
       {g.movimientos.length === 0 ? (
         <EstadoVacio
           texto={TEXTO_GRUPO_MOVIMIENTOS_VACIO}
@@ -312,7 +351,9 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
       ) : null}
       {g.movimientos.map((m) => (
         <Tarjeta key={m.id} testID={`mov-compartido-${m.id}`}>
-          <Texto variante="cuerpoFuerte">{m.titulo}</Texto>
+          <Texto variante="cuerpoFuerte" accessibilityRole="header">
+            {m.titulo}
+          </Texto>
           <TextoCifras
             texto={`${m.fechaTexto} · ${m.detalle}`}
             {...(m.anulado ? { tono: 'secundario' as const } : {})}
@@ -338,6 +379,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
               etiqueta={BTN_ANULAR}
               variante="texto"
               ancho="contenido"
+              pista={PISTA_ANULAR_MOVIMIENTO}
               alPresionar={() => anular(m.id)}
             />
           ) : null}
@@ -349,6 +391,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           testID="grupo-salir-abrir"
           etiqueta={BTN_DEJAR_DE_COMPARTIR}
           variante="texto"
+          pista={PISTA_DEJAR_DE_COMPARTIR}
           alPresionar={() => setPanel('salir')}
         />
       ) : null}

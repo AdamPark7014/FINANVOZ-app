@@ -3,7 +3,7 @@ import type { PropuestaGastoCompartido } from '../../servicios';
 import { Boton, Tarjeta, Texto } from '../../ui';
 import { Chips } from '../onboarding/componentes';
 import { FormularioGastoCompartido } from './FormularioGastoCompartido';
-import { BTN_CANCELAR, ETIQUETA_CON_QUIEN_COMPARTES } from './textos';
+import { BTN_CANCELAR, ETIQUETA_CON_QUIEN_COMPARTES, PISTA_CANCELAR_GASTO } from './textos';
 
 /**
  * Confirmación de un gasto compartido dictado (`02 §27`): si hay varios grupos abiertos y no quedó claro con
@@ -23,7 +23,13 @@ export function TarjetaConfirmarCompartido({
   if (!grupo) {
     return (
       <Tarjeta testID="confirmar-compartido-grupo">
-        <Texto variante="subtitulo">{ETIQUETA_CON_QUIEN_COMPARTES}</Texto>
+        <Texto
+          variante="subtitulo"
+          testID="confirmar-compartido-titulo"
+          accessibilityRole="header"
+        >
+          {ETIQUETA_CON_QUIEN_COMPARTES}
+        </Texto>
         <Chips
           testID="confirmar-compartido-grupo"
           opciones={propuesta.grupos.map((g) => ({ valor: g.id, etiqueta: g.nombre }))}
@@ -33,6 +39,7 @@ export function TarjetaConfirmarCompartido({
         <Boton
           etiqueta={BTN_CANCELAR}
           variante="texto"
+          pista={PISTA_CANCELAR_GASTO}
           alPresionar={alCancelar}
           testID="confirmar-compartido-cancelar"
         />

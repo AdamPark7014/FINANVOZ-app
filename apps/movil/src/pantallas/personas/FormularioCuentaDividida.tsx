@@ -23,10 +23,16 @@ import {
   ERROR_DIVISION_REPARTO,
   ERROR_DIVISION_TOTAL,
   ETIQUETA_CATEGORIA_PARTE,
+  ETIQUETA_CON_QUIEN,
+  ETIQUETA_ENTRE_CUANTOS,
   ETIQUETA_ORIGEN_DIVISION,
+  ETIQUETA_TE_DEBEN_TOTAL,
+  ETIQUETA_TU_PARTE,
   PISTA_AGREGAR_PERSONA,
   PISTA_CANCELAR_DIVISION,
   PISTA_GUARDAR_DIVISION,
+  PISTA_MAS_PARTES,
+  PISTA_MENOS_PARTES,
   TEXTO_CONTACTOS_VACIO,
   etiquetaVacioContactosDivision,
   textoFaltanPersonas,
@@ -171,7 +177,9 @@ export function FormularioCuentaDividida({
         testID="division-descripcion"
       />
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">¿Entre cuántos? (contándote)</Texto>
+        <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
+          {ETIQUETA_ENTRE_CUANTOS}
+        </Texto>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m }}>
           <Boton
             etiqueta="−"
@@ -180,12 +188,14 @@ export function FormularioCuentaDividida({
             ancho="contenido"
             alPresionar={() => cambiarPartes(partes - 1)}
             deshabilitado={partes <= 2}
+            pista={PISTA_MENOS_PARTES}
             testID="division-menos"
           />
           <Texto
             variante="cuerpoFuerte"
             testID="division-partes"
             accessibilityLiveRegion="polite"
+            accessibilityLabel={`${ETIQUETA_ENTRE_CUANTOS} Entre ${partes}`}
           >{`Entre ${partes}`}</Texto>
           <Boton
             etiqueta="+"
@@ -194,6 +204,7 @@ export function FormularioCuentaDividida({
             ancho="contenido"
             alPresionar={() => cambiarPartes(partes + 1)}
             deshabilitado={partes >= MAX_PARTES}
+            pista={PISTA_MAS_PARTES}
             testID="division-mas"
           />
         </View>
@@ -201,14 +212,18 @@ export function FormularioCuentaDividida({
       {reparto ? (
         <View style={{ gap: espacio.xxs }} testID="division-reparto">
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Texto variante="cuerpo">Tu parte</Texto>
-            <Cifra centavos={reparto.parteUsuario} contexto="Tu parte" testID="division-tu-parte" />
+            <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
+              {ETIQUETA_TU_PARTE}
+            </Texto>
+            <Cifra centavos={reparto.parteUsuario} contexto={ETIQUETA_TU_PARTE} testID="division-tu-parte" />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Texto variante="cuerpo">Te deben en total</Texto>
+            <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
+              {ETIQUETA_TE_DEBEN_TOTAL}
+            </Texto>
             <Cifra
               centavos={reparto.porCobrarTotal}
-              contexto="Te deben en total"
+              contexto={ETIQUETA_TE_DEBEN_TOTAL}
               testID="division-te-deben"
             />
           </View>
@@ -225,7 +240,9 @@ export function FormularioCuentaDividida({
         </View>
       ) : null}
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">¿Con quién?</Texto>
+        <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
+          {ETIQUETA_CON_QUIEN}
+        </Texto>
         <Texto
           variante="secundario"
           tono="secundario"

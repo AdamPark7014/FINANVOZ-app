@@ -9,7 +9,7 @@ import {
   type PropuestaGastoCompartido,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, CampoTexto, etiquetaHablada, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import {
   AYUDA_PROPORCION,
@@ -31,6 +31,7 @@ import {
   formatoProporcionReparto,
   OPCIONES_REPARTO,
   parsearProporcionReparto,
+  PISTA_CANCELAR_GASTO,
   PISTA_GUARDAR_GASTO_COMPARTIDO,
   resumenGastoCompartido,
   TITULO_AGREGAR_GASTO,
@@ -138,13 +139,27 @@ export function FormularioGastoCompartido({
 
   return (
     <Tarjeta testID="formulario-gasto-compartido">
-      <Texto variante="subtitulo">{prellenado ? TITULO_REVISAR_GASTO : TITULO_AGREGAR_GASTO}</Texto>
+      <Texto
+        variante="subtitulo"
+        testID="compartido-formulario-titulo"
+        accessibilityRole="header"
+      >
+        {prellenado ? TITULO_REVISAR_GASTO : TITULO_AGREGAR_GASTO}
+      </Texto>
       {prellenado && total !== null && total > 0 ? (
         <Texto
           variante="cuerpo"
           accessibilityLiveRegion="polite"
           importantForAccessibility="yes"
           testID="compartido-resumen"
+          accessibilityLabel={etiquetaHablada(
+            resumenGastoCompartido({
+              descripcion: descripcion.trim(),
+              total,
+              pagueYo: quien === null ? null : quien === 'yo',
+              miParteBp: miParteBpVista,
+            }),
+          )}
         >
           {resumenGastoCompartido({
             descripcion: descripcion.trim(),
@@ -216,7 +231,13 @@ export function FormularioGastoCompartido({
         pista={PISTA_GUARDAR_GASTO_COMPARTIDO}
         alPresionar={guardar}
       />
-      <Boton testID="compartido-cancelar" etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
+      <Boton
+        testID="compartido-cancelar"
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        pista={PISTA_CANCELAR_GASTO}
+        alPresionar={alCancelar}
+      />
     </Tarjeta>
   );
 }

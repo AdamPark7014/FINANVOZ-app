@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Share, View } from 'react-native';
+import { Pressable, Share, Text, View } from 'react-native';
 import type { Centavos } from '@cartera/core';
 import {
   detallePersona,
@@ -14,7 +14,21 @@ import {
   sincronizarRecordatoriosCobro,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  CampoMonto,
+  Cifra,
+  espacio,
+  etiquetaHablada,
+  hitSlopTactil,
+  OBJETIVO_TACTIL_MIN,
+  Pantalla,
+  radio,
+  Tarjeta,
+  Texto,
+  tipo,
+  useTema,
+} from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
@@ -145,7 +159,13 @@ function Detalle({
       </Texto>
       <Tarjeta>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-          <Texto variante="cuerpoFuerte">{etiquetaSaldoPersona(d.saldo)}</Texto>
+          <Texto
+            variante="cuerpoFuerte"
+            {...(d.saldo !== 0 ? OCULTAR_ETIQUETA_VISIBLE : {})}
+            testID="persona-saldo-etiqueta"
+          >
+            {etiquetaSaldoPersona(d.saldo)}
+          </Texto>
           {d.saldo !== 0 ? (
             <Cifra
               centavos={Math.abs(d.saldo)}
@@ -155,7 +175,12 @@ function Detalle({
           ) : null}
         </View>
         {d.saldo > 0 ? (
-          <Texto variante="secundario" tono="secundario" testID="persona-tip-te-deben">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="persona-tip-te-deben"
+            accessibilityLiveRegion="polite"
+          >
             {TIP_SALDO_TE_DEBEN}
           </Texto>
         ) : null}
@@ -169,12 +194,9 @@ function Detalle({
             pista={PISTA_COBRAR}
             testID="boton-cobrar"
           />
-          <Boton
-            etiqueta={ETIQUETA_YA_ME_PAGO}
-            variante="secundario"
+          <BotonYaMePago
+            expandido={panel === 'pago'}
             alPresionar={() => setPanel(panel === 'pago' ? null : 'pago')}
-            pista={PISTA_YA_ME_PAGO}
-            testID="boton-ya-me-pago"
           />
         </View>
       ) : null}
@@ -232,25 +254,69 @@ function Detalle({
             etiquetaAccesible={etiquetaVacioMovimientosPersona()}
           />
         ) : null}
-        {d.movimientos.map((m) => (
-          <Tarjeta key={m.id} testID={`persona-mov-${m.id}`}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-              <View style={{ flex: 1, gap: espacio.xxs }}>
-                <Texto variante="cuerpoFuerte">{m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}</Texto>
-                <Texto variante="secundario" tono="secundario">
-                  {`${NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} · ${etiquetaDiaMes(m.fecha)}`}
-                </Texto>
-              </View>
-              <Cifra
-                centavos={m.monto}
-                contexto={m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
-                testID={`persona-mov-${m.id}-saldo`}
-              />
-            </View>
-          </Tarjeta>
-        ))}
+        {d.movimientos.length > 0 ? (
+          <View accessibilityRole="list" testID="persona-movimientos-lista" style={{ gap: espacio.s }}>
+            {d.movimientos.map((m) => (
+              <Tarjeta key={m.id} testID={`persona-mov-${m.id}`} style={{ gap: espacio.s }}>
+                <View
+                  accessibilityRole="listitem"
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
+                >
+                  <View style={{ flex: 1, gap: espacio.xxs }}>
+                    <Texto variante="cuerpoFuerte">{m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}</Texto>
+                    <Texto variante="secundario" tono="secundario">
+                      {`${NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} · ${etiquetaDiaMes(m.fecha)}`}
+                    </Texto>
+                  </View>
+                  <Cifra
+                    centavos={m.monto}
+                    contexto={m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
+                    testID={`persona-mov-${m.id}-saldo`}
+                  />
+                </View>
+              </Tarjeta>
+            ))}
+          </View>
+        ) : null}
       </View>
     </Pantalla>
+  );
+}
+
+/** «Ya me pagó»: TalkBack anuncia expandido/colapsado (`02 §15`). */
+function BotonYaMePago({ expandido, alPresionar }: { expandido: boolean; alPresionar: () => void }) {
+  const { c } = useTema();
+  return (
+    <Pressable
+      testID="boton-ya-me-pago"
+      onPress={alPresionar}
+      accessibilityRole="button"
+      accessibilityLabel={etiquetaHablada(ETIQUETA_YA_ME_PAGO)}
+      accessibilityHint={PISTA_YA_ME_PAGO}
+      accessibilityState={{ expanded: expandido }}
+      hitSlop={hitSlopTactil}
+      style={({ pressed }) => ({
+        minHeight: OBJETIVO_TACTIL_MIN,
+        minWidth: OBJETIVO_TACTIL_MIN,
+        paddingHorizontal: espacio.xl,
+        paddingVertical: espacio.m,
+        borderRadius: radio.m,
+        borderWidth: 1.5,
+        borderColor: c.acentoTexto,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'stretch',
+        opacity: pressed ? 0.85 : 1,
+      })}
+    >
+      <Text
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[tipo.etiqueta, { fontSize: 16, color: c.acentoTexto, textAlign: 'center' }]}
+      >
+        {ETIQUETA_YA_ME_PAGO}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -373,6 +439,7 @@ function Recordatorio({
           <Texto
             variante="cuerpo"
             testID="persona-recordatorio-fecha"
+            accessibilityRole="header"
             accessibilityLiveRegion="polite"
           >
             {mensajeRecordatorioCobro(fecha.etiqueta)}

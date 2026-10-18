@@ -13,7 +13,7 @@ import {
   type RenglonEstado,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, Cifra, espacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import {
@@ -29,9 +29,23 @@ import {
   CHIP_MISMO,
   CHIP_OTRO,
   ERROR_CONTRASENA_PDF,
+  ETIQUETA_ALERTA,
   ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
+  ETIQUETA_EXITO,
+  ETIQUETA_PREGUNTA_CONCILIACION,
+  ETIQUETA_PREGUNTA_CONTRASENA,
   ETIQUETA_RESUMEN_ESTADO,
+  PISTA_ABRIR_PDF,
+  PISTA_AJUSTAR_SALDO,
+  PISTA_CANCELAR_ESTADO,
+  PISTA_ELEGIR_TARJETA,
+  PISTA_ENTENDIDO,
+  PISTA_ESCRIBE_CONTRASENA,
+  PISTA_GUARDAR_ESTADO,
+  PISTA_NO_AJUSTAR,
+  PISTA_CONTESTAR_DUDOSOS,
+  PISTA_VER_TARJETA_ESTADO,
   etiquetaBotonTarjeta,
   etiquetaChipsDudoso,
   etiquetaRenglonEstado,
@@ -151,7 +165,7 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo" testID="estado-cuenta-titulo">
+      <Texto variante="titulo" testID="estado-cuenta-titulo" accessibilityRole="header">
         {TITULO_PANTALLA}
       </Texto>
       {estado.tipo === 'leyendo' ? (
@@ -203,12 +217,18 @@ export function LeerEstadoCuenta({
       ) : null}
       {estado.tipo === 'ajustado' ? (
         <>
-          <Texto variante="cuerpo" testID="estado-ajustado" accessibilityLiveRegion="polite">
+          <Texto
+            variante="cuerpo"
+            testID="estado-ajustado"
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={`${ETIQUETA_EXITO}. ${mensajeAjustado(estado.nombre)}`}
+          >
             {mensajeAjustado(estado.nombre)}
           </Texto>
           <Boton
             etiqueta={BTN_VER_TARJETA}
             alPresionar={() => alVerTarjeta(estado.tarjetaId)}
+            pista={PISTA_VER_TARJETA_ESTADO}
             testID="estado-ver-tarjeta"
           />
         </>
@@ -223,12 +243,19 @@ function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void;
       <Texto
         variante="cuerpo"
         testID={testID}
-        accessibilityLiveRegion="polite"
+        accessibilityRole="alert"
+        accessibilityLiveRegion="assertive"
         accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}. ${texto}`}
       >
         {texto}
       </Texto>
-      <Boton etiqueta={BTN_ENTENDIDO} variante="secundario" alPresionar={alSalir} testID="estado-salir" />
+      <Boton
+        etiqueta={BTN_ENTENDIDO}
+        variante="secundario"
+        alPresionar={alSalir}
+        pista={PISTA_ENTENDIDO}
+        testID="estado-salir"
+      />
     </>
   );
 }
@@ -248,7 +275,13 @@ function PedirContrasena({
   };
   return (
     <>
-      <Texto variante="cuerpo">{MENSAJE_CONTRASENA}</Texto>
+      <Texto
+        variante="cuerpo"
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={`${ETIQUETA_PREGUNTA_CONTRASENA}. ${MENSAJE_CONTRASENA}`}
+      >
+        {MENSAJE_CONTRASENA}
+      </Texto>
       <CampoTexto
         etiqueta={ETIQUETA_CONTRASENA_PDF}
         valor={contrasena}
@@ -258,8 +291,20 @@ function PedirContrasena({
         nativo={{ secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false }}
         testID="estado-contrasena"
       />
-      <Boton etiqueta={BTN_ABRIR} alPresionar={abrir} deshabilitado={contrasena === ''} testID="estado-abrir" />
-      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+      <Boton
+        etiqueta={BTN_ABRIR}
+        alPresionar={abrir}
+        deshabilitado={contrasena === ''}
+        pista={contrasena === '' ? PISTA_ESCRIBE_CONTRASENA : PISTA_ABRIR_PDF}
+        testID="estado-abrir"
+      />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alSalir}
+        pista={PISTA_CANCELAR_ESTADO}
+        testID="estado-cancelar"
+      />
     </>
   );
 }
@@ -279,7 +324,13 @@ function Lectura({
     case 'escaneado':
       return (
         <>
-          <Texto variante="subtitulo" testID="estado-escaneado" accessibilityLiveRegion="polite">
+          <Texto
+            variante="subtitulo"
+            testID="estado-escaneado"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="assertive"
+            accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}. ${MENSAJE_ESCANEADO}`}
+          >
             {MENSAJE_ESCANEADO}
           </Texto>
           <Aviso texto={AYUDA_PDF_ESCANEADO} alSalir={alSalir} testID="estado-escaneado-ayuda" />
@@ -311,16 +362,25 @@ function Lectura({
           <Texto variante="cuerpo" testID="estado-elegir" accessibilityLiveRegion="polite">
             {preguntaElegirTarjeta(lectura.banco, lectura.ultimos4, lectura.corte)}
           </Texto>
-          {lectura.tarjetas.map((t) => (
-            <Boton
-              key={t.cuentaId}
-              etiqueta={etiquetaBotonTarjeta(t.nombre, t.ultimos4)}
-              variante="secundario"
-              alPresionar={() => alElegirTarjeta(t.cuentaId)}
-              testID={`estado-tarjeta-${t.cuentaId}`}
-            />
-          ))}
-          <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+          <View accessibilityRole="list" style={{ gap: espacio.s }}>
+            {lectura.tarjetas.map((t) => (
+              <Boton
+                key={t.cuentaId}
+                etiqueta={etiquetaBotonTarjeta(t.nombre, t.ultimos4)}
+                variante="secundario"
+                alPresionar={() => alElegirTarjeta(t.cuentaId)}
+                pista={PISTA_ELEGIR_TARJETA}
+                testID={`estado-tarjeta-${t.cuentaId}`}
+              />
+            ))}
+          </View>
+          <Boton
+            etiqueta={BTN_CANCELAR}
+            variante="texto"
+            alPresionar={alSalir}
+            pista={PISTA_CANCELAR_ESTADO}
+            testID="estado-cancelar"
+          />
         </>
       );
     case 'listo':
@@ -361,12 +421,26 @@ function Revisar({
           {resumen}
         </Texto>
         {a.cuadra === false ? (
-          <Texto variante="secundario" tono="faltante" testID="estado-no-cuadra">
+          <Texto
+            variante="secundario"
+            tono="faltante"
+            testID="estado-no-cuadra"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={`${ETIQUETA_ALERTA}. ${AVISO_NO_CUADRA}`}
+          >
             {AVISO_NO_CUADRA}
           </Texto>
         ) : null}
         {a.renglonesSinLeer > 0 ? (
-          <Texto variante="secundario" tono="faltante" testID="estado-sin-leer">
+          <Texto
+            variante="secundario"
+            tono="faltante"
+            testID="estado-sin-leer"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={`${ETIQUETA_ALERTA}. ${mensajeRenglonesSinLeer(a.renglonesSinLeer)}`}
+          >
             {mensajeRenglonesSinLeer(a.renglonesSinLeer)}
           </Texto>
         ) : null}
@@ -378,7 +452,7 @@ function Revisar({
       </Tarjeta>
 
       {a.nuevos.length > 0 ? (
-        <View style={{ gap: espacio.xs }} testID="estado-nuevos">
+        <View style={{ gap: espacio.xs }} testID="estado-nuevos" accessibilityRole="list">
           <Texto variante="subtitulo" accessibilityRole="header">
             {tituloNuevos(a.nuevos.length)}
           </Texto>
@@ -408,7 +482,7 @@ function Revisar({
       )}
 
       {a.dudosos.length > 0 ? (
-        <View style={{ gap: espacio.m }} testID="estado-dudosos">
+        <View style={{ gap: espacio.m }} testID="estado-dudosos" accessibilityRole="list">
           <Texto variante="subtitulo" accessibilityRole="header">
             {TITULO_DUDOSOS}
           </Texto>
@@ -424,13 +498,31 @@ function Revisar({
       ) : null}
 
       <MensajeError texto={error} />
-      <Boton etiqueta={BTN_GUARDAR} alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
+      <Boton
+        etiqueta={BTN_GUARDAR}
+        alPresionar={guardar}
+        deshabilitado={faltan}
+        pista={faltan ? PISTA_CONTESTAR_DUDOSOS : PISTA_GUARDAR_ESTADO}
+        testID="estado-guardar"
+      />
       {faltan ? (
-        <Texto variante="secundario" tono="secundario" testID="estado-faltan-dudosos">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="estado-faltan-dudosos"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={MENSAJE_FALTAN_DUDOSOS}
+        >
           {MENSAJE_FALTAN_DUDOSOS}
         </Texto>
       ) : null}
-      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alSalir}
+        pista={PISTA_CANCELAR_ESTADO}
+        testID="estado-cancelar"
+      />
     </>
   );
 }
@@ -444,16 +536,26 @@ function Dudoso({
   valor: 'mismo' | 'otro' | null;
   alCambiar: (v: 'mismo' | 'otro') => void;
 }) {
+  const preguntaExistente = preguntaMismoMovimiento(
+    d.existente.descripcion,
+    d.existente.fecha,
+    d.existente.monto,
+  );
   return (
-    <Tarjeta testID={`estado-dudoso-${d.indice}`} accionesAnidadas>
+    <View accessibilityRole="listitem">
+      <Tarjeta testID={`estado-dudoso-${d.indice}`} accionesAnidadas>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="cuerpo" style={{ flex: 1 }}>
           {lineaEncabezadoDudoso(d.descripcion, d.fecha)}
         </Texto>
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
-      <Texto variante="secundario" tono="secundario">
-        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        accessibilityLabel={etiquetaHablada(preguntaExistente)}
+      >
+        {preguntaExistente}
       </Texto>
       <Chips
         etiqueta={etiquetaChipsDudoso(d.descripcion)}
@@ -465,7 +567,8 @@ function Dudoso({
         alCambiar={alCambiar}
         testID={`estado-dudoso-${d.indice}`}
       />
-    </Tarjeta>
+      </Tarjeta>
+    </View>
   );
 }
 
@@ -484,26 +587,49 @@ function Guardado({
   alNoAjustar: () => void;
   alVerTarjeta: () => void;
 }) {
+  const guardado = mensajeGuardado(agregados, nombre);
+  const conciliacion = propuesta ? preguntaConciliacion(propuesta) : null;
   return (
     <>
-      <Texto variante="cuerpo" testID="estado-guardado" accessibilityLiveRegion="polite">
-        {mensajeGuardado(agregados, nombre)}
+      <Texto
+        variante="cuerpo"
+        testID="estado-guardado"
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={`${ETIQUETA_EXITO}. ${guardado}`}
+      >
+        {guardado}
       </Texto>
-      {propuesta ? (
+      {propuesta && conciliacion ? (
         <Tarjeta testID="estado-conciliacion" accionesAnidadas>
-          <Texto variante="cuerpo" testID="estado-conciliacion-texto" accessibilityLiveRegion="polite">
-            {preguntaConciliacion(propuesta)}
+          <Texto
+            variante="cuerpo"
+            testID="estado-conciliacion-texto"
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={`${ETIQUETA_PREGUNTA_CONCILIACION} ${etiquetaHablada(conciliacion)}`}
+          >
+            {conciliacion}
           </Texto>
-          <Boton etiqueta={BTN_AJUSTAR} alPresionar={() => alAjustar(propuesta)} testID="estado-ajustar" />
+          <Boton
+            etiqueta={BTN_AJUSTAR}
+            alPresionar={() => alAjustar(propuesta)}
+            pista={PISTA_AJUSTAR_SALDO}
+            testID="estado-ajustar"
+          />
           <Boton
             etiqueta={BTN_NO_AJUSTAR}
             variante="secundario"
             alPresionar={alNoAjustar}
+            pista={PISTA_NO_AJUSTAR}
             testID="estado-no-ajustar"
           />
         </Tarjeta>
       ) : (
-        <Boton etiqueta={BTN_VER_TARJETA} alPresionar={alVerTarjeta} testID="estado-ver-tarjeta" />
+        <Boton
+          etiqueta={BTN_VER_TARJETA}
+          alPresionar={alVerTarjeta}
+          pista={PISTA_VER_TARJETA_ESTADO}
+          testID="estado-ver-tarjeta"
+        />
       )}
     </>
   );

@@ -29,6 +29,23 @@ export const AVISO_NO_CUADRA =
 export const MENSAJE_FALTAN_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
 export const PISTA_CONTESTAR_DUDOSOS = MENSAJE_FALTAN_DUDOSOS;
 
+/** TalkBack: pistas de botones (`02 §15`). */
+export const PISTA_ENTENDIDO = 'Cierra este aviso y vuelves a donde estabas';
+export const PISTA_ESCRIBE_CONTRASENA = 'Escribe la contraseña del PDF para poder abrirlo';
+export const PISTA_ABRIR_PDF = 'Abre el PDF con la contraseña que escribiste';
+export const PISTA_CANCELAR_ESTADO = 'Sales sin guardar movimientos del estado de cuenta';
+export const PISTA_GUARDAR_ESTADO = 'Guarda en tu tarjeta los movimientos que marcaste';
+export const PISTA_AJUSTAR_SALDO = 'Ajusta el saldo de tu tarjeta para que coincida con tu banco';
+export const PISTA_NO_AJUSTAR = 'Dejas el saldo como está en Cartera';
+export const PISTA_VER_TARJETA_ESTADO = 'Abre el detalle de la tarjeta';
+export const PISTA_ELEGIR_TARJETA = 'Usa esta tarjeta para leer el estado de cuenta';
+
+/** Prefijos TalkBack para estados y avisos. */
+export const ETIQUETA_EXITO = 'Listo';
+export const ETIQUETA_ALERTA = 'Alerta';
+export const ETIQUETA_PREGUNTA_CONCILIACION = '¿Ajusto el saldo?';
+export const ETIQUETA_PREGUNTA_CONTRASENA = 'Contraseña del PDF';
+
 /** Cuando el PDF cuadra pero no hay renglones nuevos que marcar (`02 §26`). */
 export const TEXTO_SIN_NUEVOS = 'No hay movimientos nuevos que revisar.';
 

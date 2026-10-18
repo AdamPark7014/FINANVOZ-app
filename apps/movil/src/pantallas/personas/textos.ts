@@ -107,6 +107,22 @@ export function etiquetaVacioMovimientosPersona(): string {
   return `${TITULO_MOVIMIENTOS}. ${TEXTO_MOVIMIENTOS_PERSONA_VACIO}`;
 }
 
+/** Cuenta dividida: cuántas partes incluyéndote (`02 §17`). */
+export const ETIQUETA_ENTRE_CUANTOS = '¿Entre cuántos? (contándote)';
+
+/** TalkBack al bajar participantes en cuenta dividida (`02 §19`). */
+export const PISTA_MENOS_PARTES = 'Quita una persona del reparto';
+/** TalkBack al subir participantes en cuenta dividida (`02 §19`). */
+export const PISTA_MAS_PARTES = 'Agrega una persona al reparto';
+
+export const ETIQUETA_TU_PARTE = 'Tu parte';
+export const ETIQUETA_TE_DEBEN_TOTAL = 'Te deben en total';
+
+/** Datos para cobrar: campos del formulario. */
+export const ETIQUETA_CELULAR_COBRO = 'Tu celular (para DiMo)';
+export const ETIQUETA_CLABE_COBRO = 'Tu CLABE';
+export const ETIQUETA_CANCELAR = 'Cancelar';
+
 /** Cuenta dividida / formulario: selector de contactos. */
 export const ETIQUETA_CON_QUIEN = '¿Con quién?';
 

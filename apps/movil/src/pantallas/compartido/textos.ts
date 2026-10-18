@@ -35,6 +35,8 @@ export const BTN_CREAR_CODIGO = 'Crear código';
 /** Tras escribir el nombre de tu pareja (`02 §15`). */
 export const PISTA_CREAR_CODIGO = 'Genera el código QR para que tu pareja te escanee';
 export const BTN_LISTO = 'Listo';
+/** Tras crear el grupo y mostrar el QR (`02 §15`). */
+export const PISTA_LISTO_TRAS_QR = 'Abre el grupo que acabas de crear';
 /** Antes de abrir la cámara en unirse (`02 §15`). */
 export const PISTA_ABRIR_ESCANER = 'Abre la cámara para leer el código QR de tu pareja';
 export const ETIQUETA_NOMBRE_PAREJA = '¿Cómo se llama tu pareja?';
@@ -71,6 +73,24 @@ export const BTN_MOSTRAR_CODIGO = 'Mostrar código';
 export const BTN_REGISTRAR_PAGO = 'Registrar pago';
 export const BTN_DEJAR_DE_COMPARTIR = 'Dejar de compartir';
 export const BTN_ANULAR = 'Anular';
+
+/** Detalle del grupo: vuelve a Gastos compartidos (`02 §15`). */
+export const PISTA_VOLVER_GRUPO = 'Regresa a la lista de grupos';
+/** Detalle del grupo: cierra agregar, saldar, código o salir (`02 §15`). */
+export const PISTA_VOLVER_PANEL_GRUPO = 'Cierra este paso y vuelves al grupo';
+/** Pista TalkBack al abrir un grupo desde la lista (`02 §15`). */
+export const PISTA_ABRIR_GRUPO = 'Abre el detalle de este grupo compartido';
+/** Grupo (`02 §15`). */
+export const PISTA_AGREGAR_GASTO = 'Registra un gasto que se reparte con tu pareja';
+export const PISTA_SALDAR = 'Registra el pago para quedar a mano';
+export const PISTA_MOSTRAR_CODIGO = 'Muestra un código QR para que tu pareja vuelva a vincularse';
+export const PISTA_VOLVER_A_VINCULAR = 'Abre la cámara para escanear el código de tu pareja';
+export const PISTA_REGISTRAR_PAGO = 'Guarda el pago en tu libro y lo comparte cuando haya red';
+export const PISTA_DEJAR_DE_COMPARTIR = 'Cierra el grupo para los dos; cada quien conserva lo registrado';
+export const PISTA_CONFIRMAR_SALIR_GRUPO = 'Confirma que quieres dejar de compartir con tu pareja';
+export const PISTA_CANCELAR_PANEL = 'Cierra sin guardar ni confirmar';
+export const PISTA_ANULAR_MOVIMIENTO = 'Anula este gasto compartido en tu libro';
+export const PISTA_CANCELAR_GASTO = 'Cierra el formulario sin guardar el gasto';
 export const TITULO_LO_COMPARTIDO = 'Lo compartido';
 /** Grupo abierto sin movimientos compartidos aún (`02 §27`). */
 export const TEXTO_GRUPO_MOVIMIENTOS_VACIO = 'Todavía no hay gastos compartidos.';
