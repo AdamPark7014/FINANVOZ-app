@@ -114,7 +114,7 @@ function Detalle({
         <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">
           {d.nombre}
         </Texto>
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
           {NOMBRE_MODO[d.modo]}
         </Texto>
       </View>

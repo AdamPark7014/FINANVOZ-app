@@ -228,7 +228,13 @@ export function PantallaMeAlcanza({
       {estado.tipo === 'formulario' ? (
         <View style={{ gap: espacio.m }} testID="me-alcanza-formulario">
           {estado.aviso ? (
-            <Texto variante="secundario" tono="secundario" testID="me-alcanza-aviso">
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              testID="me-alcanza-aviso"
+            >
               {estado.aviso}
             </Texto>
           ) : null}

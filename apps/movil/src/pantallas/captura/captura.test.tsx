@@ -129,6 +129,10 @@ describe('Movimientos → capturas por revisar', () => {
     expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveTextContent(
       TEXTO_CAPTURAS_POR_REVISAR_VACIO,
     );
+    expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaVacioCapturasPorRevisar(),
+    );
     p.cerrar();
   });
 

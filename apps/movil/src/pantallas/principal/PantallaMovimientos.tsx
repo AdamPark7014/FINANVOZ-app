@@ -166,7 +166,13 @@ export function PantallaMovimientos({
 
       {filtro ? (
         <Tarjeta testID="movimientos-filtro">
-          <Texto variante="secundario">{TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}</Texto>
+          <Texto
+            variant="secundario"
+            accessibilityLabel={etiquetaFiltroMovimientosActivo()}
+            accessibilityLiveRegion="polite"
+          >
+            {TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}
+          </Texto>
           {alQuitarFiltro ? (
             <Boton
               etiqueta="Ver todos"

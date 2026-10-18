@@ -76,6 +76,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityLabel).toBe('Toca para ver tu día');
+    expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     expect(
       within(previa).getByTestId('previa-widget-solo-texto', { includeHiddenElements: true }).props
         .importantForAccessibility,

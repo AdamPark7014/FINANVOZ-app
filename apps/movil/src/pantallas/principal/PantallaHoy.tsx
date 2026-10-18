@@ -40,6 +40,7 @@ import {
   TITULO_HOY_LIBRE_NEGATIVO,
   TITULO_HOY_PUEDES_GASTAR,
   TITULO_SIN_INGRESO,
+  TITULO_TARJETA_DEL_DIA,
 } from './textos';
 
 export interface NavegacionHoy {

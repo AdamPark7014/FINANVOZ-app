@@ -224,13 +224,16 @@ export function ActivarCaptura({
                 testID={`${testID}-app-${a.banco}`}
               />
             ))}
-            <Boton
-              etiqueta="Activar captura"
-              deshabilitado={marcadas.length === 0}
-              alPresionar={() => void guardarApps(paso.apps)}
-              testID={`${testID}-guardar-apps`}
-            />
-            {ahoraNo}
+            <View style={{ gap: espacio.s }}>
+              <Boton
+                etiqueta="Activar captura"
+                deshabilitado={marcadas.length === 0}
+                alPresionar={() => void guardarApps(paso.apps)}
+                testID={`${testID}-guardar-apps`}
+                etiquetaAccesible="Activar captura con las apps marcadas"
+              />
+              {ahoraNo}
+            </View>
           </>
         )
       ) : null}

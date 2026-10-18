@@ -155,6 +155,7 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
 
     tocar('ajustes-cambiar-ingreso');
     expect(r.getPathname()).toBe('/ajustes/ingreso');
+    expect(screen.getByTestId('editar-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('editar-ingreso-frecuencia-quincena')).toHaveProp('accessibilityState', {
       selected: true,
       checked: true,

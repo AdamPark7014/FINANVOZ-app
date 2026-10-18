@@ -27,6 +27,7 @@ import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { EstadoVacio } from './EstadoVacio';
 import {
+  BTN_AGREGAR_TARJETA_CREDITO,
   BTN_AJUSTES_CUENTAS,
   BTN_AJUSTES_CUENTAS_ACCESIBLE,
   contextoSaldoCompromiso,

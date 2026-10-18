@@ -154,7 +154,13 @@ export function PasoOnboarding({
         </Texto>
       ) : null}
       {tip ? (
-        <Texto variante="secundario" tono="secundario" testID="onb-tip">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="onb-tip"
+          accessibilityRole="text"
+          accessibilityLabel={etiquetaTipOnboarding(tip)}
+        >
           {tip}
         </Texto>
       ) : null}
