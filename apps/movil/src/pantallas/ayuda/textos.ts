@@ -1,5 +1,6 @@
 import { LEYENDA_ESTIMACION } from '../../servicios/deducciones';
 import { INTERPRETACIONES_NUBE_MES } from '../../servicios/plan';
+import { etiquetaHablada } from '../../ui/formato';
 
 export interface PreguntaFrecuente {
   /** Estable: forma el `testID` y sirve para medir cuál se abre (sin contenido). */
@@ -70,6 +71,26 @@ export function pistaPreguntaFrecuente(abierta: boolean): string {
 
 /** TalkBack: región de texto al expandir una pregunta (antes del contenido). */
 export const ETIQUETA_RESPUESTA = 'Respuesta';
+
+function correoEnPalabras(correo: string): string {
+  return correo.replace('@', ' arroba ').replace(/\./g, ' punto ');
+}
+
+/** TalkBack: párrafo de la FAQ abierta; el primero lleva el encabezado «Respuesta». */
+export function etiquetaAccesibleParrafoRespuesta(parrafo: string, esPrimero: boolean): string {
+  const cuerpo = etiquetaHablada(parrafo);
+  return esPrimero ? `${ETIQUETA_RESPUESTA}. ${cuerpo}` : cuerpo;
+}
+
+/** TalkBack: bloque de contacto con la dirección de correo en palabras (`02 §15`). */
+export function etiquetaAccesibleCuerpoContacto(correo: string): string {
+  return textoCuerpoContacto(correo).replace(correo, correoEnPalabras(correo));
+}
+
+/** TalkBack: aviso cuando no hay app de correo (`02 §15`). */
+export function etiquetaAccesibleSinAppCorreo(correo: string): string {
+  return mensajeSinAppCorreo(correo).replace(correo, correoEnPalabras(correo));
+}
 
 /**
  * Diez dudas probables según los flujos de la especificación (pendiente sustituir tras beta en `docs/ESTADO.md`).

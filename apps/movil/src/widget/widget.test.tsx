@@ -14,7 +14,7 @@ import { ProveedorSesion, useSesion } from '../sesion/ProveedorSesion';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { SeccionWidget } from '../pantallas/ajustes/SeccionWidget';
 import { auditar } from '../pantallas/__pruebas__/accesibilidad';
-import { PISTA_PREVIA } from '../pantallas/ajustes/widget-textos';
+import { PISTA_OCULTAR_MONTOS, PISTA_PREVIA } from '../pantallas/ajustes/widget-textos';
 import { SincronizarWidget } from './SincronizarWidget';
 import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
 import { WidgetHoy } from './WidgetHoy';
@@ -257,6 +257,7 @@ describe('Ajustes → Widget', () => {
     expect(previaAjustes.props.accessibilityHint).toBe(PISTA_PREVIA);
     expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
     const interruptor = screen.getByTestId('ajustes-widget-ocultar');
+    expect(interruptor.props.accessibilityHint).toBe(PISTA_OCULTAR_MONTOS);
     expect(interruptor.props.accessibilityState).toMatchObject({ checked: false });
 
     fireEvent.press(interruptor);

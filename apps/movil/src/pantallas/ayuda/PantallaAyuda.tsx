@@ -8,7 +8,9 @@ import {
   PISTA_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
-  ETIQUETA_RESPUESTA,
+  etiquetaAccesibleCuerpoContacto,
+  etiquetaAccesibleParrafoRespuesta,
+  etiquetaAccesibleSinAppCorreo,
   ETIQUETA_VOLVER,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
@@ -79,7 +81,11 @@ export function PantallaAyuda({
         <Texto variante="subtitulo" testID="ayuda-contacto-titulo" accessibilityRole="header">
           {CONTACTO_TITULO}
         </Texto>
-        <Texto variante="cuerpo" testID="ayuda-contacto-cuerpo">
+        <Texto
+          variante="cuerpo"
+          testID="ayuda-contacto-cuerpo"
+          accessibilityLabel={etiquetaAccesibleCuerpoContacto(CORREO_AYUDA)}
+        >
           {textoCuerpoContacto(CORREO_AYUDA)}
         </Texto>
         <Boton

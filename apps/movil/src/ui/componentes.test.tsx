@@ -129,6 +129,22 @@ describe('Interruptor', () => {
     expect(interruptor).toBeChecked();
     expect(interruptor.props.accessibilityHint).toBe('No cuenta como dinero libre');
   });
+
+  it('pista TalkBack puede diferir de la descripción visible', () => {
+    render(
+      <Interruptor
+        etiqueta="Ocultar montos"
+        descripcion="En pantalla verás otro texto"
+        pista="Actualiza el widget al instante"
+        valor={false}
+        alCambiar={() => {}}
+        testID="interruptor-pista"
+      />,
+    );
+    expect(screen.getByTestId('interruptor-pista').props.accessibilityHint).toBe(
+      'Actualiza el widget al instante',
+    );
+  });
 });
 
 describe('CampoTexto', () => {
