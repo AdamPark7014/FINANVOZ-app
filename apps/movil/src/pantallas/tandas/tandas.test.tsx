@@ -34,6 +34,7 @@ import {
   PISTA_EDITAR_NOMBRE_CUENTA,
   PISTA_GUARDAR_CAMBIOS,
   PISTA_GUARDAR_TANDA,
+  PISTA_GUARDAR_TANDA,
   PISTA_ME_TOCO,
   PISTA_NUEVA_TANDA,
   PISTA_VER_CALENDARIO,
@@ -171,6 +172,7 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={alAbrirTanda} />);
 
     fireEvent.press(screen.getByTestId('tandas-nueva'));
+    expect(screen.getByTestId('tanda-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_TANDA);
     fireEvent.changeText(screen.getByTestId('tanda-nombre'), EJEMPLO_NOMBRE_TANDA);
     fireEvent.changeText(screen.getByTestId('tanda-aportacion'), '500');
     fireEvent.press(screen.getByTestId('tanda-frecuencia-semanal'));
@@ -329,7 +331,7 @@ describe('Tandas (02 §18)', () => {
     vista.unmount();
 
     renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
-    expect(screen.getByTestId('tanda-archivada')).toBeTruthy();
+    expect(screen.getByTestId('tanda-archivada')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.queryByTestId('tanda-ya-la-di')).toBeNull();
   });
 
@@ -366,5 +368,6 @@ describe('copy centralizado (textos.ts)', () => {
     expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/Volver/);
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/lista de tandas/i);
+    expect(PISTA_GUARDAR_TANDA).toMatch(/aportación/i);
   });
 });
