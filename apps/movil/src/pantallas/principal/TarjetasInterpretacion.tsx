@@ -4,7 +4,6 @@ import {
   aplicarEleccion,
   etiquetaDiaMes,
   mensajeError,
-  type AccionElegir,
   type MovimientoVista,
   type OrigenDictado,
   type ResultadoTexto,
@@ -171,7 +170,7 @@ export function TarjetaDuplicados({
               </View>
               <Cifra centavos={m.monto} />
               <Boton
-                etiqueta="Borrar este"
+                etiqueta={BTN_BORRAR_DUPLICADO}
                 variante="secundario"
                 ancho="contenido"
                 alPresionar={() => {
@@ -192,7 +191,12 @@ export function TarjetaDuplicados({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Están bien" variante="texto" alPresionar={alCerrar} testID="boton-cerrar-duplicados" />
+      <Boton
+        etiqueta={BTN_DUPLICADOS_OK}
+        variante="texto"
+        alPresionar={alCerrar}
+        testID="boton-cerrar-duplicados"
+      />
     </Tarjeta>
   );
 }
@@ -219,10 +223,15 @@ export function TarjetaAclarar({
         />
       ) : (
         <Texto variante="secundario" tono="secundario">
-          Dímelo otra vez con ese dato.
+          {TEXTO_ACLARAR_SIN_OPCIONES}
         </Texto>
       )}
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="boton-cancelar-aclarar" />
+      <Boton
+        etiqueta={ETIQUETA_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID="boton-cancelar-aclarar"
+      />
     </Tarjeta>
   );
 }

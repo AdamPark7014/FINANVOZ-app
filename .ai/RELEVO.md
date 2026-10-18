@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **test(movil): tandas** — aserciones de aviso en Hoy (aportación/cobro) unificadas con `toHaveTextContent` en `tandas.test.tsx`, alineadas al resto del archivo.
+- **movil/principal:** copy de `TarjetasInterpretacion` (elegir, duplicados, aclarar) en `textos.ts`; `interpretacion-textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Pulir UI principal, tarjetas, suscripciones, barrels copy. Ver `git log`.
+- TarjetaConfirmarMsi, invitación avisos, Hoy, deducciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`TarjetasInterpretacion.tsx`, `principal/textos.ts`, estados-cuenta, PanelRegistrar) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local (me-alcanza, tandas, respaldo…) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Push `main` si hace falta.
+2. Pantallas con strings sueltos (Movimientos, TarjetaConfirmarTanda chips, etc.).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
