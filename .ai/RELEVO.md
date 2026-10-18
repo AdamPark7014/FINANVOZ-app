@@ -6,27 +6,29 @@
 
 ## Hecho en este turno
 
-- **me-alcanza/index.ts:** barrel exporta `textos.ts` (mismo patrón que Suscripciones).
+- **fix(movil): pulir UI tarjetas** — copy en `textos.ts` (detalle, pago, MSI, confirmar MSI); empty `tarjeta-meses-vacio` / movimientos / estados con `accessibilityLiveRegion`; `Dato` con `etiquetaAccesibleDato`; título `header`; `BTN_CANCELAR` unificado; barrel `index.ts`; pruebas vacío/a11y + `textos.test.ts` (`c7c879b`, oleada previa `5f04619`/`9f2b98b`).
 
 ## Hecho (acumulado reciente)
 
-- CTAs ¿Me alcanza? en `textos.ts`; alias Ayuda/Ajustes; deducciones copy. Ver `git log`.
+- **`696b6c6` principal** — empty Movimientos/Cuentas, chips a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear (estados-cuenta, tarjetas, tandas, respaldo…) — no mezclado.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno (estados-cuenta, PanelRegistrar) — no mezclar.
+- Tests `tarjetas.test.tsx` (Hoy/Cuentas) pueden fallar por testIDs fuera de tarjetas.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP ajeno si Adam lo pide.
+2. Push `main` si hace falta.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
