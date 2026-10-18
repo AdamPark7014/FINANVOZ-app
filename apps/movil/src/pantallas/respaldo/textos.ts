@@ -123,3 +123,5 @@ export const BTN_RESPALDAR_RESTAURAR = 'Respaldar y restaurar';
 
 /** Bienvenida · teléfono nuevo (`02 §19`). */
 export const BTN_ONBOARDING_RESTAURAR = '¿Vienes de otro teléfono? Restaurar respaldo';
+export const PISTA_ONBOARDING_RESTAURAR =
+  'Recupera tus datos desde un respaldo en la nube o un archivo';

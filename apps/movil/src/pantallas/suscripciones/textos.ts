@@ -20,17 +20,7 @@ export function etiquetaAccesibleAyudaSuscripciones(): string {
 
 /** TalkBack: resumen mensual/anual con cifras en palabras (`02 §15`). */
 export function etiquetaAccesibleResumenSuscripciones(textoResumen: string): string {
-  return `Total en suscripciones activas. ${textoResumen.replace(/\$\d[\d,]*(?:\.\d{2})?/g, (cifra) =>
-    cifra
-      .replace(/\$(\d[\d,]*)(?:\.(\d{2}))?/, (_, pesos: string, cent?: string) => {
-        const n = Number(pesos.replace(/,/g, '')) * 100 + Number(cent ?? '0');
-        const entero = Math.floor(n / 100);
-        const resto = n % 100;
-        if (resto === 0) return `${entero} pesos`;
-        return `${entero} pesos con ${resto} centavos`;
-      })
-      .replace(/\$/g, ''),
-  )}`;
+  return `Total en suscripciones activas. ${etiquetaHablada(textoResumen)}`;
 }
 
 /** Sin cargos recurrentes detectados (E14). */

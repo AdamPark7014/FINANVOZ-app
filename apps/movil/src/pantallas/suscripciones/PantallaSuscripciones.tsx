@@ -88,7 +88,11 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         </Texto>
       ) : null}
       {v.textoResumen ? (
-        <Texto variante="cuerpoFuerte" testID="suscripciones-resumen">
+        <Texto
+          variante="cuerpoFuerte"
+          testID="suscripciones-resumen"
+          accessibilityLabel={etiquetaAccesibleResumenSuscripciones(v.textoResumen)}
+        >
           {v.textoResumen}
         </Texto>
       ) : (

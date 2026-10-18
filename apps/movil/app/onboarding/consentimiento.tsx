@@ -13,6 +13,7 @@ import {
   BTN_LEER_AVISO_COMPLETO,
   CASILLA_DATOS_FINANCIEROS,
   CASILLA_ESTADISTICAS_OPCIONAL,
+  PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
   TIP_CONSENTIMIENTO,
@@ -75,6 +76,7 @@ export default function Consentimiento() {
           variante="texto"
           ancho="contenido"
           etiqueta={BTN_LEER_AVISO_COMPLETO}
+          pista={PISTA_LEER_AVISO_COMPLETO}
           alPresionar={() => router.push('/aviso-privacidad')}
         />
       </Tarjeta>

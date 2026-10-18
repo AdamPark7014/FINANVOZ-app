@@ -30,6 +30,7 @@ export const TITULO_CONSENTIMIENTO = 'Tus datos son tuyos';
 export const TITULO_AVISO_SIMPLIFICADO = 'Aviso de privacidad';
 export const BTN_ACEPTAR_CONTINUAR = 'Aceptar y continuar';
 export const BTN_LEER_AVISO_COMPLETO = 'Leer el aviso completo';
+export const PISTA_LEER_AVISO_COMPLETO = 'Abre el aviso de privacidad completo en otra pantalla';
 export const PISTA_MARCAR_CASILLA_DATOS = 'Primero marca la casilla de tus datos financieros';
 export const CASILLA_DATOS_FINANCIEROS =
   'Acepto que Finanvoz guarde y use mis datos financieros para funcionar, como dice el aviso.';

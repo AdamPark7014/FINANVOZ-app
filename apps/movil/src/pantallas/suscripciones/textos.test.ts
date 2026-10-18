@@ -1,5 +1,6 @@
 import {
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,

@@ -295,6 +295,10 @@ describe('recordatorio de cobro', () => {
     });
     expect(n.vecesPedido()).toBe(1);
     expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct'));
+    expect(screen.getByTestId('boton-quitar-recordatorio')).toHaveProp(
+      'accessibilityHint',
+      PISTA_QUITAR_RECORDATORIO,
+    );
     expect(n.puerto.lista()).toEqual([
       expect.objectContaining({
         id: `cobro:${p.caro}`,
@@ -325,6 +329,7 @@ describe('recordatorio de cobro', () => {
       fireEvent.press(screen.getByTestId('recordatorio-cobro-2026-10-12'));
     });
     expect(textoDe('persona-recordatorio-mensaje')).toBe(MENSAJE_PERMISO_AVISOS);
+    expect(screen.getByTestId('persona-recordatorio-mensaje')).toHaveProp('accessibilityRole', 'alert');
     expect(n.puerto.lista()).toEqual([]);
   });
 });

@@ -13,6 +13,7 @@ import {
   PISTA_AYUDA,
   PISTA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
