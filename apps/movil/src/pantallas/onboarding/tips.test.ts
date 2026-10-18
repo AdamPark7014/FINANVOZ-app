@@ -48,18 +48,17 @@ describe('tips de onboarding', () => {
   });
 
   it('TIP_INGRESO_SALTAR menciona «Saltar por ahora» y Ajustes › Ingreso', () => {
-    expect(TIP_INGRESO_SALTAR).toMatch(/Saltar por ahora/);
-    expect(TIP_INGRESO_SALTAR).toMatch(/Ajustes/);
-    expect(TIP_INGRESO_SALTAR).toMatch(/Ingreso/);
+    expect(TIP_INGRESO_SALTAR).toMatch(/«Saltar por ahora»/);
+    expect(TIP_INGRESO_SALTAR).toMatch(/Ajustes › Ingreso/);
   });
 
   it('TIP_CUENTAS_MINIMO menciona «Continuar» y Cuentas', () => {
-    expect(TIP_CUENTAS_MINIMO).toMatch(/Continuar/);
+    expect(TIP_CUENTAS_MINIMO).toMatch(/«Continuar»/);
     expect(TIP_CUENTAS_MINIMO).toMatch(/Cuentas/);
   });
 
   it('TIP_PAGOS_SALTAR menciona «Saltar por ahora»', () => {
-    expect(TIP_PAGOS_SALTAR).toMatch(/Saltar por ahora/);
+    expect(TIP_PAGOS_SALTAR).toMatch(/«Saltar por ahora»/);
     expect(TIP_PAGOS_SALTAR).toMatch(/Hoy/);
   });
 });

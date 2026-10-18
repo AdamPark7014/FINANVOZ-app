@@ -11,7 +11,7 @@ import { useCaptura } from '../../captura/ProveedorCaptura';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { ActivarCaptura } from './ActivarCaptura';
@@ -52,9 +52,12 @@ export function TarjetaArqueo({
       setError(mensajeError(e));
     }
   };
+  const pregunta = `Deberías traer ${exacto} en efectivo. ¿Cuánto traes?`;
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{`Deberías traer ${exacto} en efectivo. ¿Cuánto traes?`}</Texto>
+      <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {pregunta}
+      </Texto>
       {t.conPorAsignar ? (
         <View style={{ gap: espacio.s }}>
           <Texto variante="secundario" tono="secundario">

@@ -43,8 +43,8 @@ describe('textos de estado de cuenta en PDF', () => {
         saldoBanco: 1_402_195,
         saldoCartera: 1_387_195,
         tarjetaId: 'x',
+        nombreTarjeta: 'Oro',
         corte: '2026-10-10',
-        diferencia: 15_000,
       }),
     ).toBe('Según tu banco debes $14,021.95; según Cartera, $13,871.95. ¿Ajusto?');
   });

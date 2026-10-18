@@ -17,9 +17,11 @@ export const TEXTO_PRIVACIDAD =
   'Qué se guarda, qué sale de tu teléfono y a quién, tus permisos, descargar o borrar tus datos.';
 export const BTN_PRIVACIDAD = 'Abrir el centro de privacidad';
 
-export const SECCION_AYUDA = 'Ayuda';
-export const TEXTO_AYUDA = 'Respuestas a las dudas más comunes y nuestro correo de contacto.';
-export const BTN_AYUDA = 'Ver preguntas frecuentes';
+export {
+  BTN_ABRIR_DESDE_AJUSTES as BTN_AYUDA,
+  SECCION_AJUSTES as SECCION_AYUDA,
+  TEXTO_CARD_AJUSTES as TEXTO_AYUDA,
+} from '../ayuda/textos';
 
 export const SECCION_ACERCA = 'Acerca de';
 export const BTN_TERMINOS = 'Leer los términos de uso';

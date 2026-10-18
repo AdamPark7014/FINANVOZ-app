@@ -274,9 +274,7 @@ describe('Tandas (02 §18)', () => {
     fireEvent.press(within(tarjeta).getByTestId('tanda-guardar'));
     const [t] = listarTandas(p.ctx);
     expect(t).toMatchObject({ aportacion: 50_000, participantes: 10, turno: 4 });
-    expect(
-      within(screen.getByTestId('aviso')).getByText(MENSAJE_TANDA_GUARDADA),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(MENSAJE_TANDA_GUARDADA);
   });
 });
 

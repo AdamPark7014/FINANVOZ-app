@@ -1,5 +1,10 @@
 import type { Centavos, PlainDate } from '@cartera/core';
-import { etiquetaDiaMes, type AnalisisEstadoCuenta, type PropuestaConciliacionEstado } from '../../servicios';
+import {
+  etiquetaDiaMes,
+  type AnalisisEstadoCuenta,
+  type PropuestaConciliacionEstado,
+  type RenglonEstado,
+} from '../../servicios';
 import { formatearCentavos } from '../../ui';
 
 /** Botones de la pantalla (`02 §14`: verbo primero). */
@@ -19,7 +24,7 @@ export const TITULO_DUDOSOS = '¿Ya los tenías?';
 export const AVISO_NO_CUADRA =
   'Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.';
 
-export const PISTA_CONTESTAR_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
+export const MENSAJE_FALTAN_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
 
 /** Cuando el PDF cuadra pero no hay renglones nuevos que marcar (`02 §26`). */
 export const TEXTO_SIN_NUEVOS = 'No hay movimientos nuevos que revisar.';

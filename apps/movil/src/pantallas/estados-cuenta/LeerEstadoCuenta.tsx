@@ -13,9 +13,11 @@ import {
   type RenglonEstado,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import {
+  AVISO_NO_CUADRA,
   AYUDA_PDF_ESCANEADO,
   BTN_ABRIR,
   BTN_AJUSTAR,
@@ -27,9 +29,13 @@ import {
   CHIP_MISMO,
   CHIP_OTRO,
   ERROR_CONTRASENA_PDF,
+  ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
+  ETIQUETA_RESUMEN_ESTADO,
   etiquetaBotonTarjeta,
   etiquetaChipsDudoso,
+  etiquetaRenglonEstado,
+  lineaEncabezadoDudoso,
   mensajeAjustado,
   mensajeAnteriorAlAlta,
   mensajeAnteriores,
@@ -42,15 +48,15 @@ import {
   MENSAJE_DEMASIADO_GRANDE,
   MENSAJE_ERROR_GUARDAR,
   MENSAJE_ESCANEADO,
-  MENSAJE_FALTAN_DUDOSOS,
   MENSAJE_INVALIDO,
+  MENSAJE_FALTAN_DUDOSOS,
   MENSAJE_LEYENDO,
-  MENSAJE_NO_CUADRA,
   MENSAJE_NO_DISPONIBLE,
   preguntaConciliacion,
   preguntaElegirTarjeta,
   preguntaMismoMovimiento,
   resumenEstado,
+  TEXTO_SIN_NUEVOS,
   tituloNuevos,
   TITULO_DUDOSOS,
   TITULO_PANTALLA,

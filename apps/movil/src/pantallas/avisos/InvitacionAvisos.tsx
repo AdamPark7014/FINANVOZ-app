@@ -3,6 +3,12 @@ import { listarTarjetas } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Tarjeta, Texto } from '../../ui';
 import { useNotificaciones, type PermisoAvisos } from './notificaciones';
+import {
+  BTN_INVITACION_AVISOS_NO,
+  BTN_INVITACION_AVISOS_SI,
+  CUERPO_INVITACION_AVISOS,
+  TITULO_INVITACION_AVISOS,
+} from './textos';
 
 /** "Ahora no" vale hasta cerrar la app: la invitación vuelve a salir la próxima vez, nunca dos veces seguidas. */
 let descartadaEnSesion = false;
@@ -38,13 +44,12 @@ export function InvitacionAvisos() {
   if (!notificaciones || !hayTarjetas || oculta || permiso !== 'sin_preguntar') return null;
   return (
     <Tarjeta testID="invitacion-avisos">
-      <Texto variante="cuerpoFuerte">¿Te aviso antes de que venzan tus tarjetas?</Texto>
+      <Texto variante="cuerpoFuerte">{TITULO_INVITACION_AVISOS}</Texto>
       <Texto variante="secundario" tono="secundario">
-        Te aviso el día de corte y 3 días antes de la fecha límite, con lo que tienes que pagar para no
-        generar intereses. Los avisos se quedan en tu teléfono.
+        {CUERPO_INVITACION_AVISOS}
       </Texto>
       <Boton
-        etiqueta="Sí, avísame"
+        etiqueta={BTN_INVITACION_AVISOS_SI}
         testID="invitacion-avisos-si"
         alPresionar={() => {
           setOculta(true);
@@ -59,7 +64,7 @@ export function InvitacionAvisos() {
         }}
       />
       <Boton
-        etiqueta="Ahora no"
+        etiqueta={BTN_INVITACION_AVISOS_NO}
         variante="texto"
         testID="invitacion-avisos-no"
         alPresionar={() => {

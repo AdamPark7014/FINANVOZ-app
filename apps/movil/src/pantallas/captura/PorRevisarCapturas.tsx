@@ -14,7 +14,7 @@ import {
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
@@ -166,7 +166,13 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
         {c.monto !== null ? <Cifra centavos={c.monto} contexto={titulo} /> : null}
       </View>
       {c.motivos.map((m) => (
-        <Texto key={m} variante="secundario">
+        <Texto
+          key={m}
+          variante="secundario"
+          {...(m === 'fue_a_meses' || (m === 'sin_categoria' && preguntaCategoria)
+            ? OCULTAR_ETIQUETA_VISIBLE
+            : {})}
+        >
           {MOTIVO[m]}
         </Texto>
       ))}
@@ -184,6 +190,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             }
           }}
           prefijoTestID={`${testID}-meses`}
+          etiqueta={MOTIVO.fue_a_meses}
         />
       ) : null}
       {preguntaCategoria ? (

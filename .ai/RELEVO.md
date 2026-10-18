@@ -32,6 +32,6 @@
 ## Estimación rápida
 
 FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
-�pida
+�pida
 
 FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
