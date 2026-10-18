@@ -154,6 +154,7 @@ describe('CA-M8-02 · Cobrar', () => {
     const compartir = jest.fn(async () => {});
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} compartir={compartir} />);
     expect(textoDe('persona-saldo')).toBe('$300');
+    expect(screen.getByTestId('boton-cobrar')).toHaveProp('accessibilityHint', PISTA_COBRAR);
 
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-cobrar'));

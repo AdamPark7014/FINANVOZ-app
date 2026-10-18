@@ -151,7 +151,12 @@ function Detalle({
 
       {d.saldo > 0 ? (
         <View style={{ gap: espacio.s }}>
-          <Boton etiqueta={ETIQUETA_COBRAR} alPresionar={() => void cobrar()} testID="boton-cobrar" />
+          <Boton
+            etiqueta={ETIQUETA_COBRAR}
+            alPresionar={() => void cobrar()}
+            pista={PISTA_COBRAR}
+            testID="boton-cobrar"
+          />
           <Boton
             etiqueta={ETIQUETA_YA_ME_PAGO}
             variante="secundario"
