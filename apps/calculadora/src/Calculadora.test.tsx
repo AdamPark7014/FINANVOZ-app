@@ -15,13 +15,18 @@ function llenar(ingreso: string, deudas: string, msi: string, precio?: string, m
   escribir(/te llega al mes/i, ingreso);
   escribir(/pagas al mes de deudas/i, deudas);
   escribir(/cuánto es de meses sin intereses/i, msi);
-  if (precio) escribir(/^precio$/i, precio);
+  if (precio) escribir(/cuánto cuesta/i, precio);
   if (meses) fireEvent.change(screen.getByLabelText(/^meses$/i), { target: { value: meses } });
 }
 
 const texto = (prueba: string) => document.querySelector(`[data-prueba="${prueba}"]`)?.textContent ?? '';
 
 describe('Calculadora', () => {
+  it('marca el ingreso como obligatorio para lectores de pantalla', () => {
+    render(<Calculadora />);
+    expect(screen.getByLabelText(/te llega al mes/i).getAttribute('aria-required')).toBe('true');
+  });
+
   it('CA-M0-02 · E10-01: capacidad $1,000, limitante MSI y "Sí cabe" con margen $0', () => {
     render(<Calculadora />);
     llenar('20,000', '3,000', '1,000', '12,000', '12');
@@ -61,6 +66,7 @@ describe('Calculadora', () => {
     expect(campo.getAttribute('aria-invalid')).toBeNull();
     fireEvent.blur(campo);
     expect(screen.getByText(/Escribe solo números/)).toBeTruthy();
+    expect(screen.getByRole('alert').textContent).toMatch(/Escribe solo números/);
     expect(campo.getAttribute('aria-invalid')).toBe('true');
     escribir(/te llega al mes/i, '20,000');
     expect(screen.queryByText(/Escribe solo números/)).toBeNull();

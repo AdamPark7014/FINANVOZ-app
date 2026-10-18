@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Lista de espera (web M0):** correo con `aria-invalid`/`aria-describedby`, foco al fallar validación; éxito con `role="status"`; consentimiento `aria-required`.
+- **Calculadora (web M0):** micro a11y — `aria-required` en ingreso, `role="alert"` en errores, caption de tabla, grupo del veredicto, foco al mostrar resultado; copy «¿Cuánto cuesta?»; test de alerta y obligatorio.
 
 ## Hecho (acumulado reciente)
 
-- TalkBack móvil (deducciones, plan, registrar), copy calculadora. Ver `git log`.
+- Lista espera a11y, TalkBack móvil. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en `apps/calculadora` (`Calculadora.tsx` / test) — no mezclar sin `git status`.
+- WIP paralelo (onboarding, principal, ayuda) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   capacidadEndeudamiento,
   PARAMETROS_CAPACIDAD,
@@ -14,9 +14,10 @@ interface CampoProps {
   onCambio: (v: string) => void;
   onSalir: () => void;
   error?: string | undefined;
+  requerido?: boolean;
 }
 
-function CampoPesos({ etiqueta, ayuda, valor, onCambio, onSalir, error }: CampoProps) {
+function CampoPesos({ etiqueta, ayuda, valor, onCambio, onSalir, error, requerido }: CampoProps) {
   const id = useId();
   const idAyuda = `${id}-ayuda`;
   const idError = `${id}-error`;
@@ -33,18 +34,21 @@ function CampoPesos({ etiqueta, ayuda, valor, onCambio, onSalir, error }: CampoP
         <span aria-hidden="true">$</span>
         <input
           id={id}
+          type="text"
           inputMode="decimal"
+          enterKeyHint="done"
           autoComplete="off"
           placeholder="0"
           value={valor}
           onChange={(e) => onCambio(e.target.value)}
           onBlur={onSalir}
           aria-invalid={error ? true : undefined}
+          aria-required={requerido ? true : undefined}
           aria-describedby={describe}
         />
       </div>
       {error && (
-        <p id={idError} className="error">
+        <p id={idError} className="error" role="alert">
           {error}
         </p>
       )}
@@ -126,6 +130,11 @@ function useRetrasado<T>(valor: T, ms: number): T {
 }
 
 function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; meses: number }) {
+  const refTitulo = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    refTitulo.current?.focus();
+  }, []);
+  const idVeredicto = useId();
   const tope = r.limitante === 'msi' ? r.topeMsi : r.topeDeuda;
   const limitante =
     r.limitante === 'msi'
@@ -134,7 +143,9 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
 
   return (
     <section className="resultado" aria-labelledby="titulo-resultado">
-      <h2 id="titulo-resultado">Tu resultado</h2>
+      <h2 id="titulo-resultado" ref={refTitulo} tabIndex={-1}>
+        Tu resultado
+      </h2>
       <p className="etiqueta">Puedes sumar en pagos al mes</p>
       <p className="cifra" data-prueba="capacidad">
         {formatearPesos(r.capacidadMensual)}
@@ -151,8 +162,15 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
       )}
 
       {r.compra && (
-        <div className={`veredicto ${r.compra.cabe ? 'si' : 'no'}`} data-prueba="veredicto">
-          <p className="veredicto-titulo">{r.compra.cabe ? 'Sí cabe' : 'No cabe'}</p>
+        <div
+          className={`veredicto ${r.compra.cabe ? 'si' : 'no'}`}
+          data-prueba="veredicto"
+          role="group"
+          aria-labelledby={idVeredicto}
+        >
+          <p className="veredicto-titulo" id={idVeredicto}>
+            {r.compra.cabe ? 'Sí cabe' : 'No cabe'}
+          </p>
           <p>
             {`Pagarías ${formatearPesos(r.compra.cuotaMaxima)} al mes durante ${meses} meses. `}
             {r.compra.cabe
@@ -166,6 +184,9 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
 
       <h3>La compra más cara que te cabe, según los meses</h3>
       <table className="plazos">
+        <caption className="solo-lector">
+          Compra más cara que te cabe según los meses sin intereses
+        </caption>
         <thead>
           <tr>
             <th scope="col">Meses</th>
@@ -230,6 +251,7 @@ export function Calculadora() {
           onCambio={cambiar('ingreso', setIngreso)}
           onSalir={salir('ingreso')}
           error={errorVisible('ingreso')}
+          requerido
         />
         <CampoPesos
           etiqueta="¿Cuánto pagas al mes de deudas?"
@@ -249,7 +271,7 @@ export function Calculadora() {
         <fieldset className="compra">
           <legend>¿Quieres revisar una compra? (opcional)</legend>
           <CampoPesos
-            etiqueta="Precio"
+            etiqueta="¿Cuánto cuesta?"
             valor={precio}
             onCambio={cambiar('precio', setPrecio)}
             onSalir={salir('precio')}
