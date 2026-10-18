@@ -25,13 +25,28 @@ import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
 import {
   AYUDA_DATOS_INSUFICIENTES,
+  BTN_CALCULAR,
+  BTN_CAMBIAR_DATOS,
+  BTN_CANCELAR,
+  BTN_CERRAR,
+  BTN_COMO_LO_CALCULE,
+  BTN_DESHACER,
+  BTN_HACER_OTRA_CUENTA,
+  BTN_INTENTAR_DE_NUEVO,
+  BTN_LISTO,
+  BTN_LO_COMPRE,
+  BTN_OCULTAR_COMO_LO_CALCULE,
+  BTN_VER_MOVIMIENTOS,
   ERROR_CALCULO,
   ERROR_MESES,
   ERROR_PRECIO,
   ERROR_RECORDATORIO,
+  MENSAJE_AVISO_RECORDATORIO,
   MENSAJE_CANCELADO,
   MENSAJE_PERMISO_AVISOS,
   MENSAJE_SIN_AVISOS,
+  TEXTO_RECORDATORIO_PROGRAMADO,
+  TEXTO_YA_LO_REGISTRE,
 } from './textos';
 
 /** El cálculo (por omisión `meAlcanza` de servicios); inyectable para pruebas con el resultado de un vector. */

@@ -48,8 +48,8 @@ export function EditarIngreso({
       pie={
         <Boton
           testID="editar-ingreso-guardar"
-          etiqueta="Guardar"
-          pista="Recalculo cuánto puedes gastar con este ingreso"
+          etiqueta={ETIQUETA_GUARDAR}
+          pista={PISTA_GUARDAR}
           deshabilitado={!formulario.completo}
           alPresionar={guardar}
         />
@@ -59,13 +59,13 @@ export function EditarIngreso({
         testID="editar-ingreso-volver"
         variante="texto"
         ancho="contenido"
-        etiqueta="Volver"
-        pista="Sale sin guardar"
+        etiqueta={ETIQUETA_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">Tu ingreso</Texto>
+      <Texto variante="titulo">{TITULO_EDITAR}</Texto>
       <Texto variante="cuerpo" tono="secundario">
-        Con esto calculo cuánto puedes gastar cada día hasta tu próximo pago.
+        {INTRO_EDITAR}
       </Texto>
       <CamposIngreso formulario={formulario} prefijo="editar-ingreso" />
       <MensajeError texto={error} />

@@ -123,7 +123,7 @@ export const espacio = {
   xxxl: 48,
 } as const;
 
-/** Margen lateral de pantalla. */
+/** Margen lateral de pantalla (= `espacio.l`; escala completa en `README.md`). */
 export const margenPantalla = espacio.l;
 
 export const radio = {

@@ -241,17 +241,17 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
           {textoSinCorteDesdeAlta(d.etiquetaProximoCorte)}
         </Texto>
       )}
-      <Dato etiqueta="Fecha límite" valor={d.etiquetaFechaLimite} testID="tarjeta-fecha-limite" />
-      <Dato etiqueta="Próximo corte" valor={d.etiquetaProximoCorte} testID="tarjeta-proximo-corte" />
-      <Dato etiqueta="Disponible" valor={formatearCentavos(d.disponible)} testID="tarjeta-disponible" />
+      <Dato etiqueta={ETIQUETA_FECHA_LIMITE} valor={d.etiquetaFechaLimite} testID="tarjeta-fecha-limite" />
+      <Dato etiqueta={ETIQUETA_PROXIMO_CORTE} valor={d.etiquetaProximoCorte} testID="tarjeta-proximo-corte" />
+      <Dato etiqueta={ETIQUETA_DISPONIBLE} valor={formatearCentavos(d.disponible)} testID="tarjeta-disponible" />
       <Barra
         llenoBp={d.usoBp}
         marcaBp={UMBRAL_USO_BP}
-        etiquetaAccesible={`Usas ${d.usoPorcentaje} % de tu límite`}
+        etiquetaAccesible={etiquetaAccesibleUsoTarjeta(d.usoPorcentaje)}
         testID="tarjeta-barra-uso"
       />
       <Texto variante="secundario" tono="secundario" testID="tarjeta-uso">
-        {`Usas ${d.usoPorcentaje} % de tu límite de ${formatearCentavos(d.limiteCredito)}. La marca es el 30 %.`}
+        {textoUsoLimiteTarjeta(d.usoPorcentaje, formatearCentavos(d.limiteCredito))}
       </Texto>
     </Tarjeta>
   );
@@ -260,15 +260,15 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
 function EstadoCuenta({ e }: { e: EstadoCuentaVista }) {
   return (
     <Tarjeta testID={`estado-${e.corte}`}>
-      <Texto variante="cuerpoFuerte">{`Corte del ${etiquetaDiaMes(e.corte)}`}</Texto>
+      <Texto variante="cuerpoFuerte">{tituloEstadoCuenta(etiquetaDiaMes(e.corte))}</Texto>
       <Dato
-        etiqueta={e.saldoCorte < 0 ? 'Saldo a favor al corte' : 'Lo que debías el día de corte'}
+        etiqueta={etiquetaSaldoAlCorte(e.saldoCorte)}
         valor={formatearCentavos(Math.abs(e.saldoCorte))}
       />
-      <Dato etiqueta="Lo que ya pagaste desde entonces" valor={formatearCentavos(e.pagosPosteriores)} />
-      <Dato etiqueta="Para no generar intereses" valor={formatearCentavos(e.pngi)} />
+      <Dato etiqueta={ETIQUETA_PAGADO_DESDE_CORTE} valor={formatearCentavos(e.pagosPosteriores)} />
+      <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(e.pngi)} />
       <Texto variante="secundario" tono="secundario">
-        {`Fecha límite: ${etiquetaDiaMes(e.limite)}`}
+        {textoFechaLimiteEstado(etiquetaDiaMes(e.limite))}
       </Texto>
     </Tarjeta>
   );

@@ -148,20 +148,20 @@ export default function Ajustes() {
       </Tarjeta>
 
       <Tarjeta testID="ajustes-ayuda">
-        <Texto variante="subtitulo">Ayuda</Texto>
+        <Texto variante="subtitulo">{SECCION_AYUDA}</Texto>
         <Texto variante="secundario" tono="secundario">
-          Respuestas a las dudas más comunes y nuestro correo de contacto.
+          {TEXTO_AYUDA}
         </Texto>
         <Boton
           testID="ajustes-abrir-ayuda"
           variante="secundario"
-          etiqueta="Ver preguntas frecuentes"
+          etiqueta={BTN_AYUDA}
           alPresionar={() => router.push('/ayuda')}
         />
       </Tarjeta>
 
       <Tarjeta testID="ajustes-acerca">
-        <Texto variante="subtitulo">Acerca de</Texto>
+        <Texto variante="subtitulo">{SECCION_ACERCA}</Texto>
         <Texto variante="secundario" tono="secundario">
           {TEXTO_NO_ASESORIA}
         </Texto>

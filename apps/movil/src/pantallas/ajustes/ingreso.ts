@@ -98,18 +98,9 @@ function cuando(regla: Regla): string {
 
 /** "Te pagan $13,000 cada quincena, el 15 y el último día del mes. Tu próximo pago: jue 15." */
 export function resumenIngreso(vista: VistaIngreso, hoy: PlainDate): string {
-  if (vista.ingresoVariable) return 'Tu ingreso varía: reparto tu dinero libre en 30 días.';
+  if (vista.ingresoVariable) return RESUMEN_INGRESO_VARIABLE;
   const ingreso = vista.ingreso;
-  if (!ingreso) return 'Todavía no me dices cada cuándo te pagan.';
-  const frase = `Te pagan ${formatearCentavos(ingreso.monto)} ${cuando(ingreso.regla)}.`;
+  if (!ingreso) return RESUMEN_SIN_INGRESO;
   const proximo = proximoPago(ingreso.regla, hoy);
-  return proximo ? `${frase} Tu próximo pago: ${etiquetaFecha(proximo)}.` : frase;
-}
-
-/** Confirmación al guardar (`02 §14`: sin signos de exclamación). */
-export function mensajeIngresoGuardado(variable: boolean, proximo: PlainDate | null): string {
-  if (variable) return 'Listo: como tu ingreso varía, reparto tu dinero libre en 30 días.';
-  return proximo
-    ? `Listo: guardé tu ingreso. Tu próximo pago es el ${etiquetaFecha(proximo)}.`
-    : 'Listo: guardé tu ingreso.';
+  return lineaResumenIngreso(ingreso.monto, cuando(ingreso.regla), proximo);
 }

@@ -145,7 +145,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               <Boton
                 testID="restaurar-elegir"
                 variante={nube ? 'secundario' : 'primario'}
-                etiqueta={nube ? 'Desde un archivo' : 'Elegir archivo'}
+                etiqueta={nube ? BTN_DESDE_ARCHIVO : BTN_ELEGIR_ARCHIVO}
                 cargando={trabajando}
                 deshabilitado={trabajando}
                 alPresionar={() => void elegir()}
@@ -154,11 +154,11 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
           ) : paso.tipo === 'nube' ? (
             <>
               <Texto variante="secundario" tono="secundario">
-                Escribe el correo de tu cuenta de respaldo. Te mando un código para entrar.
+                {TEXTO_CORREO_RESTAURAR}
               </Texto>
               {trabajando ? (
                 <Texto variante="cuerpo" tono="secundario" testID="restaurar-bajando">
-                  Bajando tu respaldo…
+                  {TEXTO_BAJANDO}
                 </Texto>
               ) : nube ? (
                 <FlujoCorreo cuenta={nube.cuenta} soloEntrar alConfirmar={(r) => void bajar(r)} />

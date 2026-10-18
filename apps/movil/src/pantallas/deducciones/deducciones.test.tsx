@@ -92,7 +92,8 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
       ctx,
       <ImportarCompartidas leer={async () => []} alVerDeducciones={jest.fn()} />,
     );
-    expect(screen.getByTestId('importar-vacio')).toHaveTextContent(TEXTO_IMPORTAR_VACIO);
+    expect(await screen.findByTestId('importar-vacio')).toBeTruthy();
+    expect(textoDe('importar-vacio')).toBe(TEXTO_IMPORTAR_VACIO);
     r.unmount();
     renderConSesion(
       ctx,
@@ -109,7 +110,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar();
     renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
     llenarPerfil('PEPJ800101AB1', '300,000');
-    expect(screen.getByTestId('deducciones-sin-facturas')).toHaveTextContent(TEXTO_FACTURAS_VACIO);
+    expect(textoDe('deducciones-sin-facturas')).toBe(TEXTO_FACTURAS_VACIO);
     expect(screen.queryByTestId(/^factura-/)).toBeNull();
   });
 

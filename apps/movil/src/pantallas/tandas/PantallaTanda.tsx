@@ -228,16 +228,16 @@ function Ajustes({
       <Tarjeta testID="tanda-editar">
         <CampoTexto
           testID="tanda-editar-nombre"
-          etiqueta="Nombre"
+          etiqueta={ETIQUETA_NOMBRE}
           valor={nombre}
           alCambiar={setNombre}
         />
         {cuentas.length > 0 ? (
           <Chips
             testID="tanda-editar-cuenta"
-            etiqueta="¿De qué cuenta sale la aportación?"
+            etiqueta={ETIQUETA_CUENTA_APORTACION}
             opciones={[
-              { valor: '', etiqueta: 'Pregúntame cada vez' },
+              { valor: '', etiqueta: ETIQUETA_CUENTA_PREGUNTAR },
               ...cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre })),
             ]}
             valor={cuentaId ?? ''}
@@ -245,7 +245,7 @@ function Ajustes({
           />
         ) : (
           <ElegirCuentaTanda
-            pregunta="¿De qué cuenta sale la aportación?"
+            pregunta={ETIQUETA_CUENTA_APORTACION}
             alElegir={(id) => setCuentaId(id)}
             prefijoTestID="tanda-editar-cuenta"
           />

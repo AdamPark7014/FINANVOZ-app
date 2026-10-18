@@ -14,7 +14,7 @@ import {
   sincronizarRecordatoriosCobro,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';

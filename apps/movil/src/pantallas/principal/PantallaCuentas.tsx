@@ -322,7 +322,11 @@ function TarjetaCredito({ d, t, alAbrir }: { d: CuentaDebes; t: TarjetaVista | n
             {aFavor ? 'Saldo a favor' : 'Tarjeta de crédito'}
           </Texto>
         </View>
-        <Cifra centavos={aFavor ? -d.saldo : d.saldo} contexto={d.nombre} testID={`cuenta-${d.id}-saldo`} />
+        <Cifra
+          centavos={aFavor ? -d.saldo : d.saldo}
+          contexto={contextoSaldoTarjeta(d.nombre, aFavor)}
+          testID={`cuenta-${d.id}-saldo`}
+        />
       </View>
       {d.meses > 0 ? (
         <Texto variante="secundario" testID={`cuenta-${d.id}-meses`}>
@@ -381,7 +385,11 @@ function PersonaDebes({
             Le debes
           </Texto>
         </View>
-        <Cifra centavos={d.saldo} contexto={`Le debes a ${d.nombre}`} testID={`cuenta-${d.id}-saldo`} />
+        <Cifra
+          centavos={d.saldo}
+          contexto={contextoSaldoLeDebes(d.nombre)}
+          testID={`cuenta-${d.id}-saldo`}
+        />
       </View>
       {alAbrirPersona ? (
         <Boton
