@@ -3,11 +3,14 @@
 export const SECCION_WIDGET = 'Widget';
 
 export const TEXTO_INSTRUCCION =
-  'Agrégalo desde la pantalla de inicio de tu teléfono: deja presionado un espacio vacío y busca Finanvoz.';
+  'En la pantalla de inicio mantén presionado un espacio vacío, elige Widgets y busca Finanvoz.';
 
 export const ETIQUETA_PREVIA = 'Vista previa';
+
+/** TalkBack en la vista previa de Ajustes (cifras fijas e4-01, no el libro del usuario). */
+export const PISTA_PREVIA = 'Cifras de ejemplo; no muestra tu saldo real.';
 
 export const ETIQUETA_OCULTAR = 'Ocultar montos';
 
 export const DESC_OCULTAR =
-  'El widget dice “Toca para ver tu día” en lugar de cuánto puedes gastar.';
+  'En el widget verás “Toca para ver tu día” en lugar del monto.';

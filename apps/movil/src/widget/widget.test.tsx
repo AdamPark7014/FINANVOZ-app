@@ -45,6 +45,22 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     expect(screen.getByText('$214')).toBeTruthy();
     expect(screen.getByText('· 4 días')).toBeTruthy();
   });
+
+  it('anuncia una etiqueta hablada y oculta los textos internos para TalkBack', () => {
+    render(
+      <PreviaWidget
+        vista={VISTA_EJEMPLO_WIDGET}
+        esquema="claro"
+        pistaAccesible="Cifras de ejemplo; no muestra tu saldo real."
+      />,
+    );
+    const previa = screen.getByTestId('previa-widget');
+    expect(previa.props.accessibilityRole).toBe('summary');
+    expect(previa.props.accessibilityLabel).toBe('Hoy puedes doscientos catorce pesos · 4 días');
+    expect(previa.props.accessibilityHint).toBe('Cifras de ejemplo; no muestra tu saldo real.');
+    const fila = screen.getByText('Hoy puedes').parent;
+    expect(fila?.props.importantForAccessibility).toBe('no-hide-descendants');
+  });
 });
 
 describe('WidgetHoy (componente del widget)', () => {

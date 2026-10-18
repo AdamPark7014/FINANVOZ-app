@@ -13,20 +13,38 @@ export const VISTA_EJEMPLO_WIDGET = construirVistaWidget(
  * Vista previa en la app (Ajustes → Widget): imita el widget del lanzador con componentes RN,
  * no el árbol `react-native-android-widget`.
  */
-export function PreviaWidget({ vista, esquema }: { vista: VistaWidget; esquema: EsquemaColor }) {
+export function PreviaWidget({
+  vista,
+  esquema,
+  pistaAccesible,
+}: {
+  vista: VistaWidget;
+  esquema: EsquemaColor;
+  /** Hint TalkBack (p. ej. que la vista previa usa cifras fijas). */
+  pistaAccesible?: string;
+}) {
   const c = colores[esquema];
   const conCifra = vista.cifra !== null && vista.titulo !== null && vista.detalle !== null;
   const tamCifra = vista.cifra ? tamanoFuenteCifra(vista.cifra) : 22;
   return (
     <View
+      testID="previa-widget"
       accessibilityRole="summary"
       accessibilityLabel={etiquetaAccesibleWidget(vista)}
+      {...(pistaAccesible ? { accessibilityHint: pistaAccesible } : {})}
       style={[estilos.contenedor, { backgroundColor: c.superficie, borderColor: c.borde }]}
     >
       {conCifra ? (
-        <View style={estilos.fila}>
-          <Text style={[estilos.titulo, { color: c.texto }]}>{vista.titulo}</Text>
+        <View
+          style={estilos.fila}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden
+        >
+          <Text importantForAccessibility="no" style={[estilos.titulo, { color: c.texto }]}>
+            {vista.titulo}
+          </Text>
           <Text
+            importantForAccessibility="no"
             style={[
               estilos.cifra,
               {
@@ -39,12 +57,17 @@ export function PreviaWidget({ vista, esquema }: { vista: VistaWidget; esquema: 
           >
             {vista.cifra}
           </Text>
-          <Text style={[estilos.detalle, { color: c.textoSecundario }]}>
+          <Text importantForAccessibility="no" style={[estilos.detalle, { color: c.textoSecundario }]}>
             {detalleConSeparador(vista.detalle)}
           </Text>
         </View>
       ) : (
-        <Text style={[estilos.titulo, { color: c.texto }]} numberOfLines={2}>
+        <Text
+          importantForAccessibility="no"
+          accessibilityElementsHidden
+          style={[estilos.titulo, { color: c.texto }]}
+          numberOfLines={2}
+        >
           {vista.texto}
         </Text>
       )}

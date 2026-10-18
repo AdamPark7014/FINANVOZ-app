@@ -270,7 +270,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
       {opcion === 'cuenta' ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaCual}
+            {PREGUNTA_A_CUAL}
           </Texto>
           <GrupoChips
             opciones={[
@@ -279,7 +279,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
                 etiqueta: `${e.cuenta} · ${etiquetaFecha(e.fecha)}`,
               })),
               ...cuentas.map((c) => ({ valor: `c:${c.id}`, etiqueta: c.nombre })),
-              { valor: 'externa', etiqueta: 'Una que no llevo aquí' },
+              { valor: 'externa', etiqueta: ETIQUETA_CUENTA_EXTERNA },
             ]}
             valor={null}
             alCambiar={(v) => {
@@ -289,35 +289,35 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
                   : v.startsWith('e:')
                     ? { destino: 'entrada', capturaId: v.slice(2) }
                     : { destino: 'cuenta', cuentaId: v.slice(2) };
-              contestar(r, 'Listo: lo cuento como un movimiento entre tus cuentas.');
+              contestar(r, AVISO_SALIDA_ENTRE_CUENTAS);
             }}
             prefijoTestID={`${testID}-destino`}
-            etiqueta={preguntaCual}
+            etiqueta={PREGUNTA_A_CUAL}
           />
         </View>
       ) : null}
       {opcion === 'prestamo' ? (
         <ElegirPersona
           testID={testID}
-          pregunta="¿A quién le prestaste?"
+          pregunta={PREGUNTA_A_QUIEN_PRESTASTE}
           alElegir={(personaId) =>
-            contestar({ destino: 'prestamo', personaId }, 'Listo: lo anoté como un préstamo.')
+            contestar({ destino: 'prestamo', personaId }, AVISO_SALIDA_PRESTAMO)
           }
         />
       ) : null}
       {opcion === 'gasto' ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaGasto}
+            {PREGUNTA_QUE_PAGASTE}
           </Texto>
           <GrupoChips
             opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
             valor={null}
             alCambiar={(categoria) =>
-              contestar({ destino: 'gasto', categoria }, 'Listo: lo anoté como un gasto.')
+              contestar({ destino: 'gasto', categoria }, AVISO_SALIDA_GASTO)
             }
             prefijoTestID={`${testID}-categoria`}
-            etiqueta={preguntaGasto}
+            etiqueta={PREGUNTA_QUE_PAGASTE}
           />
         </View>
       ) : null}
@@ -336,25 +336,23 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
   const cuentas = useCuentasPropias(p.tarjeta);
   const contestar = (r: RespuestaPago, mensaje: string) =>
     responder(() => responderPagoSinOrigen(ctx, p.capturaId, r), mensaje);
-  const titulo = `¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`;
-  const preguntaCual = '¿De cuál?';
-  const preguntaDebe = '¿Se lo tienes que pagar?';
+  const titulo = tituloPagoSinOrigen(p.monto, p.tarjeta);
   return (
     <Marco
       testID={testID}
       titulo={titulo}
-      detalle={`Llegó el ${etiquetaFecha(p.fecha)} y no vi de qué cuenta salió.`}
+      detalle={detallePagoSinOrigen(etiquetaFecha(p.fecha))}
       error={error}
     >
       <GrupoChips
         opciones={[
-          { valor: 'cuenta', etiqueta: 'De una de mis cuentas' },
-          { valor: 'externa', etiqueta: 'De una cuenta que no llevo aquí' },
-          { valor: 'alguien', etiqueta: 'Alguien más la pagó' },
+          { valor: 'cuenta', etiqueta: ETIQUETA_PAGO_CUENTA },
+          { valor: 'externa', etiqueta: ETIQUETA_PAGO_EXTERNA },
+          { valor: 'alguien', etiqueta: ETIQUETA_PAGO_ALGUIEN },
         ]}
         valor={opcion}
         alCambiar={(o) => {
-          if (o === 'externa') contestar({ origen: 'externa' }, 'Listo: registré el pago de tu tarjeta.');
+          if (o === 'externa') contestar({ origen: 'externa' }, AVISO_PAGO_TARJETA);
           else setOpcion(o);
         }}
         prefijoTestID={testID}
