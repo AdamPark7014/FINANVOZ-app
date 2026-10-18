@@ -4,6 +4,7 @@ import { IconoPestana, ProveedorAvisos } from '../../src/pantallas/principal';
 import { barraPestanas, estiloBarraPestanas, useTema } from '../../src/ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
+  ROL_ACCESIBILIDAD_BOTON_PESTANA,
   testIdBotonPestana,
   type RutaPestanaVisible,
 } from './pestanas-textos';

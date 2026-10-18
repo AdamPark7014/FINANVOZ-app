@@ -166,7 +166,13 @@ export function PasoOnboarding({
 export function MensajeError({ texto }: { texto: string | null }) {
   if (!texto) return null;
   return (
-    <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite" testID="error-formulario">
+    <Texto
+      variante="secundario"
+      tono="faltante"
+      accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
+      testID="error-formulario"
+    >
       {texto}
     </Texto>
   );

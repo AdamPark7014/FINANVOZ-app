@@ -83,6 +83,7 @@ describe('pantalla del plan', () => {
   it('Volver anuncia pista para cerrar la pantalla', () => {
     const p = e510();
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />);
+    expect(screen.getByTestId(ID.tituloPantalla)).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId(ID.volver)).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 

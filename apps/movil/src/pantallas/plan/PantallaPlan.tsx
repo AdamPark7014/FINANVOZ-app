@@ -115,7 +115,9 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
         pista={PISTA_VOLVER}
         testID={ID.volver}
       />
-      <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
+      <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
+        {TITULO_PANTALLA}
+      </Texto>
 
       <Tarjeta testID={ID.actual}>
         <Texto variante="subtitulo" testID={ID.titulo}>

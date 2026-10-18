@@ -1,3 +1,5 @@
+import type { ViewProps } from 'react-native';
+
 /** Copy es-MX, testID y TalkBack de la barra y rutas del grupo `(tabs)` (02-UX §2, §15). */
 
 export const ETIQUETA_ACCESIBILIDAD_PESTANA = {
@@ -7,6 +9,9 @@ export const ETIQUETA_ACCESIBILIDAD_PESTANA = {
 } as const;
 
 export type RutaPestanaVisible = keyof typeof ETIQUETA_ACCESIBILIDAD_PESTANA;
+
+/** Rol TalkBack de cada botón en la barra inferior (no confundir con el contenedor de la pantalla). */
+export const ROL_ACCESIBILIDAD_BOTON_PESTANA = 'tab' as const;
 
 /** Botones de la barra inferior (Maestro: `pestana-hoy`, etc.). */
 export function testIdBotonPestana(ruta: RutaPestanaVisible): `pestana-${RutaPestanaVisible}` {
@@ -23,3 +28,20 @@ export const TEST_ID_PANTALLA_PESTANA = {
 export const TEST_ID_PANTALLA_REGISTRAR = 'tab-registrar';
 
 export const ETIQUETA_ACCESIBILIDAD_REGISTRAR = 'Registrar gasto o ingreso';
+
+/** Props de accesibilidad del `View` raíz de cada ruta de pestaña (misma etiqueta que el botón activo). */
+export function propsContenedorPestana(
+  ruta: RutaPestanaVisible,
+): Pick<ViewProps, 'testID' | 'accessibilityLabel'> {
+  return {
+    testID: TEST_ID_PANTALLA_PESTANA[ruta],
+    accessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta],
+  };
+}
+
+export function propsContenedorRegistrar(): Pick<ViewProps, 'testID' | 'accessibilityLabel'> {
+  return {
+    testID: TEST_ID_PANTALLA_REGISTRAR,
+    accessibilityLabel: ETIQUETA_ACCESIBILIDAD_REGISTRAR,
+  };
+}

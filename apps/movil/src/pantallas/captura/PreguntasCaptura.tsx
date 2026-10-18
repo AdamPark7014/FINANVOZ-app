@@ -21,7 +21,7 @@ import {
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
@@ -537,27 +537,32 @@ function FormularioCuentaCaptura({
   const [saldo, setSaldo] = useState<Centavos | null>(null);
   const [error, setError] = useState<string | null>(null);
   const guardar = () => {
-    if (nombre.trim() === '') return setError('Ponle un nombre a la cuenta.');
-    if (saldo === null) return setError('Escribe cuánto tiene la cuenta hoy.');
+    if (nombre.trim() === '') return setError(ERROR_NOMBRE_CUENTA);
+    if (saldo === null) return setError(ERROR_SALDO_CUENTA);
     try {
       agregarCuentaDesdeCaptura(ctx, p.capturaId, { nombre: nombre.trim(), saldoHoy: saldo });
       alGuardar();
     } catch {
-      setError('No pude guardar eso. Revisa los datos e intenta de nuevo.');
+      setError(ERROR_GUARDAR_CUENTA);
     }
   };
   return (
     <View style={{ gap: espacio.s }} testID={testID}>
-      <CampoTexto etiqueta="Nombre" valor={nombre} alCambiar={setNombre} testID={`${testID}-nombre`} />
+      <CampoTexto
+        etiqueta={ETIQUETA_NOMBRE_CUENTA}
+        valor={nombre}
+        alCambiar={setNombre}
+        testID={`${testID}-nombre`}
+      />
       <CampoMonto
-        etiqueta="¿Cuánto tiene hoy?"
-        ayuda="El saldo que ves hoy en tu app; ya incluye este movimiento."
+        etiqueta={ETIQUETA_SALDO_HOY}
+        ayuda={AYUDA_SALDO_HOY}
         alCambiar={setSaldo}
         testID={`${testID}-saldo`}
       />
       <Fallo texto={error} />
-      <Boton etiqueta="Guardar cuenta" alPresionar={guardar} testID={`${testID}-guardar`} />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} />
+      <Boton etiqueta={BTN_GUARDAR_CUENTA} alPresionar={guardar} testID={`${testID}-guardar`} />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
     </View>
   );
 }
@@ -567,30 +572,30 @@ function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) 
   const { ctx } = useSesion();
   const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
-  const que = p.dictado.descripcion ? `«${p.dictado.descripcion}»` : 'lo que anotaste';
+  const que = descripcionDuplicado(p.dictado.descripcion);
   return (
     <Marco
       testID={testID}
-      titulo={`¿Es lo mismo que ${que} del ${etiquetaFecha(p.dictado.fecha)}?`}
-      detalle={`Tu banco avisó de ${formatearCentavos(p.monto)} el ${etiquetaFecha(p.fecha)}; anotaste ${formatearCentavos(p.dictado.monto)}.`}
+      titulo={tituloDuplicado(que, etiquetaFecha(p.dictado.fecha))}
+      detalle={detalleDuplicado(p.monto, etiquetaFecha(p.fecha), p.dictado.monto)}
       error={error}
     >
       <Boton
-        etiqueta="Sí, es el mismo"
+        etiqueta={BTN_SI_ES_MISMO}
         alPresionar={() =>
-          responder(() => responderDuplicado(ctx, p.capturaId, 'mismo'), 'Listo: lo dejé una sola vez.')
+          responder(() => responderDuplicado(ctx, p.capturaId, 'mismo'), AVISO_DUPLICADO_MISMO)
         }
         testID={`${testID}-mismo`}
       />
       <Boton
-        etiqueta="No, es otro"
+        etiqueta={BTN_NO_ES_OTRO}
         variante="secundario"
         alPresionar={() =>
           responder(() => {
             responderDuplicado(ctx, p.capturaId, 'otro');
             // La captura lo emparejó con lo que dictaste y era otro movimiento.
             registrarEvento({ nombre: 'correccion', propiedades: { campo: 'otro' } });
-          }, 'Listo: lo registré aparte.')
+          }, AVISO_DUPLICADO_OTRO)
         }
         testID={`${testID}-otro`}
       />
@@ -604,24 +609,23 @@ function FueAMeses({ p, testID }: { p: Pregunta<'fue_a_meses'>; testID: string }
   const avisarRegistro = useAvisoRegistro();
   const { responder, error } = useResponder();
   const [errorMeses, setErrorMeses] = useState<string | null>(null);
-  const que = p.comercio ? `${p.comercio} ` : '';
-  const titulo = '¿Fue a meses?';
+  const prefijoComercio = p.comercio ? `${p.comercio} ` : '';
   return (
     <Marco
       testID={testID}
-      titulo={titulo}
-      detalle={`${que}${formatearCentavos(p.monto)} con tu ${p.tarjeta} · ${etiquetaFecha(p.fecha)}`}
+      titulo={TITULO_FUE_A_MESES}
+      detalle={detalleFueAMeses(prefijoComercio, p.monto, p.tarjeta, etiquetaFecha(p.fecha))}
       error={error ?? errorMeses}
     >
       <GrupoChips
         opciones={[
-          ...MESES_CAPTURA.map((n) => ({ valor: n as string, etiqueta: `${n} meses` })),
-          { valor: 'no', etiqueta: 'No' },
+          ...MESES_CAPTURA.map((n) => ({ valor: n as string, etiqueta: etiquetaMesesChip(n) })),
+          { valor: 'no', etiqueta: ETIQUETA_MSI_NO },
         ]}
         valor={null}
         alCambiar={(v) => {
           if (v === 'no') {
-            responder(() => confirmarCaptura(ctx, p.capturaId), 'Va. Lo dejo como cargo normal.');
+            responder(() => confirmarCaptura(ctx, p.capturaId), AVISO_MSI_NO);
             return;
           }
           try {

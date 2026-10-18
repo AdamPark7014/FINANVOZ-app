@@ -11,6 +11,7 @@ import {
   PISTA_MARCAR_CASILLA_DATOS,
   TITULO_BIENVENIDA,
   TITULO_CONSENTIMIENTO,
+  TITULO_INGRESO,
   textoProgresoOnboarding,
 } from './textos';
 
@@ -26,6 +27,7 @@ describe('textos de onboarding', () => {
       CASILLA_DATOS_FINANCIEROS,
       CASILLA_ESTADISTICAS_OPCIONAL,
       PISTA_MARCAR_CASILLA_DATOS,
+      TITULO_INGRESO,
     ]) {
       expect(texto).not.toMatch(/!/);
       expect(texto).not.toMatch(/por favor/i);

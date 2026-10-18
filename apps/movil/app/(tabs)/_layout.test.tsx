@@ -6,10 +6,10 @@ import { TEST_ID_PANTALLA_REGISTRAR, testIdBotonPestana } from './pestanas-texto
 
 const RUTAS = {
   '(tabs)/_layout': LayoutPestanas,
-  '(tabs)/hoy': () => <Text testID="pantalla-hoy">Hoy</Text>,
-  '(tabs)/movimientos': () => <Text testID="pantalla-movimientos">Movimientos</Text>,
-  '(tabs)/cuentas': () => <Text testID="pantalla-cuentas">Cuentas</Text>,
-  '(tabs)/registrar': () => <Text testID="pantalla-registrar">Registrar</Text>,
+  '(tabs)/hoy': () => <Text testID="pantalla-hoy">Resumen del día</Text>,
+  '(tabs)/movimientos': () => <Text testID="pantalla-movimientos">Lista de movimientos</Text>,
+  '(tabs)/cuentas': () => <Text testID="pantalla-cuentas">Tus cuentas</Text>,
+  '(tabs)/registrar': () => <Text testID="pantalla-registrar">Formulario registrar</Text>,
 };
 
 describe('LayoutPestanas', () => {

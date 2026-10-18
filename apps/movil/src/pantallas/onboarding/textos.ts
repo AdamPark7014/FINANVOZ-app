@@ -25,6 +25,9 @@ export const CASILLA_DATOS_FINANCIEROS =
 export const CASILLA_ESTADISTICAS_OPCIONAL =
   'Compartir estadísticas anónimas de uso para mejorar la app (opcional).';
 
+/** O3 · Ingreso */
+export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
+
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
   return `Paso ${paso} de ${total}`;

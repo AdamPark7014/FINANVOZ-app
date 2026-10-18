@@ -8,6 +8,7 @@ import {
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
 import { TIP_INGRESO_SALTAR } from '../../src/pantallas/onboarding/tips';
+import { BTN_ONB_CONTINUAR, TITULO_INGRESO } from '../../src/pantallas/onboarding/textos';
 import {
   conceptoIngreso,
   leerDiaMes,
@@ -74,13 +75,13 @@ export default function Ingreso() {
     <PasoOnboarding
       testID="onb-ingreso"
       paso={3}
-      titulo="¿Cada cuándo te pagan?"
+      titulo={TITULO_INGRESO}
       tip={TIP_INGRESO_SALTAR}
       pie={
         <>
           <Boton
             testID="onb-ingreso-continuar"
-            etiqueta="Continuar"
+            etiqueta={BTN_ONB_CONTINUAR}
             deshabilitado={!completo}
             alPresionar={guardar}
           />
