@@ -26,6 +26,8 @@ import {
   type VistaMeAlcanza,
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
+import { etiquetaHablada } from '../../ui/formato';
+import { mensajeCompraMsi } from '../tarjetas/textos';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import {
   notificacionesEnMemoria,
@@ -378,9 +380,16 @@ describe('¿Me alcanza?', () => {
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
-    expect(
-      within(aviso).getByLabelText(etiquetaHablada('Registré: Unos tenis $1,500 a 3 meses con la Nu')),
-    ).toBeTruthy();
+    const plan = listarPlanesMsi(p.ctx, p.nu)[0];
+    if (!plan) throw new Error('sin plan MSI');
+    const msgMsi = mensajeCompraMsi({
+      descripcion: 'unos tenis',
+      monto: 150_000,
+      meses: 3,
+      tarjeta: 'Nu ••4410',
+      cuotas: plan.cuotas,
+    });
+    expect(within(aviso).getByLabelText(etiquetaHablada(msgMsi.split('\n')[0] ?? msgMsi))).toBeTruthy();
 
     fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
@@ -390,10 +399,12 @@ describe('¿Me alcanza?', () => {
     const antes = listarMovimientos(p.ctx).flatMap((d) => d.movimientos).length;
     fireEvent.press(screen.getByTestId('lo-compre-contado_hoy'));
     expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Unos tenis de $1,500 · por asignar'),
+      within(screen.getByTestId('aviso')).getByLabelText(
+        etiquetaHablada('Registré: Unos tenis de $1,500 · por asignar'),
+      ),
     ).toBeTruthy();
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes + 1);
-    fireEvent.press(within(screen.getByTestId('aviso')).getByText('Deshacer'));
+    fireEvent.press(within(screen.getByTestId('aviso')).getByRole('button', { name: BTN_DESHACER }));
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes);
   });
 

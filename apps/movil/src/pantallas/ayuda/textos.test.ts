@@ -7,6 +7,8 @@ import {
   ICONO_PREGUNTA_CERRADA,
   INTRO,
   SECCION_AJUSTES,
+  SECCION_AYUDA,
+  TEXTO_AYUDA,
   TEXTO_CARD_AJUSTES,
   TITULO,
   mensajeSinAppCorreo,
@@ -19,6 +21,9 @@ describe('textos de ayuda', () => {
     expect(SECCION_AJUSTES).toBe(TITULO);
     expect(TEXTO_CARD_AJUSTES).toMatch(/correo de contacto/);
     expect(BTN_ABRIR_DESDE_AJUSTES).toMatch(/preguntas frecuentes/i);
+    expect(SECCION_AYUDA).toBe(SECCION_AJUSTES);
+    expect(TEXTO_AYUDA).toBe(TEXTO_CARD_AJUSTES);
+    expect(BTN_AYUDA).toBe(BTN_ABRIR_DESDE_AJUSTES);
     expect(INTRO).toMatch(/Toca una pregunta/);
   });
 

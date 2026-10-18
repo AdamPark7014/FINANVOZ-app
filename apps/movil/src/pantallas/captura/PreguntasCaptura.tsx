@@ -321,7 +321,9 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
       ) : null}
       {opcion === 'alguien' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario">¿Se lo tienes que pagar?</Texto>
+          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaDebe}
+          </Texto>
           <GrupoChips
             opciones={[
               { valor: 'si', etiqueta: 'Sí, se lo debo' },
@@ -333,6 +335,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
               else setDebe(v);
             }}
             prefijoTestID={`${testID}-debe`}
+            etiqueta={preguntaDebe}
           />
           {debe === 'si' ? (
             <ElegirPersona
@@ -364,6 +367,7 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
     : `Llegó un aviso de ${p.banco}. ¿En qué cuenta fue?`;
   const asociar = (cuentaId: string) =>
     responder(() => asociarCuentaCaptura(ctx, p.capturaId, cuentaId), 'Listo: ya sé de qué cuenta es.');
+  const preguntaCandidatas = '¿Es alguna de estas?';
   return (
     <Marco
       testID={testID}
@@ -391,13 +395,23 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
         <>
           {p.candidatas.length > 0 ? (
             <View style={{ gap: espacio.xs }}>
-              <Texto variante="secundario">¿Es alguna de estas?</Texto>
+              {(() => {
+                const preguntaCandidatas = '¿Es alguna de estas?';
+                return (
+                  <>
+              <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+                {preguntaCandidatas}
+              </Texto>
               <GrupoChips
                 opciones={p.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
                 valor={null}
                 alCambiar={asociar}
                 prefijoTestID={`${testID}-cuenta`}
+                etiqueta={preguntaCandidatas}
               />
+                  </>
+                );
+              })()}
             </View>
           ) : null}
           <Boton

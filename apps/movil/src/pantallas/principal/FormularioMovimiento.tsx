@@ -272,11 +272,7 @@ export function FormularioMovimiento({
         ) : null}
         {campos.origen ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto
-              variante="etiqueta"
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            >
+            <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.origen.pregunta}
             </Texto>
             <GrupoChips
@@ -295,11 +291,7 @@ export function FormularioMovimiento({
         ) : null}
         {campos.destino ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto
-              variante="etiqueta"
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            >
+            <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.destino.pregunta}
             </Texto>
             <GrupoChips

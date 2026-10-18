@@ -248,7 +248,9 @@ function PedirContrasena({
   };
   return (
     <>
-      <Texto variante="cuerpo">{MENSAJE_CONTRASENA}</Texto>
+      <Texto variante="cuerpo" testID="estado-contrasena-aviso" accessibilityLiveRegion="polite">
+        {MENSAJE_CONTRASENA}
+      </Texto>
       <CampoTexto
         etiqueta={ETIQUETA_CONTRASENA_PDF}
         valor={contrasena}
