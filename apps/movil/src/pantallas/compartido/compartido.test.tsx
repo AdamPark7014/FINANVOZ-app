@@ -27,7 +27,6 @@ import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
 import {
-  BTN_COMPARTIDOS_CUENTAS,
   ETIQUETA_ACCESIBILIDAD_QR_UNION,
   ETIQUETA_CON_QUIEN_COMPARTES,
   ERROR_NOMBRE_PAREJA,
@@ -129,6 +128,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const servidor = servidorCompartidoFalso();
     const A = telefono(servidor, 'usuario-a');
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
+    expect(screen.getByTestId('compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('compartidos-vacio')).toHaveTextContent(TEXTO_COMPARTIDOS_VACIO);
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     A.cerrar();

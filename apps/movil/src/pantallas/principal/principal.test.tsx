@@ -457,7 +457,9 @@ describe('Cuentas', () => {
     expect(screen.getByTestId(`cuenta-${nuId}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoTarjeta(nu.nombre, false)} ${cifraEnPalabras(nu.saldo)}`,
     );
-    expect(screen.getByTestId('cuenta-internet-saldo').props.accessibilityLabel).toBe(
+    const internet = vista.compromisos.find((c) => c.concepto === 'internet');
+    if (!internet) throw new Error('e4-01 sin compromiso internet');
+    expect(screen.getByTestId(`compromiso-${internet.programadoId}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoCompromiso(internet.concepto, etiquetaFecha(internet.fecha))} ${cifraEnPalabras(internet.monto)}`,
     );
     p.cerrar();
