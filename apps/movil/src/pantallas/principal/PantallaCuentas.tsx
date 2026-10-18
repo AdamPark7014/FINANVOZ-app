@@ -225,7 +225,7 @@ export function PantallaCuentas({
       {alAbrirCompartidos ? (
         <Seccion titulo="Gastos compartidos" testID="seccion-compartidos">
           <Boton
-            etiqueta="Gastos con tu pareja"
+            etiqueta={BTN_COMPARTIDOS_CUENTAS}
             variante="secundario"
             alPresionar={alAbrirCompartidos}
             testID="boton-compartidos"
