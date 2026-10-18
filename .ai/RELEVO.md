@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **movil/estados-cuenta:** copy de usuario centralizado en `textos.ts` (`LeerEstadoCuenta.tsx` sin cadenas es-MX inline); helpers de renglones/dudosos; a11y resumen/aviso; pruebas `estados-cuenta.test.tsx` en verde.
+- **movil/tarjetas:** copy de `TarjetaConfirmarMsi` centralizado en `textos.ts`; prueba `textos.test.ts`; test MSI usa constantes.
 
 ## Hecho (acumulado reciente)
 
-- Oleadas copy/a11y (tarjetas, principal, onboarding, tandas, privacidad). Ver `git log`.
+- Invitación avisos, TarjetaExplicacion, privacidad barrel. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear (ajustes/ingreso, arqueo, plan, personas, etc.) — otro turno; no mezclar en commits ajenos.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local sin commitear (FormularioMovimiento, estados-cuenta tests, plan tests…) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Siguiente carpeta movil con copy inline (p. ej. privacidad `Reconsentimiento`).
+2. Siguiente pantalla con strings en `.tsx` (Movimientos, TarjetasInterpretacion, etc.).
 
 ## No tocar
 
