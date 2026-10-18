@@ -92,6 +92,8 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     expect(textoDe('division-tu-parte')).toBe('$300');
     expect(textoDe('division-te-deben')).toBe('$900');
     expect(textoDe('division-faltan')).toBe('Elige 3 personas (llevas 0).');
+    expect(screen.getByRole('radiogroup', { name: ETIQUETA_ORIGEN_DIVISION })).toBeTruthy();
+    expect(screen.getByRole('radiogroup', { name: ETIQUETA_CATEGORIA_PARTE })).toBeTruthy();
     expect(screen.getByTestId(`division-origen-${p.nu}`).props.accessibilityState).toMatchObject({
       selected: true,
     });
