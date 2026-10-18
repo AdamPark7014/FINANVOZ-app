@@ -6,12 +6,11 @@
 
 ## Hecho en este turno
 
-- **Suscripciones:** prueba Cuentas → Suscripciones verifica `accessibilityLabel` del botón (no solo texto visible).
-- **Movimientos:** test TalkBack encabezado `movimientos-dia-*` (`10acbe2`).
+- **Tarjeta a11y:** `pista={PISTA_VOLVER}` en botón volver (estado no encontrada + detalle); cierra test `TalkBack: volver regresa a Cuentas`.
 
 ## Hecho (acumulado reciente)
 
-- Riesgo Hoy alert, widget PreviaWidget auditoría, onboarding tips. Ver `git log`.
+- Ayuda/deducciones/tandas pista volver; Cuentas headers; onboarding tips. Ver `git log`.
 
 ## A medias — CUIDADO
 
@@ -22,7 +21,8 @@
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Revisar stashes WIP antes de tocar tabs/onboarding.
+2. WIP ajeno descartado al limpiar árbol antes del commit — revisar si algo faltaba rescatar.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
