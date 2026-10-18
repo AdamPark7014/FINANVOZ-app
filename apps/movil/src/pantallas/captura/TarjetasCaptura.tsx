@@ -162,7 +162,12 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
       </Texto>
       <View style={{ gap: espacio.s }}>
         {puente ? (
-          <Boton etiqueta="Activar" alPresionar={() => setActivando(true)} testID={`${testID}-reactivar`} />
+          <Boton
+            etiqueta="Activar"
+            alPresionar={() => setActivando(true)}
+            testID={`${testID}-reactivar`}
+            etiquetaAccesible="Activar lectura de notificaciones del banco"
+          />
         ) : null}
         <Boton
           etiqueta="Ahora no"

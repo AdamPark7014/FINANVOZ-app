@@ -14,10 +14,6 @@ export function etiquetaVacioCapturasPorRevisar(): string {
   return `${TITULO_CAPTURAS_POR_REVISAR}. ${TEXTO_CAPTURAS_POR_REVISAR_VACIO}`;
 }
 
-export function etiquetaSinAppsBanco(): string {
-  return `${TITULO_ELEGIR_APPS}. ${TEXTO_SIN_APPS_BANCO}`;
-}
-
 export const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
 export const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
 export const AVISO_SIN_TEXTO =

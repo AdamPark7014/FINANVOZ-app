@@ -515,7 +515,12 @@ function FormularioTarjetaCaptura({
     <View style={{ gap: espacio.s }} testID={testID}>
       {campos}
       <Boton etiqueta={BTN_GUARDAR_TARJETA} alPresionar={guardar} testID={`${testID}-guardar`} />
-      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID={`${testID}-cancelar`}
+      />
     </View>
   );
 }

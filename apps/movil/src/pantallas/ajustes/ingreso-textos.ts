@@ -11,6 +11,8 @@ import { OPCIONES_DIA_SEMANA } from '../onboarding/ingreso';
 export const SECCION_INGRESO = 'Ingreso';
 export const ETIQUETA_CAMBIAR_INGRESO = 'Cambiar mi ingreso';
 export const ETIQUETA_CONFIGURAR_INGRESO = 'Decir cada cuándo me pagan';
+export const PISTA_CAMBIAR_INGRESO = 'Abre el formulario para cambiar cuánto y cada cuándo te pagan';
+export const PISTA_CONFIGURAR_INGRESO = 'Abre el formulario para decir cuánto y cada cuándo te pagan';
 
 export const TITULO_EDITAR = 'Tu ingreso';
 export const INTRO_EDITAR =

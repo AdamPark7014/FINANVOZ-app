@@ -9,7 +9,7 @@ import {
   registrarSenalesCaptura,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, EstadoVacio, Tarjeta, Texto } from '../../ui';
 import { Casilla } from '../onboarding/componentes';
 import {
   ALTERNATIVA_NO_DISPONIBLE,

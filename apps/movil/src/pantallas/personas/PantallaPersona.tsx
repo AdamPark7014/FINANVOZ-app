@@ -208,7 +208,7 @@ function Detalle({
       {d.saldo > 0 ? <Recordatorio personaId={personaId} fecha={d.recordatorio} /> : null}
 
       <View style={{ gap: espacio.s }}>
-        <Texto variante="subtitulo" testID="persona-movimientos-titulo">
+        <Texto variante="subtitulo" testID="persona-movimientos-titulo" accessibilityRole="header">
           {TITULO_MOVIMIENTOS}
         </Texto>
         {d.movimientos.length === 0 ? (
@@ -290,7 +290,12 @@ function YaMePago({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta={ETIQUETA_GUARDAR} alPresionar={guardar} testID="boton-guardar-pago-persona" />
+      <Boton
+        etiqueta={ETIQUETA_GUARDAR}
+        alPresionar={guardar}
+        pista={PISTA_GUARDAR_PAGO}
+        testID="boton-guardar-pago-persona"
+      />
     </Tarjeta>
   );
 }
