@@ -6,27 +6,26 @@
 
 ## Hecho en este turno
 
-- **widget / Ajustes:** copy `widget-textos` (`PISTA_PREVIA`, instrucción Widgets, desc. ocultar montos); `PreviaWidget` hint TalkBack, textos internos fuera de lectura (`previa-widget-fila` / `previa-widget-solo-texto`); tests `widget.test.tsx` — ver `cd86735`, `e57d1a6`, `05a3ce3`.
+- **Cuentas:** botón «Agregar tarjeta de crédito» usa `BTN_AGREGAR_TARJETA_CREDITO` en `principal/textos.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips, Cuentas atajos, ayuda/tandas TalkBack. Ver `git log`.
+- Atajos Cuentas (tandas, suscripciones, deducciones, compartidos), onboarding/tabs. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP ajeno en disco (onboarding, personas, captura) — no mezclar; `relevo.ps1 salvar` si hace falta.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Rescates WIP en commits pequeños.
+2. Descartar o commitear WIP ajeno por pantalla.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

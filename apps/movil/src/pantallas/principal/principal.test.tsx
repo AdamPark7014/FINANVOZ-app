@@ -476,6 +476,21 @@ describe('Cuentas', () => {
     fireEvent.press(screen.getByTestId('boton-ajustes'));
     expect(alAbrirAjustes).toHaveBeenCalled();
   });
+
+  it('CTA Tandas en Cuentas usa copy centralizado y abre la ruta', () => {
+    const p = abrirPruebaPantalla();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const alAbrirTandas = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTandas={alAbrirTandas} />,
+    );
+    expect(screen.getByText(BTN_TANDAS_CUENTAS)).toBeTruthy();
+    expect(screen.getByTestId('seccion-tandas-titulo')).toHaveProp('accessibilityRole', 'header');
+    fireEvent.press(screen.getByTestId('boton-tandas'));
+    expect(alAbrirTandas).toHaveBeenCalled();
+    p.cerrar();
+  });
 });
 
 describe('Movimientos', () => {
