@@ -1,6 +1,9 @@
 /**
  * `pnpm eval:nlu` (docs/06-NLU.md §8). Imprime solo ids, nombres de campo y agregados, nunca el texto dictado ni
- * montos (regla 9).
+ * montos (regla 9). En Windows: tip pwsh en `packages/nlu/README.md`.
+ *
+ * Salida (eval UI en consola): reglas → cobertura/precisión + ids fallidos; nube/offline → `formatearReporte`
+ * (campos vs umbral, latencia, tokens, costo). Progreso largo va a stderr (`eval:nlu: N casos…`).
  *
  *   --nivel reglas                                   nivel 0, sin red
  *   --nivel nube --proveedor X [--modelo M] [--grabar] [--limite N] [--concurrencia N]

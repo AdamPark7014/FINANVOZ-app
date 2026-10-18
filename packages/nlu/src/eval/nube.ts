@@ -202,7 +202,7 @@ const ETIQUETA: Record<CampoMetrica, string> = {
   completo: 'caso completo',
 };
 
-/** Texto del reporte: solo ids, campos y agregados. */
+/** Texto del reporte de eval (stdout de `pnpm eval:nlu --nivel nube` / `--offline`): solo ids, campos y agregados. */
 export function formatearReporte(r: ReporteNube): string {
   const lineas = [`Nivel 2 · nube — ${r.proveedor} / ${r.modelo} — ${r.casos} casos`];
   for (const campo of Object.keys(UMBRALES) as CampoMetrica[]) {
