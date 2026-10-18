@@ -27,6 +27,7 @@ import {
 } from '../../ui';
 import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import type { MotorDictado } from '../../voz';
+import { ACCESIBILIDAD_ABRIR, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { CandadoPlus } from '../plan/CandadoPlus';
 import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';

@@ -170,6 +170,10 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       checked: true,
     });
     expect(screen.getByTestId('editar-ingreso-monto')).toHaveProp('value', '13,000');
+    expect(screen.getByTestId('editar-ingreso-monto')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaCampoMonto(PREGUNTA_MONTO, '13,000'),
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
 
     // Cada viernes: sin el día no se puede guardar.

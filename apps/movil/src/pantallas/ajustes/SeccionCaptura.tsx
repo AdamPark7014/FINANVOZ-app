@@ -63,6 +63,7 @@ export function SeccionCaptura() {
               refrescar();
             }}
             testID="ajustes-captura-desactivar"
+            pista={PISTA_DESACTIVAR_CAPTURA}
             style={{ marginTop: espacio.s }}
           />
         </>

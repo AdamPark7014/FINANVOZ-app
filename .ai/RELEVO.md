@@ -1,31 +1,32 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-17
+- **Fecha:** 2026-10-18
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Ajustes › Captura:** estado activo usa `accessibilityLabel={etiquetaCapturaActiva(...)}` (conteo en palabras, `02 §15`).
+- **Ajustes › Captura:** `etiquetaCapturaActiva` (conteo en palabras), pistas TalkBack en Activar/Desactivar, test `captura-textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Deducciones/Suscripciones CTAs TalkBack, captura por revisar, onboarding. Ver `git log`.
+- Tandas vacío/pistas, capturas por revisar título, EstadoVacio. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP suelto en otros archivos — revisar `git status` antes de editar.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `accessibilityLabel` en CTAs compartidos/tandas desde Cuentas (paridad suscripciones).
+2. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

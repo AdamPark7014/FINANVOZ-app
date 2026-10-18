@@ -117,6 +117,29 @@ describe('analítica de las correcciones de captura (03 §8, pendiente 30)', () 
     p.cerrar();
   });
 
+  it('cuenta nueva (débito): el saldo se anuncia en pesos (02 §15)', () => {
+    const p = eCaptura();
+    const pregunta = {
+      tipo: 'cuenta_nueva' as const,
+      capturaId: 'cap-prueba',
+      banco: 'Banco A',
+      bancoId: 'banco_a',
+      ultimos4: null,
+      monto: 50_000,
+      fecha: '2026-10-11',
+      candidatas: [],
+      sugerencia: 'cuenta' as const,
+    };
+    conAnalitica(p.ctx, <TarjetaPreguntaCaptura pregunta={pregunta} testID="pregunta" />);
+    fireEvent.press(screen.getByTestId('pregunta-agregar'));
+    expect(screen.getByTestId('pregunta-form-saldo')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaCampoMonto(ETIQUETA_SALDO_HOY, ''),
+    );
+    expect(screen.getByTestId('pregunta-form-saldo')).toHaveProp('accessibilityHint', AYUDA_SALDO_HOY);
+    p.cerrar();
+  });
+
   it('"No es mía" en una tarjeta detectada envía correccion {campo: cuenta} y nada del aviso', async () => {
     const p = eCaptura();
     const base = ejemplos.find((e) => e.id === 'N-06');

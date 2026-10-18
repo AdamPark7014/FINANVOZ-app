@@ -18,7 +18,10 @@ export const OPCIONES_MODO_AVISO: readonly OpcionChip<ModoAvisoCaptura>[] = [
 ];
 
 export const BTN_DESACTIVAR_CAPTURA = 'Desactivar';
+export const PISTA_DESACTIVAR_CAPTURA =
+  'Deja de leer avisos de banco; la lista blanca se vacía en tu teléfono';
 export const BTN_ACTIVAR_CAPTURA = 'Activar';
+export const PISTA_ACTIVAR_CAPTURA = 'Activa la lectura de notificaciones de las apps que elijas';
 
 export const ESTADO_APAGADA = 'Apagada.';
 export const ESTADO_NO_DISPONIBLE = 'No disponible en este teléfono.';

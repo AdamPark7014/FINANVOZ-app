@@ -542,9 +542,9 @@ describe('Movimientos', () => {
       p.ctx,
       <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ cuentaId: p.e.cuentas.bbva as string }} />,
     );
-    expect(screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO).props.accessibilityLabel).toBe(
-      etiquetaFiltroMovimientosActivo(),
-    );
+    const filtroActivo = screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO);
+    expect(filtroActivo.props.accessibilityLabel).toBe(etiquetaFiltroMovimientosActivo());
+    expect(filtroActivo).toHaveProp('accessibilityLiveRegion', 'polite');
     p.cerrar();
   });
 
