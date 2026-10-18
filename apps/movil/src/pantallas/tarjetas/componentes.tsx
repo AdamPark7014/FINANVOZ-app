@@ -237,7 +237,7 @@ export function PreguntaLiquidarMeses({
         />
       </View>
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}

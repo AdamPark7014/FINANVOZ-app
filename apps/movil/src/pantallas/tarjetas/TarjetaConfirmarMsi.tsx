@@ -7,7 +7,7 @@ import {
   type ResultadoTexto,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
@@ -78,9 +78,15 @@ export function TarjetaConfirmarMsi({
 
   return (
     <Tarjeta testID="confirmacion-msi">
-      <Texto variante="subtitulo">{TITULO_CONFIRMAR_MSI[datos.motivo]}</Texto>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <Texto variante="cuerpoFuerte" style={{ flex: 1 }}>
+      <Texto variante="subtitulo" testID="confirmacion-msi-titulo" accessibilityRole="header">
+        {TITULO_CONFIRMAR_MSI[datos.motivo]}
+      </Texto>
+      <View
+        accessible
+        accessibilityLabel={`${tituloCompraMsiMeses(entrada.meses)}, ${formatearCentavos(entrada.monto)}`}
+        style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
+      >
+        <Texto variante="cuerpoFuerte" style={{ flex: 1 }} importantForAccessibility="no">
           {tituloCompraMsiMeses(entrada.meses)}
         </Texto>
         <Cifra centavos={entrada.monto} />

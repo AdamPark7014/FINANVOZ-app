@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **Hoy:** `ProbabilidadHoy` usa `OCULTAR_ETIQUETA_VISIBLE` al calcular (sin props a11y inline).
+- **Captura por revisar:** `testID="capturas-por-revisar-titulo"` + aserción de `accessibilityRole="header"` en estado vacío (`captura.test.tsx`).
 
 ## Hecho (acumulado reciente)
 
-- Movimientos/Cuentas TalkBack; suscripciones vacío; onboarding. Ver `git log`.
+- Suscripciones/tarjetas TalkBack, vacío captura, Cuentas/Hoy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP en `PantallaTarjeta` (imports a11y) — no commitear a medias.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Terminar a11y tarjeta (movimientos/estados vacíos) en un commit aparte.
-3. M11 negocio cuando toque el hito.
+2. `git status` antes de editar (relevo / WIP paralelo).
+3. Centralizar copy onboarding restante.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

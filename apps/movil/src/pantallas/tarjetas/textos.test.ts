@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { tituloCompraMsiMeses, TITULO_CONFIRMAR_MSI } from './textos';
+import {
+  etiquetaVacioMsiTarjeta,
+  mensajePagoPlaneadoApartado,
+  tituloCompraMsiMeses,
+  TITULO_CONFIRMAR_MSI,
+  VACIO_MSI_TARJETA,
+} from './textos';
 
 describe('tarjetas/textos · confirmar MSI', () => {
   it('título de compra incluye meses', () => {
@@ -12,5 +18,9 @@ describe('tarjetas/textos · confirmar MSI', () => {
 
   it('aviso al apartar pago planeado incluye el monto', () => {
     expect(mensajePagoPlaneadoApartado(50_000)).toBe('Listo: aparto $500.00 para cada pago planeado.');
+  });
+
+  it('vacío MSI incluye el título de sección para TalkBack', () => {
+    expect(etiquetaVacioMsiTarjeta()).toBe(`Meses sin intereses. ${VACIO_MSI_TARJETA}`);
   });
 });

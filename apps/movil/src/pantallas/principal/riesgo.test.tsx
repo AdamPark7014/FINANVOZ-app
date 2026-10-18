@@ -11,7 +11,12 @@ import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
-import { ProbabilidadHoy, TEXTO_RIESGO } from './ProbabilidadHoy';
+import {
+  etiquetaAccesibleProbabilidad,
+  ProbabilidadHoy,
+  TEXTO_RIESGO,
+} from './ProbabilidadHoy';
+import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
 

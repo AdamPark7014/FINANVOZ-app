@@ -79,11 +79,14 @@ describe('accesibilidad (CA-M7-05)', () => {
         motor={crearMotorFalso().motor}
       />,
     );
-    expect(
-      screen.getByRole('radiogroup', {
-        name: 'Deberías traer mil ciento cuarenta pesos en efectivo. ¿Cuánto traes?',
-      }),
-    ).toBeTruthy();
+    expect(screen.getByTestId('tarjeta-accion-0-exacto')).toHaveProp(
+      'accessibilityLabel',
+      'mil ciento cuarenta pesos',
+    );
+    expect(screen.getByTestId('tarjeta-accion-0-otra_cantidad')).toHaveProp(
+      'accessibilityLabel',
+      'Otra cantidad',
+    );
     sinHallazgos();
     p.cerrar();
   });

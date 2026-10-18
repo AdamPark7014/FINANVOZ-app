@@ -18,8 +18,6 @@ import { useNotificaciones } from '../avisos/notificaciones';
 export const TEXTO_RIESGO =
   'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
 
-export const TEXTO_CALCULANDO_PROBABILIDAD = 'Calculando si llegas…';
-
 /** TalkBack: la barra lleva el dato; el texto visible debajo no se repite (`ui/README.md`). */
 export function etiquetaAccesibleProbabilidad(texto: string, etiqueta: string | null): string {
   return etiqueta ? `${texto}. ${etiqueta}` : texto;

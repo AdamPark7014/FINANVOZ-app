@@ -185,10 +185,11 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
   const [error, setError] = useState<string | null>(null);
   return (
     <View style={{ gap: espacio.m }} testID="corregir-saldo">
-      <Texto variante="secundario" tono="secundario">
-        {d.saldoAFavor > 0
-          ? `Según lo que llevo, tienes ${formatearCentavos(d.saldoAFavor)} a favor. Escribe lo que dice tu banco, sin contar meses sin intereses.`
-          : `Según lo que llevo, debes ${formatearCentavos(d.saldoRevolvente)}. Escribe lo que dice tu banco, sin contar meses sin intereses.`}
+      <Texto variante="secundario" tono="secundario" testID="corregir-intro">
+        {textoIntroCorregirSaldo(
+          d.saldoAFavor > 0,
+          formatearCentavos(d.saldoAFavor > 0 ? d.saldoAFavor : d.saldoRevolvente),
+        )}
       </Texto>
       <Chips
         testID="corregir-sentido"
