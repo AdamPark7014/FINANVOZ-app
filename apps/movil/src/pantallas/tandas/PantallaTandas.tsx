@@ -40,7 +40,9 @@ export function PantallaTandas({
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto variante="titulo">{TITULO_TANDAS}</Texto>
+      <Texto variante="titulo" testID="tandas-titulo">
+        {TITULO_TANDAS}
+      </Texto>
       {nueva ? (
         <FormularioTanda
           alGuardar={(t: TandaCreada) => {
