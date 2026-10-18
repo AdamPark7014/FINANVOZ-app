@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { View } from 'react-native';
 import { listarTandas, type TandaCreada } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { FormularioTanda } from './FormularioTanda';
 import {
   ETIQUETA_NUEVA_TANDA,
   ETIQUETA_VER_CALENDARIO,
   ETIQUETA_VOLVER,
+  etiquetaAccesibleTandaEnLista,
   etiquetaVacioTandas,
   PISTA_NUEVA_TANDA,
   PISTA_VACIO_TANDAS,
@@ -66,25 +68,37 @@ export function PantallaTandas({
               pistaCta={PISTA_VACIO_TANDAS}
             />
           ) : null}
-          {tandas.map((t) => (
-            <Tarjeta key={t.id} testID={`tanda-${t.id}`}>
-              <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
-              <Texto variante="secundario" tono="secundario">
-                {t.proxima
-                  ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
-                  : textoSubtituloListaSinProxima(t.etiquetaCobro)}
-              </Texto>
-              <Texto variante="secundario">{textoEnRiesgo(t.enRiesgo)}</Texto>
-              <Boton
-                testID={`tanda-${t.id}-abrir`}
-                etiqueta={ETIQUETA_VER_CALENDARIO}
-                variante="texto"
-                ancho="contenido"
-                alPresionar={() => alAbrirTanda(t.id)}
-                pista={PISTA_VER_CALENDARIO}
-              />
-            </Tarjeta>
-          ))}
+          <View accessibilityRole="list" testID="tandas-lista" style={{ gap: espacio.s }}>
+            {tandas.map((t) => (
+              <Tarjeta key={t.id} testID={`tanda-${t.id}`}>
+                <View
+                  accessible
+                  accessibilityLabel={etiquetaAccesibleTandaEnLista(t)}
+                  style={{ gap: espacio.xxs }}
+                >
+                  <Texto variante="cuerpoFuerte" importantForAccessibility="no">
+                    {t.nombre}
+                  </Texto>
+                  <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
+                    {t.proxima
+                      ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
+                      : textoSubtituloListaSinProxima(t.etiquetaCobro)}
+                  </Texto>
+                  <Texto variante="secundario" importantForAccessibility="no">
+                    {textoEnRiesgo(t.enRiesgo)}
+                  </Texto>
+                </View>
+                <Boton
+                  testID={`tanda-${t.id}-abrir`}
+                  etiqueta={ETIQUETA_VER_CALENDARIO}
+                  variante="texto"
+                  ancho="contenido"
+                  alPresionar={() => alAbrirTanda(t.id)}
+                  pista={PISTA_VER_CALENDARIO}
+                />
+              </Tarjeta>
+            ))}
+          </View>
           <Boton
             testID="tandas-nueva"
             etiqueta={ETIQUETA_NUEVA_TANDA}

@@ -36,7 +36,12 @@ import {
   ACCESIBILIDAD_TANDA_ARCHIVADA,
   ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   ERROR_NOMBRE_TANDA_VACIO,
+  etiquetaAccesibleCobroDetalle,
+  etiquetaAccesibleConfirmarArchivar,
+  etiquetaAccesibleProximaAportacionDetalle,
+  etiquetaAccesibleResumenDetalleTanda,
   etiquetaAccesibleRondaTanda,
+  etiquetaAccesibleSubtituloDetalleTanda,
   etiquetaEstadoRonda,
   TEXTO_CONFIRMAR_ARCHIVAR,
   TEXTO_NO_ES_INGRESO,
@@ -125,7 +130,11 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
             {TEXTO_TANDA_ARCHIVADA}
           </Texto>
         ) : null}
-        <Texto variante="secundario" tono="secundario">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLabel={etiquetaAccesibleSubtituloDetalleTanda(d.aportacion, d.participantes, d.turno)}
+        >
           {textoSubtituloTanda(d.aportacion, d.participantes, d.turno)}
         </Texto>
       </View>
@@ -134,7 +143,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       {d.activa && d.proxima ? (
         <Tarjeta>
-          <Texto variante="cuerpo">{textoProximaAportacion(d.proxima.etiqueta)}</Texto>
+          <Texto
+            variante="cuerpo"
+            accessibilityLabel={etiquetaAccesibleProximaAportacionDetalle(d.proxima.etiqueta)}
+          >
+            {textoProximaAportacion(d.proxima.etiqueta)}
+          </Texto>
           {ya.elegir ?? (
             <Boton
               testID="tanda-ya-la-di"
@@ -144,7 +158,13 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
             />
           )}
           {ya.error ? (
-            <Texto variante="secundario" tono="faltante">
+            <Texto
+              variante="secundario"
+              tono="faltante"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              accessibilityLabel={ya.error}
+            >
               {ya.error}
             </Texto>
           ) : null}
@@ -153,7 +173,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       {d.activa && !d.cobrada ? (
         <Tarjeta>
-          <Texto variante="cuerpo">{textoCobras(d.cobro, d.etiquetaCobro)}</Texto>
+          <Texto
+            variante="cuerpo"
+            accessibilityLabel={etiquetaAccesibleCobroDetalle(d.cobro, d.etiquetaCobro)}
+          >
+            {textoCobras(d.cobro, d.etiquetaCobro)}
+          </Texto>
           {cobrando ? (
             <MeTocoLaTanda tandaId={tandaId} testID="tanda-me-toco" alTerminar={() => setCobrando(false)} />
           ) : (
@@ -165,7 +190,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
               pista={PISTA_ME_TOCO}
             />
           )}
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
             {TEXTO_NO_ES_INGRESO}
           </Texto>
         </Tarjeta>
@@ -174,6 +199,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
       {d.activa ? <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver} /> : null}
 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
+        <View accessibilityRole="list" style={{ gap: espacio.s }}>
         {d.rondas.map((r) => (
           <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
             <View
@@ -204,6 +230,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
             </View>
           </Tarjeta>
         ))}
+        </View>
       </Seccion>
     </Pantalla>
   );
@@ -263,7 +290,9 @@ function Ajustes({
   if (archivando) {
     return (
       <Tarjeta testID="tanda-archivar">
-        <Texto variante="cuerpo">{TEXTO_CONFIRMAR_ARCHIVAR}</Texto>
+        <Texto variante="cuerpo" accessibilityLabel={etiquetaAccesibleConfirmarArchivar()}>
+          {TEXTO_CONFIRMAR_ARCHIVAR}
+        </Texto>
         <Boton
           testID="tanda-archivar-confirmar"
           etiqueta={ETIQUETA_ARCHIVAR_TANDA}
@@ -355,17 +384,23 @@ function Ajustes({
 function Resumen({ d }: { d: DetalleTanda }) {
   return (
     <Tarjeta testID="tanda-resumen-detalle">
-      <Texto variante="cuerpo" testID="tanda-aportado">
-        {textoAportado(d.aportado)}
-      </Texto>
-      <Texto variante="cuerpoFuerte" testID="tanda-en-riesgo">
-        {textoEnRiesgo(d.enRiesgo)}
-      </Texto>
-      {d.cobrada ? (
-        <Texto variante="cuerpo" testID="tanda-por-aportar">
-          {textoPorAportar(d.porAportar)}
+      <View
+        accessible
+        accessibilityLabel={etiquetaAccesibleResumenDetalleTanda(d)}
+        style={{ gap: espacio.xxs }}
+      >
+        <Texto variante="cuerpo" testID="tanda-aportado" importantForAccessibility="no">
+          {textoAportado(d.aportado)}
         </Texto>
-      ) : null}
+        <Texto variante="cuerpoFuerte" testID="tanda-en-riesgo" importantForAccessibility="no">
+          {textoEnRiesgo(d.enRiesgo)}
+        </Texto>
+        {d.cobrada ? (
+          <Texto variante="cuerpo" testID="tanda-por-aportar" importantForAccessibility="no">
+            {textoPorAportar(d.porAportar)}
+          </Texto>
+        ) : null}
+      </View>
     </Tarjeta>
   );
 }

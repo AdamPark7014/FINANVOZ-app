@@ -49,7 +49,11 @@ import {
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
   TITULO_CALENDARIO,
+  etiquetaAccesibleResumenDetalleTanda,
   etiquetaAccesibleRondaTanda,
+  etiquetaAccesibleTandaEnLista,
+  etiquetaAccesibleTarjetaHoyAportacion,
+  etiquetaAccesibleTextoYaEmpezo,
   etiquetaVacioTandas,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
@@ -164,6 +168,47 @@ describe('Tandas (02 §18)', () => {
     const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
     expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp('accessibilityHint', PISTA_VER_CALENDARIO);
+  });
+
+  it('lista de tandas: filas con etiqueta TalkBack y role list', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    const [t] = listarTandas(p.ctx);
+    if (!t) throw new Error('sin tanda');
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
+    expect(screen.getByTestId('tandas-lista')).toHaveProp('accessibilityRole', 'list');
+    expect(
+      within(screen.getByTestId(`tanda-${tandaId}`)).getByLabelText(etiquetaAccesibleTandaEnLista(t)),
+    ).toBeTruthy();
+  });
+
+  it('detalle: resumen financiero con etiqueta TalkBack', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    const d = detalleTanda(p.ctx, tandaId);
+    renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+    expect(
+      within(screen.getByTestId('tanda-resumen-detalle')).getByLabelText(
+        etiquetaAccesibleResumenDetalleTanda(d),
+      ),
+    ).toBeTruthy();
+  });
+
+  it('Tarjeta de Hoy aportación anuncia pregunta y monto en palabras', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    crearTanda(p.ctx, entradaDe(v));
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    const tarjeta = screen.getByTestId('tarjeta-accion-0');
+    expect(within(tarjeta).getByLabelText(etiquetaAccesibleTarjetaHoyAportacion({
+      pregunta: PREGUNTA_YA_DISTE,
+      nombre: 'Tanda de la oficina',
+      monto: 50_000,
+      cuando: 'hoy',
+      etiquetaFecha: 'vie 16',
+    }))).toBeTruthy();
   });
 
   it('Tarjeta de Hoy "Ya la di" tiene pista TalkBack', () => {
@@ -421,5 +466,19 @@ describe('copy centralizado (textos.ts)', () => {
       },
       false,
     )).toMatch(/tu turno/i);
+    expect(etiquetaAccesibleTandaEnLista({
+      nombre: 'Oficina',
+      aportacion: 50_000,
+      proxima: { etiqueta: 'vie 16' },
+      etiquetaCobro: 'vie 6',
+      enRiesgo: 0,
+    })).not.toMatch(/\$/);
+    expect(etiquetaAccesibleTextoYaEmpezo({
+      aportacionesHechas: 6,
+      yaCobraste: true,
+      saldoInicial: -200_000,
+      faltan: 4,
+      porAportar: 200_000,
+    })).toMatch(/pesos/i);
   });
 });

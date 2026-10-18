@@ -111,7 +111,13 @@ export function MeTocoLaTanda({
         />
       ) : null}
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={error}
+        >
           {error}
         </Texto>
       ) : null}

@@ -16,6 +16,8 @@ import {
   PISTA_TODAVIA_NO_COBRO,
   PISTA_YA_LA_DI,
   TEXTO_NO_ES_INGRESO,
+  etiquetaAccesibleTarjetaHoyAportacion,
+  etiquetaAccesibleTarjetaHoyCobro,
 } from './textos';
 
 /** Tarjetas de Hoy de la tanda (`02 §18`): "¿Ya diste tu tanda?" y "Me tocó la tanda". */
@@ -39,8 +41,13 @@ function TarjetaAportacion({
   const ya = useYaLaDi(t.tandaId, t.fecha, testID);
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{t.pregunta}</Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto
+        variante="cuerpoFuerte"
+        accessibilityLabel={etiquetaAccesibleTarjetaHoyAportacion(t)}
+      >
+        {t.pregunta}
+      </Texto>
+      <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
         {`${t.nombre} · ${formatearCentavos(t.monto)}${t.cuando === 'hoy' ? ' hoy' : `, tocaba el ${t.etiquetaFecha}`}`}
       </Texto>
       {ya.elegir ?? (
@@ -65,7 +72,13 @@ function TarjetaAportacion({
         </View>
       )}
       {ya.error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={ya.error}
+        >
           {ya.error}
         </Texto>
       ) : null}
@@ -79,8 +92,13 @@ function TarjetaCobro({ t, testID }: { t: Extract<TarjetaTanda, { tipo: 'tanda_c
   const [cobrando, setCobrando] = useState(false);
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{t.pregunta}</Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto
+        variante="cuerpoFuerte"
+        accessibilityLabel={etiquetaAccesibleTarjetaHoyCobro(t)}
+      >
+        {t.pregunta}
+      </Texto>
+      <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
         {`${t.nombre} · ${formatearCentavos(t.monto)}. ${TEXTO_NO_ES_INGRESO}`}
       </Texto>
       {cobrando ? (

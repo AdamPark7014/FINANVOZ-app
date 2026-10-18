@@ -43,6 +43,8 @@ import {
   TEXTO_COMPROMISO_APORTACION,
   TITULO_YA_EMPEZO,
   errorTurno,
+  etiquetaAccesibleResumenCobroFormulario,
+  etiquetaAccesibleTextoYaEmpezo,
   textoResumenCobro,
   textoYaEmpezoCompleto,
 } from './textos';
@@ -242,6 +244,12 @@ export function FormularioTanda({
             variante="cuerpo"
             accessibilityLiveRegion="polite"
             importantForAccessibility="yes"
+            accessibilityLabel={etiquetaAccesibleResumenCobroFormulario(
+              propuesta.cobro,
+              etiquetaFecha(propuesta.fechaCobro),
+              propuesta.turno,
+              propuesta.participantes,
+            )}
           >
             {textoResumenCobro(
               propuesta.cobro,
@@ -250,14 +258,16 @@ export function FormularioTanda({
               propuesta.participantes,
             )}
           </Texto>
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
             {TEXTO_COMPROMISO_APORTACION}
           </Texto>
         </Tarjeta>
       ) : null}
       {ya ? (
         <Tarjeta testID="tanda-ya-empezo">
-          <Texto variante="cuerpoFuerte">{TITULO_YA_EMPEZO}</Texto>
+          <Texto variante="cuerpoFuerte" accessibilityRole="header">
+            {TITULO_YA_EMPEZO}
+          </Texto>
           <CampoTexto
             testID="tanda-hechas"
             etiqueta={ETIQUETA_APORTACIONES_HECHAS}
@@ -279,6 +289,7 @@ export function FormularioTanda({
               testID="tanda-ya-empezo-texto"
               accessibilityLiveRegion="polite"
               importantForAccessibility="yes"
+              accessibilityLabel={etiquetaAccesibleTextoYaEmpezo(corregida)}
             >
               {textoYaEmpezoCompleto(corregida)}
             </Texto>

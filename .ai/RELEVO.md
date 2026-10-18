@@ -6,26 +6,24 @@
 
 ## Hecho en este turno
 
-- **Onboarding (móvil):** TalkBack en `PasoOnboarding` — anuncio y foco al entrar a cada paso; encabezado, ayuda, progreso con label/hint; pistas en chips y casillas; tests `componentes.test.tsx` y textos.
+- **Tandas (móvil):** micro TalkBack — etiquetas en lista, detalle, formulario y tarjetas de Hoy; montos en palabras; `role="list"` y alertas en errores; tests en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Calculadora lista espera a11y, TalkBack otras pantallas móvil. Ver `git log`.
+- Onboarding, calculadora, otras pantallas a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP sin commitear en disco: `arqueo`, `ayuda`, `compartido`, `estados-cuenta`, `me-alcanza`, `personas`, `tandas` (TalkBack paralelo) — no mezclar con onboarding ya en `fe87f5e`.
+- WIP paralelo (arqueo, compartido, estados-cuenta, me-alcanza, personas, principal, ayuda) — **no mezclar** sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
-1. Commitear o salvar el WIP paralelo de pantallas (ver `git status`).
-2. Adam — M0 / EAS.
-3. TalkBack aviso «No sé» tarjeta en `FormularioTarjetaNueva`.
+1. Adam — M0 / EAS.
+2. TalkBack aviso «No sé» tarjeta en `FormularioTarjetaNueva`.
 
 ## No tocar
 
-- Cambios unstaged fuera de onboarding hasta que el otro agente los salve o commitee.
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
