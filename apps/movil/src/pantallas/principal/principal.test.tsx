@@ -569,6 +569,7 @@ describe('Movimientos', () => {
       />,
     );
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_FILTRO_VACIO);
+    expect(screen.getByTestId('movimientos-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('movimientos-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioMovimientos(true),
     );

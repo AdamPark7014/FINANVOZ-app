@@ -30,7 +30,12 @@ import {
   TIP_INGRESO_SALTAR,
   TIP_PAGOS_SALTAR,
 } from './tips';
-import { etiquetaProgresoOnboarding, PISTA_MARCAR_CASILLA_DATOS, TITULO_BIENVENIDA } from './textos';
+import {
+  etiquetaProgresoOnboarding,
+  PISTA_MARCAR_CASILLA_DATOS,
+  PISTA_ONB_CONTINUAR,
+  TITULO_BIENVENIDA,
+} from './textos';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
 const RUTAS = {

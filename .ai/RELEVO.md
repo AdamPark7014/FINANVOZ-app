@@ -1,30 +1,31 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-18
+- **Fecha:** 2026-10-17
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Onboarding O1–O7:** tips en `tips.ts` (re-export `textos.ts`), TalkBack «Consejo» + pistas en CTAs; test O2 pista al marcar casilla.
+- **Ajustes › Captura:** estado activo usa `accessibilityLabel={etiquetaCapturaActiva(...)}` (conteo en palabras, `02 §15`).
 
 ## Hecho (acumulado reciente)
 
-- Cuentas list a11y, captura/ayuda leftovers, me-alcanza tests. Ver `git log`.
+- Deducciones/Suscripciones CTAs TalkBack, captura por revisar, onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local (`SeccionCaptura`, `Chip.test`, etc.) — no mezclar en commits de onboarding.
-- CI Windows; M0 Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajeno en disco.
+2. `accessibilityLabel` en CTAs compartidos/tandas desde Cuentas (paridad suscripciones).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

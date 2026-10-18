@@ -142,6 +142,7 @@ describe('Suscripciones (02 §20)', () => {
     expect(screen.getByTestId('suscripciones-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioSuscripciones(),
     );
+    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
     expect(screen.queryByTestId('suscripciones-inactivas')).toBeNull();
   });
 
@@ -149,6 +150,7 @@ describe('Suscripciones (02 §20)', () => {
     const p = conEscenario('e4-01');
     const alAbrir = jest.fn();
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirSuscripciones={alAbrir} />);
+    expect(screen.getByTestId('seccion-suscripciones-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-suscripciones').props.accessibilityLabel).toBe(
       BTN_SUSCRIPCIONES_CUENTAS,
     );

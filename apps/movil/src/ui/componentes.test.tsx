@@ -229,11 +229,20 @@ describe('CampoMonto', () => {
     const alCambiar = jest.fn();
     render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
     expect(screen.getByLabelText('Monto en pesos')).toHaveProp('accessibilityLabel', 'Monto en pesos');
-    fireEvent.changeText(screen.getByLabelText(/Monto/), '1,099.90');
-    expect(screen.getByLabelText(/Monto/)).toHaveProp(
+    const campo = screen.getByLabelText('Monto en pesos');
+    fireEvent.changeText(campo, '1,099.90');
+    expect(campo).toHaveProp(
       'accessibilityLabel',
       'Monto en pesos, mil noventa y nueve pesos con noventa centavos',
     );
+  });
+
+  it('deshabilitado anuncia disabled en TalkBack', () => {
+    render(<CampoMonto etiqueta="Monto" alCambiar={() => {}} deshabilitado />);
+    expect(screen.getByLabelText('Monto en pesos').props.accessibilityState).toEqual({
+      invalid: false,
+      disabled: true,
+    });
   });
 });
 

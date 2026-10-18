@@ -16,6 +16,8 @@ import {
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { auditar } from '../__pruebas__/accesibilidad';
+import { etiquetaCampoMonto } from '../../ui/formato';
+import { ayudaColchon, ETIQUETA_MONTO_COLCHON } from './colchon-textos';
 import {
   CONFIRMACION_INGRESO_VARIABLE,
   ETIQUETA_CAMBIAR_INGRESO,
@@ -23,6 +25,7 @@ import {
   fraseCuandoTePagan,
   lineaResumenIngreso,
   mensajeIngresoGuardado,
+  PREGUNTA_MONTO,
   RESUMEN_INGRESO_VARIABLE,
   RESUMEN_SIN_INGRESO,
 } from './ingreso-textos';

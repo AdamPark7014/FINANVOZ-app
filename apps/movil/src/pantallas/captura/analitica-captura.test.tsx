@@ -20,8 +20,10 @@ import { ProveedorAnalitica } from '../../sesion/ProveedorAnalitica';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { conEscenario } from '../principal/__pruebas__/base';
+import { etiquetaCampoMonto } from '../../ui/formato';
 import { PorRevisarCapturas } from './PorRevisarCapturas';
 import { TarjetaPreguntaCaptura } from './PreguntasCaptura';
+import { AYUDA_SALDO_HOY, ETIQUETA_SALDO_HOY } from './textos';
 
 /**
  * Pendiente 30 (parte captura): `correccion {campo}` desde las capturas. Solo el campo, nunca el monto, el
