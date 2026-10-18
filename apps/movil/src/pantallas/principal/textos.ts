@@ -60,6 +60,10 @@ export const NOMBRE_ORIGEN: Record<string, string> = {
 };
 
 export { MENSAJE_ERROR_GENERAL, MENSAJE_NO_ENTENDI, mensajeError };
+
+/** Placeholder del campo «Escribir» en el panel (`02 §5.9`). */
+export const EJEMPLO_CAMPO_REGISTRAR = 'tacos 80 en efectivo';
+
 export const MENSAJE_POR_INTERPRETAR =
   'Lo guardé; lo interpreto cuando tengas internet. Lo encuentras en Movimientos, en Por revisar.';
 

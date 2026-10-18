@@ -67,6 +67,7 @@ import {
   MENSAJE_NO_ENTENDI,
   MENSAJE_NO_SOPORTADO,
   MENSAJE_SIN_DUPLICADOS,
+  EJEMPLO_CAMPO_REGISTRAR,
   mensajeAnulado,
   mensajeConfigurado,
   mensajeCorregido,
@@ -623,7 +624,7 @@ export function PanelRegistrar({
             etiqueta="¿Qué registro?"
             valor={texto}
             alCambiar={setTexto}
-            ejemplo="tacos 80 en efectivo"
+            ejemplo={EJEMPLO_CAMPO_REGISTRAR}
             autoFocus={!abiertoAlInicio}
             alEnviar={() => enviar(texto, 'texto')}
             nativo={{ returnKeyType: 'send', autoCorrect: false }}
