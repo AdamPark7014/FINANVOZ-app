@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Plan:** título de pantalla con `accessibilityRole="header"` (`ID.tituloPantalla`) + aserción en `plan.test.tsx`.
+- **PreviaWidget:** rama sin cifra (`ocultar montos`) envuelta con `importantForAccessibility="no-hide-descendants"`, igual que la fila con cifra.
 
 ## Hecho (acumulado reciente)
 
-- Ajustes header, Chip TalkBack, widget/captura. Ver `git log`.
+- Chip TalkBack, ajustes header, widget/captura a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: `me-alcanza/*`, `captura.test.tsx`, `widget.test.tsx` (turno anterior).
+- WIP local: `PreguntasCaptura.tsx`, `PantallaRespaldo.tsx` sin commitear.
 - WIP: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE`).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
@@ -22,7 +22,7 @@
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP me-alcanza/captura/widget.
+2. Cerrar WIP captura/respaldo/tanda.
 3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
