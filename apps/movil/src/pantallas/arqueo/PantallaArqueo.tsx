@@ -15,6 +15,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips } from '../onboarding/componentes';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { mensajeError } from '../principal/textos';
 import {
   ACCESIBILIDAD_CERRAR,
@@ -30,6 +31,7 @@ import {
   mensajeSumaPropuesta,
   OPCIONES_SOBRANTE,
   ETIQUETA_GASTO_SIN_DESCRIPCION,
+  etiquetaVacioSinEfectivo,
   PASO_MARCAR_AYUDA,
   PASO_MARCAR_TITULO,
   TEXTO_SIN_CUENTA_EFECTIVO,
@@ -93,14 +95,11 @@ export function PantallaArqueo({
           alCerrar={alCerrar}
         />
       ) : (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
+        <EstadoVacio
+          texto={TEXTO_SIN_CUENTA_EFECTIVO}
           testID="arqueo-sin-efectivo"
-          accessibilityLiveRegion="polite"
-        >
-          {TEXTO_SIN_CUENTA_EFECTIVO}
-        </Texto>
+          etiquetaAccesible={etiquetaVacioSinEfectivo()}
+        />
       )}
     </Pantalla>
   );
@@ -173,7 +172,9 @@ function Arqueo({
   if (hecho) {
     return (
       <Tarjeta testID="arqueo-hecho">
-        <Texto variante="cuerpoFuerte">{hecho}</Texto>
+        <Texto variante="cuerpoFuerte" accessibilityLiveRegion="polite">
+          {hecho}
+        </Texto>
         <Boton etiqueta={LISTO} alPresionar={alCerrar} testID="arqueo-listo" />
       </Tarjeta>
     );

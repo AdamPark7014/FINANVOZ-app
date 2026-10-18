@@ -83,6 +83,10 @@ describe('onboarding', () => {
     tocar('onb-empezar');
     expect(r.getPathname()).toBe('/onboarding/consentimiento');
     expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CONSENTIMIENTO);
+    expect(screen.getByTestId('onb-tip')).toHaveProp(
+      'accessibilityLabel',
+      `Consejo: ${TIP_CONSENTIMIENTO}`,
+    );
 
     // La casilla obligatoria viene sin marcar y el botón no hace nada hasta marcarla.
     expect(screen.getByTestId('onb-casilla-datos')).toHaveProp('accessibilityState', { checked: false });

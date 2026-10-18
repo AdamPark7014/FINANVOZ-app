@@ -25,6 +25,7 @@ import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
 import {
   AYUDA_DATOS_INSUFICIENTES,
+  etiquetaVacioDatosInsuficientes,
   BTN_CALCULAR,
   BTN_CAMBIAR_DATOS,
   BTN_CANCELAR,

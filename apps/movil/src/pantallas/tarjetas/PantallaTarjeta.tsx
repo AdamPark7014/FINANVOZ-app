@@ -13,6 +13,7 @@ import {
 import { useVista } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { CandadoPlus } from '../plan/CandadoPlus';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { Dato, FormularioPago, PreguntaLiquidarMeses, Seccion } from './componentes';
 import { CorregirSaldo, EditarTarjeta } from './EditarTarjeta';
@@ -34,6 +35,7 @@ import {
   ETIQUETA_PROXIMO_CORTE,
   ETIQUETA_SALDO_A_FAVOR,
   etiquetaAccesibleUsoTarjeta,
+  etiquetaVacioMovimientosTarjeta,
   etiquetaSaldoAlCorte,
   MOVIMIENTO_SIN_TITULO,
   NOMBRE_MODO,

@@ -75,7 +75,7 @@ describe('GrupoChips (TalkBack)', () => {
         prefijoTestID="pago"
       />,
     );
-    const grupo = screen.getByRole('radiogroup', { name: '¿Con qué pagaste?' });
+    const grupo = screen.getByLabelText('¿Con qué pagaste?');
     expect(grupo).toBeTruthy();
     expect(screen.getByTestId('pago-efectivo').props.accessibilityState).toEqual({ selected: true });
     expect(screen.getByTestId('pago-debito').props.accessibilityState).toEqual({ selected: false });
@@ -100,7 +100,7 @@ describe('OCULTAR_ETIQUETA_VISIBLE', () => {
         ¿Con qué pagaste?
       </Text>,
     );
-    const pregunta = screen.getByTestId('pregunta');
+    const pregunta = screen.getByTestId('pregunta', { includeHiddenElements: true });
     expect(pregunta.props.accessibilityElementsHidden).toBe(true);
     expect(pregunta.props.importantForAccessibility).toBe('no-hide-descendants');
   });

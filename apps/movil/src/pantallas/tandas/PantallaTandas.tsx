@@ -7,6 +7,9 @@ import {
   ETIQUETA_NUEVA_TANDA,
   ETIQUETA_VER_CALENDARIO,
   ETIQUETA_VOLVER,
+  etiquetaVacioTandas,
+  PISTA_NUEVA_TANDA,
+  PISTA_VER_CALENDARIO,
   PISTA_VOLVER,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
@@ -54,9 +57,11 @@ export function PantallaTandas({
       ) : (
         <>
           {tandas.length === 0 ? (
-            <Texto variante="cuerpo" tono="secundario" testID="tandas-vacio">
-              {TEXTO_TANDAS_VACIO}
-            </Texto>
+            <EstadoVacio
+              texto={TEXTO_TANDAS_VACIO}
+              testID="tandas-vacio"
+              etiquetaAccesible={etiquetaVacioTandas()}
+            />
           ) : null}
           {tandas.map((t) => (
             <Tarjeta key={t.id} testID={`tanda-${t.id}`}>

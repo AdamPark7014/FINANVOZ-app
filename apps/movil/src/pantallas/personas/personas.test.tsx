@@ -205,6 +205,14 @@ describe('CA-M8-02 · Cobrar', () => {
     );
   });
 
+  it('TalkBack en Guardar del panel Ya me pagó (`02 §19`)', () => {
+    const p = conAmigos();
+    cena(p);
+    renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
+    expect(screen.getByTestId('boton-guardar-pago-persona')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO);
+  });
+
   it('"Ya me pagó" de Caro deja su saldo en 0 y sale de Te deben', () => {
     const p = conAmigos();
     cena(p);

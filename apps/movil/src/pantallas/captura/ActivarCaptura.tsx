@@ -172,6 +172,7 @@ export function ActivarCaptura({
             <Texto
               variante="cuerpo"
               testID={paso.denegado ? `${testID}-permiso-denegado-texto` : `${testID}-permiso-texto`}
+              accessibilityLabel={etiquetaPermisoCaptura(paso.denegado)}
             >
               {paso.denegado ? PERMISO_DENEGADO : PERMISO_INSTRUCCION}
             </Texto>

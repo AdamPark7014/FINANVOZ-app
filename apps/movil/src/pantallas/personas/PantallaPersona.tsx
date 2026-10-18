@@ -88,9 +88,7 @@ export function PantallaPersona({
           alPresionar={alVolver}
           pista={PISTA_VOLVER}
         />
-        <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
-          {TEXTO_PERSONA_NO_ENCONTRADA}
-        </Texto>
+        <EstadoVacio texto={TEXTO_PERSONA_NO_ENCONTRADA} testID="persona-no-encontrada" />
       </Pantalla>
     );
   }
@@ -175,7 +173,13 @@ function Detalle({
       ) : null}
 
       {mensaje ? (
-        <Texto variante="secundario" tono="faltante" testID="persona-mensaje">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="persona-mensaje"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {mensaje}
         </Texto>
       ) : null}
@@ -227,7 +231,11 @@ function Detalle({
                   {`${NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} · ${etiquetaDiaMes(m.fecha)}`}
                 </Texto>
               </View>
-              <Cifra centavos={m.monto} contexto={m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} />
+              <Cifra
+                centavos={m.monto}
+                contexto={m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
+                testID={`persona-mov-${m.id}-saldo`}
+              />
             </View>
           </Tarjeta>
         ))}

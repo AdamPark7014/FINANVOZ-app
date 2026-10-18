@@ -3,6 +3,7 @@ import fc from 'fast-check';
 import {
   cifraEnPalabras,
   enteroEnPalabras,
+  etiquetaCampoMonto,
   etiquetaHablada,
   formatearCentavos,
   leerPesos,

@@ -515,6 +515,7 @@ describe('Movimientos', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    expect(screen.getByTestId('movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_VACIO);
     expect(screen.getByTestId('movimientos-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioMovimientos(false),
@@ -551,6 +552,8 @@ describe('Movimientos', () => {
       p.ctx,
       <PantallaMovimientos alRegistrar={jest.fn()} detalleInicial={id ?? null} />,
     );
+    const fechaDia = listarMovimientos(p.ctx)[0]?.fecha;
+    expect(screen.getByTestId(`movimientos-dia-${fechaDia}`)).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId(`detalle-${id}`)).toBeTruthy();
   });
 

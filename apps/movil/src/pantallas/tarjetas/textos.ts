@@ -122,6 +122,12 @@ export const ETIQUETA_SALDO_SEGUN_BANCO = 'Saldo según tu banco';
 export const ERROR_SALDO_SEGUN_BANCO = 'Escribe el saldo que dice tu banco.';
 export const ERROR_CORREGIR_SALDO = 'No pude corregir el saldo. Intenta de nuevo.';
 
+export function textoIntroCorregirSaldo(aFavor: boolean, monto: string): string {
+  return aFavor
+    ? `Según lo que llevo, tienes ${monto} a favor. Escribe lo que dice tu banco, sin contar meses sin intereses.`
+    : `Según lo que llevo, debes ${monto}. Escribe lo que dice tu banco, sin contar meses sin intereses.`;
+}
+
 export function textoPrimerCorteEnApp(etiquetaProximoCorte: string): string {
   return `Tu primer corte con la app es el ${etiquetaProximoCorte}.`;
 }
@@ -139,7 +145,7 @@ export function textoPagarPngiAntesDe(fechaLimite: string): string {
 }
 export const TEXTO_PNGI_CUBIERTO = 'Ya cubriste el pago de tu último corte.';
 export function textoSinCorteDesdeAlta(etiquetaProximoCorte: string): string {
-  return `Aún no cierra ningún corte desde que la agregaste. El primero es el ${etiquetaProximoCorte}.`;
+  return `Todavía no cierra ningún corte desde que la agregaste. El primero es el ${etiquetaProximoCorte}.`;
 }
 export const ETIQUETA_FECHA_LIMITE = 'Fecha límite';
 export const ETIQUETA_PROXIMO_CORTE = 'Próximo corte';

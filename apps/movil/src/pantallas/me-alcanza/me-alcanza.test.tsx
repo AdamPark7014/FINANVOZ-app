@@ -59,6 +59,7 @@ import {
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
   PISTA_CALCULAR,
+  PISTA_CANCELAR,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
@@ -425,8 +426,10 @@ describe('¿Me alcanza?', () => {
     await waitFor(() =>
       expect(screen.getByTestId('me-alcanza-progreso').props.accessibilityLabel).toBe(ETIQUETA_PROGRESO),
     );
+    expect(screen.getByTestId('boton-cancelar-me-alcanza')).toHaveProp('accessibilityHint', PISTA_CANCELAR);
     fireEvent.press(screen.getByTestId('boton-cancelar-me-alcanza'));
     expect(textoDe('me-alcanza-aviso')).toBe(MENSAJE_CANCELADO);
+    expect(screen.getByTestId('me-alcanza-aviso')).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId('me-alcanza-formulario')).toBeTruthy();
     // Al soltar el bloque pendiente, el cálculo ve la cancelación y no pinta nada.
     await act(async () => {
@@ -437,9 +440,11 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByTestId('me-alcanza-formulario')).toBeTruthy();
   });
 
-  it('TalkBack en Calcular (`02 §19`)', () => {
+  it('TalkBack en cabecera y acciones del formulario (`02 §19`)', () => {
     const p = e401();
     montar(p.ctx, <PantallaMeAlcanza alCerrar={jest.fn()} />);
+    expect(screen.getByTestId('me-alcanza-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('boton-cerrar-me-alcanza')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
     expect(screen.getByTestId('boton-calcular-me-alcanza')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
   });
 

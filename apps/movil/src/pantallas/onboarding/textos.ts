@@ -1,5 +1,12 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
+export {
+  TIP_COLCHON_SIN_POR_AHORA,
+  TIP_CUENTAS_MINIMO,
+  TIP_INGRESO_SALTAR,
+  TIP_PAGOS_SALTAR,
+} from './tips';
+
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
 
@@ -78,6 +85,8 @@ export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
 export const AYUDA_PAGO_VARIABLE =
   'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
 export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
+export const TIP_PAGOS_SALTAR =
+  'Si hoy no quieres registrar pagos fijos, toca «Saltar por ahora»; los agregas cuando quieras desde Hoy.';
 export const PISTA_PAGOS_SALTAR = 'Pasa al siguiente paso sin registrar pagos fijos';
 export const PISTA_PAGOS_CONTINUAR = 'Pasa a activar la captura automática';
 

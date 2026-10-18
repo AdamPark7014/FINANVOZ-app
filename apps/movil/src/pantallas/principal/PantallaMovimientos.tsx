@@ -113,7 +113,7 @@ export function PantallaMovimientos({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo" testID="movimientos-titulo">
+        <Texto variante="titulo" testID="movimientos-titulo" accessibilityRole="header">
           Movimientos
         </Texto>
         <Boton
