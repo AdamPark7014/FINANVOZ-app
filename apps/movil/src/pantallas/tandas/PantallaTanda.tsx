@@ -79,7 +79,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
     <Pantalla testID="pantalla-tanda" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="tanda-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
@@ -90,11 +90,11 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         </Texto>
         {!d.activa ? (
           <Texto variante="secundario" tono="secundario" testID="tanda-archivada">
-            Archivada · ya no aparto aportaciones
+            {TEXTO_TANDA_ARCHIVADA}
           </Texto>
         ) : null}
         <Texto variante="secundario" tono="secundario">
-          {`${formatearCentavos(d.aportacion)} por ronda · ${d.participantes} participantes · tu turno: ${d.turno}`}
+          {textoSubtituloTanda(d.aportacion, d.participantes, d.turno)}
         </Texto>
       </View>
 
@@ -102,8 +102,10 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       {d.activa && d.proxima ? (
         <Tarjeta>
-          <Texto variante="cuerpo">{`Próxima aportación: ${d.proxima.etiqueta}`}</Texto>
-          {ya.elegir ?? <Boton testID="tanda-ya-la-di" etiqueta="Ya la di" alPresionar={() => ya.dar()} />}
+          <Texto variante="cuerpo">{textoProximaAportacion(d.proxima.etiqueta)}</Texto>
+          {ya.elegir ?? (
+            <Boton testID="tanda-ya-la-di" etiqueta={ETIQUETA_YA_LA_DI} alPresionar={() => ya.dar()} />
+          )}
           {ya.error ? (
             <Texto variante="secundario" tono="faltante">
               {ya.error}

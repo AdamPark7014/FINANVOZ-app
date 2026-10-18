@@ -26,7 +26,7 @@ import { Chips, MensajeError } from '../onboarding/componentes';
 import { PuertaPlus } from '../plan/CandadoPlus';
 import { mensajeError } from '../principal/textos';
 import type { ArchivosFacturas } from './archivos';
-import { LEYENDA_ESTIMACION } from './textos';
+import { LEYENDA_ESTIMACION, TEXTO_FACTURAS_VACIO, TEXTO_IMPORTAR_VACIO } from './textos';
 
 export const PEDIR_PERFIL =
   'Para estimar, necesito tu RFC, tus ingresos brutos del año (los de tu constancia de sueldos, incluidos los exentos) y, si la tienes, tu base gravable.';
@@ -34,9 +34,6 @@ export const PERFIL_EN_TELEFONO = 'Se guardan solo en tu teléfono.';
 export const ERROR_RFC = 'Revisa tu RFC: son 13 letras y números, como aparece en tu constancia.';
 export const ERROR_INGRESOS = 'Escribe tus ingresos brutos del año.';
 export const MENSAJE_IMPORTAR_ERROR = 'No pude leer esos archivos. Intenta de nuevo.';
-export const SIN_FACTURAS =
-  'Todavía no tienes facturas de este año. Compártelas con Finanvoz desde tu correo o el portal del SAT (el XML o un ZIP), o elígelas aquí.';
-
 /**
  * Personal → Deducciones (`02 §24`, RF-FIS-01…03, Plus): importar facturas, pedir el perfil fiscal la primera vez,
  * "Llevas $25,900 deducibles en 2026 (estimación)" por tipo, lo que no es deducible con su motivo, el ISR que
@@ -139,8 +136,8 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
 
       <Texto variante="subtitulo">Tus facturas</Texto>
       {v.facturas.length === 0 ? (
-        <Texto variante="secundario" tono="secundario" testID="deducciones-sin-facturas">
-          {SIN_FACTURAS}
+        <Texto variante="cuerpo" tono="secundario" testID="deducciones-sin-facturas">
+          {TEXTO_FACTURAS_VACIO}
         </Texto>
       ) : null}
       {v.facturas.map((f) => (
@@ -513,8 +510,8 @@ export function ImportarCompartidas({
       {estado.tipo === 'listo' ? <ResultadoImportacionTarjeta r={estado.r} /> : null}
       {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
       {estado.tipo === 'vacio' ? (
-        <Texto variante="cuerpo" testID="importar-vacio">
-          No llegó ningún archivo. Comparte el XML de la factura o un ZIP.
+        <Texto variante="cuerpo" tono="secundario" testID="importar-vacio">
+          {TEXTO_IMPORTAR_VACIO}
         </Texto>
       ) : null}
       {estado.tipo !== 'leyendo' ? (

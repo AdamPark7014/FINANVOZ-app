@@ -399,7 +399,7 @@ function Resultado({
           ))}
           {alVerMovimientos ? (
             <Boton
-              etiqueta="Ver los movimientos"
+              etiqueta={BTN_VER_MOVIMIENTOS}
               variante="texto"
               ancho="contenido"
               alPresionar={alVerMovimientos}
@@ -419,7 +419,7 @@ function Resultado({
       ) : null}
       {recordado ? (
         <Texto variante="secundario" tono="secundario" testID="recordatorio-programado">
-          Te lo recuerdo ese día.
+          {TEXTO_RECORDATORIO_PROGRAMADO}
         </Texto>
       ) : null}
       {mensajeRecordatorio ? (
@@ -428,7 +428,7 @@ function Resultado({
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Hacer otra cuenta"
+        etiqueta={BTN_HACER_OTRA_CUENTA}
         variante="texto"
         ancho="contenido"
         alPresionar={alOtraCuenta}
@@ -483,11 +483,11 @@ function FilaEscenario({
       {e.tipo !== 'base' ? (
         comprado === e.clave ? (
           <Texto variante="secundario" tono="acento" testID={`comprado-${e.tipo}`}>
-            Ya lo registré.
+            {TEXTO_YA_LO_REGISTRE}
           </Texto>
         ) : comprado === null ? (
           <Boton
-            etiqueta="Lo compré"
+            etiqueta={BTN_LO_COMPRE}
             variante="secundario"
             ancho="contenido"
             pista={`Registra la compra: ${e.etiqueta}`}

@@ -196,7 +196,7 @@ function TarjetaNube({
             alGuardar={() => {
               setCreada((n) => n + 1);
               alCrearContrasena();
-              setMensaje({ texto: 'Listo: guardé tu contraseña de respaldo.', error: false });
+              setMensaje({ texto: MENSAJE_CONTRASENA_GUARDADA, error: false });
             }}
             alCancelar={() => setMensaje(null)}
           />
@@ -204,19 +204,19 @@ function TarjetaNube({
       ) : (
         <>
           <Texto variante="secundario" tono="secundario" testID="respaldo-correo-actual">
-            {`Respaldas con ${cuenta.tipo === 'con_correo' ? cuenta.correo : ''}.`}
+            {cuenta.tipo === 'con_correo' ? textoRespaldasCon(cuenta.correo) : ''}
           </Texto>
           <Boton
             testID="respaldo-ahora"
-            etiqueta="Respaldar ahora"
+            etiqueta={BTN_RESPALDAR_AHORA}
             cargando={respaldando}
             deshabilitado={respaldando || borrando !== 'no'}
             alPresionar={() => void respaldar()}
           />
           <Interruptor
             testID="respaldo-automatico"
-            etiqueta="Respaldo automático"
-            descripcion="Cada semana, aunque no abras la app. No te pido la contraseña."
+            etiqueta={ETIQUETA_RESPALDO_AUTOMATICO}
+            descripcion={DESC_RESPALDO_AUTOMATICO}
             valor={vista.automatico}
             alCambiar={(automatico) => fijar({ automatico })}
           />

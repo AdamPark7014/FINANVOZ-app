@@ -13,7 +13,7 @@ import {
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
-import { Casilla } from '../onboarding/componentes';
+import { Casilla, Chips } from '../onboarding/componentes';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
@@ -22,6 +22,7 @@ import {
   CONTINUAR,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,
+  ETIQUETA_QUIEN_TE_PAGO,
   LISTO,
   mensajeCuadra,
   mensajeEfectivoQuedo,
@@ -29,7 +30,6 @@ import {
   OPCIONES_SOBRANTE,
   PASO_MARCAR_AYUDA,
   PASO_MARCAR_TITULO,
-  QUIEN_TE_PAGO,
   SIN_CUENTA_EFECTIVO,
   TITULO,
   textoDeberiasTraer,
@@ -347,15 +347,13 @@ function Sobrante({
         prefijoTestID="arqueo-sobrante"
       />
       {opcion === 'me_pagaron' ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario">{QUIEN_TE_PAGO}</Texto>
-          <GrupoChips
-            opciones={teDeben.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
-            valor={null}
-            alCambiar={(personaId) => alResponder({ tipo: 'me_pagaron', personaId })}
-            prefijoTestID="arqueo-persona"
-          />
-        </View>
+        <Chips
+          testID="arqueo-persona"
+          etiqueta={ETIQUETA_QUIEN_TE_PAGO}
+          opciones={teDeben.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
+          valor={null}
+          alCambiar={(personaId) => alResponder({ tipo: 'me_pagaron', personaId })}
+        />
       ) : null}
     </View>
   );

@@ -1,5 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
-import { espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, tipo, useTema } from '../../ui';
+import { Pressable, View } from 'react-native';
+import { espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, Texto, useTema } from '../../ui';
 
 export interface OpcionChip<T extends string> {
   readonly valor: T;
@@ -15,6 +15,7 @@ export function Chip({
   seleccionado,
   alPresionar,
   multiple = false,
+  etiquetaAccesible,
   testID,
 }: {
   etiqueta: string;
@@ -22,6 +23,8 @@ export function Chip({
   alPresionar: () => void;
   /** Se pueden elegir varias del grupo ("¿Con quién?"). */
   multiple?: boolean;
+  /** TalkBack si el texto visible no basta (p. ej. «Caro ×2»). */
+  etiquetaAccesible?: string;
   testID?: string;
 }) {
   const { c } = useTema();
@@ -30,7 +33,7 @@ export function Chip({
       testID={testID}
       onPress={alPresionar}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
-      accessibilityLabel={etiquetaHablada(etiqueta)}
+      accessibilityLabel={etiquetaHablada(etiquetaAccesible ?? etiqueta)}
       accessibilityState={
         multiple ? { checked: seleccionado } : { selected: seleccionado, checked: seleccionado }
       }
@@ -44,9 +47,14 @@ export function Chip({
         backgroundColor: seleccionado ? c.superficieAlterna : pressed ? c.superficieAlterna : c.superficie,
       })}
     >
-      <Text style={[tipo.etiqueta, { color: seleccionado ? c.acentoTexto : c.texto }]}>
+      <Texto
+        variante="etiqueta"
+        tono={seleccionado ? 'acento' : 'normal'}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         {seleccionado ? `✓ ${etiqueta}` : etiqueta}
-      </Text>
+      </Texto>
     </Pressable>
   );
 }
@@ -57,14 +65,21 @@ export function GrupoChips<T extends string>({
   valor,
   alCambiar,
   prefijoTestID,
+  etiqueta,
 }: {
   opciones: readonly OpcionChip<T>[];
   valor: T | null;
   alCambiar: (v: T) => void;
   prefijoTestID?: string;
+  /** Pregunta del grupo (TalkBack en el radiogroup), p. ej. «¿Con qué pagaste?». */
+  etiqueta?: string;
 }) {
   return (
-    <View accessibilityRole="radiogroup" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={etiqueta ? etiquetaHablada(etiqueta) : undefined}
+      style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}
+    >
       {opciones.map((o) => (
         <Chip
           key={o.valor}

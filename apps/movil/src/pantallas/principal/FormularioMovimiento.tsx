@@ -16,11 +16,28 @@ import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from
 import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
 import { mensajeCuentaDividida } from '../personas/textos';
 import { GrupoChips, type OpcionChip } from './Chip';
-import { mensajeError, NOMBRE_TIPO, type TipoMovimiento } from './textos';
+import {
+  AVISO_RETIRO_EFECTIVO_TARJETA,
+  BTN_AGREGAR_PERSONA,
+  BTN_GUARDAR_MOVIMIENTO,
+  CAMPOS_FORMULARIO_MOVIMIENTO,
+  EJEMPLO_DESCRIPCION,
+  EJEMPLO_NUEVA_PERSONA,
+  ERROR_CUENTAS_DISTINTAS,
+  ERROR_ELEGIR_CATEGORIA,
+  ERROR_ELEGIR_PERSONA,
+  ERROR_MONTO_CERO,
+  ETIQUETA_AGREGAR_PERSONA,
+  ETIQUETA_CATEGORIA,
+  ETIQUETA_DESCRIPCION,
+  ETIQUETA_MONTO,
+  ETIQUETA_QUE_PASO,
+  NOMBRE_TIPO_FORMULARIO,
+  type TipoFormulario,
+  type TipoMovimiento,
+} from './formularioMovimiento-textos';
+import { mensajeError, NOMBRE_TIPO } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
-
-/** El formulario agrega "Cuenta dividida" (`02 §17`), que tiene su propio formulario con contactos. */
-type TipoFormulario = TipoMovimiento | 'cuenta_dividida';
 
 const TIPOS: readonly TipoFormulario[] = [
   'gasto',

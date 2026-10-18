@@ -171,7 +171,7 @@ function Detalle({
       {d.saldo > 0 ? <Recordatorio personaId={personaId} fecha={d.recordatorio} /> : null}
 
       <View style={{ gap: espacio.s }}>
-        <Texto variante="subtitulo">Movimientos</Texto>
+        <Texto variante="subtitulo">{TITULO_MOVIMIENTOS}</Texto>
         {d.movimientos.length === 0 ? (
           <Texto variante="cuerpo" tono="secundario" testID="persona-movimientos-vacio">
             {TEXTO_MOVIMIENTOS_PERSONA_VACIO}
@@ -212,14 +212,14 @@ function YaMePago({
   const [intentado, setIntentado] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const faltante =
-    monto === null || monto <= 0 ? 'Escribe un monto mayor a $0.' : !destinoId ? '¿A dónde te llegó?' : null;
+    monto === null || monto <= 0 ? ERROR_MONTO_MAYOR_CERO : !destinoId ? ETIQUETA_A_DONDE_LLEGO : null;
 
   const guardar = () => {
     setIntentado(true);
     if (faltante || monto === null || !destinoId) return;
     try {
       const r = registrarPrestamo(ctx, { tipo: 'cobro_prestamo', personaId, cuentaId: destinoId, monto });
-      alTerminar(`Registré que te pagó ${formatearCentavos(monto)}`, r.deshacer);
+      alTerminar(mensajeRegistroCobro(monto), r.deshacer);
     } catch (e) {
       setError(mensajeError(e));
     }
@@ -227,9 +227,9 @@ function YaMePago({
 
   return (
     <Tarjeta testID="persona-ya-me-pago">
-      <Texto variante="subtitulo">¿Cuánto te pagó?</Texto>
-      <CampoMonto etiqueta="Monto" valorInicial={saldo} alCambiar={setMonto} testID="pago-persona-monto" />
-      <Texto variante="etiqueta">¿A dónde te llegó?</Texto>
+      <Texto variante="subtitulo">{TITULO_YA_ME_PAGO}</Texto>
+      <CampoMonto etiqueta={ETIQUETA_MONTO} valorInicial={saldo} alCambiar={setMonto} testID="pago-persona-monto" />
+      <Texto variante="etiqueta">{ETIQUETA_A_DONDE_LLEGO}</Texto>
       <GrupoChips
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={destinoId}

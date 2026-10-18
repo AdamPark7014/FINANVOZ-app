@@ -19,7 +19,13 @@ import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import type { ArchivosFacturas } from './archivos';
 import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones';
-import { AVISO_DEDUCIBLE_EFECTIVO, LEYENDA_ESTIMACION, MENSAJE_SIN_PARAMETROS } from './textos';
+import {
+  AVISO_DEDUCIBLE_EFECTIVO,
+  LEYENDA_ESTIMACION,
+  MENSAJE_SIN_PARAMETROS,
+  TEXTO_FACTURAS_VACIO,
+  TEXTO_IMPORTAR_VACIO,
+} from './textos';
 
 const CARPETA_CFDI = join(__dirname, '../../../../../fixtures/cfdi');
 
@@ -86,7 +92,7 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
       ctx,
       <ImportarCompartidas leer={async () => []} alVerDeducciones={jest.fn()} />,
     );
-    expect(await screen.findByTestId('importar-vacio')).toBeTruthy();
+    expect(screen.getByTestId('importar-vacio')).toHaveTextContent(TEXTO_IMPORTAR_VACIO);
     r.unmount();
     renderConSesion(
       ctx,
