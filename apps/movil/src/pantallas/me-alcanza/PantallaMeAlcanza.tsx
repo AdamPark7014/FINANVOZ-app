@@ -212,12 +212,15 @@ export function PantallaMeAlcanza({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">{TITULO}</Texto>
+        <Texto variante="titulo" testID="me-alcanza-titulo">
+          {TITULO}
+        </Texto>
         <Boton
           etiqueta={BTN_CERRAR}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
+          etiquetaAccesible={ACCESIBILIDAD_CERRAR}
           testID="boton-cerrar-me-alcanza"
         />
       </View>

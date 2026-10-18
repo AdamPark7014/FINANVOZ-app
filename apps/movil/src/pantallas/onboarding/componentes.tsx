@@ -142,6 +142,7 @@ export function PasoOnboarding({
         variante="secundario"
         tono="secundario"
         testID="onb-progreso"
+        accessibilityRole="text"
         accessibilityLabel={etiquetaProgresoOnboarding(paso)}
       >
         {textoProgresoOnboarding(paso)}

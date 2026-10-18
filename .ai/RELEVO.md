@@ -6,24 +6,22 @@
 
 ## Hecho en este turno
 
-- **PantallaCuentas (empty/a11y):** en `origin/main` — `cuentas-titulo`, `seccion-*-titulo`, `etiquetaVacioCuentas*` + `EstadoVacio.etiquetaAccesible`, botones Cobrar/Ver/Contar con etiqueta TalkBack; tests Cuentas en verde (`listarCuentas`, `compromiso-*-saldo`).
+- **Onboarding O5/O7:** copy de pagos fijos y colchón en `onboarding/textos.ts`; pantallas importan desde ahí. Tips O3–O7 en `textos.ts`; `tips.ts` solo reexporta (sin ciclo con `textos`). Sugerencia 10 %: `sugerenciaMontoColchon10` en `colchon-textos.ts`. Commit **`34ffca6`** en `origin/main`.
 
 ## Hecho (acumulado reciente)
 
-- Deducciones, tabs, onboarding/captura, Chip. Ver `git log`.
+- O3/O4 centralizados (`43574fd`), tabs/personas/captura TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: captura/ActivarCaptura, Movimientos, Chip.test (no mezclar sin cerrar).
-- Pantallas negocio (M11) aún no en UI.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP local ajeno (principal, deducciones, etc.) — no mezclar.
+- Typecheck móvil / CI Windows pendientes.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP captura/Movimientos sin pisar relevo.
-3. M11 negocio cuando toque el hito.
+2. Tips O2/O6 en `textos` si se busca un solo módulo.
 
 ## No tocar
 
