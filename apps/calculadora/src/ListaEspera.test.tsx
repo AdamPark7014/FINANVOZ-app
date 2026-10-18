@@ -14,6 +14,9 @@ vi.mock('./config', () => ({
 }));
 
 import {
+  LISTA_ESPERA_ARIA_CTA,
+  LISTA_ESPERA_ARIA_CTA_ENVIANDO,
+  LISTA_ESPERA_ARIA_FORMULARIO,
   LISTA_ESPERA_ERROR_CONSENTIMIENTO,
   LISTA_ESPERA_PREGUNTAS,
   LISTA_ESPERA_TITULO_EXITO,
@@ -41,9 +44,15 @@ function contestar(correo: string) {
   }
 }
 
-const enviar = () => fireEvent.click(screen.getByRole('button', { name: /anotarme/i }));
+const enviar = () => fireEvent.click(screen.getByRole('button', { name: LISTA_ESPERA_ARIA_CTA }));
 
 describe('Lista de espera', () => {
+  it('a11y · formulario y CTA con aria-label en es-MX', () => {
+    render(<ListaEspera />);
+    expect(screen.getByRole('form', { name: LISTA_ESPERA_ARIA_FORMULARIO })).toBeTruthy();
+    expect(screen.getByRole('button', { name: LISTA_ESPERA_ARIA_CTA })).toBeTruthy();
+  });
+
   it('CA-M0-05 · no envía sin consentimiento', () => {
     render(<ListaEspera />);
     contestar('ana@ejemplo.mx');
@@ -66,6 +75,9 @@ describe('Lista de espera', () => {
     contestar('ana@ejemplo.mx');
     fireEvent.click(screen.getByLabelText(/acepto/i));
     enviar();
+    expect(screen.getByRole('button', { name: LISTA_ESPERA_ARIA_CTA_ENVIANDO }).getAttribute('aria-busy')).toBe(
+      'true',
+    );
     await waitFor(() => expect(screen.getByRole('heading', { name: LISTA_ESPERA_TITULO_EXITO })).toBeTruthy());
     expect(screen.getByText(listaEsperaTextoExito('Finanvoz'))).toBeTruthy();
     const cuerpo = JSON.parse((fetch.mock.calls[0]?.[1] as RequestInit).body as string) as Record<
