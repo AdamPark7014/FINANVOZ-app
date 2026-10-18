@@ -251,6 +251,16 @@ export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
 export const SUBTITULO_SIN_INGRESO =
   'Así reparto tu dinero libre hasta el próximo pago.';
 
+export { PISTA_CONFIGURAR_INGRESO as PISTA_CONFIGURAR_INGRESO_HOY } from '../ajustes/ingreso-textos';
+
+/** TalkBack en CTAs de Hoy (`02 §15`). */
+export const PISTA_VER_DESGLOSE = 'Muestra efectivo, reservado, colchón y libre';
+export const PISTA_OCULTAR_DESGLOSE = 'Oculta el desglose de tu dinero';
+export const PISTA_VER_QUE_VIENE = 'Muestra lo que viene antes de tu próximo ingreso';
+export const PISTA_CONTAR_EFECTIVO = 'Abre el arqueo para contar el efectivo que traes';
+export const PISTA_AVISO_ENTENDIDO = 'Oculta este aviso';
+export const PISTA_ME_ALCANZA_HOY = 'Calcula si te alcanza para una compra';
+
 // ——— Modo explicar (`02 §22`) ———
 
 export const MENSAJE_EXPLICANDO = 'Revisando tus datos…';

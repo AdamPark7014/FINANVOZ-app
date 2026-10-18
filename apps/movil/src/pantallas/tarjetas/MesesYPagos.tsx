@@ -133,14 +133,11 @@ export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
   return (
     <Seccion titulo={TITULO_MESES_SIN_INTERESES} testID="tarjeta-meses">
       {planes.length === 0 ? (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
+        <EstadoVacio
+          texto={VACIO_MSI_TARJETA}
           testID="tarjeta-meses-vacio"
-          accessibilityLiveRegion="polite"
-        >
-          {VACIO_MSI_TARJETA}
-        </Texto>
+          etiquetaAccesible={etiquetaVacioMsiTarjeta()}
+        />
       ) : null}
       {planes.map((p) => (
         <FilaPlan key={p.id} p={p} />

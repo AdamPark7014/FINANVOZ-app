@@ -96,6 +96,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         <Texto
           variante="secundario"
           tono={mensaje.error ? 'faltante' : 'secundario'}
+          accessibilityRole={mensaje.error ? 'alert' : 'text'}
           accessibilityLiveRegion="polite"
           testID="suscripciones-mensaje"
         >

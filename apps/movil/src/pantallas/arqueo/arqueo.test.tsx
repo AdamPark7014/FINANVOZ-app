@@ -41,6 +41,13 @@ describe('copy del arqueo (es-MX)', () => {
     expect(TITULO).not.toMatch(/!/);
   });
 
+  it('tarjeta de Hoy y posponer', () => {
+    expect(AHORA_NO).toBe('Ahora no');
+    expect(MENSAJE_POSPONER).toBe('Va. Te pregunto mañana.');
+    expect(AYUDA_POR_ASIGNAR).toMatch(/gastos/);
+    expect(ACCESIBILIDAD_LISTO).toMatch(/cerrar/);
+  });
+
   it('estado vacío y opciones de sobrante', () => {
     expect(TEXTO_SIN_CUENTA_EFECTIVO).toContain('Cuentas');
     expect(Object.values(OPCIONES_SOBRANTE)).toEqual([

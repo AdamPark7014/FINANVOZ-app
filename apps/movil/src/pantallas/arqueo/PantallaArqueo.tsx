@@ -173,10 +173,15 @@ function Arqueo({
   if (hecho) {
     return (
       <Tarjeta testID="arqueo-hecho">
-        <Texto variante="cuerpoFuerte" accessibilityLiveRegion="polite">
+        <Texto variante="cuerpoFuerte" testID="arqueo-mensaje-hecho" accessibilityLiveRegion="polite">
           {hecho}
         </Texto>
-        <Boton etiqueta={LISTO} alPresionar={alCerrar} testID="arqueo-listo" />
+        <Boton
+          etiqueta={LISTO}
+          etiquetaAccesible={ACCESIBILIDAD_LISTO}
+          alPresionar={alCerrar}
+          testID="arqueo-listo"
+        />
       </Tarjeta>
     );
   }

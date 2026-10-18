@@ -15,10 +15,6 @@ export const PISTA_AYUDA =
 export const TEXTO_SUSCRIPCIONES_VACIO =
   'Todavía no veo cargos que se repitan. Cuando un cobro llegue cada mes, cada semana o cada año, aparece aquí.';
 
-export function etiquetaVacioSuscripciones(): string {
-  return `${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`;
-}
-
 /** Vacío de resumen: título de pantalla + copy para TalkBack (`02 §15`). */
 export function etiquetaVacioSuscripciones(): string {
   return `${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`;

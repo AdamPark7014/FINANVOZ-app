@@ -115,25 +115,29 @@ export function PantallaCuentas({
             etiquetaAccesible={etiquetaVacioCuentasTienes()}
           />
         ) : null}
-        {v.tienes.map((c) => (
-          <Fila
-            key={c.id}
-            testID={`cuenta-${c.id}`}
-            titulo={c.nombre}
-            subtitulo={NOMBRE_SUBTIPO[c.subtipo] ?? null}
-            centavos={c.saldo}
-            contextoSaldo={contextoSaldoTienes(c.nombre)}
-            {...(c.subtipo === 'efectivo' && alContarEfectivo
-              ? {
-                  accion: {
-                    etiqueta: 'Contar mi efectivo',
-                    etiquetaAccesible: `Contar mi efectivo en ${c.nombre}`,
-                    alPresionar: () => alContarEfectivo(c.id),
-                  },
-                }
-              : {})}
-          />
-        ))}
+        {v.tienes.length > 0 ? (
+          <View accessibilityRole="list" testID="seccion-tienes-lista" style={{ gap: espacio.s }}>
+            {v.tienes.map((c) => (
+              <Fila
+                key={c.id}
+                testID={`cuenta-${c.id}`}
+                titulo={c.nombre}
+                subtitulo={NOMBRE_SUBTIPO[c.subtipo] ?? null}
+                centavos={c.saldo}
+                contextoSaldo={contextoSaldoTienes(c.nombre)}
+                {...(c.subtipo === 'efectivo' && alContarEfectivo
+                  ? {
+                      accion: {
+                        etiqueta: 'Contar mi efectivo',
+                        etiquetaAccesible: `Contar mi efectivo en ${c.nombre}`,
+                        alPresionar: () => alContarEfectivo(c.id),
+                      },
+                    }
+                  : {})}
+              />
+            ))}
+          </View>
+        ) : null}
       </Seccion>
 
       <Seccion titulo="Debes" testID="seccion-debes">
