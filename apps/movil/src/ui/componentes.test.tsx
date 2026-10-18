@@ -178,6 +178,7 @@ describe('EstadoVacio', () => {
     const vacio = screen.getByTestId('vacio');
     expect(vacio).toHaveTextContent('Todavía no hay movimientos.');
     expect(vacio.props.accessibilityLiveRegion).toBe('polite');
+    expect(vacio.props.accessibilityRole).toBe('text');
     expect(vacio.props.accessibilityLabel).toBe('Todavía no hay movimientos.');
   });
 

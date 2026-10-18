@@ -33,6 +33,7 @@ import {
   MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
+  etiquetaVacioGrupoMovimientos,
   TEXTO_COMPARTIDOS_VACIO,
   TEXTO_GRUPO_MOVIMIENTOS_VACIO,
   TEXTO_SALIR,

@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** prueba del engrane Ajustes usa `accessibilityLabel` (`BTN_AJUSTES_CUENTAS_ACCESIBLE`), no `getByText` del emoji visible.
+- **Hoy CTAs TalkBack:** `PISTA_*` en `principal/textos.ts`; `PantallaHoy` usa `pista` → `accessibilityHint` (desglose, ingreso, arqueo, aviso, ¿Me alcanza?); tests `principal.test.tsx` y `app/(tabs)/hoy.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Por revisar header, deducciones/suscripciones CTAs TalkBack, onboarding tips. Ver `git log`.
+- CampoMonto, PreviaWidget, captura/onboarding headers, suscripciones TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP paralelo: revisar `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Push commits locales si quedan ahead de origin.
+2. CTAs secundarios en tarjetas de acción de Hoy si hace falta más polish.
 
 ## No tocar
 

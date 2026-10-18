@@ -34,6 +34,8 @@ import {
   etiquetaProgresoOnboarding,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
+  PISTA_PAGOS_CONTINUAR,
+  PISTA_PAGOS_SALTAR,
   TITULO_BIENVENIDA,
 } from './textos';
 

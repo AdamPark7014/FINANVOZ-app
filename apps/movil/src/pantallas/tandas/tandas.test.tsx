@@ -251,6 +251,8 @@ describe('Tandas (02 §18)', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTanda tandaId="tanda-inexistente" alVolver={jest.fn()} />);
     expect(screen.getByTestId('tanda-no-encontrada')).toHaveTextContent(TEXTO_TANDA_NO_ENCONTRADA);
+    expect(screen.getByTestId('tanda-no-encontrada')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
   });
 
   it('editar y archivar desde el detalle: cambia nombre y cuenta y quita la tanda de la lista', () => {

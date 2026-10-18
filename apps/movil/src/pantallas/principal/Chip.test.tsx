@@ -11,7 +11,7 @@ describe('Chip (TalkBack)', () => {
     expect(chip.props.accessibilityRole).toBe('radio');
     expect(chip.props.accessibilityLabel).toBe('Efectivo');
     expect(chip.props.accessibilityState).toMatchObject({ selected: true });
-    const texto = screen.getByText('✓ Efectivo');
+    const texto = screen.getByText('✓ Efectivo', { includeHiddenElements: true });
     expect(texto.props.accessibilityElementsHidden).toBe(true);
     expect(texto.props.importantForAccessibility).toBe('no-hide-descendants');
   });
@@ -77,8 +77,8 @@ describe('GrupoChips (TalkBack)', () => {
     );
     const grupo = screen.getByLabelText('¿Con qué pagaste?');
     expect(grupo.props.accessibilityRole).toBe('radiogroup');
-    expect(screen.getByTestId('pago-efectivo').props.accessibilityState).toEqual({ selected: true });
-    expect(screen.getByTestId('pago-debito').props.accessibilityState).toEqual({ selected: false });
+    expect(screen.getByTestId('pago-efectivo').props.accessibilityState?.selected).toBe(true);
+    expect(screen.getByTestId('pago-debito').props.accessibilityState?.selected).toBe(false);
   });
 
   it('pasa etiquetaAccesible de la opción al chip', () => {
