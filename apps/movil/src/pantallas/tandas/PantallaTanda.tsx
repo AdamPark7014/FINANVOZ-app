@@ -116,7 +116,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
           {ya.elegir ?? (
             <Boton
               testID="tanda-ya-la-di"
-              etiqueta={ETIQUETA_YA_LA_LA_DI}
+              etiqueta={ETIQUETA_YA_LA_DI}
               alPresionar={() => ya.dar()}
               pista={PISTA_YA_LA_DI}
             />

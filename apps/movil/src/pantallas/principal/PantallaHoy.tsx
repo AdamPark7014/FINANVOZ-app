@@ -196,7 +196,7 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
       : 'en los próximos días';
     return (
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="subtitulo" testID="hoy-libre-negativo-etiqueta">
+        <Texto variante="subtitulo" testID="hoy-libre-negativo-etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {TITULO_HOY_LIBRE_NEGATIVO}
         </Texto>
         <Cifra

@@ -38,6 +38,7 @@ import {
   NOMBRE_TIPO_LIBRO,
   resumenMovimiento,
   PREGUNTA_PASAR_A_MESES,
+  etiquetaFiltroMovimientosActivo,
   etiquetaVacioMovimientos,
   TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
@@ -112,7 +113,9 @@ export function PantallaMovimientos({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">Movimientos</Texto>
+        <Texto variante="titulo" testID="movimientos-titulo">
+          Movimientos
+        </Texto>
         <Boton
           etiqueta="Registrar"
           ancho="contenido"

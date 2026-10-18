@@ -39,6 +39,7 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
         testID="ajustes-cambiar-ingreso"
         variante="secundario"
         etiqueta={configurado ? ETIQUETA_CAMBIAR_INGRESO : ETIQUETA_CONFIGURAR_INGRESO}
+        pista={configurado ? PISTA_CAMBIAR_INGRESO : PISTA_CONFIGURAR_INGRESO}
         alPresionar={alCambiar}
       />
     </Tarjeta>

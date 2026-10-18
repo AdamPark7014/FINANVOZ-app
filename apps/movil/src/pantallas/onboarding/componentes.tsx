@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
-import { etiquetaProgresoOnboarding, textoProgresoOnboarding } from './textos';
+import { etiquetaProgresoOnboarding, etiquetaTipOnboarding, textoProgresoOnboarding } from './textos';
 
 export { ERROR_GUARDAR, PASOS_ONBOARDING } from './textos';
 

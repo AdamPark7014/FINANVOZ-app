@@ -6,22 +6,24 @@
 
 ## Hecho en este turno
 
-- **Onboarding O3/O4:** copy ingreso/cuentas en `onboarding/textos.ts`; pantallas importan desde ahí. Sin reexport circular `textos` ↔ `tips` (`43574fd`).
+- **PantallaCuentas (empty/a11y):** en `origin/main` — `cuentas-titulo`, `seccion-*-titulo`, `etiquetaVacioCuentas*` + `EstadoVacio.etiquetaAccesible`, botones Cobrar/Ver/Contar con etiqueta TalkBack; tests Cuentas en verde (`listarCuentas`, `compromiso-*-saldo`).
 
 ## Hecho (acumulado reciente)
 
-- O5/O7 en textos, cuentas atajos, tabs TalkBack. Ver `git log`.
+- Deducciones, tabs, onboarding/captura, Chip. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en móvil (personas, principal, widget) — no mezclar.
+- WIP local: captura/ActivarCaptura, Movimientos, Chip.test (no mezclar sin cerrar).
+- Pantallas negocio (M11) aún no en UI.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Tips O2/O6 en `textos` si se quiere un solo módulo.
+2. Cerrar WIP captura/Movimientos sin pisar relevo.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 

@@ -92,6 +92,7 @@ export function SeccionColchon() {
             testID="ajustes-cambiar-colchon"
             variante="secundario"
             etiqueta={colchon > 0 ? BTN_CAMBIAR_COLCHON : BTN_APARTAR_COLCHON}
+            pista={colchon > 0 ? PISTA_CAMBIAR_COLCHON : PISTA_APARTAR_COLCHON}
             alPresionar={abrir}
           />
         </>

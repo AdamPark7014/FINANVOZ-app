@@ -6,6 +6,7 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaSuscripciones } from './PantallaSuscripciones';
 import {
+  BTN_SUSCRIPCIONES_CUENTAS,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
@@ -134,6 +135,7 @@ describe('Suscripciones (02 §20)', () => {
     const p = conEscenario('e4-01');
     const alAbrir = jest.fn();
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirSuscripciones={alAbrir} />);
+    expect(screen.getByText(BTN_SUSCRIPCIONES_CUENTAS)).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-suscripciones'));
     expect(alAbrir).toHaveBeenCalled();
   });

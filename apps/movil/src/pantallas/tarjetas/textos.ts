@@ -77,6 +77,7 @@ export const NOMBRE_ESTADO_PLAN = {
 /** Detalle `/tarjetas/[id]` (`02 §8`): navegación, resumen, movimientos, estados y configuración. */
 
 export const BTN_VOLVER = 'Volver';
+export const PISTA_VOLVER = 'Regresa a Cuentas';
 export const TEXTO_TARJETA_NO_ENCONTRADA = 'No encontré esa tarjeta.';
 export const TITULO_PAGAR_TARJETA = 'Pagar tarjeta';
 export const BTN_PAGAR = 'Pagar';

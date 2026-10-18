@@ -44,6 +44,13 @@ describe('Chip (TalkBack)', () => {
     expect(screen.getByTestId('c').props.accessibilityLabel).toBe('Caro, dos partes');
   });
 
+  it('mide al menos 48 dp y amplía el área táctil', () => {
+    render(<Chip etiqueta="Sí" seleccionado={false} alPresionar={() => {}} testID="c" />);
+    const chip = screen.getByTestId('c');
+    expect(chip).toHaveStyle({ minHeight: 48, minWidth: 48 });
+    expect(chip.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
+  });
+
   it('llama alPresionar', () => {
     const alPresionar = jest.fn();
     render(<Chip etiqueta="Débito" seleccionado={false} alPresionar={alPresionar} testID="c" />);

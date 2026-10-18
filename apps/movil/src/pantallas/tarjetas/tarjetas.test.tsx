@@ -37,6 +37,7 @@ import { PantallaTarjeta } from './PantallaTarjeta';
 import {
   AYUDA_SALDO_A_FAVOR,
   BTN_AGREGAR_PAGO_PLANEADO,
+  PISTA_VOLVER,
   ERROR_ORIGEN_PAGO,
   mensajePagoPlaneadoApartado,
   TEXTO_TARJETA_NO_ENCONTRADA,

@@ -178,20 +178,22 @@ export function ActivarCaptura({
               {PERMISO_AYUDA_ANDROID}
             </Texto>
           </Tarjeta>
-          <Boton etiqueta="Ya lo activé" alPresionar={() => void revisarPermiso()} testID={`${testID}-ya`} />
-          <Boton
-            etiqueta="Abrir el ajuste otra vez"
-            variante="secundario"
-            alPresionar={() => void puente?.abrirAjustesPermiso()}
-            testID={`${testID}-abrir-ajuste`}
-          />
-          <Boton
-            etiqueta="Abrir información de la app"
-            variante="texto"
-            alPresionar={() => void puente?.abrirInfoApp()}
-            testID={`${testID}-info-app`}
-          />
-          {ahoraNo}
+          <View style={{ gap: espacio.s }}>
+            <Boton etiqueta="Ya lo activé" alPresionar={() => void revisarPermiso()} testID={`${testID}-ya`} />
+            <Boton
+              etiqueta="Abrir el ajuste otra vez"
+              variante="secundario"
+              alPresionar={() => void puente?.abrirAjustesPermiso()}
+              testID={`${testID}-abrir-ajuste`}
+            />
+            <Boton
+              etiqueta="Abrir información de la app"
+              variante="texto"
+              alPresionar={() => void puente?.abrirInfoApp()}
+              testID={`${testID}-info-app`}
+            />
+            {ahoraNo}
+          </View>
         </>
       ) : null}
 
