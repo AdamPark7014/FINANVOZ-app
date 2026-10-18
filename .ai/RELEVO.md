@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** botón Tandas usa `BTN_TANDAS_CUENTAS` en `tandas/textos.ts` (simétrico a suscripciones, deducciones y compartidos).
+- **Personas (detalle):** `testID="persona-movimientos-titulo"` en sección movimientos; aserción TalkBack en prueba vacía.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding O5/O7 copy, tabs TalkBack, personas/widget tests. Ver `git log`.
+- Cuentas/tandas BTN centralizado; onboarding O5/O7; PreviaWidget/widget; personas nombre header. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP local en deducciones/estados-cuenta/principal/widget tests — revisar `git status`.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar inline restante en `PantallaCuentas` (`Ajustes`, tarjetas) si conviene.
+2. Centralizar inline restante en `PantallaCuentas` si conviene.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
