@@ -2,6 +2,8 @@
 
 Datos de prueba que funcionan como **contrato** de la implementación. Las pruebas los cargan por `id` o por ruta; nunca se copian dentro de los archivos de prueba.
 
+> **Tip:** nunca edites `motores/vectores.json` a mano; regenera con `node scripts/oraculo.mjs --escribir` (ver § Cambiar un vector).
+
 | Archivo | Qué contiene | Quién lo consume |
 |---|---|---|
 | `motores/oraculo.py` | Implementación de referencia independiente (Python ≥ 3.10, solo biblioteca estándar) de los motores de `docs/05-MOTORES.md` | `node scripts/oraculo.mjs --verificar` (CI y `/verificar`) |

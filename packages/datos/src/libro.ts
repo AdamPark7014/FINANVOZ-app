@@ -176,7 +176,7 @@ export class Libro {
     return this.consultasPreparadas;
   }
 
-  /** E2 regla 1. Si la clave de idempotencia ya existe devuelve la transacción existente (no es error). */
+  /** E2 regla 1: cada transacción debe sumar cero en centavos (`validarAsientos`). Idempotencia: clave duplicada devuelve la existente. */
   registrar(nueva: TransaccionNueva): ResultadoRegistro {
     return this.db.transaction(() => this.registrarEn(nueva, null));
   }
