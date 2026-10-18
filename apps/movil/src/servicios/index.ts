@@ -225,9 +225,12 @@ export {
 export { marcarAvisoVisto, type Aviso } from './avisos';
 export {
   aportarTanda,
+  archivarTanda,
   cobrarTanda,
   crearTanda,
   detalleTanda,
+  editarTanda,
+  EditarTanda,
   EntradaTanda,
   FRECUENCIAS_TANDA,
   listarTandas,
@@ -245,12 +248,18 @@ export {
   type TarjetaTanda,
 } from './tandas';
 export {
+  aceptarAumentoSuscripcion,
   convertirEnCompromiso,
+  fijarNombreSuscripcion,
+  listarAumentosSuscripcionPendientes,
   listarSuscripciones,
+  mantenerMontoSuscripcion,
   marcarNoEsSuscripcion,
+  nombreVisible,
   procesarSuscripciones,
   procesarSuscripcionesDelDia,
   yaLaCancele,
+  type AumentoSuscripcionPendiente,
   type SuscripcionVista,
   type VistaSuscripciones,
 } from './suscripciones';
@@ -393,10 +402,13 @@ export {
   activarCaptura,
   capturaInactiva,
   desactivarCaptura,
+  fijarModoAvisoCaptura,
   HORAS_CAPTURA_INACTIVA,
   obtenerEstadoCaptura,
+  obtenerModoAvisoCaptura,
   registrarSenalesCaptura,
   type EstadoCapturaVista,
+  type ModoAvisoCaptura,
 } from './estado-captura';
 export {
   arqueoPendiente,
@@ -472,16 +484,22 @@ export {
 } from './cfdi';
 export {
   asignarAlumnoNivel,
+  asignarBeneficiarioLentes,
   AVISO_DEDUCIBLE_EFECTIVO,
+  BENEFICIARIO_TITULAR,
   confirmarPagoFactura,
   FORMAS_PAGO_CONFIRMADO,
   guardarPerfilFiscal,
   LEYENDA_ESTIMACION,
+  marcarFacturaCancelada,
   marcarLentes,
   MENSAJE_SIN_PARAMETROS,
   normalizarRfc,
   obtenerDeducciones,
   obtenerPerfilFiscal,
+  ocultarFacturaImportada,
+  opcionesBeneficiarioLentes,
+  recuperarFactura,
   TEXTO_MOTIVO_EXCLUSION,
   type FacturaVista,
   type FormaPagoConfirmado,
