@@ -6,28 +6,28 @@
 
 ## Hecho en este turno
 
-- **me-alcanza:** copy centralizado en `textos.ts` (formulario, calculando, recomendación, vacío/datos insuficientes); `PantallaMeAlcanza` sin strings sueltos; tests alineados con a11y (`Boton`/`Aviso`) + casos formulario, error y permiso de avisos.
+- **fix(movil): tarjetas** — `MENSAJE_SALDO_SIN_CAMBIO` en `tarjetas/textos.ts`; `EditarTarjeta.tsx` al corregir saldo sin cambio.
 
 ## Hecho (acumulado reciente)
 
-- Oleada UI a11y, Ajustes copy, deducciones vacío, etc. Ver `git log`.
+- Movimientos anular, me-alcanza, estados-cuenta, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Working tree ajeno: `apps/movil/src/pantallas/tandas/textos.ts` (turno anterior) — no mezclar en commits de me-alcanza.
+- WIP ajeno (`PreguntasCaptura`, `MesesYPagos`, TarjetasAccion/Interpretacion, etc.) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP tandas según Adam.
-3. `git push` cuando Adam quiera.
+2. Más strings sueltos (MesesYPagos, TarjetasAccion, captura).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
