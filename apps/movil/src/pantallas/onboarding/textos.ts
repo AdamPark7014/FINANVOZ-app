@@ -45,8 +45,7 @@ export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
 /** O4 · Cuentas */
 export const TITULO_CUENTAS = '¿Con qué pagas?';
-export const TIP_CUENTAS_MINIMO =
-  'Puedes tocar «Continuar» solo con efectivo; cuentas, billeteras y tarjetas las agregas después en Cuentas.';
+export const PISTA_CUENTAS_CONTINUAR = 'Pasa a tus pagos fijos del mes';
 export const ETIQUETA_EFECTIVO_ONB = '¿Cuánto efectivo traes ahorita?';
 export const AYUDA_EFECTIVO_ONB = 'Si no sabes exacto, pon lo que calcules. Lo ajustas después.';
 export const ERROR_CUENTA_INCOMPLETA = 'Escribe el nombre y el saldo de la cuenta.';
