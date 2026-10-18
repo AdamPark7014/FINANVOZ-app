@@ -96,6 +96,7 @@ export default function PagosFijos() {
           testID="onb-pagos-continuar"
           etiqueta={agregados.length > 0 ? BTN_ONB_CONTINUAR : BTN_ONB_SALTAR}
           variante={agregados.length > 0 ? 'primario' : 'secundario'}
+          pista={agregados.length > 0 ? PISTA_PAGOS_CONTINUAR : PISTA_PAGOS_SALTAR}
           alPresionar={() => router.push('/onboarding/captura')}
         />
       }

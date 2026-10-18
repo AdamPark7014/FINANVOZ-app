@@ -1,5 +1,6 @@
 /** Copy es-MX de la pestaña Hoy (ruta); el héroe usa los mismos textos que `principal/textos`. */
 export {
+  PISTA_CONFIGURAR_INGRESO_HOY,
   SUBTITULO_SIN_INGRESO,
   TITULO_HOY_LIBRE_NEGATIVO,
   TITULO_HOY_PUEDES_GASTAR,

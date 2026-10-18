@@ -487,7 +487,13 @@ function Resultado({
         </Texto>
       ) : null}
       {mensajeRecordatorio ? (
-        <Texto variante="secundario" tono="secundario" testID="recordatorio-mensaje">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          testID="recordatorio-mensaje"
+        >
           {mensajeRecordatorio}
         </Texto>
       ) : null}

@@ -345,7 +345,7 @@ function FilaMovimiento({
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
   const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
   const etiquetaAccesible = etiquetaHablada(
-    [titulo(m), subtitulo, formatearCentavos(centavos)].filter(Boolean).join(', '),
+    [titulo(m), subtitulo, cifraEnPalabras(centavos)].filter(Boolean).join(', '),
   );
   return (
     <Tarjeta

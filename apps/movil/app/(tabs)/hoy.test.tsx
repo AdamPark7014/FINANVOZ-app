@@ -5,6 +5,7 @@ import { abrirPruebaPantalla } from '../../src/pantallas/principal/__pruebas__/b
 import Hoy from './hoy';
 import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from './pestanas-textos';
 import {
+  PISTA_CONFIGURAR_INGRESO_HOY,
   SUBTITULO_SIN_INGRESO,
   TEST_ID_HOY_SIN_INGRESO,
   TEST_ID_TAB_HOY,
@@ -41,7 +42,10 @@ describe('pestaña Hoy (ruta)', () => {
     expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.contenedor)).toBeTruthy();
     expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.titulo)).toHaveTextContent(TITULO_SIN_INGRESO);
     expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.subtitulo)).toHaveTextContent(SUBTITULO_SIN_INGRESO);
-    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.boton)).toBeTruthy();
+    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.boton)).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONFIGURAR_INGRESO_HOY,
+    );
     p.cerrar();
   });
 });

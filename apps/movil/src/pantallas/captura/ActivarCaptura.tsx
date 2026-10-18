@@ -23,6 +23,7 @@ import {
   PERMISO_AYUDA_ANDROID,
   PERMISO_DENEGADO,
   PERMISO_INSTRUCCION,
+  etiquetaPermisoCaptura,
   etiquetaSinAppsBanco,
   TEXTO_SIN_APPS_BANCO,
   TITULO_ELEGIR_APPS,

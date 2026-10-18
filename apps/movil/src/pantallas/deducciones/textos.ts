@@ -38,6 +38,11 @@ export const TEXTO_FACTURAS_VACIO =
 
 export const TITULO_TUS_FACTURAS = 'Tus facturas';
 
+/** Vacío de facturas: encabezado de sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioFacturas(): string {
+  return `${TITULO_TUS_FACTURAS}. ${TEXTO_FACTURAS_VACIO}`;
+}
+
 export const TITULO_FACTURAS_OCULTAS = 'Importadas por error';
 export const TEXTO_FACTURAS_OCULTAS =
   'No entran en tu estimación. Si fue un error, puedes volver a mostrarlas.';
@@ -51,6 +56,11 @@ export const TEXTO_IMPORTAR_LEYENDO = 'Leyendo tus facturas…';
 /** Hoja de compartir sin archivos (`02 §24`). */
 export const TEXTO_IMPORTAR_VACIO =
   'No llegó ningún archivo. Comparte el XML de la factura o un ZIP del SAT.';
+
+/** Vacío al importar por compartir: título + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioImportar(): string {
+  return `${TITULO_IMPORTAR_COMPARTIDAS}. ${TEXTO_IMPORTAR_VACIO}`;
+}
 
 export const BTN_VER_DEDUCCIONES = 'Ver mis deducciones';
 /** Entrada desde Cuentas (`02 §24`). */

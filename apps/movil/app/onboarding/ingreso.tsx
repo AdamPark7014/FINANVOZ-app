@@ -99,6 +99,7 @@ export default function Ingreso() {
             testID="onb-ingreso-continuar"
             etiqueta={BTN_ONB_CONTINUAR}
             deshabilitado={!completo}
+            pista={completo ? PISTA_ONB_CONTINUAR : undefined}
             alPresionar={guardar}
           />
           <Boton

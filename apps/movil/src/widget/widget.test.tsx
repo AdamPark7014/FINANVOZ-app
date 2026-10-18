@@ -78,13 +78,27 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityLabel).toBe('Toca para ver tu día');
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
+    expect(previa.props.accessibilityLabel).not.toMatch(/\$|\d/);
+    expect(JSON.stringify(screen.toJSON())).not.toMatch(/\$|214/);
+    expect(auditar(screen.toJSON())).toEqual([]);
     expect(
       within(previa).getByTestId('previa-widget-solo-texto', { includeHiddenElements: true }).props
         .importantForAccessibility,
     ).toBe('no-hide-descendants');
-    expect(within(previa).getByText('Toca para ver tu día', { hidden: true }).props.importantForAccessibility).toBe(
-      'no',
-    );
+    expect(
+      within(previa).getByTestId('previa-widget-texto', { includeHiddenElements: true }).props
+        .importantForAccessibility,
+    ).toBe('no');
+  });
+
+  it('con cifra pasa auditoría: una sola etiqueta hablada, sin cifras sueltas en el árbol', () => {
+    render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
+    expect(auditar(screen.toJSON())).toEqual([]);
+    const previa = screen.getByTestId('previa-widget');
+    expect(
+      within(previa).getByTestId('previa-widget-cifra', { includeHiddenElements: true }).props
+        .importantForAccessibility,
+    ).toBe('no');
   });
 });
 

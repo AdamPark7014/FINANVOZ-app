@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
-import { espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
+import { espacio, hitSlopTactil, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
 
 export type VarianteBoton = 'primario' | 'secundario' | 'texto';
 
@@ -51,7 +51,7 @@ export function Boton({
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
       accessibilityHint={pista ?? (cargando ? 'Espera, termina de cargar' : undefined)}
       accessibilityState={{ disabled: inactivo, busy: cargando }}
-      hitSlop={variante === 'texto' ? espacio.s : undefined}
+      hitSlop={variante === 'texto' ? hitSlopTactil : undefined}
       style={({ pressed }) => [
         {
           minHeight: OBJETIVO_TACTIL_MIN,

@@ -46,11 +46,17 @@ export default function Colchon() {
       tip={TIP_COLCHON_SIN_POR_AHORA}
       pie={
         <>
-          <Boton testID="onb-ver-mi-dia" etiqueta={BTN_VER_MI_DIA} alPresionar={() => terminar(monto ?? 0)} />
+          <Boton
+            testID="onb-ver-mi-dia"
+            etiqueta={BTN_VER_MI_DIA}
+            pista={PISTA_VER_MI_DIA}
+            alPresionar={() => terminar(monto ?? 0)}
+          />
           <Boton
             testID="onb-colchon-saltar"
             variante="texto"
             etiqueta={BTN_SIN_COLCHON_POR_AHORA}
+            pista={PISTA_COLCHON_SALTAR}
             alPresionar={() => terminar(0)}
           />
         </>

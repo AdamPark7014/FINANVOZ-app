@@ -177,3 +177,10 @@ export function etiquetaHablada(texto: string): string {
     return cifraEnPalabras(signo ? -centavos : centavos);
   });
 }
+
+/** Campo editable de pesos (02-UX §15): nombre + monto escrito en palabras, sin leer dígitos sueltos. */
+export function etiquetaCampoMonto(etiqueta: string, texto: string): string {
+  const nombre = `${etiquetaHablada(etiqueta)} en pesos`;
+  const centavos = leerPesos(texto);
+  return centavos === null ? nombre : `${nombre}, ${cifraEnPalabras(centavos, 'centavos')}`;
+}

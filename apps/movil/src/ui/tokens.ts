@@ -136,6 +136,14 @@ export const radio = {
 /** Objetivo táctil mínimo (02-UX §15, RNF-08). */
 export const OBJETIVO_TACTIL_MIN = 48;
 
+/** Amplía el área táctil cuando el control visible mide menos de 48 dp. */
+export const hitSlopTactil = {
+  top: espacio.s,
+  bottom: espacio.s,
+  left: espacio.s,
+  right: espacio.s,
+} as const;
+
 /**
  * Duración mínima del aviso con "Deshacer" (02-UX §1.3, RF-REG-04). Android puede pedir más (ajuste "Tiempo
  * para actuar" de accesibilidad) y con lector de pantalla no se cierra solo.

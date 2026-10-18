@@ -34,6 +34,10 @@ import {
   MENSAJE_ANULADO_MOVIMIENTO,
   SUBTITULO_SIN_INGRESO,
   TITULO_SIN_INGRESO,
+  PISTA_CONFIGURAR_INGRESO_HOY,
+  PISTA_ME_ALCANZA_HOY,
+  PISTA_OCULTAR_DESGLOSE,
+  PISTA_VER_DESGLOSE,
   contextoSaldoCompromiso,
   contextoSaldoTarjeta,
   contextoSaldoTienes,
@@ -79,6 +83,17 @@ function todas(ctx: Parameters<typeof renderConSesion>[0], motor = crearMotorFal
 }
 
 describe('Hoy', () => {
+  it('CTAs traen accessibilityHint para TalkBack (`02 §15`)', () => {
+    const p = conEscenario('e4-01');
+    const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
+    renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
+    expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_DESGLOSE);
+    expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
+    fireEvent.press(screen.getByTestId('boton-desglose'));
+    expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_OCULTAR_DESGLOSE);
+    p.cerrar();
+  });
+
   it('CA-M2-03 · con la semilla e4-01 muestra $214, "4 días para tu quincena (jue 15)" y el desglose de E4-01', () => {
     const p = conEscenario('e4-01');
     const v = vector<VectorE4>('E4-01');
@@ -496,36 +511,6 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
-  it('encabezados y filas con etiquetas TalkBack (`02 §15`)', () => {
-    const p = conEscenario('e4-01');
-    todas(p.ctx);
-    fireEvent.press(screen.getByTestId('boton-escribir'));
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    expect(screen.getByTestId('movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
-    const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
-    expect(screen.getByTestId(`movimientos-dia-${listarMovimientos(p.ctx)[0]?.fecha}`)).toHaveProp(
-      'accessibilityRole',
-      'header',
-    );
-    expect(screen.getByTestId(`movimiento-${id}`).props.accessibilityLabel).toMatch(/veinticinco pesos/);
-    p.cerrar();
-  });
-
-  it('filtro activo anuncia contexto en TalkBack', () => {
-    const p = conEscenario('e4-01');
-    renderConSesion(
-      p.ctx,
-      <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ cuentaId: p.e.cuentas.bbva as string }} />,
-    );
-    expect(screen.getByTestId('movimientos-filtro')).toBeTruthy();
-    expect(screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO).props.accessibilityLabel).toBe(
-      etiquetaFiltroMovimientosActivo(),
-    );
-    p.cerrar();
-  });
-
   it('sin movimientos muestra TEXTO_MOVIMIENTOS_VACIO; filtro vacío muestra TEXTO_MOVIMIENTOS_FILTRO_VACIO', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });

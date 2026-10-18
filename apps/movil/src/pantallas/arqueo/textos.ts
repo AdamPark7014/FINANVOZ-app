@@ -16,6 +16,11 @@ export const TOTAL = 'Total';
 export const TEXTO_SIN_CUENTA_EFECTIVO =
   'No llevas una cuenta de efectivo. Agrégala en Cuentas para poder contarla.';
 
+/** Vacío sin cuenta de efectivo: título + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioSinEfectivo(): string {
+  return `${TITULO}. ${TEXTO_SIN_CUENTA_EFECTIVO}`;
+}
+
 /** Gasto por asignar sin descripción en el paso 1. */
 export const ETIQUETA_GASTO_SIN_DESCRIPCION = 'Gasto';
 

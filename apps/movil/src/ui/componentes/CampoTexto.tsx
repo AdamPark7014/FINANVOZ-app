@@ -17,6 +17,9 @@ export interface CampoTextoProps {
   teclado?: KeyboardTypeOptions;
   autoFocus?: boolean;
   alEnviar?: () => void;
+  deshabilitado?: boolean;
+  /** Sobrescribe la etiqueta de TalkBack (p. ej. campos de monto en pesos). */
+  etiquetaAccesible?: string;
   /** Propiedades nativas adicionales (autocorrección, longitud máxima…). */
   nativo?: Omit<TextInputProps, 'value' | 'onChangeText' | 'style' | 'accessibilityLabel'>;
   testID?: string;

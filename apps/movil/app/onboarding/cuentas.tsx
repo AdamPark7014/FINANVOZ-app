@@ -98,7 +98,14 @@ export default function Cuentas() {
       paso={4}
       titulo={TITULO_CUENTAS}
       tip={TIP_CUENTAS_MINIMO}
-      pie={<Boton testID="onb-cuentas-continuar" etiqueta={BTN_ONB_CONTINUAR} alPresionar={continuar} />}
+      pie={
+        <Boton
+          testID="onb-cuentas-continuar"
+          etiqueta={BTN_ONB_CONTINUAR}
+          pista={PISTA_CUENTAS_CONTINUAR}
+          alPresionar={continuar}
+        />
+      }
     >
       {tieneEfectivo ? null : (
         <CampoMonto
