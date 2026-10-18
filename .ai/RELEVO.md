@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **Onboarding tips:** consejos O3–O7 solo en `tips.ts`; `textos.ts` reexporta para pantallas y pruebas (sin duplicar).
+- **Tandas a11y:** `testID="tandas-titulo"` en lista (paridad con `tanda-titulo` en detalle); aserción de encabezado en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Cuentas compartidos copy, pestañas TalkBack, deducciones. Ver `git log`.
+- Personas/widget TalkBack, captura copy, arqueo, tabs, principal. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP local en disco — revisar `git status` antes de reescribir.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `TIP_CAPTURA_AHORA_NO` / O6: mismo patrón si hace falta reexport en `textos.ts`.
-3. M11 negocio cuando toque el hito.
+2. Cerrar WIP restante sin pisar.
+3. Centralizar copy O3–O7 en `textos.ts`; `LeerEstadoCuenta` EstadoVacio TalkBack si aplica.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
