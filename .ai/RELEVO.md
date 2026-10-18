@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Deducciones TalkBack:** pista en «Importar facturas», encabezados en «Tus facturas» y «Importadas por error», radiogroup «Año» cuando hay varios ejercicios.
+- **Lista de espera (web M0):** correo con `aria-invalid`/`aria-describedby`, foco al fallar validación; éxito con `role="status"`; consentimiento `aria-required`.
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones inactivas acordeón, onboarding O6, PreviaWidget. Ver `git log`.
+- TalkBack móvil (deducciones, plan, registrar), copy calculadora. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, principal, ayuda) — no mezclar sin `git status`.
+- WIP paralelo en `apps/calculadora` (Aviso, Calculadora, `index.html`) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
@@ -32,4 +32,3 @@
 ## Estimación rápida
 
 FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
-

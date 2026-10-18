@@ -47,9 +47,52 @@
         "publisher": { "@type": "Organization", "name": "Finanvoz", "url": "https://finanvoz.com/" }
       }
     </script>
+    <style>
+      .saltar-contenido {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .saltar-contenido:focus {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0.75rem 1rem 0;
+        overflow: visible;
+        clip: auto;
+        white-space: normal;
+        padding: 0.5rem 0.75rem;
+        background: #0b7a61;
+        color: #fff;
+        border-radius: 0.25rem;
+        z-index: 1;
+      }
+    </style>
   </head>
   <body>
+    <a class="saltar-contenido" href="#contenido-principal">Saltar al contenido principal</a>
     <div id="raiz"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function () {
+        var raiz = document.getElementById('raiz');
+        if (!raiz) return;
+        function marcarMain() {
+          var main = raiz.querySelector('main');
+          if (main && main.id !== 'contenido-principal') {
+            main.id = 'contenido-principal';
+            main.tabIndex = -1;
+          }
+        }
+        marcarMain();
+        new MutationObserver(marcarMain).observe(raiz, { childList: true, subtree: true });
+      })();
+    </script>
   </body>
 </html>
