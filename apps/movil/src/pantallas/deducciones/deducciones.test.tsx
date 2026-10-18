@@ -105,6 +105,14 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
 });
 
 describe('Deducciones (02 §24, CA-M12-03)', () => {
+  it('sin facturas del ejercicio lo explica', () => {
+    const ctx = preparar();
+    renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    llenarPerfil('PEPJ800101AB1', '300,000');
+    expect(screen.getByTestId('deducciones-sin-facturas')).toHaveTextContent(TEXTO_FACTURAS_VACIO);
+    expect(screen.queryByTestId(/^factura-/)).toBeNull();
+  });
+
   it('primera vez, importar, alumno, nivel y lentes: "Llevas $25,900"; "Ya la pagué" por transferencia: $30,900', async () => {
     const ctx = preparar();
     const archivos = selectorFalso();

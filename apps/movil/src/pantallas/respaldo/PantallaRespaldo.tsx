@@ -196,7 +196,7 @@ function TarjetaNube({
             alGuardar={() => {
               setCreada((n) => n + 1);
               alCrearContrasena();
-              setMensaje({ texto: MENSAJE_CONTRASENA_GUARDADA, error: false });
+              setMensaje({ texto: 'Listo: guardé tu contraseña de respaldo.', error: false });
             }}
             alCancelar={() => setMensaje(null)}
           />
@@ -204,27 +204,27 @@ function TarjetaNube({
       ) : (
         <>
           <Texto variante="secundario" tono="secundario" testID="respaldo-correo-actual">
-            {cuenta.tipo === 'con_correo' ? textoRespaldasCon(cuenta.correo) : ''}
+            {`Respaldas con ${cuenta.tipo === 'con_correo' ? cuenta.correo : ''}.`}
           </Texto>
           <Boton
             testID="respaldo-ahora"
-            etiqueta={BTN_RESPALDAR_AHORA}
+            etiqueta="Respaldar ahora"
             cargando={respaldando}
             deshabilitado={respaldando || borrando !== 'no'}
             alPresionar={() => void respaldar()}
           />
           <Interruptor
             testID="respaldo-automatico"
-            etiqueta={ETIQUETA_RESPALDO_AUTOMATICO}
-            descripcion={DESC_RESPALDO_AUTOMATICO}
+            etiqueta="Respaldo automático"
+            descripcion="Cada semana, aunque no abras la app. No te pido la contraseña."
             valor={vista.automatico}
             alCambiar={(automatico) => fijar({ automatico })}
           />
           {vista.automatico ? (
             <Interruptor
               testID="respaldo-solo-wifi"
-              etiqueta="Solo con Wi-Fi"
-              descripcion="Así no gasta tus datos móviles."
+              etiqueta={ETIQUETA_SOLO_WIFI}
+              descripcion={DESC_SOLO_WIFI}
               valor={vista.soloWifi}
               alCambiar={(soloWifi) => fijar({ soloWifi })}
             />
@@ -234,7 +234,7 @@ function TarjetaNube({
               testID="respaldo-borrar-cuenta"
               variante="texto"
               ancho="contenido"
-              etiqueta="Borrar cuenta de respaldo"
+              etiqueta={BTN_BORRAR_CUENTA}
               alPresionar={() => {
                 setMensaje(null);
                 setBorrando('confirmar');
@@ -243,7 +243,7 @@ function TarjetaNube({
           ) : (
             <>
               <Texto variante="cuerpo" tono="faltante" testID="respaldo-borrar-aviso">
-                Se borran todos tus respaldos de la nube y tu correo. Lo que hay en este teléfono no cambia.
+                {AVISO_BORRAR_CUENTA}
               </Texto>
               <Boton
                 testID="respaldo-borrar-confirmar"

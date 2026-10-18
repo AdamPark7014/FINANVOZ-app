@@ -182,7 +182,7 @@ export const CONTEXTO_CIFRA_HOY_PUEDES = TITULO_HOY_PUEDES_GASTAR;
 export const CONTEXTO_CIFRA_LIBRE_NEGATIVO = 'Hoy';
 export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
 export const SUBTITULO_SIN_INGRESO =
-  'Así reparto tu dinero libre hasta tu próximo pago.';
+  'Así reparto tu dinero libre hasta el próximo pago.';
 
 // ——— Modo explicar (`02 §22`) ———
 

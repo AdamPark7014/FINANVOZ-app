@@ -116,13 +116,13 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       {d.activa && !d.cobrada ? (
         <Tarjeta>
-          <Texto variante="cuerpo">{`Cobras ${formatearCentavos(d.cobro)} el ${d.etiquetaCobro}.`}</Texto>
+          <Texto variante="cuerpo">{textoCobras(d.cobro, d.etiquetaCobro)}</Texto>
           {cobrando ? (
             <MeTocoLaTanda tandaId={tandaId} testID="tanda-me-toco" alTerminar={() => setCobrando(false)} />
           ) : (
             <Boton
               testID="tanda-me-toco"
-              etiqueta="Me tocó la tanda"
+              etiqueta={ETIQUETA_ME_TOCO}
               variante="secundario"
               alPresionar={() => setCobrando(true)}
             />
@@ -135,7 +135,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       {d.activa ? <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver} /> : null}
 
-      <Seccion titulo="Calendario" testID="tanda-calendario">
+      <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
         {d.rondas.map((r) => (
           <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>

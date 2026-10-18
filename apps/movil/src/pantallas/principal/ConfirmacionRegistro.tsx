@@ -20,16 +20,17 @@ type Registrado = Extract<ResultadoTexto, { resultado: 'registrado' }>;
 
 const TITULO: Record<Motivo, string> = {
   monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
-  cuenta: 'Me falta saber la cuenta.',
+  cuenta: 'Confirma la cuenta.',
   aproximado: 'Confírmame la cuenta.',
-  impuestos: 'Revísalo antes de guardar.',
+  impuestos: 'Es un gasto de impuestos. Revísalo antes de guardar.',
 };
 
 function pregunta(f: CuentaPorElegir): string {
-  const base = f.campo === 'origenId' ? '¿De qué cuenta salió?' : '¿A qué cuenta llegó?';
-  if (f.motivo === 'no_encontrada' && f.alias) return `No tengo una cuenta «${f.alias}». ${base}`;
+  if (f.motivo === 'no_encontrada' && f.alias) {
+    return `No tengo una cuenta «${f.alias}». ¿Cuál fue?`;
+  }
   if (f.motivo === 'aproximado' && f.alias) return `¿Con «${f.alias}» te refieres a esta?`;
-  return base;
+  return f.campo === 'origenId' ? '¿De qué cuenta salió?' : '¿A qué cuenta llegó?';
 }
 
 const clave = (i: number, campo: CuentaPorElegir['campo']) => `${i}:${campo}`;
@@ -134,6 +135,7 @@ export function ConfirmacionRegistro({
         etiqueta="Guardar"
         alPresionar={guardar}
         deshabilitado={!completo}
+        pista={completo ? undefined : 'Elige una cuenta en los chips de arriba.'}
         testID="boton-guardar-confirmacion"
       />
       <Boton

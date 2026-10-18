@@ -8,6 +8,7 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
+import { TIP_CONSENTIMIENTO } from '../../src/pantallas/onboarding/tips';
 import { aceptarConsentimiento } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
 import { Boton, espacio, Tarjeta, Texto } from '../../src/ui';
@@ -39,6 +40,7 @@ export default function Consentimiento() {
       testID="onb-consentimiento"
       paso={2}
       titulo="Tus datos son tuyos"
+      tip={TIP_CONSENTIMIENTO}
       pie={
         <Boton
           testID="onb-aceptar"

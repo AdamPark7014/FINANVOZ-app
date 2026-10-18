@@ -17,8 +17,14 @@ export const PASO_MARCAR_TITULO = 'Antes: ¿pagaste alguno de estos en efectivo?
 export const PASO_MARCAR_AYUDA =
   'Los que marques pasan a tu efectivo antes de contar, para no contarlos dos veces.';
 
+/** Chips del paso «Deberías traer…» (`02 §7`). */
 export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
+
+/** Campo cuando eliges «Otra cantidad». */
 export const ETIQUETA_MONTO_TRAES = '¿Cuánto traes?';
+
+/** Radios al registrar sobrante como cobro de préstamo (`02 §7`, E7-09). */
+export const ETIQUETA_QUIEN_TE_PAGO = '¿Quién te pagó?';
 
 export const OPCIONES_SOBRANTE = {
   me_dieron: 'Me dieron dinero',
@@ -26,8 +32,6 @@ export const OPCIONES_SOBRANTE = {
   anote_de_mas: 'Anoté algo de más',
   no_se: 'No sé, solo corrígelo',
 } as const;
-
-export const QUIEN_TE_PAGO = '¿Quién te pagó?';
 
 export const mensajeCuadra = (): string => 'Listo: tu efectivo cuadra.';
 

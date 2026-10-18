@@ -1,5 +1,6 @@
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { LISTA_ESPERA_URL, MARCA, RESPONSABLE, RESPONSABLE_DEFINIDO, VERSION_AVISO } from './config';
+import { LISTA_ESPERA_TITULO_EXITO, listaEsperaTextoExito } from './textos';
 
 /** Mismo contrato que `services/proxy/supabase/functions/_shared/lista-espera.ts`. */
 const PREGUNTAS = [
@@ -109,8 +110,8 @@ export function ListaEspera() {
   if (envio === 'listo') {
     return (
       <section className="tarjeta" aria-live="polite">
-        <h2>Listo, ya estás en la lista</h2>
-        <p>Te escribimos cuando abramos la beta de {MARCA}. Puedes darte de baja desde cualquier correo.</p>
+        <h2>{LISTA_ESPERA_TITULO_EXITO}</h2>
+        <p>{listaEsperaTextoExito(MARCA)}</p>
       </section>
     );
   }

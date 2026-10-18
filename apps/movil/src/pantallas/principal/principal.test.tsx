@@ -17,6 +17,11 @@ import {
 import { formatearCentavos } from '../../ui';
 import { cifraEnPalabras } from '../../ui/formato';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
+import {
+  TEXTO_CUENTAS_COMPROMISOS_VACIO,
+  TEXTO_CUENTAS_DEBES_VACIO,
+  TEXTO_CUENTAS_TIENES_VACIO,
+} from './textos';
 import { contextoSaldoCompromiso, contextoSaldoTarjeta, contextoSaldoTienes } from './textos';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaCuentas } from './PantallaCuentas';
@@ -308,7 +313,7 @@ describe('Registrar', () => {
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 80 con tarjeta');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     const tarjeta = screen.getByTestId('confirmacion-registro');
-    expect(within(tarjeta).getByText('Me falta saber la cuenta.')).toBeTruthy();
+    expect(within(tarjeta).getByText('Confirma la cuenta.')).toBeTruthy();
     expect(within(tarjeta).getByText('¿De qué cuenta salió?')).toBeTruthy();
     expect(screen.getByTestId('boton-guardar-confirmacion').props.accessibilityState).toMatchObject({
       disabled: true,

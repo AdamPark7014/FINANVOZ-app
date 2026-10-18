@@ -3,9 +3,17 @@
  * Las pantallas en `app/onboarding/` pueden pasarlos a `PasoOnboarding` como `tip`.
  */
 
+<<<<<<< Updated upstream
+/** O2 · Consentimiento: nada se persiste hasta aceptar (CA-M2-05). */
+export const TIP_CONSENTIMIENTO =
+  'Tus datos no se guardan en el teléfono hasta que marques la casilla obligatoria y toques «Aceptar y continuar».';
+
 /** O6 · Captura automática: salir del flujo sin activar permisos hoy. */
+=======
+/** O6 · Captura automática: permiso de notificaciones — salir del flujo sin activarlo hoy. */
+>>>>>>> Stashed changes
 export const TIP_CAPTURA_AHORA_NO =
-  'Si hoy no quieres dar permisos, toca «Ahora no»; activas la captura cuando quieras en Ajustes › Captura.';
+  'Si hoy no quieres dar acceso a notificaciones, toca «Ahora no»; activas la captura cuando quieras en Ajustes › Captura.';
 
 /** O7 · Colchón: terminar el onboarding sin apartar monto hoy. */
 export const TIP_COLCHON_SIN_POR_AHORA =

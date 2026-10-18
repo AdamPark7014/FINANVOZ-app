@@ -246,7 +246,7 @@ function YaMePago({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar" alPresionar={guardar} testID="boton-guardar-pago-persona" />
+      <Boton etiqueta={ETIQUETA_GUARDAR} alPresionar={guardar} testID="boton-guardar-pago-persona" />
     </Tarjeta>
   );
 }
@@ -281,7 +281,7 @@ function Recordatorio({
       await sincronizar();
       refrescar();
     } catch {
-      setMensaje('No pude programar el aviso. Intenta de nuevo.');
+      setMensaje(MENSAJE_ERROR_RECORDATORIO);
     }
   };
 
@@ -290,7 +290,7 @@ function Recordatorio({
       {fecha ? (
         <>
           <Texto variante="cuerpo" testID="persona-recordatorio-fecha">
-            {`Te recuerdo cobrar el ${fecha.etiqueta}.`}
+            {mensajeRecordatorioCobro(fecha.etiqueta)}
           </Texto>
           <Boton
             etiqueta="Quitar recordatorio"

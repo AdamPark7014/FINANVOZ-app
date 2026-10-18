@@ -13,6 +13,8 @@ vi.mock('./config', () => ({
   RESPONSABLE_DEFINIDO: true,
 }));
 
+import { LISTA_ESPERA_TITULO_EXITO, listaEsperaTextoExito } from './textos';
+
 const { ListaEspera } = await import('./ListaEspera');
 
 let fetch: ReturnType<typeof vi.fn>;
@@ -57,7 +59,8 @@ describe('Lista de espera', () => {
     contestar('ana@ejemplo.mx');
     fireEvent.click(screen.getByLabelText(/acepto/i));
     enviar();
-    await waitFor(() => expect(screen.getByText(/ya estás en la lista/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('heading', { name: LISTA_ESPERA_TITULO_EXITO })).toBeTruthy());
+    expect(screen.getByText(listaEsperaTextoExito('Finanvoz'))).toBeTruthy();
     const cuerpo = JSON.parse((fetch.mock.calls[0]?.[1] as RequestInit).body as string) as Record<
       string,
       unknown

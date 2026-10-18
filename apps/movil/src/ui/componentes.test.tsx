@@ -31,6 +31,13 @@ describe('Cifra', () => {
     expect(screen.getByText('$1,500.00')).toBeTruthy();
   });
 
+  it('centavos negativos en modo pesos redondean hacia abajo (−$1, no $0)', () => {
+    render(<Cifra centavos={-99} modo="pesos" contexto="Reservado" testID="c" />);
+    const cifra = screen.getByTestId('c');
+    expect(cifra).toHaveTextContent('−$1');
+    expect(cifra.props.accessibilityLabel).toBe('Reservado menos un peso');
+  });
+
   it('no corta la cifra (sin numberOfLines) para texto al 200 %', () => {
     render(<Cifra centavos={123456789} testID="c" />);
     expect(screen.getByTestId('c').props.numberOfLines).toBeUndefined();

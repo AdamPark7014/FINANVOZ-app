@@ -106,7 +106,7 @@ function Detalle({
           />
         </Tarjeta>
       ) : (
-        <Boton etiqueta={BTN_PAGAR} alPresionar={() => setPanel('pagar')} testID="tarjeta-pagar" />
+        <Boton etiqueta="Pagar" alPresionar={() => setPanel('pagar')} testID="tarjeta-pagar" />
       )}
 
       <SeccionMeses planes={d.planes} />
@@ -114,23 +114,23 @@ function Detalle({
       {plus.compromisoMsi12Meses ? (
         <CompromisoMeses meses={d.compromiso12Meses} />
       ) : d.compromiso12Meses.some((m) => m.monto > 0) ? (
-        <CandadoPlus texto={CANDADO_COMPROMISO_12_MESES} testID="candado-compromiso-12-meses" />
+        <CandadoPlus texto="Ver tus meses de los próximos 12 meses" testID="candado-compromiso-12-meses" />
       ) : null}
 
       {d.modo === 'plan' ? <PagosPlaneados d={d} /> : null}
 
       <Seccion
-        titulo={d.ultimoCorte ? TITULO_DESDE_ULTIMO_CORTE : TITULO_DESDE_ALTA}
+        titulo={d.ultimoCorte ? 'Desde tu último corte' : 'Desde que la agregaste'}
         testID="tarjeta-movimientos"
       >
         {d.desdeElCorte.length === 0 ? (
-          <Texto variante="secundario" tono="secundario" testID="tarjeta-movimientos-vacio">
-            {VACIO_MOVIMIENTOS_TARJETA}
+          <Texto variante="secundario" tono="secundario">
+            Sin compras ni pagos todavía.
           </Texto>
         ) : null}
         {d.desdeElCorte.map((m) => {
           const titulo =
-            m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
+            m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_TITULO;
           return (
             <View
               key={m.id}
@@ -149,10 +149,10 @@ function Detalle({
         })}
       </Seccion>
 
-      <Seccion titulo="Estados de cuenta" testID="tarjeta-estados">
+      <Seccion titulo={TITULO_ESTADOS_CUENTA} testID="tarjeta-estados">
         {d.estadosCuenta.length === 0 ? (
-          <Texto variante="secundario" tono="secundario">
-            {`Tu primer corte con la app es el ${d.etiquetaProximoCorte}.`}
+          <Texto variante="secundario" tono="secundario" testID="tarjeta-estados-vacio">
+            {textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
           </Texto>
         ) : null}
         {d.estadosCuenta.map((e) => (
@@ -160,7 +160,7 @@ function Detalle({
         ))}
         {alLeerEstadoPdf ? (
           <Boton
-            etiqueta="Leer el PDF de tu banco"
+            etiqueta={BTN_LEER_PDF_BANCO}
             variante="secundario"
             alPresionar={alLeerEstadoPdf}
             testID="tarjeta-leer-pdf"

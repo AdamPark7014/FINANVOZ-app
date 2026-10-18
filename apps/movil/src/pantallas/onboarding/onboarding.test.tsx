@@ -71,6 +71,7 @@ describe('onboarding', () => {
     const antes = conteoTablas();
     tocar('onb-empezar');
     expect(r.getPathname()).toBe('/onboarding/consentimiento');
+    expect(screen.getByTestId('onb-tip')).toBeTruthy();
 
     // La casilla obligatoria viene sin marcar y el botón no hace nada hasta marcarla.
     expect(screen.getByTestId('onb-casilla-datos')).toHaveProp('accessibilityState', { checked: false });
@@ -185,6 +186,7 @@ describe('onboarding', () => {
     tocar('onb-pagos-continuar');
 
     // O6: sin módulo nativo, "No disponible en este teléfono".
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(/notificaciones/);
     expect(screen.getByTestId('onb-captura-pronto')).toHaveTextContent(/No disponible en este teléfono/);
     tocar('onb-captura-continuar');
 

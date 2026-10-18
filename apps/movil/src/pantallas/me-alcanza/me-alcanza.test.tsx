@@ -47,10 +47,15 @@ import { abrirMeAlcanza, tomarConsultaPendiente } from '.';
 import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
 import {
   AYUDA_DATOS_INSUFICIENTES,
+  BTN_COMO_LO_CALCULE,
+  BTN_DESHACER,
+  BTN_HACER_OTRA_CUENTA,
+  BTN_LO_COMPRE,
   ERROR_PRECIO,
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
+  TEXTO_RECORDATORIO_PROGRAMADO,
 } from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
@@ -249,6 +254,9 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
+    expect(screen.getByText(BTN_LO_COMPRE)).toBeTruthy();
+    expect(screen.getByText(BTN_COMO_LO_CALCULE)).toBeTruthy();
+    expect(screen.getByText(BTN_HACER_OTRA_CUENTA)).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
     // Texto fijo de `08 §1`.
@@ -366,7 +374,7 @@ describe('¿Me alcanza?', () => {
     const aviso = screen.getByTestId('aviso');
     expect(within(aviso).getByText(/^Registré: Unos tenis \$1,500 a 3 meses/)).toBeTruthy();
 
-    fireEvent.press(within(aviso).getByText('Deshacer'));
+    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
 
@@ -531,7 +539,7 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     const aviso = screen.getByTestId('aviso');
     expect(within(aviso).getByText('Listo: no lo uso para estimar tus gastos de cada día.')).toBeTruthy();
-    fireEvent.press(within(aviso).getByText('Deshacer'));
+    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 

@@ -244,9 +244,9 @@ function Seccion({
   );
 }
 
-function Vacio({ texto }: { texto: string }) {
+function Vacio({ texto, testID }: { texto: string; testID: string }) {
   return (
-    <Texto variante="secundario" tono="secundario">
+    <Texto variante="cuerpo" tono="secundario" testID={testID}>
       {texto}
     </Texto>
   );

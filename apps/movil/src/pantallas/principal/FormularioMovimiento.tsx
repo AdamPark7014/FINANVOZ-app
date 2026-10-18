@@ -52,60 +52,7 @@ const TIPOS: readonly TipoFormulario[] = [
   'cuenta_dividida',
 ];
 
-const NOMBRE_TIPO_FORMULARIO: Record<TipoFormulario, string> = {
-  ...NOMBRE_TIPO,
-  cuenta_dividida: 'Cuenta dividida',
-};
-
 type Cuenta = { id: string; nombre: string; clase: 'efectivo' | 'liquida' | 'tarjeta' };
-
-/** Qué cuentas pide cada tipo y con qué pregunta (sin vocabulario contable). */
-const CAMPOS: Record<
-  TipoMovimiento,
-  {
-    origen?: { pregunta: string; clases: readonly Cuenta['clase'][] };
-    destino?: { pregunta: string; clases: readonly Cuenta['clase'][] };
-    persona?: string;
-    categoria?: 'gasto' | 'ingreso';
-  }
-> = {
-  gasto: {
-    categoria: 'gasto',
-    origen: { pregunta: '¿Con qué pagaste?', clases: ['efectivo', 'liquida', 'tarjeta'] },
-  },
-  ingreso: {
-    categoria: 'ingreso',
-    destino: { pregunta: '¿A dónde llegó?', clases: ['efectivo', 'liquida'] },
-  },
-  transferencia: {
-    origen: { pregunta: '¿De qué cuenta sale?', clases: ['efectivo', 'liquida'] },
-    destino: { pregunta: '¿A qué cuenta llega?', clases: ['efectivo', 'liquida'] },
-  },
-  retiro_efectivo: {
-    origen: { pregunta: '¿De dónde lo sacaste?', clases: ['liquida', 'tarjeta'] },
-    destino: { pregunta: '¿Dónde lo traes?', clases: ['efectivo'] },
-  },
-  pago_tarjeta: {
-    origen: { pregunta: '¿Con qué pagaste?', clases: ['efectivo', 'liquida'] },
-    destino: { pregunta: '¿Qué tarjeta pagaste?', clases: ['tarjeta'] },
-  },
-  prestamo_otorgado: {
-    persona: '¿A quién le prestaste?',
-    origen: { pregunta: '¿De dónde salió?', clases: ['efectivo', 'liquida'] },
-  },
-  prestamo_recibido: {
-    persona: '¿Quién te prestó?',
-    destino: { pregunta: '¿A dónde llegó?', clases: ['efectivo', 'liquida'] },
-  },
-  cobro_prestamo: {
-    persona: '¿Quién te pagó?',
-    destino: { pregunta: '¿A dónde llegó?', clases: ['efectivo', 'liquida'] },
-  },
-  pago_prestamo: {
-    persona: '¿A quién le pagaste?',
-    origen: { pregunta: '¿De dónde salió?', clases: ['efectivo', 'liquida'] },
-  },
-};
 
 /**
  * Formulario de movimiento (02-UX §1.1: la última vía, después de captura y dictado) para los tipos que origina
@@ -149,7 +96,7 @@ export function FormularioMovimiento({
       .filter((d) => d.tipo === 'tarjeta')
       .map((d) => ({ id: d.id, nombre: d.nombre, clase: 'tarjeta' as const })),
   ];
-  const campos = CAMPOS[tipo];
+  const campos = CAMPOS_FORMULARIO_MOVIMIENTO[tipo];
   const opciones = (clases: readonly Cuenta['clase'][]): OpcionChip<string>[] =>
     cuentas.filter((c) => clases.includes(c.clase)).map((c) => ({ valor: c.id, etiqueta: c.nombre }));
   const categorias =
@@ -165,12 +112,12 @@ export function FormularioMovimiento({
   };
 
   const faltante = (): string | null => {
-    if (monto === null || monto <= 0) return 'Escribe un monto mayor a $0.';
-    if (campos.categoria && !categoria) return 'Elige una categoría.';
-    if (campos.persona && !personaId) return 'Elige a la persona.';
+    if (monto === null || monto <= 0) return ERROR_MONTO_CERO;
+    if (campos.categoria && !categoria) return ERROR_ELEGIR_CATEGORIA;
+    if (campos.persona && !personaId) return ERROR_ELEGIR_PERSONA;
     if (campos.origen && !origenId) return campos.origen.pregunta;
     if (campos.destino && !destinoId) return campos.destino.pregunta;
-    if (origenId && origenId === destinoId) return 'Elige dos cuentas distintas.';
+    if (origenId && origenId === destinoId) return ERROR_CUENTAS_DISTINTAS;
     return null;
   };
   const pendiente = faltante();
