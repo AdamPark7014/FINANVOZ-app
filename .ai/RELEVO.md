@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Personas · TalkBack vacío y alta:** `EstadoVacio` + `etiquetaVacioContactosDivision` en cuenta dividida sin contactos; `PISTA_AGREGAR_PERSONA` en Agregar (división y formulario de movimiento).
+- **Chip / Boton TalkBack:** `principal/Chip` reexporta el kit UI (hitSlop 48 dp en captura/arqueo/tandas); hints por omisión en chip y botón deshabilitado.
 
 ## Hecho (acumulado reciente)
 
-- CampoMonto hints, tarjetas lista TalkBack, ayuda FAQ. Ver `git log`.
+- CampoMonto pista en palabras, personas vacío/alta, tarjetas lista. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP `principal.test.tsx` (turno anterior) — no mezclar.
+- WIP paralelo (principal.test.tsx, etc.) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

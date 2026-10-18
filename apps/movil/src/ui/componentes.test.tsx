@@ -76,6 +76,7 @@ describe('Boton', () => {
     expect(alPresionar).not.toHaveBeenCalled();
     expect(boton).toBeDisabled();
     expect(boton.props.accessibilityState).toEqual({ disabled: true, busy: false });
+    expect(boton.props.accessibilityHint).toBe('No disponible');
   });
 
   it.each(['primario', 'secundario', 'texto'] as const)('variante %s mide al menos 48 dp', (v) => {
@@ -102,6 +103,7 @@ describe('Chip', () => {
     const chip = screen.getByTestId('chip');
     expect(chip.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
     expect(chip.props.accessibilityState).toEqual({ selected: false, disabled: true });
+    expect(chip.props.accessibilityHint).toBe('No disponible');
     fireEvent.press(chip);
     expect(alPresionar).not.toHaveBeenCalled();
   });
