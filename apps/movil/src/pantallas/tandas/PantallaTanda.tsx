@@ -310,12 +310,14 @@ function Ajustes({
         etiqueta={ETIQUETA_EDITAR_NOMBRE_CUENTA}
         variante="secundario"
         alPresionar={() => setEditando(true)}
+        pista={PISTA_EDITAR_NOMBRE_CUENTA}
       />
       <Boton
         testID="tanda-archivar-abrir"
         etiqueta={ETIQUETA_ARCHIVAR_TANDA}
         variante="texto"
         alPresionar={() => setArchivando(true)}
+        pista={PISTA_ARCHIVAR_TANDA}
       />
     </View>
   );
