@@ -206,7 +206,7 @@ describe('CampoMonto', () => {
   it('marca el texto que no es monto', () => {
     const alCambiar = jest.fn();
     render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
-    fireEvent.changeText(screen.getByLabelText('Monto'), '12.345');
+    fireEvent.changeText(screen.getByLabelText('Monto en pesos'), '12.345');
     expect(alCambiar).toHaveBeenLastCalledWith(null);
     expect(screen.getByText(ERROR_FORMATO_MONTO)).toBeTruthy();
   });
