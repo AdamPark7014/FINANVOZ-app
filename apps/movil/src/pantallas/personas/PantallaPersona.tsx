@@ -58,7 +58,9 @@ export function PantallaPersona({
     return (
       <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
         <Boton etiqueta="Volver" variante="texto" ancho="contenido" alPresionar={alVolver} />
-        <Texto variante="cuerpo">No encontré a esa persona.</Texto>
+        <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
+          {TEXTO_PERSONA_NO_ENCONTRADA}
+        </Texto>
       </Pantalla>
     );
   }
@@ -171,8 +173,8 @@ function Detalle({
       <View style={{ gap: espacio.s }}>
         <Texto variante="subtitulo">Movimientos</Texto>
         {d.movimientos.length === 0 ? (
-          <Texto variante="secundario" tono="secundario">
-            Todavía no hay movimientos con esta persona.
+          <Texto variante="cuerpo" tono="secundario" testID="persona-movimientos-vacio">
+            {TEXTO_MOVIMIENTOS_PERSONA_VACIO}
           </Texto>
         ) : null}
         {d.movimientos.map((m) => (

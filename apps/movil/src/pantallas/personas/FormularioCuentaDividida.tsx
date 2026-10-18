@@ -207,6 +207,11 @@ export function FormularioCuentaDividida({
         <Texto variante="secundario" tono="secundario" testID="division-faltan">
           {textoFaltanPersonas(ajenas, elegidas.length)}
         </Texto>
+        {personas.length === 0 ? (
+          <Texto variante="cuerpo" tono="secundario" testID="division-contactos-vacio">
+            {TEXTO_CONTACTOS_VACIO}
+          </Texto>
+        ) : null}
         <View accessibilityRole="list" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
           {personas.map((p) => {
             const veces = vecesElegida(p.cuentaId);
