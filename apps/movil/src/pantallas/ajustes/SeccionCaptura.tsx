@@ -32,7 +32,9 @@ export function SeccionCaptura() {
   const [activando, setActivando] = useState(false);
   return (
     <Tarjeta testID="ajustes-captura">
-      <Texto variante="subtitulo">{SECCION_CAPTURA}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-captura-titulo" accessibilityRole="header">
+        {SECCION_CAPTURA}
+      </Texto>
       {activando ? (
         <ActivarCaptura testID="ajustes-captura" alTerminar={() => setActivando(false)} />
       ) : estado.activada ? (

@@ -30,6 +30,7 @@ import {
   BTN_NO_ES_MIA,
   etiquetaPermisoCaptura,
   etiquetaVacioCapturasPorRevisar,
+  INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,
