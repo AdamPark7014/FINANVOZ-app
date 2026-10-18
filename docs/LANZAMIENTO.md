@@ -15,16 +15,135 @@
 | `eas.json` con perfiles `development`, `preview` y `production` (app-bundle, `autoIncrement`, `appVersionSource: remote`, `SENTRY_DISABLE_AUTO_UPLOAD` mientras no haya token) | Crear el archivo y documentar las variables por perfil | Cuenta de Expo (sentada 2) | **Hecho 2026-10-17** (código): `apps/movil/eas.json` en `main`; falta `eas init` y `eas build -p android --profile preview` (sentada 2) | M7 | 10, 28, 109 |
 | Página web con el aviso de privacidad **de la app** y la URL para pedir el borrado de cuenta | Tercera entrada de Vite en `apps/calculadora` con el texto de `pantallas/onboarding/aviso.ts` | Revisión legal (sentada 5) | URL pública | M7 | 24, 26, 111 |
 
-## Sentada 1 — Adam con cuentas: publicar M0 (hacer ya)
+## Sentada 1 — Publicar M0 (infra externa)
 
-| Tarea | Accesos y materiales | Pasos | Depende de | Evidencia de cierre | Pendientes |
-|---|---|---|---|---|---|
-| Comprar el dominio | Cuenta de Cloudflare | Registrar `finanvoz.com` en Cloudflare Registrar | — | `Resolve-DnsName finanvoz.com -Type NS` muestra servidores de Cloudflare | 12 |
-| Proyecto de Pages | Cloudflare | 1) `npx wrangler pages project create finanvoz --production-branch=main` 2) Dominio `finanvoz.com` (y `www` que redirija al apex) 3) Token de API con permiso "Account · Cloudflare Pages · Edit" 4) Copiar el Account ID | Dominio | Proyecto visible en el panel | 12 |
-| Proyecto de Supabase y `lista-espera` | Cuenta de Supabase y CLI | 1) Crear el proyecto (región cercana a México) 2) `cd services/proxy && supabase link --project-ref <ref>` 3) `supabase db push` 4) `supabase secrets set LISTA_ESPERA_SAL=<64 aleatorios> CALCULADORA_ORIGEN=https://finanvoz.com` 5) `supabase functions deploy lista-espera` (el `config.toml` ya quita la verificación de JWT) | Sentada 0 | `curl -i -X OPTIONS <url> -H "Origin: https://finanvoz.com" -H "Access-Control-Request-Method: POST"` responde 204 con `access-control-allow-origin` | 11 |
-| GitHub | Admin del repositorio | Settings → Environments → `produccion`: secretos `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`; variable `VITE_LISTA_ESPERA_URL=https://<ref>.supabase.co/functions/v1/lista-espera`. `VITE_RESPONSABLE_*` es opcional: ya sale de `responsable.json` | Las dos filas anteriores | Variables y secretos listados en el entorno | 12 |
-| Publicar | GitHub Actions | Actions → "Publicar calculadora" → Run workflow | Todo lo anterior y CI de `main` en verde | `https://finanvoz.com` responde 200 | 12 |
-| Prueba de humo | Navegador y `curl` | 1) Calcular no genera peticiones 2) Anotarse una vez → `{"ok":true}` 3) El sexto POST seguido → 429 4) Sin consentimiento → 400 5) Consola sin errores de CSP (`vite preview` no aplica `_headers`) 6) Lighthouse móvil ≥ 90 7) `select * from lista_espera_resumen;` y borrar las filas de prueba | Publicar | CA-M0-05, 06 y 07 en ESTADO con URL y fecha → **cierra M0** | 11, 12 |
+Cierra los pendientes **11** (Supabase + `lista-espera`) y **12** (dominio, Pages, GitHub, primer despliegue). Nada de esto asume cuentas ya creadas: cada paso empieza en blanco hasta que lo marques tú.
+
+### Hecho en el repositorio (no repetir en consola)
+
+| Pieza | Dónde | Notas |
+|---|---|---|
+| Edge Function `lista-espera`, contrato y pruebas CA-M0-05 | `services/proxy/supabase/functions/` | OPTIONS 204 sin cuerpo; límite 5/h por IP en SQL |
+| `verify_jwt = false` solo en `lista-espera` y `webhooks-revenuecat` | `services/proxy/supabase/config.toml` | El despliegue sigue usando la bandera del README |
+| Migración de la lista | `services/proxy/supabase/migrations/20261012000000_lista_espera.sql` | `supabase db push` la aplica |
+| Calculadora E10, lista de espera, aviso | `apps/calculadora/` | Montos no salen del navegador (CA-M0-07); `aviso-de-privacidad.html` |
+| Responsable NEXARA en build | `apps/calculadora/src/responsable.json` | `VITE_RESPONSABLE_*` en GitHub es **opcional** |
+| Bloqueo si falta URL o responsable | `apps/calculadora/scripts/verificar-publicacion.mjs` | Lo corre el workflow antes de `vite build` |
+| Despliegue a Pages `finanvoz` | `.github/workflows/publicar-calculadora.yml` | Entorno GitHub **`produccion`**; manual (`workflow_dispatch`) |
+| CSP en producción | `apps/calculadora/public/_headers` | `vite preview` local **no** aplica estos encabezados |
+| Lighthouse móvil ≥ 90 en CI | `.github/workflows/ci.yml` | CA-M0-04 en código; el sitio publicado conviene revisarlo aparte |
+
+### Checklist copy-paste (orden fijo)
+
+Sustituye `<ref>` por el *Project ref* de Supabase (Settings → General). Guarda tokens y sales **fuera** del repositorio.
+
+#### 1 · Supabase CLI (una vez por máquina)
+
+Comandos literales de `services/proxy/README.md` → **M0 · lista-espera**:
+
+```powershell
+npm i -g supabase
+```
+
+#### 2 · Dominio en Cloudflare
+
+- [ ] Registrar **`finanvoz.com`** en Cloudflare Registrar (cuenta Cloudflare).
+- [ ] Evidencia en PowerShell: `Resolve-DnsName finanvoz.com -Type NS` → nameservers de Cloudflare.
+
+#### 3 · Proyecto Supabase y función `lista-espera`
+
+- [ ] Crear proyecto en [Supabase](https://supabase.com/dashboard) (región cercana a México).
+- [ ] Enlazar, migraciones, secretos y despliegue (**mismos pasos 2–5 del README**):
+
+```powershell
+cd C:\dev\apps\FINANVOZ-app\services\proxy
+supabase link --project-ref <ref>
+supabase db push
+```
+
+Genera **64 caracteres aleatorios** para `LISTA_ESPERA_SAL` (nunca los commitees). Ejemplo en PowerShell:
+
+```powershell
+-join ((48..57 + 65..90 + 97..122 | Get-Random -Count 64 | ForEach-Object { [char]$_ }))
+```
+
+```powershell
+supabase secrets set LISTA_ESPERA_SAL=<pega-los-64> CALCULADORA_ORIGEN=https://finanvoz.com
+supabase functions deploy lista-espera --no-verify-jwt
+```
+
+- [ ] Anota la URL pública (paso 6 del README):
+
+`https://<ref>.supabase.co/functions/v1/lista-espera` → la usarás en **`VITE_LISTA_ESPERA_URL`**.
+
+- [ ] Preflight CORS (204, `access-control-allow-origin: https://finanvoz.com`):
+
+```powershell
+curl.exe -i -X OPTIONS "https://<ref>.supabase.co/functions/v1/lista-espera" `
+  -H "Origin: https://finanvoz.com" `
+  -H "Access-Control-Request-Method: POST"
+```
+
+#### 4 · Cloudflare Pages (proyecto `finanvoz`)
+
+- [ ] Crear el proyecto Pages (rama de producción `main`):
+
+```powershell
+cd C:\dev\apps\FINANVOZ-app
+npx wrangler pages project create finanvoz --production-branch=main
+```
+
+- [ ] En el panel: **Custom domains** → `finanvoz.com` y `www.finanvoz.com` → redirigir `www` al apex.
+- [ ] **My Profile → API Tokens** → token con permiso **Account · Cloudflare Pages · Edit** (copiar token).
+- [ ] Copiar **Account ID** (barra lateral del dashboard de Cloudflare).
+
+#### 5 · GitHub — entorno `produccion`
+
+Repositorio **FINANVOZ-app** → **Settings → Environments → produccion** (crear si no existe).
+
+| Tipo | Nombre | Valor |
+|---|---|---|
+| Secret | `CLOUDFLARE_API_TOKEN` | token del paso 4 |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Account ID del paso 4 |
+| Variable | `VITE_LISTA_ESPERA_URL` | `https://<ref>.supabase.co/functions/v1/lista-espera` |
+
+Opcional (si no las pones, el build usa `responsable.json`):
+
+| Variable | Cuándo |
+|---|---|
+| `VITE_RESPONSABLE_NOMBRE` | Solo si quieres sobreescribir el JSON |
+| `VITE_RESPONSABLE_DOMICILIO` | Ídem |
+| `VITE_RESPONSABLE_CORREO` | Ídem |
+
+#### 6 · Publicar la calculadora
+
+- [ ] `main` con CI en verde (`pnpm lint`, typecheck, test, oráculo, Lighthouse).
+- [ ] GitHub → **Actions** → **Publicar calculadora** → **Run workflow** (usa el entorno `produccion`).
+- [ ] El job ejecuta (en este orden): `verificar-publicacion` → `build` → `wrangler pages deploy apps/calculadora/dist --project-name=finanvoz --branch=main`.
+- [ ] Evidencia: `curl.exe -I https://finanvoz.com` → **200**.
+
+#### 7 · Humo en producción (cierra M0 en ESTADO)
+
+| # | Qué | Cómo | Esperado |
+|---|---|---|---|
+| 1 | Calculadora sin red | DevTools → Red; usar solo E10 | 0 peticiones al calcular |
+| 2 | Alta válida | Formulario en `https://finanvoz.com` | Mensaje de éxito; en SQL `select * from lista_espera_resumen;` |
+| 3 | Límite IP | 6 POST seguidos desde la misma IP (navegador o `curl`) | El 6.º → **429** |
+| 4 | Sin consentimiento | POST sin `consentimiento: true` | **400** |
+| 5 | CSP | Consola en el sitio publicado (no en `vite preview`) | Sin violaciones de CSP |
+| 6 | Lighthouse móvil | Chrome DevTools o PageSpeed en la URL publicada | Rendimiento y accesibilidad ≥ 90 |
+| 7 | Limpieza | Editor SQL Supabase | Borrar filas de prueba |
+
+POST de ejemplo (sustituye correo si quieres; `version_aviso` debe coincidir con `apps/calculadora/src/config.ts`, hoy **`2026-10-m8`**):
+
+```powershell
+curl.exe -X POST "https://<ref>.supabase.co/functions/v1/lista-espera" `
+  -H "Origin: https://finanvoz.com" `
+  -H "Content-Type: application/json" `
+  -d "{\"correo\":\"tu-correo@ejemplo.mx\",\"consentimiento\":true,\"version_aviso\":\"2026-10-m8\",\"sitio_web\":\"\",\"respuestas\":{\"telefono\":\"android\",\"notificaciones\":\"si\",\"precio\":\"50_99\",\"uso\":\"personal\"}}"
+```
+
+**Cierre:** registra URL y fecha en `docs/ESTADO.md` (CA-M0-05, CA-M0-06, CA-M0-07) → **M0** listo. Pendientes **11** y **12** pasan a hecho.
 
 ## Sentada 2 — Adam con cuentas: beta cerrada (M3 → M7)
 
@@ -58,7 +177,7 @@
 
 | Tarea | Pasos | Depende de | Evidencia de cierre | Pendientes |
 |---|---|---|---|---|
-| Base, onboarding y avisos | Cronometrar el onboarding, abrir la base sin llave (debe fallar), biometría, multitarea, arranque y E4 | — | Mediciones en ESTADO | 13 |
+| Base, onboarding y avisos | Cronometrar el onboarding (`maestro test apps/movil/.maestro/onboarding.yaml`; ver `docs/maestro.md`), flujos CA-M2-02 y arqueo básico en el mismo build, abrir la base sin llave (debe fallar), biometría, multitarea, arranque y E4 | — | Mediciones en ESTADO | 13 |
 | Captura | Activar en O6, `publicar-ejemplos.mjs`, app no autorizada, supervivencia del servicio | 13 | CA-M5-01, 02 y 08 | 15 |
 | Simulador | E8 con K = 1 y N = 10,000 < 150 ms | 13 | Mediciones en ESTADO | 18 |
 | Beta en el teléfono | Fila de consentimiento en Supabase, TalkBack y texto al 200 %, exportar y borrar, `adb backup`, secretos sobre el APK | Sentada 2 | CA-M7-05 | 22, 29 |
