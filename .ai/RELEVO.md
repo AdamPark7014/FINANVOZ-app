@@ -6,17 +6,18 @@
 
 ## Hecho en este turno
 
-- **M2 / UI:** copy vacío de Cuentas (`02 §11`) centralizado en `principal/textos.ts`; `PantallaCuentas` usa constantes, `testID` y variante `cuerpo`. Prueba en `principal.test.tsx`.
+- **ui/tokens:** comentarios JSDoc de contraste WCAG (AA y 1.4.11) alineados con `tokens.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-Ver `docs/ESTADO.md` y `git log` (oleadas W/V, compartidos, personas, ¿Me alcanza?, etc.).
+Ver `docs/ESTADO.md` y `git log` (tips docs, M16 compartido, ¿Me alcanza?, etc.).
 
 ## A medias — CUIDADO
 
 - CI: `publicar-ejemplos.test.ts` y `rendimiento.test.ts` (RNF-01) pueden fallar en Windows.
 - M0 / Expo / teléfono / legal / fiscal: sin cambio (Adam).
 - `semilla.ts` / `semilla.test.ts`: typecheck preexistentes en movil (no tocados).
+- Otro agente: cambios sin commitear en pantallas principal, onboarding, ajustes, respaldo, fixtures (no tocados en este turno).
 
 ## Siguiente paso
 
@@ -28,6 +29,7 @@ Ver `docs/ESTADO.md` y `git log` (oleadas W/V, compartidos, personas, ¿Me alcan
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, `eas.json`, `app.config`, vectores a mano.
+- Archivos sin commitear del otro turno salvo rescate acordado.
 
 ## Estimación rápida
 

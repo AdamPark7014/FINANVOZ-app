@@ -12,6 +12,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { mensajeError } from '../principal/textos';
+import { TEXTO_SUSCRIPCIONES_VACIO } from './textos';
 
 type Accion = 'compromiso' | 'cancelada' | 'no_es';
 
@@ -70,8 +71,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         </Texto>
       ) : (
         <Texto variante="cuerpo" tono="secundario" testID="suscripciones-vacio">
-          Todavía no veo cargos que se repitan. Cuando un cobro llegue cada mes, cada semana o cada año,
-          aparece aquí.
+          {TEXTO_SUSCRIPCIONES_VACIO}
         </Texto>
       )}
       {mensaje ? (

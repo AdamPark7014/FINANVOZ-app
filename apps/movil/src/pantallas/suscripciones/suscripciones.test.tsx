@@ -5,6 +5,7 @@ import { conEscenario, vector } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaSuscripciones } from './PantallaSuscripciones';
+import { TEXTO_SUSCRIPCIONES_VACIO } from './textos';
 
 interface VectorE14 {
   hoy: string;
@@ -101,7 +102,7 @@ describe('Suscripciones (02 §20)', () => {
   it('sin cargos que se repitan lo explica sin cifras', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
-    expect(screen.getByTestId('suscripciones-vacio')).toBeTruthy();
+    expect(screen.getByTestId('suscripciones-vacio')).toHaveTextContent(TEXTO_SUSCRIPCIONES_VACIO);
     expect(screen.queryByTestId('suscripciones-inactivas')).toBeNull();
   });
 
