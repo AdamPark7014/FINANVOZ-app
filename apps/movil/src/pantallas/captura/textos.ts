@@ -162,7 +162,7 @@ export function detalleFueAMeses(
   return `${prefijoComercio}${formatearCentavos(monto)} con tu ${tarjeta} · ${fechaEtiqueta}`;
 }
 
-export function descripcionDuplicado(descripcion: string | undefined): string {
+export function descripcionDuplicado(descripcion: string | null | undefined): string {
   return descripcion ? `«${descripcion}»` : DUPLICADO_SIN_DESCRIPCION;
 }
 

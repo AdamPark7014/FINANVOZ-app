@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Plan:** `ID.tituloPantalla` en `plan/textos.ts` alinea testID con `PantallaPlan` y `plan.test.tsx` (header TalkBack).
+- **Tabs:** `pestanas-textos.test` fija `ROL_ACCESIBILIDAD_BOTON_PESTANA` en `tab` (TalkBack §15).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding/tabs/captura/deducciones copy y a11y. Ver `git log`.
+- Plan `tituloPantalla`, colchón `sugerenciaMontoColchon10`, onboarding/tabs/captura/deducciones. Ver `git log`.
 
 ## A medias — CUIDADO
 

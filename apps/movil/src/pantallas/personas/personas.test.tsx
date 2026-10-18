@@ -26,6 +26,7 @@ import {
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
   PISTA_COBRAR,
+  PISTA_VOLVER,
   TEXTO_CONTACTOS_VACIO,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
@@ -319,7 +320,7 @@ describe('estados vacíos (es-MX)', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
     expect(textoDe('persona-no-encontrada')).toBe(TEXTO_PERSONA_NO_ENCONTRADA);
-    expect(screen.getByTestId('persona-volver')).toBeTruthy();
+    expect(screen.getByTestId('persona-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
   it('sin movimientos lo explica', () => {

@@ -1,5 +1,7 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
+export { TIP_CUENTAS_MINIMO, TIP_INGRESO_SALTAR } from './tips';
+
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
 

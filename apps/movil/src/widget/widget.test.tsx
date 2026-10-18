@@ -69,10 +69,17 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
   });
 
   it('modo solo texto oculta el copy interno como la fila con cifra', () => {
-    const soloTexto = construirVistaWidget(null, { ocultarMontos: true });
-    render(<PreviaWidget vista={soloTexto} esquema="claro" />);
+    const soloTexto = construirVistaWidget(
+      { estado: 'normal', hoyPuedesPesos: 214, dias: 4 },
+      { ocultarMontos: true },
+    );
+    render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
+    expect(screen.getByTestId('previa-widget').props.accessibilityLabel).toBe('Toca para ver tu día');
     expect(screen.getByTestId('previa-widget-solo-texto').props.importantForAccessibility).toBe(
       'no-hide-descendants',
+    );
+    expect(screen.getByText('Toca para ver tu día', { hidden: true }).props.importantForAccessibility).toBe(
+      'no',
     );
   });
 });
