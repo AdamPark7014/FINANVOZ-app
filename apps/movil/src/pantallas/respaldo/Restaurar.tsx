@@ -25,6 +25,14 @@ import {
   ETIQUETA_VOLVER,
   INTRO_RESTAURAR_ARCHIVO,
   INTRO_RESTAURAR_NUBE,
+  PISTA_RESTAURAR_ABRIR,
+  PISTA_RESTAURAR_CANCELAR,
+  PISTA_RESTAURAR_CONFIRMAR,
+  PISTA_RESTAURAR_DESDE_ARCHIVO,
+  PISTA_RESTAURAR_DESDE_NUBE,
+  PISTA_RESTAURAR_ELEGIR_ARCHIVO,
+  PISTA_RESTAURAR_OTRO_ARCHIVO,
+  PISTA_RESTAURAR_VOLVER_ELEGIR,
   PISTA_VOLVER_RESTAURAR,
   mensajeErrorNube,
   mensajeErrorRespaldo,
@@ -142,6 +150,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                   testID="restaurar-nube"
                   etiqueta={BTN_DESDE_NUBE}
                   deshabilitado={trabajando}
+                  pista={PISTA_RESTAURAR_DESDE_NUBE}
                   alPresionar={() => {
                     setError(null);
                     setPaso({ tipo: 'nube' });
@@ -154,6 +163,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 etiqueta={nube ? BTN_DESDE_ARCHIVO : BTN_ELEGIR_ARCHIVO}
                 cargando={trabajando}
                 deshabilitado={trabajando}
+                pista={nube ? PISTA_RESTAURAR_DESDE_ARCHIVO : PISTA_RESTAURAR_ELEGIR_ARCHIVO}
                 alPresionar={() => void elegir()}
               />
             </>
@@ -173,6 +183,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 variante="texto"
                 etiqueta={BTN_VOLVER_A_ELEGIR}
                 deshabilitado={trabajando}
+                pista={PISTA_RESTAURAR_VOLVER_ELEGIR}
                 alPresionar={() => {
                   setError(null);
                   setPaso({ tipo: 'elegir' });
@@ -200,12 +211,14 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 etiqueta={BTN_ABRIR_RESPALDO}
                 cargando={trabajando}
                 deshabilitado={trabajando || contrasena === ''}
+                pista={PISTA_RESTAURAR_ABRIR}
                 alPresionar={() => void abrir(paso.archivo)}
               />
               <Boton
                 variante="texto"
                 etiqueta={paso.deLaNube ? BTN_VOLVER_A_ELEGIR : BTN_ELEGIR_OTRO_ARCHIVO}
                 deshabilitado={trabajando}
+                pista={paso.deLaNube ? PISTA_RESTAURAR_VOLVER_ELEGIR : PISTA_RESTAURAR_OTRO_ARCHIVO}
                 alPresionar={() => {
                   setError(null);
                   setContrasena('');
@@ -219,7 +232,12 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 {resumenRespaldo(paso.listo)}
               </Texto>
               {tieneDatos ? (
-                <Texto variante="cuerpo" tono="faltante" testID="restaurar-reemplaza">
+                <Texto
+                  variante="cuerpo"
+                  tono="faltante"
+                  testID="restaurar-reemplaza"
+                  accessibilityRole="alert"
+                >
                   {AVISO_REEMPLAZA_DATOS}
                 </Texto>
               ) : null}
@@ -228,12 +246,14 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 etiqueta={BTN_RESTAURAR}
                 cargando={trabajando}
                 deshabilitado={trabajando}
+                pista={PISTA_RESTAURAR_CONFIRMAR}
                 alPresionar={() => void restaurar(paso.listo)}
               />
               <Boton
                 variante="texto"
                 etiqueta={BTN_CANCELAR}
                 deshabilitado={trabajando}
+                pista={PISTA_RESTAURAR_CANCELAR}
                 alPresionar={() => setPaso({ tipo: 'elegir' })}
               />
             </>

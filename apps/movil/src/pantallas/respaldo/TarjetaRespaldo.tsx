@@ -12,7 +12,10 @@ import {
   DESCRIPCION_ARCHIVO,
   MENSAJE_CONTRASENA_GUARDADA,
   MENSAJE_NO_EXPORTAR,
+  PISTA_CAMBIAR_CONTRASENA,
+  PISTA_CREAR_CONTRASENA,
   PISTA_EXPORTAR_ARCHIVO,
+  PISTA_RESTAURAR_RESPALDO,
   SUBTITULO_ARCHIVO,
 } from './textos';
 
@@ -97,6 +100,7 @@ export function TarjetaRespaldo({
             variante="texto"
             ancho="contenido"
             etiqueta={BTN_CAMBIAR_CONTRASENA}
+            pista={PISTA_CAMBIAR_CONTRASENA}
             alPresionar={() => {
               setMensaje(null);
               setEditando(true);
@@ -108,6 +112,7 @@ export function TarjetaRespaldo({
           testID="privacidad-respaldo-crear"
           variante="secundario"
           etiqueta={BTN_CREAR_CONTRASENA}
+          pista={PISTA_CREAR_CONTRASENA}
           alPresionar={() => {
             setMensaje(null);
             setEditando(true);
@@ -120,6 +125,7 @@ export function TarjetaRespaldo({
           variante="texto"
           ancho="contenido"
           etiqueta={BTN_RESTAURAR_RESPALDO}
+          pista={PISTA_RESTAURAR_RESPALDO}
           alPresionar={alRestaurar}
         />
       )}

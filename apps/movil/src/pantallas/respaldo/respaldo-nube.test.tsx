@@ -25,7 +25,12 @@ import { borrarTodoApp, restaurarSesion } from '../../servicios/sesion';
 import type { TiendaEnMemoria } from '../../suscripciones/memoria';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
-import { PISTA_CONFIRMAR_BORRAR_CUENTA, PISTA_RESPALDAR_AHORA } from './textos';
+import {
+  PISTA_CANCELAR_BORRAR_CUENTA,
+  PISTA_CONFIRMAR_BORRAR_CUENTA,
+  PISTA_ENVIAR_CODIGO,
+  PISTA_RESPALDAR_AHORA,
+} from './textos';
 
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
 let mockPreparar: ((ctx: Contexto) => void) | null = null;
@@ -135,6 +140,7 @@ function ctxActual(): Contexto {
 
 async function entrarConCorreo() {
   await waitFor(() => expect(screen.getByTestId('respaldo-correo')).toBeTruthy());
+  expect(screen.getByTestId('respaldo-pedir-codigo')).toHaveProp('accessibilityHint', PISTA_ENVIAR_CODIGO);
   fireEvent.changeText(screen.getByTestId('respaldo-correo'), CORREO);
   fireEvent.press(screen.getByTestId('respaldo-pedir-codigo'));
   await waitFor(() => expect(screen.getByTestId('respaldo-codigo')).toBeTruthy());
@@ -220,6 +226,10 @@ describe('Ajustes → Respaldo en la nube (M9, 02 §19)', () => {
     expect(screen.getByTestId('respaldo-borrar-confirmar')).toHaveProp(
       'accessibilityHint',
       PISTA_CONFIRMAR_BORRAR_CUENTA,
+    );
+    expect(screen.getByTestId('respaldo-borrar-cancelar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_BORRAR_CUENTA,
     );
     fireEvent.press(screen.getByTestId('respaldo-borrar-confirmar'));
     await waitFor(() =>

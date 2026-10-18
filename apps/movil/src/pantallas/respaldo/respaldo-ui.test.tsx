@@ -19,10 +19,14 @@ import {
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
   PISTA_BORRAR_CUENTA,
+  PISTA_CAMBIAR_CONTRASENA,
   PISTA_CONFIRMAR_BORRAR_CUENTA,
   PISTA_CANCELAR_CONTRASENA,
+  PISTA_CREAR_CONTRASENA,
   PISTA_EXPORTAR_ARCHIVO,
   PISTA_GUARDAR_CONTRASENA,
+  PISTA_RESTAURAR_ELEGIR_ARCHIVO,
+  PISTA_RESTAURAR_RESPALDO,
   PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
   PISTA_VOLVER_RESTAURAR,
@@ -55,6 +59,9 @@ describe('textos de respaldo (`02 §14`, §19)', () => {
       PISTA_VOLVER,
       PISTA_BORRAR_CUENTA,
       PISTA_CONFIRMAR_BORRAR_CUENTA,
+      PISTA_CREAR_CONTRASENA,
+      PISTA_CAMBIAR_CONTRASENA,
+      PISTA_RESTAURAR_RESPALDO,
       PISTA_RESPALDAR_AHORA,
       PISTA_EXPORTAR_ARCHIVO,
       PISTA_GUARDAR_CONTRASENA,
@@ -79,9 +86,17 @@ describe('accesibilidad en pantalla respaldo', () => {
     expect(screen.getByTestId('respaldo-titulo')).toHaveTextContent(TITULO_RESPALDO);
     expect(screen.getByTestId('respaldo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('privacidad-respaldo-crear')).toHaveProp('accessibilityRole', 'button');
+    expect(screen.getByTestId('privacidad-respaldo-crear')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CREAR_CONTRASENA,
+    );
     expect(screen.getByTestId('privacidad-respaldo-restaurar')).toHaveProp(
       'accessibilityLabel',
       BTN_RESTAURAR_RESPALDO,
+    );
+    expect(screen.getByTestId('privacidad-respaldo-restaurar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_RESTAURAR_RESPALDO,
     );
     p.cerrar();
   });
@@ -138,7 +153,24 @@ describe('accesibilidad en pantalla respaldo', () => {
     p.cerrar();
   });
 
-  it('Restaurar: volver tiene rol, etiqueta y pista', () => {
+  it('TarjetaRespaldo con contraseña: cambiar tiene pista TalkBack', async () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    const contrasena = 'mi frase de respaldo segura';
+    await fijarContrasenaRespaldo(r.deps, contrasena, contrasena);
+    montar(
+      p.ctx,
+      <TarjetaRespaldo alRestaurar={jest.fn()} />,
+      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
+    );
+    expect(screen.getByTestId('privacidad-respaldo-cambiar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CAMBIAR_CONTRASENA,
+    );
+    p.cerrar();
+  }, 15_000);
+
+  it('Restaurar: volver y elegir archivo tienen pista TalkBack', () => {
     const p = crearSesionPrueba('2026-10-11');
     const r = crearRespaldoPrueba();
     montar(
@@ -154,6 +186,10 @@ describe('accesibilidad en pantalla respaldo', () => {
     expect(screen.getByTestId('restaurar-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_RESTAURAR);
     expect(screen.getByTestId('restaurar-titulo')).toHaveTextContent(TITULO_RESTAURAR);
     expect(screen.getByTestId('restaurar-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('restaurar-elegir')).toHaveProp(
+      'accessibilityHint',
+      PISTA_RESTAURAR_ELEGIR_ARCHIVO,
+    );
     p.cerrar();
   });
 });

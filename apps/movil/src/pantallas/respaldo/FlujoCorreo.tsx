@@ -13,6 +13,9 @@ import {
   BTN_USAR_OTRO_CORREO,
   ETIQUETA_CODIGO,
   ETIQUETA_CORREO,
+  PISTA_CONFIRMAR_CODIGO,
+  PISTA_ENVIAR_CODIGO,
+  PISTA_USAR_OTRO_CORREO,
   textoCodigoEnviado,
 } from './textos';
 
@@ -89,6 +92,7 @@ export function FlujoCorreo({
         etiqueta={BTN_ENVIAR_CODIGO}
         cargando={trabajando}
         deshabilitado={trabajando || correo.trim() === ''}
+        pista={PISTA_ENVIAR_CODIGO}
         alPresionar={() => void pedir()}
       />
       {error ? <MensajeError texto={error} /> : null}
@@ -113,6 +117,7 @@ export function FlujoCorreo({
         etiqueta={BTN_CONFIRMAR}
         cargando={trabajando}
         deshabilitado={trabajando || codigo.trim() === ''}
+        pista={PISTA_CONFIRMAR_CODIGO}
         alPresionar={() => void confirmar(modo)}
       />
       <Boton
@@ -120,6 +125,7 @@ export function FlujoCorreo({
         ancho="contenido"
         etiqueta={BTN_USAR_OTRO_CORREO}
         deshabilitado={trabajando}
+        pista={PISTA_USAR_OTRO_CORREO}
         alPresionar={() => {
           setError(null);
           setModo(null);

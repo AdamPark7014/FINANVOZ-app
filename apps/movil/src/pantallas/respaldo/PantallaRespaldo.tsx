@@ -33,6 +33,7 @@ import {
   MENSAJE_LISTO_NUBE,
   MENSAJE_NO_GUARDAR_AJUSTE,
   PISTA_BORRAR_CUENTA,
+  PISTA_CANCELAR_BORRAR_CUENTA,
   PISTA_CONFIRMAR_BORRAR_CUENTA,
   PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
@@ -193,7 +194,9 @@ function TarjetaNube({
 
   return (
     <Tarjeta testID="respaldo-nube">
-      <Texto variante="subtitulo">{SUBTITULO_NUBE}</Texto>
+      <Texto variante="subtitulo" testID="respaldo-nube-titulo" accessibilityRole="header">
+        {SUBTITULO_NUBE}
+      </Texto>
       <Texto variante="cuerpo" testID="respaldo-ultimo">
         {vista.textoUltimo}
       </Texto>
@@ -298,9 +301,11 @@ function TarjetaNube({
                 pista={PISTA_CONFIRMAR_BORRAR_CUENTA}
               />
               <Boton
+                testID="respaldo-borrar-cancelar"
                 variante="texto"
                 etiqueta={BTN_CANCELAR}
                 deshabilitado={borrando === 'borrando'}
+                pista={PISTA_CANCELAR_BORRAR_CUENTA}
                 alPresionar={() => setBorrando('no')}
               />
             </>

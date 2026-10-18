@@ -22,6 +22,8 @@ export const PISTA_BORRAR_CUENTA = 'Elimina tu cuenta de respaldo en la nube';
 /** TalkBack al confirmar borrar cuenta (`02 §19`). */
 export const PISTA_CONFIRMAR_BORRAR_CUENTA =
   'Confirma borrar la cuenta y todos los respaldos en la nube';
+export const PISTA_CANCELAR_BORRAR_CUENTA =
+  'Cierra la confirmación y conserva tu cuenta en la nube';
 export const TITULO_RESPALDO = 'Respaldo';
 export const SUBTITULO_NUBE = 'En la nube';
 export const AVISO_PENDIENTE = 'Llevas más de 2 semanas sin respaldo.';
@@ -67,6 +69,12 @@ export const BTN_EXPORTAR_ARCHIVO = 'Exportar respaldo (.cartera)';
 /** TalkBack cuando ya hay contraseña (`02 §19`). */
 export const PISTA_EXPORTAR_ARCHIVO =
   'Genera un archivo cifrado para guardarlo o pasarlo a otro teléfono';
+export const PISTA_CREAR_CONTRASENA =
+  'Abre el formulario para crear la contraseña que cifra tus respaldos';
+export const PISTA_CAMBIAR_CONTRASENA =
+  'Genera una contraseña nueva; los respaldos viejos siguen abriéndose con la anterior';
+export const PISTA_RESTAURAR_RESPALDO =
+  'Abre el flujo para recuperar tus datos desde la nube o un archivo';
 export const BTN_CAMBIAR_CONTRASENA = 'Cambiar contraseña';
 export const BTN_CREAR_CONTRASENA = 'Crear contraseña de respaldo';
 export const BTN_RESTAURAR_RESPALDO = 'Restaurar un respaldo';
@@ -99,6 +107,9 @@ export function ayudaContrasena(): string {
 
 export const ETIQUETA_CORREO = 'Tu correo';
 export const BTN_ENVIAR_CODIGO = 'Enviarme el código';
+export const PISTA_ENVIAR_CODIGO = 'Te mando un código a tu correo para confirmarlo';
+export const PISTA_CONFIRMAR_CODIGO = 'Valida el código de seis dígitos que recibiste';
+export const PISTA_USAR_OTRO_CORREO = 'Vuelve a escribir un correo distinto';
 
 export function textoCodigoEnviado(correo: string): string {
   return `Te mandé un código a ${correo.trim().toLowerCase()}. Escríbelo aquí.`;
@@ -115,18 +126,30 @@ export const INTRO_RESTAURAR_ARCHIVO =
   'Recupera tus cuentas, movimientos y ajustes desde un archivo .cartera que exportaste antes.';
 export const RESTAURAR_NO_DISPONIBLE = 'Restaurar no está disponible en esta versión de la app.';
 export const BTN_DESDE_NUBE = 'Desde la nube';
+export const PISTA_RESTAURAR_DESDE_NUBE =
+  'Entra con tu correo y baja tu respaldo más reciente de la nube';
 export const BTN_DESDE_ARCHIVO = 'Desde un archivo';
+export const PISTA_RESTAURAR_DESDE_ARCHIVO = 'Elige un archivo cifrado que exportaste antes';
 export const BTN_ELEGIR_ARCHIVO = 'Elegir archivo';
+export const PISTA_RESTAURAR_ELEGIR_ARCHIVO = PISTA_RESTAURAR_DESDE_ARCHIVO;
 export const TEXTO_CORREO_RESTAURAR =
   'Escribe el correo de tu cuenta de respaldo. Te mando un código para entrar.';
 export const TEXTO_BAJANDO = 'Bajando tu respaldo…';
 export const BTN_VOLVER_A_ELEGIR = 'Volver a elegir';
 export const TEXTO_RESPALDO_RECIENTE = 'Encontré tu respaldo más reciente. Escribe su contraseña.';
 export const BTN_ABRIR_RESPALDO = 'Abrir respaldo';
+export const PISTA_RESTAURAR_ABRIR =
+  'Descifra el respaldo con la contraseña que usaste al crearlo o exportarlo';
 export const BTN_ELEGIR_OTRO_ARCHIVO = 'Elegir otro archivo';
+export const PISTA_RESTAURAR_OTRO_ARCHIVO = 'Elige otro archivo en lugar del que ya seleccionaste';
+export const PISTA_RESTAURAR_VOLVER_ELEGIR =
+  'Regresa a elegir si restauras desde la nube o un archivo';
 export const AVISO_REEMPLAZA_DATOS =
   'Se reemplaza todo lo que hay ahora en este teléfono. Si quieres conservarlo, primero exporta un respaldo.';
 export const BTN_RESTAURAR = 'Restaurar';
+export const PISTA_RESTAURAR_CONFIRMAR =
+  'Reemplaza los datos de este teléfono con los del respaldo';
+export const PISTA_RESTAURAR_CANCELAR = 'Cierra el resumen sin restaurar';
 
 /** Tarjeta en Ajustes (`02 §12`). */
 export const SECCION_RESPALDO = 'Respaldo';
