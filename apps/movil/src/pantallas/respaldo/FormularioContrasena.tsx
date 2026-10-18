@@ -1,16 +1,24 @@
 import { useState } from 'react';
 import {
   fijarContrasenaRespaldo,
-  mensajeErrorRespaldo,
-  MIN_CONTRASENA_RESPALDO,
   validarContrasenaNueva,
   type DependenciasRespaldo,
 } from '../../servicios';
 import { Boton, CampoTexto, Texto } from '../../ui';
-
-/** Aviso antes de crear la contraseña (`02 §19`, `05 §E16`: "la UI lo dice antes de crearla"). */
-export const AVISO_CONTRASENA =
-  'Esta contraseña cifra tu respaldo. Ni nosotros la conocemos: si la olvidas, nadie puede recuperar tu respaldo.';
+import {
+  AVISO_CONTRASENA,
+  ayudaContrasena,
+  BTN_CANCELAR,
+  BTN_GUARDAR_CONTRASENA,
+  errorContrasenaCorta,
+  ERROR_CONTRASENAS_NO_COINCIDEN,
+  ETIQUETA_CONFIRMAR_CONTRASENA,
+  ETIQUETA_CONTRASENA,
+  ETIQUETA_CONTRASENA_NUEVA,
+  mensajeErrorRespaldo,
+  MENSAJE_NO_GUARDAR_CONTRASENA,
+  TEXTO_RESPALDOS_ANTERIORES,
+} from './textos';
 
 const NATIVO_CONTRASENA = {
   secureTextEntry: true,
@@ -43,11 +51,7 @@ export function FormularioContrasena({
   const guardar = async () => {
     const problema = validarContrasenaNueva(contrasena, confirmacion);
     if (problema) {
-      setError(
-        problema === 'corta'
-          ? `Usa al menos ${MIN_CONTRASENA_RESPALDO} caracteres.`
-          : 'Las contraseñas no coinciden.',
-      );
+      setError(problema === 'corta' ? errorContrasenaCorta() : ERROR_CONTRASENAS_NO_COINCIDEN);
       return;
     }
     setError(null);
@@ -61,7 +65,7 @@ export function FormularioContrasena({
       setError(
         e instanceof Error && 'codigo' in e
           ? mensajeErrorRespaldo(e)
-          : 'No pude guardar la contraseña. Intenta de nuevo.',
+          : MENSAJE_NO_GUARDAR_CONTRASENA,
       );
     } finally {
       setGuardando(false);

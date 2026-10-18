@@ -178,3 +178,15 @@ export const MENSAJE_EXPLICAR_SIN_RED =
 export const MENSAJE_EXPLICAR_ERROR = 'No pude responderte ahora. Pregúntame de nuevo en un rato.';
 export const MENSAJE_EXPLICAR_SOLO_PLUS =
   'Preguntarme lo que quieras sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.';
+
+// ——— Cuentas (`02 §11`) ———
+
+/** Tienes: sin efectivo, débito, billetera ni ahorro. */
+export const TEXTO_CUENTAS_TIENES_VACIO =
+  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrégalas al configurar la app o cuando captures un movimiento.';
+
+/** Debes: sin tarjetas ni deudas con personas. */
+export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamos con personas.';
+
+/** Compromisos: nada en los próximos 30 días. */
+export const TEXTO_CUENTAS_COMPROMISOS_VACIO = 'No tienes pagos en los próximos 30 días.';

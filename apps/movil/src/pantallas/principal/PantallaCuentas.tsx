@@ -21,6 +21,11 @@ import {
   Tarjeta,
   Texto,
 } from '../../ui';
+import {
+  TEXTO_CUENTAS_COMPROMISOS_VACIO,
+  TEXTO_CUENTAS_DEBES_VACIO,
+  TEXTO_CUENTAS_TIENES_VACIO,
+} from './textos';
 
 const NOMBRE_SUBTIPO: Record<string, string> = {
   efectivo: 'Efectivo',

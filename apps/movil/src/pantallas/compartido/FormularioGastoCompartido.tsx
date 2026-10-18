@@ -24,6 +24,7 @@ import {
   ETIQUETA_DESCRIPCION_GASTO,
   ETIQUETA_MONTO_GASTO,
   ETIQUETA_OTRA_PROPORCION,
+  ETIQUETA_PAGUE_YO,
   ETIQUETA_QUIEN_PAGO,
   ETIQUETA_REPARTO,
   etiquetaPagoPareja,
@@ -171,7 +172,7 @@ export function FormularioGastoCompartido({
         testID="compartido-quien"
         etiqueta={ETIQUETA_QUIEN_PAGO}
         opciones={[
-          { valor: 'yo', etiqueta: 'Pagué yo' },
+          { valor: 'yo', etiqueta: ETIQUETA_PAGUE_YO },
           { valor: 'otro', etiqueta: etiquetaPagoPareja(nombrePareja) },
         ]}
         valor={quien}
