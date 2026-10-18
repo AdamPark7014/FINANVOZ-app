@@ -632,7 +632,7 @@ function FueAMeses({ p, testID }: { p: Pregunta<'fue_a_meses'>; testID: string }
           }
         }}
         prefijoTestID={`${testID}-meses`}
-        etiqueta={titulo}
+        etiqueta={TITULO_FUE_A_MESES}
       />
     </Marco>
   );
