@@ -10,6 +10,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
+import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
 import { useNotificaciones } from '../avisos/notificaciones';
 
 /** Aviso de riesgo en Hoy (P < 50 %, `02 §13`): sin cifras nuevas, solo qué significa la probabilidad. */

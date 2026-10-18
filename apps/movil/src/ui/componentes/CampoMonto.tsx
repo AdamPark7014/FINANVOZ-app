@@ -47,6 +47,7 @@ export function CampoMonto({
       }}
       ejemplo="0.00"
       teclado="decimal-pad"
+      etiquetaAccesible={etiquetaCampoMonto(etiqueta, texto)}
       error={error ?? (invalido ? ERROR_FORMATO_MONTO : null)}
       {...(ayuda === undefined ? {} : { ayuda })}
       {...(deshabilitado === undefined ? {} : { deshabilitado })}

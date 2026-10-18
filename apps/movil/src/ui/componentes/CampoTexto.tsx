@@ -64,7 +64,7 @@ export function CampoTexto({
         onFocus={() => setEnfocado(true)}
         onBlur={() => setEnfocado(false)}
         editable={!deshabilitado}
-        accessibilityLabel={etiquetaHablada(etiqueta)}
+        accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
         accessibilityState={{ invalid: conError, disabled: deshabilitado }}
         {...nativo}

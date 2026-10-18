@@ -21,6 +21,12 @@ export const PISTA_VOLVER = 'Regresa a Ajustes';
 
 export const TITULO = 'Ayuda';
 export const INTRO = 'Toca una pregunta para ver la respuesta.';
+/** Encabezado de la lista desplegable (TalkBack: región antes del contacto). */
+export const PREGUNTAS_TITULO = 'Preguntas frecuentes';
+export const ETIQUETA_RESPUESTA = 'Respuesta';
+
+/** TalkBack: botón en Ajustes que abre esta pantalla. */
+export const PISTA_ABRIR_DESDE_AJUSTES = 'Abre las preguntas frecuentes y el contacto';
 
 /** Indicador visual junto a cada pregunta (oculto a TalkBack). */
 export const ICONO_PREGUNTA_CERRADA = '+';

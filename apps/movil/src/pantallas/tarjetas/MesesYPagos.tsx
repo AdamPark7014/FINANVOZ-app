@@ -32,7 +32,9 @@ import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { ElegirCuenta, Seccion } from './componentes';
 import {
+  etiquetaAccesiblePlanMsi,
   etiquetaMes,
+  etiquetaVacioMsiTarjeta,
   mensajeLiquidacionPlan,
   NOMBRE_ESTADO_PLAN,
   SUBTITULO_COMPROMISO_MSI,

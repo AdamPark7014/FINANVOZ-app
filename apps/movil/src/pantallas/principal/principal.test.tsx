@@ -600,7 +600,7 @@ describe('Movimientos', () => {
     expect(within(detalle).getByText('Registrado escribiendo · 11 oct')).toBeTruthy();
     fireEvent.press(within(detalle).getByTestId('boton-anular'));
     fireEvent.press(screen.getByTestId('boton-confirmar-anular'));
-    expect(screen.getByText(MENSAJE_ANULADO_MOVIMIENTO)).toBeTruthy();
+    expect(screen.getByLabelText(MENSAJE_ANULADO_MOVIMIENTO)).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
     expect(listarMovimientos(p.ctx)).toEqual([]);
   });

@@ -162,8 +162,8 @@ export function PantallaHoy({
       />
       {plus.tarjetaDelDia && vista.tarjetaDelDia ? (
         <Tarjeta testID="tarjeta-del-dia">
-          <Texto variante="etiqueta" tono="secundario">
-            Tarjeta del día
+          <Texto variante="etiqueta" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {TITULO_TARJETA_DEL_DIA}
           </Texto>
           <Texto
             variante="cuerpo"
@@ -179,7 +179,7 @@ export function PantallaHoy({
         <Boton
           etiqueta="¿Me alcanza?"
           variante="secundario"
-          pista={PISTA_ME_ALCANZA_HOY}
+          pista="Calcula si te alcanza para una compra"
           alPresionar={() => navegacion.alAbrirMeAlcanza?.()}
           testID="boton-me-alcanza"
         />

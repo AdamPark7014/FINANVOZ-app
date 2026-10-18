@@ -251,6 +251,17 @@ export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
 export const SUBTITULO_SIN_INGRESO =
   'Así reparto tu dinero libre hasta el próximo pago.';
 
+/** Plus: tip del día en Hoy (`02 §4`). */
+export const TITULO_TARJETA_DEL_DIA = 'Tarjeta del día';
+
+/** TalkBack de la tarjeta del día: título + tip en una sola frase. */
+export function etiquetaTarjetaDelDia(texto: string): string {
+  return `${TITULO_TARJETA_DEL_DIA}. ${texto}`;
+}
+
+/** Indicador mientras se calcula la probabilidad en Hoy (`02 §15`). */
+export const ETIQUETA_PROBABILIDAD_CALCULANDO = 'Calculando si llegas…';
+
 export { PISTA_CONFIGURAR_INGRESO as PISTA_CONFIGURAR_INGRESO_HOY } from '../ajustes/ingreso-textos';
 
 /** TalkBack en CTAs de Hoy (`02 §15`). */
