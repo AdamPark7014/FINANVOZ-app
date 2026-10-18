@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **fix(movil): tarjetas** — `MENSAJE_SALDO_SIN_CAMBIO` en `tarjetas/textos.ts`; `EditarTarjeta.tsx` al corregir saldo sin cambio.
+- **tarjetas/MesesYPagos:** botones y errores de pago planeado usan constantes de `textos.ts` (sin cadenas inline).
 
 ## Hecho (acumulado reciente)
 
-- Movimientos anular, me-alcanza, estados-cuenta, tandas. Ver `git log`.
+- Copy y a11y móvil (me-alcanza, captura, anulación, estados-cuenta). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`PreguntasCaptura`, `MesesYPagos`, TarjetasAccion/Interpretacion, etc.) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local: `ajustes`, `personas`, `EditarTarjeta`/`textos` tarjetas — no mezclar en commits ajenos.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Más strings sueltos (MesesYPagos, TarjetasAccion, captura).
+2. Commits pequeños del WIP tarjetas/personas cuando toque.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
