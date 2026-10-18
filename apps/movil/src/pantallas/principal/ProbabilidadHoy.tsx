@@ -110,7 +110,7 @@ export function ProbabilidadHoy({
       ) : null}
       {vista.riesgo ? (
         <Tarjeta testID="aviso-riesgo">
-          <Texto variante="secundario" accessibilityLiveRegion="polite">
+          <Texto variante="secundario" accessibilityRole="alert" accessibilityLiveRegion="polite">
             {TEXTO_RIESGO}
           </Texto>
         </Tarjeta>

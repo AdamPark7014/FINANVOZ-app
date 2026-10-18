@@ -44,6 +44,7 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     const p = await conGastoDiario(40_000, '2026-10-27');
     const n = montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
     expect(screen.getByTestId('aviso-riesgo')).toHaveTextContent(TEXTO_RIESGO);
+    expect(screen.getByText(TEXTO_RIESGO)).toHaveProp('accessibilityRole', 'alert');
     await waitFor(() => expect(n.puerto.lista()).toHaveLength(1));
     expect(n.puerto.lista()[0]).toMatchObject({
       fecha: '2026-10-28',
