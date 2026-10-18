@@ -10,6 +10,7 @@ import {
   ETIQUETA_VOLVER,
   etiquetaVacioTandas,
   PISTA_NUEVA_TANDA,
+  PISTA_VACIO_TANDAS,
   PISTA_VER_CALENDARIO,
   PISTA_VOLVER,
   TEXTO_TANDAS_VACIO,
@@ -62,6 +63,7 @@ export function PantallaTandas({
               texto={TEXTO_TANDAS_VACIO}
               testID="tandas-vacio"
               etiquetaAccesible={etiquetaVacioTandas()}
+              pistaCta={PISTA_VACIO_TANDAS}
             />
           ) : null}
           {tandas.map((t) => (

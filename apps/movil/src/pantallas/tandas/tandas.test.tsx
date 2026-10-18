@@ -41,6 +41,7 @@ import {
   PISTA_GUARDAR_TANDA,
   PISTA_ME_TOCO,
   PISTA_NUEVA_TANDA,
+  PISTA_VACIO_TANDAS,
   PISTA_VER_CALENDARIO,
   PISTA_VOLVER,
   PISTA_VOLVER_DETALLE,
@@ -187,6 +188,7 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
     expect(screen.getByTestId('tandas-vacio')).toHaveTextContent(TEXTO_TANDAS_VACIO);
     expect(screen.getByTestId('tandas-vacio').props.accessibilityLabel).toBe(etiquetaVacioTandas());
+    expect(screen.getByTestId('tandas-vacio').props.accessibilityHint).toBe(PISTA_VACIO_TANDAS);
     expect(screen.getByTestId('tandas-nueva')).toBeTruthy();
     expect(screen.queryByTestId(/^tanda-/)).toBeNull();
   });

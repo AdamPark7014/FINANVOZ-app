@@ -194,6 +194,9 @@ export function etiquetaVacioTandas(): string {
   return `${TITULO_TANDAS}. ${TEXTO_TANDAS_VACIO}`;
 }
 
+/** Lista vacía: el CTA «Nueva tanda» va justo debajo del copy (`02 §15`). */
+export const PISTA_VACIO_TANDAS = 'Más abajo, botón Nueva tanda';
+
 export const textoAportado = (centavos: number) => `Llevas ${formatearCentavos(centavos)} aportados`;
 export const textoEnRiesgo = (centavos: number) =>
   `Si la tanda se cae, arriesgas ${formatearCentavos(centavos)}`;
