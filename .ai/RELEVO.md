@@ -14,16 +14,18 @@
 
 ## A medias — CUIDADO
 
-- WIP paralelo (principal, ayuda) — no mezclar sin `git status`.
+- WIP sin commitear en disco: `arqueo`, `ayuda`, `compartido`, `estados-cuenta`, `me-alcanza`, `personas`, `tandas` (TalkBack paralelo) — no mezclar con onboarding ya en `fe87f5e`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
-1. Adam — M0 / EAS.
-2. TalkBack aviso «No sé» tarjeta en `FormularioTarjetaNueva`.
+1. Commitear o salvar el WIP paralelo de pantallas (ver `git status`).
+2. Adam — M0 / EAS.
+3. TalkBack aviso «No sé» tarjeta en `FormularioTarjetaNueva`.
 
 ## No tocar
 
+- Cambios unstaged fuera de onboarding hasta que el otro agente los salve o commitee.
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.

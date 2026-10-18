@@ -20,10 +20,16 @@ import {
   OPCIONES_SOBRANTE,
   PISTA_CALCULAR,
   PISTA_CERRAR,
+  PISTA_CASILLA_GASTO,
   PISTA_CONFIRMAR,
   PISTA_CONTINUAR,
   PISTA_LISTO,
   PISTA_MONTO_TRAES,
+  PISTA_PASO_MARCAR,
+  PISTA_TARJETA_CONTEO_LISTO,
+  ETIQUETA_TARJETA_CONTEO_LISTO,
+  etiquetaChipExacto,
+  PASO_MARCAR_AYUDA,
   PASO_MARCAR_TITULO,
   TEXTO_SIN_CUENTA_EFECTIVO,
   TITULO,
@@ -67,6 +73,11 @@ describe('copy del arqueo (es-MX)', () => {
       'Anoté algo de más',
       'No sé, solo corrígelo',
     ]);
+  });
+
+  it('chip exacto habla el monto en palabras', () => {
+    expect(etiquetaChipExacto(64_000)).toBe('Llevo seiscientos cuarenta pesos');
+    expect(PISTA_CONFIRMAR).toBe('Guarda el conteo y los ajustes');
   });
 
   it('mensajes dinámicos con montos formateados', () => {
@@ -118,6 +129,8 @@ describe('PantallaArqueo · vacío y errores', () => {
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('arqueo-hecho')).toHaveProp('accessibilityLabel', ETIQUETA_TARJETA_CONTEO_LISTO);
+    expect(screen.getByTestId('arqueo-hecho')).toHaveProp('accessibilityHint', PISTA_TARJETA_CONTEO_LISTO);
     expect(textoDe('arqueo-mensaje-hecho')).toBe(mensajeCuadra());
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityHint', PISTA_LISTO);
@@ -149,6 +162,11 @@ describe('PantallaArqueo · vacío y errores', () => {
     const continuar = screen.queryByTestId('arqueo-continuar');
     if (continuar) {
       expect(continuar).toHaveProp('accessibilityHint', PISTA_CONTINUAR);
+      const casilla = screen.queryAllByRole('checkbox')[0];
+      if (casilla) {
+        expect(casilla).toHaveProp('accessibilityHint', PISTA_CASILLA_GASTO);
+      }
+      expect(screen.getByText(PASO_MARCAR_AYUDA)).toHaveProp('accessibilityHint', PISTA_PASO_MARCAR);
     }
     p.cerrar();
   });

@@ -1,6 +1,6 @@
 import type { Centavos } from '@cartera/core';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import {
   calcularArqueo,
   confirmarArqueo,
@@ -12,8 +12,20 @@ import {
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
-import { Casilla, Chips } from '../onboarding/componentes';
+import {
+  Boton,
+  CampoMonto,
+  Cifra,
+  espacio,
+  etiquetaHablada,
+  formatearCentavos,
+  OBJETIVO_TACTIL_MIN,
+  Pantalla,
+  radio,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { mensajeError } from '../principal/textos';
@@ -23,21 +35,29 @@ import {
   CERRAR,
   CONFIRMAR,
   CONTINUAR,
+  ETIQUETA_TARJETA_CONTEO_LISTO,
   PISTA_CALCULAR,
+  PISTA_CASILLA_GASTO,
   PISTA_CERRAR,
   PISTA_CONFIRMAR,
   PISTA_CONTINUAR,
+  PISTA_GRUPO_PROPUESTA,
+  PISTA_GRUPO_SOBRANTE,
   PISTA_LISTO,
   PISTA_MONTO_TRAES,
+  PISTA_PASO_MARCAR,
+  PISTA_TARJETA_CONTEO_LISTO,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,
   ETIQUETA_QUIEN_TE_PAGO,
   LISTO,
+  etiquetaAccesibleCasillaGasto,
+  etiquetaCasillaGasto,
+  etiquetaChipExacto,
   mensajeCuadra,
   mensajeEfectivoQuedo,
   mensajeSumaPropuesta,
   OPCIONES_SOBRANTE,
-  ETIQUETA_GASTO_SIN_DESCRIPCION,
   etiquetaVacioSinEfectivo,
   PASO_MARCAR_AYUDA,
   PASO_MARCAR_TITULO,
@@ -50,6 +70,56 @@ import {
 } from './textos';
 
 type Paso = 'marcar' | 'cantidad' | 'resultado';
+
+/** Casilla del paso 1 con pista TalkBack (no tocar `onboarding/componentes`). */
+function CasillaGastoArqueo({
+  etiqueta,
+  etiquetaAccesible,
+  valor,
+  alCambiar,
+  testID,
+}: {
+  etiqueta: string;
+  etiquetaAccesible: string;
+  valor: boolean;
+  alCambiar: (valor: boolean) => void;
+  testID: string;
+}) {
+  const { c } = useTema();
+  return (
+    <Pressable
+      testID={testID}
+      onPress={() => alCambiar(!valor)}
+      accessibilityRole="checkbox"
+      accessibilityLabel={etiquetaHablada(etiquetaAccesible)}
+      accessibilityHint={PISTA_CASILLA_GASTO}
+      accessibilityState={{ checked: valor }}
+      style={{ minHeight: OBJETIVO_TACTIL_MIN, flexDirection: 'row', alignItems: 'center', gap: espacio.m }}
+    >
+      <View
+        style={{
+          width: 26,
+          height: 26,
+          borderRadius: radio.s,
+          borderWidth: 2,
+          borderColor: valor ? c.acento : c.textoSecundario,
+          backgroundColor: valor ? c.acento : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {valor ? (
+          <Texto variante="etiqueta" style={{ color: c.sobreAcento }}>
+            ✓
+          </Texto>
+        ) : null}
+      </View>
+      <Texto variante="cuerpo" style={{ flex: 1 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        {etiqueta}
+      </Texto>
+    </Pressable>
+  );
+}
 
 /**
  * Arqueo de efectivo (`02 §7`, E7, CA-M5-05): (1) solo con gastos por asignar de más de 24 h, "¿pagaste alguno
@@ -179,24 +249,31 @@ function Arqueo({
 
   if (hecho) {
     return (
-      <Tarjeta testID="arqueo-hecho">
-        <Texto
-          variante="cuerpoFuerte"
-          testID="arqueo-mensaje-hecho"
-          importantForAccessibility="yes"
-          accessibilityLiveRegion="polite"
-          accessibilityRole="alert"
-        >
-          {hecho}
-        </Texto>
-        <Boton
-          etiqueta={LISTO}
-          etiquetaAccesible={ACCESIBILIDAD_LISTO}
-          pista={PISTA_LISTO}
-          alPresionar={alCerrar}
-          testID="arqueo-listo"
-        />
-      </Tarjeta>
+      <View
+        testID="arqueo-hecho"
+        accessibilityLabel={ETIQUETA_TARJETA_CONTEO_LISTO}
+        accessibilityHint={PISTA_TARJETA_CONTEO_LISTO}
+        accessibilityRole="summary"
+      >
+        <Tarjeta accionesAnidadas>
+          <Texto
+            variante="cuerpoFuerte"
+            testID="arqueo-mensaje-hecho"
+            importantForAccessibility="yes"
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            {hecho}
+          </Texto>
+          <Boton
+            etiqueta={LISTO}
+            etiquetaAccesible={ACCESIBILIDAD_LISTO}
+            pista={PISTA_LISTO}
+            alPresionar={alCerrar}
+            testID="arqueo-listo"
+          />
+        </Tarjeta>
+      </View>
     );
   }
 
@@ -205,13 +282,14 @@ function Arqueo({
       {paso === 'marcar' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-marcar">
           <Texto variante="subtitulo">{PASO_MARCAR_TITULO}</Texto>
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="secundario" tono="secundario" accessibilityHint={PISTA_PASO_MARCAR}>
             {PASO_MARCAR_AYUDA}
           </Texto>
           {inicial.porAsignar.map((g) => (
-            <Casilla
+            <CasillaGastoArqueo
               key={g.transaccionId}
-              etiqueta={`${g.descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION} ${formatearCentavos(g.monto)} · ${g.etiqueta}`}
+              etiqueta={etiquetaCasillaGasto(g.descripcion, g.monto, g.etiqueta)}
+              etiquetaAccesible={etiquetaAccesibleCasillaGasto(g.descripcion, g.monto, g.etiqueta)}
               valor={marcados.includes(g.transaccionId)}
               alCambiar={(v) =>
                 setMarcados((m) => (v ? [...m, g.transaccionId] : m.filter((id) => id !== g.transaccionId)))
@@ -235,7 +313,7 @@ function Arqueo({
           </Texto>
           <GrupoChips
             opciones={[
-              { valor: 'exacto', etiqueta: formatearCentavos(esperado) },
+              { valor: 'exacto', etiqueta: formatearCentavos(esperado), etiquetaAccesible: etiquetaChipExacto(esperado) },
               { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
             ]}
             valor={otra ? 'otra' : null}
@@ -316,11 +394,15 @@ function Faltante({
   const [error, setError] = useState<string | null>(null);
   const suma = montos.reduce<number>((s, m) => s + (m ?? 0), 0);
   return (
-    <View style={{ gap: espacio.s }} testID="arqueo-faltante">
-      <Texto variante="subtitulo">
+    <View style={{ gap: espacio.s }} testID="arqueo-faltante" accessibilityLiveRegion="polite">
+      <Texto
+        variante="subtitulo"
+        testID="arqueo-faltante-titulo"
+        accessibilityHint={PISTA_GRUPO_PROPUESTA}
+      >
         {textoFaltante(calculo.hueco)}
       </Texto>
-      <Tarjeta>
+      <Tarjeta accionesAnidadas>
         {calculo.propuesta.map((p, i) => (
           <CampoMonto
             key={p.categoria}
@@ -380,7 +462,12 @@ function Sobrante({
   const [opcion, setOpcion] = useState<OpcionSobrante | null>(null);
   const preguntaSobrante = textoSobrante(-calculo.hueco);
   return (
-    <View style={{ gap: espacio.s }} testID="arqueo-sobrante">
+    <View
+      style={{ gap: espacio.s }}
+      testID="arqueo-sobrante"
+      accessibilityLiveRegion="polite"
+      accessibilityHint={PISTA_GRUPO_SOBRANTE}
+    >
       <Texto variante="subtitulo" {...OCULTAR_ETIQUETA_VISIBLE}>
         {preguntaSobrante}
       </Texto>
@@ -402,12 +489,12 @@ function Sobrante({
         etiqueta={preguntaSobrante}
       />
       {opcion === 'me_pagaron' ? (
-        <Chips
-          testID="arqueo-persona"
-          etiqueta={ETIQUETA_QUIEN_TE_PAGO}
+        <GrupoChips
           opciones={teDeben.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
           valor={null}
           alCambiar={(personaId) => alResponder({ tipo: 'me_pagaron', personaId })}
+          prefijoTestID="arqueo-persona"
+          etiqueta={ETIQUETA_QUIEN_TE_PAGO}
         />
       ) : null}
     </View>

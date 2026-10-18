@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui';
 
 /** Redacción del arqueo (`02 §7`, `02 §14`): tuteo, sin tecnicismos contables. */
 
@@ -24,7 +24,18 @@ export const PISTA_CONTINUAR = 'Pasa a decir cuánto efectivo traes';
 /** TalkBack: compara con lo esperado. */
 export const PISTA_CALCULAR = 'Compara lo que traes con lo esperado';
 /** TalkBack: guarda conteo y ajustes. */
-export const PISTA_CONFIRMAR = 'Registra el conteo y los ajustes en tu libro';
+export const PISTA_CONFIRMAR = 'Guarda el conteo y los ajustes';
+/** TalkBack: casilla de gasto por asignar en paso 1. */
+export const PISTA_CASILLA_GASTO = 'Marca o desmarca si lo pagaste en efectivo';
+/** TalkBack: ayuda bajo el título del paso 1. */
+export const PISTA_PASO_MARCAR = 'Los marcados pasan a tu efectivo antes de contar';
+/** TalkBack: tarjeta de éxito tras confirmar. */
+export const ETIQUETA_TARJETA_CONTEO_LISTO = 'Conteo terminado';
+export const PISTA_TARJETA_CONTEO_LISTO = 'Abajo está el botón para cerrar';
+/** TalkBack: reparto del faltante. */
+export const PISTA_GRUPO_PROPUESTA = 'Ajusta cuánto falta en cada parte; deben sumar lo que falta';
+/** TalkBack: origen del sobrante. */
+export const PISTA_GRUPO_SOBRANTE = 'Elige de dónde salió el efectivo de más';
 /** TalkBack: tras mensaje de listo. */
 export const PISTA_LISTO = 'Cierra la pantalla después del conteo';
 /** TalkBack: tarjeta de Hoy con gastos por asignar. */
@@ -57,6 +68,28 @@ export const AYUDA_POR_ASIGNAR =
 
 /** Chips del paso «Deberías traer…» (`02 §7`). */
 export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
+
+/** TalkBack: chip «traigo justo lo esperado». */
+export const etiquetaChipExacto = (esperado: Centavos): string =>
+  `Llevo ${cifraEnPalabras(esperado)}`;
+
+/** Visible en la casilla del paso 1. */
+export const etiquetaCasillaGasto = (
+  descripcion: string | null | undefined,
+  monto: Centavos,
+  etiqueta: string,
+): string =>
+  `${descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION} ${formatearCentavos(monto)} · ${etiqueta}`;
+
+/** TalkBack en la casilla del paso 1 (montos en palabras). */
+export const etiquetaAccesibleCasillaGasto = (
+  descripcion: string | null | undefined,
+  monto: Centavos,
+  etiqueta: string,
+): string => {
+  const nombre = descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION;
+  return `${nombre}, ${cifraEnPalabras(monto)}, ${etiqueta}`;
+};
 
 /** Campo cuando eliges «Otra cantidad». */
 export const ETIQUETA_MONTO_TRAES = '¿Cuánto traes?';
