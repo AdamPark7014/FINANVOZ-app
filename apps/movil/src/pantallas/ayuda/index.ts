@@ -6,4 +6,3 @@ export {
   PREGUNTAS_FRECUENTES,
   type PreguntaFrecuente,
 } from './preguntas';
-export { TITULO as TITULO_AYUDA } from './textos';

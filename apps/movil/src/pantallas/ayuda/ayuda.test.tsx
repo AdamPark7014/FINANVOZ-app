@@ -10,6 +10,7 @@ import {
   PantallaAyuda,
   PREGUNTAS_FRECUENTES,
 } from './index';
+import { BTN_ESCRIBIR_CORREO, ETIQUETA_VOLVER, mensajeSinAppCorreo, TITULO } from './textos';
 
 /** CA-M13-04: ayuda en la app con 10 preguntas frecuentes y correo de contacto. */
 

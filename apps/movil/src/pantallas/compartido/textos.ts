@@ -7,9 +7,12 @@ export { mensajeErrorCompartido } from '../../servicios';
 /** Redacción de Gastos compartidos (`02 §27`, `02 §14`): copy de pantallas; cifras vienen de `servicios/`. */
 
 export const ETIQUETA_VOLVER = 'Volver';
+/** Botón Volver en la lista de grupos (vuelve a Cuentas). */
+export const PISTA_VOLVER_CUENTAS = 'Regresa a Cuentas';
 export const TITULO_GASTOS_COMPARTIDOS = 'Gastos compartidos';
-export const TEXTO_LISTA_VACIA =
-  'Comparte gastos con tu pareja: los dos ven lo mismo y cada quien conserva su libro privado.';
+/** Sin grupos vinculados (`02 §27`). */
+export const TEXTO_COMPARTIDOS_VACIO =
+  'Crea un grupo con tu pareja o escanea su código. Los dos ven lo compartido; cada quien conserva su libro privado.';
 export const AVISO_REVINCULAR_LISTA = 'Vuelve a vincular este teléfono';
 export const BTN_CREAR_CON_ALGUIEN = 'Crear con alguien';
 export const BTN_ESCANEAR_CODIGO = 'Escanear código';

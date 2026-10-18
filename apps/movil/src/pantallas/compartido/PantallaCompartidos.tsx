@@ -26,7 +26,8 @@ import {
   ETIQUETA_NOMBRE_PAREJA,
   ETIQUETA_VOLVER,
   instruccionQrTrasCrear,
-  TEXTO_LISTA_VACIA,
+  PISTA_VOLVER_CUENTAS,
+  TEXTO_COMPARTIDOS_VACIO,
   TITULO_GASTOS_COMPARTIDOS,
 } from './textos';
 
@@ -117,6 +118,7 @@ export function PantallaCompartidos({
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
+        pista={modo.tipo === 'lista' ? PISTA_VOLVER_CUENTAS : undefined}
         alPresionar={modo.tipo === 'lista' ? alVolver : volverALista}
       />
       <Texto variante="titulo">{TITULO_GASTOS_COMPARTIDOS}</Texto>

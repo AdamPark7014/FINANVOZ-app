@@ -1,6 +1,41 @@
+import type { Centavos } from '@cartera/core';
 import { formatearCentavos } from '../../ui';
 
 /** Redacción de cuentas divididas, cobros y personas (`02 §17`, `02 §14`): solo presentación. */
+
+export const ETIQUETA_VOLVER = 'Volver';
+export const ETIQUETA_COBRAR = 'Cobrar';
+export const ETIQUETA_YA_ME_PAGO = 'Ya me pagó';
+export const ETIQUETA_GUARDAR = 'Guardar';
+export const ETIQUETA_GUARDAR_Y_COBRAR = 'Guardar y cobrar';
+export const ETIQUETA_MONTO = 'Monto';
+export const ETIQUETA_A_DONDE_LLEGO = '¿A dónde te llegó?';
+export const ETIQUETA_QUITAR_RECORDATORIO = 'Quitar recordatorio';
+
+export const TITULO_MOVIMIENTOS = 'Movimientos';
+export const TITULO_PEDIR_DATOS_COBRO = '¿A dónde te pagan?';
+export const AYUDA_PEDIR_DATOS_COBRO =
+  'Para cobrar, primero dime tus datos. Solo te los pido una vez.';
+export const TITULO_YA_ME_PAGO = '¿Cuánto te pagó?';
+export const TITULO_RECORDATORIO_COBRO = '¿Te recuerdo cobrar?';
+
+/** Detalle cuando te deben: no infla E4 hasta el cobro (regla 12). */
+export const TIP_SALDO_TE_DEBEN = 'No suma a tu dinero libre hasta que te paguen.';
+
+export const ERROR_MONTO_MAYOR_CERO = 'Escribe un monto mayor a $0.';
+
+export function mensajeRegistroCobro(monto: Centavos): string {
+  return `Registré que te pagó ${formatearCentavos(monto)}`;
+}
+
+export function mensajeRecordatorioCobro(etiquetaFecha: string): string {
+  return `Te recuerdo cobrar el ${etiquetaFecha}.`;
+}
+
+export const MENSAJE_SIN_AVISOS = 'No puedo programar avisos en este teléfono.';
+export const MENSAJE_PERMISO_AVISOS =
+  'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.';
+export const MENSAJE_ERROR_RECORDATORIO = 'No pude programar el aviso. Intenta de nuevo.';
 
 /** "Registré: la cena $1,200 · te deben $900". */
 export function mensajeCuentaDividida(
