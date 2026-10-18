@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Text } from 'react-native';
 import {
   Aviso,
+  Barra,
   Boton,
   CampoMonto,
   CampoTexto,
@@ -14,6 +15,16 @@ import {
   Texto,
   useAviso,
 } from './index';
+
+describe('Barra', () => {
+  it('expone progreso en la etiqueta y el valor accesible', () => {
+    render(<Barra llenoBp={3500} etiquetaAccesible="Usaste el 35 % de tu tarjeta" testID="b" />);
+    const barra = screen.getByTestId('b');
+    expect(barra.props.accessibilityRole).toBe('progressbar');
+    expect(barra.props.accessibilityLabel).toBe('Usaste el 35 % de tu tarjeta');
+    expect(barra.props.accessibilityValue).toEqual({ min: 0, max: 100, now: 35, text: '35%' });
+  });
+});
 
 describe('Cifra', () => {
   it('muestra el monto formateado y lo etiqueta en palabras para TalkBack', () => {
@@ -107,6 +118,7 @@ describe('CampoTexto', () => {
     fireEvent.changeText(screen.getByLabelText('Qué compraste'), 'coca 25');
     expect(alCambiar).toHaveBeenCalledWith('coca 25');
     expect(screen.getByText('Falta el monto. Escríbelo con números.')).toBeTruthy();
+    expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true });
   });
 });
 

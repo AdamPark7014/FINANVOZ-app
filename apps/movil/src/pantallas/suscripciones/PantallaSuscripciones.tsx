@@ -202,7 +202,7 @@ function Fila({
           <Boton
             testID={`${id}-compromiso`}
             etiqueta={ETIQUETA_COMPROMISO}
-            variante="secundaria"
+            variante="secundario"
             alPresionar={() => alHacer('compromiso')}
             pista={PISTA_COMPROMISO}
           />

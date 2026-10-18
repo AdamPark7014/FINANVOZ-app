@@ -5,7 +5,12 @@ import { conEscenario, vector } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaSuscripciones } from './PantallaSuscripciones';
-import { TEXTO_SUSCRIPCIONES_VACIO } from './textos';
+import {
+  mensajeAccionSuscripcion,
+  mensajeNombreGuardado,
+  PISTA_AYUDA,
+  TEXTO_SUSCRIPCIONES_VACIO,
+} from './textos';
 
 interface VectorE14 {
   hoy: string;
@@ -32,9 +37,7 @@ describe('Suscripciones (02 §20)', () => {
   it('CA-M10-01 · muestra las 5 activas con monto y fecha, el resumen, "antes $115" y Disney Plus aparte', () => {
     const { ctx } = preparar();
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
-    expect(textoDe('suscripciones-ayuda')).toBe(
-      'Aprétala en Hoy, dilo si ya no la pagas o si no es suscripción.',
-    );
+    expect(textoDe('suscripciones-ayuda')).toBe(PISTA_AYUDA);
     expect(textoDe('suscripciones-resumen')).toBe(
       'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
     );
@@ -59,7 +62,7 @@ describe('Suscripciones (02 §20)', () => {
     fireEvent.press(screen.getByTestId('suscripcion-dominio-web-editar-nombre'));
     fireEvent.changeText(screen.getByTestId('suscripcion-dominio-web-nombre'), 'Dominio web');
     fireEvent.press(screen.getByTestId('suscripcion-dominio-web-guardar-nombre'));
-    expect(textoDe('suscripciones-mensaje')).toBe('Listo: la llamo Dominio web.');
+    expect(textoDe('suscripciones-mensaje')).toBe(mensajeNombreGuardado('Dominio web'));
     expect(screen.getByText('Dominio web')).toBeTruthy();
   });
 

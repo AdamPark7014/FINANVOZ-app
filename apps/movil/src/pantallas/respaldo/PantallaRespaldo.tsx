@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   borrarCuentaRespaldo,
   fijarRespaldoAutomatico,
-  mensajeErrorNube,
   obtenerRespaldoNube,
   respaldarEnNube,
   tieneContrasenaRespaldo,
@@ -15,6 +14,31 @@ import { Boton, Interruptor, Tarjeta, Texto } from '../../ui';
 import { FlujoCorreo } from './FlujoCorreo';
 import { FormularioContrasena } from './FormularioContrasena';
 import { TarjetaRespaldo } from './TarjetaRespaldo';
+import {
+  AVISO_BORRAR_CUENTA,
+  AVISO_PENDIENTE,
+  BTN_BORRAR_CUENTA,
+  BTN_BORRAR_CUENTA_CONFIRMAR,
+  BTN_CANCELAR,
+  BTN_RESPALDAR_AHORA,
+  DESC_RESPALDO_AUTOMATICO,
+  DESC_SOLO_WIFI,
+  ETIQUETA_RESPALDO_AUTOMATICO,
+  ETIQUETA_SOLO_WIFI,
+  ETIQUETA_VOLVER,
+  mensajeErrorNube,
+  MENSAJE_BORRAR_CUENTA_OK,
+  MENSAJE_CONTRASENA_GUARDADA,
+  MENSAJE_CORREO_CUENTA_OK,
+  MENSAJE_LISTO_NUBE,
+  MENSAJE_NO_GUARDAR_AJUSTE,
+  SUBTITULO_NUBE,
+  TEXTO_ACTIVAR_NUBE,
+  TEXTO_SESION_VENCIDA,
+  TITULO_RESPALDO,
+  textoCrearContrasenaTrasCorreo,
+  textoRespaldasCon,
+} from './textos';
 
 /**
  * Ajustes → Respaldo (`02 §19`, RF-RES-01…04): último respaldo, "Respaldar ahora", respaldo automático semanal
@@ -38,10 +62,10 @@ export function PantallaRespaldo({
         testID="respaldo-volver"
         variante="texto"
         ancho="contenido"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">Respaldo</Texto>
+      <Texto variante="titulo">{TITULO_RESPALDO}</Texto>
       {nube ? (
         <TarjetaNube
           nube={nube}
@@ -119,7 +143,7 @@ function TarjetaNube({
       const r = await respaldarEnNube({ cifrado: deps, respaldos: nube.respaldos }, ctx);
       setMensaje(
         r.ok
-          ? { texto: 'Listo: tu respaldo está en la nube.', error: false }
+          ? { texto: MENSAJE_LISTO_NUBE, error: false }
           : { texto: mensajeErrorNube(r.error), error: true },
       );
       refrescar();

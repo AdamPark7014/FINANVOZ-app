@@ -2,7 +2,7 @@
 
 Datos de prueba que funcionan como **contrato** de la implementación. Las pruebas los cargan por `id` o por ruta; nunca se copian dentro de los archivos de prueba.
 
-> **Tip:** nunca edites `motores/vectores.json` a mano; regenera con `node scripts/oraculo.mjs --escribir` (ver § Cambiar un vector).
+> **Tip:** nunca edites `motores/vectores.json` a mano; regenera con `node scripts/oraculo.mjs --escribir` (ver § Cambiar un vector y § Oráculo en PowerShell).
 
 | Archivo | Qué contiene | Quién lo consume |
 |---|---|---|
@@ -22,6 +22,20 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `pdf/banco_{b,e,f}.pdf`, `.txt`, `.json` | Tres bancos ficticios: Banco B (42 movimientos en dos páginas, CA-M15-02), Banco E (dos fechas por renglón, abonos `CR`) y Banco F (fechas sin año, acentos, kerning); `banco_e.protegido.pdf` (contraseña `PRUEBA2026`) y `escaneado.pdf` (solo una imagen) | `nucleo-jvm` (PDFBox extrae el `.txt`), `packages/core` (CA-M15-01), `apps/movil` (CA-M15-02 y 03) |
 | `pdf/analizadores.ejemplo.json` | Analizadores **sintéticos** de esos tres bancos (`07 §8`); solo en builds de desarrollo | `packages/core`, `apps/movil` |
 | `escenarios/*.json` | Estados de usuario para cargar en la app de desarrollo y verificar pantallas: `e4-01`, `e5-10`, `e-captura`, `e14-01`, `e-negocio` | Cargador de semillas de `apps/movil` |
+
+## Oráculo en PowerShell (Windows)
+
+Desde la **raíz del repo** (donde está `package.json`):
+
+```powershell
+node scripts/oraculo.mjs --verificar   # CI y /verificar
+node scripts/oraculo.mjs --escribir    # solo tras cambio en 05-MOTORES + oraculo.py + ESTADO
+```
+
+- **`scripts/oraculo.mjs`** localiza Python ≥ 3.10 (`py -3`, luego `python` / `python3` en Windows). No hace falta llamar `py` a mano salvo depurar el oráculo directo: `py -3 fixtures/motores/oraculo.py --verificar`.
+- **`--verificar` compara JSON parseado**, no el texto del archivo ni un hash del disco: CRLF/LF y espacios de formato no importan. No uses `diff`, `fc` ni `git diff` sobre `vectores.json` para decidir si coincide (ver `docs/ESTADO.md`, decisión 2026-10-11).
+- **Reproducibilidad:** mulberry32 y FNV-1a en el oráculo dan los mismos bits que Node 22 en `packages/core`. Si una prueba de vector falla, corrige la implementación o el oráculo según `docs/05-MOTORES.md`; no parchees `vectores.json`.
+- **Sin Python local:** puedes **omitir** el oráculo al cerrar tu turno y anotarlo; **CI no lo omite**. Si el script termina con el mensaje de Python no encontrado, instala 3.10+ desde [python.org](https://www.python.org/downloads/) o repite en la máquina que sí lo tenga.
 
 ## Cómo usar los vectores
 

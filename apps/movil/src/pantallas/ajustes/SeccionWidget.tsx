@@ -1,8 +1,20 @@
-import { useState } from 'react';
-import { Platform } from 'react-native';
-import { fijarOcultarMontosWidget, obtenerAjustesWidget } from '../../servicios';
+import { useMemo, useState } from 'react';
+import { Platform, View } from 'react-native';
+import { construirVistaWidget, fijarOcultarMontosWidget, obtenerAjustesWidget } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Interruptor, Tarjeta, Texto } from '../../ui';
+import { espacio, Interruptor, Tarjeta, Texto, useTema } from '../../ui';
+import { PreviaWidget } from '../../widget/PreviaWidget';
+import { MENSAJE_NO_GUARDAR } from './textos';
+import {
+  DESC_OCULTAR,
+  ETIQUETA_OCULTAR,
+  ETIQUETA_PREVIA,
+  SECCION_WIDGET,
+  TEXTO_INSTRUCCION,
+} from './widget-textos';
+
+/** Datos de ejemplo (misma línea que la semilla e4-01 y `VISTA_EJEMPLO_WIDGET`). */
+const EJEMPLO_HOY = { estado: 'normal' as const, hoyPuedesPesos: 214, dias: 4 };
 
 /**
  * Ajustes → Widget (`02 §21`, Gratis): "Ocultar montos" cambia "Hoy puedes $214 · 4 días" por "Toca para ver tu
@@ -10,22 +22,35 @@ import { Interruptor, Tarjeta, Texto } from '../../ui';
  */
 export function SeccionWidget() {
   const { ctx, refrescar } = useSesion();
+  const { esquema } = useTema();
   const { ocultarMontos } = useVista(obtenerAjustesWidget);
   const [error, setError] = useState(false);
+  const vistaPrevia = useMemo(
+    () => construirVistaWidget(EJEMPLO_HOY, { ocultarMontos }),
+    [ocultarMontos],
+  );
+
   if (Platform.OS !== 'android') return null;
+
   return (
     <Tarjeta testID="ajustes-widget">
-      <Texto variante="subtitulo">Widget</Texto>
-      <Texto variante="secundario" tono="secundario">
-        Agrégalo desde la pantalla de inicio de tu teléfono: deja presionado un espacio vacío y busca
-        Finanvoz.
+      <Texto variante="subtitulo">{SECCION_WIDGET}</Texto>
+      <Texto variante="secundario" tono="secundario" testID="ajustes-widget-instrucciones">
+        {TEXTO_INSTRUCCION}
       </Texto>
-      <Interruptor
-        testID="ajustes-widget-ocultar"
-        etiqueta="Ocultar montos"
-        descripcion="El widget dice “Toca para ver tu día” en lugar de cuánto puedes gastar."
-        valor={ocultarMontos}
-        alCambiar={(valor) => {
+      <Texto variante="etiqueta" style={{ marginTop: espacio.m }}>
+        {ETIQUETA_PREVIA}
+      </Texto>
+      <View testID="ajustes-widget-previa" style={{ marginTop: espacio.xs }}>
+        <PreviaWidget vista={vistaPrevia} esquema={esquema} />
+      </View>
+      <View style={{ marginTop: espacio.m }}>
+        <Interruptor
+          testID="ajustes-widget-ocultar"
+          etiqueta={ETIQUETA_OCULTAR}
+          descripcion={DESC_OCULTAR}
+          valor={ocultarMontos}
+          alCambiar={(valor) => {
           try {
             fijarOcultarMontosWidget(ctx, valor);
             setError(false);
@@ -36,8 +61,13 @@ export function SeccionWidget() {
         }}
       />
       {error ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
-          No pude guardar el cambio. Intenta de nuevo.
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="ajustes-widget-error"
+          accessibilityLiveRegion="polite"
+        >
+          {MENSAJE_NO_GUARDAR}
         </Texto>
       ) : null}
     </Tarjeta>

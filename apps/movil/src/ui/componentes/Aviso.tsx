@@ -142,7 +142,13 @@ export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: Aviso
         {...(alPresionarMensaje ? { accessibilityHint: 'Abre el detalle para editarlo' } : {})}
         style={{ flex: 1, minHeight: OBJETIVO_TACTIL_MIN, justifyContent: 'center' }}
       >
-        <Text style={[tipo.secundario, { color: c.sobreAviso }]}>{mensaje}</Text>
+        <Text
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={[tipo.secundario, { color: c.sobreAviso }]}
+        >
+          {mensaje}
+        </Text>
       </Pressable>
       {accion ? (
         <Pressable
@@ -160,7 +166,13 @@ export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: Aviso
             alignItems: 'center',
           }}
         >
-          <Text style={[tipo.etiqueta, { color: c.avisoAccion }]}>{accion.etiqueta}</Text>
+          <Text
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={[tipo.etiqueta, { color: c.avisoAccion }]}
+          >
+            {accion.etiqueta}
+          </Text>
         </Pressable>
       ) : null}
       {lector ? (
@@ -177,7 +189,13 @@ export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: Aviso
             alignItems: 'center',
           }}
         >
-          <Text style={[tipo.etiqueta, { color: c.sobreAviso }]}>Cerrar</Text>
+          <Text
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={[tipo.etiqueta, { color: c.sobreAviso }]}
+          >
+            Cerrar
+          </Text>
         </Pressable>
       ) : null}
     </View>

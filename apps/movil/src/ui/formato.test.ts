@@ -6,6 +6,7 @@ import {
   etiquetaHablada,
   formatearCentavos,
   leerPesos,
+  tieneCifra,
   type ModoCifra,
 } from './formato';
 
@@ -30,6 +31,18 @@ describe('formatearCentavos', () => {
 
   it('no formatea lo que no es un entero de centavos', () => {
     expect(formatearCentavos(1.5)).toBe('—');
+  });
+});
+
+describe('tieneCifra', () => {
+  it.each([
+    ['Faltan $315.', true],
+    ['$0.05', true],
+    ['Sin cifras ni 4 días', false],
+    ['precio 1500', false],
+    ['', false],
+  ])('%s → %s', (texto, esperado) => {
+    expect(tieneCifra(texto)).toBe(esperado);
   });
 });
 

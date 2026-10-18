@@ -19,7 +19,7 @@ import {
 } from '../../servicios';
 import { borrarTodoApp, restaurarSesion } from '../../servicios/sesion';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
-import { AVISO_CONTRASENA } from './FormularioContrasena';
+import { AVISO_CONTRASENA, ERROR_CONTRASENAS_NO_COINCIDEN, errorContrasenaCorta } from './textos';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
 
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
@@ -111,12 +111,12 @@ describe('respaldo cifrado (M9, 02 §19)', () => {
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena'), 'corta');
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena-confirmar'), 'corta');
     fireEvent.press(screen.getByTestId('respaldo-contrasena-guardar'));
-    expect(screen.getByText('Usa al menos 10 caracteres.')).toBeTruthy();
+    expect(screen.getByText(errorContrasenaCorta())).toBeTruthy();
 
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena'), CONTRASENA);
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena-confirmar'), `${CONTRASENA}!`);
     fireEvent.press(screen.getByTestId('respaldo-contrasena-guardar'));
-    expect(screen.getByText('Las contraseñas no coinciden.')).toBeTruthy();
+    expect(screen.getByText(ERROR_CONTRASENAS_NO_COINCIDEN)).toBeTruthy();
 
     fireEvent.changeText(screen.getByTestId('respaldo-contrasena-confirmar'), CONTRASENA);
     fireEvent.press(screen.getByTestId('respaldo-contrasena-guardar'));

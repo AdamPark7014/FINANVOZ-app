@@ -142,6 +142,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     // B agrega "Súper 1,200, pagué yo, 40 % mío".
     const b = en(B, <PantallaGrupoCompartido grupoId={grupo} alVolver={jest.fn()} />);
     await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Están a mano'));
+    expect(screen.getByTestId('grupo-movimientos-vacio')).toHaveTextContent(TEXTO_GRUPO_MOVIMIENTOS_VACIO);
     fireEvent.press(screen.getByTestId('grupo-agregar'));
     fireEvent.changeText(screen.getByTestId('compartido-total'), '1200');
     fireEvent.changeText(screen.getByTestId('compartido-descripcion'), 'Súper');

@@ -156,3 +156,10 @@ df2a218 feat(movil): analitica modo_explicar con resultado y vueltas
 - Lanzamiento: `docs/LANZAMIENTO.md`
 - Roadmap: `docs/09-ROADMAP.md`
 - Portfolio: `C:\dev\apps\PRODUCTOS-apps\_factory\PORTFOLIO_STATUS.md`
+
+### Tips para agentes (copy/UI/fixtures)
+
+| Tema | Dónde |
+|---|---|
+| Oráculo, vectores, PowerShell | `fixtures/README.md` — `node scripts/oraculo.mjs --verificar`; comparación JSON (no `diff` ni hash de archivo); omitir solo local si falta Python |
+| Tokens, espaciado, accesibilidad | `apps/movil/src/ui/README.md` — `espacio`, `margenPantalla`, `OBJETIVO_TACTIL_MIN` |
