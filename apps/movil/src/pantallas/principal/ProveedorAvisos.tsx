@@ -24,6 +24,9 @@ export function ProveedorAvisos({
         {children}
         <View
           pointerEvents="box-none"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
           style={{
             position: 'absolute',
             left: 0,
