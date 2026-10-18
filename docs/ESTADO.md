@@ -26,6 +26,22 @@
 
 Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados · Saltado (con motivo).
 
+## Avance megaprompt (2026-10-17)
+
+Detalle en [`docs/PROGRESO-70.md`](PROGRESO-70.md). HEAD: `b852b4a`.
+
+| Métrica | % |
+|---|---:|
+| Código implementado (M0–M16 v1 Android) | **~93** |
+| Plan megaprompt ponderado (FinanVoz-first 60 %) | **~53** |
+| Launch-ready (web + tienda + legal + teléfono) | **~36** |
+
+**Bloqueo crítico M0:** pendientes **11** (Supabase + `lista-espera`) y **12** (dominio Cloudflare Pages + secrets `produccion` + workflow «Publicar calculadora») — sin ellos no cierra **CA-M0-06** (6 nov 2026). Copy-paste: `docs/LANZAMIENTO.md` sentada 1.
+
+**CI:** en `main`, `publicar-ejemplos` y umbral RNF-01 Node estabilizados en `b852b4a`; PGlite/RLS puede exceder `hookTimeout` en Windows bajo carga paralela.
+
+**Solo código restante (resumen):** plantillas captura/PDF reales (datos probadores), UI MSI previos en tarjeta existente (M4), iPhone v2 (M14), ajustes post-benchmark NLU/explicar (88, 152), versión 1.0.0 al cortar prod (109). **Espera humana:** tabla Pendientes (#10–114, 120–152) — cuentas, Supabase desplegado, Play, contador, abogado, teléfono.
+
 ## Decisiones
 
 | Fecha | Hito | Decisión | Motivo | Docs afectados |
@@ -375,7 +391,7 @@ Estados: Pendiente · En curso · Cerrado · Cerrado con pendientes aceptados ·
 | 61 | M9 | Revisión legal: restaurar desde la nube en la bienvenida manda el correo a Supabase antes del consentimiento de O2 (el consentimiento llega dentro del respaldo restaurado); confirmar que el aviso de privacidad lo cubre o mover la restauración después de O2 | Abogado + Adam | Antes de publicar M9 |
 | 62 | M9 | iPhone (v2): agregar el plugin `expo-background-task` (identificadores de BGTaskScheduler) y probar la tarea semanal; en Android no hace falta | Claude Code | M14 |
 | 63 | M10 | ~~Tarea diaria en segundo plano (`expo-background-task`) que llame `procesarSuscripcionesDelDia`~~ Resuelto el 2026-10-17 (código en main; falta teléfono): `src/tareas/diaria.ts`, `diaria.test.tsx` | Claude Code | M10 |
-| 64 | M10 | Ver Cuentas → Suscripciones en el teléfono con un libro como E14-01 (no hay escenario semilla `e14-01` en `fixtures/escenarios`; proponerlo como cambio de fixtures) y "Convertir en compromiso" reflejado en Hoy | Adam (con su Android) + Claude por Remote Control | M10 |
+| 64 | M10 | Ver Cuentas → Suscripciones en el teléfono con la semilla **`e14-01`** (`3b25f12`, `pnpm --filter movil semilla e14-01` en dev) y "Convertir en compromiso" reflejado en Hoy | Adam (con su Android) + Claude por Remote Control | M10 |
 | 65 | M10 | ~~Una suscripción ya convertida en compromiso: "Ya la cancelé" y actualizar el monto cuando E14 ve un aumento de precio~~ Resuelto el 2026-10-17 (código en main; falta teléfono): `yaLaCancele`, aumentos pendientes en Hoy (`suscripciones.ts`) | Claude Code | M10–M13 |
 | 66 | M10 | ~~Nombre editable de una suscripción ("Dominio web", "Disney+") en lugar del comercio normalizado con mayúsculas~~ Resuelto el 2026-10-17 (código en main; falta teléfono): `fijarNombreSuscripcion`, ajuste `suscripciones:nombres` | Claude Code | M13 |
 | 67 | M10 | Detectar suscripciones también en gastos sin comercio (dictados con descripción) o en cuentas divididas, si los probadores lo piden | Beta | M13 |

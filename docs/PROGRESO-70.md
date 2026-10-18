@@ -1,52 +1,137 @@
 # Progreso del plan megaprompt (FinanVoz · 2026-10-17)
 
-Documento de una página tras oleadas **W1–W9** y **V1–V20** en `FINANVOZ-app`. La fábrica **PRODUCTOS-apps** y **RestaurantOS** están fuera de este repo ([`C:\dev\apps\PRODUCTOS-apps\INDICE.md`](../../PRODUCTOS-apps/INDICE.md)).
+Documento denso tras oleadas **W1–W9** y **V1–V20** en `FINANVOZ-app`. Fábrica **PRODUCTOS-apps** y **RestaurantOS** viven fuera ([`C:\dev\apps\PRODUCTOS-apps\INDICE.md`](../../PRODUCTOS-apps/INDICE.md)).
 
-## Resumen ejecutivo
+**HEAD de referencia:** `b852b4a` (`fix(movil): estabiliza RNF-01 Node y publicar-ejemplos sin sh`). Tablero vivo: `docs/ESTADO.md` · Ruta externa: `docs/LANZAMIENTO.md` · Handoff: `.ai/RELEVO.md`.
 
-| Track | % | Qué significa |
+---
+
+## Tabla de avance (%)
+
+| Métrica | % | Qué cuenta |
 |---:|---:|---|
-| **1 · FinanVoz first** | **68 %** | Spec M0–M16 (Android v1): motores y app casi completos en CI; falta lo que solo Adam/terceros cierran (M0 web, cuentas, teléfono, legal, fiscal, tienda). |
-| **2 · Estándar** | **45 %** | `docs/ESTADO.md`, `docs/LANZAMIENTO.md`, relevo FUSION, checklist por sentadas; CI casi verde (2 tests flaky/fallando hoy). |
-| **3 · Fábrica** | **12 %** | Decisión de coexistencia FinanVoz ↔ portfolio; sin `apply.mjs` sobre este monorepo. |
-| **4 · RestaurantOS** | **8 %** (piloto) / **maduro aparte** | Piloto `products/restaurant-os/` stub; vertical `food/RestaurantOS` ya materializado en otro repo (no es meta de FinanVoz). |
+| **Código implementado** (M0–M16 scope v1 Android en `main`) | **~93** | Motores, proxy, app, captura, respaldo, M15/M16 adelantados; CI Node/jest/JVM/PGlite. Resto de código: plantillas captura/PDF reales (datos), UI «meses que ya tenía» en tarjeta existente (M4), pendientes 62/123/124/128/129/151 (v2 iPhone), 100 (solo si M11), 109 (versión 1.0.0 al cortar prod), 88/152 (ajustes post-benchmark). |
+| **Plan megaprompt ponderado** (FinanVoz-first **60 %** + estándar 15 % + fábrica 15 % + RestaurantOS 10 %) | **~53** | FinanVoz track **~69 %** ×0.6 + estándar **~48 %** ×0.15 + fábrica **~12 %** ×0.15 + RestaurantOS piloto **~8 %** ×0.10 ≈ **53 %**. |
+| **Launch-ready** (medible en producción: web M0 + beta/tienda + legal/fiscal + teléfono) | **~36** | M0 sin URL pública (11–12); app sin EAS preview ni Play; Supabase prod sin desplegar; contador/abogado; ~150 pendientes «Adam/teléfono/terceros» en ESTADO. |
 
-**Plan completo (ponderado FinanVoz-first 60 %): ~52 %.** Objetivo «70 % en 2 días» se cumple en **lado código FinanVoz (~92 %)**; no en ** lanzamiento medible (~35 %)**.
+### Tracks del megaprompt
 
-## 1 · FinanVoz — desglose
+| Track | % | Nota |
+|---:|---:|---|
+| 1 · FinanVoz first | **69** | Código ~93 %; camino a tienda ~36 % |
+| 2 · Estándar | **48** | ESTADO/LANZAMIENTO/relevo; `pnpm test` verde en HEAD (RLS PGlite puede flakear en Windows bajo carga) |
+| 3 · Fábrica | **12** | ADR coexistencia; sin `apply.mjs` sobre este monorepo |
+| 4 · RestaurantOS | **8** (piloto) | Stub en portfolio; `food/RestaurantOS` maduro aparte |
 
-| Ámbito | % | Hecho | Falta |
-|---|---:|---|---|
-| Código agentes (M1–M16 scope v1 Android) | **92** | Pendientes de **código** 16, 30–31, 33–34, 40–42, 47, 57, 63–66, 74, 79, 84*, 87, 99, 113, 148–149, pulido voz/SEO, EAS config en repo | 84 texto legal en Play; teléfono; plantillas reales (3); MSI previos UI (M4); algunos betas (67, 75) |
-| M0 calculadora pública | **75** | E10, lista, aviso, CI Lighthouse, workflow Pages, OPTIONS lista-espera, og/SEO, aviso web m8 | **Adam:** 11–12 (Supabase + dominio + secrets + primer deploy) → CA-M0-06 |
-| Beta / tienda (M7–M13) | **35** | RevenueCat/webhook en código, privacidad centro, ayuda, tienda borrador, accesibilidad jest | **Adam:** Play, RC, PostHog, probadores, capturas, despliegue escalonado, Sentry real |
-| Validación dispositivo | **15** | Semillas, jest-expo, spikes documentados | **Adam:** builds EAS, adb, Maestro, dos teléfonos M16, mediciones RNF |
+Objetivo «70 % en 2 días»: **cumplido en código FinanVoz**; **no** en lanzamiento medible ni en plan four-track completo.
 
-\*84: copy y `VERSION_CONSENTIMIENTO` en app; falta revisión abogado + Data safety.
+---
 
-## 2 · Estándar
+## Bloqueo Adam · M0 (pendientes 11 y 12)
 
-- **Hecho:** megaprompt operativo (solo `main`, oleadas por archivos, relevo, LANZAMIENTO por sentadas, cierre pendientes en ESTADO 2026-10-17).
-- **Falta:** commit de relevo al cerrar cada turno; suite `pnpm test` 100 % estable; EXEC-PACKET cuando haya arquitectura dura; no mezclar tracks en un solo commit.
+**CA-M0-06** (URL pública antes del **6 nov 2026**) no cierra hasta esto. El código de calculadora, E10, lista-espera, aviso NEXARA, workflow Pages y Lighthouse CI están en `main`.
 
-## 3 · Fábrica y 4 · RestaurantOS
+| # | Acción (Adam) | Dónde |
+|---|---|---|
+| **11** | Crear proyecto **Supabase** y desplegar Edge Function **`lista-espera`** (migraciones + secretos de sal IP) | `services/proxy/README.md` |
+| **12** | Comprar **`finanvoz.com`** en Cloudflare; proyecto **Pages** `finanvoz`; en GitHub entorno **`produccion`**: secretos `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; variables `VITE_LISTA_ESPERA_URL`, `VITE_RESPONSABLE_*`; ejecutar workflow **«Publicar calculadora»** | `docs/LANZAMIENTO.md` sentada 1 (copy-paste en `297e605`) |
 
-- **Hecho (otro repo):** ADR portfolio, `restaurant-os` piloto saas-ai, `food/RestaurantOS` referencia F4.
-- **No hecho:** aplicar fábrica a FinanVoz; gate demo RestaurantOS desde FinanVoz; unificar marcas más allá de nombre comercial Finanvoz.
+Sin 11–12: no hay lista de espera real, no hay validación de demanda M0, y M3/M9/M10/M16 comparten el mismo Supabase pendiente de crear.
 
-## Lo que solo Adam puede hacer (bloqueos críticos)
+---
 
-1. **M0 (urgente, 6 nov):** Supabase proyecto + `lista-espera` + `finanvoz.com` + GitHub env `produccion` + publicar calculadora (`docs/LANZAMIENTO.md`).
-2. **Cuentas (pendiente 10):** Expo/EAS, Google Play, Supabase prod, RevenueCat, PostHog, LLM keys.
-3. **Contador (90–93):** validar `config/fiscal/2026.json` → deducciones y M13.
-4. **Abogado (4, 26, 54, 61, 103):** aviso integral app+web, respaldo, CFDI, explicar, términos.
-5. **Android físico:** checklist teléfono en ESTADO (13+, 28, 44–46, 76–77, 107, 140–141).
-6. **Operación Supabase:** desplegar funciones/migraciones; ejecutar `limpiar-anonimos.mjs`; buckets plantillas/respaldo.
-7. **Plantillas captura / PDF:** muestras reales anonimizadas (probador + contador donde aplique).
+## Hitos M0–M16 (una línea)
+
+| Hito | Estado | Línea |
+|---|---|---|
+| **M0** | Parcial | Código listo (E10, formulario, aviso web m8); **bloqueado 11–12** → CA-M0-06 |
+| **M1** | Hecho | Cerrado 2026-10-12; oráculo + motores + datos + NLU reglas |
+| **M2** | Parcial | Código Node/jest completo; cierra **teléfono** (13, Maestro ≤4 min) |
+| **M3** | Parcial | Proxy/app en repo; cierra **Supabase + benchmark `--grabar`** (14) |
+| **M4** | Parcial | Código + CA-M4-01 estable; avisos en dispositivo (13); MSI previos post-O4 sin UI |
+| **M5** | Parcial | Ingesta/arqueo en CI; **plantillas reales** (3, CA-M5-07) + **adb** (15) |
+| **M6** | Parcial | E8 vectores OK; **E8 &lt;150 ms en teléfono** (18) |
+| **M7** | Parcial | RC/webhook/privacidad en código; Play, legal, PostHog, probadores (20–29) |
+| **M8** | Parcial | Personas/tandas en jest; validación voz real y notificaciones (32, 43) |
+| **M9** | Parcial | `.cartera` + UI en jest; Supabase respaldo (52–53), quick-crypto teléfono (44–46, 59–60) |
+| **M10** | Parcial | E14, widget, explicar, plantillas en código; llaves 70–72, despliegue, legal 84/26 |
+| **M11** | Saltado | Sin demanda (`10 §1`); retomar tras lista/beta |
+| **M12** | Parcial | App + motores jest; **`config/fiscal/2026.json` sin validar** (90–93) bloquea cifras reales |
+| **M13** | Parcial | Ayuda, RNF en Node, borradores tienda; ficha, capturas, escalonado, Sentry prod (101–114) |
+| **M14** | Pendiente | iPhone v2 |
+| **M15** | Parcial | PDF sintético + analizadores en CI/JVM; bancos reales (122), teléfono (120–121) |
+| **M16** | Parcial | E17 + pantallas en PGlite; dos teléfonos + Supabase `compartido` (140–142) |
+
+---
+
+## Solo código (agentes) vs espera humana
+
+### Aún solo código (prioridad baja hasta desbloqueos)
+
+| Ítem | Hito | Nota |
+|---|---|---|
+| UI «Agregar meses que ya tenía» en tarjeta existente | M4 | Decisión 2026-10-12; hoy solo en alta O4 |
+| `reales.json` + ejemplos cuando Adam/probadores entreguen notificaciones | M5 | Motor listo; pendiente **3** |
+| Analizadores PDF reales | M15 | pendiente **122** |
+| Pendientes **123**, **128** (MSI/corte PDF), **124** (vigilancia PdfBox) | M15 | |
+| **109** versión 1.0.0 al cortar build prod | M13 | Con Adam |
+| **88** cupo explicar por turno; **152** modelos NLU tras llaves Adam | M10/M3 | |
+| **75** paquetes nuevos en `<queries>` vs plantillas remotas | M10 | Decisión producto |
+| **62**, **129**, **151** | M14 | iPhone v2 |
+| **100** paquete contador negocio | M11 | Solo si se retoma M11 |
+
+### Espera humana (no desbloquea agentes en vacío)
+
+| Bloque | Pendientes clave | Quién |
+|---|---|---|
+| **M0 web** | **11**, **12** | Adam |
+| **Cuentas** | **10**, Expo `eas init`, preview/prod | Adam |
+| **Supabase prod** | **14**, **52–53**, **57** (ejecutar script), **83**, **142**, funciones NLU/respaldo/compartido/plantillas | Adam |
+| **Play / tienda** | **20–29**, **101–104**, **112** | Adam + abogado |
+| **Legal** | **4**, **26**, **54**, **61**, **84** (visto bueno), **103**, **125**, **143–144** | Abogado + Adam |
+| **Fiscal** | **90–93** | Contador |
+| **Teléfono Android** | **13–15**, **18**, **32**, **43–46**, **59–60**, **64**, **76–77**, **86**, **96–98**, **107**, **110**, **120–121**, **140–141** | Adam + RC |
+| **Muestras reales** | **3** (notificaciones), **122** (PDF), **8** (llave plantillas) | Probadores + Adam |
+| **Beta producto** | **67**, **108** | Post-probadores |
+| **Megaprompt fuera repo** | Fábrica / RestaurantOS | `PRODUCTOS-apps` |
+
+---
+
+## Últimos commits relevantes (`git log --oneline -15`)
+
+```
+b852b4a fix(movil): estabiliza RNF-01 Node y publicar-ejemplos sin sh
+ded5bd9 docs: estimacion de avance del plan megaprompt (~70%)
+6a12da8 docs(movil): guia Maestro y test del cupo en manejador LLM
+f428885 feat(nlu): constante y tests del cupo de interpretaciones por explicar
+5be528d test(movil): flujos Maestro onboarding, gasto efectivo y arqueo
+297e605 docs: sentada 1 copy-paste y cierra 57/78/87/84 en ESTADO
+2cdf03b feat(calculadora): publica aviso integral alineado con VERSION m8
+91d8138 test(movil): estabiliza CA-M4-01 evitando 226 aperturas dia a dia
+1e73f7b docs(lanzamiento): app.config y eas.json hechos en codigo
+fdc490b docs(estado): cierra pendientes 41, 87, 84 codigo, 113 y 57 en documentacion
+3b25f12 feat(movil): escenario semilla e14-01 para suscripciones
+04614e1 feat(movil): preview del widget Hoy puedes para el lanzador
+b411d05 feat(proxy): script y RPC para limpiar anonimos huérfanos
+7534cb3 feat(movil): aviso m8 cubre modo explicar y sube VERSION_CONSENTIMIENTO
+df2a218 feat(movil): analitica modo_explicar con resultado y vueltas
+```
+
+---
+
+## Top 5 siguientes (orden recomendado)
+
+1. **Adam · M0 (11–12):** Supabase + `lista-espera` + `finanvoz.com` + secrets GitHub + primer deploy calculadora (`LANZAMIENTO` sentada 1).
+2. **Adam · Cuentas (10):** mismo Supabase para app; `eas init` + build **preview** con `EXPO_PUBLIC_*` (sentada 2).
+3. **Adam · Supabase prod:** migraciones + `nlu-interpretar`, `respaldo`, `compartido`, `llm-turno`; benchmark `--grabar` (14, 82, 152).
+4. **Adam · Android:** Maestro onboarding + captura `adb` + mediciones RNF (13–15, 18) con guía Maestro (`6a12da8`).
+5. **Terceros · legal/fiscal:** contador 90–93 + abogado 26/84/103 (bloquean deducciones reales y texto Play).
+
+---
 
 ## Referencias
 
-- Tablero hitos: `docs/ESTADO.md`
-- Ruta externa: `docs/LANZAMIENTO.md`
-- Handoff agentes: `.ai/RELEVO.md`
+- Tablero: `docs/ESTADO.md`
+- Lanzamiento: `docs/LANZAMIENTO.md`
+- Roadmap: `docs/09-ROADMAP.md`
 - Portfolio: `C:\dev\apps\PRODUCTOS-apps\_factory\PORTFOLIO_STATUS.md`
