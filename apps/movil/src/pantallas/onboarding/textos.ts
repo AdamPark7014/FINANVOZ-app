@@ -1,5 +1,6 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
+export { TIP_CUENTAS_MINIMO, TIP_INGRESO_SALTAR } from './tips';
 
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
@@ -44,6 +45,8 @@ export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
 /** O4 · Cuentas */
 export const TITULO_CUENTAS = '¿Con qué pagas?';
+export const TIP_CUENTAS_MINIMO =
+  'Puedes tocar «Continuar» solo con efectivo; cuentas, billeteras y tarjetas las agregas después en Cuentas.';
 export const ETIQUETA_EFECTIVO_ONB = '¿Cuánto efectivo traes ahorita?';
 export const AYUDA_EFECTIVO_ONB = 'Si no sabes exacto, pon lo que calcules. Lo ajustas después.';
 export const ERROR_CUENTA_INCOMPLETA = 'Escribe el nombre y el saldo de la cuenta.';
@@ -78,6 +81,8 @@ export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
 export const AYUDA_PAGO_VARIABLE =
   'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
 export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
+export const TIP_PAGOS_SALTAR =
+  'Si hoy no quieres registrar pagos fijos, toca «Saltar por ahora»; los agregas cuando quieras desde Hoy.';
 
 export function etiquetaAgregarPago(concepto: string): string {
   return `Agregar ${concepto}`;
@@ -90,6 +95,8 @@ export const AYUDA_COLCHON_ONB =
 export const ETIQUETA_COLCHON = 'Tu colchón';
 export const BTN_VER_MI_DIA = 'Ver mi día';
 export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
+export const TIP_COLCHON_SIN_POR_AHORA =
+  'Si hoy no quieres apartar nada, toca «Sin colchón por ahora»; lo configuras cuando quieras en Ajustes › Colchón.';
 
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {

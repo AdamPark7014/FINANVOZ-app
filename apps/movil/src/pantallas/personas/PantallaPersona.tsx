@@ -18,6 +18,7 @@ import { Boton, CampoMonto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
 import {
@@ -41,6 +42,7 @@ import {
   MENSAJE_SIN_AVISOS,
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
+  etiquetaVacioMovimientosPersona,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
   TIP_SALDO_TE_DEBEN,

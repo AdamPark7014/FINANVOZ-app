@@ -86,6 +86,11 @@ export const TEXTO_PERSONA_NO_ENCONTRADA = 'No encontré a esa persona.';
 /** Detalle: aún no hay préstamos ni cuentas divididas con ella. */
 export const TEXTO_MOVIMIENTOS_PERSONA_VACIO = 'Todavía no hay movimientos con esta persona.';
 
+/** Vacío de movimientos: encabezado de sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioMovimientosPersona(): string {
+  return `${TITULO_MOVIMIENTOS}. ${TEXTO_MOVIMIENTOS_PERSONA_VACIO}`;
+}
+
 /** Cuenta dividida: aún no hay contactos guardados. */
 export const TEXTO_CONTACTOS_VACIO =
   'Todavía no tienes contactos. Escribe abajo a quien te debe y elige a cada uno.';

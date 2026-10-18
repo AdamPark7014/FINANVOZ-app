@@ -6,27 +6,25 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** copy del engrane Ajustes centralizado en `principal/textos.ts` (`BTN_AJUSTES_CUENTAS` + accesible).
-
-## Hecho (acumulado reciente)
-
-- Personas TalkBack movimientos; tandas BTN; onboarding O5/O7. Ver `git log`.
+- **Personas:** `PISTA_GUARDAR_PAGO` en Guardar del panel «Ya me pagó» (TalkBack `02 §19`); prueba en `personas.test.tsx`.
+- **Acumulado:** `PISTA_COBRAR`, `PISTA_YA_ME_PAGO`, `PISTA_VOLVER`; `PISTA_CALCULAR` en ¿Me alcanza? (`89f4685`).
 
 ## A medias — CUIDADO
 
+- WIP local en ayuda/onboarding/tandas (no mezclar sin revisar).
+- Typecheck móvil: otros TS pendientes.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar inline restante en `PantallaCuentas` (`Cuentas` título, tarjetas) si conviene.
-3. M11 negocio cuando toque el hito.
+2. Descartar o commitear WIP ayuda/onboarding limpio.
+3. Recordatorio cobrar: pista TalkBack si otro pase M13.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
