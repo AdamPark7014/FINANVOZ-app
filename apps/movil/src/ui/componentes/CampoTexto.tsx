@@ -35,6 +35,7 @@ export function CampoTexto({
   teclado = 'default',
   autoFocus,
   alEnviar,
+  deshabilitado = false,
   nativo,
   testID,
 }: CampoTextoProps) {
@@ -61,15 +62,16 @@ export function CampoTexto({
         onSubmitEditing={alEnviar}
         onFocus={() => setEnfocado(true)}
         onBlur={() => setEnfocado(false)}
+        editable={!deshabilitado}
         accessibilityLabel={etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
-        accessibilityState={{ invalid: conError }}
+        accessibilityState={{ invalid: conError, disabled: deshabilitado }}
         {...nativo}
         style={[
           tipo.cuerpo,
           {
             minHeight: OBJETIVO_TACTIL_MIN,
-            color: c.texto,
+            color: deshabilitado ? c.textoDeshabilitado : c.texto,
             backgroundColor: c.superficie,
             borderRadius: radio.m,
             borderWidth: enfocado || conError ? 2 : 1,

@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
-import { espacio, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
+import { espacio, hitSlopTactil, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
 import { Texto } from './Texto';
 
 export interface OpcionChip<T extends string> {
@@ -36,6 +36,7 @@ export function Chip({
   seleccionado,
   alPresionar,
   multiple = false,
+  deshabilitado = false,
   etiquetaAccesible,
   testID,
 }: {
@@ -44,6 +45,7 @@ export function Chip({
   alPresionar: () => void;
   /** Se pueden elegir varias del grupo ("¿Con quién?"). */
   multiple?: boolean;
+  deshabilitado?: boolean;
   /** TalkBack si el texto visible no basta (p. ej. «Caro ×2»). */
   etiquetaAccesible?: string;
   testID?: string;
@@ -53,10 +55,11 @@ export function Chip({
     <Pressable
       testID={testID}
       onPress={alPresionar}
+      disabled={deshabilitado}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityLabel={etiquetaChipHablada(etiqueta, etiquetaAccesible)}
-      accessibilityState={multiple ? { checked: seleccionado } : { selected: seleccionado }}
-      hitSlop={espacio.s}
+      accessibilityState={multiple ? { checked: seleccionado, disabled: deshabilitado } : { selected: seleccionado, disabled: deshabilitado }}
+      hitSlop={hitSlopTactil}
       style={({ pressed }) => ({
         minHeight: OBJETIVO_TACTIL_MIN,
         minWidth: OBJETIVO_TACTIL_MIN,
@@ -65,13 +68,14 @@ export function Chip({
         alignItems: 'center',
         borderRadius: radio.pastilla,
         borderWidth: seleccionado ? 2 : 1,
-        borderColor: seleccionado ? c.acentoTexto : c.bordeControl,
+        borderColor: deshabilitado ? c.bordeControl : seleccionado ? c.acentoTexto : c.bordeControl,
+        opacity: deshabilitado ? 0.55 : 1,
         backgroundColor: seleccionado ? c.superficieAlterna : pressed ? c.superficieAlterna : c.superficie,
       })}
     >
       <Texto
         variante="etiqueta"
-        tono={seleccionado ? 'acento' : 'normal'}
+        tono={deshabilitado ? 'secundario' : seleccionado ? 'acento' : 'normal'}
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       >

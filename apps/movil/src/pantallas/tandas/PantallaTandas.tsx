@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { listarTandas, type TandaCreada } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Pantalla, Tarjeta, Texto } from '../../ui';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { FormularioTanda } from './FormularioTanda';
 import {
   ETIQUETA_NUEVA_TANDA,

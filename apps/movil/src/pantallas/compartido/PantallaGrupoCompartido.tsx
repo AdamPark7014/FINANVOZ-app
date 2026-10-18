@@ -301,9 +301,11 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
       <Texto variante="subtitulo">{TITULO_LO_COMPARTIDO}</Texto>
       {g.movimientos.length === 0 ? (
-        <Texto variante="cuerpo" tono="secundario" testID="grupo-movimientos-vacio">
-          {TEXTO_GRUPO_MOVIMIENTOS_VACIO}
-        </Texto>
+        <EstadoVacio
+          texto={TEXTO_GRUPO_MOVIMIENTOS_VACIO}
+          testID="grupo-movimientos-vacio"
+          etiquetaAccesible={etiquetaVacioGrupoMovimientos()}
+        />
       ) : null}
       {g.movimientos.map((m) => (
         <Tarjeta key={m.id} testID={`mov-compartido-${m.id}`}>

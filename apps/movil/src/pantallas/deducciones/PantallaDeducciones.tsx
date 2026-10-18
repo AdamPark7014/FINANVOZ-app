@@ -571,7 +571,7 @@ export function ImportarCompartidas({
   }, [ctx, leer, refrescar]);
   return (
     <Pantalla testID="importar-compartidas" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo" testID="importar-titulo">
+      <Texto variante="titulo" testID="importar-titulo" accessibilityRole="header">
         {TITULO_IMPORTAR_COMPARTIDAS}
       </Texto>
       {estado.tipo === 'leyendo' ? (

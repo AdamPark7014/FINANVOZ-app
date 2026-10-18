@@ -145,7 +145,7 @@ describe('CampoTexto', () => {
     fireEvent.changeText(screen.getByLabelText('Qué compraste'), 'coca 25');
     expect(alCambiar).toHaveBeenCalledWith('coca 25');
     expect(screen.getByText('Falta el monto. Escríbelo con números.')).toBeTruthy();
-    expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true });
+    expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true, disabled: false });
   });
 
   it('deshabilitado anuncia disabled', () => {

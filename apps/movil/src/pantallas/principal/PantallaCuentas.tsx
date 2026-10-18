@@ -148,22 +148,25 @@ export function PantallaCuentas({
             etiquetaAccesible={etiquetaVacioCuentasDebes()}
           />
         ) : null}
-        {v.debes.map((d) =>
-          d.tipo === 'tarjeta' ? (
-            <TarjetaCredito
-              key={d.id}
-              d={d}
-              t={tarjetas.find((t) => t.id === d.id) ?? null}
-              {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
-            />
-          ) : (
-            <PersonaDebes
-              key={d.id}
-              d={d}
-              {...(alAbrirPersona ? { alAbrirPersona } : {})}
-            />
-          ),
-        )}
+        {v.debes.length > 0 ? (
+          <View accessibilityRole="list" testID="seccion-debes-lista" style={{ gap: espacio.s }}>
+            {v.debes.map((d) =>
+              d.tipo === 'tarjeta' ? (
+                <View key={d.id} accessibilityRole="listitem">
+                  <TarjetaCredito
+                    d={d}
+                    t={tarjetas.find((t) => t.id === d.id) ?? null}
+                    {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
+                  />
+                </View>
+              ) : (
+                <View key={d.id} accessibilityRole="listitem">
+                  <PersonaDebes d={d} {...(alAbrirPersona ? { alAbrirPersona } : {})} />
+                </View>
+              ),
+            )}
+          </View>
+        ) : null}
         {alAgregarTarjeta ? (
           <Boton
             etiqueta={BTN_AGREGAR_TARJETA_CREDITO}

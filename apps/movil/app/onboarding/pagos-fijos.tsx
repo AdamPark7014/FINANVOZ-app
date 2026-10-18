@@ -139,9 +139,23 @@ export default function PagosFijos() {
       {agregados.length > 0 ? (
         <View style={{ gap: espacio.s }} testID="onb-pagos-lista">
           {agregados.map((p) => (
-            <View key={p.id} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Texto variante="cuerpo">{`${p.concepto} · día ${p.dia}`}</Texto>
-              <Cifra centavos={p.monto} contexto={`${p.concepto}, cada mes`} />
+            <View
+              key={p.id}
+              testID={`onb-pago-agregado-${p.id}`}
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel={etiquetaHablada(
+                `${p.concepto}, día ${p.dia} de cada mes, ${cifraEnPalabras(p.monto)}`,
+              )}
+            >
+              <View
+                importantForAccessibility="no-hide-descendants"
+                accessibilityElementsHidden
+                style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+              >
+                <Texto variante="cuerpo">{`${p.concepto} · día ${p.dia}`}</Texto>
+                <Cifra centavos={p.monto} contexto={`${p.concepto}, cada mes`} />
+              </View>
             </View>
           ))}
         </View>

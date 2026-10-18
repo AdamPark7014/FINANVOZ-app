@@ -125,6 +125,13 @@ export function PantallaHoy({
             variante="texto"
             ancho="contenido"
             alPresionar={() => setVerDesglose((v) => !v)}
+            pista={
+              verDesglose
+                ? PISTA_OCULTAR_DESGLOSE
+                : vista.estado === 'libre_negativo'
+                  ? PISTA_VER_QUE_VIENE
+                  : PISTA_VER_DESGLOSE
+            }
             testID="boton-desglose"
           />
           {verDesglose ? <Desglose vista={vista} /> : null}

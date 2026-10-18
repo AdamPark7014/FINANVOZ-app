@@ -163,7 +163,9 @@ function Fila({
             ayuda={AYUDA_NOMBRE}
           />
         ) : (
-          <Texto variante="cuerpoFuerte">{s.nombre}</Texto>
+          <Texto variante="cuerpoFuerte" testID={`${id}-nombre`} accessibilityRole="header">
+            {s.nombre}
+          </Texto>
         )}
         {!editandoNombre ? (
           <Boton

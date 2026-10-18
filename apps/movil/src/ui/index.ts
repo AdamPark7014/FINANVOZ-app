@@ -12,6 +12,12 @@ export {
 export { Pantalla, type PantallaProps } from './componentes/Pantalla';
 export { Texto, type TextoProps, type TonoTexto } from './componentes/Texto';
 export { Boton, type BotonProps, type VarianteBoton } from './componentes/Boton';
+export {
+  Chip,
+  GrupoChips,
+  OCULTAR_ETIQUETA_VISIBLE,
+  type OpcionChip,
+} from './componentes/Chip';
 export { Tarjeta, type TarjetaProps } from './componentes/Tarjeta';
 export { Cifra, type CifraProps } from './componentes/Cifra';
 export { Interruptor, type InterruptorProps } from './componentes/Interruptor';

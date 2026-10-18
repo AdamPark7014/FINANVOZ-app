@@ -12,6 +12,7 @@ export interface CampoMontoProps {
   ayuda?: string;
   /** Error del formulario (p. ej. "Escribe un monto mayor a $0"). */
   error?: string | null;
+  deshabilitado?: boolean;
   autoFocus?: boolean;
   testID?: string;
 }
@@ -28,6 +29,7 @@ export function CampoMonto({
   alCambiar,
   ayuda,
   error,
+  deshabilitado,
   autoFocus,
   testID,
 }: CampoMontoProps) {
@@ -47,6 +49,7 @@ export function CampoMonto({
       teclado="decimal-pad"
       error={error ?? (invalido ? ERROR_FORMATO_MONTO : null)}
       {...(ayuda === undefined ? {} : { ayuda })}
+      {...(deshabilitado === undefined ? {} : { deshabilitado })}
       {...(autoFocus === undefined ? {} : { autoFocus })}
       {...(testID === undefined ? {} : { testID })}
     />

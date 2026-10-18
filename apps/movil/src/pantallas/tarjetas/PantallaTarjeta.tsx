@@ -33,11 +33,8 @@ import {
   ETIQUETA_PAGADO_DESDE_CORTE,
   ETIQUETA_PNGI,
   ETIQUETA_PROXIMO_CORTE,
-  ACCESIBILIDAD_TARJETA_NO_ENCONTRADA,
   ETIQUETA_SALDO_A_FAVOR,
-  etiquetaAccesibleMovimientoTarjeta,
   etiquetaAccesibleUsoTarjeta,
-  etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   etiquetaSaldoAlCorte,
   MOVIMIENTO_SIN_TITULO,
@@ -82,7 +79,13 @@ export function PantallaTarjeta({
   if (!existe) {
     return (
       <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta={BTN_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Boton
+          etiqueta={BTN_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
         <Texto variante="cuerpo" tono="secundario" testID="tarjeta-no-encontrada">
           {TEXTO_TARJETA_NO_ENCONTRADA}
         </Texto>
