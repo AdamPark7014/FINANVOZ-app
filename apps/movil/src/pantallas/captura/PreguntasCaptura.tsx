@@ -276,6 +276,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
   const contestar = (r: RespuestaPago, mensaje: string) =>
     responder(() => responderPagoSinOrigen(ctx, p.capturaId, r), mensaje);
   const titulo = `¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`;
+  const preguntaCual = '¿De cuál?';
   const preguntaDebe = '¿Se lo tienes que pagar?';
   return (
     <Marco
@@ -299,25 +300,31 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
         etiqueta={titulo}
       />
       {opcion === 'cuenta' ? (
-        <GrupoChips
-          opciones={[
-            ...p.salidas.map((s) => ({
-              valor: `s:${s.capturaId}`,
-              etiqueta: `${s.cuenta} · ${etiquetaFecha(s.fecha)}`,
-            })),
-            ...cuentas.map((c) => ({ valor: `c:${c.id}`, etiqueta: c.nombre })),
-          ]}
-          valor={null}
-          alCambiar={(v) =>
-            contestar(
-              v.startsWith('s:')
-                ? { origen: 'salida', capturaId: v.slice(2) }
-                : { origen: 'cuenta', cuentaId: v.slice(2) },
-              'Listo: registré el pago de tu tarjeta.',
-            )
-          }
-          prefijoTestID={`${testID}-origen`}
-        />
+        <View style={{ gap: espacio.xs }}>
+          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaCual}
+          </Texto>
+          <GrupoChips
+            opciones={[
+              ...p.salidas.map((s) => ({
+                valor: `s:${s.capturaId}`,
+                etiqueta: `${s.cuenta} · ${etiquetaFecha(s.fecha)}`,
+              })),
+              ...cuentas.map((c) => ({ valor: `c:${c.id}`, etiqueta: c.nombre })),
+            ]}
+            valor={null}
+            alCambiar={(v) =>
+              contestar(
+                v.startsWith('s:')
+                  ? { origen: 'salida', capturaId: v.slice(2) }
+                  : { origen: 'cuenta', cuentaId: v.slice(2) },
+                'Listo: registré el pago de tu tarjeta.',
+              )
+            }
+            prefijoTestID={`${testID}-origen`}
+            etiqueta={preguntaCual}
+          />
+        </View>
       ) : null}
       {opcion === 'alguien' ? (
         <View style={{ gap: espacio.xs }}>

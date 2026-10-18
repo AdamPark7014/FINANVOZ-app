@@ -6,28 +6,28 @@
 
 ## Hecho en este turno
 
-- **test(movil):** pruebas alineadas a UI con texto oculto al lector — avisos de tanda (`toHaveTextContent` + `saldoInicial` en E11-03); filtro de consulta en Movimientos (`hidden: true`). Resuelto conflicto stash en `tandas.test.tsx`.
+- **me-alcanza:** copy centralizado en `textos.ts` (formulario, calculando, recomendación, vacío/datos insuficientes); `PantallaMeAlcanza` sin strings sueltos; tests alineados con a11y (`Boton`/`Aviso`) + casos formulario, error y permiso de avisos.
 
 ## Hecho (acumulado reciente)
 
-- Estados de cuenta: copy/a11y en `LeerEstadoCuenta`, barrel `index.ts` (`b3a74f1`). Consulta/respaldo: `BTN_LISTO`, `boton-cerrar-consulta`. Ver `git log`.
+- Oleada UI a11y, Ajustes copy, deducciones vacío, etc. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- Working tree ajeno: `apps/movil/src/pantallas/tandas/textos.ts` (turno anterior) — no mezclar en commits de me-alcanza.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP ajeno (tabs, arqueo, PanelRegistrar) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Push `main` si hace falta.
+2. Commitear o descartar WIP tandas según Adam.
+3. `git push` cuando Adam quiera.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
