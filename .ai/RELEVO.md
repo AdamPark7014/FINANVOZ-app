@@ -1,27 +1,27 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-18
+- **Fecha:** 2026-10-17
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Onboarding O6:** `TIP_CAPTURA_AHORA_NO` reexportado desde `textos.ts` (mismo patrón que O3–O7).
+- **Hoy:** `ProbabilidadHoy` usa `OCULTAR_ETIQUETA_VISIBLE` al calcular (sin props a11y inline).
 
 ## Hecho (acumulado reciente)
 
-- Tips O3–O7 en `tips.ts` sin ciclo; suscripciones/tandas WIP. Ver `git log`.
+- Movimientos/Cuentas TalkBack; suscripciones vacío; onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP: `PantallaSuscripciones`, `tandas/textos` PISTA_* (no mezclar).
+- WIP en `PantallaTarjeta` (imports a11y) — no commitear a medias.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cablear PISTA_* en pantallas Tandas.
+2. Terminar a11y tarjeta (movimientos/estados vacíos) en un commit aparte.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
