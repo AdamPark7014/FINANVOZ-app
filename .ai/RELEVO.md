@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Micro TalkBack compartidos + suscripciones (`bd3af07`):** `PISTA_CREAR_CON_ALGUIEN` / `PISTA_ESCANEAR_CODIGO` en lista compartidos; `etiquetaAccesibleAyudaSuscripciones()` en ayuda de suscripciones; tests en `compartido.test.tsx` y `suscripciones.test.tsx`.
+- **Tandas TalkBack:** pistas en editar/archivar/guardar/confirmar (`PISTA_*` en `textos.ts`, `PantallaTanda`); tests calendario como encabezado y hints en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Widget/Captura Ajustes, tandas, arqueo. Ver `git log`.
+- Captura Ajustes (SeccionCaptura), principal Chip/Movimientos, ayuda FAQ, tarjetas movimientos en palabras. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`captura-textos.test.tsx`, `ayuda.test.tsx`) — no mezclar.
-- M0 / EAS: Adam.
+- CI Windows, M0 / EAS: Adam.
+- WIP ajeno en disco — `git status` antes de editar.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Pistas TalkBack en flujo QR/cámara compartidos si sigue a11y.
+2. TalkBack en pantallas secundarias si hace falta (formulario nueva tanda, etc.).
 
 ## No tocar
 

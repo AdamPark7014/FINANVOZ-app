@@ -501,6 +501,14 @@ describe('¿Me alcanza?', () => {
     );
     await screen.findByTestId('me-alcanza-fallo');
     expect(textoDe('me-alcanza-error-calculo')).toBe(ERROR_CALCULO);
+    expect(screen.getByTestId('boton-reintentar-me-alcanza')).toHaveProp(
+      'accessibilityHint',
+      PISTA_REINTENTAR_ME_ALCANZA,
+    );
+    expect(screen.getByTestId('boton-cambiar-datos-me-alcanza')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CAMBIAR_DATOS_ME_ALCANZA,
+    );
     fireEvent.press(screen.getByTestId('boton-reintentar-me-alcanza'));
     await waitFor(() => expect(calcular).toHaveBeenCalledTimes(2));
   });

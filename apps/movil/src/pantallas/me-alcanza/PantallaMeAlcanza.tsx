@@ -319,12 +319,14 @@ export function PantallaMeAlcanza({
           <Boton
             etiqueta={BTN_INTENTAR_DE_NUEVO}
             alPresionar={() => iniciar(estado.consulta)}
+            pista={PISTA_REINTENTAR_ME_ALCANZA}
             testID="boton-reintentar-me-alcanza"
           />
           <Boton
             etiqueta={BTN_CAMBIAR_DATOS}
             variante="texto"
             alPresionar={() => setEstado({ tipo: 'formulario', aviso: null })}
+            pista={PISTA_CAMBIAR_DATOS_ME_ALCANZA}
             testID="boton-cambiar-datos-me-alcanza"
           />
         </View>

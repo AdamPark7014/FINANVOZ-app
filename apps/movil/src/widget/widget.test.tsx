@@ -249,6 +249,9 @@ describe('Ajustes → Widget', () => {
     await act(async () => {});
     expect(screen.getByTestId('ajustes-widget-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-widget-previa-etiqueta')).toHaveProp('accessibilityRole', 'header');
+    const previaAjustes = within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget');
+    expect(previaAjustes.props.accessibilityHint).toBe(PISTA_PREVIA);
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
     const interruptor = screen.getByTestId('ajustes-widget-ocultar');
     expect(interruptor.props.accessibilityState).toMatchObject({ checked: false });
 
