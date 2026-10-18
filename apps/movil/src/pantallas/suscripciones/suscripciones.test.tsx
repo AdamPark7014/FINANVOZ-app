@@ -13,6 +13,7 @@ import {
   PISTA_AYUDA,
   PISTA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleHoyApartaSuscripcion,
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
@@ -128,8 +129,12 @@ describe('Suscripciones (02 §20)', () => {
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
     expect(screen.getByTestId('suscripciones-mensaje')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('suscripciones-mensaje')).toHaveProp('importantForAccessibility', 'yes');
     expect(textoDe('suscripciones-mensaje')).toBe(mensajeAccionSuscripcion('compromiso', 'Netflix'));
-    expect(screen.getByTestId('suscripcion-netflix-apartada')).toBeTruthy();
+    expect(screen.getByTestId('suscripcion-netflix-apartada')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleHoyApartaSuscripcion('Netflix'),
+    );
     expect(screen.queryByTestId('suscripcion-netflix-compromiso')).toBeNull();
     expect(obtenerHoy(ctx).reservado - antes).toBe(21_900);
   });

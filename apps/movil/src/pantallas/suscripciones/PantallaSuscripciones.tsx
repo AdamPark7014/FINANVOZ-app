@@ -22,6 +22,7 @@ import {
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleHoyApartaSuscripcion,
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
@@ -109,6 +110,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
           tono={mensaje.error ? 'faltante' : 'secundario'}
           accessibilityRole={mensaje.error ? 'alert' : 'text'}
           accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
           testID="suscripciones-mensaje"
         >
           {mensaje.texto}
@@ -217,7 +219,12 @@ function Fila({
       </View>
       {s.compromiso ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="acento" testID={`${id}-apartada`}>
+          <Texto
+            variante="secundario"
+            tono="acento"
+            testID={`${id}-apartada`}
+            accessibilityLabel={etiquetaAccesibleHoyApartaSuscripcion(s.nombre)}
+          >
             {TEXTO_HOY_APARTA}
           </Texto>
           <Boton

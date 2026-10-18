@@ -50,6 +50,11 @@ export const ETIQUETA_GUARDAR_NOMBRE = 'Guardar nombre';
 export const PISTA_GUARDAR_NOMBRE = 'Guarda el nombre que escribiste';
 
 export const TEXTO_HOY_APARTA = 'Hoy ya la aparta.';
+
+/** TalkBack: estado compromiso en la fila, con nombre para contexto (`02 §15`). */
+export function etiquetaAccesibleHoyApartaSuscripcion(nombre: string): string {
+  return `${nombre}. ${TEXTO_HOY_APARTA}`;
+}
 export const ETIQUETA_COMPROMISO = 'Convertir en compromiso';
 export const PISTA_COMPROMISO = 'Hoy aparta el monto antes de cada cargo';
 export const ETIQUETA_CANCELADA = 'Ya la cancelé';

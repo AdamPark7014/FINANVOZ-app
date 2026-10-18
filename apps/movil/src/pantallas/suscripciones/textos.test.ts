@@ -1,7 +1,9 @@
 import {
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleHoyApartaSuscripcion,
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
+  TEXTO_HOY_APARTA,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
@@ -28,6 +30,10 @@ describe('textos de suscripciones (02 §20)', () => {
 
   it('próximo cargo con contexto TalkBack', () => {
     expect(etiquetaAccesibleProximoSuscripcion('próximo 14 oct')).toBe('Próximo cargo: próximo 14 oct');
+  });
+
+  it('compromiso activo incluye nombre en TalkBack', () => {
+    expect(etiquetaAccesibleHoyApartaSuscripcion('Netflix')).toBe(`Netflix. ${TEXTO_HOY_APARTA}`);
   });
 
   it('ayuda en plural para varias filas', () => {
