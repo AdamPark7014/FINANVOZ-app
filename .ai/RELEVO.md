@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Compartido · TalkBack:** `PISTA_VISTA_CAMARA` en `EscanerQr`; `PISTA_ESCRIBIR_NOMBRE_PAREJA` en «Escanear su código» sin nombre; tests.
+- **Movimientos · lista:** TalkBack en encabezados de día (`etiquetaEncabezadoDiaMovimientos`); test en `principal.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- O3 ingreso, ayuda, captura, consentimiento, respaldo. Ver `git log`.
+- Lista/listitem, intro por revisar, filtro activo, vacíos. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (`tarjetas/textos.ts`, ajustes, personas, principal) — no mezclar en commits ajenos.
+- WIP sin commitear ajeno (`tarjetas/textos.ts`) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
@@ -25,6 +25,7 @@
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- Widget, GymOS, ConstructionOS.
 - `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
