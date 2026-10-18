@@ -36,6 +36,17 @@ describe('tarjetas/textos · confirmar MSI', () => {
   it('vacío MSI incluye el título de sección para TalkBack', () => {
     expect(etiquetaVacioMsiTarjeta()).toBe(`Meses sin intereses. ${VACIO_MSI_TARJETA}`);
   });
+
+  it('pregunta tarjeta desconocida cita el alias dictado', () => {
+    expect(preguntaTarjetaConfirmarMsi({ motivo: 'no_encontrada', alias: 'Oro' })).toBe(
+      'No tengo una tarjeta «Oro». ¿Con cuál fue?',
+    );
+    expect(preguntaTarjetaConfirmarMsi({ motivo: 'cuenta' })).toBe(TITULO_CONFIRMAR_MSI.cuenta);
+  });
+
+  it('etiqueta accesible de liquidar repite la descripción del plan', () => {
+    expect(etiquetaSiLiquidar('la tele')).toBe('Sí, la tele');
+  });
 });
 
 describe('tarjetas/textos · TalkBack', () => {

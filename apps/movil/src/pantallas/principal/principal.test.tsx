@@ -43,7 +43,6 @@ import {
   PISTA_OCULTAR_DESGLOSE,
   PISTA_DESCARTAR_FRASE,
   PISTA_REGISTRAR_MOVIMIENTO,
-  PISTA_REVISAR_FRASE,
   PISTA_VER_DESGLOSE,
   PISTA_VER_TODOS_MOVIMIENTOS,
   contextoSaldoCompromiso,
@@ -562,12 +561,40 @@ describe('Movimientos', () => {
     const p = conEscenario('e4-01');
     renderConSesion(
       p.ctx,
-      <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ cuentaId: p.e.cuentas.bbva as string }} />,
+      <PantallaMovimientos
+        alRegistrar={jest.fn()}
+        filtro={{ cuentaId: p.e.cuentas.bbva as string }}
+        alQuitarFiltro={jest.fn()}
+      />,
     );
     expect(screen.getByTestId('movimientos-filtro')).toBeTruthy();
     const filtroActivo = screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO);
     expect(filtroActivo.props.accessibilityLabel).toBe(etiquetaFiltroMovimientosActivo());
     expect(filtroActivo).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('boton-quitar-filtro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_VER_TODOS_MOVIMIENTOS,
+    );
+    p.cerrar();
+  });
+
+  it('por revisar: Descartar trae accessibilityHint (`02 §15`)', async () => {
+    const p = conEscenario('e4-01');
+    todas(p.ctx);
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(
+      screen.getByTestId('campo-registrar'),
+      'ayer fui al súper con mi prima y pagó ella',
+    );
+    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    await screen.findByTestId('mensaje-registro');
+    screen.unmount();
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    const [frase] = listarPorInterpretar(p.ctx);
+    expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_DESCARTAR_FRASE,
+    );
     p.cerrar();
   });
 

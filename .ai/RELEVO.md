@@ -6,27 +6,28 @@
 
 ## Hecho en este turno
 
-- **TalkBack micro tests:** `tandas.test.tsx` ancla `PISTA_VER_CALENDARIO`, `PISTA_YA_LA_DI`; `arqueo.test.tsx` ancla `accessibilityLiveRegion` en `arqueo-mensaje-hecho`.
+- **Gastos compartidos (detalle):** `grupo-titulo` con `accessibilityRole="header"` + aserción en `compartido.test.tsx` (TalkBack §15).
 
 ## Hecho (acumulado reciente)
 
-- Tandas/arqueo copy y pistas en pantallas; Me alcanza, suscripciones, Hoy CTAs. Ver `git log`.
+- Me alcanza/Movimientos pistas, compartidos lista, onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en working tree (captura/compartido/formato) — no mezclar sin revisar `git status`.
-- CA-M6-05 probabilidad: intermitente en local.
-- M0 / EAS: Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP paralelo en commits pequeños.
+2. Headers TalkBack en pantallas restantes si hace falta.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
