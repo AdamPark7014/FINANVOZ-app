@@ -6,32 +6,29 @@
 
 ## Hecho en este turno
 
-- **movil/avisos:** copy de `InvitacionAvisos` centralizado en `pantallas/avisos/textos.ts`; prueba `textos.test.ts`.
+- **onboarding O3–O5:** `TIP_INGRESO_SALTAR`, `TIP_CUENTAS_MINIMO`, `TIP_PAGOS_SALTAR` en `tips.ts`; cableados en `app/onboarding/ingreso|cuentas|pagos-fijos.tsx`; pruebas en `tips.test.ts` y `onboarding.test.tsx`. En main: `9f2b98b` (tips + wire), `1266b67` (aserciones recorrido).
 
 ## Hecho (acumulado reciente)
 
-- Confirmación de registro, Hoy, principal, onboarding. Ver `git log`.
+- Tips O2/O6/O7, copy Ajustes, a11y principal. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP local sin commitear (avisos, captura, estados-cuenta, tandas…) — otro turno; no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (privacidad, estados-cuenta, ajustes, tarjetas tests, registrar indent…) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Oleadas copy en pantallas que aún traen strings en `.tsx` (Movimientos, TarjetaConfirmarMsi, etc.).
+2. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- Working tree ajeno sin commitear salvo pedido explícito.
+- Working tree ajeno sin commitear salvo el pedido explícito del turno.
 
 ## Estimación rápida
-
-FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
-�pida
 
 FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
