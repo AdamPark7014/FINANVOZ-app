@@ -77,6 +77,8 @@ export const BTN_VER_PLUS = 'Ver Plus';
 export const BTN_AJUSTES_CUENTAS = '⚙ Ajustes';
 /** TalkBack: sin emoji del engrane. */
 export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
+/** Sección Debes en Cuentas (`02 §11`). */
+export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
 export const BTN_VER_MOVIMIENTOS_CHEVRON = 'Ver movimientos ›';
 export const BTN_LISTO = 'Listo';

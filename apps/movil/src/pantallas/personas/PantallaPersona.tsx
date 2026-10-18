@@ -28,6 +28,7 @@ import {
   ETIQUETA_COBRAR,
   PISTA_COBRAR,
   ETIQUETA_GUARDAR,
+  PISTA_GUARDAR_PAGO,
   ETIQUETA_GUARDAR_Y_COBRAR,
   ETIQUETA_MONTO,
   ETIQUETA_QUITAR_RECORDATORIO,
@@ -211,9 +212,11 @@ function Detalle({
           {TITULO_MOVIMIENTOS}
         </Texto>
         {d.movimientos.length === 0 ? (
-          <Texto variante="cuerpo" tono="secundario" testID="persona-movimientos-vacio">
-            {TEXTO_MOVIMIENTOS_PERSONA_VACIO}
-          </Texto>
+          <EstadoVacio
+            texto={TEXTO_MOVIMIENTOS_PERSONA_VACIO}
+            testID="persona-movimientos-vacio"
+            etiquetaAccesible={etiquetaVacioMovimientosPersona()}
+          />
         ) : null}
         {d.movimientos.map((m) => (
           <Tarjeta key={m.id} testID={`persona-mov-${m.id}`}>

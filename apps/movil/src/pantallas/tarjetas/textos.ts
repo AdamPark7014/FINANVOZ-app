@@ -55,6 +55,19 @@ export const NOMBRE_MODO = {
 
 export const VACIO_MSI_TARJETA = 'No tienes compras a meses en esta tarjeta.';
 
+/** Vacíos del detalle: sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioMsiTarjeta(): string {
+  return `${TITULO_MESES_SIN_INTERESES}. ${VACIO_MSI_TARJETA}`;
+}
+
+export function etiquetaVacioMovimientosTarjeta(tituloSeccion: string): string {
+  return `${tituloSeccion}. ${VACIO_MOVIMIENTOS_TARJETA}`;
+}
+
+export function etiquetaVacioEstadosTarjeta(mensaje: string): string {
+  return `${TITULO_ESTADOS_CUENTA}. ${mensaje}`;
+}
+
 export const NOMBRE_ESTADO_PLAN = {
   activo: 'Activo',
   terminado: 'Ya pagaste todas las cuotas',
