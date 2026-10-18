@@ -27,6 +27,7 @@ import {
   PREGUNTA_HOY_COBRO,
   PREGUNTA_YA_DISTE,
   TEXTO_NO_ES_INGRESO,
+  ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   TEXTO_TANDA_NO_ENCONTRADA,
   PISTA_ARCHIVAR_TANDA,
   PISTA_CONFIRMAR_ARCHIVAR,
@@ -293,6 +294,10 @@ describe('Tandas (02 §18)', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTanda tandaId="tanda-inexistente" alVolver={jest.fn()} />);
     expect(screen.getByTestId('tanda-no-encontrada')).toHaveTextContent(TEXTO_TANDA_NO_ENCONTRADA);
+    expect(screen.getByTestId('tanda-no-encontrada')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
+    );
     expect(screen.getByTestId('tanda-no-encontrada')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
   });
@@ -358,5 +363,7 @@ describe('copy centralizado (textos.ts)', () => {
     expect(MENSAJE_TODAVIA_NO_APORTACION).toBe('La sigo apartando. Te pregunto mañana.');
     expect(MENSAJE_TODAVIA_NO_COBRO).toBe('Va. Te pregunto mañana.');
     expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
+    expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/Volver/);
+    expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/lista de tandas/i);
   });
 });

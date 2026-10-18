@@ -92,6 +92,9 @@ export const PISTA_VOLVER = 'Regresa a Cuentas';
 /** Detalle de una tanda. */
 export const PISTA_VOLVER_DETALLE = 'Regresa a la lista de tandas';
 export const TEXTO_TANDA_NO_ENCONTRADA = 'No encontré esa tanda.';
+/** TalkBack cuando el id no existe (`02 §18`, como detalle de tarjeta). */
+export const ACCESIBILIDAD_TANDA_NO_ENCONTRADA =
+  'No encontré esa tanda. Usa Volver para regresar a la lista de tandas.';
 export const TEXTO_TANDA_ARCHIVADA = 'Archivada · ya no aparto aportaciones';
 export const ETIQUETA_YA_LA_DI = 'Ya la di';
 /** TalkBack al registrar la aportación del día (`02 §18`). */

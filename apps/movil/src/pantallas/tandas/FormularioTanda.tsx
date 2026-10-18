@@ -31,6 +31,7 @@ import {
   ETIQUETA_CUENTA_APORTACION_OPCIONAL,
   ETIQUETA_FRECUENCIA,
   ETIQUETA_GUARDAR_TANDA,
+  PISTA_GUARDAR_TANDA,
   ETIQUETA_NOMBRE_OPCIONAL,
   ETIQUETA_PARTICIPANTES,
   ETIQUETA_PRIMERA_FECHA,
@@ -275,7 +276,12 @@ export function FormularioTanda({
         </Tarjeta>
       ) : null}
       <MensajeError texto={error} />
-      <Boton testID="tanda-guardar" etiqueta={ETIQUETA_GUARDAR_TANDA} alPresionar={guardar} />
+      <Boton
+        testID="tanda-guardar"
+        etiqueta={ETIQUETA_GUARDAR_TANDA}
+        alPresionar={guardar}
+        pista={PISTA_GUARDAR_TANDA}
+      />
       <Boton testID="tanda-cancelar" variante="texto" etiqueta={ETIQUETA_CANCELAR} alPresionar={alCancelar} />
     </View>
   );

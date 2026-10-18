@@ -6,12 +6,11 @@
 
 ## Hecho en este turno
 
-- **Movimientos TalkBack:** `PISTA_VER_TODOS_MOVIMIENTOS`, `PISTA_REVISAR_FRASE`, `PISTA_DESCARTAR_FRASE`; tests `principal.test.tsx` + `nube.test.tsx` (`3fa4f2f`, rescates).
-- **Me alcanza TalkBack:** `PISTA_REINTENTAR_ME_ALCANZA` y `PISTA_CAMBIAR_DATOS_ME_ALCANZA` en error de cálculo (`518f8bc`, `c86dc86`).
+- **PantallaTanda TalkBack:** `ACCESIBILIDAD_TANDA_NO_ENCONTRADA` en detalle inexistente (paridad con tarjeta); tests en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Tandas, widget, tarjetas, captura. Ver `git log`.
+- Movimientos/me-alcanza TalkBack, tandas pistas, widget, tarjetas. Ver `git log`.
 
 ## A medias — CUIDADO
 

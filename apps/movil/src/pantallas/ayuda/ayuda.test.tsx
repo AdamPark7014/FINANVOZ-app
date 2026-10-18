@@ -11,6 +11,7 @@ import {
   PREGUNTAS_FRECUENTES,
 } from './index';
 import {
+  ACCESIBILIDAD_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
   ETIQUETA_RESPUESTA,
@@ -149,6 +150,7 @@ describe('pantalla de ayuda', () => {
   it('"Volver" regresa', () => {
     const volver = jest.fn();
     render(<PantallaAyuda alVolver={volver} />);
+    expect(screen.getByTestId('ayuda-volver')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_VOLVER);
     expect(screen.getByTestId('ayuda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
     fireEvent.press(screen.getByTestId('ayuda-volver'));
     expect(volver).toHaveBeenCalled();

@@ -31,6 +31,7 @@ import {
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
   ETIQUETA_YA_LA_DI,
+  ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   ERROR_NOMBRE_TANDA_VACIO,
   etiquetaEstadoRonda,
   TEXTO_CONFIRMAR_ARCHIVAR,
@@ -80,6 +81,7 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
           variante="cuerpo"
           tono="secundario"
           testID="tanda-no-encontrada"
+          accessibilityLabel={ACCESIBILIDAD_TANDA_NO_ENCONTRADA}
           accessibilityLiveRegion="polite"
         >
           {TEXTO_TANDA_NO_ENCONTRADA}
