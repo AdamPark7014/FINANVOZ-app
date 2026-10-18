@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Compartido:** imports faltantes (`BTN_COMPARTIDOS_CUENTAS`, `etiquetaVacioCompartidos`) en `compartido.test.tsx`.
+- **CampoMonto / Ajustes / Captura a11y:** `etiquetaCampoMonto` en UI; tests ingreso-colchón (`17dbca9`, `a142c21`), captura cuenta nueva + `textos.test.ts` (`a36fc17`), micro `componentes`/`EstadoVacio` (`2745805`).
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones/deducciones CTAs Cuentas; Movimientos por revisar; captura Ajustes. Ver `git log`.
+- Suscripciones, Hoy CTAs, por revisar captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP ajeno en disco (`git status`: compartido, tarjetas, riesgo…) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Prueba `Cuentas abre Compartidos` con header + `accessibilityLabel` (paridad suscripciones).
-3. M11 negocio cuando toque el hito.
+2. TalkBack en dispositivo (CA-M7-05 en ESTADO).
 
 ## No tocar
 
