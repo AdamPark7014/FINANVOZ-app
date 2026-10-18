@@ -235,7 +235,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           <Texto variante="cuerpo">{TEXTO_SALIR}</Texto>
           <Boton
             testID="grupo-salir-confirmar"
-            etiqueta="Dejar de compartir"
+            etiqueta={BTN_DEJAR_DE_COMPARTIR}
             cargando={ocupado}
             alPresionar={() => {
               void conResultado(() => salirDelGrupo(ctx, deps, grupoId)).then((ok) => {
@@ -245,7 +245,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           />
           <Boton
             testID="grupo-salir-cancelar"
-            etiqueta="Cancelar"
+            etiqueta={BTN_CANCELAR}
             variante="texto"
             alPresionar={() => setPanel('ninguno')}
           />

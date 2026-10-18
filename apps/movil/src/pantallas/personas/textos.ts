@@ -37,3 +37,13 @@ export function etiquetaSaldoPersona(saldo: number): string {
 }
 
 export const MENSAJE_COMPARTIR_NO_DISPONIBLE = 'No pude abrir la hoja de compartir. Intenta de nuevo.';
+
+/** Detalle: id que ya no existe en el libro (`02 §17`). */
+export const TEXTO_PERSONA_NO_ENCONTRADA = 'No encontré a esa persona.';
+
+/** Detalle: aún no hay préstamos ni cuentas divididas con ella. */
+export const TEXTO_MOVIMIENTOS_PERSONA_VACIO = 'Todavía no hay movimientos con esta persona.';
+
+/** Cuenta dividida: aún no hay contactos guardados. */
+export const TEXTO_CONTACTOS_VACIO =
+  'Todavía no tienes contactos. Escribe abajo a quien te debe y elige a cada uno.';

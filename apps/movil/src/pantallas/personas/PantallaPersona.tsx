@@ -20,7 +20,12 @@ import { GrupoChips } from '../principal/Chip';
 import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
-import { etiquetaSaldoPersona, MENSAJE_COMPARTIR_NO_DISPONIBLE } from './textos';
+import {
+  etiquetaSaldoPersona,
+  MENSAJE_COMPARTIR_NO_DISPONIBLE,
+  TEXTO_MOVIMIENTOS_PERSONA_VACIO,
+  TEXTO_PERSONA_NO_ENCONTRADA,
+} from './textos';
 
 /** Abre la hoja de compartir del sistema con el mensaje (WhatsApp, SMS, lo que elijas). */
 export type Compartir = (mensaje: string) => Promise<void>;

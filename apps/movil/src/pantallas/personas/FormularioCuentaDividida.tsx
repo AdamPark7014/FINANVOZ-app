@@ -17,7 +17,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Cifra, espacio, formatearCentavos, Texto } from '../../ui';
 import { Chip, GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
-import { textoFaltanPersonas } from './textos';
+import { TEXTO_CONTACTOS_VACIO, textoFaltanPersonas } from './textos';
 
 export type RegistradoDivision = Extract<ResultadoTexto, { resultado: 'registrado_division' }>;
 

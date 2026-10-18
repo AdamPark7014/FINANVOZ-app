@@ -16,6 +16,7 @@ import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaRegistrar } from '../principal/PantallaRegistrar';
+import { FormularioCuentaDividida } from './FormularioCuentaDividida';
 import { PantallaPersona } from './PantallaPersona';
 
 /** CLABE con dígito de control válido. */
