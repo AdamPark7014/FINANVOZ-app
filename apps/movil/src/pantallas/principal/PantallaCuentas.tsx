@@ -120,6 +120,7 @@ export function PantallaCuentas({
               ? {
                   accion: {
                     etiqueta: 'Contar mi efectivo',
+                    etiquetaAccesible: `Contar mi efectivo en ${c.nombre}`,
                     alPresionar: () => alContarEfectivo(c.id),
                   },
                 }

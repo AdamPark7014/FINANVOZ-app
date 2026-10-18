@@ -3,7 +3,7 @@ import { useRouter, type Router } from 'expo-router';
 import { View } from 'react-native';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaCuentas } from '../../src/pantallas/principal';
-import { ETIQUETA_ACCESIBILIDAD_PESTANA, TEST_ID_PANTALLA_PESTANA } from './pestanas-textos';
+import { propsContenedorPestana } from './pestanas-textos';
 
 /** Callbacks de la pestaña Cuentas hacia el stack (`02 §11`). */
 export function navegacionDesdeCuentas(router: Router): ComponentProps<typeof PantallaCuentas> {
@@ -27,11 +27,7 @@ export function navegacionDesdeCuentas(router: Router): ComponentProps<typeof Pa
 export default function Cuentas() {
   const router = useRouter();
   return (
-    <View
-      style={{ flex: 1 }}
-      testID={TEST_ID_PANTALLA_PESTANA.cuentas}
-      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA.cuentas}
-    >
+    <View style={{ flex: 1 }} {...propsContenedorPestana('cuentas')}>
       <PantallaCuentas {...navegacionDesdeCuentas(router)} />
     </View>
   );

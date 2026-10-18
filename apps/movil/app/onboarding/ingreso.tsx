@@ -103,8 +103,8 @@ export default function Ingreso() {
           <Boton
             testID="onb-ingreso-saltar"
             variante="texto"
-            etiqueta="Saltar por ahora"
-            pista="Calcularé tu día con los próximos 30 días"
+            etiqueta={BTN_ONB_SALTAR}
+            pista={PISTA_INGRESO_SALTAR}
             alPresionar={() => seguir(() => configurarIngresoVariable(ctx))}
           />
         </>
@@ -119,7 +119,7 @@ export default function Ingreso() {
 
       {variable ? (
         <Texto variante="cuerpo" tono="secundario">
-          Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.
+          {CUERPO_INGRESO_VARIABLE}
         </Texto>
       ) : (
         <>

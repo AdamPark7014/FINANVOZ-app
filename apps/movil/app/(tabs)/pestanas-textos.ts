@@ -36,13 +36,13 @@ export const TEST_ID_PANTALLA_REGISTRAR = 'tab-registrar';
 
 export const ETIQUETA_ACCESIBILIDAD_REGISTRAR = 'Registrar gasto o ingreso';
 
-/** Props de accesibilidad del `View` raíz de cada ruta de pestaña (misma etiqueta que el botón activo). */
+/** Props de accesibilidad del `View` raíz de cada ruta de pestaña (contenido, no el botón de barra). */
 export function propsContenedorPestana(
   ruta: RutaPestanaVisible,
 ): Pick<ViewProps, 'testID' | 'accessibilityLabel'> {
   return {
     testID: TEST_ID_PANTALLA_PESTANA[ruta],
-    accessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta],
+    accessibilityLabel: ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA[ruta],
   };
 }
 

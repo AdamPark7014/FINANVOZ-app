@@ -5,7 +5,7 @@ import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaRegistrar, paramsDeDetalle, paramsDeFiltro } from '../../src/pantallas/principal';
-import { ETIQUETA_ACCESIBILIDAD_REGISTRAR, TEST_ID_PANTALLA_REGISTRAR } from './pestanas-textos';
+import { propsContenedorRegistrar } from './pestanas-textos';
 
 /** Ruta Registrar (sin pestaña): dictado, texto y formulario (`02 §2`). */
 export default function Registrar() {
@@ -14,11 +14,7 @@ export default function Registrar() {
   const { frase } = useLocalSearchParams<{ frase?: string }>();
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));
   return (
-    <View
-      style={{ flex: 1 }}
-      testID={TEST_ID_PANTALLA_REGISTRAR}
-      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_REGISTRAR}
-    >
+    <View style={{ flex: 1 }} {...propsContenedorRegistrar()}>
       <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
         <PantallaRegistrar
           // `key`: revisar otra frase vuelve a montar el panel.

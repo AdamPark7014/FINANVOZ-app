@@ -15,11 +15,7 @@ export default function Hoy() {
   useConfirmacionAlVolver((mensaje) => mostrarAviso({ mensaje }));
   return (
     // Un gasto compartido dictado se confirma aquí mismo (`02 §27`).
-    <View
-      style={{ flex: 1 }}
-      testID={TEST_ID_TAB_HOY}
-      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA.hoy}
-    >
+    <View style={{ flex: 1 }} {...propsContenedorPestana('hoy')}>
       <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
         <PantallaHoy
           navegacion={{

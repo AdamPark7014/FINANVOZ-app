@@ -114,10 +114,8 @@ export default function PagosFijos() {
         <Tarjeta key={sugerido.clave} testID="onb-pago-formulario">
           <CampoMonto
             testID="onb-pago-monto"
-            etiqueta={sugerido.variable ? '¿Cuánto pagas más o menos?' : '¿Cuánto pagas?'}
-            {...(sugerido.variable
-              ? { ayuda: 'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.' }
-              : {})}
+            etiqueta={sugerido.variable ? ETIQUETA_PAGO_MONTO_VARIABLE : ETIQUETA_PAGO_MONTO_FIJO}
+            {...(sugerido.variable ? { ayuda: AYUDA_PAGO_VARIABLE } : {})}
             alCambiar={setMonto}
           />
           <CampoTexto

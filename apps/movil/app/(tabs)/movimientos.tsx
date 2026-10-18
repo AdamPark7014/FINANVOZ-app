@@ -15,11 +15,7 @@ export default function Movimientos() {
   const filtro = filtroDeParams(params);
   const detalle = detalleDeParams(params);
   return (
-    <View
-      style={{ flex: 1 }}
-      testID={TEST_ID_PANTALLA_PESTANA.movimientos}
-      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA.movimientos}
-    >
+    <View style={{ flex: 1 }} {...propsContenedorPestana('movimientos')}>
       <PantallaMovimientos
         filtro={filtro}
         detalleInicial={detalle}

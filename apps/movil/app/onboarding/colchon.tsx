@@ -48,11 +48,9 @@ export default function Colchon() {
     >
       <CampoMonto
         testID="onb-colchon-monto"
-        etiqueta="Tu colchón"
+        etiqueta={ETIQUETA_COLCHON}
         valorInicial={sugerido > 0 ? sugerido : null}
-        {...(sugerido > 0
-          ? { ayuda: `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan.` }
-          : {})}
+        {...(sugerido > 0 ? { ayuda: ayudaSugerenciaColchonOnboarding(sugerido) } : {})}
         alCambiar={setMonto}
       />
       <MensajeError texto={error} />
