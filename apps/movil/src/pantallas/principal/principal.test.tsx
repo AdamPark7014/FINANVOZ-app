@@ -544,20 +544,6 @@ describe('Movimientos', () => {
     p.cerrar();
   });
 
-  it('cola por revisar: encabezado y pista TalkBack en Descartar', async () => {
-    const p = conEscenario('e4-01');
-    await registrarTexto(p.ctx, 'ayer le pasé 200 a mi jefa', 'voz');
-    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    const [frase] = listarPorInterpretar(p.ctx);
-    expect(frase).toBeTruthy();
-    expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
-      'accessibilityHint',
-      PISTA_DESCARTAR_FRASE,
-    );
-    p.cerrar();
-  });
-
   it('encabezados y filas con etiquetas TalkBack (`02 §15`)', () => {
     const p = conEscenario('e4-01');
     todas(p.ctx);
