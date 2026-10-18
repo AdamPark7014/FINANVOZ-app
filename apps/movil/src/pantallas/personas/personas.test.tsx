@@ -333,6 +333,7 @@ describe('estados vacíos (es-MX)', () => {
     const p = conAmigos();
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('persona-nombre')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('persona-tip-te-deben')).toBe(TIP_SALDO_TE_DEBEN);
   });
 

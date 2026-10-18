@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Persona:** `persona-nombre` con `accessibilityRole="header"` (simétrico a arqueo/suscripciones); aserción en `personas.test.tsx`.
+- **Plan:** `ID.tituloPantalla` en `plan/textos.ts` alinea testID con `PantallaPlan` y `plan.test.tsx` (header TalkBack).
 
 ## Hecho (acumulado reciente)
 
-- Arqueo título header + widget solo-texto testID; deducciones copy; tabs/hoy TalkBack (ver `git log`).
+- Onboarding/tabs/captura/deducciones copy y a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
+- Typecheck móvil: otros TS pendientes (`MesesYPagos`, `ConfirmacionRegistro`, etc.) — no mezclar en commits a11y.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal params: Adam.
 

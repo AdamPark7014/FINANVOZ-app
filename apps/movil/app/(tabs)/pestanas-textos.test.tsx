@@ -24,6 +24,7 @@ describe('pestanas-textos', () => {
         accessibilityLabel: ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA[ruta],
       });
     }
+    expect(ROL_ACCESIBILIDAD_BOTON_PESTANA).toBe('tab');
   });
 
   it('expone contenedor Registrar sin pestaña en la barra', () => {

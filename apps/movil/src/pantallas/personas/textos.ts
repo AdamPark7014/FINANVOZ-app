@@ -4,6 +4,7 @@ import { formatearCentavos } from '../../ui';
 /** Redacción de cuentas divididas, cobros y personas (`02 §17`, `02 §14`): solo presentación. */
 
 export const ETIQUETA_VOLVER = 'Volver';
+export const PISTA_VOLVER = 'Regresa a Cuentas';
 export const ETIQUETA_COBRAR = 'Cobrar';
 /** TalkBack en ficha cuando te deben (`02 §19`). */
 export const PISTA_COBRAR = 'Arma el mensaje para pedirle que te pague';
