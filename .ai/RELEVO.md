@@ -6,27 +6,28 @@
 
 ## Hecho en este turno
 
-- **movil/onboarding:** tips O3 (ingreso), O4 (cuentas) y O5 (pagos fijos) en `tips.ts`, cableados en `app/onboarding/`; pruebas en `tips.test.ts`.
+- **ui:** defaults a11y — texto visible oculto al lector en `Boton`, `Interruptor`, `Aviso`; `CampoTexto` con `accessibilityState.invalid`; `Barra` con `accessibilityValue`; tests `tieneCifra`, `Barra`, hint del interruptor; JSDoc; README accesibilidad. Commit `f2370e1` (+ `592edba`, `376d74d`).
 
 ## Hecho (acumulado reciente)
 
-- Copy privacidad/compartido/captura, suscripciones, Ajustes, ingreso, plan, respaldo README. Ver `git log`.
+- Tips onboarding O3–O5; copy privacidad/plan/respaldo. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (ajustes, deducciones, personas, tandas, etc.) — turno anterior; no mezclar.
+- WIP local sin commitear (hoy, onboarding, deducciones, principal, respaldo, tandas, tarjetas, explicar…) — otro turno; no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Tips onboarding O4 tarjeta «Agregar después» u otras áreas de la lista (plan, estados-cuenta a11y) si siguen pendientes.
+2. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- Working tree ajeno sin commitear salvo el pedido explícito del turno.
 
 ## Estimación rápida
 
