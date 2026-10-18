@@ -79,7 +79,7 @@ export function FormularioContrasena({
       </Texto>
       {cambiando ? (
         <Texto variante="secundario" tono="secundario">
-          Tus respaldos anteriores se siguen abriendo con la contraseña anterior.
+          {TEXTO_RESPALDOS_ANTERIORES}
         </Texto>
       ) : null}
       <CampoTexto
