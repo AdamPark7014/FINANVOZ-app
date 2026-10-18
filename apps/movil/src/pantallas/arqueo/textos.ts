@@ -60,6 +60,8 @@ export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
 
 /** Campo cuando eliges «Otra cantidad». */
 export const ETIQUETA_MONTO_TRAES = '¿Cuánto traes?';
+/** TalkBack: total en pesos al contar efectivo. */
+export const PISTA_MONTO_TRAES = 'Escribe el total de efectivo que traes';
 
 /** Radios al registrar sobrante como cobro de préstamo (`02 §7`, E7-09). */
 export const ETIQUETA_QUIEN_TE_PAGO = '¿Quién te pagó?';

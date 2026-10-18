@@ -28,6 +28,7 @@ import {
   PISTA_CONFIRMAR,
   PISTA_CONTINUAR,
   PISTA_LISTO,
+  PISTA_MONTO_TRAES,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,
   ETIQUETA_QUIEN_TE_PAGO,
@@ -240,6 +241,7 @@ function Arqueo({
             <>
               <CampoMonto
                 etiqueta={ETIQUETA_MONTO_TRAES}
+                ayuda={PISTA_MONTO_TRAES}
                 valorInicial={real}
                 alCambiar={setReal}
                 autoFocus={efectivoInicial === undefined}

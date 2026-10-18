@@ -23,6 +23,7 @@ import {
   PISTA_CONFIRMAR,
   PISTA_CONTINUAR,
   PISTA_LISTO,
+  PISTA_MONTO_TRAES,
   PASO_MARCAR_TITULO,
   TEXTO_SIN_CUENTA_EFECTIVO,
   TITULO,
@@ -127,6 +128,7 @@ describe('PantallaArqueo · vacío y errores', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
     fireEvent.press(screen.getByTestId('arqueo-otra'));
+    expect(screen.getByTestId('arqueo-monto')).toHaveProp('accessibilityHint', PISTA_MONTO_TRAES);
     expect(screen.getByTestId('arqueo-calcular')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '300');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
