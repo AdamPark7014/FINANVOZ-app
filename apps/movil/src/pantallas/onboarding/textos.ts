@@ -34,6 +34,8 @@ export const CASILLA_ESTADISTICAS_OPCIONAL =
 
 /** O3 · Ingreso */
 export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
+export const TIP_INGRESO_SALTAR =
+  'Si todavía no quieres poner tu ingreso, toca «Saltar por ahora»; lo configuras cuando quieras en Ajustes › Ingreso.';
 export const BTN_ONB_SALTAR = 'Saltar por ahora';
 export const PISTA_INGRESO_SALTAR = 'Calcularé tu día con los próximos 30 días';
 export const CUERPO_INGRESO_VARIABLE =
