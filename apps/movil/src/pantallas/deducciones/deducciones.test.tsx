@@ -30,7 +30,9 @@ import {
   PEDIR_PERFIL,
   TEXTO_FACTURAS_OCULTAS,
   TEXTO_FACTURAS_VACIO,
+  etiquetaVacioFacturas,
   TEXTO_IMPORTAR_VACIO,
+  etiquetaVacioImportar,
   TITULO_PUERTA_PLUS,
   TITULO_TUS_FACTURAS,
   PISTA_VOLVER,
@@ -134,6 +136,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     llenarPerfil('PEPJ800101AB1', '300,000');
     expect(screen.getByTestId('deducciones-tus-facturas')).toHaveTextContent(TITULO_TUS_FACTURAS);
     expect(textoDe('deducciones-sin-facturas')).toBe(TEXTO_FACTURAS_VACIO);
+    expect(screen.getByTestId('deducciones-sin-facturas').props.accessibilityLabel).toBe(etiquetaVacioFacturas());
     expect(screen.queryByTestId(/^factura-/)).toBeNull();
   });
 

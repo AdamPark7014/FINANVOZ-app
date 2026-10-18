@@ -334,7 +334,12 @@ export function PantallaMeAlcanza({
           <Texto variante="cuerpo" testID="me-alcanza-mensaje">
             {estado.vista.mensaje}
           </Texto>
-          <Texto variante="secundario" tono="secundario" testID="me-alcanza-datos-ayuda">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="me-alcanza-datos-ayuda"
+            accessibilityLabel={etiquetaVacioDatosInsuficientes()}
+          >
             {AYUDA_DATOS_INSUFICIENTES}
           </Texto>
           <Boton

@@ -38,6 +38,7 @@ import {
   ETIQUETA_VOLVER,
   instruccionQrMostrarCodigo,
   instruccionRevincularGrupo,
+  etiquetaVacioGrupoMovimientos,
   TEXTO_GRUPO_MOVIMIENTOS_VACIO,
   TEXTO_SALIR,
   textoPendientesCompartir,

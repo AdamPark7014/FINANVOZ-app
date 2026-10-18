@@ -77,8 +77,10 @@ import {
   TITULO_TUS_FACTURAS,
   TEXTO_FACTURAS_OCULTAS,
   TEXTO_FACTURAS_VACIO,
+  etiquetaVacioFacturas,
   TEXTO_IMPORTAR_LEYENDO,
   TEXTO_IMPORTAR_VACIO,
+  etiquetaVacioImportar,
   tituloPantallaDeducciones,
   DESC_LENTES,
 } from './textos';

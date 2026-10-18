@@ -19,6 +19,7 @@ import { EstadoVacio } from '../principal/EstadoVacio';
 import { mensajeError } from '../principal/textos';
 import {
   ACCESIBILIDAD_CERRAR,
+  ACCESIBILIDAD_LISTO,
   CERRAR,
   CONFIRMAR,
   CONTINUAR,

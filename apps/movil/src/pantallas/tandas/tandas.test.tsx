@@ -97,6 +97,7 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
     expect(screen.getByTestId('tandas-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
     expect(screen.getByTestId('tandas-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('tandas-nueva')).toHaveProp('accessibilityHint', PISTA_NUEVA_TANDA);
   });
 
   it('Volver en el detalle tiene pista TalkBack', () => {

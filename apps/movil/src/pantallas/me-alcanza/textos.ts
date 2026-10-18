@@ -27,6 +27,10 @@ export const TEXTO_PARCIAL_HORIZONTE = 'Algunos pagos caen después de 2 años: 
 export const AYUDA_DATOS_INSUFICIENTES =
   'Sigue registrando tus gastos un par de semanas y vuelve a calcular.';
 
+export function etiquetaVacioDatosInsuficientes(): string {
+  return `${TITULO}. ${AYUDA_DATOS_INSUFICIENTES}`;
+}
+
 export const MENSAJE_CANCELADO =
   'Cancelé el cálculo. Puedes cambiar los datos y volver a calcular.';
 

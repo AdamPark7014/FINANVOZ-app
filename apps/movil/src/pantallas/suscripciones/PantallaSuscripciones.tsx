@@ -22,6 +22,7 @@ import {
   ETIQUETA_NOMBRE,
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
+  etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,

@@ -1,12 +1,5 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
-export {
-  TIP_COLCHON_SIN_POR_AHORA,
-  TIP_CUENTAS_MINIMO,
-  TIP_INGRESO_SALTAR,
-  TIP_PAGOS_SALTAR,
-} from './tips';
-
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
 
@@ -36,6 +29,8 @@ export const CASILLA_ESTADISTICAS_OPCIONAL =
 
 /** O3 · Ingreso */
 export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
+export const TIP_INGRESO_SALTAR =
+  'Si todavía no quieres poner tu ingreso, toca «Saltar por ahora»; lo configuras cuando quieras en Ajustes › Ingreso.';
 export const BTN_ONB_SALTAR = 'Saltar por ahora';
 export const PISTA_INGRESO_SALTAR = 'Calcularé tu día con los próximos 30 días';
 export const CUERPO_INGRESO_VARIABLE =
@@ -52,6 +47,8 @@ export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
 /** O4 · Cuentas */
 export const TITULO_CUENTAS = '¿Con qué pagas?';
+export const TIP_CUENTAS_MINIMO =
+  'Puedes tocar «Continuar» solo con efectivo; cuentas, billeteras y tarjetas las agregas después en Cuentas.';
 export const PISTA_CUENTAS_CONTINUAR = 'Pasa a tus pagos fijos del mes';
 export const ETIQUETA_EFECTIVO_ONB = '¿Cuánto efectivo traes ahorita?';
 export const AYUDA_EFECTIVO_ONB = 'Si no sabes exacto, pon lo que calcules. Lo ajustas después.';
@@ -103,6 +100,8 @@ export const AYUDA_COLCHON_ONB =
 export const ETIQUETA_COLCHON = 'Tu colchón';
 export const BTN_VER_MI_DIA = 'Ver mi día';
 export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
+export const TIP_COLCHON_SIN_POR_AHORA =
+  'Si hoy no quieres apartar nada, toca «Sin colchón por ahora»; lo configuras cuando quieras en Ajustes › Colchón.';
 export const PISTA_COLCHON_SALTAR = 'Termina el recorrido sin apartar colchón';
 export const PISTA_VER_MI_DIA = 'Termina el recorrido y abre tu día';
 

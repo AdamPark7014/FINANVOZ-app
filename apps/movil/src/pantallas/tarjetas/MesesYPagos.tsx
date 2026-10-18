@@ -48,6 +48,7 @@ import {
   ERROR_MONTO_PAGO_PLANEADO,
   mensajePagoPlaneadoApartado,
   textoConfirmarLiquidar,
+  etiquetaVacioMsiTarjeta,
   VACIO_MSI_TARJETA,
 } from './textos';
 

@@ -34,6 +34,10 @@ export const PASO_MARCAR_TITULO = 'Antes: ¿pagaste alguno de estos en efectivo?
 export const PASO_MARCAR_AYUDA =
   'Los que marques pasan a tu efectivo antes de contar, para no contarlos dos veces.';
 
+/** Tarjeta de Hoy cuando hay gastos por asignar viejos (paso 1 del arqueo). */
+export const AYUDA_POR_ASIGNAR =
+  'Antes revisemos unos gastos que no sé con qué pagaste.';
+
 /** Chips del paso «Deberías traer…» (`02 §7`). */
 export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
 

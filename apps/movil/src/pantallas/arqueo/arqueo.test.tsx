@@ -5,6 +5,10 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
 import {
   ACCESIBILIDAD_CERRAR,
+  ACCESIBILIDAD_LISTO,
+  AHORA_NO,
+  AYUDA_POR_ASIGNAR,
+  MENSAJE_POSPONER,
   etiquetaVacioSinEfectivo,
   ETIQUETA_GASTO_SIN_DESCRIPCION,
   ETIQUETA_MONTO_TRAES,
