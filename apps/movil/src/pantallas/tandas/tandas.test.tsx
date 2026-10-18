@@ -313,6 +313,10 @@ describe('Tandas (02 §18)', () => {
     expect(detalleTanda(p.ctx, tandaId).cuentaOrigenId).toBe(p.efectivo);
 
     fireEvent.press(screen.getByTestId('tanda-archivar-abrir'));
+    expect(screen.getByTestId('tanda-archivar-confirmar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONFIRMAR_ARCHIVAR,
+    );
     fireEvent.press(screen.getByTestId('tanda-archivar-confirmar'));
     expect(listarTandas(p.ctx)).toEqual([]);
     expect(alVolver).toHaveBeenCalled();
