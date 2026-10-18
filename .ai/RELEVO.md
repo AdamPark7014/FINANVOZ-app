@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **O3 ingreso · TalkBack:** `PISTA_COMPLETAR_INGRESO` en Continuar deshabilitado; test en flujo O2→O3.
+- **Compartido · TalkBack:** `PISTA_VISTA_CAMARA` en `EscanerQr`; `PISTA_ESCRIBIR_NOMBRE_PAREJA` en «Escanear su código» sin nombre; tests.
 
 ## Hecho (acumulado reciente)
 
-- Ayuda, captura, consentimiento aviso completo, respaldo. Ver `git log`.
+- O3 ingreso, ayuda, captura, consentimiento, respaldo. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (ajustes, personas, principal) — no mezclar en commits ajenos.
+- WIP paralelo (`tarjetas/textos.ts`, ajustes, personas, principal) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
