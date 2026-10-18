@@ -6,7 +6,7 @@
 
 ## Hecho en este turno
 
-- **Tandas (móvil):** micro TalkBack — etiquetas en lista, detalle, formulario y tarjetas de Hoy; montos en palabras; `role="list"` y alertas en errores; tests en `tandas.test.tsx`.
+- **Tandas (móvil):** micro TalkBack — etiquetas en lista, detalle, formulario y tarjetas de Hoy; montos en palabras; `role="list"` y alertas en errores; tests en `tandas.test.tsx`. Commit `72eae6e`.
 
 ## Hecho (acumulado reciente)
 

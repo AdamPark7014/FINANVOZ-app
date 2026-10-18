@@ -374,6 +374,12 @@ describe('entradas', () => {
 });
 
 describe('textos de estado de cuenta', () => {
+  it('pistas TalkBack de botones en tuteo', () => {
+    expect(PISTA_ENTENDIDO).toMatch(/aviso/i);
+    expect(PISTA_ESCRIBE_CONTRASENA).toMatch(/contraseña/i);
+    expect(PISTA_CONTESTAR_DUDOSOS).toMatch(/Contesta/i);
+  });
+
   it('mensajeNoReconocido y tituloNuevos en español de México', () => {
     expect(mensajeNoReconocido(['Banco B', 'Banco E'])).toBe(
       'Todavía no sé leer estados de cuenta de ese banco. Por ahora leo: Banco B, Banco E.',

@@ -61,6 +61,8 @@ export const MENSAJE_ELEGIR_PDF = 'Elige el PDF de tu estado de cuenta…';
 
 /** Extracción en el teléfono (sin subir el archivo). */
 export const MENSAJE_LEYENDO = 'Leyendo tu estado de cuenta…';
+/** TalkBack mientras se extrae el PDF en el teléfono. */
+export const ETIQUETA_LEYENDO = 'Leyendo estado de cuenta';
 
 export const MENSAJE_CONTRASENA =
   'Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.';

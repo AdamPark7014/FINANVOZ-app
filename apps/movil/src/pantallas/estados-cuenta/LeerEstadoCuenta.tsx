@@ -33,6 +33,7 @@ import {
   ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
   ETIQUETA_EXITO,
+  ETIQUETA_LEYENDO,
   ETIQUETA_PREGUNTA_CONCILIACION,
   ETIQUETA_PREGUNTA_CONTRASENA,
   ETIQUETA_RESUMEN_ESTADO,
@@ -169,7 +170,13 @@ export function LeerEstadoCuenta({
         {TITULO_PANTALLA}
       </Texto>
       {estado.tipo === 'leyendo' ? (
-        <Texto variante="cuerpo" tono="secundario" testID="estado-leyendo" accessibilityLiveRegion="polite">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="estado-leyendo"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={`${ETIQUETA_LEYENDO}. ${MENSAJE_LEYENDO}`}
+        >
           {MENSAJE_LEYENDO}
         </Texto>
       ) : null}
