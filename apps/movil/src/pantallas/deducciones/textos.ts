@@ -52,6 +52,8 @@ export const TEXTO_IMPORTAR_VACIO =
   'No llegó ningún archivo. Comparte el XML de la factura o un ZIP del SAT.';
 
 export const BTN_VER_DEDUCCIONES = 'Ver mis deducciones';
+/** Entrada desde Cuentas (`02 §24`). */
+export const BTN_DEDUCCIONES_CUENTAS = 'Ver mis deducciones del año';
 export const ETIQUETA_IMPORTACION_LISTO = 'Listo';
 
 /** Detalle por factura. */
