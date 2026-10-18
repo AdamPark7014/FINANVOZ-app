@@ -7,7 +7,7 @@ import {
   VERSION_CONSENTIMIENTO,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { AVISO_SIMPLIFICADO } from '../onboarding/aviso';
+import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from '../onboarding/aviso';
 import { Casilla, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import {
@@ -17,8 +17,14 @@ import {
   BTN_RECONSENT_SOLO_LECTURA,
   CASILLA_ESTADISTICAS_OPCIONAL,
   CASILLA_RECONSENT_DATOS,
+  etiquetaIntroReconsentimiento,
   introReconsentimiento,
   PISTA_CASILLA_DATOS_FINANCIEROS,
+  PISTA_LEER_AVISO_COMPLETO,
+  PISTA_RECONSENT_ACEPTAR,
+  PISTA_RECONSENT_BORRAR,
+  PISTA_RECONSENT_SOLO_LECTURA,
+  TITULO_AVISO_PRIVACIDAD,
   TITULO_RECONSENTIMIENTO,
 } from './textos';
 
@@ -71,27 +77,45 @@ export function Reconsentimiento({
 
   return (
     <Pantalla testID="reconsentimiento" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo">{TITULO_RECONSENTIMIENTO}</Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto testID="reconsent-titulo" variante="titulo" accessibilityRole="header">
+        {TITULO_RECONSENTIMIENTO}
+      </Texto>
+      <Texto
+        testID="reconsent-intro"
+        variante="secundario"
+        tono="secundario"
+        accessibilityRole="text"
+        accessibilityLabel={etiquetaIntroReconsentimiento(VERSION_CONSENTIMIENTO)}
+      >
         {introReconsentimiento(VERSION_CONSENTIMIENTO)}
       </Texto>
-      <Tarjeta>
-        <Texto variante="subtitulo">Aviso de privacidad</Texto>
-        <View style={{ gap: espacio.s }}>
-          {AVISO_SIMPLIFICADO.map((punto) => (
-            <Texto key={punto} variante="secundario">
-              {`• ${punto}`}
-            </Texto>
-          ))}
-        </View>
-        <Boton
-          testID="reconsent-aviso-completo"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_LEER_AVISO_COMPLETO}
-          alPresionar={() => router.push('/aviso-privacidad')}
-        />
-      </Tarjeta>
+      <View
+        testID="reconsent-aviso-simplificado"
+        accessible
+        accessibilityRole="summary"
+        accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_PRIVACIDAD, AVISO_SIMPLIFICADO)}
+      >
+        <Tarjeta>
+          <Texto variante="subtitulo" accessibilityElementsHidden>
+            {TITULO_AVISO_PRIVACIDAD}
+          </Texto>
+          <View style={{ gap: espacio.s }} importantForAccessibility="no-hide-descendants">
+            {AVISO_SIMPLIFICADO.map((punto) => (
+              <Texto key={punto} variante="secundario" accessibilityElementsHidden>
+                {`• ${punto}`}
+              </Texto>
+            ))}
+          </View>
+          <Boton
+            testID="reconsent-aviso-completo"
+            variante="texto"
+            ancho="contenido"
+            etiqueta={BTN_LEER_AVISO_COMPLETO}
+            pista={PISTA_LEER_AVISO_COMPLETO}
+            alPresionar={() => router.push('/aviso-privacidad')}
+          />
+        </Tarjeta>
+      </View>
       <Casilla
         testID="reconsent-casilla-datos"
         etiqueta={CASILLA_RECONSENT_DATOS}
@@ -108,13 +132,14 @@ export function Reconsentimiento({
         testID="reconsent-aceptar"
         etiqueta={BTN_RECONSENT_ACEPTAR}
         deshabilitado={!acepta}
-        {...(acepta ? {} : { pista: PISTA_CASILLA_DATOS_FINANCIEROS })}
+        pista={acepta ? PISTA_RECONSENT_ACEPTAR : PISTA_CASILLA_DATOS_FINANCIEROS}
         alPresionar={aceptar}
       />
       <Boton
         testID="reconsent-solo-lectura"
         variante="secundario"
         etiqueta={BTN_RECONSENT_SOLO_LECTURA}
+        pista={PISTA_RECONSENT_SOLO_LECTURA}
         alPresionar={soloLectura}
       />
       <Boton
@@ -122,6 +147,8 @@ export function Reconsentimiento({
         variante="texto"
         etiqueta={BTN_RECONSENT_BORRAR}
         deshabilitado={borrando}
+        cargando={borrando}
+        pista={PISTA_RECONSENT_BORRAR}
         alPresionar={() => void borrarTodo()}
       />
       <MensajeError texto={error} />

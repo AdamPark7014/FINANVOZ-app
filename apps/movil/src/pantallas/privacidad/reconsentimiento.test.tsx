@@ -11,7 +11,17 @@ import {
   obtenerConsentimiento,
   VERSION_CONSENTIMIENTO,
 } from '../../servicios';
+import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from '../onboarding/aviso';
 import { crearSesionPrueba, type SesionPrueba } from '../onboarding/__pruebas__/sesion';
+import {
+  etiquetaIntroReconsentimiento,
+  PISTA_CASILLA_DATOS_FINANCIEROS,
+  PISTA_LEER_AVISO_COMPLETO,
+  PISTA_RECONSENT_ACEPTAR,
+  PISTA_RECONSENT_BORRAR,
+  PISTA_RECONSENT_SOLO_LECTURA,
+  TITULO_AVISO_PRIVACIDAD,
+} from './textos';
 
 const RUTAS = {
   _layout: () => <Stack screenOptions={{ headerShown: false }} />,
@@ -65,5 +75,36 @@ describe('reconsentimiento (pendiente 31)', () => {
     abrir('/');
     tocar('reconsent-borrar');
     expect(s.control.borrarTodo).toHaveBeenCalledTimes(1);
+  });
+
+  it('TalkBack: aviso resumido, casillas y pistas en los botones', () => {
+    abrir('/');
+    expect(screen.getByTestId('reconsent-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('reconsent-intro')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaIntroReconsentimiento(VERSION_CONSENTIMIENTO),
+    );
+    expect(screen.getByTestId('reconsent-aviso-simplificado')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_PRIVACIDAD, AVISO_SIMPLIFICADO),
+    );
+    expect(screen.getByTestId('reconsent-aviso-completo')).toHaveProp(
+      'accessibilityHint',
+      PISTA_LEER_AVISO_COMPLETO,
+    );
+    expect(screen.getByTestId('reconsent-casilla-datos')).toHaveProp('accessibilityState', {
+      checked: false,
+    });
+    expect(screen.getByTestId('reconsent-aceptar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CASILLA_DATOS_FINANCIEROS,
+    );
+    tocar('reconsent-casilla-datos');
+    expect(screen.getByTestId('reconsent-aceptar')).toHaveProp('accessibilityHint', PISTA_RECONSENT_ACEPTAR);
+    expect(screen.getByTestId('reconsent-solo-lectura')).toHaveProp(
+      'accessibilityHint',
+      PISTA_RECONSENT_SOLO_LECTURA,
+    );
+    expect(screen.getByTestId('reconsent-borrar')).toHaveProp('accessibilityHint', PISTA_RECONSENT_BORRAR);
   });
 });

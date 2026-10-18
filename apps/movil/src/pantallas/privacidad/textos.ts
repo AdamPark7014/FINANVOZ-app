@@ -1,4 +1,5 @@
 import { etiquetaDiaMes } from '../../servicios';
+import { enteroEnPalabras, etiquetaHablada } from '../../ui/formato';
 import { RESPONSABLE, type SeccionAviso } from '../onboarding/aviso';
 import { TEXTO_NO_ASESORIA, VERSION_TERMINOS } from './legales';
 
@@ -18,6 +19,10 @@ export function introReconsentimiento(version: string): string {
   return `Publicamos una versión nueva del aviso (${version}). Si no la aceptas ahora, entras en solo lectura: puedes ver y exportar tus datos, pero no registrar movimientos nuevos hasta que la aceptes al abrir la app.`;
 }
 
+export function etiquetaIntroReconsentimiento(version: string): string {
+  return etiquetaHablada(introReconsentimiento(version));
+}
+
 export const CASILLA_RECONSENT_DATOS =
   'Acepto esta versión del aviso de privacidad y que Finanvoz siga guardando y usando mis datos financieros, como ahí se describe.';
 
@@ -28,9 +33,14 @@ export const BTN_RECONSENT_ACEPTAR = 'Aceptar y continuar';
 export const BTN_RECONSENT_SOLO_LECTURA = 'Continuar en solo lectura';
 export const BTN_RECONSENT_BORRAR = 'Borrar todo';
 export const PISTA_CASILLA_DATOS_FINANCIEROS = 'Primero marca la casilla de tus datos financieros';
+export const PISTA_RECONSENT_ACEPTAR = 'Actualiza tu consentimiento y abre tu día';
+export const PISTA_RECONSENT_SOLO_LECTURA =
+  'Entras en solo lectura y abres tu día sin aceptar el aviso nuevo';
+export const PISTA_RECONSENT_BORRAR = 'Borra todos los datos de este teléfono';
 
 /** Desde O2, reconsentimiento o Ajustes: abre `/aviso-privacidad`. */
 export const BTN_LEER_AVISO_COMPLETO = 'Leer el aviso completo';
+export const PISTA_LEER_AVISO_COMPLETO = 'Abre el aviso de privacidad completo en otra pantalla';
 
 export const TITULO_AVISO_PRIVACIDAD = 'Aviso de privacidad';
 export const TIP_AVISO_PRIVACIDAD =
@@ -46,6 +56,10 @@ export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
 export const TITULO_PRIVACIDAD = 'Tu privacidad';
 export const INTRO_PRIVACIDAD =
   'Tus datos viven cifrados en este teléfono. Aquí ves qué se guarda, qué sale y a quién, y decides.';
+
+export function etiquetaAccesibleIntroPrivacidad(): string {
+  return etiquetaHablada(INTRO_PRIVACIDAD);
+}
 
 export const SECCION_GUARDADO = 'Qué se guarda en este teléfono';
 export const TEXTO_GUARDADO_VACIO =
@@ -109,8 +123,12 @@ export const TEXTO_DESCARGA_GRATIS =
   'Descárgalos cuando quieras, gratis, también si cancelas Plus.';
 export const BTN_EXPORTAR_JSON = 'Descargar todos mis datos (JSON)';
 export const BTN_EXPORTAR_CSV = 'Descargar mis movimientos (CSV)';
+export const PISTA_EXPORTAR_JSON = 'Prepara un archivo con todos tus datos para compartir';
+export const PISTA_EXPORTAR_CSV = 'Prepara un archivo con tus movimientos para compartir';
 export const BTN_LEER_AVISO = 'Leer el aviso de privacidad';
 export const BTN_LEER_TERMINOS = 'Leer los términos de uso';
+export const PISTA_LEER_AVISO = 'Abre el aviso de privacidad en otra pantalla';
+export const PISTA_LEER_TERMINOS = 'Abre los términos de uso en otra pantalla';
 
 export const TITULO_COMPARTIR_JSON = 'Tus datos de Finanvoz';
 export const TITULO_COMPARTIR_CSV = 'Tus movimientos de Finanvoz';
@@ -120,6 +138,9 @@ export const TEXTO_BORRAR_ADVERTENCIA =
   'Se borran de este teléfono todas tus cuentas, tarjetas, movimientos y ajustes. No se puede deshacer. Si quieres conservarlos, primero descarga tus datos.';
 export const BTN_BORRAR_CONFIRMAR = 'Borrar todo para siempre';
 export const BTN_BORRAR_INICIAR = 'Borrar todos mis datos';
+export const PISTA_BORRAR_INICIAR = 'Muestra la confirmación para borrar todos tus datos';
+export const PISTA_BORRAR_CONFIRMAR = 'Borra de este teléfono cuentas, movimientos y ajustes';
+export const PISTA_BORRAR_CANCELAR = 'Cierra la confirmación sin borrar nada';
 export const BTN_CANCELAR = 'Cancelar';
 
 export const MENSAJE_NO_GUARDAR = 'No pude guardar el cambio. Intenta de nuevo.';
@@ -170,6 +191,10 @@ export function textoDerechosArco(correo: string = RESPONSABLE.correo): string {
   return `Para ejercer tus derechos o revocar tu consentimiento también puedes escribir a ${correo}.`;
 }
 
+export function etiquetaAccesibleDerechosArco(correo: string = RESPONSABLE.correo): string {
+  return etiquetaHablada(textoDerechosArco(correo));
+}
+
 export function etiquetaConfirmarBorrar(palabra: string = PALABRA_BORRAR): string {
   return `Escribe ${palabra} para confirmar`;
 }
@@ -184,8 +209,27 @@ export function textoCaptura(activada: boolean, appsBanco: number): string {
     : 'Captura automática: apagada. La activas en Ajustes.';
 }
 
+export function etiquetaAccesibleCaptura(activada: boolean, appsBanco: number): string {
+  return etiquetaHablada(textoCaptura(activada, appsBanco));
+}
+
 export function textoConsentimiento(version: string, fecha: string): string {
   return `Aceptaste el aviso de privacidad (versión ${version}) el ${etiquetaDiaMes(fecha)} ${fecha.slice(0, 4)}.`;
+}
+
+export function etiquetaAccesibleConsentimiento(version: string, fecha: string): string {
+  return etiquetaHablada(textoConsentimiento(version, fecha));
+}
+
+export function etiquetaLineaGuardado(linea: string): string {
+  const m = /^(\d+) (.*)$/.exec(linea);
+  if (m) {
+    const n = Number(m[1]);
+    if (Number.isSafeInteger(n) && n >= 0) {
+      return `${enteroEnPalabras(n)} ${m[2]}`;
+    }
+  }
+  return etiquetaHablada(linea);
 }
 
 export const TEXTO_SIN_CONSENTIMIENTO =

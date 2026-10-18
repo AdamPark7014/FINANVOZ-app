@@ -23,6 +23,12 @@ import {
   ETIQUETA_ESTADISTICAS,
   ACCESIBILIDAD_VOLVER,
   ETIQUETA_VOLVER,
+  etiquetaAccesibleCaptura,
+  etiquetaAccesibleConsentimiento,
+  etiquetaAccesibleDerechosArco,
+  etiquetaAccesibleIntroPrivacidad,
+  etiquetaConfirmarBorrar,
+  etiquetaLineaGuardado,
   guardadoVacio,
   INTRO_PRIVACIDAD,
   lineasGuardado,
@@ -32,6 +38,13 @@ import {
   NOTA_SERVICIOS_FUERA_MX,
   PALABRA_BORRAR,
   PERMISOS,
+  PISTA_BORRAR_CANCELAR,
+  PISTA_BORRAR_CONFIRMAR,
+  PISTA_BORRAR_INICIAR,
+  PISTA_EXPORTAR_CSV,
+  PISTA_EXPORTAR_JSON,
+  PISTA_LEER_AVISO,
+  PISTA_LEER_TERMINOS,
   PISTA_PERMISOS_TELEFONO,
   PISTA_VOLVER,
   SALE_DEL_TELEFONO,
@@ -52,7 +65,6 @@ import {
   textoCaptura,
   textoConsentimiento,
   textoDerechosArco,
-  etiquetaConfirmarBorrar,
 } from './textos';
 
 /**
@@ -133,7 +145,13 @@ export function CentroPrivacidad({
       <Texto testID="privacidad-titulo" variante="titulo" accessibilityRole="header">
         {TITULO_PRIVACIDAD}
       </Texto>
-      <Texto testID="privacidad-intro" variante="cuerpo" tono="secundario">
+      <Texto
+        testID="privacidad-intro"
+        variante="cuerpo"
+        tono="secundario"
+        accessibilityRole="text"
+        accessibilityLabel={etiquetaAccesibleIntroPrivacidad()}
+      >
         {INTRO_PRIVACIDAD}
       </Texto>
 
@@ -147,7 +165,9 @@ export function CentroPrivacidad({
           </Texto>
         ) : (
           lineasGuardado(g).map((linea) => (
-            <Texto key={linea} variante="cuerpo">{`• ${linea}`}</Texto>
+            <Texto key={linea} variante="cuerpo" accessibilityLabel={etiquetaLineaGuardado(linea)}>
+              {`• ${linea}`}
+            </Texto>
           ))
         )}
         <Texto variante="secundario" tono="secundario">
@@ -184,11 +204,23 @@ export function CentroPrivacidad({
           valor={vista.estadisticas}
           alCambiar={cambiarEstadisticas}
         />
-        <Texto variante="cuerpo" testID="privacidad-captura">
+        <Texto
+          variante="cuerpo"
+          testID="privacidad-captura"
+          accessibilityLabel={etiquetaAccesibleCaptura(vista.captura.activada, vista.captura.apps)}
+        >
           {textoCaptura(vista.captura.activada, vista.captura.apps)}
         </Texto>
         {vista.consentimiento ? (
-          <Texto variante="secundario" tono="secundario" testID="privacidad-consentimiento">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="privacidad-consentimiento"
+            accessibilityLabel={etiquetaAccesibleConsentimiento(
+              vista.consentimiento.version,
+              vista.consentimiento.fecha,
+            )}
+          >
             {textoConsentimiento(vista.consentimiento.version, vista.consentimiento.fecha)}
           </Texto>
         ) : (
@@ -234,6 +266,7 @@ export function CentroPrivacidad({
           testID="privacidad-exportar-json"
           variante="secundario"
           etiqueta={BTN_EXPORTAR_JSON}
+          pista={PISTA_EXPORTAR_JSON}
           cargando={exportando === 'json'}
           deshabilitado={exportando !== null}
           alPresionar={() => void exportar('json')}
@@ -242,6 +275,7 @@ export function CentroPrivacidad({
           testID="privacidad-exportar-csv"
           variante="secundario"
           etiqueta={BTN_EXPORTAR_CSV}
+          pista={PISTA_EXPORTAR_CSV}
           cargando={exportando === 'csv'}
           deshabilitado={exportando !== null}
           alPresionar={() => void exportar('csv')}
@@ -251,6 +285,7 @@ export function CentroPrivacidad({
           variante="texto"
           ancho="contenido"
           etiqueta={BTN_LEER_AVISO}
+          pista={PISTA_LEER_AVISO}
           alPresionar={alLeerAviso}
         />
         <Boton
@@ -258,9 +293,14 @@ export function CentroPrivacidad({
           variante="texto"
           ancho="contenido"
           etiqueta={BTN_LEER_TERMINOS}
+          pista={PISTA_LEER_TERMINOS}
           alPresionar={alLeerTerminos}
         />
-        <Texto variante="secundario" tono="secundario">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLabel={etiquetaAccesibleDerechosArco()}
+        >
           {textoDerechosArco()}
         </Texto>
         {mensaje ? (
@@ -295,6 +335,7 @@ export function CentroPrivacidad({
             <Boton
               testID="privacidad-borrar-confirmar"
               etiqueta={BTN_BORRAR_CONFIRMAR}
+              pista={PISTA_BORRAR_CONFIRMAR}
               deshabilitado={palabra.trim().toUpperCase() !== PALABRA_BORRAR}
               cargando={borrando}
               alPresionar={() => {
@@ -306,6 +347,7 @@ export function CentroPrivacidad({
               testID="privacidad-borrar-cancelar"
               variante="texto"
               etiqueta={BTN_CANCELAR}
+              pista={PISTA_BORRAR_CANCELAR}
               alPresionar={() => {
                 setConfirmando(false);
                 setPalabra('');
@@ -317,6 +359,7 @@ export function CentroPrivacidad({
             testID="privacidad-borrar-iniciar"
             variante="secundario"
             etiqueta={BTN_BORRAR_INICIAR}
+            pista={PISTA_BORRAR_INICIAR}
             alPresionar={() => setConfirmando(true)}
           />
         )}

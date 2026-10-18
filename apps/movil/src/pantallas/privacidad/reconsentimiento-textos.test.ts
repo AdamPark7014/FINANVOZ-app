@@ -3,6 +3,10 @@ import {
   BTN_RECONSENT_SOLO_LECTURA,
   CASILLA_RECONSENT_DATOS,
   introReconsentimiento,
+  PISTA_LEER_AVISO_COMPLETO,
+  PISTA_RECONSENT_ACEPTAR,
+  PISTA_RECONSENT_BORRAR,
+  PISTA_RECONSENT_SOLO_LECTURA,
   TIP_AVISO_PRIVACIDAD,
   TIP_SOLO_LECTURA,
   TITULO_RECONSENTIMIENTO,
@@ -29,5 +33,18 @@ describe('copy reconsentimiento y aviso-privacidad (02 §14)', () => {
       expect(tip).not.toMatch(/por favor/i);
     }
     expect(BTN_RECONSENT_SOLO_LECTURA).toMatch(/solo lectura/i);
+  });
+
+  it('pistas TalkBack del reconsentimiento usan tuteo y no exclamación', () => {
+    for (const pista of [
+      PISTA_LEER_AVISO_COMPLETO,
+      PISTA_RECONSENT_ACEPTAR,
+      PISTA_RECONSENT_SOLO_LECTURA,
+      PISTA_RECONSENT_BORRAR,
+    ]) {
+      expect(pista).not.toMatch(/!/);
+      expect(pista).not.toMatch(/por favor/i);
+    }
+    expect(PISTA_RECONSENT_ACEPTAR).toMatch(/tu día/i);
   });
 });

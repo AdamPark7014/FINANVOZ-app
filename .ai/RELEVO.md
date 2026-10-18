@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Plan (móvil, N582):** micro TalkBack — resumen dictado (`etiquetaAccesibleResumenPlan`), lista «Plus incluye», precios de oferta en palabras, live regions al cargar/vacío, pistas en compra/restaurar/administrar; `PuertaPlus` con encabezado y descripción hablada; tests en `plan.test.tsx` (11/11).
+- **Privacidad / reconsentimiento (N579):** TalkBack — encabezados, aviso simplificado resumido, intro y conteos dictados (`etiquetaHablada` / `enteroEnPalabras`), pistas en botones, región viva en error de exportación; tests en `privacidad.test.tsx`, `reconsentimiento.test.tsx` y textos.
 
 ## Hecho (acumulado reciente)
 
-- Gastos compartidos, ¿Me alcanza?, tandas, onboarding TalkBack. Ver `git log`.
+- Plan N582, gastos compartidos, ¿Me alcanza?, tandas, onboarding TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (principal, ayuda) — no mezclar sin `git status`.
+- WIP paralelo en `captura/` y `deducciones/` (sin commitear) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

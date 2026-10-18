@@ -19,7 +19,19 @@ import {
 import { abrirSesion, borrarTodoApp } from '../../servicios/sesion';
 import { compartirArchivo } from '../ajustes/compartir';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
-import { ACCESIBILIDAD_VOLVER, PISTA_VOLVER } from './textos';
+import {
+  ACCESIBILIDAD_VOLVER,
+  etiquetaAccesibleIntroPrivacidad,
+  MENSAJE_NO_EXPORTAR,
+  PISTA_BORRAR_CANCELAR,
+  PISTA_BORRAR_CONFIRMAR,
+  PISTA_BORRAR_INICIAR,
+  PISTA_EXPORTAR_CSV,
+  PISTA_EXPORTAR_JSON,
+  PISTA_LEER_AVISO,
+  PISTA_LEER_TERMINOS,
+  PISTA_VOLVER,
+} from './textos';
 
 /** La raíz real con la apertura nativa sustituida (igual que `ajustes.test.tsx`). */
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
@@ -97,6 +109,10 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_VOLVER);
     expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+    expect(screen.getByTestId('privacidad-intro')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleIntroPrivacidad(),
+    );
   });
 
   it('dice qué se guarda, qué sale y a quién, y qué permisos usa', () => {
@@ -164,6 +180,33 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     );
   });
 
+  it('TalkBack: exportar, legales y borrar traen pistas', () => {
+    renderRouter(RUTAS, { initialUrl: '/privacidad' });
+    expect(screen.getByTestId('privacidad-exportar-json')).toHaveProp(
+      'accessibilityHint',
+      PISTA_EXPORTAR_JSON,
+    );
+    expect(screen.getByTestId('privacidad-exportar-csv')).toHaveProp(
+      'accessibilityHint',
+      PISTA_EXPORTAR_CSV,
+    );
+    expect(screen.getByTestId('privacidad-aviso')).toHaveProp('accessibilityHint', PISTA_LEER_AVISO);
+    expect(screen.getByTestId('privacidad-terminos')).toHaveProp('accessibilityHint', PISTA_LEER_TERMINOS);
+    expect(screen.getByTestId('privacidad-borrar-iniciar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_BORRAR_INICIAR,
+    );
+    fireEvent.press(screen.getByTestId('privacidad-borrar-iniciar'));
+    expect(screen.getByTestId('privacidad-borrar-confirmar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_BORRAR_CONFIRMAR,
+    );
+    expect(screen.getByTestId('privacidad-borrar-cancelar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_BORRAR_CANCELAR,
+    );
+  });
+
   it('exporta JSON y CSV con la hoja de compartir', async () => {
     renderRouter(RUTAS, { initialUrl: '/privacidad' });
     fireEvent.press(screen.getByTestId('privacidad-exportar-json'));
@@ -176,6 +219,16 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     fireEvent.press(screen.getByTestId('privacidad-exportar-csv'));
     await waitFor(() => expect(compartirArchivo).toHaveBeenCalledTimes(2));
     expect(llamada(1)).toMatchObject({ nombre: 'finanvoz-movimientos.csv', tipoMime: 'text/csv' });
+  });
+
+  it('si falla la exportación, anuncia el error en una región viva', async () => {
+    jest.mocked(compartirArchivo).mockRejectedValueOnce(new Error('fallo'));
+    renderRouter(RUTAS, { initialUrl: '/privacidad' });
+    fireEvent.press(screen.getByTestId('privacidad-exportar-json'));
+    await waitFor(() => expect(screen.getByTestId('privacidad-mensaje')).toBeTruthy());
+    expect(screen.getByTestId('privacidad-mensaje')).toHaveTextContent(MENSAJE_NO_EXPORTAR);
+    expect(screen.getByTestId('privacidad-mensaje')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('privacidad-mensaje')).toHaveProp('accessibilityLiveRegion', 'polite');
   });
 
   it('borrar todo pide escribir BORRAR y después vuelve al onboarding con una base nueva', async () => {

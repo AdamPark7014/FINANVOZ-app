@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  etiquetaAccesibleIntroPrivacidad,
+  etiquetaIntroReconsentimiento,
+  etiquetaLineaGuardado,
   guardadoVacio,
+  INTRO_PRIVACIDAD,
   lineasGuardado,
   lineaVersionTerminos,
   PALABRA_BORRAR,
@@ -43,5 +47,11 @@ describe('textos del centro de privacidad', () => {
   it('PALABRA_BORRAR y versión de términos son estables para pruebas de UI', () => {
     expect(PALABRA_BORRAR).toBe('BORRAR');
     expect(lineaVersionTerminos('2026-10-m8')).toBe('Versión 2026-10-m8');
+  });
+
+  it('etiquetas habladas para intro y conteos del centro', () => {
+    expect(etiquetaAccesibleIntroPrivacidad()).toBe(INTRO_PRIVACIDAD);
+    expect(etiquetaIntroReconsentimiento('2026-10-m8')).toContain('2026-10-m8');
+    expect(etiquetaLineaGuardado('2 movimientos')).toMatch(/dos movimientos/i);
   });
 });
