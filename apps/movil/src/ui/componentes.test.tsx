@@ -178,6 +178,15 @@ describe('EstadoVacio', () => {
     const vacio = screen.getByTestId('vacio');
     expect(vacio).toHaveTextContent('Todavía no hay movimientos.');
     expect(vacio.props.accessibilityLiveRegion).toBe('polite');
+    expect(vacio.props.accessibilityLabel).toBe('Aún no hay movimientos.');
+  });
+
+  it('lee cifras del copy en palabras cuando no hay etiquetaAccesible', () => {
+    render(<EstadoVacio texto="Faltan $315 en el arqueo." testID="vacio" />);
+    expect(screen.getByTestId('vacio')).toHaveProp(
+      'accessibilityLabel',
+      'Faltan trescientos quince pesos en el arqueo.',
+    );
   });
 
   it('etiquetaAccesible sobrescribe el label de TalkBack', () => {

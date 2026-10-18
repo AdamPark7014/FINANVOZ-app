@@ -476,6 +476,9 @@ describe('¿Me alcanza?', () => {
     await screen.findByTestId('me-alcanza-datos-insuficientes');
     expect(textoDe('me-alcanza-mensaje')).toBe(MENSAJE_DATOS_INSUFICIENTES);
     expect(textoDe('me-alcanza-datos-ayuda')).toBe(AYUDA_DATOS_INSUFICIENTES);
+    expect(screen.getByTestId('me-alcanza-datos-ayuda').props.accessibilityLabel).toBe(
+      etiquetaVacioDatosInsuficientes(),
+    );
     expect(screen.getByText('Una compra de $1,500')).toBeTruthy();
     expect(screen.getByTestId('boton-listo-datos-insuficientes')).toBeTruthy();
   });

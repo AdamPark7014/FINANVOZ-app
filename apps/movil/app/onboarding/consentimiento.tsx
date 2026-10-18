@@ -8,7 +8,6 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
-import { TIP_CONSENTIMIENTO } from '../../src/pantallas/onboarding/tips';
 import {
   BTN_ACEPTAR_CONTINUAR,
   BTN_LEER_AVISO_COMPLETO,
@@ -16,6 +15,7 @@ import {
   CASILLA_ESTADISTICAS_OPCIONAL,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
+  TIP_CONSENTIMIENTO,
   TITULO_AVISO_SIMPLIFICADO,
   TITULO_CONSENTIMIENTO,
 } from '../../src/pantallas/onboarding/textos';

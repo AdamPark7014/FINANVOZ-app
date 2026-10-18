@@ -126,7 +126,9 @@ export function PantallaMovimientos({
 
       {porRevisar.length > 0 ? (
         <View style={{ gap: espacio.s }} testID="por-revisar">
-          <Texto variante="subtitulo">{TITULO_POR_REVISAR}</Texto>
+          <Texto variante="subtitulo" testID="movimientos-por-revisar-titulo">
+            {TITULO_POR_REVISAR}
+          </Texto>
           <Texto variante="secundario" tono="secundario">
             {TEXTO_POR_REVISAR}
           </Texto>

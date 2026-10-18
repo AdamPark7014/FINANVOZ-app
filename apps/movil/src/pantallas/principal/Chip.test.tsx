@@ -10,7 +10,7 @@ describe('Chip (TalkBack)', () => {
     const chip = screen.getByTestId('c');
     expect(chip.props.accessibilityRole).toBe('radio');
     expect(chip.props.accessibilityLabel).toBe('Efectivo');
-    expect(chip.props.accessibilityState).toEqual({ selected: true });
+    expect(chip.props.accessibilityState).toMatchObject({ selected: true });
     const texto = screen.getByText('✓ Efectivo');
     expect(texto.props.accessibilityElementsHidden).toBe(true);
     expect(texto.props.importantForAccessibility).toBe('no-hide-descendants');

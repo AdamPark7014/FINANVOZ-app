@@ -1,4 +1,5 @@
 import type { ModoAvisoCaptura } from '../../servicios';
+import { enteroEnPalabras } from '../../ui/formato';
 import type { OpcionChip } from '../principal/Chip';
 
 /** Redacción Ajustes › Captura (`02 §12`, `08 §3.1`): tuteo; el conteo de apps viene de `servicios/`. */
