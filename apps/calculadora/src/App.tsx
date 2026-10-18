@@ -18,7 +18,7 @@ export function App() {
         </svg>
         <span className="marca">{MARCA}</span>
       </header>
-      <main>
+      <main id="contenido-principal" tabIndex={-1}>
         <h1>¿Cuántos MSI aguantas?</h1>
         <p className="entrada">
           Antes del Buen Fin, calcula cuánto puedes sumar en pagos al mes sin pasarte de lo recomendado.

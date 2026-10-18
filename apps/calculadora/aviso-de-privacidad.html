@@ -9,8 +9,36 @@
     <link rel="apple-touch-icon" href="/icono-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Aviso de privacidad · Finanvoz</title>
+    <style>
+      .saltar-contenido {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .saltar-contenido:focus {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0.75rem 1rem 0;
+        overflow: visible;
+        clip: auto;
+        white-space: normal;
+        padding: 0.5rem 0.75rem;
+        background: #0b7a61;
+        color: #fff;
+        border-radius: 0.25rem;
+        z-index: 1;
+      }
+    </style>
   </head>
   <body>
+    <a class="saltar-contenido" href="#contenido-principal">Saltar al contenido principal</a>
     <div id="raiz"></div>
     <script type="module" src="/src/aviso-main.tsx"></script>
   </body>
