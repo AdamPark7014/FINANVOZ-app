@@ -147,14 +147,19 @@ describe('/llm/turno · contrato (03 §6)', () => {
       latencia_ms: 0,
     });
     expect(a.consumidos).toEqual([USUARIO]);
-    expect(a.eventos[0]).toMatchObject({ endpoint: '/llm/turno', codigo: 'herramientas', estado_http: 200 });
+    expect(a.eventos[0]).toMatchObject({
+      endpoint: '/llm/turno',
+      codigo: 'herramientas',
+      estado_http: 200,
+      resultados_herramienta: 0,
+    });
   });
 
   it('segunda vuelta con resultados: respuesta del asistente', async () => {
     const a = armar({ principal: [json(respuestaAnthropic('respuestamarcador $98,765'))] });
     const r = await a.manejador(solicitud(SEGUNDA));
     expect((await cuerpo(r)).salida).toEqual({ tipo: 'respuesta', texto: 'respuestamarcador $98,765' });
-    expect(a.eventos[0]).toMatchObject({ codigo: 'respuesta' });
+    expect(a.eventos[0]).toMatchObject({ codigo: 'respuesta', resultados_herramienta: 1 });
   });
 
   it('ante un 5xx del principal responde el alterno', async () => {
