@@ -92,7 +92,12 @@ export function TarjetaExplicacion({
         </Texto>
       ) : null}
       {respuesta.tipo === 'limite' ? (
-        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="explicacion-limite">
+        <Texto
+          variante="cuerpo"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          testID="explicacion-limite"
+        >
           {respuesta.mensaje}
         </Texto>
       ) : null}

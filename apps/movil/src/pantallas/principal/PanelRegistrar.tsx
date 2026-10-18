@@ -75,6 +75,7 @@ import {
   mensajeFueraDeAlcance,
   mensajePasarAMeses,
   mensajeRegistrado,
+  esMensajeRegistroAlerta,
 } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
@@ -625,11 +626,7 @@ export function PanelRegistrar({
         <Texto
           variante="secundario"
           tono="secundario"
-          accessibilityRole={
-            mensaje === MENSAJE_EXPLICAR_ERROR || mensaje === MENSAJE_EXPLICAR_SIN_RED
-              ? 'alert'
-              : undefined
-          }
+          accessibilityRole={esMensajeRegistroAlerta(mensaje) ? 'alert' : undefined}
           accessibilityLiveRegion="polite"
           testID="mensaje-registro"
         >

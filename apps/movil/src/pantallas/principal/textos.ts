@@ -1,6 +1,11 @@
 import { ErrorDominio } from '@cartera/core';
 import { formatearCentavos } from '../../ui';
 import {
+  MENSAJE_LIMITE_DIARIO,
+  MENSAJE_LIMITE_MENSUAL_GRATIS,
+  MENSAJE_LIMITE_MENSUAL_PLUS,
+} from '../plan/textos';
+import {
   etiquetaDiaMes,
   MENSAJE_CORRECCION_NO_SOPORTADA,
   MENSAJE_ERROR_GENERAL,
@@ -248,6 +253,20 @@ export const MENSAJE_EXPLICAR_SIN_RED =
 export const MENSAJE_EXPLICAR_ERROR = 'No pude responderte ahora. Pregúntame de nuevo en un rato.';
 export const MENSAJE_EXPLICAR_SOLO_PLUS =
   'Preguntarme lo que quieras sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.';
+
+/** TalkBack: errores de explicar y cupo del intérprete en el panel (`CA-M7-02`). */
+const MENSAJES_REGISTRO_ALERTA = new Set([
+  MENSAJE_EXPLICAR_ERROR,
+  MENSAJE_EXPLICAR_SIN_RED,
+  MENSAJE_LIMITE_NUBE,
+  MENSAJE_LIMITE_MENSUAL_GRATIS,
+  MENSAJE_LIMITE_MENSUAL_PLUS,
+  MENSAJE_LIMITE_DIARIO,
+]);
+
+export function esMensajeRegistroAlerta(mensaje: string): boolean {
+  return MENSAJES_REGISTRO_ALERTA.has(mensaje);
+}
 
 // ——— Movimientos (`02 §10`) ———
 

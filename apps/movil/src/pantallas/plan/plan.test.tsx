@@ -208,7 +208,9 @@ describe('CA-M7-02 · al agotar las 30 interpretaciones del mes', () => {
     });
 
     await escribir(COMPLEJA);
-    expect(textoDe('mensaje-registro')).toBe(MENSAJE_LIMITE_MENSUAL_GRATIS);
+    const aviso = screen.getByTestId('mensaje-registro');
+    expect(aviso).toHaveTextContent(MENSAJE_LIMITE_MENSUAL_GRATIS);
+    expect(aviso.props.accessibilityRole).toBe('alert');
     expect(MENSAJE_LIMITE_MENSUAL_GRATIS).toContain('30 frases');
     expect(listarPorInterpretar(p.ctx)).toHaveLength(1);
     const llamadas = f.recibidas.length;

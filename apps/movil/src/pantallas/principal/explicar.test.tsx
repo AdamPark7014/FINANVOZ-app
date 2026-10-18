@@ -95,6 +95,7 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
     await escribir(golden('Q13').texto);
     const limite = await screen.findByTestId('explicacion-limite');
     expect(limite).toHaveTextContent(mensaje);
+    expect(limite.props.accessibilityRole).toBe('alert');
     expect(limite).not.toHaveTextContent('Por revisar');
     expect(screen.queryByTestId('explicacion-pie')).toBeNull();
   });
