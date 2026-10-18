@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **reconsentimiento / aviso-privacidad:** copy es-MX centralizado en `pantallas/privacidad/textos.ts` (`introReconsentimiento`, casillas, tips); componente `Reconsentimiento.tsx`; rutas `app/reconsentimiento.tsx` y `app/aviso-privacidad.tsx` (barrel); tests `reconsentimiento-textos.test.ts` — en remoto (`ab7822d`, barrel `e3fc441`).
+- **suscripciones:** copy §20 en `textos.ts`; pantalla enlazada; tests de textos; `index` reexporta como Plan; ayuda en plural.
 
 ## Hecho (acumulado reciente)
 
-- Invitación avisos, respaldo, ingreso UI. Ver `git log`.
+- Oleadas copy movil (Ajustes, plan, captura, ayuda). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (captura, estados-cuenta, principal, tandas) sin commitear.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno (principal, estados-cuenta, me-alcanza, tandas) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Oleadas copy captura/principal si Adam pide.
+2. Commits del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- WIP ajeno en working tree.
 
 ## Estimación rápida
 
