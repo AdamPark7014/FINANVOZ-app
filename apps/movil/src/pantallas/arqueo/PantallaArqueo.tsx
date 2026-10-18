@@ -74,7 +74,9 @@ export function PantallaArqueo({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">{TITULO}</Texto>
+        <Texto testID="arqueo-titulo" variante="titulo" accessibilityRole="header">
+          {TITULO}
+        </Texto>
         <Boton
           etiqueta={CERRAR}
           etiquetaAccesible={ACCESIBILIDAD_CERRAR}

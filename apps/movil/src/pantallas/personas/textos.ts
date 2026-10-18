@@ -5,6 +5,8 @@ import { formatearCentavos } from '../../ui';
 
 export const ETIQUETA_VOLVER = 'Volver';
 export const ETIQUETA_COBRAR = 'Cobrar';
+/** TalkBack en ficha cuando te deben (`02 §19`). */
+export const PISTA_COBRAR = 'Arma el mensaje para pedirle que te pague';
 export const ETIQUETA_YA_ME_PAGO = 'Ya me pagó';
 export const ETIQUETA_GUARDAR = 'Guardar';
 export const ETIQUETA_GUARDAR_Y_COBRAR = 'Guardar y cobrar';

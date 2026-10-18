@@ -61,6 +61,7 @@ describe('PantallaArqueo · vacío y errores', () => {
   it('sin cuenta de efectivo muestra el mensaje en arqueo-sin-efectivo', () => {
     const p = abrirPruebaPantalla();
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    expect(screen.getByTestId('arqueo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('arqueo-sin-efectivo')).toBe(TEXTO_SIN_CUENTA_EFECTIVO);
     expect(screen.getByTestId('arqueo-sin-efectivo')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('boton-cerrar-arqueo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
