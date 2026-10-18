@@ -28,6 +28,7 @@ import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../ser
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 import {
   BTN_NO_ES_MIA,
+  etiquetaVacioCapturasPorRevisar,
   PERMISO_DENEGADO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,

@@ -92,7 +92,11 @@ export const PISTA_VOLVER_DETALLE = 'Regresa a la lista de tandas';
 export const TEXTO_TANDA_NO_ENCONTRADA = 'No encontré esa tanda.';
 export const TEXTO_TANDA_ARCHIVADA = 'Archivada · ya no aparto aportaciones';
 export const ETIQUETA_YA_LA_DI = 'Ya la di';
+/** TalkBack al registrar la aportación del día (`02 §18`). */
+export const PISTA_YA_LA_DI = 'Registra que diste tu aportación de esta ronda';
 export const ETIQUETA_ME_TOCO = 'Me tocó la tanda';
+/** TalkBack al cobrar tu turno (`02 §18`). */
+export const PISTA_ME_TOCO = 'Registra el cobro; no cuenta como ingreso';
 export const TITULO_CALENDARIO = 'Calendario';
 export const SUFIJO_TU_TURNO = ' · tu turno';
 export const ETIQUETA_EDITAR_NOMBRE_CUENTA = 'Editar nombre o cuenta';

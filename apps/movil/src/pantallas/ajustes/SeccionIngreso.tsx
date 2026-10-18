@@ -6,6 +6,8 @@ import { useConfirmacionAlVolver } from './confirmacion';
 import {
   ETIQUETA_CAMBIAR_INGRESO,
   ETIQUETA_CONFIGURAR_INGRESO,
+  PISTA_CAMBIAR_INGRESO,
+  PISTA_CONFIGURAR_INGRESO,
   SECCION_INGRESO,
 } from './ingreso-textos';
 import { resumenIngreso } from './ingreso';

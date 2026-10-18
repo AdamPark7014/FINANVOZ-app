@@ -48,6 +48,10 @@ export const TEXTO_SIN_APPS_BANCO =
 export const TITULO_ELEGIR_APPS = '¿Qué apps de banco leo?';
 export const INTRO_ELEGIR_APPS = 'Solo leo las que marques.';
 
+export function etiquetaSinAppsBanco(): string {
+  return `${TITULO_ELEGIR_APPS}. ${TEXTO_SIN_APPS_BANCO}`;
+}
+
 export const LISTA_CAPTURA_ACTIVA = 'La captura automática está activa.';
 export const LISTA_CAPTURA_APPS = (nombres: readonly string[]) =>
   `Listo: anotaré lo que avisen ${nombres.join(', ')}.`;

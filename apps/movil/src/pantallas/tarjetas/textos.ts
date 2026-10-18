@@ -260,3 +260,23 @@ export function etiquetaSiLiquidar(descripcion: string): string {
 export function etiquetaAccesibleDato(etiqueta: string, valor: string): string {
   return `${etiqueta}: ${valor}`;
 }
+
+/** TalkBack: compra o pago en la lista del detalle. */
+export function etiquetaAccesibleMovimientoTarjeta(
+  titulo: string,
+  fecha: string,
+  monto: string,
+  esSalida: boolean,
+): string {
+  return `${titulo}, ${fecha}, ${esSalida ? 'gasto' : 'abono'} ${monto}`;
+}
+
+/** TalkBack: fila de compra a meses en el detalle. */
+export function etiquetaAccesiblePlanMsi(
+  descripcion: string,
+  cuota: string,
+  restantes: number,
+  meses: number,
+): string {
+  return `${descripcion}, ${cuota} al mes, faltan ${restantes} de ${meses}`;
+}

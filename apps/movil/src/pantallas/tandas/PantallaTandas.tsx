@@ -73,6 +73,7 @@ export function PantallaTandas({
                 variante="texto"
                 ancho="contenido"
                 alPresionar={() => alAbrirTanda(t.id)}
+                pista={PISTA_VER_CALENDARIO}
               />
             </Tarjeta>
           ))}

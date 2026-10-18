@@ -147,7 +147,11 @@ export function PantallaHoy({
           <Texto variante="etiqueta" tono="secundario">
             Tarjeta del día
           </Texto>
-          <Texto variante="cuerpo" testID="tarjeta-del-dia-texto">
+          <Texto
+            variante="cuerpo"
+            testID="tarjeta-del-dia-texto"
+            accessibilityLabel={etiquetaTarjetaDelDia(vista.tarjetaDelDia.texto)}
+          >
             {vista.tarjetaDelDia.texto}
           </Texto>
         </Tarjeta>

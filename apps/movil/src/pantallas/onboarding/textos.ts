@@ -94,8 +94,13 @@ export const AYUDA_COLCHON_ONB =
 export const ETIQUETA_COLCHON = 'Tu colchón';
 export const BTN_VER_MI_DIA = 'Ver mi día';
 export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
-export const TIP_COLCHON_SIN_POR_AHORA =
-  'Si hoy no quieres apartar nada, toca «Sin colchón por ahora»; lo configuras cuando quieras en Ajustes › Colchón.';
+export const PISTA_COLCHON_SALTAR = 'Termina el recorrido sin apartar colchón';
+export const PISTA_VER_MI_DIA = 'Termina el recorrido y abre tu día';
+
+/** TalkBack: el consejo no depende solo del color del texto secundario. */
+export function etiquetaTipOnboarding(tip: string): string {
+  return `Consejo: ${tip}`;
+}
 
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {

@@ -21,7 +21,7 @@ import {
   Cifra,
   espacio,
   etiquetaHablada,
-  formatearCentavos,
+  cifraEnPalabras,
   Pantalla,
   Tarjeta,
   Texto,

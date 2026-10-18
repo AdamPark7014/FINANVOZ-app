@@ -95,7 +95,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         pista={PISTA_VOLVER_DETALLE}
       />
       <View style={{ gap: espacio.xxs }}>
-        <Texto variante="titulo" testID="tanda-titulo">
+        <Texto variante="titulo" testID="tanda-titulo" accessibilityRole="header">
           {d.nombre}
         </Texto>
         {!d.activa ? (

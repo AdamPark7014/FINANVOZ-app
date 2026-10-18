@@ -205,6 +205,7 @@ export function TarjetaCapturaInactiva({ testID }: { testID: string }) {
             void puente.abrirAjustesPermiso();
           }}
           testID={`${testID}-revisar`}
+          etiquetaAccesible="Revisar acceso a notificaciones de tu banco"
         />
       ) : null}
     </Tarjeta>

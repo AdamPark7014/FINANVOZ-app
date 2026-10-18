@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../../ui/componentes/Chip';
 
 describe('Chip (TalkBack)', () => {
   it('radio: etiqueta hablada, selected sin checked, texto visible oculto', () => {

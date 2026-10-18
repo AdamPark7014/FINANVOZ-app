@@ -64,8 +64,10 @@ export function EditarIngreso({
         pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">{TITULO_EDITAR}</Texto>
-      <Texto variante="cuerpo" tono="secundario">
+      <Texto variante="titulo" testID="editar-ingreso-titulo" accessibilityRole="header">
+        {TITULO_EDITAR}
+      </Texto>
+      <Texto variante="cuerpo" tono="secundario" testID="editar-ingreso-intro">
         {INTRO_EDITAR}
       </Texto>
       <CamposIngreso formulario={formulario} prefijo="editar-ingreso" />

@@ -11,6 +11,9 @@ export const BTN_CANCELAR = 'Cancelar';
 
 export const BTN_CAMBIAR_COLCHON = 'Cambiar mi colchón';
 export const BTN_APARTAR_COLCHON = 'Apartar un colchón';
+export const PISTA_CAMBIAR_COLCHON = 'Abre el campo para cambiar cuánto apartas';
+export const PISTA_APARTAR_COLCHON =
+  'Abre el campo para apartar dinero que no cuenta para lo que puedes gastar';
 
 export const AYUDA_SIN_SUGERENCIA = 'Escribe 0 si no quieres colchón.';
 
