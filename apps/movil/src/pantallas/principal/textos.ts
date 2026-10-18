@@ -300,6 +300,19 @@ export const TEXTO_CUENTAS_COMPROMISOS_VACIO = 'No tienes pagos en los próximos
 
 export const SUBTITULO_CUENTAS_COMPROMISOS = 'Próximos 30 días';
 
+/** Vacíos de Cuentas: sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioCuentasTienes(): string {
+  return `Tienes. ${TEXTO_CUENTAS_TIENES_VACIO}`;
+}
+
+export function etiquetaVacioCuentasDebes(): string {
+  return `Debes. ${TEXTO_CUENTAS_DEBES_VACIO}`;
+}
+
+export function etiquetaVacioCuentasCompromisos(): string {
+  return `Compromisos. ${TEXTO_CUENTAS_COMPROMISOS_VACIO}`;
+}
+
 /** Contexto TalkBack de cada saldo en Cuentas (`02 §15`). */
 export function contextoSaldoTienes(nombre: string): string {
   return `En ${nombre} tienes`;

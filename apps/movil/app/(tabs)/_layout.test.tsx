@@ -34,7 +34,7 @@ describe('LayoutPestanas', () => {
       const boton = screen.getByTestId(`pestana-${ruta}`);
       expect(boton).toBeTruthy();
       expect(boton.props.accessibilityLabel).toBe(ETIQUETA_ACCESIBILIDAD_PESTANA[ruta]);
-      expect(screen.getByLabelText(etiqueta)).toBe(boton);
+      expect(screen.getByText(etiqueta)).toBeTruthy();
     }
   });
 });

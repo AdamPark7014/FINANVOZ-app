@@ -58,7 +58,7 @@ export default function Colchon() {
         testID="onb-colchon-monto"
         etiqueta={ETIQUETA_COLCHON}
         valorInicial={sugerido > 0 ? sugerido : null}
-        {...(sugerido > 0 ? { ayuda: ayudaSugerenciaColchonOnboarding(sugerido) } : {})}
+        {...(sugerido > 0 ? { ayuda: sugerenciaMontoColchon10(sugerido) } : {})}
         alCambiar={setMonto}
       />
       <MensajeError texto={error} />

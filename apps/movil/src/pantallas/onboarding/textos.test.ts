@@ -52,7 +52,7 @@ describe('textos de onboarding', () => {
   });
 
   it('O7 sugiere el 10 % con formato de pesos', () => {
-    expect(ayudaSugerenciaColchonOnboarding(130_000)).toBe(
+    expect(sugerenciaMontoColchon10(130_000)).toBe(
       'Te sugerimos $1,300: el 10 % de lo que te pagan.',
     );
   });

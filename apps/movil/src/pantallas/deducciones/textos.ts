@@ -39,7 +39,7 @@ export const TITULO_TUS_FACTURAS = 'Tus facturas';
 
 export const TITULO_FACTURAS_OCULTAS = 'Importadas por error';
 export const TEXTO_FACTURAS_OCULTAS =
-  'No cuentan en tu estimación. Puedes volver a mostrarlas.';
+  'No entran en tu estimación. Si fue un error, puedes volver a mostrarlas.';
 
 export const ETIQUETA_NO_DEDUCIBLES = 'No deducibles';
 
@@ -49,7 +49,7 @@ export const TEXTO_IMPORTAR_LEYENDO = 'Leyendo tus facturas…';
 
 /** Hoja de compartir sin archivos (`02 §24`). */
 export const TEXTO_IMPORTAR_VACIO =
-  'No llegó ningún archivo. Comparte el XML de la factura o un ZIP.';
+  'No llegó ningún archivo. Comparte el XML de la factura o un ZIP del SAT.';
 
 export const BTN_VER_DEDUCCIONES = 'Ver mis deducciones';
 export const ETIQUETA_IMPORTACION_LISTO = 'Listo';
