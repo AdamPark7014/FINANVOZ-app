@@ -44,6 +44,7 @@ import {
   etiquetaAccesibleDato,
   etiquetaAccesibleMovimientoTarjeta,
   etiquetaAccesiblePlanMsi,
+  etiquetaAccesibleBarraUsoTarjeta,
   etiquetaAccesibleUsoTarjeta,
   etiquetaVacioEstadosTarjeta,
   etiquetaSiLiquidar,

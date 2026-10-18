@@ -156,6 +156,12 @@ export const ETIQUETA_DISPONIBLE = 'Disponible';
 export function etiquetaAccesibleUsoTarjeta(porcentaje: number): string {
   return `Usas ${porcentaje} % de tu límite`;
 }
+
+/** TalkBack en la barra de uso: incluye límite y la marca del 30 % (el pie visual queda oculto). */
+export function etiquetaAccesibleBarraUsoTarjeta(porcentaje: number, limite: Centavos): string {
+  return `Usas ${porcentaje} % de tu límite de ${cifraEnPalabras(limite, 'pesos')}. La marca es el 30 %.`;
+}
+
 export function textoUsoLimiteTarjeta(porcentaje: number, limite: string): string {
   return `Usas ${porcentaje} % de tu límite de ${limite}. La marca es el 30 %.`;
 }
