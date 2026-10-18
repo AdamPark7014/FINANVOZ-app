@@ -176,7 +176,9 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         ancho="contenido"
         alPresionar={panel === 'ninguno' ? alVolver : () => setPanel('ninguno')}
       />
-      <Texto variante="titulo">{g.nombre}</Texto>
+      <Texto variante="titulo" testID="grupo-titulo" accessibilityRole="header">
+        {g.nombre}
+      </Texto>
       <Texto variante="subtitulo" testID="grupo-saldo" accessibilityLabel={etiquetaHablada(g.saldo.texto)}>
         {g.saldo.texto}
       </Texto>

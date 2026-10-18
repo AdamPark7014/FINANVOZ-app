@@ -8,6 +8,7 @@ import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
 import { PantallaRegistrar } from './PantallaRegistrar';
+import { PISTA_REVISAR_FRASE } from './textos';
 
 const HOY = '2026-10-11';
 const TACOS_Y_COCA = 'me eché unos tacos de 80 con la Nu y una coca de 25 en efectivo';
