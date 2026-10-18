@@ -75,13 +75,28 @@ export function pistaPreguntaFrecuente(abierta: boolean): string {
 /** TalkBack: región de texto al expandir una pregunta (antes del contenido). */
 export const ETIQUETA_RESPUESTA = 'Respuesta';
 
+/** TalkBack: instrucción bajo el título de la pantalla. */
+export function etiquetaAccesibleIntro(): string {
+  return INTRO;
+}
+
 function correoEnPalabras(correo: string): string {
   return correo.replace('@', ' arroba ').replace(/\./g, ' punto ');
 }
 
+/** TalkBack: respuestas de la FAQ — cifras en pesos, rutas sin el separador «›» (`02 §15`). */
+function textoFaqHablado(parrafo: string): string {
+  return etiquetaHablada(parrafo)
+    .replace(/ › /g, ', sección ')
+    .replace(/\b48 h\b/g, 'cuarenta y ocho horas')
+    .replace(/\b3 días\b/g, 'tres días')
+    .replace(/\bversión 4\.0\b/gi, 'versión cuatro punto cero')
+    .replace(/archivo \.cartera/g, 'archivo punto cartera');
+}
+
 /** TalkBack: párrafo de la FAQ abierta; el primero lleva el encabezado «Respuesta». */
 export function etiquetaAccesibleParrafoRespuesta(parrafo: string, esPrimero: boolean): string {
-  const cuerpo = etiquetaHablada(parrafo);
+  const cuerpo = textoFaqHablado(parrafo);
   return esPrimero ? `${ETIQUETA_RESPUESTA}. ${cuerpo}` : cuerpo;
 }
 

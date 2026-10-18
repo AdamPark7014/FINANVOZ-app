@@ -12,6 +12,7 @@ import {
   etiquetaAccesibleParrafoRespuesta,
   etiquetaAccesibleSinAppCorreo,
   ETIQUETA_VOLVER,
+  etiquetaAccesibleIntro,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
   INTRO,
@@ -59,14 +60,19 @@ export function PantallaAyuda({
       <Texto variante="titulo" testID="ayuda-titulo" accessibilityRole="header">
         {TITULO}
       </Texto>
-      <Texto variante="cuerpo" tono="secundario" testID="ayuda-intro">
+      <Texto
+        variante="cuerpo"
+        tono="secundario"
+        testID="ayuda-intro"
+        accessibilityLabel={etiquetaAccesibleIntro()}
+      >
         {INTRO}
       </Texto>
       <Texto variante="subtitulo" testID="ayuda-preguntas-titulo" accessibilityRole="header">
         {PREGUNTAS_TITULO}
       </Texto>
 
-      <View style={{ gap: espacio.s }} testID="ayuda-preguntas">
+      <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityRole="list">
         {PREGUNTAS_FRECUENTES.map((p) => (
           <Pregunta
             key={p.id}
@@ -102,6 +108,7 @@ export function PantallaAyuda({
             tono="faltante"
             accessibilityRole="alert"
             accessibilityLiveRegion="polite"
+            importantForAccessibility="yes"
             accessibilityLabel={etiquetaAccesibleSinAppCorreo(CORREO_AYUDA)}
             testID="ayuda-sin-correo"
           >

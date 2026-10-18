@@ -6,6 +6,7 @@ import {
   BTN_ABRIR_DESDE_AJUSTES,
   BTN_AYUDA,
   etiquetaAccesibleCuerpoContacto,
+  etiquetaAccesibleIntro,
   etiquetaAccesibleParrafoRespuesta,
   etiquetaAccesibleSinAppCorreo,
   ETIQUETA_RESPUESTA,
@@ -59,5 +60,8 @@ describe('textos de ayuda', () => {
     expect(etiquetaAccesibleSinAppCorreo(CORREO_AYUDA)).toMatch(/arroba/);
     expect(etiquetaAccesibleParrafoRespuesta('Hola.', true)).toMatch(/^Respuesta\./);
     expect(etiquetaAccesibleParrafoRespuesta('Hola.', false)).toBe('Hola.');
+    expect(etiquetaAccesibleIntro()).toBe(INTRO);
+    expect(etiquetaAccesibleParrafoRespuesta('Ve a Ajustes › Captura.', true)).toMatch(/sección Captura/);
+    expect(etiquetaAccesibleParrafoRespuesta('Espera 48 h.', false)).toMatch(/cuarenta y ocho horas/);
   });
 });

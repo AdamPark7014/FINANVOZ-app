@@ -16,6 +16,7 @@ import {
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
   etiquetaAccesibleCuerpoContacto,
+  etiquetaAccesibleIntro,
   etiquetaAccesibleParrafoRespuesta,
   etiquetaAccesibleSinAppCorreo,
   ETIQUETA_VOLVER,
@@ -132,6 +133,24 @@ describe('pantalla de ayuda', () => {
     // El "$1,000" de tarjetas se lee en palabras.
     fireEvent.press(screen.getByTestId('ayuda-pregunta-tarjetas'));
     expect(screen.getByText(/\$1,000/)).toHaveProp('accessibilityLabel', expect.stringMatching(/mil pesos/));
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
+  });
+
+  it('TalkBack: rutas y plazos en respuestas se leen en palabras', () => {
+    render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={jest.fn(async () => {})} />);
+    fireEvent.press(screen.getByTestId('ayuda-pregunta-captura'));
+    const captura = PREGUNTAS_FRECUENTES.find((p) => p.id === 'captura')!;
+    expect(screen.getByText(captura.respuesta[0])).toHaveProp(
+      'accessibilityLabel',
+      expect.stringMatching(/sección Captura/),
+    );
+    expect(screen.getByText(captura.respuesta[0]).props.accessibilityLabel).not.toContain('›');
+    fireEvent.press(screen.getByTestId('ayuda-pregunta-efectivo'));
+    const efectivo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'efectivo')!;
+    expect(screen.getByText(efectivo.respuesta[0])).toHaveProp(
+      'accessibilityLabel',
+      expect.stringMatching(/cuarenta y ocho horas/),
+    );
   });
 
   it('"Escribir un correo" abre el mailto sin datos de la persona', async () => {
@@ -156,6 +175,8 @@ describe('pantalla de ayuda', () => {
     expect(abrir).toHaveBeenCalledWith(enlaceCorreoAyuda());
     expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(mensajeSinAppCorreo(CORREO_AYUDA));
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp(
       'accessibilityLabel',
       etiquetaAccesibleSinAppCorreo(CORREO_AYUDA),
@@ -177,6 +198,8 @@ describe('pantalla de ayuda', () => {
     expect(screen.getByTestId('ayuda-titulo')).toHaveTextContent(TITULO);
     expect(screen.getByTestId('ayuda-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ayuda-intro')).toHaveTextContent(INTRO);
+    expect(screen.getByTestId('ayuda-intro')).toHaveProp('accessibilityLabel', etiquetaAccesibleIntro());
+    expect(screen.getByTestId('ayuda-preguntas')).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId('ayuda-preguntas-titulo')).toHaveTextContent(PREGUNTAS_TITULO);
     expect(screen.getByTestId('ayuda-preguntas-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveTextContent(CONTACTO_TITULO);
