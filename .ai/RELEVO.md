@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **Me alcanza / tandas / suscripciones (UI):** copy centralizado, vacíos con `EstadoVacio` + etiquetas TalkBack, pistas en lista (nueva tanda, calendario, cancelar/cerrar en me-alcanza), inactivas suscripciones; quita import duplicado en `tandas.test.tsx`.
+- **Tandas:** copy y pistas TalkBack en lista/detalle (volver, nueva, calendario, ya la di, me tocó); vacío con `EstadoVacio`; test aserta `PISTA_ME_TOCO`.
 
 ## Hecho (acumulado reciente)
 
-- Hoy, Cuentas, captura, ayuda, deducciones. Ver `git log`.
+- Onboarding tips, ayuda/captura/suscripciones a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`git status`): no mezclar.
-- CA-M6-05 probabilidad: intermitente en local.
-- M0 / EAS: Adam.
+- Muchos archivos WIP en `git status` (otros turnos) — no commitear sin revisar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `accessibilityHint` en botones tandas/compartidos desde Cuentas (paridad suscripciones).
+2. Salvar o commitear WIP suelto en tests/UI.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 

@@ -10,7 +10,7 @@ import {
   unirseConQr,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, EstadoVacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';

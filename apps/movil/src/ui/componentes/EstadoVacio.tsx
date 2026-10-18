@@ -22,7 +22,7 @@ export function EstadoVacio({
       testID={testID}
       accessibilityRole="text"
       accessibilityLiveRegion="polite"
-      accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(texto)}
+      accessibilityLabel={etiquetaAccesible ?? etiquetaEstadoVacio(texto)}
     >
       {texto}
     </Texto>

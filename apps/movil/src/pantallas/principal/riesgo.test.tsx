@@ -57,6 +57,11 @@ describe('ProbabilidadHoy · TalkBack', () => {
   it('calculando expone etiqueta y liveRegion para TalkBack', () => {
     const p = conEscenario('e4-01');
     activarPlus(p.ctx);
+    const efectivo = p.e.cuentas['efectivo'] as string;
+    for (let f: PlainDate = '2026-10-11'; f < '2026-11-25'; f = sumarDias(f, 1)) {
+      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
+    }
+    p.reloj.fijar('2026-10-31');
     montar(
       p.ctx,
       <ProbabilidadHoy bloques={{ ceder: () => new Promise(() => undefined) }} hora={() => '10:00'} />,

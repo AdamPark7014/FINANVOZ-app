@@ -15,6 +15,11 @@ export const BTN_COMPARTIDOS_CUENTAS = 'Gastos con tu pareja';
 /** Sin grupos vinculados (`02 §27`). */
 export const TEXTO_COMPARTIDOS_VACIO =
   'Crea un grupo con tu pareja o escanea su código. Los dos ven lo compartido; cada quien conserva su libro privado.';
+
+/** Vacío de lista: título de pantalla + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioCompartidos(): string {
+  return `${TITULO_GASTOS_COMPARTIDOS}. ${TEXTO_COMPARTIDOS_VACIO}`;
+}
 export const AVISO_REVINCULAR_LISTA = 'Vuelve a vincular este teléfono';
 export const BTN_CREAR_CON_ALGUIEN = 'Crear con alguien';
 export const BTN_ESCANEAR_CODIGO = 'Escanear código';
