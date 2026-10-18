@@ -26,6 +26,7 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
+import { parsearProporcionReparto } from './textos';
 
 // La cámara falsa "lee" el QR que la prueba deja en `mockQr` al tocarla.
 let mockQr = '';
@@ -293,6 +294,33 @@ describe('02 §27 · Gastos con tu pareja', () => {
       { titulo: 'Súper', anulado: false },
     ]);
     A.cerrar();
+  });
+
+  it('pendiente 148 · otra proporción 55/45 y categorías del libro', async () => {
+    expect(parsearProporcionReparto('55/45')).toEqual({ ok: true, miParteBp: 5500 });
+    expect(parsearProporcionReparto('70 / 20').ok).toBe(false);
+
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    const B = telefono(servidor, 'usuario-b');
+    const grupo = await vincular(A, B);
+
+    const b = en(B, <PantallaGrupoCompartido grupoId={grupo} alVolver={jest.fn()} />);
+    await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Están a mano'));
+    fireEvent.press(screen.getByTestId('grupo-agregar'));
+    expect(screen.getByTestId('compartido-categoria-transporte')).toBeTruthy();
+    fireEvent.changeText(screen.getByTestId('compartido-total'), '1000');
+    fireEvent.changeText(screen.getByTestId('compartido-descripcion'), 'Uber');
+    fireEvent.press(screen.getByTestId('compartido-categoria-transporte'));
+    fireEvent.changeText(screen.getByTestId('compartido-reparto-otra'), '55/45');
+    fireEvent.press(screen.getByTestId(`compartido-cuenta-${B.cuenta}`));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('compartido-guardar'));
+    });
+    await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Ana te debe $450'));
+    b.unmount();
+    A.cerrar();
+    B.cerrar();
   });
 
   it('el QR se dibuja con tramos que cubren cada fila', () => {

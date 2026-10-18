@@ -11,7 +11,15 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
-import { etiquetaReparto, OPCIONES_CATEGORIA, OPCIONES_REPARTO, resumenGastoCompartido } from './textos';
+import {
+  AYUDA_PROPORCION,
+  EJEMPLO_PROPORCION,
+  ETIQUETA_OTRA_PROPORCION,
+  formatoProporcionReparto,
+  OPCIONES_REPARTO,
+  parsearProporcionReparto,
+  resumenGastoCompartido,
+} from './textos';
 
 type Quien = 'yo' | 'otro';
 
@@ -43,30 +51,63 @@ export function FormularioGastoCompartido({
   const [quien, setQuien] = useState<Quien | null>(
     prellenado ? (prellenado.pagueYo === null ? null : prellenado.pagueYo ? 'yo' : 'otro') : 'yo',
   );
-  const [reparto, setReparto] = useState<number | null>(prellenado?.miParteBp ?? 5000);
+  const repartoInicial = prellenado?.miParteBp ?? 5000;
+  const repartoEnChips = OPCIONES_REPARTO.some((o) => o.valor === repartoInicial);
+  const [reparto, setReparto] = useState<number | null>(repartoInicial);
+  const [otraProporcion, setOtraProporcion] = useState(
+    prellenado && !repartoEnChips ? formatoProporcionReparto(repartoInicial) : '',
+  );
+  const [otraActiva, setOtraActiva] = useState(Boolean(prellenado && !repartoEnChips));
+  const [errorProporcion, setErrorProporcion] = useState<string | null>(null);
   const [cuentaId, setCuentaId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Lo dictado puede traer una categoría o un reparto que no están entre los chips de siempre.
-  const opcionesCategoria = [...OPCIONES_CATEGORIA];
+  const opcionesCategoria = categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }));
   if (prellenado && !opcionesCategoria.some((o) => o.valor === prellenado.categoria)) {
     const nombre = categorias.find((c) => c.slug === prellenado.categoria)?.nombre ?? prellenado.categoria;
     opcionesCategoria.unshift({ valor: prellenado.categoria, etiqueta: nombre });
   }
-  const opcionesReparto = [...OPCIONES_REPARTO];
-  if (prellenado && !opcionesReparto.some((o) => o.valor === prellenado.miParteBp)) {
-    opcionesReparto.push({ valor: prellenado.miParteBp, etiqueta: etiquetaReparto(prellenado.miParteBp) });
-  }
+
+  const elegirRepartoChip = (bp: number) => {
+    setOtraActiva(false);
+    setOtraProporcion('');
+    setErrorProporcion(null);
+    setReparto(bp);
+  };
+
+  const cambiarOtraProporcion = (texto: string) => {
+    setOtraActiva(true);
+    setOtraProporcion(texto);
+    const r = parsearProporcionReparto(texto);
+    setErrorProporcion(r.ok ? null : texto.trim() === '' ? null : r.mensaje);
+    setReparto(r.ok ? r.miParteBp : null);
+  };
+
+  const miParteBpAlGuardar = (): number | null => {
+    if (otraActiva) {
+      const r = parsearProporcionReparto(otraProporcion);
+      if (!r.ok) {
+        setErrorProporcion(r.mensaje);
+        return null;
+      }
+      return r.miParteBp;
+    }
+    return reparto;
+  };
+
+  const repartoOtra = otraActiva ? parsearProporcionReparto(otraProporcion) : null;
+  const miParteBpVista = repartoOtra?.ok ? repartoOtra.miParteBp : reparto;
 
   const guardar = () => {
     if (total === null || total <= 0) return setError('Escribe cuánto fue el gasto.');
-    if (categoria === null || quien === null || reparto === null)
+    const miParteBp = miParteBpAlGuardar();
+    if (categoria === null || quien === null || miParteBp === null)
       return setError('Elige en qué fue, quién pagó y cómo se reparte.');
     try {
       agregarGastoCompartido(ctx, deps, grupoId, {
         total,
         pagueYo: quien === 'yo',
-        miParteBp: reparto,
+        miParteBp,
         descripcion: descripcion.trim(),
         categoria,
         ...(quien === 'yo' && cuentaId ? { cuentaId } : {}),
@@ -88,7 +129,7 @@ export function FormularioGastoCompartido({
             descripcion: descripcion.trim(),
             total,
             pagueYo: quien === null ? null : quien === 'yo',
-            miParteBp: reparto,
+            miParteBp: miParteBpVista,
           })}
         </Texto>
       ) : null}
@@ -125,9 +166,18 @@ export function FormularioGastoCompartido({
       <Chips
         testID="compartido-reparto"
         etiqueta="¿Cómo se reparte?"
-        opciones={opcionesReparto}
-        valor={reparto}
-        alCambiar={setReparto}
+        opciones={OPCIONES_REPARTO}
+        valor={otraActiva ? null : reparto}
+        alCambiar={elegirRepartoChip}
+      />
+      <CampoTexto
+        testID="compartido-reparto-otra"
+        etiqueta={ETIQUETA_OTRA_PROPORCION}
+        valor={otraProporcion}
+        alCambiar={cambiarOtraProporcion}
+        ejemplo={EJEMPLO_PROPORCION}
+        ayuda={AYUDA_PROPORCION}
+        error={errorProporcion}
       />
       {quien === 'yo' && cuentas.length > 0 ? (
         <Chips
