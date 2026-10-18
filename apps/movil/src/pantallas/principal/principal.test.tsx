@@ -244,7 +244,7 @@ describe('Registrar', () => {
       </>,
     );
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
-    expect(screen.getByTestId('movimientos-vacio')).toBeTruthy();
+    expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_VACIO);
 
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
