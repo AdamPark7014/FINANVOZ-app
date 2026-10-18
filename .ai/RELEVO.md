@@ -6,24 +6,23 @@
 
 ## Hecho en este turno
 
-- **Ajustes › Ingreso y Colchón:** encabezados TalkBack (`header`) en tarjetas de sección; copy `RESUMEN_SIN_INGRESO`; tests `ingreso-colchon.test.tsx` (pistas y títulos ya en main).
+- **Suscripciones a11y:** `etiquetaVacioSuscripciones`; vacío con `EstadoVacio` + live region; test en `suscripciones.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Pistas en botones ingreso/colchón, `EditarIngreso` header, widget, Cuentas. Ver `git log`.
+- Persona / estado cuenta / Movimientos vacíos TalkBack, tabs a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno: onboarding routes, Movimientos, personas.test, PreviaWidget (no commitear sin revisar).
-- Pantallas negocio (M11) aún no en UI.
+- WIP sin commitear (no tocar): `hoy-textos`, onboarding cuentas/pagos-fijos, `principal.test`, `Boton`, `CampoTexto`, captura/principal varios.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar o descartar WIP ajeno en disco.
-3. M11 negocio cuando toque el hito.
+2. Rescatar/cerrar WIP local sin pisar.
+3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
 
