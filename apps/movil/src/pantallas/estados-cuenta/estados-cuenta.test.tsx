@@ -25,6 +25,7 @@ import {
   mensajeNoReconocido,
   MENSAJE_ESCANEADO,
   MENSAJE_INVALIDO,
+  etiquetaVacioSinNuevosEstado,
   TEXTO_SIN_NUEVOS,
   tituloNuevos,
   TITULO_PANTALLA,
@@ -158,6 +159,9 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
       /: 42 movimientos; ya tenías todos; el saldo al corte coincide$/,
     );
     expect(screen.getByTestId('estado-sin-nuevos')).toHaveTextContent(TEXTO_SIN_NUEVOS);
+    expect(screen.getByTestId('estado-sin-nuevos').props.accessibilityLabel).toBe(
+      etiquetaVacioSinNuevosEstado(),
+    );
   });
 
   it('quitar un nuevo de la lista no lo agrega', async () => {
