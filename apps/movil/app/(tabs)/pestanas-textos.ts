@@ -8,6 +8,13 @@ export const ETIQUETA_ACCESIBILIDAD_PESTANA = {
   cuentas: 'Pestaña Cuentas, efectivo, tarjetas y deudas',
 } as const;
 
+/** Contenedor de la ruta activa: mismo contexto que la pestaña, sin prefijo "Pestaña" (TalkBack §15). */
+export const ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA = {
+  hoy: 'Hoy, resumen de tu día',
+  movimientos: 'Movimientos, historial de movimientos',
+  cuentas: 'Cuentas, efectivo, tarjetas y deudas',
+} as const satisfies Record<keyof typeof ETIQUETA_ACCESIBILIDAD_PESTANA, string>;
+
 export type RutaPestanaVisible = keyof typeof ETIQUETA_ACCESIBILIDAD_PESTANA;
 
 /** Rol TalkBack de cada botón en la barra inferior (no confundir con el contenedor de la pantalla). */

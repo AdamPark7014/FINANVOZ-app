@@ -31,16 +31,16 @@ export default function Colchon() {
     <PasoOnboarding
       testID="onb-colchon"
       paso={7}
-      titulo="¿Cuánto quieres no tocar nunca?"
-      ayuda="Tu colchón no cuenta para lo que puedes gastar. Lo cambias cuando quieras en Ajustes › Colchón."
+      titulo={TITULO_COLCHON}
+      ayuda={AYUDA_COLCHON_ONB}
       tip={TIP_COLCHON_SIN_POR_AHORA}
       pie={
         <>
-          <Boton testID="onb-ver-mi-dia" etiqueta="Ver mi día" alPresionar={() => terminar(monto ?? 0)} />
+          <Boton testID="onb-ver-mi-dia" etiqueta={BTN_VER_MI_DIA} alPresionar={() => terminar(monto ?? 0)} />
           <Boton
             testID="onb-colchon-saltar"
             variante="texto"
-            etiqueta="Sin colchón por ahora"
+            etiqueta={BTN_SIN_COLCHON_POR_AHORA}
             alPresionar={() => terminar(0)}
           />
         </>

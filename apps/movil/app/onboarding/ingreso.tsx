@@ -7,8 +7,23 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
-import { TIP_INGRESO_SALTAR } from '../../src/pantallas/onboarding/tips';
-import { BTN_ONB_CONTINUAR, TITULO_INGRESO } from '../../src/pantallas/onboarding/textos';
+import {
+  AYUDA_MONTO_INGRESO,
+  BTN_ONB_CONTINUAR,
+  BTN_ONB_SALTAR,
+  CUERPO_INGRESO_VARIABLE,
+  EJEMPLO_DIA_MES_INGRESO,
+  ERROR_DIA_MES_INGRESO,
+  ETIQUETA_DIA_MES_INGRESO,
+  ETIQUETA_DIA_SEMANA_INGRESO,
+  ETIQUETA_FIN_DE_SEMANA_INGRESO,
+  ETIQUETA_MONTO_INGRESO,
+  ETIQUETA_PROXIMA_VEZ_INGRESO,
+  ETIQUETA_PROXIMO_PAGO,
+  PISTA_INGRESO_SALTAR,
+  TIP_INGRESO_SALTAR,
+  TITULO_INGRESO,
+} from '../../src/pantallas/onboarding/textos';
 import {
   conceptoIngreso,
   leerDiaMes,

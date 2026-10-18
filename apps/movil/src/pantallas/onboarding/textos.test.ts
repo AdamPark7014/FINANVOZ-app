@@ -48,6 +48,12 @@ describe('textos de onboarding', () => {
     expect(AYUDA_BIENVENIDA).toMatch(/\btu\b/i);
   });
 
+  it('O7 sugiere el 10 % con formato de pesos', () => {
+    expect(ayudaSugerenciaColchonOnboarding(130_000)).toBe(
+      'Te sugerimos $1,300: el 10 % de lo que te pagan.',
+    );
+  });
+
   it('TalkBack del progreso describe el recorrido inicial', () => {
     expect(textoProgresoOnboarding(1)).toBe('Paso 1 de 7');
     expect(PASOS_ONBOARDING).toBe(7);

@@ -260,7 +260,7 @@ function Seccion({
   testID: string;
 }) {
   return (
-    <View style={{ gap: espacio.s }} testID={testID} accessibilityLabel={titulo} accessible>
+    <View style={{ gap: espacio.s }} testID={testID}>
       <Texto variante="subtitulo" testID={`${testID}-titulo`}>
         {titulo}
       </Texto>

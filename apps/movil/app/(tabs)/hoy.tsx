@@ -6,7 +6,7 @@ import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacio
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaHoy, paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
-import { ETIQUETA_ACCESIBILIDAD_PESTANA, TEST_ID_TAB_HOY } from './hoy-textos';
+import { propsContenedorPestana } from './pestanas-textos';
 
 export default function Hoy() {
   const router = useRouter();

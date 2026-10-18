@@ -92,7 +92,7 @@ export default function PagosFijos() {
       pie={
         <Boton
           testID="onb-pagos-continuar"
-          etiqueta={agregados.length > 0 ? 'Continuar' : 'Saltar por ahora'}
+          etiqueta={agregados.length > 0 ? BTN_ONB_CONTINUAR : BTN_ONB_SALTAR}
           variante={agregados.length > 0 ? 'primario' : 'secundario'}
           alPresionar={() => router.push('/onboarding/captura')}
         />

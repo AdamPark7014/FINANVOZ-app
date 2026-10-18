@@ -6,7 +6,7 @@ import {
   PantallaMovimientos,
   type ParamsMovimientos,
 } from '../../src/pantallas/principal';
-import { ETIQUETA_ACCESIBILIDAD_PESTANA, TEST_ID_PANTALLA_PESTANA } from './pestanas-textos';
+import { propsContenedorPestana } from './pestanas-textos';
 
 /** Pestaña Movimientos (`02 §10`): filtro y detalle solo vía parámetros de ruta (regla 9). */
 export default function Movimientos() {
