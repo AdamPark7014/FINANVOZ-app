@@ -287,6 +287,13 @@ describe('Tarjetas', () => {
     expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
+  it('tarjeta inexistente: volver usa la misma pista TalkBack', () => {
+    const p = conEscenario('e4-01');
+    montar(p.ctx, <PantallaTarjeta tarjetaId="contraparte:tarjeta:inexistente" alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tarjeta-no-encontrada')).toHaveTextContent(TEXTO_TARJETA_NO_ENCONTRADA);
+    expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
   it('sin MSI ni movimientos muestra el copy vacío de textos.ts', () => {
     const p = conEscenario('e4-01');
     const nu = p.e.cuentas.nu as string;

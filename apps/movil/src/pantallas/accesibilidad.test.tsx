@@ -160,7 +160,11 @@ describe('accesibilidad (CA-M7-05)', () => {
     fireEvent.press(screen.getByTestId('arqueo-otra'));
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '700');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
-    expect(screen.getByText('Traes $60 más de lo esperado. ¿De dónde salió?')).toBeTruthy();
+    expect(
+      screen.getByRole('radiogroup', {
+        name: 'Traes sesenta pesos más de lo esperado. ¿De dónde salió?',
+      }),
+    ).toBeTruthy();
     sinHallazgos();
     p.cerrar();
   });

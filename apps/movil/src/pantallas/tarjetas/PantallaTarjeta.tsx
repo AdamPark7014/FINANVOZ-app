@@ -80,6 +80,7 @@ export function PantallaTarjeta({
     return (
       <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
         <Boton
+          testID="tarjeta-volver"
           etiqueta={BTN_VOLVER}
           variante="texto"
           ancho="contenido"

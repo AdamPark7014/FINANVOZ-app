@@ -6,28 +6,29 @@
 
 ## Hecho en este turno
 
-- **Onboarding tips:** `TIP_*` viven solo en `tips.ts`; `textos.ts` reexporta sin duplicar (evita ciclo tips↔textos y fallos en `textos.test` / `tips.test`).
+- **Movimientos TalkBack:** `movimientos-titulo`, encabezados por día, filtro con `etiquetaFiltroMovimientosActivo`, filas con `cifraEnPalabras`; pruebas en `principal.test.tsx`.
+- **Fix menor:** duplicado `etiquetaVacioSuscripciones` en `suscripciones/textos.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Captura por revisar a11y, suscripciones TalkBack, widget previa. Ver `git log`.
+- Cuentas/personas/captura headers, onboarding tips, deducciones importar. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
-- WIP suelto (`git status`) de otros hilos — no mezclar.
+- Typecheck móvil: otros TS pendientes en repo — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Copy O6 captura centralizado si falta fuera de `tips.ts`.
+2. Headers TalkBack en pantallas restantes si hace falta.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

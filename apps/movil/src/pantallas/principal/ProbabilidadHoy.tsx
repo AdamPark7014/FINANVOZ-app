@@ -10,6 +10,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
+import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
 import { useNotificaciones } from '../avisos/notificaciones';
 
