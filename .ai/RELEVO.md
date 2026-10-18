@@ -6,22 +6,21 @@
 
 ## Hecho en este turno
 
-- **Personas TalkBack:** etiqueta accesible en persona no encontrada; live region en detalle del reparto de cuenta dividida.
+- **PantallaMovimientos TalkBack:** pistas en Anular / Sí anular; confirmación con `alert` + live region; pistas de fila en `textos.ts`; tests en `principal.test.tsx` e `interpretacion-textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Live region en division-faltan/partes, recordatorio cobro, vacíos contactos. Ver `git log`.
+- ActivarCaptura, PreviaWidget, captura Hoy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP onboarding, captura, suscripciones, principal — otros turnos, no mezclar.
-- WIP `componentes.test.tsx` (Boton/Chip hints).
+- WIP ayuda/me-alcanza (4 archivos sin commitear del turno anterior) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack aviso retiro tarjeta en formulario movimiento o errores live region en `ActivarCaptura`.
+2. TalkBack aviso retiro tarjeta en formulario movimiento.
 
 ## No tocar
 
