@@ -1,28 +1,26 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-17
+- **Fecha:** 2026-10-18
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Captura por revisar:** `testID="capturas-por-revisar-titulo"` + aserción de `accessibilityRole="header"` en estado vacío (`captura.test.tsx`).
+- **Ajustes › Ingreso y Colchón:** ya en `682a231` — headers TalkBack en secciones, copy `RESUMEN_SIN_INGRESO`, tests hints/títulos; pistas y `EditarIngreso` header en commits previos (`8088eb3`, `fddf40f`).
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones/tarjetas TalkBack, vacío captura, Cuentas/Hoy. Ver `git log`.
+- Hoy alert TalkBack `71d133a`, Cuentas/captura `682a231`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes.
+- WIP local: ProbabilidadHoy, tandas/tarjetas tests, RELEVO sin commitear.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `git status` antes de editar (relevo / WIP paralelo).
-3. Centralizar copy onboarding restante.
+2. No mezclar WIP local ajeno.
 
 ## No tocar
 
