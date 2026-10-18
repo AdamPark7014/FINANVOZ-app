@@ -20,6 +20,7 @@ import {
   TITULO_COLCHON,
   TITULO_CONSENTIMIENTO,
   TIP_CAPTURA_AHORA_NO,
+  TIP_CONSENTIMIENTO,
   TIP_COLCHON_SIN_POR_AHORA,
   TIP_CUENTAS_MINIMO,
   TIP_INGRESO_SALTAR,
@@ -99,7 +100,8 @@ describe('textos de onboarding', () => {
     expect(TIP_COLCHON_SIN_POR_AHORA).toMatch(/«Sin colchón por ahora»/);
   });
 
-  it('O6 tip de captura se reexporta desde textos', () => {
+  it('O2 y O6 tips se reexportan desde textos (fuente tips.ts)', () => {
+    expect(TIP_CONSENTIMIENTO).toMatch(/«Aceptar y continuar»/);
     expect(TIP_CAPTURA_AHORA_NO).toMatch(/«Ahora no»/);
     expect(TIP_CAPTURA_AHORA_NO).toMatch(/Ajustes › Captura/);
   });

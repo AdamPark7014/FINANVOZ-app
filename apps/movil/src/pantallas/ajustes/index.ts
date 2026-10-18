@@ -18,6 +18,7 @@ export {
   TEXTO_PRIVACIDAD,
   TITULO,
   MENSAJE_NO_GUARDAR,
+  PISTA_AYUDA,
   PISTA_VOLVER,
   etiquetaAccesibilidadVersion,
   etiquetaCargarEscenario,

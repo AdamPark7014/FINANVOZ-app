@@ -309,6 +309,9 @@ export const TEXTO_POR_REVISAR =
   'Las interpreto cuando tengas internet. Si ya lo registraste a mano, descártala.';
 export const TEXTO_MOVIMIENTOS_FILTRO_ACTIVO = 'Solo los movimientos de tu pregunta.';
 
+/** CTA «Registrar» en la pestaña Movimientos (`02 §15`). */
+export const PISTA_REGISTRAR_MOVIMIENTO = 'Abre el formulario para registrar un gasto o ingreso';
+
 /** Filtro de consulta activo en Movimientos (`06 §6`, TalkBack). */
 export function etiquetaFiltroMovimientosActivo(): string {
   return `Movimientos. ${TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}`;

@@ -33,8 +33,8 @@ describe('textos de ayuda', () => {
   it('iconos de expandir y mensajes de contacto son estables', () => {
     expect(ICONO_PREGUNTA_CERRADA).toBe('+');
     expect(ICONO_PREGUNTA_ABIERTA).toBe('−');
-    expect(pistaPreguntaFrecuente(false)).toMatch(/Muestra/);
-    expect(pistaPreguntaFrecuente(true)).toMatch(/Oculta/);
+    expect(pistaPreguntaFrecuente(false)).toMatch(/Despliega/);
+    expect(pistaPreguntaFrecuente(true)).toMatch(/Pliega/);
     expect(textoCuerpoContacto(CORREO_AYUDA)).toContain(CORREO_AYUDA);
     expect(mensajeSinAppCorreo(CORREO_AYUDA)).toContain(CORREO_AYUDA);
   });

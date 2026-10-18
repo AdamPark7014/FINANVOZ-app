@@ -61,9 +61,9 @@ export function mensajeSinAppCorreo(correo: string): string {
   return `No encontré una app de correo en tu teléfono. Escríbenos desde tu correo a ${correo}.`;
 }
 
-/** Pista al expandir o cerrar una pregunta frecuente. */
+/** Pista TalkBack al expandir o cerrar una pregunta frecuente. */
 export function pistaPreguntaFrecuente(abierta: boolean): string {
-  return abierta ? 'Oculta la respuesta' : 'Muestra la respuesta';
+  return abierta ? 'Pliega la respuesta' : 'Despliega la respuesta';
 }
 
 /**

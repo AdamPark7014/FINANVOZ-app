@@ -67,10 +67,9 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     expect(previa.props.accessibilityRole).toBe('summary');
     expect(previa.props.accessibilityLabel).toBe('Hoy puedes doscientos catorce pesos · 4 días');
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
-    expect(
-      within(previa).getByTestId('previa-widget-fila', { includeHiddenElements: true }).props
-        .importantForAccessibility,
-    ).toBe('no-hide-descendants');
+    const fila = within(previa).getByTestId('previa-widget-fila', { includeHiddenElements: true });
+    expect(fila.props.accessibilityElementsHidden).toBe(true);
+    expect(fila.props.importantForAccessibility).toBe('no-hide-descendants');
     expect(within(previa).getByText('Hoy puedes', { hidden: true }).props.importantForAccessibility).toBe(
       'no',
     );

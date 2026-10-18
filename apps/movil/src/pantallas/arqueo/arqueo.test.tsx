@@ -90,6 +90,23 @@ describe('PantallaArqueo · vacío y errores', () => {
     const bbva = p.e.cuentas['bbva'] as string;
     renderConSesion(p.ctx, <PantallaArqueo cuentaId={bbva} alCerrar={jest.fn()} />);
     expect(textoDe('arqueo-sin-efectivo')).toBe(TEXTO_SIN_CUENTA_EFECTIVO);
+    expect(screen.getByTestId('arqueo-sin-efectivo').props.accessibilityLabel).toBe(
+      etiquetaVacioSinEfectivo(),
+    );
+    p.cerrar();
+  });
+
+  it('TalkBack en Listo tras cuadrar el conteo (`02 §15`)', () => {
+    const p = conEscenario('e4-01');
+    const alCerrar = jest.fn();
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={alCerrar} />);
+    const continuar = screen.queryByTestId('arqueo-continuar');
+    if (continuar) fireEvent.press(continuar);
+    fireEvent.press(screen.getByTestId('arqueo-exacto'));
+    fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
+    fireEvent.press(screen.getByTestId('arqueo-listo'));
+    expect(alCerrar).toHaveBeenCalled();
     p.cerrar();
   });
 

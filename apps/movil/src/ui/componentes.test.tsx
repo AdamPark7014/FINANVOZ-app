@@ -1,3 +1,4 @@
+import { auditar } from '../pantallas/__pruebas__/accesibilidad';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { useState } from 'react';
 import { Text } from 'react-native';

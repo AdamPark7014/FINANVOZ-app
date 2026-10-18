@@ -38,10 +38,12 @@ export function PreviaWidget({
         <View
           testID="previa-widget-fila"
           style={estilos.fila}
+          accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >
           <Text
             testID="previa-widget-titulo"
+            accessibilityElementsHidden
             importantForAccessibility="no"
             style={[estilos.titulo, { color: c.texto }]}
           >

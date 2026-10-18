@@ -20,7 +20,7 @@ import { abrirSesion } from '../../servicios/sesion';
 import { notificacionesEnMemoria } from '../avisos/notificaciones';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { PISTA_AYUDA, PISTA_VOLVER } from './textos';
+import { etiquetaAccesibilidadVersion, PISTA_AYUDA, PISTA_VOLVER } from './textos';
 
 /**
  * La raíz real (`app/_layout.tsx`) con la apertura nativa sustituida: cada `abrirSesion` entrega una base nueva
@@ -139,7 +139,7 @@ describe('ajustes', () => {
     expect(screen.getByTestId('ajustes-abrir-ayuda')).toHaveProp('accessibilityHint', PISTA_AYUDA);
     expect(screen.getByTestId('ajustes-version')).toHaveProp(
       'accessibilityLabel',
-      'Finanvoz versión 1.0.0',
+      etiquetaAccesibilidadVersion('0.1.0'),
     );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('ajustes-abrir-ayuda'));

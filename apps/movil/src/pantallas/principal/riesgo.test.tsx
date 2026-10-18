@@ -16,6 +16,7 @@ import {
   ProbabilidadHoy,
   TEXTO_RIESGO,
 } from './ProbabilidadHoy';
+import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
 
@@ -50,6 +51,47 @@ describe('ProbabilidadHoy · TalkBack', () => {
     );
     expect(etiquetaAccesibleProbabilidad('87 % de llegar sin tocar tu colchón', null)).toBe(
       '87 % de llegar sin tocar tu colchón',
+    );
+  });
+
+  it('calculando expone etiqueta y liveRegion para TalkBack', () => {
+    const p = conEscenario('e4-01');
+    activarPlus(p.ctx);
+    montar(
+      p.ctx,
+      <ProbabilidadHoy bloques={{ ceder: () => new Promise(() => undefined) }} hora={() => '10:00'} />,
+    );
+    expect(screen.getByTestId('probabilidad-calculando')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_PROBABILIDAD_CALCULANDO,
+    );
+    expect(screen.getByTestId('probabilidad-calculando')).toHaveProp('accessibilityLiveRegion', 'polite');
+  });
+
+  it('mensaje de datos insuficientes usa live region', () => {
+    const p = conEscenario('e4-01');
+    activarPlus(p.ctx);
+    const efectivo = p.e.cuentas['efectivo'] as string;
+    for (let f: PlainDate = '2026-10-11'; f < '2026-10-24'; f = sumarDias(f, 1)) {
+      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
+    }
+    p.reloj.fijar('2026-10-24');
+    montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
+    expect(screen.getByTestId('probabilidad-mensaje')).toHaveProp('accessibilityLiveRegion', 'polite');
+  });
+
+  it('calculando expone etiqueta accesible única', () => {
+    const p = conEscenario('e4-01');
+    activarPlus(p.ctx);
+    const efectivo = p.e.cuentas['efectivo'] as string;
+    for (let f: PlainDate = '2026-10-11'; f < '2026-11-25'; f = sumarDias(f, 1)) {
+      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
+    }
+    p.reloj.fijar('2026-10-31');
+    montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
+    expect(screen.getByTestId('probabilidad-calculando')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_PROBABILIDAD_CALCULANDO,
     );
   });
 

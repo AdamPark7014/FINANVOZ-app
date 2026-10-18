@@ -19,6 +19,7 @@ import {
   PISTA_ESCRIBIR_CORREO,
   PISTA_VOLVER,
   PREGUNTAS_TITULO,
+  pistaPreguntaFrecuente,
   TITULO,
 } from './textos';
 
@@ -92,6 +93,7 @@ describe('pantalla de ayuda', () => {
     }
     const boton = screen.getByTestId('ayuda-pregunta-respaldo');
     expect(boton).toHaveProp('accessibilityState', { expanded: false });
+    expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
     expect(screen.getByTestId('ayuda-respuesta-respaldo')).toBeTruthy();
     expect(screen.getByTestId('ayuda-pregunta-respaldo')).toHaveProp('accessibilityState', {

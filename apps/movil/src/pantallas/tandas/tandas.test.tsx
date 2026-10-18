@@ -108,6 +108,7 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
     expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
     expect(screen.getByTestId('tanda-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('tanda-me-toco')).toHaveProp('accessibilityHint', PISTA_ME_TOCO);
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {

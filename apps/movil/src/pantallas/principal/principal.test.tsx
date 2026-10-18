@@ -40,6 +40,7 @@ import {
   PISTA_CONFIGURAR_INGRESO_HOY,
   PISTA_ME_ALCANZA_HOY,
   PISTA_OCULTAR_DESGLOSE,
+  PISTA_REGISTRAR_MOVIMIENTO,
   PISTA_VER_DESGLOSE,
   contextoSaldoCompromiso,
   contextoSaldoTarjeta,
@@ -525,6 +526,20 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
+  it('Registrar trae accessibilityHint para TalkBack (`02 §15`)', () => {
+    const p = abrirPruebaPantalla();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const alRegistrar = jest.fn();
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={alRegistrar} />);
+    expect(screen.getByTestId('boton-registrar-movimiento')).toHaveProp(
+      'accessibilityHint',
+      PISTA_REGISTRAR_MOVIMIENTO,
+    );
+    fireEvent.press(screen.getByTestId('boton-registrar-movimiento'));
+    expect(alRegistrar).toHaveBeenCalled();
+    p.cerrar();
+  });
+
   it('encabezados y filas con etiquetas TalkBack (`02 §15`)', () => {
     const p = conEscenario('e4-01');
     todas(p.ctx);

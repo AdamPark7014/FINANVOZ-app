@@ -46,6 +46,7 @@ import {
   TEXTO_POR_REVISAR,
   TITULO_POR_REVISAR,
   MENSAJE_ANULADO_MOVIMIENTO,
+  PISTA_REGISTRAR_MOVIMIENTO,
 } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
@@ -120,6 +121,7 @@ export function PantallaMovimientos({
           etiqueta="Registrar"
           ancho="contenido"
           alPresionar={alRegistrar}
+          pista={PISTA_REGISTRAR_MOVIMIENTO}
           testID="boton-registrar-movimiento"
         />
       </View>

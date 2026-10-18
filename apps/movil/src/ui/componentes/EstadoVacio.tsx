@@ -1,4 +1,4 @@
-import { etiquetaHablada } from '../formato';
+import { etiquetaEstadoVacio } from '../formato';
 import { Texto } from './Texto';
 
 /**

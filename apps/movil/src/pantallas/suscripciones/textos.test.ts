@@ -1,4 +1,5 @@
 import {
+  etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
@@ -13,10 +14,6 @@ describe('textos de suscripciones (02 §20)', () => {
   });
 
   it('etiqueta TalkBack del vacío incluye título de pantalla', () => {
-    expect(etiquetaVacioSuscripciones()).toBe(`${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`);
-  });
-
-  it('etiqueta hablada del vacío incluye título de pantalla', () => {
     expect(etiquetaVacioSuscripciones()).toBe(`${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`);
   });
 
