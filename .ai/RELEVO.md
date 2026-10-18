@@ -6,26 +6,29 @@
 
 ## Hecho en este turno
 
-- **Captura notificaciones UI:** copy vacío por revisar + permiso en `textos.ts`; `EstadoVacio`/`etiquetaPermisoCaptura` en `ActivarCaptura`; prueba `textos.test.ts`.
+- **Captura por revisar / tandas:** intro con `testID`, errores con `accessibilityLiveRegion`, header en aviso no reconocido; prueba de título header con pendientes; detalle tanda inexistente: `tanda-volver` + live region en mensaje.
 
 ## Hecho (acumulado reciente)
 
-- TalkBack Hoy/Movimientos/Cuentas, onboarding O6, Ajustes captura. Ver `git log`.
+- Movimientos/Cuentas/Registrar headers, onboarding consent pista, EstadoVacio. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en móvil — no mezclar en commits de captura.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP ajeno en working tree (onboarding, ajustes captura, Chip.test, etc.).
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Video flujo divulgación → captura para Play (`08 §3.1`).
+2. Headers TalkBack en pantallas restantes si hace falta.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
