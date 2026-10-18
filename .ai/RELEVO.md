@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Detalle tarjeta · TalkBack:** cada tarjeta del historial de estados de cuenta (`estado-*`) anuncia corte, saldo al corte, pagos posteriores, PNGI y fecha límite en una etiqueta (`etiquetaAccesibleEstadoCuentaTarjeta`); tests en `tarjetas.test.tsx`.
+- **Personas · TalkBack recordatorio:** `PISTA_QUITAR_RECORDATORIO` en el botón quitar; mensaje sin permiso de avisos con rol `alert`; tests en `personas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Tandas archivada, ayuda, captura, widget, barra uso. Ver `git log`.
+- Tarjetas historial estado de cuenta, tandas archivada, ayuda, captura, widget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, captura, me-alcanza, movimientos) — no mezclar en commits ajenos.
+- WIP paralelo (onboarding, arqueo, tarjetas, captura, me-alcanza) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

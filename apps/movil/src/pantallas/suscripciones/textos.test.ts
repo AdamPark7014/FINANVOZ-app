@@ -30,6 +30,13 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaAccesibleAyudaSuscripciones()).toContain(PISTA_AYUDA);
   });
 
+  it('resumen activas: contexto TalkBack y cifras en palabras', () => {
+    const resumen = 'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)';
+    expect(etiquetaAccesibleResumenSuscripciones(resumen)).toMatch(/^Total en suscripciones activas\./);
+    expect(etiquetaAccesibleResumenSuscripciones(resumen)).toMatch(/pesos/);
+    expect(etiquetaAccesibleResumenSuscripciones(resumen)).not.toMatch(/\$/);
+  });
+
   it('mensajes de acción con nombre del comercio', () => {
     expect(mensajeAccionSuscripcion('compromiso', 'Netflix')).toBe(
       'Listo: Hoy aparta tu Netflix antes de cada cargo.',

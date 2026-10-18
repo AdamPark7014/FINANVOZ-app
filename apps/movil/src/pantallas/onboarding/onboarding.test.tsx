@@ -30,10 +30,12 @@ import {
   TIP_INGRESO_SALTAR,
   TIP_PAGOS_SALTAR,
 } from './tips';
+import { PISTA_ONBOARDING_RESTAURAR } from '../respaldo/textos';
 import { etiquetaHablada } from '../../ui';
 import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
+  PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
   PISTA_ONB_EMPEZAR,
@@ -86,6 +88,10 @@ describe('onboarding', () => {
     expect(screen.getByText(TITULO_BIENVENIDA)).toBeTruthy();
     expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
     expect(screen.getByTestId('onb-empezar')).toHaveProp('accessibilityHint', PISTA_ONB_EMPEZAR);
+    expect(screen.getByTestId('onb-restaurar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_ONBOARDING_RESTAURAR,
+    );
   });
 
   it('CA-M2-05 · no se escribe nada antes de aceptar; al aceptar queda la evidencia', () => {
@@ -125,6 +131,10 @@ describe('onboarding', () => {
 
   it('el aviso completo se abre desde O2', () => {
     const r = abrir('/onboarding/consentimiento');
+    expect(screen.getByTestId('onb-aviso-completo')).toHaveProp(
+      'accessibilityHint',
+      PISTA_LEER_AVISO_COMPLETO,
+    );
     tocar('onb-aviso-completo');
     expect(r.getPathname()).toBe('/aviso-privacidad');
     expect(screen.getByText('Tus derechos')).toBeTruthy();

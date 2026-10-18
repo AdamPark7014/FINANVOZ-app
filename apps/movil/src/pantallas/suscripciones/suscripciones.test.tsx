@@ -69,7 +69,12 @@ describe('Suscripciones (02 §20)', () => {
       'accessibilityLabel',
       etiquetaAccesibleAyudaSuscripciones(),
     );
-    expect(screen.getByTestId('suscripciones-resumen').props.accessibilityLabel).toMatch(/pesos/);
+    expect(screen.getByTestId('suscripciones-resumen')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleResumenSuscripciones(
+        'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
+      ),
+    );
     expect(screen.getByTestId('suscripcion-netflix-monto').props.accessibilityLabel).toMatch(/pesos/);
     expect(screen.getByTestId('suscripcion-netflix-nombre')).toHaveProp('accessibilityRole', 'header');
     expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
