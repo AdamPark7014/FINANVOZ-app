@@ -255,7 +255,7 @@ function TarjetaNube({
               />
               <Boton
                 variante="texto"
-                etiqueta="Cancelar"
+                etiqueta={BTN_CANCELAR}
                 deshabilitado={borrando === 'borrando'}
                 alPresionar={() => setBorrando('no')}
               />

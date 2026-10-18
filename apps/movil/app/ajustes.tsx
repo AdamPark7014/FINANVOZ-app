@@ -3,6 +3,32 @@ import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
+import {
+  BTN_AYUDA,
+  BTN_PRIVACIDAD,
+  BTN_RESPALDAR_RESTAURAR,
+  BTN_TERMINOS,
+  DESC_BLOQUEO,
+  DESC_MULTITAREA,
+  ETIQUETA_BLOQUEO,
+  ETIQUETA_MULTITAREA,
+  ETIQUETA_VOLVER,
+  MENSAJE_NO_GUARDAR,
+  SECCION_ACERCA,
+  SECCION_AYUDA,
+  SECCION_BLOQUEO,
+  SECCION_DEV,
+  SECCION_PRIVACIDAD,
+  SECCION_RESPALDO,
+  TEXTO_AYUDA,
+  TEXTO_DEV,
+  TEXTO_PRIVACIDAD,
+  TITULO,
+  etiquetaAccesibilidadVersion,
+  etiquetaCargarEscenario,
+  lineaVersion,
+  mensajeErrorCargarEscenario,
+} from '../src/pantallas/ajustes';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionColchon } from '../src/pantallas/ajustes/SeccionColchon';
@@ -41,7 +67,7 @@ export default function Ajustes() {
       fijarBloqueo(ctx, cambios);
       refrescar();
     } catch {
-      setMensaje('No pude guardar el cambio. Intenta de nuevo.');
+      setMensaje(MENSAJE_NO_GUARDAR);
     }
   };
 
@@ -57,27 +83,27 @@ export default function Ajustes() {
         testID="ajustes-volver"
         variante="texto"
         ancho="contenido"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         alPresionar={() => router.back()}
       />
-      <Texto variante="titulo">Ajustes</Texto>
+      <Texto variante="titulo">{TITULO}</Texto>
 
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
       <SeccionColchon />
 
       <Tarjeta>
-        <Texto variante="subtitulo">Bloqueo</Texto>
+        <Texto variante="subtitulo">{SECCION_BLOQUEO}</Texto>
         <Interruptor
           testID="ajustes-bloqueo"
-          etiqueta="Pedir huella o PIN al abrir"
-          descripcion="También al volver después de 1 minuto fuera de la app."
+          etiqueta={ETIQUETA_BLOQUEO}
+          descripcion={DESC_BLOQUEO}
           valor={bloqueo.activo}
           alCambiar={(activo) => cambiarBloqueo({ activo })}
         />
         <Interruptor
           testID="ajustes-multitarea"
-          etiqueta="Ocultar en multitarea"
-          descripcion="La vista previa de apps recientes sale en blanco y no se permiten capturas de pantalla."
+          etiqueta={ETIQUETA_MULTITAREA}
+          descripcion={DESC_MULTITAREA}
           valor={bloqueo.ocultarEnMultitarea}
           alCambiar={(ocultarEnMultitarea) => cambiarBloqueo({ ocultarEnMultitarea })}
         />
@@ -88,14 +114,14 @@ export default function Ajustes() {
       <SeccionWidget />
 
       <Tarjeta testID="ajustes-respaldo">
-        <Texto variante="subtitulo">Respaldo</Texto>
+        <Texto variante="subtitulo">{SECCION_RESPALDO}</Texto>
         <Texto variante="secundario" tono={respaldo.pendiente ? 'faltante' : 'secundario'}>
           {respaldo.textoUltimo}
         </Texto>
         <Boton
           testID="ajustes-abrir-respaldo"
           variante="secundario"
-          etiqueta="Respaldar y restaurar"
+          etiqueta={BTN_RESPALDAR_RESTAURAR}
           alPresionar={() => router.push('/respaldo')}
         />
       </Tarjeta>
@@ -104,14 +130,14 @@ export default function Ajustes() {
       <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
 
       <Tarjeta>
-        <Texto variante="subtitulo">Privacidad</Texto>
+        <Texto variante="subtitulo">{SECCION_PRIVACIDAD}</Texto>
         <Texto variante="secundario" tono="secundario">
-          Qué se guarda, qué sale de tu teléfono y a quién, tus permisos, descargar o borrar tus datos.
+          {TEXTO_PRIVACIDAD}
         </Texto>
         <Boton
           testID="ajustes-privacidad"
           variante="secundario"
-          etiqueta="Abrir el centro de privacidad"
+          etiqueta={BTN_PRIVACIDAD}
           alPresionar={() => router.push('/privacidad')}
         />
         {mensaje ? (

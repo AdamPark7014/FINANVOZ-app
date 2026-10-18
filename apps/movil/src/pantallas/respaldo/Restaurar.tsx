@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import {
   bajarUltimoRespaldo,
-  mensajeErrorNube,
-  mensajeErrorRespaldo,
   obtenerCentroPrivacidad,
   prepararRestauracion,
-  resumenRespaldo,
   type RespaldoListo,
 } from '../../servicios';
 import { useControlApp } from '../../sesion/ControlApp';
@@ -13,6 +10,29 @@ import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, CampoTexto, Tarjeta, Texto } from '../../ui';
 import { FlujoCorreo, type CuentaConfirmada } from './FlujoCorreo';
+import {
+  AVISO_REEMPLAZA_DATOS,
+  BTN_ABRIR_RESPALDO,
+  BTN_CANCELAR,
+  BTN_DESDE_ARCHIVO,
+  BTN_DESDE_NUBE,
+  BTN_ELEGIR_ARCHIVO,
+  BTN_ELEGIR_OTRO_ARCHIVO,
+  BTN_RESTAURAR,
+  BTN_VOLVER_A_ELEGIR,
+  ETIQUETA_CONTRASENA,
+  ETIQUETA_VOLVER,
+  INTRO_RESTAURAR_ARCHIVO,
+  INTRO_RESTAURAR_NUBE,
+  mensajeErrorNube,
+  mensajeErrorRespaldo,
+  RESTAURAR_NO_DISPONIBLE,
+  resumenRespaldo,
+  TEXTO_BAJANDO,
+  TEXTO_CORREO_RESTAURAR,
+  TEXTO_RESPALDO_RECIENTE,
+  TITULO_RESTAURAR,
+} from './textos';
 
 type Paso =
   | { tipo: 'elegir' }
@@ -97,18 +117,16 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
         testID="restaurar-volver"
         variante="texto"
         ancho="contenido"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         deshabilitado={trabajando}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">Restaurar un respaldo</Texto>
+      <Texto variante="titulo">{TITULO_RESTAURAR}</Texto>
       <Texto variante="cuerpo" tono="secundario">
-        {nube
-          ? 'Recupera tus cuentas, movimientos y ajustes desde tu respaldo en la nube o desde un archivo .cartera.'
-          : 'Recupera tus cuentas, movimientos y ajustes desde un archivo .cartera que exportaste antes.'}
+        {nube ? INTRO_RESTAURAR_NUBE : INTRO_RESTAURAR_ARCHIVO}
       </Texto>
       {!respaldo ? (
-        <Texto variante="cuerpo">Restaurar no está disponible en esta versión de la app.</Texto>
+        <Texto variante="cuerpo">{RESTAURAR_NO_DISPONIBLE}</Texto>
       ) : (
         <Tarjeta testID="restaurar-paso">
           {paso.tipo === 'elegir' ? (
@@ -116,7 +134,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               {nube ? (
                 <Boton
                   testID="restaurar-nube"
-                  etiqueta="Desde la nube"
+                  etiqueta={BTN_DESDE_NUBE}
                   deshabilitado={trabajando}
                   alPresionar={() => {
                     setError(null);

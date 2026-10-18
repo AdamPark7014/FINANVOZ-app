@@ -22,7 +22,13 @@ import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips } from './Chip';
 import { useMostrarAviso } from './ProveedorAvisos';
 import { useAvisoRegistro } from './useAvisoRegistro';
-import { NOMBRE_ORIGEN, NOMBRE_TIPO_LIBRO, resumenMovimiento } from './textos';
+import {
+  NOMBRE_ORIGEN,
+  NOMBRE_TIPO_LIBRO,
+  resumenMovimiento,
+  TEXTO_MOVIMIENTOS_FILTRO_VACIO,
+  TEXTO_MOVIMIENTOS_VACIO,
+} from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
   automatico: 'automático',
@@ -155,9 +161,7 @@ export function PantallaMovimientos({
 
       {dias.length === 0 ? (
         <Texto variante="cuerpo" tono="secundario" testID="movimientos-vacio">
-          {filtro
-            ? 'No hay movimientos que coincidan.'
-            : 'Todavía no registras movimientos. En Hoy di o escribe algo como «tacos 80 en efectivo».'}
+          {filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
         </Texto>
       ) : null}
 

@@ -193,6 +193,15 @@ export const MENSAJE_EXPLICAR_ERROR = 'No pude responderte ahora. Pregúntame de
 export const MENSAJE_EXPLICAR_SOLO_PLUS =
   'Preguntarme lo que quieras sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.';
 
+// ——— Movimientos (`02 §10`) ———
+
+/** Lista vacía (sin filtro). */
+export const TEXTO_MOVIMIENTOS_VACIO =
+  'Todavía no hay movimientos. Ve a Hoy y di o escribe algo como «tacos 80 en efectivo».';
+
+/** Consulta filtrada sin resultados (`06 §6`). */
+export const TEXTO_MOVIMIENTOS_FILTRO_VACIO = 'No hay movimientos que coincidan.';
+
 // ——— Cuentas (`02 §11`) ———
 
 /** Tienes: sin efectivo, débito, billetera ni ahorro. */
@@ -204,3 +213,24 @@ export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamo
 
 /** Compromisos: nada en los próximos 30 días. */
 export const TEXTO_CUENTAS_COMPROMISOS_VACIO = 'No tienes pagos en los próximos 30 días.';
+
+/** Contexto TalkBack de cada saldo en Cuentas (`02 §15`). */
+export function contextoSaldoTienes(nombre: string): string {
+  return `En ${nombre} tienes`;
+}
+
+export function contextoSaldoTeDebe(nombre: string): string {
+  return `${nombre} te debe`;
+}
+
+export function contextoSaldoTarjeta(nombre: string, aFavor: boolean): string {
+  return aFavor ? `Saldo a favor en ${nombre}` : `Debes en ${nombre}`;
+}
+
+export function contextoSaldoLeDebes(nombre: string): string {
+  return `Le debes a ${nombre}`;
+}
+
+export function contextoSaldoCompromiso(concepto: string, fechaEtiqueta: string): string {
+  return `Pago de ${concepto} el ${fechaEtiqueta}`;
+}

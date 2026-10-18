@@ -1,7 +1,14 @@
 import type { Centavos, DiaSemana, ModoFinDeSemana, PlainDate, Regla } from '@cartera/core';
-import { etiquetaFecha, proximoPago, type VistaAjustes } from '../../servicios';
-import { formatearCentavos } from '../../ui';
+import { proximoPago, type VistaAjustes } from '../../servicios';
 import { OPCIONES_DIA_SEMANA, type FinDeSemana, type Frecuencia } from '../onboarding/ingreso';
+import {
+  lineaResumenIngreso,
+  mensajeIngresoGuardado,
+  RESUMEN_INGRESO_VARIABLE,
+  RESUMEN_SIN_INGRESO,
+} from './ingreso-textos';
+
+export { mensajeIngresoGuardado };
 
 /**
  * Ajustes › Ingreso (`02 §12`): las mismas respuestas de O3 (`onboarding/ingreso.ts`) leídas del ingreso guardado,

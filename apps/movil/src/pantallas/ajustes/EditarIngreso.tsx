@@ -4,6 +4,14 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Pantalla, Texto } from '../../ui';
 import { ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { CamposIngreso, useFormularioIngreso } from './FormularioIngreso';
+import {
+  ETIQUETA_GUARDAR,
+  ETIQUETA_VOLVER,
+  INTRO_EDITAR,
+  PISTA_GUARDAR,
+  PISTA_VOLVER,
+  TITULO_EDITAR,
+} from './ingreso-textos';
 import { mensajeIngresoGuardado, valoresDeIngreso } from './ingreso';
 
 /**

@@ -18,6 +18,14 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaRegistrar } from '../principal/PantallaRegistrar';
 import { FormularioCuentaDividida } from './FormularioCuentaDividida';
 import { PantallaPersona } from './PantallaPersona';
+import {
+  MENSAJE_PERMISO_AVISOS,
+  mensajeRecordatorioCobro,
+  mensajeRegistroCobro,
+  TEXTO_MOVIMIENTOS_PERSONA_VACIO,
+  TEXTO_PERSONA_NO_ENCONTRADA,
+  TIP_SALDO_TE_DEBEN,
+} from './textos';
 
 /** CLABE con dígito de control válido. */
 const CLABE = '012345678901234568';
@@ -191,7 +199,7 @@ describe('CA-M8-02 · Cobrar', () => {
     fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
     fireEvent.press(screen.getByTestId(`pago-persona-destino-${p.bbva}`));
     fireEvent.press(screen.getByTestId('boton-guardar-pago-persona'));
-    expect(within(screen.getByTestId('aviso')).getByText('Registré que te pagó $300')).toBeTruthy();
+    expect(within(screen.getByTestId('aviso')).getByText(mensajeRegistroCobro(30_000))).toBeTruthy();
     expect(screen.getByText('Están a mano')).toBeTruthy();
     expect(screen.queryByTestId('boton-cobrar')).toBeNull();
     expect(screen.queryByTestId(`te-debe-${p.caro}`)).toBeNull();
@@ -257,7 +265,7 @@ describe('recordatorio de cobro', () => {
       fireEvent.press(screen.getByTestId('recordatorio-cobro-2026-10-14'));
     });
     expect(n.vecesPedido()).toBe(1);
-    expect(textoDe('persona-recordatorio-fecha')).toBe('Te recuerdo cobrar el mié 14 oct.');
+    expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct.'));
     expect(n.puerto.lista()).toEqual([
       expect.objectContaining({
         id: `cobro:${p.caro}`,
@@ -287,9 +295,7 @@ describe('recordatorio de cobro', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('recordatorio-cobro-2026-10-12'));
     });
-    expect(textoDe('persona-recordatorio-mensaje')).toBe(
-      'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.',
-    );
+    expect(textoDe('persona-recordatorio-mensaje')).toBe(MENSAJE_PERMISO_AVISOS);
     expect(n.puerto.lista()).toEqual([]);
   });
 });
@@ -298,14 +304,21 @@ describe('estados vacíos (es-MX)', () => {
   it('persona inexistente', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
-    expect(screen.getByTestId('persona-no-encontrada')).toBeTruthy();
+    expect(screen.getByText(TEXTO_PERSONA_NO_ENCONTRADA)).toBeTruthy();
   });
 
   it('sin movimientos lo explica', () => {
     const p = conEscenario('e4-01');
     const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
     renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
-    expect(screen.getByTestId('persona-movimientos-vacio')).toBeTruthy();
+    expect(screen.getByText(TEXTO_MOVIMIENTOS_PERSONA_VACIO)).toBeTruthy();
+  });
+
+  it('con saldo a favor muestra el tip de dinero libre', () => {
+    const p = conAmigos();
+    cena(p);
+    renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
+    expect(screen.getByText(TIP_SALDO_TE_DEBEN)).toBeTruthy();
   });
 
   it('cuenta dividida sin contactos', () => {

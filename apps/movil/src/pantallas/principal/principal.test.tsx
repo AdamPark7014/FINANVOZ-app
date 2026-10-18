@@ -21,8 +21,11 @@ import {
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,
+  TEXTO_MOVIMIENTOS_VACIO,
+  contextoSaldoCompromiso,
+  contextoSaldoTarjeta,
+  contextoSaldoTienes,
 } from './textos';
-import { contextoSaldoCompromiso, contextoSaldoTarjeta, contextoSaldoTienes } from './textos';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';

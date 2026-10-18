@@ -302,7 +302,7 @@ function Recordatorio({
         </>
       ) : (
         <>
-          <Texto variante="subtitulo">¿Te recuerdo cobrar?</Texto>
+          <Texto variante="subtitulo">{TITULO_RECORDATORIO_COBRO}</Texto>
           <GrupoChips
             opciones={opciones.map((o) => ({ valor: o.fecha, etiqueta: o.etiqueta }))}
             valor={null}

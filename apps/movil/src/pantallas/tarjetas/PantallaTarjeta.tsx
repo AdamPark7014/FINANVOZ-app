@@ -175,19 +175,17 @@ function Detalle({
           <CorregirSaldo d={d} alTerminar={() => setPanel(null)} />
         ) : (
           <>
-            <Texto variante="secundario" tono="secundario">
-              {d.ciclo.diaLimitePago !== undefined
-                ? `Corta el ${d.ciclo.diaCorte} y pagas el ${d.ciclo.diaLimitePago}.`
-                : `Corta el ${d.ciclo.diaCorte} y tienes ${d.ciclo.diasParaPagar ?? 0} días para pagar.`}
+            <Texto variante="secundario" tono="secundario" testID="tarjeta-ciclo-resumen">
+              {textoCicloTarjeta(d.ciclo)}
             </Texto>
             <Boton
-              etiqueta="Editar tarjeta"
+              etiqueta={BTN_EDITAR_TARJETA}
               variante="secundario"
               alPresionar={() => setPanel('editar')}
               testID="tarjeta-editar"
             />
             <Boton
-              etiqueta="Corregir saldo"
+              etiqueta={BTN_CORREGIR_SALDO}
               variante="texto"
               alPresionar={() => setPanel('corregir')}
               testID="tarjeta-corregir"
@@ -205,7 +203,7 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
     <Tarjeta testID="tarjeta-resumen">
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="subtitulo" style={{ flex: 1 }}>
-          Debes
+          {ETIQUETA_DEBES}
         </Texto>
         <Cifra
           centavos={d.deudaTotal}
@@ -216,33 +214,31 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
       </View>
       {d.msiPorPagar > 0 ? (
         <Texto variante="secundario" tono="secundario" testID="tarjeta-deuda-meses">
-          {`De eso, ${formatearCentavos(d.msiPorPagar)} son meses sin intereses.`}
+          {textoDeudaMeses(formatearCentavos(d.msiPorPagar))}
         </Texto>
       ) : null}
       {d.saldoAFavor > 0 ? (
         <View testID="tarjeta-saldo-a-favor" style={{ gap: espacio.xxs }}>
-          <Dato etiqueta="Saldo a favor" valor={formatearCentavos(d.saldoAFavor)} />
+          <Dato etiqueta={ETIQUETA_SALDO_A_FAVOR} valor={formatearCentavos(d.saldoAFavor)} />
           <Texto variante="secundario" tono="secundario">
-            No se suma a tu dinero libre: se usa en tus próximas compras con esta tarjeta.
+            {AYUDA_SALDO_A_FAVOR}
           </Texto>
         </View>
       ) : null}
       {d.ultimoCorte ? (
         <View style={{ gap: espacio.xxs }}>
           <Dato
-            etiqueta="Para no generar intereses"
+            etiqueta={ETIQUETA_PNGI}
             valor={formatearCentavos(d.pngi)}
             testID="tarjeta-pngi"
           />
           <Texto variante="secundario" tono="secundario">
-            {d.pngi > 0
-              ? `Págalo a más tardar el ${d.etiquetaFechaLimite}.`
-              : 'Ya cubriste el pago de tu último corte.'}
+            {d.pngi > 0 ? textoPagarPngiAntesDe(d.etiquetaFechaLimite) : TEXTO_PNGI_CUBIERTO}
           </Texto>
         </View>
       ) : (
         <Texto variante="secundario" tono="secundario" testID="tarjeta-sin-corte">
-          {`Aún no cierra ningún corte desde que la agregaste. El primero es el ${d.etiquetaProximoCorte}.`}
+          {textoSinCorteDesdeAlta(d.etiquetaProximoCorte)}
         </Texto>
       )}
       <Dato etiqueta="Fecha límite" valor={d.etiquetaFechaLimite} testID="tarjeta-fecha-limite" />

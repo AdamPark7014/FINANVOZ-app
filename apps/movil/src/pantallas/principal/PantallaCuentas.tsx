@@ -22,6 +22,11 @@ import {
   Texto,
 } from '../../ui';
 import {
+  contextoSaldoCompromiso,
+  contextoSaldoLeDebes,
+  contextoSaldoTarjeta,
+  contextoSaldoTeDebe,
+  contextoSaldoTienes,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,
@@ -99,6 +104,7 @@ export function PantallaCuentas({
             titulo={c.nombre}
             subtitulo={NOMBRE_SUBTIPO[c.subtipo] ?? null}
             centavos={c.saldo}
+            contextoSaldo={contextoSaldoTienes(c.nombre)}
             {...(c.subtipo === 'efectivo' && alContarEfectivo
               ? {
                   accion: {
@@ -151,6 +157,7 @@ export function PantallaCuentas({
               titulo={p.nombre}
               subtitulo={null}
               centavos={p.saldo}
+              contextoSaldo={contextoSaldoTeDebe(p.nombre)}
               {...(alAbrirPersona
                 ? { accion: { etiqueta: 'Cobrar', alPresionar: () => alAbrirPersona(p.id) } }
                 : {})}
@@ -166,9 +173,11 @@ export function PantallaCuentas({
         {v.compromisos.map((c) => (
           <Fila
             key={`${c.programadoId}:${c.fecha}`}
+            testID={`compromiso-${c.programadoId}`}
             titulo={c.concepto}
             subtitulo={etiquetaFecha(c.fecha)}
             centavos={c.monto}
+            contextoSaldo={contextoSaldoCompromiso(c.concepto, etiquetaFecha(c.fecha))}
           />
         ))}
       </Seccion>
@@ -256,12 +265,14 @@ function Fila({
   titulo,
   subtitulo,
   centavos,
+  contextoSaldo,
   testID,
   accion,
 }: {
   titulo: string;
   subtitulo: string | null;
   centavos: number;
+  contextoSaldo: string;
   testID?: string;
   accion?: { etiqueta: string; alPresionar: () => void };
 }) {
@@ -276,7 +287,11 @@ function Fila({
             </Texto>
           ) : null}
         </View>
-        <Cifra centavos={centavos} contexto={titulo} {...(testID ? { testID: `${testID}-saldo` } : {})} />
+        <Cifra
+          centavos={centavos}
+          contexto={contextoSaldo}
+          {...(testID ? { testID: `${testID}-saldo` } : {})}
+        />
       </View>
       {accion ? (
         <Boton

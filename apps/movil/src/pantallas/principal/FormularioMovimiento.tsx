@@ -207,21 +207,21 @@ export function FormularioMovimiento({
       <>
         <CampoMonto
           key={`monto-${clave}`}
-          etiqueta="¿Cuánto?"
+          etiqueta={ETIQUETA_MONTO}
           alCambiar={setMonto}
-          error={intentado && (monto === null || monto <= 0) ? 'Escribe un monto mayor a $0.' : null}
+          error={intentado && (monto === null || monto <= 0) ? ERROR_MONTO_CERO : null}
           testID="campo-monto"
         />
         <CampoTexto
-          etiqueta="¿En qué? (opcional)"
+          etiqueta={ETIQUETA_DESCRIPCION}
           valor={descripcion}
           alCambiar={setDescripcion}
-          ejemplo="tacos"
+          ejemplo={EJEMPLO_DESCRIPCION}
           testID="campo-descripcion"
         />
         {campos.categoria ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto variante="etiqueta">Categoría</Texto>
+            <Texto variante="etiqueta">{ETIQUETA_CATEGORIA}</Texto>
             <GrupoChips
               opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
               valor={categoria}
@@ -242,16 +242,16 @@ export function FormularioMovimiento({
             <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'flex-end' }}>
               <View style={{ flex: 1 }}>
                 <CampoTexto
-                  etiqueta="Agregar persona"
+                  etiqueta={ETIQUETA_AGREGAR_PERSONA}
                   valor={nuevaPersona}
                   alCambiar={setNuevaPersona}
-                  ejemplo="Mi jefa"
+                  ejemplo={EJEMPLO_NUEVA_PERSONA}
                   alEnviar={agregarPersona}
                   testID="campo-nueva-persona"
                 />
               </View>
               <Boton
-                etiqueta="Agregar"
+                etiqueta={BTN_AGREGAR_PERSONA}
                 variante="secundario"
                 ancho="contenido"
                 alPresionar={agregarPersona}
@@ -274,7 +274,7 @@ export function FormularioMovimiento({
         ) : null}
         {tipo === 'retiro_efectivo' && origenEsTarjeta ? (
           <Texto variante="secundario" tono="faltante">
-            Sacar efectivo con tarjeta de crédito suele cobrar comisión e intereses desde el primer día.
+            {AVISO_RETIRO_EFECTIVO_TARJETA}
           </Texto>
         ) : null}
         {campos.destino ? (
@@ -298,7 +298,11 @@ export function FormularioMovimiento({
             {error}
           </Texto>
         ) : null}
-        <Boton etiqueta="Guardar" alPresionar={guardar} testID="boton-guardar-movimiento" />
+        <Boton
+          etiqueta={BTN_GUARDAR_MOVIMIENTO}
+          alPresionar={guardar}
+          testID="boton-guardar-movimiento"
+        />
       </>
     );
   }

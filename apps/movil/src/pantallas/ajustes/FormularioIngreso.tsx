@@ -18,6 +18,19 @@ import {
   proximos14Dias,
   reglaDeIngreso,
 } from '../onboarding/ingreso';
+import {
+  AYUDA_MONTO,
+  EJEMPLO_DIA_MES,
+  ERROR_DIA_MES,
+  ETIQUETA_PROXIMO_PAGO,
+  PREGUNTA_DIA_MES,
+  PREGUNTA_DIA_SEMANA,
+  PREGUNTA_FIN_SEMANA,
+  PREGUNTA_FRECUENCIA,
+  PREGUNTA_MONTO,
+  PREGUNTA_PROXIMA_VEZ,
+  TEXTO_INGRESO_VARIABLE,
+} from './ingreso-textos';
 import { INGRESO_EN_BLANCO, type ValoresIngreso } from './ingreso';
 
 /**

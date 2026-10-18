@@ -8,7 +8,7 @@ import {
   type DetalleTanda,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { Seccion } from '../tarjetas/componentes';
 import { codigoError, mensajeError } from '../principal/textos';
@@ -140,14 +140,14 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
           <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
               <Texto variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'} style={{ flex: 1 }}>
-                {`${r.t}. ${r.etiqueta}${r.esCobro ? ' · tu turno' : ''}`}
+                {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
               </Texto>
               <Texto variante="secundario" tono="secundario">
-                {etiquetaRonda(r, !d.activa)}
+                {etiquetaEstadoRonda(r, !d.activa)}
               </Texto>
             </View>
             <Texto variante="secundario" tono="secundario" testID={`tanda-ronda-${r.t}-riesgo`}>
-              {`Después de esta ronda arriesgas ${formatearCentavos(r.enRiesgo)}`}
+              {textoDespuesRondaRiesgo(r.enRiesgo)}
             </Texto>
           </Tarjeta>
         ))}
@@ -179,7 +179,7 @@ function Ajustes({
       const cambios: { nombre?: string; cuentaId?: string | null } = {};
       const nombreTrim = nombre.trim();
       if (nombreTrim === '') {
-        setError('Escribe un nombre para la tanda.');
+        setError(ERROR_NOMBRE_TANDA_VACIO);
         return;
       }
       if (nombreTrim !== d.nombre) cambios.nombre = nombreTrim;
@@ -210,14 +210,11 @@ function Ajustes({
   if (archivando) {
     return (
       <Tarjeta testID="tanda-archivar">
-        <Texto variante="cuerpo">
-          Archivar quita la tanda de tu lista y cancela las aportaciones que faltaban. Lo que ya registraste se
-          queda.
-        </Texto>
-        <Boton testID="tanda-archivar-confirmar" etiqueta="Archivar tanda" alPresionar={archivar} />
+        <Texto variante="cuerpo">{TEXTO_CONFIRMAR_ARCHIVAR}</Texto>
+        <Boton testID="tanda-archivar-confirmar" etiqueta={ETIQUETA_ARCHIVAR_TANDA} alPresionar={archivar} />
         <Boton
           testID="tanda-archivar-cancelar"
-          etiqueta="Cancelar"
+          etiqueta={ETIQUETA_CANCELAR}
           variante="texto"
           alPresionar={() => setArchivando(false)}
         />

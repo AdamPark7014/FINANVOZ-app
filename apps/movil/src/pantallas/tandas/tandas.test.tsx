@@ -18,6 +18,13 @@ import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaTanda } from './PantallaTanda';
 import { PantallaTandas } from './PantallaTandas';
+import {
+  TEXTO_TANDA_NO_ENCONTRADA,
+  textoDespuesRondaRiesgo,
+  textoEnRiesgo,
+  textoAportado,
+  textoPorAportar,
+} from './textos';
 
 interface RondaVector {
   t: number;
@@ -105,11 +112,9 @@ describe('Tandas (02 §18)', () => {
     // Calendario: tu ronda marcada y lo que arriesgas después de cada una (E11-01 `en_riesgo`).
     expect(screen.getByText('4. vie 6 · tu turno')).toBeTruthy();
     for (const r of esperado) {
-      expect(textoDe(`tanda-ronda-${r.t}-riesgo`)).toBe(
-        `Después de esta ronda arriesgas ${formatearCentavos(r.en_riesgo)}`,
-      );
+      expect(textoDe(`tanda-ronda-${r.t}-riesgo`)).toBe(textoDespuesRondaRiesgo(r.en_riesgo));
     }
-    expect(textoDe('tanda-en-riesgo')).toBe('Si la tanda se cae, arriesgas $0');
+    expect(textoDe('tanda-en-riesgo')).toBe(textoEnRiesgo(0));
 
     // Lo mostrado arriba sigue a lo registrado: ronda por ronda, con el cobro en tu turno.
     for (const r of esperado) {
@@ -118,14 +123,10 @@ describe('Tandas (02 §18)', () => {
       if (r.t === v.turno) cobrarTanda(p.ctx, { tandaId, cuentaId: p.bbva });
       vista.unmount();
       vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
-      expect(textoDe('tanda-en-riesgo')).toBe(
-        `Si la tanda se cae, arriesgas ${formatearCentavos(r.en_riesgo)}`,
-      );
-      expect(textoDe('tanda-aportado')).toBe(`Llevas ${formatearCentavos(r.aportado)} aportados`);
+      expect(textoDe('tanda-en-riesgo')).toBe(textoEnRiesgo(r.en_riesgo));
+      expect(textoDe('tanda-aportado')).toBe(textoAportado(r.aportado));
       if (r.t >= v.turno) {
-        expect(textoDe('tanda-por-aportar')).toBe(
-          `Te faltan ${formatearCentavos(r.por_aportar)} por aportar`,
-        );
+        expect(textoDe('tanda-por-aportar')).toBe(textoPorAportar(r.por_aportar));
       }
     }
   });
@@ -190,6 +191,12 @@ describe('Tandas (02 §18)', () => {
     const [t] = listarTandas(p.ctx);
     if (!t) throw new Error('no se guardó la tanda');
     expect(t).toMatchObject({ posicion: -200_000, cobrada: true, aportacionesHechas: 6 });
+  });
+
+  it('sin id válido explica que no la encontró', () => {
+    const p = preparar('2026-10-16');
+    renderConSesion(p.ctx, <PantallaTanda tandaId="tanda-inexistente" alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tanda-no-encontrada')).toHaveTextContent(TEXTO_TANDA_NO_ENCONTRADA);
   });
 
   it('editar y archivar desde el detalle: cambia nombre y cuenta y quita la tanda de la lista', () => {
