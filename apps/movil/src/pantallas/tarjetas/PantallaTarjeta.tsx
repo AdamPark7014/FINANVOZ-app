@@ -17,7 +17,42 @@ import { NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { Dato, FormularioPago, PreguntaLiquidarMeses, Seccion } from './componentes';
 import { CorregirSaldo, EditarTarjeta } from './EditarTarjeta';
 import { CompromisoMeses, PagosPlaneados, SeccionMeses } from './MesesYPagos';
-import { NOMBRE_MODO } from './textos';
+import {
+  AYUDA_SALDO_A_FAVOR,
+  BTN_CORREGIR_SALDO,
+  BTN_EDITAR_TARJETA,
+  BTN_LEER_PDF_BANCO,
+  BTN_PAGAR,
+  BTN_VOLVER,
+  CANDADO_COMPROMISO_12_MESES,
+  ETIQUETA_DEBES,
+  ETIQUETA_DISPONIBLE,
+  ETIQUETA_FECHA_LIMITE,
+  ETIQUETA_PAGADO_DESDE_CORTE,
+  ETIQUETA_PNGI,
+  ETIQUETA_PROXIMO_CORTE,
+  ETIQUETA_SALDO_A_FAVOR,
+  etiquetaAccesibleUsoTarjeta,
+  etiquetaSaldoAlCorte,
+  MOVIMIENTO_SIN_TITULO,
+  NOMBRE_MODO,
+  TEXTO_PNGI_CUBIERTO,
+  TEXTO_TARJETA_NO_ENCONTRADA,
+  textoCicloTarjeta,
+  textoDeudaMeses,
+  textoFechaLimiteEstado,
+  textoPagarPngiAntesDe,
+  textoPrimerCorteEnApp,
+  textoSinCorteDesdeAlta,
+  textoUsoLimiteTarjeta,
+  TITULO_CONFIGURACION,
+  TITULO_DESDE_ALTA,
+  TITULO_DESDE_ULTIMO_CORTE,
+  TITULO_ESTADOS_CUENTA,
+  TITULO_PAGAR_TARJETA,
+  tituloEstadoCuenta,
+  VACIO_MOVIMIENTOS_TARJETA,
+} from './textos';
 
 type Panel = 'pagar' | 'editar' | 'corregir' | null;
 
@@ -41,8 +76,10 @@ export function PantallaTarjeta({
   if (!existe) {
     return (
       <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta="Volver" variante="texto" ancho="contenido" alPresionar={alVolver} />
-        <Texto variante="cuerpo">No encontré esa tarjeta.</Texto>
+        <Boton etiqueta={BTN_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Texto variante="cuerpo" tono="secundario" testID="tarjeta-no-encontrada">
+          {TEXTO_TARJETA_NO_ENCONTRADA}
+        </Texto>
       </Pantalla>
     );
   }
@@ -67,7 +104,7 @@ function Detalle({
     <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="tarjeta-volver"
-        etiqueta="Volver"
+        etiqueta={BTN_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
@@ -93,7 +130,7 @@ function Detalle({
 
       {panel === 'pagar' ? (
         <Tarjeta>
-          <Texto variante="subtitulo">Pagar tarjeta</Texto>
+          <Texto variante="subtitulo">{TITULO_PAGAR_TARJETA}</Texto>
           <FormularioPago
             tarjetaId={d.id}
             nombre={d.nombre}
@@ -106,7 +143,7 @@ function Detalle({
           />
         </Tarjeta>
       ) : (
-        <Boton etiqueta="Pagar" alPresionar={() => setPanel('pagar')} testID="tarjeta-pagar" />
+        <Boton etiqueta={BTN_PAGAR} alPresionar={() => setPanel('pagar')} testID="tarjeta-pagar" />
       )}
 
       <SeccionMeses planes={d.planes} />
@@ -114,18 +151,18 @@ function Detalle({
       {plus.compromisoMsi12Meses ? (
         <CompromisoMeses meses={d.compromiso12Meses} />
       ) : d.compromiso12Meses.some((m) => m.monto > 0) ? (
-        <CandadoPlus texto="Ver tus meses de los próximos 12 meses" testID="candado-compromiso-12-meses" />
+        <CandadoPlus texto={CANDADO_COMPROMISO_12_MESES} testID="candado-compromiso-12-meses" />
       ) : null}
 
       {d.modo === 'plan' ? <PagosPlaneados d={d} /> : null}
 
       <Seccion
-        titulo={d.ultimoCorte ? 'Desde tu último corte' : 'Desde que la agregaste'}
+        titulo={d.ultimoCorte ? TITULO_DESDE_ULTIMO_CORTE : TITULO_DESDE_ALTA}
         testID="tarjeta-movimientos"
       >
         {d.desdeElCorte.length === 0 ? (
-          <Texto variante="secundario" tono="secundario">
-            Sin compras ni pagos todavía.
+          <Texto variante="secundario" tono="secundario" testID="tarjeta-movimientos-vacio">
+            {VACIO_MOVIMIENTOS_TARJETA}
           </Texto>
         ) : null}
         {d.desdeElCorte.map((m) => {
@@ -168,7 +205,7 @@ function Detalle({
         ) : null}
       </Seccion>
 
-      <Seccion titulo="Configuración" testID="tarjeta-configuracion">
+      <Seccion titulo={TITULO_CONFIGURACION} testID="tarjeta-configuracion">
         {panel === 'editar' ? (
           <EditarTarjeta d={d} alTerminar={() => setPanel(null)} />
         ) : panel === 'corregir' ? (

@@ -169,7 +169,7 @@ export default function Ajustes() {
           testID="ajustes-terminos"
           variante="texto"
           ancho="contenido"
-          etiqueta="Leer los términos de uso"
+          etiqueta={BTN_TERMINOS}
           alPresionar={() => router.push('/terminos')}
         />
       </Tarjeta>
@@ -178,11 +178,11 @@ export default function Ajustes() {
         testID="ajustes-version"
         onPress={tocarVersion}
         accessibilityRole="text"
-        accessibilityLabel={`Finanvoz versión ${version}`}
+        accessibilityLabel={etiquetaAccesibilidadVersion(version)}
         style={{ paddingVertical: espacio.s }}
       >
         <Texto variante="secundario" tono="secundario" alinear="center">
-          {`Finanvoz ${version}`}
+          {lineaVersion(version)}
         </Texto>
       </Pressable>
 

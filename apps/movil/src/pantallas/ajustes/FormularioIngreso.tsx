@@ -118,7 +118,7 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
               alCambiar={(v) => cambiar('diaMesTexto', v)}
               error={
                 valores.diaMesTexto !== '' && leerDiaMes(valores.diaMesTexto) === null
-                  ? 'Escribe un día del 1 al 31.'
+                  ? ERROR_DIA_MES
                   : null
               }
             />
@@ -140,7 +140,7 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
           {proximo ? (
             <Tarjeta testID={`${prefijo}-proximo-pago`}>
               <Texto variante="secundario" tono="secundario">
-                Tu próximo pago
+                {ETIQUETA_PROXIMO_PAGO}
               </Texto>
               <Texto variante="subtitulo">{etiquetaFecha(proximo)}</Texto>
             </Tarjeta>
