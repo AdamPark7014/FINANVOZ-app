@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **O3 TalkBack:** `etiquetaProximoPagoOnboarding` + tarjeta `onb-proximo-pago` anuncia fecha en una frase; tests en `onboarding.test` / `textos.test`.
+- **Arqueo TalkBack:** `PISTA_*` en CTAs (cerrar, continuar, calcular, confirmar, listo); live region + rol `alert` en errores; pistas en tarjeta Hoy (abrir/posponer). Live region al cuadrar ya estaba en `arqueo-mensaje-hecho`.
 
 ## Hecho (acumulado reciente)
 
-- Capturas por revisar, movimientos, widget, tandas. Ver `git log`.
+- O3 onboarding, capturas, movimientos, widget, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (tandas, ajustes, tests) — `git status` antes de editar; no mezclar en commits ajenos.
+- WIP paralelo — `git status` antes de editar.
 - CI Windows, M0 / EAS: Adam.
 
 ## Siguiente paso
