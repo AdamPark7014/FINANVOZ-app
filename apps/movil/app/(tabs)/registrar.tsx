@@ -1,16 +1,24 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View } from 'react-native';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaRegistrar, paramsDeDetalle, paramsDeFiltro } from '../../src/pantallas/principal';
+import { TEST_ID_PANTALLA_REGISTRAR } from './pestanas-textos';
 
+/** Ruta Registrar (sin pestaña): dictado, texto y formulario (`02 §2`). */
 export default function Registrar() {
   const router = useRouter();
   // Solo el id de una frase de "Por revisar" viaja en la ruta, nunca su texto (regla 9).
   const { frase } = useLocalSearchParams<{ frase?: string }>();
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));
   return (
+    <View
+      style={{ flex: 1 }}
+      testID={TEST_ID_PANTALLA_REGISTRAR}
+      accessibilityLabel="Registrar gasto o ingreso"
+    >
     <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
       <PantallaRegistrar
         // `key`: revisar otra frase vuelve a montar el panel.
@@ -27,5 +35,6 @@ export default function Registrar() {
         {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}
       />
     </ProveedorCompartido>
+    </View>
   );
 }

@@ -7,6 +7,14 @@ import {
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Texto } from '../../ui';
+import {
+  BTN_CONFIRMAR,
+  BTN_ENVIAR_CODIGO,
+  BTN_USAR_OTRO_CORREO,
+  ETIQUETA_CODIGO,
+  ETIQUETA_CORREO,
+  textoCodigoEnviado,
+} from './textos';
 
 export interface CuentaConfirmada {
   readonly modo: ModoCodigo;

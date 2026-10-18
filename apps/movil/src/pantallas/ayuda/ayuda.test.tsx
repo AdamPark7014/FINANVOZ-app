@@ -10,7 +10,14 @@ import {
   PantallaAyuda,
   PREGUNTAS_FRECUENTES,
 } from './index';
-import { BTN_ESCRIBIR_CORREO, ETIQUETA_VOLVER, mensajeSinAppCorreo, TITULO } from './textos';
+import {
+  BTN_ESCRIBIR_CORREO,
+  CONTACTO_TITULO,
+  ETIQUETA_VOLVER,
+  INTRO,
+  mensajeSinAppCorreo,
+  TITULO,
+} from './textos';
 
 /** CA-M13-04: ayuda en la app con 10 preguntas frecuentes y correo de contacto. */
 
@@ -132,9 +139,10 @@ describe('pantalla de ayuda', () => {
     expect(volver).toHaveBeenCalled();
   });
 
-  it('expone testID estables en título e intro', () => {
+  it('expone testID estables en título, intro y contacto', () => {
     render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={jest.fn(async () => {})} />);
     expect(screen.getByTestId('ayuda-titulo')).toHaveTextContent(TITULO);
-    expect(screen.getByTestId('ayuda-intro')).toBeTruthy();
+    expect(screen.getByTestId('ayuda-intro')).toHaveTextContent(INTRO);
+    expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveTextContent(CONTACTO_TITULO);
   });
 });

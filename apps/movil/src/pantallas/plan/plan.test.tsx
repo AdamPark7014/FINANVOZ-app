@@ -21,9 +21,11 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
+import { CANDADO_COMPROMISO_12_MESES } from '../tarjetas/textos';
 import { PantallaPlan, PuertaPlus, SeccionPlan } from '.';
 import {
   etiquetaCandadoPlus,
+  etiquetaOferta,
   ID,
   MENSAJE_ERROR_COMPRA,
   MENSAJE_LIMITE_DIARIO,
@@ -33,9 +35,9 @@ import {
   MENSAJE_OFERTAS_VACIAS,
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
+  resumenPlan,
   TITULO_PLAN_GRATIS,
   TITULO_PLUS,
-  TITULO_PLUS_PRUEBA,
 } from './textos';
 
 const DIA = 86_400_000;

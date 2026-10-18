@@ -121,7 +121,7 @@ describe('Tandas (02 §18)', () => {
     let vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
 
     // Calendario: tu ronda marcada y lo que arriesgas después de cada una (E11-01 `en_riesgo`).
-    expect(screen.getByText('4. vie 6 · tu turno')).toBeTruthy();
+    expect(screen.getByText(textoLineaRonda(4, 'vie 6', true))).toBeTruthy();
     for (const r of esperado) {
       expect(textoDe(`tanda-ronda-${r.t}-riesgo`)).toBe(textoDespuesRondaRiesgo(r.en_riesgo));
     }
@@ -149,11 +149,13 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
 
     const tarjeta = screen.getByTestId('tarjeta-accion-0');
-    expect(within(tarjeta).getByText('¿Ya diste tu tanda?')).toBeTruthy();
+    expect(within(tarjeta).getByText(PREGUNTA_YA_DISTE)).toBeTruthy();
     fireEvent.press(within(tarjeta).getByTestId('tarjeta-accion-0-ya-la-di'));
     fireEvent.press(screen.getByTestId(`tarjeta-accion-0-cuenta-${p.efectivo}`));
     expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: diste tu tanda $500 · Cartera'),
+      within(screen.getByTestId('aviso')).getByText(
+        mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
+      ),
     ).toBeTruthy();
     const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
     expect(ronda?.estado).toBe('cubierta');

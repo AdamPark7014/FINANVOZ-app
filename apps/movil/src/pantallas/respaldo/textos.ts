@@ -113,8 +113,8 @@ export const AVISO_REEMPLAZA_DATOS =
 export const BTN_RESTAURAR = 'Restaurar';
 
 /** Tarjeta en Ajustes (`02 §12`). */
-export const SECCION_AJUSTES = 'Respaldo';
-export const BTN_AJUSTES_ABRIR = 'Respaldar y restaurar';
+export const SECCION_RESPALDO = 'Respaldo';
+export const BTN_RESPALDAR_RESTAURAR = 'Respaldar y restaurar';
 
 /** Bienvenida · teléfono nuevo (`02 §19`). */
 export const BTN_ONBOARDING_RESTAURAR = '¿Vienes de otro teléfono? Restaurar respaldo';

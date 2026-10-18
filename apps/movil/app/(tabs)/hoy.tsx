@@ -6,7 +6,7 @@ import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacio
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaHoy, paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
-import { TEST_ID_TAB_HOY } from './hoy-textos';
+import { ETIQUETA_ACCESIBILIDAD_PESTANA, TEST_ID_TAB_HOY } from './hoy-textos';
 
 export default function Hoy() {
   const router = useRouter();
@@ -15,7 +15,11 @@ export default function Hoy() {
   useConfirmacionAlVolver((mensaje) => mostrarAviso({ mensaje }));
   return (
     // Un gasto compartido dictado se confirma aquí mismo (`02 §27`).
-    <View style={{ flex: 1 }} testID={TEST_ID_TAB_HOY}>
+    <View
+      style={{ flex: 1 }}
+      testID={TEST_ID_TAB_HOY}
+      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA.hoy}
+    >
       <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
         <PantallaHoy
         navegacion={{

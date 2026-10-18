@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
 import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto, useTema } from '../../ui';
-import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES, type PreguntaFrecuente } from './preguntas';
+import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES } from './preguntas';
 import {
   ACCESIBILIDAD_ESCRIBIR_CORREO,
   ACCESIBILIDAD_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
   ETIQUETA_VOLVER,
+  ICONO_PREGUNTA_ABIERTA,
+  ICONO_PREGUNTA_CERRADA,
   INTRO,
   mensajeSinAppCorreo,
   PISTA_ESCRIBIR_CORREO,
   pistaPreguntaFrecuente,
   textoCuerpoContacto,
   TITULO,
+  type PreguntaFrecuente,
 } from './textos';
 
 /**
@@ -123,7 +126,7 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >
-          {abierta ? '−' : '+'}
+          {abierta ? ICONO_PREGUNTA_ABIERTA : ICONO_PREGUNTA_CERRADA}
         </Texto>
       </Pressable>
       {abierta ? (

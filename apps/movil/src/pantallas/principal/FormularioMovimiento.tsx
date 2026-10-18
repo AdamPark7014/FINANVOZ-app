@@ -172,12 +172,19 @@ export function FormularioMovimiento({
   return (
     <View style={{ gap: espacio.l }} testID="formulario-movimiento">
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">¿Qué pasó?</Texto>
+        <Texto
+          variante="etiqueta"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {ETIQUETA_QUE_PASO}
+        </Texto>
         <GrupoChips
           opciones={TIPOS.map((t) => ({ valor: t, etiqueta: NOMBRE_TIPO_FORMULARIO[t] }))}
           valor={tipoElegido}
           alCambiar={cambiarTipo}
           prefijoTestID="tipo"
+          etiqueta={ETIQUETA_QUE_PASO}
         />
       </View>
       {tipoElegido === 'cuenta_dividida' ? (
@@ -221,23 +228,37 @@ export function FormularioMovimiento({
         />
         {campos.categoria ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto variante="etiqueta">{ETIQUETA_CATEGORIA}</Texto>
+            <Texto
+              variante="etiqueta"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {ETIQUETA_CATEGORIA}
+            </Texto>
             <GrupoChips
               opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
               valor={categoria}
               alCambiar={setCategoria}
               prefijoTestID="categoria"
+              etiqueta={ETIQUETA_CATEGORIA}
             />
           </View>
         ) : null}
         {campos.persona ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto variante="etiqueta">{campos.persona}</Texto>
+            <Texto
+              variante="etiqueta"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {campos.persona}
+            </Texto>
             <GrupoChips
               opciones={personas.map((p) => ({ valor: p.cuentaId, etiqueta: p.nombre }))}
               valor={personaId}
               alCambiar={setPersonaId}
               prefijoTestID="persona"
+              etiqueta={campos.persona}
             />
             <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'flex-end' }}>
               <View style={{ flex: 1 }}>

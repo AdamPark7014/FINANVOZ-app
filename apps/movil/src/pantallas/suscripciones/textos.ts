@@ -6,7 +6,7 @@ export const PISTA_VOLVER = 'Regresa a Cuentas';
 
 /** Con filas activas: acciones por suscripción. */
 export const PISTA_AYUDA =
-  'Conviértela en compromiso y Hoy la aparta; o avisa si ya no la pagas o no es suscripción.';
+  'Conviértelas en compromiso y Hoy las aparta; o avisa si ya no las pagas o no son suscripción.';
 
 /** Sin cargos recurrentes detectados (E14). */
 export const TEXTO_SUSCRIPCIONES_VACIO =

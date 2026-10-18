@@ -13,7 +13,7 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
-import { mensajeError, NOMBRE_TIPO } from './textos';
+import { mensajeError, NOMBRE_TIPO, PISTA_ELEGIR_CUENTA_CONFIRMACION } from './textos';
 
 type Motivo = Extract<ResultadoTexto, { resultado: 'confirmar' }>['motivo'];
 type Registrado = Extract<ResultadoTexto, { resultado: 'registrado' }>;
@@ -111,19 +111,28 @@ export function ConfirmacionRegistro({
             </Texto>
             <Cifra centavos={p.entrada.monto} />
           </View>
-          {p.faltan.map((f) => (
-            <View key={f.campo} style={{ gap: espacio.xs }}>
-              <Texto variante="secundario" tono="secundario">
-                {pregunta(f)}
-              </Texto>
-              <GrupoChips
-                opciones={f.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
-                valor={elecciones[clave(i, f.campo)] ?? null}
-                alCambiar={(id) => setElecciones((e) => ({ ...e, [clave(i, f.campo)]: id }))}
-                prefijoTestID={`elegir-${i}-${f.campo}`}
-              />
-            </View>
-          ))}
+          {p.faltan.map((f) => {
+            const leyenda = pregunta(f);
+            return (
+              <View key={f.campo} style={{ gap: espacio.xs }}>
+                <Texto
+                  variante="secundario"
+                  tono="secundario"
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  {leyenda}
+                </Texto>
+                <GrupoChips
+                  opciones={f.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+                  valor={elecciones[clave(i, f.campo)] ?? null}
+                  alCambiar={(id) => setElecciones((e) => ({ ...e, [clave(i, f.campo)]: id }))}
+                  prefijoTestID={`elegir-${i}-${f.campo}`}
+                  etiqueta={leyenda}
+                />
+              </View>
+            );
+          })}
         </View>
       ))}
       {error ? (
@@ -135,7 +144,7 @@ export function ConfirmacionRegistro({
         etiqueta="Guardar"
         alPresionar={guardar}
         deshabilitado={!completo}
-        pista={completo ? undefined : 'Elige una cuenta en los chips de arriba.'}
+        pista={completo ? undefined : PISTA_ELEGIR_CUENTA_CONFIRMACION}
         testID="boton-guardar-confirmacion"
       />
       <Boton

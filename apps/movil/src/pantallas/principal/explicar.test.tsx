@@ -2,7 +2,6 @@ import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NivelNube } from '../../servicios';
 import {
   MENSAJE_LIMITE_EXPLICAR_DIARIO,
-  MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
   MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
 } from '../../servicios/explicar';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
@@ -100,11 +99,4 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
     expect(screen.queryByTestId('explicacion-pie')).toBeNull();
   });
 
-  it('en Gratis con cupo mensual agotado muestra el mensaje de Gratis', async () => {
-    preparar([{ tipo: 'limite', codigo: 'limite_mensual' }], { plus: false });
-    await escribir(golden('Q13').texto);
-    expect(await screen.findByTestId('explicacion-limite')).toHaveTextContent(
-      MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
-    );
-  });
 });

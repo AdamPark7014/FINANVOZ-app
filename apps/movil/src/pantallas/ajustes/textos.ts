@@ -12,9 +12,6 @@ export const ETIQUETA_MULTITAREA = 'Ocultar en multitarea';
 export const DESC_MULTITAREA =
   'La vista previa de apps recientes sale en blanco y no se permiten capturas de pantalla.';
 
-export const SECCION_RESPALDO = 'Respaldo';
-export const BTN_RESPALDAR_RESTAURAR = 'Respaldar y restaurar';
-
 export const SECCION_PRIVACIDAD = 'Privacidad';
 export const TEXTO_PRIVACIDAD =
   'Qué se guarda, qué sale de tu teléfono y a quién, tus permisos, descargar o borrar tus datos.';

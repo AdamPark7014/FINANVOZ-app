@@ -20,6 +20,19 @@ export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
 export const TITULO = 'Ayuda';
 export const INTRO = 'Toca una pregunta para ver la respuesta.';
 
+/** Indicador visual junto a cada pregunta (oculto a TalkBack). */
+export const ICONO_PREGUNTA_CERRADA = '+';
+export const ICONO_PREGUNTA_ABIERTA = '−';
+
+/**
+ * Bloque Ayuda en Ajustes (`02 §12`). `ajustes/textos.ts` debe reexportar estos valores
+ * para una sola fuente de redacción.
+ */
+export const SECCION_AJUSTES = TITULO;
+export const TEXTO_CARD_AJUSTES =
+  'Respuestas a las dudas más comunes y nuestro correo de contacto.';
+export const BTN_ABRIR_DESDE_AJUSTES = 'Ver preguntas frecuentes';
+
 export const CONTACTO_TITULO = '¿No encontraste tu respuesta?';
 export const BTN_ESCRIBIR_CORREO = 'Escribir un correo';
 export const PISTA_ESCRIBIR_CORREO = 'Abre tu app de correo';

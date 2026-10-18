@@ -97,7 +97,7 @@ export function MeTocoLaTanda({
         }}
       />
       {alTerminar ? (
-        <Boton etiqueta="Cancelar" variante="texto" ancho="contenido" alPresionar={alTerminar} />
+        <Boton etiqueta={ETIQUETA_CANCELAR} variante="texto" ancho="contenido" alPresionar={alTerminar} />
       ) : null}
       {error ? (
         <Texto variante="secundario" tono="faltante">

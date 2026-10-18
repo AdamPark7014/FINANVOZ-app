@@ -18,6 +18,8 @@ import {
   LISTA_ESPERA_ARIA_CTA_ENVIANDO,
   LISTA_ESPERA_ARIA_FORMULARIO,
   LISTA_ESPERA_ERROR_CONSENTIMIENTO,
+  LISTA_ESPERA_ERROR_CORREO,
+  LISTA_ESPERA_ERROR_LIMITE,
   LISTA_ESPERA_PREGUNTAS,
   LISTA_ESPERA_TITULO_EXITO,
   listaEsperaErrorFaltaUna,
@@ -67,7 +69,7 @@ describe('Lista de espera', () => {
     fireEvent.click(screen.getByLabelText(/acepto/i));
     enviar();
     expect(fetch).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toMatch(/correo/);
+    expect(screen.getByRole('alert').textContent).toBe(LISTA_ESPERA_ERROR_CORREO);
   });
 
   it('envía solo correo, respuestas y consentimiento, sin montos', async () => {
@@ -140,6 +142,6 @@ describe('Lista de espera', () => {
     contestar('ana@ejemplo.mx');
     fireEvent.click(screen.getByLabelText(/acepto/i));
     enviar();
-    await waitFor(() => expect(screen.getByText(/varios intentos/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(LISTA_ESPERA_ERROR_LIMITE)).toBeTruthy());
   });
 });

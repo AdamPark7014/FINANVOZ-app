@@ -313,7 +313,7 @@ describe('Tarjetas', () => {
     fireEvent.press(screen.getByTestId('tarjeta-pagar'));
     expect(screen.getByTestId('pagar-monto').props.value).toBe('1,200');
     fireEvent.press(screen.getByTestId('pagar-guardar'));
-    expect(screen.getByText('Elige de qué cuenta salió el pago.')).toBeTruthy();
+    expect(screen.getByText(ERROR_ORIGEN_PAGO)).toBeTruthy();
     fireEvent.press(screen.getByTestId(`pagar-origen-${p.efectivo}`));
     fireEvent.press(screen.getByTestId('pagar-guardar'));
     const aviso = screen.getByTestId('aviso');

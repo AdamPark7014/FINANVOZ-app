@@ -79,7 +79,7 @@ export function TarjetaRespaldo({
           <Boton
             testID="privacidad-respaldo-exportar"
             variante="secundario"
-            etiqueta="Exportar respaldo (.cartera)"
+            etiqueta={BTN_EXPORTAR_ARCHIVO}
             cargando={exportando}
             deshabilitado={exportando}
             alPresionar={() => void exportar()}
@@ -88,7 +88,7 @@ export function TarjetaRespaldo({
             testID="privacidad-respaldo-cambiar"
             variante="texto"
             ancho="contenido"
-            etiqueta="Cambiar contraseña"
+            etiqueta={BTN_CAMBIAR_CONTRASENA}
             alPresionar={() => {
               setMensaje(null);
               setEditando(true);
@@ -99,7 +99,7 @@ export function TarjetaRespaldo({
         <Boton
           testID="privacidad-respaldo-crear"
           variante="secundario"
-          etiqueta="Crear contraseña de respaldo"
+          etiqueta={BTN_CREAR_CONTRASENA}
           alPresionar={() => {
             setMensaje(null);
             setEditando(true);
@@ -111,12 +111,17 @@ export function TarjetaRespaldo({
           testID="privacidad-respaldo-restaurar"
           variante="texto"
           ancho="contenido"
-          etiqueta="Restaurar un respaldo"
+          etiqueta={BTN_RESTAURAR_RESPALDO}
           alPresionar={alRestaurar}
         />
       )}
       {mensaje ? (
-        <Texto variante="secundario" tono="secundario" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLiveRegion="polite"
+          testID="privacidad-respaldo-mensaje"
+        >
           {mensaje}
         </Texto>
       ) : null}

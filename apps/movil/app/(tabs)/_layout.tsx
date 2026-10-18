@@ -2,22 +2,20 @@ import { Tabs } from 'expo-router/js-tabs';
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { IconoPestana, ProveedorAvisos } from '../../src/pantallas/principal';
 import { barraPestanas, estiloBarraPestanas, useTema } from '../../src/ui';
+import {
+  ETIQUETA_ACCESIBILIDAD_PESTANA,
+  testIdBotonPestana,
+  type RutaPestanaVisible,
+} from './pestanas-textos';
 
-type RutaPestana = (typeof barraPestanas.pestanas)[number]['ruta'];
+export { ETIQUETA_ACCESIBILIDAD_PESTANA } from './pestanas-textos';
 
-/** TalkBack: la etiqueta visible no basta; cada pestaña dice qué pantalla abre (02-UX §15). */
-export const ETIQUETA_ACCESIBILIDAD_PESTANA: Record<RutaPestana, string> = {
-  hoy: 'Pestaña Hoy, resumen de tu día',
-  movimientos: 'Pestaña Movimientos, historial de movimientos',
-  cuentas: 'Pestaña Cuentas, efectivo, tarjetas y deudas',
-};
-
-function opcionesPestana(ruta: RutaPestana): BottomTabNavigationOptions {
+function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
   const { etiqueta } = barraPestanas.pestanas.find((p) => p.ruta === ruta)!;
   return {
     title: etiqueta,
     tabBarLabel: etiqueta,
-    tabBarButtonTestID: `pestana-${ruta}`,
+    tabBarButtonTestID: testIdBotonPestana(ruta),
     tabBarAccessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta],
     tabBarIcon: ({ color }) => <IconoPestana ruta={ruta} color={color} />,
   };

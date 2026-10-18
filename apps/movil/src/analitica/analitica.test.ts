@@ -1,5 +1,5 @@
 import fc from 'fast-check';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { aleatorioNode } from '../db/node';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { estadisticasActivas, fijarEstadisticas } from '../privacidad/estadisticas';
@@ -247,6 +247,11 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
   it('un error del transporte no rompe la app ni deja rastro', async () => {
     const p = abrirPrueba();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true, estadisticas: true });
+    const consola = {
+      log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+      warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+      error: vi.spyOn(console, 'error').mockImplementation(() => {}),
+    };
     const analitica = crearAnalitica({
       transporte: () => Promise.reject(new Error('sin red')),
       aleatorio: aleatorioNode,
@@ -254,6 +259,8 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
     });
     expect(() => analitica.registrar(p.ctx, { nombre: 'app_abierta', propiedades: {} })).not.toThrow();
     await new Promise((r) => setTimeout(r, 0));
+    for (const spy of Object.values(consola)) expect(spy).not.toHaveBeenCalled();
+    for (const spy of Object.values(consola)) spy.mockRestore();
     p.base.cerrar();
   });
 

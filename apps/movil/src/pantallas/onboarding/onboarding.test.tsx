@@ -26,6 +26,9 @@ import {
   TIP_CAPTURA_AHORA_NO,
   TIP_COLCHON_SIN_POR_AHORA,
   TIP_CONSENTIMIENTO,
+  TIP_CUENTAS_MINIMO,
+  TIP_INGRESO_SALTAR,
+  TIP_PAGOS_SALTAR,
 } from './tips';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
@@ -91,6 +94,7 @@ describe('onboarding', () => {
     tocar('onb-casilla-datos');
     tocar('onb-aceptar');
     expect(r.getPathname()).toBe('/onboarding/ingreso');
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
     expect(obtenerConsentimiento(s.ctx)).toMatchObject({
       datos_financieros: true,
       estadisticas: false,
@@ -123,6 +127,7 @@ describe('onboarding', () => {
 
     it('CA-M2-12 · con meses que ya tenía y "No sé": no resta los meses del saldo y Hoy avisa', () => {
       const r = abrir('/onboarding/cuentas');
+      expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CUENTAS_MINIMO);
       tocar('onb-agregar-tarjeta');
       expect(r.getPathname()).toBe('/onboarding/tarjeta');
       llenarTarjeta();
@@ -168,12 +173,14 @@ describe('onboarding', () => {
     tocar('onb-aceptar');
 
     // O3: quincena por omisión; se ve el próximo pago (15 oct 2026 es jueves).
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
     escribir('onb-ingreso-monto', '13,000');
     expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/jue 15/);
     tocar('onb-ingreso-continuar');
     expect(r.getPathname()).toBe('/onboarding/cuentas');
 
     // O4: efectivo y una cuenta de débito.
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CUENTAS_MINIMO);
     escribir('onb-efectivo', '600');
     tocar('onb-agregar-cuenta');
     escribir('onb-cuenta-nombre', 'BBVA');
@@ -183,6 +190,7 @@ describe('onboarding', () => {
     expect(r.getPathname()).toBe('/onboarding/pagos-fijos');
 
     // O5: renta con chip sugerido.
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_PAGOS_SALTAR);
     tocar('onb-pago-renta');
     escribir('onb-pago-monto', '4,500');
     escribir('onb-pago-dia', '1');

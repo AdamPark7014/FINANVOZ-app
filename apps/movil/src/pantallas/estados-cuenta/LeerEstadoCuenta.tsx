@@ -27,9 +27,8 @@ import {
   CHIP_MISMO,
   CHIP_OTRO,
   ERROR_CONTRASENA_PDF,
-  ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
-  ETIQUETA_RESUMEN_ESTADO,
+  etiquetaBotonTarjeta,
   etiquetaChipsDudoso,
   mensajeAjustado,
   mensajeAnteriorAlAlta,
@@ -302,13 +301,13 @@ function Lectura({
           {lectura.tarjetas.map((t) => (
             <Boton
               key={t.cuentaId}
-              etiqueta={t.ultimos4 ? `${t.nombre} ••${t.ultimos4}` : t.nombre}
+              etiqueta={etiquetaBotonTarjeta(t.nombre, t.ultimos4)}
               variante="secundario"
               alPresionar={() => alElegirTarjeta(t.cuentaId)}
               testID={`estado-tarjeta-${t.cuentaId}`}
             />
           ))}
-          <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+          <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
         </>
       );
     case 'listo':
@@ -348,7 +347,7 @@ function Revisar({
         </Texto>
         {a.cuadra === false ? (
           <Texto variante="secundario" tono="faltante" testID="estado-no-cuadra">
-            {AVISO_NO_CUADRA}
+            {MENSAJE_NO_CUADRA}
           </Texto>
         ) : null}
         {a.renglonesSinLeer > 0 ? (
@@ -405,7 +404,7 @@ function Revisar({
       <Boton etiqueta={BTN_GUARDAR} alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
       {faltan ? (
         <Texto variante="secundario" tono="secundario">
-          {PISTA_CONTESTAR_DUDOSOS}
+          {MENSAJE_FALTAN_DUDOSOS}
         </Texto>
       ) : null}
       <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />

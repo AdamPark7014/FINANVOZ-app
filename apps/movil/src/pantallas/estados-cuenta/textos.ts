@@ -51,93 +51,6 @@ export const MENSAJE_DEMASIADO_GRANDE =
 export const MENSAJE_NO_DISPONIBLE = 'Por ahora solo puedo leer estados de cuenta en Android.';
 export const MENSAJE_ERROR_GUARDAR = 'No pude guardar los movimientos. Intenta de nuevo.';
 
-export const BTN_ENTENDIDO = 'Entendido';
-export const BTN_ABRIR = 'Abrir';
-export const BTN_CANCELAR = 'Cancelar';
-export const BTN_VER_TARJETA = 'Ver la tarjeta';
-export const BTN_GUARDAR = 'Guardar';
-export const BTN_AJUSTAR = 'Ajustar';
-export const BTN_NO = 'No';
-
-export const AVISO_NO_CUADRA =
-  'Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.';
-
-export const TITULO_DUDOSOS = '¿Ya los tenías?';
-
-export const PISTA_CONTESTAR_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
-
-export const ETIQUETA_MOVIMIENTO_DESCONOCIDO = 'un movimiento';
-
-export const OPCION_DUDOSO_MISMO = 'Es el mismo';
-export const OPCION_DUDOSO_OTRO = 'Es otro';
-
-export const MENSAJE_NO_RECONOCIDO_SIN_LISTA = 'Todavía no sé leer estados de cuenta de ese banco.';
-
-export function mensajeNoReconocido(bancos: readonly string[]): string {
-  if (bancos.length === 0) return MENSAJE_NO_RECONOCIDO_SIN_LISTA;
-  return `${MENSAJE_NO_RECONOCIDO_SIN_LISTA} Por ahora leo: ${bancos.join(', ')}.`;
-}
-
-export function mensajeIncompleto(banco: string): string {
-  return `Es un estado de cuenta de ${banco}, pero no pude leer todos sus datos. No agregué nada.`;
-}
-
-export function mensajeSinTarjetas(banco: string): string {
-  return `Es un estado de cuenta de ${banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`;
-}
-
-export function mensajeAnteriorAlAlta(corte: string, nombreTarjeta: string): string {
-  return `Este estado de cuenta (corte ${etiquetaDiaMes(corte)}) es de antes de que agregaras la ${nombreTarjeta}: ya está en el saldo con que la diste de alta.`;
-}
-
-export function preguntaElegirTarjeta(banco: string, ultimos4: string | null, corte: string): string {
-  const terminacion = ultimos4 ? ` terminación ${ultimos4}` : '';
-  return `¿De qué tarjeta es este estado de cuenta de ${banco}${terminacion} (corte ${etiquetaDiaMes(corte)})?`;
-}
-
-export function etiquetaBotonTarjeta(nombre: string, ultimos4: string | null): string {
-  return ultimos4 ? `${nombre} ••${ultimos4}` : nombre;
-}
-
-export function tituloNuevos(cantidad: number): string {
-  return cantidad === 1 ? 'El que no tenía' : 'Los que no tenía';
-}
-
-export function mensajeRenglonesSinLeer(n: number): string {
-  return n === 1
-    ? '1 renglón no lo pude leer; revísalo en tu PDF.'
-    : `${n} renglones no los pude leer; revísalos en tu PDF.`;
-}
-
-export function mensajeAnteriores(n: number): string {
-  return n === 1
-    ? '1 es de antes de que agregaras la tarjeta; ya está en su saldo.'
-    : `${n} son de antes de que agregaras la tarjeta; ya están en su saldo.`;
-}
-
-export function descripcionMovimientoExistente(d: RenglonDudoso): string {
-  const desc = d.existente.descripcion ?? ETIQUETA_MOVIMIENTO_DESCONOCIDO;
-  return `${desc} del ${etiquetaDiaMes(d.existente.fecha)} por ${formatearCentavos(d.existente.monto)}`;
-}
-
-export function preguntaEsMismoMovimiento(ya: string): string {
-  return `¿Es el mismo que ya tenías: ${ya}?`;
-}
-
-export function etiquetaChipsDudoso(descripcion: string): string {
-  return `¿${descripcion} ya lo tenías?`;
-}
-
-export function mensajeAjustado(nombreTarjeta: string): string {
-  return `Listo: tu ${nombreTarjeta} quedó como dice tu banco.`;
-}
-
-export function mensajeGuardado(agregados: number, nombre: string): string {
-  if (agregados === 0) return `No agregué nada: tu ${nombre} ya tenía todo.`;
-  if (agregados === 1) return `Agregué 1 movimiento a tu ${nombre}.`;
-  return `Agregué ${agregados} movimientos a tu ${nombre}.`;
-}
-
 /** "3 no los tenía" · "1 no lo tenía". */
 function noLosTenia(n: number): string {
   if (n === 0) return 'ya tenías todos';
@@ -231,6 +144,10 @@ export function preguntaElegirTarjeta(
 ): string {
   const term = ultimos4 ? ` terminación ${ultimos4}` : '';
   return `¿De qué tarjeta es este estado de cuenta de ${banco}${term} (corte ${etiquetaDiaMes(corte)})?`;
+}
+
+export function etiquetaBotonTarjeta(nombre: string, ultimos4: string | null | undefined): string {
+  return ultimos4 ? `${nombre} ••${ultimos4}` : nombre;
 }
 
 export function etiquetaChipsDudoso(descripcion: string): string {

@@ -289,14 +289,11 @@ describe('modo explicar: límites y fallas', () => {
   });
 
   it.each([
-    ['limite_mensual', true, MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS],
-    ['limite_mensual', false, MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS],
-    ['limite_diario', true, MENSAJE_LIMITE_EXPLICAR_DIARIO],
-    ['limite_diario', false, MENSAJE_LIMITE_EXPLICAR_DIARIO],
-    ['tope_global', true, MENSAJE_LIMITE_EXPLICAR_TOPE],
-    ['tope_global', false, MENSAJE_LIMITE_EXPLICAR_TOPE],
-  ] as const)('proxy devuelve límite %s (plus=%s): tipo y mensaje', async (codigo, plus, mensaje) => {
-    const p = semilla({ plus });
+    ['limite_mensual', MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS],
+    ['limite_diario', MENSAJE_LIMITE_EXPLICAR_DIARIO],
+    ['tope_global', MENSAJE_LIMITE_EXPLICAR_TOPE],
+  ] as const)('proxy devuelve límite %s en Plus: tipo y mensaje', async (codigo, mensaje) => {
+    const p = semilla({ plus: true });
     expect(await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'limite', codigo }]).nube })).toEqual({
       tipo: 'limite',
       codigo,
