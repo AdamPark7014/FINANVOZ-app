@@ -248,6 +248,7 @@ describe('Ajustes → Widget', () => {
     );
     await act(async () => {});
     expect(screen.getByTestId('ajustes-widget-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-widget-previa-etiqueta')).toHaveProp('accessibilityRole', 'header');
     const interruptor = screen.getByTestId('ajustes-widget-ocultar');
     expect(interruptor.props.accessibilityState).toMatchObject({ checked: false });
 
