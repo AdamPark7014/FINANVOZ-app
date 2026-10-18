@@ -81,6 +81,7 @@ export function TarjetaArqueo({
           valor={null}
           alCambiar={elegir}
           prefijoTestID={testID}
+          etiqueta={pregunta}
         />
       )}
       {error ? (

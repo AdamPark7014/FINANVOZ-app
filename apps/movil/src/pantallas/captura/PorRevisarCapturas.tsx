@@ -207,6 +207,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             }, 'Listo. La próxima vez lo pongo así.')
           }
           prefijoTestID={`${testID}-categoria`}
+          etiqueta={MOTIVO.sin_categoria}
         />
       ) : null}
       <View style={{ gap: espacio.s }}>

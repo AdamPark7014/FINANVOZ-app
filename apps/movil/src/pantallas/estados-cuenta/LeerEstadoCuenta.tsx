@@ -327,10 +327,6 @@ function Lectura({
   }
 }
 
-function etiquetaRenglon(r: RenglonEstado): string {
-  return `${NOMBRE_TIPO_RENGLON[r.tipo]}: ${r.descripcion} · ${etiquetaDiaMes(r.fecha)} · ${formatearCentavos(r.monto)}`;
-}
-
 function Revisar({
   a,
   alGuardar,
@@ -344,6 +340,7 @@ function Revisar({
   const [respuestas, setRespuestas] = useState<Readonly<Record<number, 'mismo' | 'otro'>>>({});
   const [error, setError] = useState<string | null>(null);
   const faltan = a.dudosos.some((d) => respuestas[d.indice] === undefined);
+  const resumen = resumenEstado(a);
   const guardar = () => {
     try {
       alGuardar(a, [...quitados], { ...respuestas });

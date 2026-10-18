@@ -452,7 +452,7 @@ describe('¿Me alcanza?', () => {
     expect(textoDe('me-alcanza-mensaje')).toBe(MENSAJE_DATOS_INSUFICIENTES);
     expect(textoDe('me-alcanza-datos-ayuda')).toBe(AYUDA_DATOS_INSUFICIENTES);
     expect(screen.getByText('Una compra de $1,500')).toBeTruthy();
-    expect(screen.getByText(BTN_LISTO)).toBeTruthy();
+    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toBeTruthy();
   });
 
   it('si el cálculo falla, muestra el error y permite reintentar', async () => {
