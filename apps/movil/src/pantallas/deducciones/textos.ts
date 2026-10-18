@@ -2,6 +2,7 @@
 export { AVISO_DEDUCIBLE_EFECTIVO, LEYENDA_ESTIMACION, MENSAJE_SIN_PARAMETROS } from '../../servicios/deducciones';
 
 export const ETIQUETA_VOLVER = 'Volver';
+export const PISTA_VOLVER = 'Regresa a Cuentas';
 
 /** Candado Plus al entrar desde Cuentas. */
 export const TITULO_PUERTA_PLUS = 'Tus deducciones del año';

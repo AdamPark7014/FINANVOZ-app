@@ -33,6 +33,7 @@ import {
   TEXTO_IMPORTAR_VACIO,
   TITULO_PUERTA_PLUS,
   TITULO_TUS_FACTURAS,
+  PISTA_VOLVER,
   tituloPantallaDeducciones,
 } from './textos';
 
