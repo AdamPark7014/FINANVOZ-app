@@ -64,6 +64,7 @@ import {
   PISTA_MOSTRAR_COMO_LO_CALCULE,
   PISTA_OCULTAR_COMO_LO_CALCULE,
   PISTA_REINTENTAR_ME_ALCANZA,
+  PISTA_VER_MOVIMIENTOS,
   PREGUNTA_MSI,
   SUFIJO_ACCESIBILIDAD_RECOMENDADA,
   TEXTO_CALCULANDO,
@@ -486,6 +487,7 @@ function Resultado({
               variante="texto"
               ancho="contenido"
               alPresionar={alVerMovimientos}
+              pista={PISTA_VER_MOVIMIENTOS}
               testID="boton-ver-movimientos-calculo"
             />
           ) : null}

@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Personas · TalkBack datos para cobrar:** `PISTA_GUARDAR_DATOS_COBRO`, `PISTA_GUARDAR_Y_COBRAR` y cancelar en `FormularioDatosCobro`; error CLABE/celular con rol `alert`; tests en `personas.test.tsx`.
+- **Respaldo · TalkBack exportar:** `PISTA_EXPORTAR_ARCHIVO` en `TarjetaRespaldo`; test en `respaldo-ui.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Recordatorio quitar/alert, tarjetas historial, tandas, ayuda, captura. Ver `git log`.
+- Personas, suscripciones, me-alcanza, tandas, arqueo. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, arqueo, tarjetas, suscripciones) — no mezclar en commits ajenos.
+- WIP paralelo (widget, onboarding, me-alcanza, personas) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `PISTA` en CTA Tandas desde Cuentas (`boton-tandas`).
+2. Más `PISTA` en respaldo (confirmar borrar cuenta, restaurar) o CTA Tandas (`boton-tandas`).
 
 ## No tocar
 

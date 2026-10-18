@@ -19,6 +19,7 @@ import {
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
   PISTA_BORRAR_CUENTA,
+  PISTA_EXPORTAR_ARCHIVO,
   PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
   PISTA_VOLVER_RESTAURAR,
@@ -51,6 +52,7 @@ describe('textos de respaldo (`02 §14`, §19)', () => {
       PISTA_VOLVER,
       PISTA_BORRAR_CUENTA,
       PISTA_RESPALDAR_AHORA,
+      PISTA_EXPORTAR_ARCHIVO,
     ].join('\n');
     expect(ui).not.toMatch(/[!¡]/);
   });
@@ -77,6 +79,23 @@ describe('accesibilidad en pantalla respaldo', () => {
     );
     p.cerrar();
   });
+
+  it('exportar archivo tiene pista TalkBack', async () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    const contrasena = 'mi frase de respaldo segura';
+    await fijarContrasenaRespaldo(r.deps, contrasena, contrasena);
+    montar(
+      p.ctx,
+      <TarjetaRespaldo alRestaurar={jest.fn()} />,
+      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
+    );
+    expect(screen.getByTestId('privacidad-respaldo-exportar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_EXPORTAR_ARCHIVO,
+    );
+    p.cerrar();
+  }, 15_000);
 
   it('TarjetaRespaldo muestra copy centralizado antes de crear contraseña', () => {
     const p = crearSesionPrueba('2026-10-11');

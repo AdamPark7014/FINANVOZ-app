@@ -219,9 +219,14 @@ export function TarjetaCapturaInactiva({ testID }: { testID: string }) {
   return (
     <Tarjeta testID={testID}>
       <Texto variante="cuerpoFuerte" accessibilityRole="header">
-        No he visto notificaciones de tu banco en 3 días. Revisa que la captura siga activa.
+        {TITULO_CAPTURA_INACTIVA}
       </Texto>
-      <Texto variante="secundario" tono="secundario" testID={`${testID}-guia`}>
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID={`${testID}-guia`}
+        accessibilityLabel={etiquetaGuiaCapturaInactiva(guiaCapturaInactiva(marcaTelefono()))}
+      >
         {guiaCapturaInactiva(marcaTelefono())}
       </Texto>
       {puente ? (
@@ -234,6 +239,7 @@ export function TarjetaCapturaInactiva({ testID }: { testID: string }) {
           }}
           testID={`${testID}-revisar`}
           etiquetaAccesible="Revisar acceso a notificaciones de tu banco"
+          pista={PISTA_REVISAR_ACCESO_CAPTURA}
         />
       ) : null}
     </Tarjeta>

@@ -24,15 +24,21 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { abrirPruebaPantalla, conEscenario, escenario, vector } from '../principal/__pruebas__/base';
 import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
+import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 import {
   BTN_NO_ES_MIA,
+  etiquetaGuiaCapturaInactiva,
+  etiquetaIntroCapturasPorRevisar,
   etiquetaPermisoCaptura,
   etiquetaVacioCapturasPorRevisar,
+  guiaCapturaInactiva,
   INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
+  PISTA_DESCARTAR_REACTIVAR_CAPTURA,
   PISTA_YA_REGISTRE_AVISO,
+  TITULO_CAPTURA_INACTIVA,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,
 } from './textos';
@@ -115,11 +121,12 @@ describe('preguntas de captura en Hoy', () => {
     registrarSenalesCaptura(p.ctx, { appsInstaladas: ['mx.ejemplo.bancoa'], ultimoEvento: INICIO });
     p.reloj.fijarInstante(INICIO + 72 * HORA);
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
-    expect(
-      screen.getByText(
-        'No he visto notificaciones de tu banco en 3 días. Revisa que la captura siga activa.',
-      ),
-    ).toBeTruthy();
+    expect(screen.getByText(TITULO_CAPTURA_INACTIVA)).toBeTruthy();
+    const guia = guiaCapturaInactiva(null);
+    expect(screen.getByTestId(/-guia$/)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaGuiaCapturaInactiva(guia),
+    );
     p.cerrar();
   });
 });
@@ -157,6 +164,10 @@ describe('Movimientos → capturas por revisar', () => {
     expect(screen.getByTestId('capturas-por-revisar')).toBeTruthy();
     expect(screen.getByTestId('capturas-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('capturas-por-revisar-intro')).toHaveTextContent(INTRO_CAPTURAS_POR_REVISAR);
+    expect(screen.getByTestId('capturas-por-revisar-intro')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaIntroCapturasPorRevisar(),
+    );
     expect(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`)).toHaveProp(
       'accessibilityHint',
       PISTA_YA_REGISTRE_AVISO,
@@ -386,6 +397,11 @@ describe('O6 · activar la captura', () => {
     const puente = puenteFalso();
     conCaptura(p.ctx, puente, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText('Vuelve a activar la lectura de notificaciones')).toBeTruthy();
+    expect(screen.getByTestId(/-reactivar$/)).toHaveProp('accessibilityHint', PISTA_ACTIVAR_CAPTURA);
+    expect(screen.getByTestId(/-ahora-no$/)).toHaveProp(
+      'accessibilityHint',
+      PISTA_DESCARTAR_REACTIVAR_CAPTURA,
+    );
     fireEvent.press(screen.getByTestId(/-reactivar$/));
     // La divulgación destacada se vuelve a mostrar antes de abrir el ajuste del sistema.
     expect(screen.getByText(DIVULGACION_CAPTURA.parrafos[1])).toBeTruthy();

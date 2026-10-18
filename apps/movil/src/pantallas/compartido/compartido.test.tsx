@@ -25,6 +25,7 @@ import { PanelRegistrar } from '../principal/PanelRegistrar';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
+import { EscanerQr } from './EscanerQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
 import {
@@ -176,16 +177,10 @@ describe('02 §27 · Gastos con tu pareja', () => {
   });
 
   it('escáner sin permiso: pista TalkBack en Permitir la cámara', () => {
-    jest.doMock('expo-camera', () => {
-      const { Pressable, Text } = jest.requireActual('react-native');
-      return {
-        useCameraPermissions: () => [{ granted: false }, jest.fn()],
-        CameraView: () => null,
-      };
-    });
-    const { EscanerQr: EscanerSinPermiso } = jest.requireActual('./EscanerQr');
-    render(<EscanerSinPermiso alLeer={jest.fn()} alCancelar={jest.fn()} />);
+    mockCamaraConcedida = false;
+    render(<EscanerQr alLeer={jest.fn()} alCancelar={jest.fn()} />);
     expect(screen.getByTestId('escaner-permiso')).toHaveProp('accessibilityHint', PISTA_PERMISO_CAMARA);
+    mockCamaraConcedida = true;
   });
 
   it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {

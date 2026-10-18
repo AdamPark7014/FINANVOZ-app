@@ -90,6 +90,7 @@ export function TarjetaRespaldo({
             cargando={exportando}
             deshabilitado={exportando}
             alPresionar={() => void exportar()}
+            pista={PISTA_EXPORTAR_ARCHIVO}
           />
           <Boton
             testID="privacidad-respaldo-cambiar"

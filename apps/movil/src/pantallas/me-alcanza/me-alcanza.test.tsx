@@ -70,6 +70,7 @@ import {
   PISTA_MOSTRAR_COMO_LO_CALCULE,
   PISTA_OCULTAR_COMO_LO_CALCULE,
   PISTA_REINTENTAR_ME_ALCANZA,
+  PISTA_VER_MOVIMIENTOS,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
@@ -459,6 +460,25 @@ describe('¿Me alcanza?', () => {
     expect(screen.queryByTestId('me-alcanza-resultado')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-fallo')).toBeNull();
     expect(screen.getByTestId('me-alcanza-formulario')).toBeTruthy();
+  });
+
+  it('TalkBack en Ver los movimientos dentro de Cómo lo calculé (`02 §19`)', async () => {
+    const p = e401();
+    montar(
+      p.ctx,
+      <PantallaMeAlcanza
+        consultaInicial={{ precio: 150_000, descripcion: 'unos tenis' }}
+        calcular={inyectar(vistaE822())}
+        alCerrar={jest.fn()}
+        alVerMovimientos={jest.fn()}
+      />,
+    );
+    await screen.findByTestId('me-alcanza-resultado');
+    fireEvent.press(screen.getByTestId('boton-como-lo-calcule'));
+    expect(screen.getByTestId('boton-ver-movimientos-calculo')).toHaveProp(
+      'accessibilityHint',
+      PISTA_VER_MOVIMIENTOS,
+    );
   });
 
   it('TalkBack en cabecera y acciones del formulario (`02 §19`)', () => {

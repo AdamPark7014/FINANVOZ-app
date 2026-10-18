@@ -77,6 +77,8 @@ export const PISTA_MOSTRAR_COMO_LO_CALCULE = 'Muestra el detalle de la simulaci�
 /** TalkBack al ocultar el detalle (`02 §19`). */
 export const PISTA_OCULTAR_COMO_LO_CALCULE = 'Oculta el detalle de la simulación';
 export const BTN_VER_MOVIMIENTOS = 'Ver los movimientos';
+/** TalkBack en el detalle de la simulación (`02 §19`). */
+export const PISTA_VER_MOVIMIENTOS = 'Abre los movimientos que usó esta simulación';
 export const BTN_LO_COMPRE = 'Lo compré';
 export const BTN_HACER_OTRA_CUENTA = 'Hacer otra cuenta';
 /** TalkBack en resultado (`02 §19`). */
