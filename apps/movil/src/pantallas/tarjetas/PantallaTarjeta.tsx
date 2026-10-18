@@ -203,14 +203,11 @@ function Detalle({
 
       <Seccion titulo={TITULO_ESTADOS_CUENTA} testID="tarjeta-estados">
         {d.estadosCuenta.length === 0 ? (
-          <Texto
-            variante="cuerpo"
-            tono="secundario"
+          <EstadoVacio
+            texto={textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
             testID="tarjeta-estados-vacio"
-            accessibilityLiveRegion="polite"
-          >
-            {textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
-          </Texto>
+            etiquetaAccesible={etiquetaVacioEstadosTarjeta(textoPrimerCorteEnApp(d.etiquetaProximoCorte))}
+          />
         ) : null}
         {d.estadosCuenta.map((e) => (
           <EstadoCuenta key={e.corte} e={e} />
