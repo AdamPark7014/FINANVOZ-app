@@ -6,21 +6,20 @@
 
 ## Hecho en este turno
 
-- **Ajustes TalkBack:** `pista={PISTA_AYUDA}` en abrir ayuda; reexport `PISTA_AYUDA` en barrel; versión sin doble lectura (`accessibilityElementsHidden`); pruebas en `ajustes.test.tsx`.
+- **Arqueo TalkBack:** `arqueo.test.tsx` — vacío BBVA con `etiquetaVacioSinEfectivo()`; flujo Listo (`ACCESIBILIDAD_LISTO`, `accessibilityLiveRegion` en mensaje) tolera cuadre directo o chip sobrante.
 
 ## Hecho (acumulado reciente)
 
-- Captura notificaciones UI, TalkBack Hoy/Movimientos/Cuentas, onboarding O6. Ver `git log`.
+- Principal sin ingreso, me-alcanza datos insuficientes, suscripciones/O5, Cuentas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP paralelo en disco — no mezclar sin `git status`.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Video flujo divulgación → captura para Play (`08 §3.1`).
 
 ## No tocar
 
