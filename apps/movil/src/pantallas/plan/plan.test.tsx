@@ -1,6 +1,6 @@
 // M7 · planes en la UI: pantalla del plan con la tienda en memoria, candados de Plus, CA-M7-02 (mensaje al agotar
 // las interpretaciones del mes) y CA-M7-07 (al terminar la prueba sin pagar todo sigue visible y editable).
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import {
   listarMovimientos,
