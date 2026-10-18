@@ -6,27 +6,27 @@
 
 ## Hecho en este turno
 
-- **TarjetaRespaldo a11y:** subtítulo del archivo `.cartera` con `testID` y rol `header`; prueba en `respaldo-ui.test.tsx`.
+- **onboarding:** copy O2 (consentimiento) centralizado en `textos.ts` y cableado en `consentimiento.tsx`; prueba §14 ampliada en `textos.test.ts`. O1 + progreso TalkBack ya en `textos.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Títulos Respaldo/Restaurar, ayuda/privacidad headers. Ver `git log`.
+- ui a11y EstadoVacio/Boton/CampoTexto, tandas, suscripciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (tandas, tarjetas, principal) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE` sin commitear).
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. Centralizar copy O3–O7 en `textos.ts` (ingreso, cuentas, pagos-fijos, colchon, tarjeta).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 
