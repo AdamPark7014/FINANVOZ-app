@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Onboarding O4:** quitada definición duplicada de `TIP_CUENTAS_MINIMO` en `textos.ts`; sigue reexportándose desde `tips.ts`.
+- **`(tabs)` a11y (ya en main):** barra con `tabBarAccessibilityRole: tab` y `ETIQUETA_ACCESIBILIDAD_PESTANA` ("Pestaña …"); rutas con `propsContenedorPestana` / `ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA` (sin prefijo); tests `_layout`, `pestanas-textos`, `hoy`.
 
 ## Hecho (acumulado reciente)
 
-- Persona: `PISTA_VOLVER` en volver, título con `accessibilityRole="header"`; deducciones/suscripciones/cuentas copy en `textos.ts`. Ver `git log`.
+- Deducciones tests, captura copy, personas/widget TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP local sin commitear: revisar `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Revisar otros tips O5–O7 por duplicado en `textos.ts` vs `tips.ts`.
+2. Tips onboarding (`tips.ts` vs `textos.ts`) si se centraliza copy.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
