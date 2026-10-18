@@ -21,7 +21,17 @@ import {
   type VistaDeducciones,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  CampoMonto,
+  CampoTexto,
+  espacio,
+  EstadoVacio,
+  Interruptor,
+  Pantalla,
+  Tarjeta,
+  Texto,
+} from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { PuertaPlus } from '../plan/CandadoPlus';
 import { mensajeError } from '../principal/textos';

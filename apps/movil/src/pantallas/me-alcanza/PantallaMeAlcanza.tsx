@@ -24,6 +24,7 @@ import { mensajeError } from '../principal/textos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
 import {
+  ACCESIBILIDAD_CERRAR,
   AYUDA_DATOS_INSUFICIENTES,
   etiquetaVacioDatosInsuficientes,
   BTN_CALCULAR,

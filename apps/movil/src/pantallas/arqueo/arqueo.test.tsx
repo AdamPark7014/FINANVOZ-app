@@ -5,6 +5,7 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
 import {
   ACCESIBILIDAD_CERRAR,
+  etiquetaVacioSinEfectivo,
   ETIQUETA_GASTO_SIN_DESCRIPCION,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,

@@ -47,6 +47,7 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { abrirMeAlcanza, tomarConsultaPendiente } from '.';
 import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
 import {
+  ACCESIBILIDAD_CERRAR,
   AYUDA_DATOS_INSUFICIENTES,
   BTN_CALCULAR,
   BTN_COMO_LO_CALCULE,

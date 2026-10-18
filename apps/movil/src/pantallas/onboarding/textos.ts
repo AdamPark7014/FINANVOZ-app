@@ -1,5 +1,11 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
+export {
+  TIP_COLCHON_SIN_POR_AHORA,
+  TIP_CUENTAS_MINIMO,
+  TIP_INGRESO_SALTAR,
+  TIP_PAGOS_SALTAR,
+} from './tips';
 
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
 export const PASOS_ONBOARDING = 7;
@@ -14,6 +20,8 @@ export const CUERPO_BIENVENIDA =
   'Anota lo que tienes, lo que debes y tus pagos fijos. Finanvoz hace las cuentas por ti.';
 export const BTN_ONB_EMPEZAR = 'Empezar';
 export const BTN_ONB_CONTINUAR = 'Continuar';
+export const PISTA_ONB_EMPEZAR = 'Inicia el recorrido de configuración';
+export const PISTA_ONB_CONTINUAR = 'Sigue con el siguiente paso del recorrido';
 
 /** O2 · Consentimiento */
 export const TITULO_CONSENTIMIENTO = 'Tus datos son tuyos';
