@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **EditarTarjeta + CorregirSaldo:** errores, etiquetas de campos, chips, botones y ayuda/ejemplo de tasa centralizados en `tarjetas/textos.ts` (bloque §8 editar/corregir). Commit en remoto: `69cdc5f` (textos ampliado antes en `5f03c16`).
+- **tandas:** `PISTA_VOLVER` / `PISTA_VOLVER_DETALLE` en `textos.ts`; botones Volver en lista y detalle con `pista` (TalkBack); prueba `accessibilityHint` en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- MesesYPagos copy, me-alcanza, captura, estados de cuenta. Ver `git log`.
+- suscripciones, plan, deducciones, tarjetas, privacidad, me-alcanza, respaldo a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear: ajustes, onboarding, respaldo, `cf7706f` local si no está en remoto.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP ajeno: `ajustes.tsx`, `PantallaAyuda`, `tarjetas/textos.ts` — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajustes/onboarding/respaldo.
-3. `git push` del commit local pendiente si Adam quiere.
+2. Más pistas TalkBack en botones de tandas (Nueva tanda, Ver calendario) si hace falta.
 
 ## No tocar
 
