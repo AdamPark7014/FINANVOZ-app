@@ -195,15 +195,11 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         {TITULO_TUS_FACTURAS}
       </Texto>
       {v.facturas.length === 0 ? (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
+        <EstadoVacio
+          texto={TEXTO_FACTURAS_VACIO}
           testID="deducciones-sin-facturas"
-          accessibilityRole="text"
-          accessibilityLabel={TEXTO_FACTURAS_VACIO}
-        >
-          {TEXTO_FACTURAS_VACIO}
-        </Texto>
+          etiquetaAccesible={etiquetaVacioFacturas()}
+        />
       ) : null}
       {v.facturas.map((f) => (
         <FilaFactura key={f.uuid} f={f} v={v} />

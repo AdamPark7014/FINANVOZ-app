@@ -115,6 +115,7 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
     );
     expect(await screen.findByTestId('importar-vacio')).toBeTruthy();
     expect(textoDe('importar-vacio')).toBe(TEXTO_IMPORTAR_VACIO);
+    expect(screen.getByTestId('importar-vacio').props.accessibilityLabel).toBe(etiquetaVacioImportar());
     r.unmount();
     renderConSesion(
       ctx,
