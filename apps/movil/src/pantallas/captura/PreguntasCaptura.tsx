@@ -92,7 +92,9 @@ function Marco({
 }) {
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{titulo}</Texto>
+      <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {titulo}
+      </Texto>
       <Texto variante="secundario" tono="secundario">
         {detalle}
       </Texto>
@@ -130,13 +132,16 @@ function ElegirPersona({
   const [nombre, setNombre] = useState('');
   return (
     <View style={{ gap: espacio.s }}>
-      <Texto variante="secundario">{pregunta}</Texto>
+      <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {pregunta}
+      </Texto>
       {personas.length > 0 ? (
         <GrupoChips
           opciones={personas.map((p) => ({ valor: p.cuentaId, etiqueta: p.nombre }))}
           valor={null}
           alCambiar={alElegir}
           prefijoTestID={`${testID}-persona`}
+          etiqueta={pregunta}
         />
       ) : null}
       <CampoTexto
@@ -176,10 +181,13 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
   const [categorias] = useState(() => listarCategorias(ctx, 'gasto'));
   const contestar = (r: RespuestaSalida, mensaje: string) =>
     responder(() => responderSalidaSinPareja(ctx, p.capturaId, r), mensaje);
+  const titulo = `¿A quién le mandaste ${formatearCentavos(p.monto)}?`;
+  const preguntaCual = '¿A cuál?';
+  const preguntaGasto = '¿Qué pagaste?';
   return (
     <Marco
       testID={testID}
-      titulo={`¿A quién le mandaste ${formatearCentavos(p.monto)}?`}
+      titulo={titulo}
       detalle={`Salió de ${p.cuenta} el ${etiquetaFecha(p.fecha)} y no vi a dónde llegó.`}
       error={error}
     >
@@ -196,10 +204,13 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
           else setOpcion(o);
         }}
         prefijoTestID={testID}
+        etiqueta={titulo}
       />
       {opcion === 'cuenta' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario">¿A cuál?</Texto>
+          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaCual}
+          </Texto>
           <GrupoChips
             opciones={[
               ...p.entradas.map((e) => ({
@@ -220,6 +231,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
               contestar(r, 'Listo: lo cuento como un movimiento entre tus cuentas.');
             }}
             prefijoTestID={`${testID}-destino`}
+            etiqueta={preguntaCual}
           />
         </View>
       ) : null}
@@ -234,7 +246,9 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
       ) : null}
       {opcion === 'gasto' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario">¿Qué pagaste?</Texto>
+          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaGasto}
+          </Texto>
           <GrupoChips
             opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
             valor={null}
@@ -242,6 +256,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
               contestar({ destino: 'gasto', categoria }, 'Listo: lo anoté como un gasto.')
             }
             prefijoTestID={`${testID}-categoria`}
+            etiqueta={preguntaGasto}
           />
         </View>
       ) : null}
@@ -260,10 +275,12 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
   const cuentas = useCuentasPropias(p.tarjeta);
   const contestar = (r: RespuestaPago, mensaje: string) =>
     responder(() => responderPagoSinOrigen(ctx, p.capturaId, r), mensaje);
+  const titulo = `¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`;
+  const preguntaDebe = '¿Se lo tienes que pagar?';
   return (
     <Marco
       testID={testID}
-      titulo={`¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`}
+      titulo={titulo}
       detalle={`Llegó el ${etiquetaFecha(p.fecha)} y no vi de qué cuenta salió.`}
       error={error}
     >
@@ -279,6 +296,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
           else setOpcion(o);
         }}
         prefijoTestID={testID}
+        etiqueta={titulo}
       />
       {opcion === 'cuenta' ? (
         <GrupoChips

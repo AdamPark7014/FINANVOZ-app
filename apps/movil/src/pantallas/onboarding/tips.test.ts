@@ -55,6 +55,7 @@ describe('tips de onboarding', () => {
   it('TIP_CUENTAS_MINIMO menciona «Continuar» y Cuentas', () => {
     expect(TIP_CUENTAS_MINIMO).toMatch(/«Continuar»/);
     expect(TIP_CUENTAS_MINIMO).toMatch(/Cuentas/);
+    expect(TIP_CUENTAS_MINIMO).not.toMatch(/d[eé]bito/i);
   });
 
   it('TIP_PAGOS_SALTAR menciona «Saltar por ahora»', () => {

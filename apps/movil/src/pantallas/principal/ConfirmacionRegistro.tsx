@@ -12,7 +12,7 @@ import { enlaceAnaliticaCorreccion } from '../../servicios/correcciones';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import {
   ETIQUETA_CANCELAR,
   ETIQUETA_GUARDAR,
@@ -107,12 +107,7 @@ export function ConfirmacionRegistro({
             const leyenda = preguntaCuentaConfirmacionRegistro(f);
             return (
               <View key={f.campo} style={{ gap: espacio.xs }}>
-                <Texto
-                  variante="secundario"
-                  tono="secundario"
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                >
+                <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
                   {leyenda}
                 </Texto>
                 <GrupoChips

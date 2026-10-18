@@ -13,6 +13,13 @@ const RUTAS = {
 };
 
 describe('LayoutPestanas', () => {
+  it('pestanas-textos alinea botones con barraPestanas', () => {
+    for (const { ruta } of barraPestanas.pestanas) {
+      expect(testIdBotonPestana(ruta)).toBe(`pestana-${ruta}`);
+    }
+    expect(TEST_ID_PANTALLA_REGISTRAR).toBe('tab-registrar');
+  });
+
   it('expone tres pestañas con testID y etiquetas TalkBack (02 §15)', () => {
     renderRouter(RUTAS, { initialUrl: '/hoy' });
     for (const { ruta, etiqueta } of barraPestanas.pestanas) {

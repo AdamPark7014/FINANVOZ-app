@@ -3,6 +3,7 @@ import {
   etiquetaDiaMes,
   type AnalisisEstadoCuenta,
   type PropuestaConciliacionEstado,
+  type RenglonDudoso,
   type RenglonEstado,
 } from '../../servicios';
 import { formatearCentavos } from '../../ui';
@@ -25,6 +26,7 @@ export const AVISO_NO_CUADRA =
   'Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.';
 
 export const MENSAJE_FALTAN_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
+export const PISTA_CONTESTAR_DUDOSOS = MENSAJE_FALTAN_DUDOSOS;
 
 /** Cuando el PDF cuadra pero no hay renglones nuevos que marcar (`02 §26`). */
 export const TEXTO_SIN_NUEVOS = 'No hay movimientos nuevos que revisar.';
@@ -132,8 +134,19 @@ export function preguntaMismoMovimiento(
   return `¿Es el mismo que ya tenías: ${textoMovimientoExistente(descripcion, fecha, monto)}?`;
 }
 
+export const NOMBRE_TIPO_RENGLON = {
+  cargo: 'Compra',
+  comision: 'Comisión o interés',
+  pago: 'Pago a la tarjeta',
+  abono: 'Bonificación',
+} as const;
+
 export function etiquetaRenglonEstado(r: RenglonEstado): string {
   return `${NOMBRE_TIPO_RENGLON[r.tipo]}: ${r.descripcion} · ${etiquetaDiaMes(r.fecha)} · ${formatearCentavos(r.monto)}`;
+}
+
+export function preguntaEsMismoMovimiento(d: RenglonDudoso): string {
+  return preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto);
 }
 
 export function lineaEncabezadoDudoso(descripcion: string, fecha: PlainDate): string {
@@ -183,10 +196,3 @@ export function preguntaConciliacion(p: PropuestaConciliacionEstado): string {
       : `${formatearCentavos(-p.saldoCartera)} a tu favor`;
   return `Según tu banco ${deuda(p.saldoBanco)}; según Cartera, ${cartera}. ¿Ajusto?`;
 }
-
-export const NOMBRE_TIPO_RENGLON = {
-  cargo: 'Compra',
-  comision: 'Comisión o interés',
-  pago: 'Pago a la tarjeta',
-  abono: 'Bonificación',
-} as const;

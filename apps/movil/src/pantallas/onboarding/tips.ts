@@ -13,7 +13,7 @@ export const TIP_INGRESO_SALTAR =
 
 /** O4 · Cuentas: efectivo basta para continuar; el resto es opcional. */
 export const TIP_CUENTAS_MINIMO =
-  'Puedes tocar «Continuar» solo con efectivo; débitos, billeteras y tarjetas los agregas después en Cuentas.';
+  'Puedes tocar «Continuar» solo con efectivo; cuentas, billeteras y tarjetas las agregas después en Cuentas.';
 
 /** O5 · Pagos fijos: saltar sin registrar compromisos mensuales hoy. */
 export const TIP_PAGOS_SALTAR =

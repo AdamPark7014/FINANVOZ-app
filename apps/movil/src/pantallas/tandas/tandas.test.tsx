@@ -165,6 +165,7 @@ describe('Tandas (02 §18)', () => {
     expect(
       within(screen.getByTestId('aviso')).getByText(
         mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
+        { hidden: true },
       ),
     ).toBeTruthy();
     const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
@@ -188,11 +189,9 @@ describe('Tandas (02 §18)', () => {
       .find((n) => within(n).queryByText(PREGUNTA_HOY_COBRO))?.props.testID as string;
     fireEvent.press(screen.getByTestId(`${testID}-me-toco`));
     fireEvent.press(screen.getByTestId(`${testID}-me-toco-cuenta-${p.bbva}`));
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
-      ),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(
+      mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
+    );
     expect(detalleTanda(p.ctx, tandaId).cobrada).toBe(true);
     expect(p.ctx.libro.saldo(cuentaId)).toBe(200_000 - 500_000);
   });

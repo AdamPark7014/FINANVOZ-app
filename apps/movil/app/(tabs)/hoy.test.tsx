@@ -3,7 +3,13 @@ import { aceptarConsentimiento, agregarCuenta } from '../../src/servicios';
 import { renderConSesion } from '../../src/pantallas/principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../../src/pantallas/principal/__pruebas__/base';
 import Hoy from './hoy';
-import { SUBTITULO_SIN_INGRESO, TITULO_SIN_INGRESO, TEST_ID_TAB_HOY } from './hoy-textos';
+import { ETIQUETA_ACCESIBILIDAD_PESTANA } from './pestanas-textos';
+import {
+  SUBTITULO_SIN_INGRESO,
+  TEST_ID_HOY_SIN_INGRESO,
+  TEST_ID_TAB_HOY,
+  TITULO_SIN_INGRESO,
+} from './hoy-textos';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -27,11 +33,15 @@ describe('pestaña Hoy (ruta)', () => {
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 300_000 });
     renderConSesion(p.ctx, <Hoy />);
-    expect(screen.getByTestId(TEST_ID_TAB_HOY)).toBeTruthy();
+    expect(screen.getByTestId(TEST_ID_TAB_HOY)).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_ACCESIBILIDAD_PESTANA.hoy,
+    );
     expect(screen.getByTestId('pantalla-hoy')).toBeTruthy();
-    expect(screen.getByTestId('hoy-sin-ingreso-titulo')).toHaveTextContent(TITULO_SIN_INGRESO);
-    expect(screen.getByTestId('hoy-sin-ingreso-subtitulo')).toHaveTextContent(SUBTITULO_SIN_INGRESO);
-    expect(screen.getByTestId('boton-configurar-ingreso')).toBeTruthy();
+    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.contenedor)).toBeTruthy();
+    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.titulo)).toHaveTextContent(TITULO_SIN_INGRESO);
+    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.subtitulo)).toHaveTextContent(SUBTITULO_SIN_INGRESO);
+    expect(screen.getByTestId(TEST_ID_HOY_SIN_INGRESO.boton)).toBeTruthy();
     p.cerrar();
   });
 });

@@ -15,7 +15,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from '../../ui';
 import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
 import { mensajeCuentaDividida } from '../personas/textos';
-import { GrupoChips, type OpcionChip } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE, type OpcionChip } from './Chip';
 import {
   AVISO_RETIRO_EFECTIVO_TARJETA,
   BTN_AGREGAR_PERSONA,
@@ -172,11 +172,7 @@ export function FormularioMovimiento({
   return (
     <View style={{ gap: espacio.l }} testID="formulario-movimiento">
       <View style={{ gap: espacio.xs }}>
-        <Texto
-          variante="etiqueta"
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
+        <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_QUE_PASO}
         </Texto>
         <GrupoChips
@@ -228,11 +224,7 @@ export function FormularioMovimiento({
         />
         {campos.categoria ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto
-              variante="etiqueta"
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            >
+            <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {ETIQUETA_CATEGORIA}
             </Texto>
             <GrupoChips
@@ -246,11 +238,7 @@ export function FormularioMovimiento({
         ) : null}
         {campos.persona ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto
-              variante="etiqueta"
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            >
+            <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.persona}
             </Texto>
             <GrupoChips

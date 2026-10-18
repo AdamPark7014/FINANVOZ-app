@@ -29,7 +29,7 @@ import {
 import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
 import { mensajeCompraMsi } from '../tarjetas/textos';
-import { GrupoChips } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { EstadoVacio } from './EstadoVacio';
 import { useMostrarAviso } from './ProveedorAvisos';
 import { useAvisoRegistro } from './useAvisoRegistro';
@@ -270,11 +270,7 @@ function PasarAMeses({
   };
   return (
     <View style={{ gap: espacio.s }} testID={`pasar-a-meses-${m.id}`}>
-      <Texto
-        variante="cuerpo"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
+      <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
         {PREGUNTA_PASAR_A_MESES}
       </Texto>
       <GrupoChips

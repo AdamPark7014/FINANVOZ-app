@@ -25,8 +25,8 @@ export const ICONO_PREGUNTA_CERRADA = '+';
 export const ICONO_PREGUNTA_ABIERTA = '−';
 
 /**
- * Bloque Ayuda en Ajustes (`02 §12`). `ajustes/textos.ts` debe reexportar estos valores
- * para una sola fuente de redacción.
+ * Bloque Ayuda en Ajustes (`02 §12`). `ajustes/textos.ts` reexporta estos valores
+ * como `SECCION_AYUDA`, `TEXTO_AYUDA` y `BTN_AYUDA` (una sola fuente de redacción).
  */
 export const SECCION_AJUSTES = TITULO;
 export const TEXTO_CARD_AJUSTES =

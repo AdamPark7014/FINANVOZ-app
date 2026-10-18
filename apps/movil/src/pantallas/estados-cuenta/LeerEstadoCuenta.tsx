@@ -10,7 +10,6 @@ import {
   type LecturaEstadoCuenta,
   type PropuestaConciliacionEstado,
   type RenglonDudoso,
-  type RenglonEstado,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
@@ -221,9 +220,11 @@ function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void;
     <>
       <Texto
         variante="cuerpo"
+        tono="secundario"
         testID={testID}
         accessibilityLiveRegion="polite"
-        accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}. ${texto}`}
+        accessibilityRole="text"
+        accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}: ${texto}`}
       >
         {texto}
       </Texto>
@@ -350,13 +351,8 @@ function Revisar({
   };
   return (
     <>
-      <Tarjeta testID="estado-resumen">
-        <Texto
-          variante="cuerpo"
-          testID="estado-resumen-texto"
-          accessibilityLiveRegion="polite"
-          accessibilityLabel={`${ETIQUETA_RESUMEN_ESTADO}. ${resumen}`}
-        >
+      <Tarjeta testID="estado-resumen" etiquetaAccesible={ETIQUETA_RESUMEN_ESTADO} accionesAnidadas>
+        <Texto variante="cuerpo" testID="estado-resumen-texto" accessibilityLiveRegion="polite">
           {resumen}
         </Texto>
         {a.cuadra === false ? (
@@ -384,7 +380,7 @@ function Revisar({
           {a.nuevos.map((n) => (
             <Casilla
               key={n.indice}
-              etiqueta={etiquetaRenglon(n)}
+              etiqueta={etiquetaRenglonEstado(n)}
               valor={!quitados.has(n.indice)}
               alCambiar={(v) =>
                 setQuitados((q) => {
@@ -448,7 +444,7 @@ function Dudoso({
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
       <Texto variante="secundario" tono="secundario">
-        {preguntaEsMismoMovimiento(d)}
+        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
       </Texto>
       <Chips
         etiqueta={etiquetaChipsDudoso(d.descripcion)}

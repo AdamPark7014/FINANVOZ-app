@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CORREO_AYUDA } from './preguntas';
 import {
   BTN_ABRIR_DESDE_AJUSTES,
+  BTN_AYUDA,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
   INTRO,

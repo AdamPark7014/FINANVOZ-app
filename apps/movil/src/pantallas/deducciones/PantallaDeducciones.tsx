@@ -176,7 +176,13 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         {TITULO_TUS_FACTURAS}
       </Texto>
       {v.facturas.length === 0 ? (
-        <Texto variante="cuerpo" tono="secundario" testID="deducciones-sin-facturas">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="deducciones-sin-facturas"
+          accessibilityRole="text"
+          accessibilityLabel={TEXTO_FACTURAS_VACIO}
+        >
           {TEXTO_FACTURAS_VACIO}
         </Texto>
       ) : null}
@@ -561,7 +567,13 @@ export function ImportarCompartidas({
       {estado.tipo === 'listo' ? <ResultadoImportacionTarjeta r={estado.r} /> : null}
       {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
       {estado.tipo === 'vacio' ? (
-        <Texto variante="cuerpo" tono="secundario" testID="importar-vacio">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="importar-vacio"
+          accessibilityRole="text"
+          accessibilityLabel={TEXTO_IMPORTAR_VACIO}
+        >
           {TEXTO_IMPORTAR_VACIO}
         </Texto>
       ) : null}

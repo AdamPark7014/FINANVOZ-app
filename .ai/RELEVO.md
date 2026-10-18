@@ -6,28 +6,28 @@
 
 ## Hecho en este turno
 
-- **onboarding O3–O5:** `TIP_INGRESO_SALTAR`, `TIP_CUENTAS_MINIMO`, `TIP_PAGOS_SALTAR` en `tips.ts`; cableados en `app/onboarding/ingreso|cuentas|pagos-fijos.tsx`; pruebas en `tips.test.ts` y `onboarding.test.tsx`. En main: `9f2b98b` (tips + wire), `1266b67` (aserciones recorrido).
+- **reconsentimiento / aviso-privacidad:** copy es-MX centralizado en `pantallas/privacidad/textos.ts` (`introReconsentimiento`, casillas, tips); componente `Reconsentimiento.tsx`; rutas `app/reconsentimiento.tsx` y `app/aviso-privacidad.tsx` (barrel); tests `reconsentimiento-textos.test.ts` — en remoto (`ab7822d`, barrel `e3fc441`).
 
 ## Hecho (acumulado reciente)
 
-- Tips O2/O6/O7, copy Ajustes, a11y principal. Ver `git log`.
+- Invitación avisos, respaldo, ingreso UI. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear (avisos, captura, estados-cuenta, tandas…) — otro turno; no mezclar.
+- WIP local ajeno (captura, estados-cuenta, principal, tandas) sin commitear.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP ajeno si Adam lo pide.
+2. Oleadas copy captura/principal si Adam pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- Working tree ajeno sin commitear salvo el pedido explícito del turno.
+- WIP ajeno en working tree.
 
 ## Estimación rápida
 

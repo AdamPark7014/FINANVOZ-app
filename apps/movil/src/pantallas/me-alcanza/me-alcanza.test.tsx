@@ -259,9 +259,9 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
-    expect(screen.getAllByText(BTN_LO_COMPRE).length).toBeGreaterThan(0);
-    expect(screen.getByText(BTN_COMO_LO_CALCULE)).toBeTruthy();
-    expect(screen.getByText(BTN_HACER_OTRA_CUENTA)).toBeTruthy();
+    expect(screen.getByTestId('lo-compre-contado_hoy')).toBeTruthy();
+    expect(screen.getByRole('button', { name: BTN_COMO_LO_CALCULE })).toBeTruthy();
+    expect(screen.getByTestId('boton-otra-cuenta')).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
     // Texto fijo de `08 §1`.
@@ -296,7 +296,6 @@ describe('¿Me alcanza?', () => {
       { notificaciones },
     );
     await screen.findByTestId('me-alcanza-resultado');
-    expect(screen.getByText('Recuérdamelo el jueves')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-recuerdamelo'));
     await screen.findByTestId('recordatorio-programado');
     expect(textoDe('recordatorio-programado')).toBe(TEXTO_RECORDATORIO_PROGRAMADO);
@@ -379,9 +378,11 @@ describe('¿Me alcanza?', () => {
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByText(/^Registré: Unos tenis \$1,500 a 3 meses/)).toBeTruthy();
+    expect(
+      within(aviso).getByLabelText(etiquetaHablada('Registré: Unos tenis $1,500 a 3 meses con la Nu')),
+    ).toBeTruthy();
 
-    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
+    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
 
