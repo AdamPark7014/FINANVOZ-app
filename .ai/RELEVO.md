@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **movil/ajustes/widget:** `SeccionWidget` con copy en `widget-textos.ts`, `PreviaWidget` reactiva al interruptor, testIDs (`ajustes-widget-previa`, instrucciones, error); indentación del handler.
+- **movil/tandas:** `FormularioTanda` y `TarjetasTanda` consumen `textos.ts` (errores, etiquetas, mensajes Todavía no); test mínimo de copy centralizado en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Copy Ajustes (captura, colchón, avisos, ingreso), widget Android, suscripciones. Ver `git log` y `docs/ESTADO.md`.
+- Copy Ajustes (widget, captura, ingreso), suscripciones, respaldo, deducciones (WIP local ajeno). Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (privacidad, onboarding, calculadora, etc.) — no mezclar.
+- WIP local sin commitear (ajustes/widget, captura, respaldo, plan, calculadora, etc.) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Limpiar WIP ajeno en commits pequeños si Adam lo pide.
+2. Seguir centralizando copy en `tarjetas/` (formularios) o commits del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
