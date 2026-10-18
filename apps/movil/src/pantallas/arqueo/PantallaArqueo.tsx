@@ -23,6 +23,11 @@ import {
   CERRAR,
   CONFIRMAR,
   CONTINUAR,
+  PISTA_CALCULAR,
+  PISTA_CERRAR,
+  PISTA_CONFIRMAR,
+  PISTA_CONTINUAR,
+  PISTA_LISTO,
   ETIQUETA_MONTO_TRAES,
   ETIQUETA_OTRA_CANTIDAD,
   ETIQUETA_QUIEN_TE_PAGO,
@@ -83,6 +88,7 @@ export function PantallaArqueo({
         <Boton
           etiqueta={CERRAR}
           etiquetaAccesible={ACCESIBILIDAD_CERRAR}
+          pista={PISTA_CERRAR}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
@@ -179,6 +185,7 @@ function Arqueo({
         <Boton
           etiqueta={LISTO}
           etiquetaAccesible={ACCESIBILIDAD_LISTO}
+          pista={PISTA_LISTO}
           alPresionar={alCerrar}
           testID="arqueo-listo"
         />

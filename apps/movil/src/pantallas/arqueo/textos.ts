@@ -17,6 +17,20 @@ export const ACCESIBILIDAD_LISTO = 'Listo, cerrar conteo de efectivo';
 export const ACCESIBILIDAD_ABRIR = 'Abrir conteo de efectivo';
 export const CONTINUAR = 'Continuar';
 export const CONFIRMAR = 'Confirmar';
+/** TalkBack: cierra sin registrar cambios. */
+export const PISTA_CERRAR = 'Cierra la pantalla; nada se guarda hasta Confirmar';
+/** TalkBack: paso 1 → cantidad en mano. */
+export const PISTA_CONTINUAR = 'Pasa a decir cuánto efectivo traes';
+/** TalkBack: compara con lo esperado. */
+export const PISTA_CALCULAR = 'Compara lo que traes con lo esperado';
+/** TalkBack: guarda conteo y ajustes. */
+export const PISTA_CONFIRMAR = 'Registra el conteo y los ajustes en tu libro';
+/** TalkBack: tras mensaje de listo. */
+export const PISTA_LISTO = 'Cierra la pantalla después del conteo';
+/** TalkBack: tarjeta de Hoy con gastos por asignar. */
+export const PISTA_ABRIR_DESDE_TARJETA = 'Abre el conteo completo, empezando por esos gastos';
+/** TalkBack: posponer tarjeta de Hoy. */
+export const PISTA_POSPONER = 'Oculta la tarjeta; te pregunto mañana';
 export const TOTAL = 'Total';
 export const AHORA_NO = 'Ahora no';
 export const MENSAJE_POSPONER = 'Va. Te pregunto mañana.';
