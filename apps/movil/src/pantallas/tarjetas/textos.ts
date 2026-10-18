@@ -18,10 +18,10 @@ export function lineaCuotas(c: Pick<CompraMsiRegistrada, 'meses' | 'cuotas'>): s
   return `${c.meses} meses: ${partes.join(' y ')}`;
 }
 
-/** "Registré: Tele $12,000 a 12 meses · Banamex Oro ••8812" + "12 meses de $1,000". */
+/** "Registré: Tele $12,000 a 12 meses sin intereses · Banamex Oro ••8812" + "12 meses de $1,000". */
 export function mensajeCompraMsi(c: CompraMsiRegistrada): string {
   const que = c.descripcion.charAt(0).toUpperCase() + c.descripcion.slice(1);
-  return `Registré: ${que} ${formatearCentavos(c.monto)} a ${c.meses} meses · ${c.tarjeta}\n${lineaCuotas(c)}`;
+  return `Registré: ${que} ${formatearCentavos(c.monto)} a ${c.meses} meses sin intereses · ${c.tarjeta}\n${lineaCuotas(c)}`;
 }
 
 function cicloEnPalabras(ciclo: TarjetaEditada['ciclo']): string {
@@ -47,8 +47,10 @@ export const NOMBRE_MODO = {
   plan: 'Voy pagando por partes',
 } as const;
 
+export const VACIO_MSI_TARJETA = 'No tienes compras a meses en esta tarjeta.';
+
 export const NOMBRE_ESTADO_PLAN = {
   activo: 'Activo',
-  terminado: 'Terminado',
-  liquidado: 'Liquidado',
+  terminado: 'Ya pagaste todas las cuotas',
+  liquidado: 'Ya lo terminaste de pagar',
 } as const;

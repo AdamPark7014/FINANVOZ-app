@@ -27,6 +27,9 @@ const HACER: Record<Accion, (ctx: Contexto, comercio: string) => unknown> = {
   no_es: marcarNoEsSuscripcion,
 };
 
+const PISTA_AYUDA =
+  'Aprétala en Hoy, dilo si ya no la pagas o si no es suscripción.';
+
 /**
  * Cuentas → Suscripciones (`02 §20`, RF-INT-01, Gratis): las activas con su monto y próximo cargo, "Pagas unos
  * $X al mes", el aumento de precio ("antes $115") y las que ya no se cobran. Por fila: Convertir en compromiso
@@ -53,8 +56,14 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista="Regresa a Cuentas"
       />
       <Texto variante="titulo">Suscripciones</Texto>
+      {v.activas.length > 0 ? (
+        <Texto variante="secundario" tono="secundario" testID="suscripciones-ayuda">
+          {PISTA_AYUDA}
+        </Texto>
+      ) : null}
       {v.textoResumen ? (
         <Texto variante="cuerpoFuerte" testID="suscripciones-resumen">
           {v.textoResumen}
@@ -131,6 +140,7 @@ function Fila({
             alCambiar={setNombre}
             testID={`${id}-nombre`}
             alEnviar={guardarNombre}
+            ayuda="Así la verás en la lista"
           />
         ) : (
           <Texto variante="cuerpoFuerte">{s.nombre}</Texto>
@@ -142,6 +152,7 @@ function Fila({
             variante="texto"
             ancho="contenido"
             alPresionar={() => setEditandoNombre(true)}
+            pista="Cambia cómo la ves en la lista"
           />
         ) : (
           <Boton
@@ -149,6 +160,7 @@ function Fila({
             etiqueta="Guardar nombre"
             variante="secundario"
             alPresionar={guardarNombre}
+            pista="Guarda el nombre que escribiste"
           />
         )}
         <Texto variante="cuerpo" testID={`${id}-monto`}>
@@ -171,6 +183,7 @@ function Fila({
             variante="texto"
             ancho="contenido"
             alPresionar={() => alHacer('cancelada')}
+            pista="La quito de la lista; si vuelve a cobrarse, te aviso aquí"
           />
         </View>
       ) : (
@@ -180,6 +193,7 @@ function Fila({
             etiqueta="Convertir en compromiso"
             variante="secundario"
             alPresionar={() => alHacer('compromiso')}
+            pista="Hoy aparta el monto antes de cada cargo"
           />
           <Boton
             testID={`${id}-cancelada`}
@@ -187,6 +201,7 @@ function Fila({
             variante="texto"
             ancho="contenido"
             alPresionar={() => alHacer('cancelada')}
+            pista="La quito de la lista; si vuelve a cobrarse, te aviso aquí"
           />
           <Boton
             testID={`${id}-no-es`}
@@ -194,6 +209,7 @@ function Fila({
             variante="texto"
             ancho="contenido"
             alPresionar={() => alHacer('no_es')}
+            pista="Dejo de tratarla como cargo recurrente"
           />
         </View>
       )}

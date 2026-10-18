@@ -186,7 +186,9 @@ describe('Registrar', () => {
 
     const aviso = screen.getByTestId('aviso');
     expect(
-      within(aviso).getByText('Registré: Tele $12,000 a 12 meses · Banamex Oro ••8812\n12 meses de $1,000'),
+      within(aviso).getByText(
+        'Registré: Tele $12,000 a 12 meses sin intereses · Banamex Oro ••8812\n12 meses de $1,000',
+      ),
     ).toBeTruthy();
     expect(within(aviso).getByText('Deshacer')).toBeTruthy();
 
@@ -348,7 +350,7 @@ describe('Tarjetas', () => {
     fireEvent.press(within(pregunta).getByTestId(`tarjeta-accion-0-si-${tele.planId}`));
     expect(listarPlanesMsi(p.ctx, p.oro)[0]).toMatchObject({ estado: 'liquidado', cuotasRestantes: 0 });
     expect(screen.queryByText('¿Este pago fue para liquidar tus meses?')).toBeNull();
-    expect(textoDe(`plan-${tele.planId}-estado`)).toBe('Liquidado');
+    expect(textoDe(`plan-${tele.planId}-estado`)).toBe('Ya lo terminaste de pagar');
     expect(screen.queryByTestId('compromiso-12-meses')).toBeNull();
     expect(screen.getByText('Listo: liquidaste la tele ($6,000).')).toBeTruthy();
     expect(obtenerHoy(p.ctx).hoyPuedesCentavos).toBeLessThanOrEqual(antes);
@@ -368,7 +370,7 @@ describe('Tarjetas', () => {
       screen.getByText('¿Liquidar tele? Lo que falta, $6,000, pasa a tu próximo pago de la tarjeta.'),
     ).toBeTruthy();
     fireEvent.press(screen.getByTestId(`plan-${tele.planId}-confirmar-liquidar`));
-    expect(textoDe(`plan-${tele.planId}-estado`)).toBe('Liquidado');
+    expect(textoDe(`plan-${tele.planId}-estado`)).toBe('Ya lo terminaste de pagar');
     fireEvent.press(within(screen.getByTestId('aviso')).getByText('Deshacer'));
     expect(textoDe(`plan-${tele.planId}-cuotas`)).toBe('$1,000 al mes · faltan 6 de 6');
   });

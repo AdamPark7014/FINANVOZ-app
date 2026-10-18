@@ -24,7 +24,7 @@ interface FilaMsi {
 
 const OPCIONES_LIMITE: readonly { valor: ModoLimite; etiqueta: string }[] = [
   { valor: 'dia', etiqueta: 'Un día del mes' },
-  { valor: 'dias', etiqueta: 'Días después del corte' },
+  { valor: 'dias', etiqueta: 'Me dan unos días después del corte' },
 ];
 const OPCIONES_SI_NO: readonly { valor: SiNo; etiqueta: string }[] = [
   { valor: 'si', etiqueta: 'Sí' },
@@ -180,7 +180,11 @@ export function useFormularioTarjeta({
         valor={limitePago}
         alCambiar={setLimitePago}
       />
-      <CampoMonto testID="tarjeta-limite-credito" etiqueta="Límite de crédito" alCambiar={setLimiteCredito} />
+      <CampoMonto
+        testID="tarjeta-limite-credito"
+        etiqueta="¿Hasta cuánto te presta esta tarjeta?"
+        alCambiar={setLimiteCredito}
+      />
       <Chips
         testID="tarjeta-completa"
         etiqueta="¿La pagas completa cada mes?"
@@ -238,7 +242,7 @@ export function useFormularioTarjeta({
           <Boton
             testID="tarjeta-msi-otra"
             variante="secundario"
-            etiqueta="Agregar otra compra a meses"
+            etiqueta="Agregar otra compra a meses sin intereses"
             alPresionar={() =>
               setFilas((fs) => [
                 ...fs,

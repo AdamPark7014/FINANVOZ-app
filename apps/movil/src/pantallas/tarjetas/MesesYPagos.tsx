@@ -30,7 +30,7 @@ import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { ElegirCuenta, Seccion } from './componentes';
-import { etiquetaMes, NOMBRE_ESTADO_PLAN } from './textos';
+import { etiquetaMes, NOMBRE_ESTADO_PLAN, VACIO_MSI_TARJETA } from './textos';
 
 // ——— Meses sin intereses ———
 
@@ -114,7 +114,7 @@ export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
     <Seccion titulo="Meses sin intereses" testID="tarjeta-meses">
       {planes.length === 0 ? (
         <Texto variante="secundario" tono="secundario">
-          No tienes compras a meses en esta tarjeta.
+          {VACIO_MSI_TARJETA}
         </Texto>
       ) : null}
       {planes.map((p) => (
@@ -130,7 +130,7 @@ export function CompromisoMeses({ meses }: { meses: readonly MesCompromiso[] }) 
   const mayor = Math.max(...meses.map((m) => m.monto));
   return (
     <Seccion
-      titulo="Lo que pagarás de meses"
+      titulo="Lo que pagarás en meses sin intereses"
       subtitulo="Próximos 12 meses, por mes de fecha límite"
       testID="compromiso-12-meses"
     >

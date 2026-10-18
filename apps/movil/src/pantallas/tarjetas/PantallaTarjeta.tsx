@@ -266,10 +266,10 @@ function EstadoCuenta({ e }: { e: EstadoCuentaVista }) {
     <Tarjeta testID={`estado-${e.corte}`}>
       <Texto variante="cuerpoFuerte">{`Corte del ${etiquetaDiaMes(e.corte)}`}</Texto>
       <Dato
-        etiqueta={e.saldoCorte < 0 ? 'Saldo a favor al corte' : 'Debías al corte'}
+        etiqueta={e.saldoCorte < 0 ? 'Saldo a favor al corte' : 'Lo que debías el día de corte'}
         valor={formatearCentavos(Math.abs(e.saldoCorte))}
       />
-      <Dato etiqueta="Pagaste después" valor={formatearCentavos(e.pagosPosteriores)} />
+      <Dato etiqueta="Lo que ya pagaste desde entonces" valor={formatearCentavos(e.pagosPosteriores)} />
       <Dato etiqueta="Para no generar intereses" valor={formatearCentavos(e.pngi)} />
       <Texto variante="secundario" tono="secundario">
         {`Fecha límite: ${etiquetaDiaMes(e.limite)}`}

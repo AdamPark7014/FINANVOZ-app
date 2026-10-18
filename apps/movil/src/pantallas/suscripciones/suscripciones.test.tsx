@@ -31,6 +31,9 @@ describe('Suscripciones (02 §20)', () => {
   it('CA-M10-01 · muestra las 5 activas con monto y fecha, el resumen, "antes $115" y Disney Plus aparte', () => {
     const { ctx } = preparar();
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(textoDe('suscripciones-ayuda')).toBe(
+      'Aprétala en Hoy, dilo si ya no la pagas o si no es suscripción.',
+    );
     expect(textoDe('suscripciones-resumen')).toBe(
       'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
     );
