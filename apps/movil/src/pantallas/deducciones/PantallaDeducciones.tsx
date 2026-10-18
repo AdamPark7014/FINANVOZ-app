@@ -248,7 +248,9 @@ function Estimacion({ v }: { v: Extract<VistaDeducciones, { estado: 'listo' }> }
       </Texto>
       {v.noDeducibles.length > 0 ? (
         <View style={{ gap: espacio.xs }} testID="deducciones-no-deducibles">
-          <Texto variante="etiqueta">No deducibles</Texto>
+          <Texto variante="etiqueta" testID="deducciones-no-deducibles-titulo">
+            {ETIQUETA_NO_DEDUCIBLES}
+          </Texto>
           {v.noDeducibles.map((f) => (
             <Texto key={f.uuid} variante="secundario" testID={`no-deducible-${f.uuid}`}>
               {`${f.emisor} · ${f.textoTotal}: ${f.textoMotivo ?? ''}`}
@@ -289,35 +291,42 @@ function FormularioPerfil({
   };
   return (
     <Tarjeta testID="deducciones-perfil">
-      <Texto variante="cuerpo">{PEDIR_PERFIL}</Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto variante="cuerpo" testID="perfil-pedir">
+        {PEDIR_PERFIL}
+      </Texto>
+      <Texto variante="secundario" tono="secundario" testID="perfil-solo-telefono">
         {PERFIL_EN_TELEFONO}
       </Texto>
       <CampoTexto
-        etiqueta="Tu RFC"
+        etiqueta={ETIQUETA_RFC}
         valor={rfc}
         alCambiar={setRfc}
-        ejemplo="PEPJ800101AB1"
+        ejemplo={EJEMPLO_RFC}
         nativo={{ autoCapitalize: 'characters', autoCorrect: false }}
         testID="perfil-rfc"
       />
       <CampoMonto
-        etiqueta="Ingresos brutos del año"
+        etiqueta={ETIQUETA_INGRESOS_BRUTOS}
         valorInicial={inicial?.ingresos ?? null}
         alCambiar={setIngresos}
         testID="perfil-ingresos"
       />
       <CampoMonto
-        etiqueta="Base gravable (opcional)"
-        ayuda="Viene en tu constancia de sueldos o te la da tu contador."
+        etiqueta={ETIQUETA_BASE_GRAVABLE}
+        ayuda={AYUDA_BASE_GRAVABLE}
         valorInicial={inicial?.base_gravable ?? null}
         alCambiar={setBase}
         testID="perfil-base"
       />
       <MensajeError texto={error} />
-      <Boton etiqueta="Guardar" alPresionar={guardar} testID="perfil-guardar" />
+      <Boton etiqueta={ETIQUETA_GUARDAR} alPresionar={guardar} testID="perfil-guardar" />
       {alCancelar ? (
-        <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="perfil-cancelar" />
+        <Boton
+          etiqueta={ETIQUETA_CANCELAR}
+          variante="texto"
+          alPresionar={alCancelar}
+          testID="perfil-cancelar"
+        />
       ) : null}
     </Tarjeta>
   );
@@ -343,7 +352,7 @@ export function ResultadoImportacionTarjeta({
       ))}
       {alCerrar ? (
         <Boton
-          etiqueta="Listo"
+          etiqueta={ETIQUETA_IMPORTACION_LISTO}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}

@@ -12,6 +12,10 @@ export {
 export { mensajeErrorNube } from '../../servicios/respaldo-nube';
 
 export const ETIQUETA_VOLVER = 'Volver';
+/** TalkBack en Ajustes → Respaldo (`02 §15`). */
+export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
+export const PISTA_VOLVER = 'Cierra esta pantalla';
+export const PISTA_BORRAR_CUENTA = 'Elimina tu cuenta de respaldo en la nube';
 export const TITULO_RESPALDO = 'Respaldo';
 export const SUBTITULO_NUBE = 'En la nube';
 export const AVISO_PENDIENTE = 'Llevas más de 2 semanas sin respaldo.';

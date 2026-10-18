@@ -16,13 +16,37 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerEntero } from '../onboarding/ingreso';
-import { OPCIONES_FRECUENCIA_TANDA, textoYaEmpezo } from './textos';
+import {
+  EJEMPLO_FECHA,
+  EJEMPLO_NOMBRE_TANDA,
+  ERROR_APORTACION,
+  ERROR_APORTACIONES_HECHAS,
+  ERROR_FECHA_INICIO,
+  ERROR_FRECUENCIA,
+  ERROR_GUARDAR_TANDA,
+  ERROR_PARTICIPANTES,
+  ETIQUETA_APORTACION,
+  ETIQUETA_APORTACIONES_HECHAS,
+  ETIQUETA_CANCELAR,
+  ETIQUETA_CUENTA_APORTACION_OPCIONAL,
+  ETIQUETA_FRECUENCIA,
+  ETIQUETA_GUARDAR_TANDA,
+  ETIQUETA_NOMBRE_OPCIONAL,
+  ETIQUETA_PARTICIPANTES,
+  ETIQUETA_PRIMERA_FECHA,
+  ETIQUETA_TURNO,
+  ETIQUETA_YA_TE_TOCO,
+  OPCIONES_FRECUENCIA_TANDA,
+  OPCIONES_SI_NO,
+  SUFIJO_RONDAS_NO_APARTO,
+  TEXTO_COMPROMISO_APORTACION,
+  TITULO_YA_EMPEZO,
+  errorTurno,
+  textoResumenCobro,
+  textoYaEmpezo,
+} from './textos';
 
 type SiNo = 'si' | 'no';
-const OPCIONES_SI_NO: readonly { valor: SiNo; etiqueta: string }[] = [
-  { valor: 'si', etiqueta: 'Sí' },
-  { valor: 'no', etiqueta: 'No' },
-];
 
 /** "16/10/2026" → `2026-10-16`, o `null`. */
 export function leerFecha(texto: string): PlainDate | null {
@@ -85,14 +109,14 @@ export function FormularioTanda({
 
   /** Arma la entrada o dice qué falta (`02 §14`). */
   const armar = (): Omit<EntradaTanda, 'aportacionesHechas' | 'yaCobraste'> | string => {
-    if (aportacion === null || aportacion <= 0) return 'Escribe cuánto das en cada ronda.';
-    if (frecuencia === null) return 'Dime cada cuándo das tu tanda.';
+    if (aportacion === null || aportacion <= 0) return ERROR_APORTACION;
+    if (frecuencia === null) return ERROR_FRECUENCIA;
     const n = leerEntero(participantes, 2, 50);
-    if (n === null) return 'Escribe cuántos son en la tanda (de 2 a 50).';
+    if (n === null) return ERROR_PARTICIPANTES;
     const k = leerEntero(turno, 1, n);
-    if (k === null) return `Escribe tu turno, del 1 al ${n}.`;
+    if (k === null) return errorTurno(n);
     const fecha = leerFecha(inicio);
-    if (fecha === null) return 'Escribe la primera fecha así: 16/10/2026.';
+    if (fecha === null) return ERROR_FECHA_INICIO;
     const regla =
       prellenado && frecuencia === frecuenciaPrellenada && inicio === inicioPrellenado
         ? prellenado.regla
@@ -140,7 +164,7 @@ export function FormularioTanda({
       return;
     }
     if (hechas !== null && hechasLeidas === null) {
-      setError('Escribe cuántas aportaciones llevas, o déjalo como te lo propuse.');
+      setError(ERROR_APORTACIONES_HECHAS);
       return;
     }
     let creada: TandaCreada;

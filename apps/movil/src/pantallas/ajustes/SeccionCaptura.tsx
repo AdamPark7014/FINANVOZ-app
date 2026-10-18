@@ -23,13 +23,10 @@ import {
  * la lista blanca nativa: desde ese momento toda notificación se descarta sin guardarse (regla 10).
  */
 export function SeccionCaptura() {
-  const { ctx, refrescar } = useCaptura();
-  const { ctx: ctxSesion, refrescar: refrescarSesion } = useSesion();
+  const { ctx, refrescar } = useSesion();
   const { puente } = useCaptura();
   const estado = useVista(obtenerEstadoCaptura);
   const [activando, setActivando] = useState(false);
-  const ctxCaptura = ctx ?? ctxSesion;
-  const refrescarCaptura = refrescar ?? refrescarSesion;
   return (
     <Tarjeta testID="ajustes-captura">
       <Texto variante="subtitulo">{SECCION_CAPTURA}</Texto>
@@ -50,17 +47,17 @@ export function SeccionCaptura() {
             opciones={OPCIONES_MODO_AVISO}
             valor={estado.modoAviso}
             alCambiar={(modo) => {
-              fijarModoAvisoCaptura(ctxCaptura, modo);
-              refrescarCaptura();
+              fijarModoAvisoCaptura(ctx, modo);
+              refrescar();
             }}
           />
           <Boton
             etiqueta={BTN_DESACTIVAR_CAPTURA}
             variante="secundario"
             alPresionar={() => {
-              desactivarCaptura(ctxCaptura);
+              desactivarCaptura(ctx);
               void puente?.fijarListaBlanca([]);
-              refrescarCaptura();
+              refrescar();
             }}
             testID="ajustes-captura-desactivar"
             style={{ marginTop: espacio.s }}

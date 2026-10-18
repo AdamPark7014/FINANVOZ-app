@@ -38,7 +38,7 @@ export function PantallaTandas({
         ancho="contenido"
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">Tandas</Texto>
+      <Texto variante="titulo">{TITULO_TANDAS}</Texto>
       {nueva ? (
         <FormularioTanda
           alGuardar={(t: TandaCreada) => {
@@ -59,20 +59,20 @@ export function PantallaTandas({
               <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
               <Texto variante="secundario" tono="secundario">
                 {t.proxima
-                  ? `${formatearCentavos(t.aportacion)} el ${t.proxima.etiqueta} · cobras el ${t.etiquetaCobro}`
-                  : `Ya diste todas tus aportaciones · cobras el ${t.etiquetaCobro}`}
+                  ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
+                  : textoSubtituloListaSinProxima(t.etiquetaCobro)}
               </Texto>
               <Texto variante="secundario">{textoEnRiesgo(t.enRiesgo)}</Texto>
               <Boton
                 testID={`tanda-${t.id}-abrir`}
-                etiqueta="Ver calendario"
+                etiqueta={ETIQUETA_VER_CALENDARIO}
                 variante="texto"
                 ancho="contenido"
                 alPresionar={() => alAbrirTanda(t.id)}
               />
             </Tarjeta>
           ))}
-          <Boton testID="tandas-nueva" etiqueta="Nueva tanda" alPresionar={() => setNueva(true)} />
+          <Boton testID="tandas-nueva" etiqueta={ETIQUETA_NUEVA_TANDA} alPresionar={() => setNueva(true)} />
         </>
       )}
     </Pantalla>

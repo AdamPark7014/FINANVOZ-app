@@ -1,6 +1,5 @@
 import { useRouter } from 'expo-router';
-import { CentroPrivacidad } from '../src/pantallas/privacidad/CentroPrivacidad';
-import { TIP_SOLO_LECTURA } from '../src/pantallas/privacidad/textos';
+import { CentroPrivacidad, TIP_SOLO_LECTURA } from '../src/pantallas/privacidad';
 import { enSoloLectura } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';

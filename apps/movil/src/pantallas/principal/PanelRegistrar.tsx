@@ -587,12 +587,22 @@ export function PanelRegistrar({
       ) : null}
 
       {escuchando ? (
-        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="transcripcion-en-vivo">
+        <Texto
+          variante="cuerpo"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={dictado.parcial === '' ? ETIQUETA_ESCUCHANDO : undefined}
+          testID="transcripcion-en-vivo"
+        >
           {dictado.parcial === '' ? TEXTO_TE_ESCUCHO : dictado.parcial}
         </Texto>
       ) : null}
       {errorVoz ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {errorVoz}
         </Texto>
       ) : null}

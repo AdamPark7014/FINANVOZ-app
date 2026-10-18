@@ -1,6 +1,29 @@
-import type { Centavos } from '@cartera/core';
+import type { Centavos, PlainDate } from '@cartera/core';
 import { etiquetaDiaMes, type AnalisisEstadoCuenta, type PropuestaConciliacionEstado } from '../../servicios';
 import { formatearCentavos } from '../../ui';
+
+/** Botones de la pantalla (`02 §14`: verbo primero). */
+export const BTN_ENTENDIDO = 'Entendido';
+export const BTN_ABRIR = 'Abrir';
+export const BTN_CANCELAR = 'Cancelar';
+export const BTN_GUARDAR = 'Guardar';
+export const BTN_AJUSTAR = 'Ajustar';
+export const BTN_NO_AJUSTAR = 'No';
+export const BTN_VER_TARJETA = 'Ver la tarjeta';
+
+export const CHIP_MISMO = 'Es el mismo';
+export const CHIP_OTRO = 'Es otro';
+
+export const TITULO_DUDOSOS = '¿Ya los tenías?';
+
+export const MENSAJE_NO_CUADRA =
+  'Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.';
+export const MENSAJE_FALTAN_DUDOSOS = 'Contesta si ya tenías cada movimiento para poder guardar.';
+
+/** TalkBack: agrupa el resumen tras leer el PDF. */
+export const ETIQUETA_RESUMEN_ESTADO = 'Resumen del estado de cuenta';
+/** TalkBack: avisos cuando no se puede continuar (banco, tarjeta, PDF, etc.). */
+export const ETIQUETA_AVISO_ESTADO = 'Aviso';
 
 export const TITULO_PANTALLA = 'Estado de cuenta';
 

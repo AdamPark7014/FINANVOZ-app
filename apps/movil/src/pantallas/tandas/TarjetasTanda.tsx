@@ -5,7 +5,14 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { MeTocoLaTanda, useYaLaDi } from './componentes';
-import { TEXTO_NO_ES_INGRESO } from './textos';
+import {
+  ETIQUETA_ME_TOCO,
+  ETIQUETA_TODAVIA_NO,
+  ETIQUETA_YA_LA_DI,
+  MENSAJE_TODAVIA_NO_APORTACION,
+  MENSAJE_TODAVIA_NO_COBRO,
+  TEXTO_NO_ES_INGRESO,
+} from './textos';
 
 /** Tarjetas de Hoy de la tanda (`02 §18`): "¿Ya diste tu tanda?" y "Me tocó la tanda". */
 export function TarjetaDeTanda({ t, testID }: { t: TarjetaTanda; testID: string }) {
@@ -34,15 +41,15 @@ function TarjetaAportacion({
       </Texto>
       {ya.elegir ?? (
         <View style={{ gap: espacio.s }}>
-          <Boton etiqueta="Ya la di" alPresionar={() => ya.dar()} testID={`${testID}-ya-la-di`} />
+          <Boton etiqueta={ETIQUETA_YA_LA_DI} alPresionar={() => ya.dar()} testID={`${testID}-ya-la-di`} />
           <Boton
-            etiqueta="Todavía no"
+            etiqueta={ETIQUETA_TODAVIA_NO}
             variante="secundario"
             testID={`${testID}-todavia-no`}
             alPresionar={() => {
               todaviaNo(ctx, { programadoId: t.programadoId, fecha: t.fecha });
               refrescar();
-              mostrar({ mensaje: 'La sigo apartando. Te pregunto mañana.' });
+              mostrar({ mensaje: MENSAJE_TODAVIA_NO_APORTACION });
             }}
           />
         </View>

@@ -98,8 +98,9 @@ describe('Interruptor', () => {
     const fila = screen.getByRole('switch', { name: 'Apartar lo que le debo' });
     expect(fila).not.toBeChecked();
     fireEvent.press(fila);
-    expect(screen.getByRole('switch', { name: 'Apartar lo que le debo' })).toBeChecked();
-    expect(screen.getByText('No cuenta como dinero libre')).toBeTruthy();
+    const interruptor = screen.getByRole('switch', { name: 'Apartar lo que le debo' });
+    expect(interruptor).toBeChecked();
+    expect(interruptor.props.accessibilityHint).toBe('No cuenta como dinero libre');
   });
 });
 

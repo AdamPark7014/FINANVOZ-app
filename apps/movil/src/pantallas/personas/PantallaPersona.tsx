@@ -74,7 +74,13 @@ export function PantallaPersona({
   if (!existe) {
     return (
       <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Boton
+          testID="persona-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+        />
         <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
           {TEXTO_PERSONA_NO_ENCONTRADA}
         </Texto>
@@ -136,7 +142,7 @@ function Detalle({
           ) : null}
         </View>
         {d.saldo > 0 ? (
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="secundario" tono="secundario" testID="persona-tip-te-deben">
             {TIP_SALDO_TE_DEBEN}
           </Texto>
         ) : null}

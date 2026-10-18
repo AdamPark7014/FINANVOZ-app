@@ -49,7 +49,6 @@ import {
   ETIQUETA_OPCION_RECOMENDADA,
   ETIQUETA_PRECIO,
   ETIQUETA_PROGRESO,
-  ETIQUETA_PROGRESO as ETIQUETA_PROGRESO_CALCULO,
   MENSAJE_AVISO_RECORDATORIO,
   MENSAJE_CANCELADO,
   MENSAJE_PERMISO_AVISOS,
@@ -211,7 +210,7 @@ export function PantallaMeAlcanza({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">¿Me alcanza?</Texto>
+        <Texto variante="titulo">{TITULO}</Texto>
         <Boton
           etiqueta={BTN_CERRAR}
           variante="texto"
@@ -229,24 +228,24 @@ export function PantallaMeAlcanza({
             </Texto>
           ) : null}
           <CampoMonto
-            etiqueta="¿Cuánto cuesta?"
+            etiqueta={ETIQUETA_PRECIO}
             valorInicial={precio}
             alCambiar={setPrecio}
             testID="me-alcanza-precio"
           />
           <CampoTexto
-            etiqueta="¿Qué es? (opcional)"
+            etiqueta={ETIQUETA_DESCRIPCION}
             valor={descripcion}
             alCambiar={setDescripcion}
-            ejemplo="unos tenis"
+            ejemplo={EJEMPLO_DESCRIPCION}
             testID="me-alcanza-descripcion"
           />
-          <Texto variante="cuerpo">¿Lo quieres a meses sin intereses?</Texto>
+          <Texto variante="cuerpo">{PREGUNTA_MSI}</Texto>
           <GrupoChips<OpcionMeses>
             opciones={[
-              { valor: 'sin', etiqueta: 'Tú dime' },
-              ...MESES.map((m) => ({ valor: m, etiqueta: `${m} meses` })),
-              { valor: 'otro', etiqueta: 'Otro' },
+              { valor: 'sin', etiqueta: ETIQUETA_MSI_TU_DIME },
+              ...MESES.map((m) => ({ valor: m, etiqueta: etiquetaChipMeses(m) })),
+              { valor: 'otro', etiqueta: ETIQUETA_MSI_OTRO },
             ]}
             valor={meses}
             alCambiar={setMeses}
@@ -254,7 +253,7 @@ export function PantallaMeAlcanza({
           />
           {meses === 'otro' ? (
             <CampoTexto
-              etiqueta="¿A cuántos meses?"
+              etiqueta={ETIQUETA_MESES_MANUAL}
               valor={mesesOtro}
               alCambiar={setMesesOtro}
               teclado="number-pad"
@@ -268,10 +267,10 @@ export function PantallaMeAlcanza({
 
       {estado.tipo === 'calculando' ? (
         <View style={{ gap: espacio.m }} testID="me-alcanza-calculando" accessibilityLiveRegion="polite">
-          <Texto variante="cuerpo">Estoy revisando tus opciones…</Texto>
+          <Texto variante="cuerpo">{TEXTO_CALCULANDO}</Texto>
           <Barra
             llenoBp={estado.progresoBp}
-            etiquetaAccesible="Avance del cálculo"
+            etiquetaAccesible={ETIQUETA_PROGRESO}
             testID="me-alcanza-progreso"
           />
           <Boton
@@ -424,7 +423,7 @@ function Resultado({
       </Texto>
 
       <Boton
-        etiqueta={verCalculo ? 'Ocultar cómo lo calculé' : 'Cómo lo calculé'}
+        etiqueta={verCalculo ? BTN_OCULTAR_COMO_LO_CALCULE : BTN_COMO_LO_CALCULE}
         variante="texto"
         ancho="contenido"
         alPresionar={() => setVerCalculo((v) => !v)}

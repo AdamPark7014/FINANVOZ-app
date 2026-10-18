@@ -21,7 +21,7 @@ export function CandadoPlus({ texto, testID }: { texto: string; testID?: string 
   const { abrirPlan } = usePlanTienda();
   const contenido = (
     <Texto variante="secundario" tono="acento">
-      {`${texto} · Plus`}
+      {etiquetaCandadoPlus(texto)}
     </Texto>
   );
   if (!abrirPlan) {
@@ -32,8 +32,8 @@ export function CandadoPlus({ texto, testID }: { texto: string; testID?: string 
       {...(testID ? { testID } : {})}
       onPress={abrirPlan}
       accessibilityRole="button"
-      accessibilityLabel={`${texto}. Disponible con Plus`}
-      accessibilityHint="Abre los planes"
+      accessibilityLabel={etiquetaAccesibilidadCandado(texto)}
+      accessibilityHint={PISTA_ABRIR_PLANES}
       style={{ minHeight: OBJETIVO_TACTIL_MIN, justifyContent: 'center' }}
     >
       {contenido}
@@ -66,7 +66,7 @@ export function PuertaPlus({
   return (
     <View
       style={{ flex: 1, padding: espacio.l, gap: espacio.l, justifyContent: 'center' }}
-      testID="puerta-plus"
+      testID={ID.puertaPlus}
     >
       <Tarjeta>
         <Texto variante="subtitulo">{titulo}</Texto>
@@ -74,9 +74,15 @@ export function PuertaPlus({
           {descripcion}
         </Texto>
         {abrirPlan ? (
-          <Boton etiqueta={ETIQUETA_CONOCER_PLUS} alPresionar={abrirPlan} testID="puerta-plus-conocer" />
+          <Boton
+            etiqueta={ETIQUETA_CONOCER_PLUS}
+            alPresionar={abrirPlan}
+            testID={ID.puertaPlusConocer}
+          />
         ) : null}
-        {alVolver ? <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" alPresionar={alVolver} /> : null}
+        {alVolver ? (
+          <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" alPresionar={alVolver} testID={ID.volver} />
+        ) : null}
       </Tarjeta>
     </View>
   );

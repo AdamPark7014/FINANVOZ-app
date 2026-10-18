@@ -101,12 +101,17 @@ export function FormularioContrasena({
       />
       <Boton
         testID="respaldo-contrasena-guardar"
-        etiqueta="Guardar contraseña"
+        etiqueta={BTN_GUARDAR_CONTRASENA}
         cargando={guardando}
         deshabilitado={guardando || contrasena === '' || confirmacion === ''}
         alPresionar={() => void guardar()}
       />
-      <Boton variante="texto" etiqueta="Cancelar" deshabilitado={guardando} alPresionar={alCancelar} />
+      <Boton
+        variante="texto"
+        etiqueta={BTN_CANCELAR}
+        deshabilitado={guardando}
+        alPresionar={alCancelar}
+      />
     </>
   );
 }

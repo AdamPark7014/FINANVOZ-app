@@ -2,8 +2,22 @@ import type { Centavos } from '@cartera/core';
 import { useState } from 'react';
 import { colchonSugerido, fijarColchon, obtenerAjustes } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, Tarjeta, Texto } from '../../ui';
 import { ERROR_GUARDAR } from '../onboarding/componentes';
+import {
+  ayudaColchon,
+  AYUDA_SIN_SUGERENCIA,
+  BTN_APARTAR_COLCHON,
+  BTN_CAMBIAR_COLCHON,
+  BTN_CANCELAR,
+  BTN_GUARDAR,
+  confirmacionColchon,
+  CONFIRMACION_SIN_COLCHON,
+  ETIQUETA_MONTO_COLCHON,
+  resumenConColchon,
+  RESUMEN_SIN_COLCHON,
+  SECCION_COLCHON,
+} from './colchon-textos';
 
 /**
  * Ajustes › Colchón (`02 §12`, RF-CFG-02): lo que no cuenta para lo que puedes gastar. Se guarda con el mismo
@@ -36,33 +50,26 @@ export function SeccionColchon() {
     refrescar();
     setEditando(false);
     setMensaje({
-      texto:
-        monto > 0
-          ? `Listo: tu colchón ahora es ${formatearCentavos(monto)}.`
-          : 'Listo: ya no apartas colchón.',
+      texto: monto > 0 ? confirmacionColchon(monto) : CONFIRMACION_SIN_COLCHON,
       error: false,
     });
   };
 
   return (
     <Tarjeta testID="ajustes-colchon">
-      <Texto variante="subtitulo">Colchón</Texto>
+      <Texto variante="subtitulo">{SECCION_COLCHON}</Texto>
       {editando ? (
         <>
           <CampoMonto
             testID="ajustes-colchon-monto"
-            etiqueta="Tu colchón"
+            etiqueta={ETIQUETA_MONTO_COLCHON}
             valorInicial={inicial}
-            ayuda={
-              sugerido > 0
-                ? `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan. Escribe 0 si no quieres colchón.`
-                : 'Escribe 0 si no quieres colchón.'
-            }
+            ayuda={sugerido > 0 ? ayudaColchon(sugerido) : AYUDA_SIN_SUGERENCIA}
             alCambiar={setMonto}
           />
           <Boton
             testID="ajustes-colchon-guardar"
-            etiqueta="Guardar"
+            etiqueta={BTN_GUARDAR}
             deshabilitado={monto === null}
             alPresionar={guardar}
           />
@@ -70,21 +77,19 @@ export function SeccionColchon() {
             testID="ajustes-colchon-cancelar"
             variante="texto"
             ancho="contenido"
-            etiqueta="Cancelar"
+            etiqueta={BTN_CANCELAR}
             alPresionar={() => setEditando(false)}
           />
         </>
       ) : (
         <>
           <Texto variante="secundario" tono="secundario" testID="ajustes-colchon-resumen">
-            {colchon > 0
-              ? `Apartas ${formatearCentavos(colchon)} que no cuentan para lo que puedes gastar.`
-              : 'Sin colchón: todo tu dinero libre cuenta para lo que puedes gastar.'}
+            {colchon > 0 ? resumenConColchon(colchon) : RESUMEN_SIN_COLCHON}
           </Texto>
           <Boton
             testID="ajustes-cambiar-colchon"
             variante="secundario"
-            etiqueta={colchon > 0 ? 'Cambiar mi colchón' : 'Apartar un colchón'}
+            etiqueta={colchon > 0 ? BTN_CAMBIAR_COLCHON : BTN_APARTAR_COLCHON}
             alPresionar={abrir}
           />
         </>

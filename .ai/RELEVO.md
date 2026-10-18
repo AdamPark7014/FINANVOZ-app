@@ -6,27 +6,27 @@
 
 ## Hecho en este turno
 
-- **docs(core):** `packages/core/README.md` — tip motores puros (`hoy` / `semilla`, sin reloj ni `Math.random()`).
+- **suscripciones:** copy centralizado en `textos.ts` (título, ayuda, botones, pistas, mensajes de acción); `PantallaSuscripciones` enlazada; ayuda alineada a §20; tests importan textos.
 
 ## Hecho (acumulado reciente)
 
-- **movil/ajustes/ingreso:** `8088eb3` — ingreso-textos; copy Ajustes en `textos.ts`. Ver `git log`.
+- Copy Ajustes, ingreso, tarjetas, tandas, plan. Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear (privacidad, compartido, calculadora, UI) — turno anterior; no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno sin commitear (`principal.test.tsx`, `tandas/textos.ts`) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Teléfono — ingreso y deducciones.
+2. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `packages/core` E*, vectores a mano (README sí).
+- `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
 

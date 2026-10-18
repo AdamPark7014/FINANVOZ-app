@@ -5,7 +5,7 @@
 
 /** O2 · Consentimiento: nada se persiste hasta aceptar (CA-M2-05). */
 export const TIP_CONSENTIMIENTO =
-  'Tus datos no se guardan en el teléfono hasta que marques la casilla obligatoria y toques «Aceptar y continuar».';
+  'Tus datos no se guardan en tu teléfono hasta que marques la casilla obligatoria y toques «Aceptar y continuar».';
 
 /** O6 · Captura automática: permiso de notificaciones — salir del flujo sin activarlo hoy. */
 export const TIP_CAPTURA_AHORA_NO =

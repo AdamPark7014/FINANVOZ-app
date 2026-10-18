@@ -123,3 +123,47 @@ export function etiquetaSaldoAlCorte(saldoCorte: number): string {
 export function textoFechaLimiteEstado(fechaLimite: string): string {
   return `Fecha límite: ${fechaLimite}`;
 }
+
+/** Meses sin intereses y pagos planeados (`02 §8`). */
+export const TITULO_MESES_SIN_INTERESES = 'Meses sin intereses';
+export const TITULO_COMPROMISO_MSI = 'Lo que pagarás en meses sin intereses';
+export const SUBTITULO_COMPROMISO_MSI = 'Próximos 12 meses, por mes de fecha límite';
+export const TITULO_PAGOS_PLANEADOS = 'Pagos planeados';
+
+export function subtituloPagosPlaneados(conPagos: boolean): string {
+  return conPagos
+    ? 'Aparto solo los pagos que vencen antes de tu próximo ingreso.'
+    : 'Sin pagos planeados aparto lo que debes completo.';
+}
+
+export function textoConfirmarLiquidar(descripcion: string, restante: string): string {
+  return `¿Liquidar ${descripcion}? Lo que falta, ${restante}, pasa a tu próximo pago de la tarjeta.`;
+}
+
+export function mensajeLiquidacionPlan(descripcion: string, monto: string): string {
+  return `Listo: liquidaste ${descripcion} (${monto}).`;
+}
+
+/** Formulario "Pagar tarjeta" y pregunta de liquidar meses. */
+export const ETIQUETA_MONTO_PAGO = '¿Cuánto pagaste?';
+export const PREGUNTA_CUENTA_PAGO = '¿De qué cuenta salió?';
+export const ERROR_MONTO_PAGO = 'Escribe cuánto pagaste.';
+export const ERROR_ORIGEN_PAGO = 'Elige de qué cuenta salió el pago.';
+export const BTN_GUARDAR_PAGO = 'Guardar pago';
+export const BTN_CANCELAR = 'Cancelar';
+export const BTN_NO = 'No';
+
+export function textoSaldoAFavorTrasPago(tarjeta: string, monto: string): string {
+  return `Tu ${tarjeta} quedó con saldo a favor de ${monto}. No lo sumo a tu dinero libre.`;
+}
+
+export const AVISO_SALDO_A_FAVOR_EN_TARJETA = 'Va. El saldo a favor se queda en tu tarjeta.';
+
+export function etiquetaSiLiquidar(descripcion: string): string {
+  return `Sí, ${descripcion}`;
+}
+
+/** TalkBack: fila etiqueta + valor en el resumen. */
+export function etiquetaAccesibleDato(etiqueta: string, valor: string): string {
+  return `${etiqueta}: ${valor}`;
+}

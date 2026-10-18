@@ -7,7 +7,7 @@ import {
   TERMINOS_CORTO,
   TITULO_TERMINOS,
   VERSION_TERMINOS,
-} from '../src/pantallas/privacidad/textos';
+} from '../src/pantallas/privacidad';
 import { Boton, espacio, Pantalla, Texto } from '../src/ui';
 
 /** Términos de uso (`08 §1`, checklist §7.1), desde el centro de privacidad y Ajustes. Solo lectura. */

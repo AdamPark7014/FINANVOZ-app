@@ -4,6 +4,37 @@ import { fijarPreferenciasAvisos, obtenerPreferenciasAvisos, type PreferenciasAv
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
 import { useNotificaciones, type PermisoAvisos } from '../avisos/notificaciones';
+import {
+  AVISO_COMPROMISO,
+  AVISO_CORTE,
+  AVISO_INGRESO,
+  AVISO_LIMITE,
+  AVISO_RESPALDO,
+  AVISO_RIESGO,
+  AVISO_TANDA,
+  AVISOS_APAGADOS_EN_TELEFONO,
+  BTN_ABRIR_AJUSTES_TELEFONO,
+  BTN_GUARDAR_HORARIO,
+  BTN_PERMITIR_AVISOS,
+  CONFIRMACION_HORARIO,
+  DESC_COMPROMISO,
+  DESC_CORTE,
+  DESC_HORARIO_SILENCIOSO,
+  DESC_INGRESO,
+  DESC_LIMITE,
+  DESC_RESPALDO,
+  DESC_RIESGO,
+  DESC_TANDA,
+  EJEMPLO_HORA_AVISOS,
+  EJEMPLO_SILENCIO_DESDE,
+  EJEMPLO_SILENCIO_HASTA,
+  ERROR_FORMATO_HORA,
+  ETIQUETA_HORA_AVISOS,
+  ETIQUETA_HORARIO_SILENCIOSO,
+  ETIQUETA_SILENCIO_DESDE,
+  ETIQUETA_SILENCIO_HASTA,
+  SECCION_AVISOS,
+} from './avisos-textos';
 
 const HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -45,7 +76,7 @@ export function SeccionAvisos() {
       setMensaje(confirmacion ?? null);
       refrescar();
     } catch {
-      setMensaje('Escribe las horas así: 22:00.');
+      setMensaje(ERROR_FORMATO_HORA);
     }
   };
 
@@ -54,24 +85,24 @@ export function SeccionAvisos() {
     const i = normalizarHora(inicio);
     const f = normalizarHora(fin);
     if (![h, i, f].every((x) => HORA.test(x))) {
-      setMensaje('Escribe las horas así: 22:00.');
+      setMensaje(ERROR_FORMATO_HORA);
       return;
     }
-    guardar({ hora: h, silencio: { inicio: i, fin: f } }, 'Listo. Tus avisos ya usan este horario.');
+    guardar({ hora: h, silencio: { inicio: i, fin: f } }, CONFIRMACION_HORARIO);
   };
 
   return (
     <Tarjeta testID="ajustes-avisos">
-      <Texto variante="subtitulo">Avisos</Texto>
+      <Texto variante="subtitulo">{SECCION_AVISOS}</Texto>
       {permiso !== null && permiso !== 'concedido' && notificaciones ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" tono="secundario" testID="ajustes-avisos-sin-permiso">
-            Los avisos están apagados en tu teléfono.
+            {AVISOS_APAGADOS_EN_TELEFONO}
           </Texto>
           <Boton
             testID="ajustes-avisos-permitir"
             variante="secundario"
-            etiqueta={permiso === 'sin_preguntar' ? 'Permitir avisos' : 'Abrir ajustes del teléfono'}
+            etiqueta={permiso === 'sin_preguntar' ? BTN_PERMITIR_AVISOS : BTN_ABRIR_AJUSTES_TELEFONO}
             alPresionar={() => {
               if (permiso === 'denegado') {
                 notificaciones.abrirAjustesSistema?.();
@@ -90,71 +121,71 @@ export function SeccionAvisos() {
       ) : null}
       <Interruptor
         testID="ajustes-aviso-corte"
-        etiqueta="Día de corte"
-        descripcion="El día que corta cada tarjeta."
+        etiqueta={AVISO_CORTE}
+        descripcion={DESC_CORTE}
         valor={pref.corte}
         alCambiar={(corte) => guardar({ corte })}
       />
       <Interruptor
         testID="ajustes-aviso-limite"
-        etiqueta="Fecha límite de pago"
-        descripcion="3 días antes, con lo que tienes que pagar para no generar intereses."
+        etiqueta={AVISO_LIMITE}
+        descripcion={DESC_LIMITE}
         valor={pref.fechaLimite}
         alCambiar={(fechaLimite) => guardar({ fechaLimite })}
       />
       <Interruptor
         testID="ajustes-aviso-riesgo"
-        etiqueta="Riesgo de no llegar"
-        descripcion="Si es más probable que tengas que tocar tu colchón antes de tu próximo ingreso."
+        etiqueta={AVISO_RIESGO}
+        descripcion={DESC_RIESGO}
         valor={pref.riesgo}
         alCambiar={(riesgo) => guardar({ riesgo })}
       />
       <Interruptor
         testID="ajustes-aviso-respaldo"
-        etiqueta="Respaldo pendiente"
-        descripcion="Si pasan 2 semanas sin respaldo, una vez por semana."
+        etiqueta={AVISO_RESPALDO}
+        descripcion={DESC_RESPALDO}
         valor={pref.respaldo}
         alCambiar={(respaldo) => guardar({ respaldo })}
       />
       <Interruptor
         testID="ajustes-aviso-tanda"
-        etiqueta="Aportación de tanda"
-        descripcion="El día que te toca dar tu aportación."
+        etiqueta={AVISO_TANDA}
+        descripcion={DESC_TANDA}
         valor={pref.tanda}
         alCambiar={(tanda) => guardar({ tanda })}
       />
       <Interruptor
         testID="ajustes-aviso-compromiso"
-        etiqueta="Compromiso sin cubrir"
-        descripcion="Un día después, si un pago fijo sigue sin registrarse."
+        etiqueta={AVISO_COMPROMISO}
+        descripcion={DESC_COMPROMISO}
         valor={pref.compromiso}
         alCambiar={(compromiso) => guardar({ compromiso })}
       />
       <Interruptor
         testID="ajustes-aviso-ingreso"
-        etiqueta="Ingreso que no llegó"
-        descripcion="3 días después, si no vi llegar tu ingreso."
+        etiqueta={AVISO_INGRESO}
+        descripcion={DESC_INGRESO}
         valor={pref.ingreso}
         alCambiar={(ingreso) => guardar({ ingreso })}
       />
       <CampoTexto
         testID="ajustes-aviso-hora"
-        etiqueta="Hora de los avisos"
-        ejemplo="09:00"
+        etiqueta={ETIQUETA_HORA_AVISOS}
+        ejemplo={EJEMPLO_HORA_AVISOS}
         valor={hora}
         alCambiar={setHora}
         nativo={{ keyboardType: 'numbers-and-punctuation', maxLength: 5 }}
       />
-      <Texto variante="etiqueta">Horario silencioso</Texto>
+      <Texto variante="etiqueta">{ETIQUETA_HORARIO_SILENCIOSO}</Texto>
       <Texto variante="secundario" tono="secundario">
-        En este horario no te aviso nada; lo que caiga ahí sale cuando termina.
+        {DESC_HORARIO_SILENCIOSO}
       </Texto>
       <View style={{ flexDirection: 'row', gap: espacio.s }}>
         <View style={{ flex: 1 }}>
           <CampoTexto
             testID="ajustes-silencio-inicio"
-            etiqueta="Desde"
-            ejemplo="22:00"
+            etiqueta={ETIQUETA_SILENCIO_DESDE}
+            ejemplo={EJEMPLO_SILENCIO_DESDE}
             valor={inicio}
             alCambiar={setInicio}
             nativo={{ keyboardType: 'numbers-and-punctuation', maxLength: 5 }}
@@ -163,8 +194,8 @@ export function SeccionAvisos() {
         <View style={{ flex: 1 }}>
           <CampoTexto
             testID="ajustes-silencio-fin"
-            etiqueta="Hasta"
-            ejemplo="08:00"
+            etiqueta={ETIQUETA_SILENCIO_HASTA}
+            ejemplo={EJEMPLO_SILENCIO_HASTA}
             valor={fin}
             alCambiar={setFin}
             nativo={{ keyboardType: 'numbers-and-punctuation', maxLength: 5 }}
@@ -174,7 +205,7 @@ export function SeccionAvisos() {
       <Boton
         testID="ajustes-guardar-horario"
         variante="secundario"
-        etiqueta="Guardar horario"
+        etiqueta={BTN_GUARDAR_HORARIO}
         alPresionar={guardarHorario}
       />
       {mensaje ? (

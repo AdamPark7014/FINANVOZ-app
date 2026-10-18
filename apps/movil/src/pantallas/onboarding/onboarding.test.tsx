@@ -22,6 +22,11 @@ import {
   onboardingCompletado,
 } from '../../servicios';
 import { crearSesionPrueba, type SesionPrueba } from './__pruebas__/sesion';
+import {
+  TIP_CAPTURA_AHORA_NO,
+  TIP_COLCHON_SIN_POR_AHORA,
+  TIP_CONSENTIMIENTO,
+} from './tips';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
 const RUTAS = {
@@ -71,7 +76,7 @@ describe('onboarding', () => {
     const antes = conteoTablas();
     tocar('onb-empezar');
     expect(r.getPathname()).toBe('/onboarding/consentimiento');
-    expect(screen.getByTestId('onb-tip')).toBeTruthy();
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CONSENTIMIENTO);
 
     // La casilla obligatoria viene sin marcar y el botón no hace nada hasta marcarla.
     expect(screen.getByTestId('onb-casilla-datos')).toHaveProp('accessibilityState', { checked: false });

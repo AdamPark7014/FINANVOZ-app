@@ -22,7 +22,21 @@ import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { PantallaPlan, PuertaPlus, SeccionPlan } from '.';
-import { MENSAJE_LIMITE_DIARIO, MENSAJE_LIMITE_MENSUAL_GRATIS, MENSAJE_LIMITE_MENSUAL_PLUS } from './textos';
+import {
+  etiquetaCandadoPlus,
+  ID,
+  MENSAJE_ERROR_COMPRA,
+  MENSAJE_LIMITE_DIARIO,
+  MENSAJE_LIMITE_MENSUAL_GRATIS,
+  MENSAJE_LIMITE_MENSUAL_PLUS,
+  MENSAJE_LISTO,
+  MENSAJE_OFERTAS_VACIAS,
+  MENSAJE_RESTAURADO_SIN_PLUS,
+  MENSAJE_SIN_TIENDA,
+  TITULO_PLAN_GRATIS,
+  TITULO_PLUS,
+  TITULO_PLUS_PRUEBA,
+} from './textos';
 
 const DIA = 86_400_000;
 /** Frase que el nivel de reglas no cubre: va a la nube. */
@@ -75,9 +89,9 @@ describe('pantalla del plan', () => {
       </>,
       { compras: tienda, abrirPlan },
     );
-    expect(textoDe('plan-titulo')).toBe('Plan Gratis');
+    expect(textoDe(ID.titulo)).toBe(TITULO_PLAN_GRATIS);
     // Hoy en Gratis: candado discreto en lugar de la probabilidad y sin tarjeta del día (`02 §4`).
-    expect(screen.getByText('Ver probabilidad · Plus')).toBeTruthy();
+    expect(screen.getByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeTruthy();
     expect(screen.queryByTestId('tarjeta-del-dia')).toBeNull();
     fireEvent.press(screen.getByTestId('candado-probabilidad'));
     expect(abrirPlan).toHaveBeenCalled();

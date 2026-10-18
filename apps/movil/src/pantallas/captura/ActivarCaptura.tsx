@@ -166,13 +166,7 @@ export function ActivarCaptura({
           <Texto variante="subtitulo" accessibilityRole="header">
             {TITULO_PERMISO_NOTIFICACIONES}
           </Texto>
-          <Tarjeta
-            testID={paso.denegado ? `${testID}-permiso-denegado` : `${testID}-permiso`}
-            accessibilityRole="summary"
-            accessibilityLabel={
-              paso.denegado ? PERMISO_DENEGADO : `${PERMISO_INSTRUCCION} ${PERMISO_AYUDA_ANDROID}`
-            }
-          >
+          <Tarjeta testID={paso.denegado ? `${testID}-permiso-denegado` : `${testID}-permiso`}>
             <Texto
               variante="cuerpo"
               testID={paso.denegado ? `${testID}-permiso-denegado-texto` : `${testID}-permiso-texto`}
@@ -242,12 +236,10 @@ export function ActivarCaptura({
         <>
           <Tarjeta testID={`${testID}-lista`}>
             <Texto variante="cuerpo">
-              {paso.nombres.length > 0
-                ? `Listo: anotaré lo que avisen ${paso.nombres.join(', ')}.`
-                : 'La captura automática está activa.'}
+              {paso.nombres.length > 0 ? LISTA_CAPTURA_APPS(paso.nombres) : LISTA_CAPTURA_ACTIVA}
             </Texto>
             <Texto variante="secundario" tono="secundario">
-              Lo que no entienda queda en Movimientos → Por revisar.
+              {LISTA_CAPTURA_POR_REVISAR}
             </Texto>
           </Tarjeta>
           {continuar(true)}

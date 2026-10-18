@@ -15,7 +15,21 @@ import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
-import { mensajePagoTarjeta } from './textos';
+import {
+  AVISO_SALDO_A_FAVOR_EN_TARJETA,
+  BTN_CANCELAR,
+  BTN_GUARDAR_PAGO,
+  BTN_NO,
+  ERROR_MONTO_PAGO,
+  ERROR_ORIGEN_PAGO,
+  ETIQUETA_MONTO_PAGO,
+  etiquetaAccesibleDato,
+  etiquetaSiLiquidar,
+  mensajeLiquidacionPlan,
+  mensajePagoTarjeta,
+  PREGUNTA_CUENTA_PAGO,
+  textoSaldoAFavorTrasPago,
+} from './textos';
 
 export function Seccion({
   titulo,
@@ -46,11 +60,15 @@ export function Seccion({
 /** Una fila "etiqueta … cifra" del detalle. */
 export function Dato({ etiqueta, valor, testID }: { etiqueta: string; valor: string; testID?: string }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-      <Texto variante="cuerpo" style={{ flex: 1 }}>
+    <View
+      accessible
+      accessibilityLabel={etiquetaAccesibleDato(etiqueta, valor)}
+      style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
+    >
+      <Texto variante="cuerpo" style={{ flex: 1 }} importantForAccessibility="no">
         {etiqueta}
       </Texto>
-      <Texto variante="cuerpoFuerte" {...(testID ? { testID } : {})}>
+      <Texto variante="cuerpoFuerte" importantForAccessibility="no" {...(testID ? { testID } : {})}>
         {valor}
       </Texto>
     </View>
@@ -110,11 +128,11 @@ export function FormularioPago({
 
   const guardar = () => {
     if (monto === null || monto <= 0) {
-      setError('Escribe cuánto pagaste.');
+      setError(ERROR_MONTO_PAGO);
       return;
     }
     if (!origen) {
-      setError('Elige de qué cuenta salió el pago.');
+      setError(ERROR_ORIGEN_PAGO);
       return;
     }
     try {
@@ -130,12 +148,12 @@ export function FormularioPago({
     <View style={{ gap: espacio.s }} testID={testID}>
       <CampoMonto
         testID={`${testID}-monto`}
-        etiqueta="¿Cuánto pagaste?"
+        etiqueta={ETIQUETA_MONTO_PAGO}
         valorInicial={montoSugerido > 0 ? montoSugerido : null}
         alCambiar={setMonto}
       />
       <ElegirCuenta
-        pregunta="¿De qué cuenta salió?"
+        pregunta={PREGUNTA_CUENTA_PAGO}
         valor={origen}
         alElegir={setOrigen}
         prefijoTestID={`${testID}-origen`}

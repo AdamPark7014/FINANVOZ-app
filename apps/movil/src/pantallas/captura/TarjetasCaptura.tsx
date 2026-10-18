@@ -150,7 +150,9 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
     );
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">Vuelve a activar la lectura de notificaciones</Texto>
+      <Texto variante="cuerpoFuerte" accessibilityRole="header">
+        Vuelve a activar la lectura de notificaciones
+      </Texto>
       <Texto variante="secundario" tono="secundario">
         Recuperé tus datos, pero en este teléfono todavía no puedo leer los avisos de tu banco.
       </Texto>
@@ -179,7 +181,7 @@ export function TarjetaCapturaInactiva({ testID }: { testID: string }) {
   const { puente } = useCaptura();
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">
+      <Texto variante="cuerpoFuerte" accessibilityRole="header">
         No he visto notificaciones de tu banco en 3 días. Revisa que la captura siga activa.
       </Texto>
       <Texto variante="secundario" tono="secundario" testID={`${testID}-guia`}>

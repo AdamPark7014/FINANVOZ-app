@@ -250,10 +250,10 @@ function Ajustes({
             prefijoTestID="tanda-editar-cuenta"
           />
         )}
-        <Boton testID="tanda-editar-guardar" etiqueta="Guardar cambios" alPresionar={guardar} />
+        <Boton testID="tanda-editar-guardar" etiqueta={ETIQUETA_GUARDAR_CAMBIOS} alPresionar={guardar} />
         <Boton
           testID="tanda-editar-cancelar"
-          etiqueta="Cancelar"
+          etiqueta={ETIQUETA_CANCELAR}
           variante="texto"
           alPresionar={() => {
             setNombre(d.nombre);

@@ -291,7 +291,7 @@ function Faltante({
         </View>
       </Tarjeta>
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" testID="arqueo-error-propuesta">
           {error}
         </Texto>
       ) : null}

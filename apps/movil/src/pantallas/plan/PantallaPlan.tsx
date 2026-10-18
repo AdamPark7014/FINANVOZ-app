@@ -105,22 +105,22 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   };
 
   return (
-    <Pantalla testID="pantalla-plan" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
-        testID="plan-volver"
+        testID={ID.volver}
       />
       <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
 
-      <Tarjeta testID="plan-actual">
-        <Texto variante="subtitulo" testID="plan-titulo">
+      <Tarjeta testID={ID.actual}>
+        <Texto variante="subtitulo" testID={ID.titulo}>
           {resumen.titulo}
         </Texto>
         {resumen.detalle ? (
-          <Texto variante="cuerpo" tono="secundario" testID="plan-detalle">
+          <Texto variante="cuerpo" tono="secundario" testID={ID.detalle}>
             {resumen.detalle}
           </Texto>
         ) : null}
@@ -129,12 +129,12 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             etiqueta={ETIQUETA_ADMINISTRAR}
             variante="secundario"
             alPresionar={() => void compras.administrar().catch(() => undefined)}
-            testID="plan-administrar"
+            testID={ID.administrar}
           />
         ) : null}
       </Tarjeta>
 
-      <Tarjeta>
+      <Tarjeta testID={ID.incluye}>
         <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
         <View style={{ gap: espacio.xs }}>
           {INCLUYE_PLUS.map((t) => (
@@ -149,19 +149,36 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       {vista.plan === 'gratis' ? (
         <View style={{ gap: espacio.m }}>
           {!compras ? (
-            <Texto variante="cuerpo" tono="secundario" testID="plan-sin-tienda">
+            <Texto variante="cuerpo" tono="secundario" testID={ID.sinTienda}>
               {MENSAJE_SIN_TIENDA}
             </Texto>
           ) : ofertas.tipo === 'cargando' ? (
-            <Texto variante="secundario" tono="secundario" testID="plan-cargando">
+            <Texto variante="secundario" tono="secundario" testID={ID.cargando}>
               {CARGANDO_OFERTAS}
             </Texto>
-          ) : ofertas.tipo === 'error' || ofertas.ofertas.length === 0 ? (
+          ) : ofertas.tipo === 'error' ? (
             <>
-              <Texto variante="cuerpo" tono="faltante" testID="plan-error">
+              <Texto variante="cuerpo" tono="faltante" testID={ID.errorOfertas}>
                 {MENSAJE_ERROR_OFERTAS}
               </Texto>
-              <Boton etiqueta={ETIQUETA_INTENTAR} variante="secundario" alPresionar={cargar} />
+              <Boton
+                etiqueta={ETIQUETA_INTENTAR}
+                variante="secundario"
+                alPresionar={cargar}
+                testID={ID.intentar}
+              />
+            </>
+          ) : ofertas.ofertas.length === 0 ? (
+            <>
+              <Texto variante="cuerpo" tono="secundario" testID={ID.vacioOfertas}>
+                {MENSAJE_OFERTAS_VACIAS}
+              </Texto>
+              <Boton
+                etiqueta={ETIQUETA_INTENTAR}
+                variante="secundario"
+                alPresionar={cargar}
+                testID={ID.intentar}
+              />
             </>
           ) : (
             ofertas.ofertas.map((o) => {
@@ -174,7 +191,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
                     cargando={ocupado === o.id}
                     deshabilitado={ocupado !== null}
                     alPresionar={() => void comprar(o.id)}
-                    testID={`plan-oferta-${o.periodo}`}
+                    testID={ID.oferta(o.periodo)}
                   />
                   <Texto variante="secundario" tono="secundario">
                     {e.detalle}
@@ -184,7 +201,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             })
           )}
           {compras?.simulada ? (
-            <Texto variante="secundario" tono="secundario">
+            <Texto variante="secundario" tono="secundario" testID={ID.notaSimulada}>
               {NOTA_COMPRA_SIMULADA}
             </Texto>
           ) : null}
@@ -192,7 +209,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       ) : null}
 
       {mensaje ? (
-        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="plan-mensaje">
+        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID={ID.mensaje}>
           {mensaje}
         </Texto>
       ) : null}
@@ -205,10 +222,10 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
           cargando={ocupado === 'restaurar'}
           deshabilitado={ocupado !== null}
           alPresionar={() => void restaurar()}
-          testID="plan-restaurar"
+          testID={ID.restaurar}
         />
       ) : null}
-      <Texto variante="secundario" tono="secundario">
+      <Texto variante="secundario" tono="secundario" testID={ID.notaTienda}>
         {NOTA_TIENDA}
       </Texto>
     </Pantalla>
@@ -219,13 +236,13 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
 export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
   const resumen = resumenPlan(useVista(obtenerPlan));
   return (
-    <Tarjeta testID="ajustes-plan">
+    <Tarjeta testID={ID.ajustesPlan}>
       <Texto variante="subtitulo">{SECCION_AJUSTES}</Texto>
-      <Texto variante="cuerpo" testID="ajustes-plan-titulo">
+      <Texto variante="cuerpo" testID={ID.ajustesPlanTitulo}>
         {resumen.titulo}
       </Texto>
       {resumen.detalle ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" testID={ID.ajustesPlanDetalle}>
           {resumen.detalle}
         </Texto>
       ) : null}
@@ -233,7 +250,7 @@ export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
         etiqueta={ETIQUETA_VER_PLANES}
         variante="secundario"
         alPresionar={alAbrirPlan}
-        testID="ajustes-plan-ver"
+        testID={ID.ajustesPlanVer}
       />
     </Tarjeta>
   );

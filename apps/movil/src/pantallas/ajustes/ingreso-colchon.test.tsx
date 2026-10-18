@@ -16,6 +16,16 @@ import {
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { auditar } from '../__pruebas__/accesibilidad';
+import {
+  CONFIRMACION_INGRESO_VARIABLE,
+  ETIQUETA_CAMBIAR_INGRESO,
+  ETIQUETA_CONFIGURAR_INGRESO,
+  fraseCuandoTePagan,
+  lineaResumenIngreso,
+  mensajeIngresoGuardado,
+  RESUMEN_INGRESO_VARIABLE,
+  RESUMEN_SIN_INGRESO,
+} from './ingreso-textos';
 
 /** Misma raíz real que `ajustes.test.tsx`: cada `abrirSesion` entrega una base nueva en memoria. */
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
@@ -54,10 +64,10 @@ jest.mock('../principal', () => {
         {
           testID: 'boton-configurar-ingreso',
           accessibilityRole: 'button',
-          accessibilityLabel: 'Decir cada cuándo me pagan',
+          accessibilityLabel: ETIQUETA_CONFIGURAR_INGRESO,
           onPress: navegacion.alConfigurarIngreso,
         },
-        createElement(Text, null, 'Decir cada cuándo me pagan'),
+        createElement(Text, null, ETIQUETA_CONFIGURAR_INGRESO),
       ),
   };
 });
@@ -106,7 +116,11 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     mockPreparar = conQuincena;
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(
-      'Te pagan $13,000 cada quincena, el 15 y el último día del mes. Tu próximo pago: jue 15.',
+      lineaResumenIngreso(
+        1_300_000,
+        fraseCuandoTePagan({ tipo: 'quincenal_15_ultimo', ajuste: 'anterior' }),
+        '2026-10-15',
+      ),
     );
     expect(screen.getByTestId('ajustes-colchon-resumen')).toHaveTextContent(
       'Sin colchón: todo tu dinero libre cuenta para lo que puedes gastar.',
@@ -114,7 +128,7 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityLabel',
-      'Cambiar mi ingreso',
+      ETIQUETA_CAMBIAR_INGRESO,
     );
     expect(screen.getByTestId('ajustes-cambiar-colchon')).toHaveProp(
       'accessibilityLabel',

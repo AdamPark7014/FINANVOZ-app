@@ -15,6 +15,33 @@ import { FlujoCorreo } from './FlujoCorreo';
 import { FormularioContrasena } from './FormularioContrasena';
 import { TarjetaRespaldo } from './TarjetaRespaldo';
 import {
+  ACCESIBILIDAD_VOLVER,
+  AVISO_BORRAR_CUENTA,
+  AVISO_PENDIENTE,
+  BTN_BORRAR_CUENTA,
+  BTN_BORRAR_CUENTA_CONFIRMAR,
+  BTN_CANCELAR,
+  BTN_RESPALDAR_AHORA,
+  DESC_RESPALDO_AUTOMATICO,
+  DESC_SOLO_WIFI,
+  ETIQUETA_RESPALDO_AUTOMATICO,
+  ETIQUETA_SOLO_WIFI,
+  ETIQUETA_VOLVER,
+  MENSAJE_BORRAR_CUENTA_OK,
+  MENSAJE_CONTRASENA_GUARDADA,
+  MENSAJE_CORREO_CUENTA_OK,
+  MENSAJE_LISTO_NUBE,
+  MENSAJE_NO_GUARDAR_AJUSTE,
+  PISTA_BORRAR_CUENTA,
+  PISTA_VOLVER,
+  SUBTITULO_NUBE,
+  TEXTO_ACTIVAR_NUBE,
+  TEXTO_SESION_VENCIDA,
+  TITULO_RESPALDO,
+  textoCrearContrasenaTrasCorreo,
+  textoRespaldasCon,
+} from './textos';
+import {
   AVISO_BORRAR_CUENTA,
   AVISO_PENDIENTE,
   BTN_BORRAR_CUENTA,
@@ -190,22 +217,20 @@ function TarjetaNube({
       </Texto>
       {vista.pendiente ? (
         <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente">
-          Llevas más de 2 semanas sin respaldo.
+          {AVISO_PENDIENTE}
         </Texto>
       ) : null}
       {cuenta.tipo === 'cargando' ? null : pedirCorreo ? (
         <>
           <Texto variante="secundario" tono="secundario" testID="respaldo-pide-correo">
-            {vista.pedirCorreo && cuenta.tipo === 'sin_correo'
-              ? 'Tu sesión de respaldo venció. Vuelve a entrar con tu correo y el código para seguir respaldando.'
-              : 'Guarda tu respaldo cifrado en la nube con tu correo. Te mando un código para confirmarlo.'}
+            {vista.pedirCorreo && cuenta.tipo === 'sin_correo' ? TEXTO_SESION_VENCIDA : TEXTO_ACTIVAR_NUBE}
           </Texto>
           <FlujoCorreo
             cuenta={nube.cuenta}
             alConfirmar={(r) => {
               if (r.cambioUsuario) void reidentificar();
               void leerCuenta();
-              setMensaje({ texto: 'Listo: tu correo quedó como cuenta de respaldo.', error: false });
+              setMensaje({ texto: MENSAJE_CORREO_CUENTA_OK, error: false });
             }}
           />
         </>

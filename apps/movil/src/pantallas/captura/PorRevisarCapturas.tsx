@@ -8,6 +8,7 @@ import {
   listarCapturasPorRevisar,
   listarCategorias,
   marcarNoReconocidaRevisada,
+  obtenerEstadoCaptura,
   type CapturaPorRevisar,
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
@@ -19,15 +20,14 @@ import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { MESES_CAPTURA } from './PreguntasCaptura';
-
-/** Redacción de capturas por revisar (`02 §6`, `02 §14`). */
-const TITULO_SECCION = 'Capturas por revisar';
-const INTRO_SECCION =
-  'Vienen de avisos de tu banco. Confírmalas o corrige categoría y meses.';
-const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
-const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
-const AVISO_SIN_TEXTO =
-  'El aviso no traía detalle. Si fue un gasto o un ingreso, regístralo tú.';
+import {
+  AVISO_SIN_TEXTO,
+  ETIQUETA_SIN_CATEGORIA,
+  INTRO_CAPTURAS_POR_REVISAR,
+  TEXTO_CAPTURAS_POR_REVISAR_VACIO,
+  TITULO_CAPTURAS_POR_REVISAR,
+  TITULO_SIN_COMERCIO,
+} from './textos';
 
 const MOTIVO: Record<CapturaPorRevisar['motivos'][number], string> = {
   fue_a_meses: '¿Fue a meses?',
@@ -45,13 +45,31 @@ const MOTIVO: Record<CapturaPorRevisar['motivos'][number], string> = {
  */
 export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void }) {
   const { catalogo } = useCaptura();
-  const lista = useVista((ctx) => listarCapturasPorRevisar(ctx, catalogo));
-  if (lista.length === 0) return null;
+  const { ctx } = useSesion();
+  const lista = useVista((v) => listarCapturasPorRevisar(v, catalogo));
+  const capturaActiva = obtenerEstadoCaptura(ctx).activada;
+
+  if (lista.length === 0) {
+    if (!capturaActiva) return null;
+    return (
+      <View style={{ gap: espacio.s }} testID="capturas-por-revisar">
+        <Texto variante="subtitulo" accessibilityRole="header">
+          {TITULO_CAPTURAS_POR_REVISAR}
+        </Texto>
+        <Texto variante="cuerpo" tono="secundario" testID="capturas-por-revisar-vacio">
+          {TEXTO_CAPTURAS_POR_REVISAR_VACIO}
+        </Texto>
+      </View>
+    );
+  }
+
   return (
     <View style={{ gap: espacio.s }} testID="capturas-por-revisar">
-      <Texto variante="subtitulo">{TITULO_SECCION}</Texto>
+      <Texto variante="subtitulo" accessibilityRole="header">
+        {TITULO_CAPTURAS_POR_REVISAR}
+      </Texto>
       <Texto variante="secundario" tono="secundario">
-        {INTRO_SECCION}
+        {INTRO_CAPTURAS_POR_REVISAR}
       </Texto>
       {lista.map((c) => (
         <FilaCaptura key={c.capturaId} c={c} alRegistrar={alRegistrar} />
