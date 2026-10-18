@@ -215,7 +215,9 @@ export function PanelRegistrar({
           setAvisoDeducible(r.movimientos.some((m) => m.avisoDeducible));
           avisarRegistro(mensajeRegistrado(r.movimientos), {
             deshacer: r.deshacer,
-            transaccionId: r.movimientos[0]?.transaccionId,
+            ...(r.movimientos[0]?.transaccionId
+              ? { transaccionId: r.movimientos[0].transaccionId }
+              : {}),
           });
           return;
         case 'corregido':
