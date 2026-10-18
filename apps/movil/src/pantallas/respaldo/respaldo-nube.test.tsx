@@ -25,7 +25,7 @@ import { borrarTodoApp, restaurarSesion } from '../../servicios/sesion';
 import type { TiendaEnMemoria } from '../../suscripciones/memoria';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
-import { PISTA_RESPALDAR_AHORA } from './textos';
+import { PISTA_CONFIRMAR_BORRAR_CUENTA, PISTA_RESPALDAR_AHORA } from './textos';
 
 const mockAbiertas: { ctx: Contexto; cerrar: () => void }[] = [];
 let mockPreparar: ((ctx: Contexto) => void) | null = null;
@@ -145,6 +145,7 @@ async function entrarConCorreo() {
       'El código no es correcto o ya venció. Pide otro.',
     ),
   );
+  expect(screen.getByTestId('respaldo-nube-error')).toHaveProp('accessibilityRole', 'alert');
   fireEvent.changeText(screen.getByTestId('respaldo-codigo'), '123456');
   fireEvent.press(screen.getByTestId('respaldo-confirmar-codigo'));
 }
@@ -214,6 +215,11 @@ describe('Ajustes → Respaldo en la nube (M9, 02 §19)', () => {
     // usuario anónimo nuevo (pendiente 58).
     fireEvent.press(screen.getByTestId('respaldo-borrar-cuenta'));
     expect(screen.getByTestId('respaldo-borrar-aviso')).toHaveTextContent(/Se borran todos tus respaldos/);
+    expect(screen.getByTestId('respaldo-borrar-aviso')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('respaldo-borrar-confirmar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONFIRMAR_BORRAR_CUENTA,
+    );
     fireEvent.press(screen.getByTestId('respaldo-borrar-confirmar'));
     await waitFor(() =>
       expect(screen.getByTestId('respaldo-mensaje')).toHaveTextContent(

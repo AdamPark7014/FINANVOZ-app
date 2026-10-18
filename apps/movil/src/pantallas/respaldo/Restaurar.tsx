@@ -243,6 +243,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               variante="secundario"
               tono="faltante"
               accessibilityLiveRegion="polite"
+              accessibilityRole="alert"
               testID="restaurar-error"
             >
               {error}

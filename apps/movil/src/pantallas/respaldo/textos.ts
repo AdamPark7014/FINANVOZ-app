@@ -19,6 +19,9 @@ export const PISTA_VOLVER = 'Cierra esta pantalla';
 export const ACCESIBILIDAD_VOLVER_RESTAURAR = 'Volver';
 export const PISTA_VOLVER_RESTAURAR = 'Regresa al paso anterior';
 export const PISTA_BORRAR_CUENTA = 'Elimina tu cuenta de respaldo en la nube';
+/** TalkBack al confirmar borrar cuenta (`02 §19`). */
+export const PISTA_CONFIRMAR_BORRAR_CUENTA =
+  'Confirma borrar la cuenta y todos los respaldos en la nube';
 export const TITULO_RESPALDO = 'Respaldo';
 export const SUBTITULO_NUBE = 'En la nube';
 export const AVISO_PENDIENTE = 'Llevas más de 2 semanas sin respaldo.';

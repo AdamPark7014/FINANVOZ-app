@@ -136,6 +136,7 @@ function MensajeError({ texto }: { texto: string }) {
       variante="secundario"
       tono="faltante"
       accessibilityLiveRegion="polite"
+      accessibilityRole="alert"
       testID="respaldo-nube-error"
     >
       {texto}
