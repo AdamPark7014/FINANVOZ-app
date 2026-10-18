@@ -6,7 +6,7 @@
 
 ## Hecho en este turno
 
-- **Ayuda · TalkBack:** FAQ lee cada párrafo al expandir; correo de contacto y aviso sin app con dirección en palabras (`d6237c9`, `d7a7f33`, `19a2050`, `27cd18d`).
+- **Ayuda · TalkBack (acordeón/correo):** FAQ lee cada párrafo al expandir; contacto y aviso sin app con correo en palabras — commits `d6237c9` … `27cd18d` en main.
 - **Captura · TalkBack reactivar:** `etiquetaCuerpoReactivarCaptura` (commits paralelos en main).
 
 ## Hecho (acumulado reciente)
