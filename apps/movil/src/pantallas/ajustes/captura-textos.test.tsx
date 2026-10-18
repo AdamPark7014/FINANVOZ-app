@@ -49,19 +49,60 @@ describe('captura-textos (TalkBack)', () => {
   });
 });
 
+function renderSeccionCaptura(appsActivas?: readonly string[]) {
+  const p = conEscenario('e4-01');
+  if (appsActivas) activarCaptura(p.ctx, appsActivas);
+  render(
+    <ProveedorSesion ctx={p.ctx}>
+      <ProveedorCaptura puente={puenteFalso()} sha256={sha256} plantillasRemotas={null}>
+        <SeccionCaptura />
+      </ProveedorCaptura>
+    </ProveedorSesion>,
+  );
+  return p;
+}
+
 describe('SeccionCaptura (TalkBack)', () => {
-  it('con captura activa, aviso al capturar es encabezado', () => {
-    const p = conEscenario('e4-01');
-    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
-    render(
-      <ProveedorSesion ctx={p.ctx}>
-        <ProveedorCaptura puente={puenteFalso()} sha256={sha256} plantillasRemotas={null}>
-          <SeccionCaptura />
-        </ProveedorCaptura>
-      </ProveedorSesion>,
+  it('título de sección es encabezado', () => {
+    const p = renderSeccionCaptura();
+    expect(screen.getByTestId('ajustes-captura-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(SECCION_CAPTURA)).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('captura apagada: estado hablado y pista de activar', () => {
+    const p = renderSeccionCaptura();
+    expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_CAPTURA_APAGADA,
+    );
+    expect(screen.getByTestId('ajustes-captura-activar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_ACTIVAR_CAPTURA,
+    );
+    p.cerrar();
+  });
+
+  it('con captura activa: estado, aviso y modo aviso para TalkBack', () => {
+    const p = renderSeccionCaptura(['mx.ejemplo.bancoa']);
+    expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaCapturaActiva(1),
     );
     expect(screen.getByTestId('ajustes-captura-aviso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(ETIQUETA_AVISO_AL_CAPTURAR)).toBeTruthy();
+    const pregunta = screen.getByTestId('ajustes-captura-aviso-pregunta', { includeHiddenElements: true });
+    expect(pregunta.props.accessibilityElementsHidden).toBe(true);
+    expect(pregunta.props.importantForAccessibility).toBe('no-hide-descendants');
+    const grupo = screen.getByLabelText(PREGUNTA_MODO_AVISO);
+    expect(grupo.props.accessibilityRole).toBe('radiogroup');
+    expect(screen.getByTestId('ajustes-captura-aviso-agrupados').props.accessibilityState?.selected).toBe(
+      true,
+    );
+    expect(screen.getByTestId('ajustes-captura-desactivar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_DESACTIVAR_CAPTURA,
+    );
     p.cerrar();
   });
 });
