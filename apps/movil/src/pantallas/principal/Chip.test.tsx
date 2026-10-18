@@ -76,7 +76,7 @@ describe('GrupoChips (TalkBack)', () => {
       />,
     );
     const grupo = screen.getByLabelText('¿Con qué pagaste?');
-    expect(grupo).toBeTruthy();
+    expect(grupo.props.accessibilityRole).toBe('radiogroup');
     expect(screen.getByTestId('pago-efectivo').props.accessibilityState).toEqual({ selected: true });
     expect(screen.getByTestId('pago-debito').props.accessibilityState).toEqual({ selected: false });
   });

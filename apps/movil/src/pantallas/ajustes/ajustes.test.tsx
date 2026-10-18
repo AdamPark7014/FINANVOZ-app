@@ -136,6 +136,11 @@ describe('ajustes', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+    expect(screen.getByTestId('ajustes-abrir-ayuda')).toHaveProp('accessibilityHint', PISTA_AYUDA);
+    expect(screen.getByTestId('ajustes-version')).toHaveProp(
+      'accessibilityLabel',
+      'Finanvoz versión 1.0.0',
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('ajustes-abrir-ayuda'));
     expect(r.getPathname()).toBe('/ayuda');

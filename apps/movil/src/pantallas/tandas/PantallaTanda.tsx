@@ -140,6 +140,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
               etiqueta={ETIQUETA_ME_TOCO}
               variante="secundario"
               alPresionar={() => setCobrando(true)}
+              pista={PISTA_ME_TOCO}
             />
           )}
           <Texto variante="secundario" tono="secundario">

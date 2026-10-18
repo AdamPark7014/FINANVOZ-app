@@ -187,7 +187,13 @@ export default function Ajustes() {
         accessibilityLabel={etiquetaAccesibilidadVersion(version)}
         style={{ paddingVertical: espacio.s }}
       >
-        <Texto variante="secundario" tono="secundario" alinear="center">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          alinear="center"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {lineaVersion(version)}
         </Texto>
       </Pressable>

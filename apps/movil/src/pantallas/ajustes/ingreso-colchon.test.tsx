@@ -237,6 +237,14 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     tocar('ajustes-cambiar-colchon');
     // Sugerencia del 10 % de la quincena, igual que en O7.
     expect(screen.getByTestId('ajustes-colchon-monto')).toHaveProp('value', '1,300');
+    expect(screen.getByTestId('ajustes-colchon-monto')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaCampoMonto(ETIQUETA_MONTO_COLCHON, '1,300'),
+    );
+    expect(screen.getByTestId('ajustes-colchon-monto')).toHaveProp(
+      'accessibilityHint',
+      ayudaColchon(130_000),
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
 
     // Vacío no guarda: para quitar el colchón hay que escribir 0.

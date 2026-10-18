@@ -6,27 +6,27 @@
 
 ## Hecho en este turno
 
-- **Ajustes › Captura:** `etiquetaCapturaActiva` (conteo en palabras), pistas TalkBack en Activar/Desactivar, test `captura-textos.test.ts`.
+- **Suscripciones TalkBack:** auditoría estricta en vacío, header de sección en Cuentas, prueba de `etiquetaVacioSuscripciones` en `textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Tandas vacío/pistas, capturas por revisar título, EstadoVacio. Ver `git log`.
+- CTAs y filas Suscripciones (montos en palabras, `auditar`, botón Cuentas). Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP ajeno en disco (`EstadoVacio`, `PantallaAyuda`) — no mezclar en commits de otra pantalla.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
-- WIP suelto en otros archivos — revisar `git status` antes de editar.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio cuando toque el hito.
+2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas (pista + prueba).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
