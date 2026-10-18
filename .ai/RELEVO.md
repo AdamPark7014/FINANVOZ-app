@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **¿Me alcanza?:** pistas TalkBack Calcular/Cancelar, test `accessibilityLabel` ayuda datos insuficientes.
+- **Ayuda (M13):** encabezado «Preguntas frecuentes», pistas TalkBack (correo con asunto, volver, abrir desde Ajustes); tests `PISTA_VOLVER` corregidos.
 
 ## Hecho (acumulado reciente)
 
-- Encabezado, alertas cancel/error/recordatorio, `etiquetaVacioDatosInsuficientes`. Ver `git log`.
+- Hoy ProbabilidadHoy; onboarding O3/O4; captura/cuentas TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (onboarding, tarjetas, EstadoVacio, widget) — no mezclar sin `git status`.
+- WIP ajeno (colchón, captura, movimientos, suscripciones) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP ajeno si Adam lo pide.
+2. Terminar a11y tarjeta si queda pendiente en otro WIP.
 
 ## No tocar
 
