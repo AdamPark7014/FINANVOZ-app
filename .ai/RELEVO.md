@@ -6,7 +6,7 @@
 
 ## Hecho en este turno
 
-- **deducciones:** copy centralizado en `textos.ts`, testIDs (`deducciones-titulo-pantalla`, `deducciones-tus-facturas`, `importar-leyendo`, empty states), pruebas enlazadas a constantes es-MX.
+- **movil/tarjetas:** copy centralizado en `textos.ts` (pago, MSI, pagos planeados, liquidar); empty `tarjeta-meses-vacio` + movimientos/estados alineados; a11y (`Dato` accesible, título `header`); pruebas vacío y TalkBack en `tarjetas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
@@ -14,21 +14,19 @@
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (tabs, estados-cuenta, tandas, suscripciones, etc.) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento; varios tests de `tarjetas.test.tsx` fallan por `PantallaCuentas`/Hoy (testIDs/copy ajeno), no por este commit.
+- WIP local sin commitear (ingreso, arqueo, estados-cuenta, principal) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. CA-M12-02 importar facturas en teléfono.
-3. Commits pequeños del WIP ajeno si Adam lo pide.
+2. Estabilizar tests tarjetas/Hoy si fallan en CI.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- Working tree ajeno sin commitear salvo el pedido del turno.
 
 ## Estimación rápida
 
