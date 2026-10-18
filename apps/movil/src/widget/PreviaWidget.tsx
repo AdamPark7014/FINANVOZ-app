@@ -35,7 +35,11 @@ export function PreviaWidget({
       style={[estilos.contenedor, { backgroundColor: c.superficie, borderColor: c.borde }]}
     >
       {conCifra ? (
-        <View style={estilos.fila} importantForAccessibility="no-hide-descendants">
+        <View
+          testID="previa-widget-fila"
+          style={estilos.fila}
+          importantForAccessibility="no-hide-descendants"
+        >
           <Text importantForAccessibility="no" style={[estilos.titulo, { color: c.texto }]}>
             {vista.titulo}
           </Text>
