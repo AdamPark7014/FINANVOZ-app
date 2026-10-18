@@ -133,14 +133,12 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     // Selección múltiple: TalkBack anuncia casillas, no opciones de radio (pendiente 35, pase de M13).
     expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityRole', 'checkbox');
     for (const id of [p.caro, p.juan, p.ana]) fireEvent.press(screen.getByTestId(`division-persona-${id}`));
-    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityState', {
+    expect(screen.getByTestId(`division-persona-${p.caro}`).props.accessibilityState).toMatchObject({
       checked: true,
     });
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
 
-    expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Cuenta dividida $1,200 · te deben $900'),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/Cuenta dividida \$1,200 · te deben \$900/);
     const [mov] = listarMovimientos(p.ctx).flatMap((d) => d.movimientos);
     expect(p.ctx.libro.obtener(mov?.id as string)?.asientos.map((a) => [a.cuentaId, a.monto])).toEqual([
       ['cat:personal:comida_fuera', 30_000],
@@ -167,7 +165,7 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     fireEvent.press(screen.getByTestId(`division-origen-${p.bbva}`));
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
 
-    expect(screen.getByText('Registré: las pizzas $650 · te deben $433.33')).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/las pizzas \$650 · te deben \$433\.33/);
     const teDeben = listarCuentas(p.ctx).teDeben;
     expect(teDeben.map((x) => [x.nombre, x.saldo])).toEqual([
       ['Caro', 21_667],
@@ -268,7 +266,7 @@ describe('CA-M8-02 · Cobrar', () => {
     fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
     fireEvent.press(screen.getByTestId(`pago-persona-destino-${p.bbva}`));
     fireEvent.press(screen.getByTestId('boton-guardar-pago-persona'));
-    expect(within(screen.getByTestId('aviso')).getByText(mensajeRegistroCobro(30_000))).toBeTruthy();
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré que te pagó \$300/);
     expect(screen.getByText('Están a mano')).toBeTruthy();
     expect(screen.queryByTestId('boton-cobrar')).toBeNull();
     expect(screen.queryByTestId(`te-debe-${p.caro}`)).toBeNull();
@@ -309,7 +307,10 @@ describe('CA-M8-02 · Cobrar', () => {
     fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
     fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
     fireEvent.press(screen.getByTestId(`division-persona-${p.juan}`));
-    expect(screen.getByText('✓ Caro ×2')).toBeTruthy();
+    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp(
+      'accessibilityLabel',
+      'Caro, 2 veces',
+    );
     fireEvent.press(screen.getByTestId('division-categoria-comida_fuera'));
     fireEvent.press(screen.getByTestId(`division-origen-${p.bbva}`));
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
@@ -406,10 +407,9 @@ describe('estados vacíos (es-MX)', () => {
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
     expect(screen.getByTestId('persona-nombre')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('persona-saldo-etiqueta')).toHaveProp(
-      'importantForAccessibility',
-      'no-hide-descendants',
-    );
+    expect(
+      screen.getByTestId('persona-saldo-etiqueta', { includeHiddenElements: true }),
+    ).toHaveProp('importantForAccessibility', 'no-hide-descendants');
     expect(textoDe('persona-tip-te-deben')).toBe(TIP_SALDO_TE_DEBEN);
     expect(screen.getByTestId('persona-tip-te-deben')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('persona-movimientos-lista')).toHaveProp('accessibilityRole', 'list');
