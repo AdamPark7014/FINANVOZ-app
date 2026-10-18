@@ -1,8 +1,19 @@
-import { useEffect, type ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { AccessibilityInfo, findNodeHandle, Pressable, View } from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
-import { etiquetaProgresoOnboarding, etiquetaTipOnboarding, textoProgresoOnboarding } from './textos';
+import {
+  anuncioCambioPasoOnboarding,
+  etiquetaAyudaPasoOnboarding,
+  etiquetaProgresoOnboarding,
+  etiquetaTipOnboarding,
+  etiquetaTituloPasoOnboarding,
+  PISTA_CASILLA_ONB,
+  PISTA_CHIP_ONB_ELEGIR,
+  PISTA_CHIP_ONB_SELECCIONADA,
+  PISTA_PROGRESO_ONB,
+  textoProgresoOnboarding,
+} from './textos';
 
 export { ERROR_GUARDAR, PASOS_ONBOARDING } from './textos';
 
@@ -43,6 +54,7 @@ export function Chips<T extends string | number>({
               onPress={() => alCambiar(o.valor)}
               accessibilityRole="radio"
               accessibilityLabel={etiquetaHablada(o.etiqueta)}
+              accessibilityHint={activo ? PISTA_CHIP_ONB_SELECCIONADA : PISTA_CHIP_ONB_ELEGIR}
               accessibilityState={{ selected: activo, checked: activo }}
               style={{
                 minHeight: OBJETIVO_TACTIL_MIN,
@@ -84,6 +96,7 @@ export function Casilla({
       onPress={() => alCambiar(!valor)}
       accessibilityRole="checkbox"
       accessibilityLabel={etiquetaHablada(etiqueta)}
+      accessibilityHint={PISTA_CASILLA_ONB}
       accessibilityState={{ checked: valor }}
       style={{ minHeight: OBJETIVO_TACTIL_MIN, flexDirection: 'row', alignItems: 'center', gap: espacio.m }}
     >
@@ -133,9 +146,29 @@ export function PasoOnboarding({
 }) {
   // Antes de O2 no hay consentimiento y la analítica no envía nada.
   const registrarEvento = useAnalitica();
+  const refTitulo = useRef<View>(null);
   useEffect(() => {
     registrarEvento({ nombre: 'onboarding_paso', propiedades: { paso } });
   }, [registrarEvento, paso]);
+  useEffect(() => {
+    let vigente = true;
+    const anuncio = anuncioCambioPasoOnboarding(paso, titulo);
+    AccessibilityInfo.isScreenReaderEnabled()
+      .then((lector) => {
+        if (!vigente || lector !== true) return;
+        AccessibilityInfo.announceForAccessibility(anuncio);
+        const nodo = findNodeHandle(refTitulo.current);
+        if (nodo != null) {
+          requestAnimationFrame(() => {
+            if (vigente) AccessibilityInfo.setAccessibilityFocus(nodo);
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      vigente = false;
+    };
+  }, [paso, titulo]);
   return (
     <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} pie={pie}>
       <Texto
@@ -144,14 +177,28 @@ export function PasoOnboarding({
         testID="onb-progreso"
         accessibilityRole="text"
         accessibilityLabel={etiquetaProgresoOnboarding(paso)}
+        accessibilityHint={PISTA_PROGRESO_ONB}
       >
         {textoProgresoOnboarding(paso)}
       </Texto>
-      <Texto variante="titulo" accessibilityRole="header">
-        {titulo}
-      </Texto>
+      <View
+        ref={refTitulo}
+        testID="onb-titulo-paso"
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel={etiquetaTituloPasoOnboarding(titulo)}
+      >
+        <Texto variante="titulo" accessible={false}>
+          {titulo}
+        </Texto>
+      </View>
       {ayuda ? (
-        <Texto variante="cuerpo" tono="secundario">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          accessibilityRole="text"
+          accessibilityLabel={etiquetaAyudaPasoOnboarding(ayuda)}
+        >
           {ayuda}
         </Texto>
       ) : null}

@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Calculadora (web M0):** micro a11y — `aria-required` en ingreso, `role="alert"` en errores, caption de tabla, grupo del veredicto, foco al mostrar resultado; copy «¿Cuánto cuesta?»; test de alerta y obligatorio.
+- **Onboarding (móvil):** TalkBack en `PasoOnboarding` — anuncio y foco al entrar a cada paso; encabezado, ayuda, progreso con label/hint; pistas en chips y casillas; tests `componentes.test.tsx` y textos.
 
 ## Hecho (acumulado reciente)
 
-- Lista espera a11y, TalkBack móvil. Ver `git log`.
+- Calculadora lista espera a11y, TalkBack otras pantallas móvil. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, principal, ayuda) — no mezclar sin `git status`.
+- WIP paralelo (principal, ayuda) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

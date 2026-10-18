@@ -95,7 +95,7 @@ describe('onboarding', () => {
     const r = abrir('/');
     expect(r.getPathname()).toBe('/onboarding');
     expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
-    expect(screen.getByText(TITULO_BIENVENIDA)).toBeTruthy();
+    expect(screen.getByTestId('onb-titulo-paso')).toHaveProp('accessibilityLabel', TITULO_BIENVENIDA);
     expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
     expect(screen.getByTestId('onb-empezar')).toHaveProp('accessibilityHint', PISTA_ONB_EMPEZAR);
     expect(screen.getByTestId('onb-restaurar')).toHaveProp(

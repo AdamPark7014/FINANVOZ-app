@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  anuncioCambioPasoOnboarding,
   AYUDA_BIENVENIDA,
   AYUDA_COLCHON_ONB,
   AYUDA_PAGOS_FIJOS,
@@ -10,17 +11,22 @@ import {
   CUERPO_BIENVENIDA,
   ERROR_GUARDAR,
   ERROR_PAGO_FIJO_INCOMPLETO,
+  etiquetaAyudaPasoOnboarding,
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
   etiquetaTipOnboarding,
+  etiquetaTituloPasoOnboarding,
   ETIQUETA_PROXIMO_PAGO,
   PASOS_ONBOARDING,
+  PISTA_CASILLA_ONB,
+  PISTA_CHIP_ONB_ELEGIR,
   PISTA_COMPLETAR_INGRESO,
   PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_CAPTURA_AHORA_NO,
   PISTA_ONB_CONTINUAR,
   PISTA_ONB_EMPEZAR,
+  PISTA_PROGRESO_ONB,
   PISTA_TARJETA_DESPUES_ONB,
   TITULO_BIENVENIDA,
   TITULO_COLCHON,
@@ -128,5 +134,22 @@ describe('textos de onboarding', () => {
 
   it('pistas TalkBack de tarjeta en onboarding', () => {
     expect(PISTA_TARJETA_DESPUES_ONB).toMatch(/sin guardar/i);
+  });
+
+  it('anuncio al cambiar de paso combina progreso y título sin PII', () => {
+    expect(anuncioCambioPasoOnboarding(2, TITULO_CONSENTIMIENTO)).toBe(
+      'Paso 2 de 7. Tus datos son tuyos',
+    );
+    expect(anuncioCambioPasoOnboarding(1, TITULO_BIENVENIDA)).not.toMatch(/\$/);
+  });
+
+  it('pistas de progreso, chips y casilla en tuteo es-MX', () => {
+    expect(PISTA_PROGRESO_ONB).toMatch(/recorrido/i);
+    for (const pista of [PISTA_CHIP_ONB_ELEGIR, PISTA_CASILLA_ONB]) {
+      expect(pista).not.toMatch(/!/);
+      expect(pista).toMatch(/Toca/i);
+    }
+    expect(etiquetaTituloPasoOnboarding(TITULO_INGRESO)).toBe(TITULO_INGRESO);
+    expect(etiquetaAyudaPasoOnboarding(AYUDA_BIENVENIDA)).toBe(AYUDA_BIENVENIDA);
   });
 });

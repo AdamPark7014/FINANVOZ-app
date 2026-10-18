@@ -143,3 +143,31 @@ export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBO
 export function etiquetaProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
   return `${textoProgresoOnboarding(paso, total)} del recorrido inicial`;
 }
+
+/** TalkBack: pista del indicador «Paso n de 7». */
+export const PISTA_PROGRESO_ONB = 'Indica en qué paso vas del recorrido inicial';
+
+/** TalkBack: chips de una sola opción en O3–O5. */
+export const PISTA_CHIP_ONB_ELEGIR = 'Toca para seleccionar esta opción';
+export const PISTA_CHIP_ONB_SELECCIONADA = 'Opción seleccionada';
+
+/** TalkBack: casillas de consentimiento y similares. */
+export const PISTA_CASILLA_ONB = 'Toca para marcar o desmarcar';
+
+/** TalkBack O1–O7: encabezado del paso (título visible). */
+export function etiquetaTituloPasoOnboarding(titulo: string): string {
+  return titulo;
+}
+
+/** TalkBack: texto de ayuda bajo el título. */
+export function etiquetaAyudaPasoOnboarding(ayuda: string): string {
+  return ayuda;
+}
+
+/**
+ * Anuncio al entrar a un paso (TalkBack): progreso + título, sin datos personales.
+ * Solo se usa con `AccessibilityInfo.announceForAccessibility`.
+ */
+export function anuncioCambioPasoOnboarding(paso: number, titulo: string, total: number = PASOS_ONBOARDING): string {
+  return `${textoProgresoOnboarding(paso, total)}. ${titulo}`;
+}
