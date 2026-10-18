@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **PantallaHoy:** botón desglose con `accessibilityState.expanded`; aviso «efectivo menos preciso» con `alert` y live region; test en `principal.test.tsx`.
+- **Deducciones TalkBack:** pista en «Importar facturas», encabezados en «Tus facturas» y «Importadas por error», radiogroup «Año» cuando hay varios ejercicios.
 
 ## Hecho (acumulado reciente)
 
-- Plan TalkBack, suscripciones, Registrar, onboarding/captura. Ver `git log`.
+- Suscripciones inactivas acordeón, onboarding O6, PreviaWidget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP en `deducciones/` y `principal/` (otros turnos) — no mezclar sin `git status`.
+- WIP paralelo (onboarding, principal, ayuda) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
@@ -32,3 +32,4 @@
 ## Estimación rápida
 
 FinanVoz código ~92 %; camino tienda ~35 %. Detalle: `docs/PROGRESO-70.md`.
+
