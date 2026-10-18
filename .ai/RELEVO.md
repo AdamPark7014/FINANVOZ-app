@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **PantallaTanda archivada:** `ACCESIBILIDAD_TANDA_ARCHIVADA` + test en flujo archivar.
+- **Detalle tarjeta · TalkBack:** cada tarjeta del historial de estados de cuenta (`estado-*`) anuncia corte, saldo al corte, pagos posteriores, PNGI y fecha límite en una etiqueta (`etiquetaAccesibleEstadoCuentaTarjeta`); tests en `tarjetas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Cancelar/edición/cobro/formulario tandas, ayuda Volver, captura, widget. Ver `git log`.
+- Tandas archivada, ayuda, captura, widget, barra uso. Ver `git log`.
 
 ## A medias — CUIDADO
 
