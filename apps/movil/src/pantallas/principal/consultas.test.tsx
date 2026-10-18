@@ -3,7 +3,7 @@ import { registrarMovimiento, listarCuentas } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { activarPlus, conEscenario, golden } from './__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
-import { filtroDeParams, paramsDeFiltro } from './filtroRuta';
+import { detalleDeParams, filtroDeParams, paramsDeDetalle, paramsDeFiltro } from './filtroRuta';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
 
@@ -116,5 +116,13 @@ describe('Movimientos con el filtro de una consulta', () => {
     expect(alQuitarFiltro).toHaveBeenCalled();
     expect(filtroDeParams({})).toBeNull();
     expect(filtroDeParams({ desde: 'ayer', categorias: 'DROP TABLE' })).toBeNull();
+  });
+
+  it('parámetro detalle: solo UUID válido abre el movimiento', () => {
+    const id = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
+    expect(paramsDeDetalle(id)).toEqual({ detalle: id });
+    expect(detalleDeParams({ detalle: id })).toBe(id);
+    expect(detalleDeParams({ detalle: 'no-es-uuid' })).toBeNull();
+    expect(detalleDeParams({ detalle: 'tacos 80' })).toBeNull();
   });
 });

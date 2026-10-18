@@ -91,6 +91,22 @@ describe('transaccionesHistorial (E8.2 · pendiente 113)', () => {
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
+  it('extraordinaria no entra al consumo diario de historialSimulacion', () => {
+    const p = e401();
+    procesarApertura(p.ctx);
+    const extra = registrarMovimiento(p.ctx, {
+      tipo: 'gasto',
+      categoria: 'antojos',
+      origenId: p.efectivo,
+      monto: 500_000,
+      fecha: '2026-10-14',
+    });
+    marcarExtraordinaria(p.ctx, extra.transaccionId, true);
+    p.reloj.fijar('2026-10-26');
+    const h = historialSimulacion(p.ctx);
+    expect(h.historial.find((d) => d.fecha === '2026-10-14')?.consumo).toBe(0);
+  });
+
   it('historialSimulacion sigue igual que antes (CA-M6-04 parcial)', () => {
     const p = e401();
     procesarApertura(p.ctx);

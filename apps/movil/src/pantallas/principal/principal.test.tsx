@@ -11,6 +11,7 @@ import {
   listarMovimientos,
   obtenerHoy,
   registrarCuentaDividida,
+  registrarMovimiento,
   registrarPrestamo,
 } from '../../servicios';
 import { formatearCentavos } from '../../ui';
@@ -232,8 +233,16 @@ describe('Hoy', () => {
 describe('Registrar', () => {
   it('CA-M2-02 · escribir "coca 25 en efectivo" registra, el efectivo baja $25 y Deshacer lo regresa', () => {
     const p = conEscenario('e4-01');
+    const nav = navegacionFalsa();
     const efectivo = p.e.cuentas.efectivo as string;
-    todas(p.ctx);
+    renderConSesion(
+      p.ctx,
+      <>
+        <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />
+        <PantallaMovimientos alRegistrar={jest.fn()} />
+        <PantallaCuentas alAbrirAjustes={jest.fn()} />
+      </>,
+    );
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
     expect(screen.getByTestId('movimientos-vacio')).toBeTruthy();
 
@@ -248,20 +257,8 @@ describe('Registrar', () => {
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
     expect(textoDe(`monto-${mov?.id}`)).toBe('−$25');
 
-    const nav = navegacionFalsa();
-    p.cerrar();
-    renderConSesion(
-      p.ctx,
-      <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />,
-    );
-    fireEvent.press(screen.getByTestId('boton-escribir'));
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 50 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    const aviso2 = screen.getByTestId('aviso');
-    fireEvent.press(within(aviso2).getByText(/^Registré: Tacos \$50 · .+ · Cartera$/));
-    expect(nav.alVerMovimiento).toHaveBeenCalledWith(
-      listarMovimientos(p.ctx)[0]?.movimientos[0]?.id,
-    );
+    fireEvent.press(within(aviso).getByText(/^Registré: Coca \$25 · .+ · Cartera$/));
+    expect(nav.alVerMovimiento).toHaveBeenCalledWith(mov?.id);
 
     fireEvent.press(within(aviso).getByText('Deshacer'));
     expect(screen.queryByTestId('aviso')).toBeNull();
@@ -410,6 +407,24 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
+  it('detalleInicial expande el movimiento al montar la pantalla', () => {
+    const p = conEscenario('e4-01');
+    const efectivo = p.e.cuentas.efectivo as string;
+    registrarMovimiento(p.ctx, {
+      tipo: 'gasto',
+      categoria: 'antojos',
+      origenId: efectivo,
+      monto: 2_500,
+      descripcion: 'coca',
+    });
+    const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id;
+    renderConSesion(
+      p.ctx,
+      <PantallaMovimientos alRegistrar={jest.fn()} detalleInicial={id ?? null} />,
+    );
+    expect(screen.getByTestId(`detalle-${id}`)).toBeTruthy();
+  });
+
   it('tocar un movimiento muestra el detalle y Anular pide confirmación', () => {
     const p = conEscenario('e4-01');
     const efectivo = p.e.cuentas.efectivo as string;
