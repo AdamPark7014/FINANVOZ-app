@@ -9,6 +9,7 @@ import {
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
+  PISTA_VOLVER,
   TEXTO_SUSCRIPCIONES_VACIO,
 } from './textos';
 
@@ -48,6 +49,12 @@ describe('textos de suscripciones', () => {
 });
 
 describe('Suscripciones (02 §20)', () => {
+  it('Volver tiene pista TalkBack', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(screen.getByTestId('suscripciones-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
   it('CA-M10-01 · muestra las 5 activas con monto y fecha, el resumen, "antes $115" y Disney Plus aparte', () => {
     const { ctx } = preparar();
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
