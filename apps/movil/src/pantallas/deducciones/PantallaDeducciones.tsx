@@ -382,7 +382,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
   const id = `factura-${f.uuid}`;
   const estado =
     f.estado === 'deducible'
-      ? 'Deducible'
+      ? ESTADO_DEDUCIBLE
       : f.estado === 'no_deducible'
         ? `No deducible: ${f.textoMotivo}`
         : null;
@@ -403,20 +403,20 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       {f.pideAlumnoNivel && niveles.length > 0 ? (
         <View style={{ gap: espacio.xs }}>
           <CampoTexto
-            etiqueta="¿De quién es la colegiatura?"
+            etiqueta={ETIQUETA_COLEGIATURA_DE_QUIEN}
             valor={alumno}
             alCambiar={setAlumno}
             testID={`${id}-alumno`}
           />
           <Chips
-            etiqueta="Nivel"
+            etiqueta={ETIQUETA_NIVEL}
             opciones={niveles}
             valor={nivel}
             alCambiar={setNivel}
             testID={`${id}-nivel`}
           />
           <Boton
-            etiqueta="Guardar alumno y nivel"
+            etiqueta={BTN_GUARDAR_ALUMNO_NIVEL}
             variante="secundario"
             deshabilitado={alumno.trim() === '' || nivel === null}
             alPresionar={() => nivel && hacer(() => asignarAlumnoNivel(ctx, f.uuid, alumno, nivel))}
@@ -428,15 +428,15 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       {f.ofreceLentes && v.estado !== 'sin_perfil' ? (
         <View style={{ gap: espacio.xs }}>
           <Interruptor
-            etiqueta="Son lentes ópticos"
-            descripcion="En el año, los lentes tienen tope aparte del resto de salud."
+            etiqueta={ETIQUETA_LENTES}
+            descripcion={DESC_LENTES}
             valor={f.lentes}
             alCambiar={(valor) => hacer(() => marcarLentes(ctx, f.uuid, valor))}
             testID={`${id}-lentes`}
           />
           {f.lentes && v.beneficiariosLentes.length > 0 ? (
             <Chips
-              etiqueta="¿De quién son?"
+              etiqueta={ETIQUETA_BENEFICIARIO_LENTES}
               opciones={v.beneficiariosLentes}
               valor={f.beneficiarioLentes}
               alCambiar={(ben) => hacer(() => asignarBeneficiarioLentes(ctx, f.uuid, ben))}

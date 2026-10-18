@@ -271,13 +271,13 @@ function Ajustes({
     <View style={{ gap: espacio.xs }}>
       <Boton
         testID="tanda-editar-abrir"
-        etiqueta="Editar nombre o cuenta"
+        etiqueta={ETIQUETA_EDITAR_NOMBRE_CUENTA}
         variante="secundario"
         alPresionar={() => setEditando(true)}
       />
       <Boton
         testID="tanda-archivar-abrir"
-        etiqueta="Archivar tanda"
+        etiqueta={ETIQUETA_ARCHIVAR_TANDA}
         variante="texto"
         alPresionar={() => setArchivando(true)}
       />

@@ -6,16 +6,16 @@
 
 ## Hecho en este turno
 
-- **suscripciones:** copy centralizado en `textos.ts` (título, ayuda, botones, pistas, mensajes de acción); `PantallaSuscripciones` enlazada; ayuda alineada a §20; tests importan textos.
+- **respaldo/FormularioContrasena:** botones usan `BTN_GUARDAR_CONTRASENA` y `BTN_CANCELAR` de `textos.ts` (sin literales duplicados).
 
 ## Hecho (acumulado reciente)
 
-- Copy Ajustes, ingreso, tarjetas, tandas, plan. Ver `git log` y `docs/ESTADO.md`.
+- Copy suscripciones, Ajustes, ingreso, tarjetas, tandas, plan. Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP ajeno sin commitear (`principal.test.tsx`, `tandas/textos.ts`) — no mezclar.
+- WIP ajeno sin commitear (varias pantallas movil, `widget-textos.ts`, tests) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso

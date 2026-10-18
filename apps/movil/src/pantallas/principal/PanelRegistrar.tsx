@@ -680,7 +680,11 @@ export function PanelRegistrar({
         })}
       >
         <Microfono color={c.sobreAcento} />
-        <Texto style={[tipo.etiqueta, { fontSize: 16, color: c.sobreAcento }]}>
+        <Texto
+          style={[tipo.etiqueta, { fontSize: 16, color: c.sobreAcento }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {escuchando ? TEXTO_TERMINAR : TEXTO_HABLAR}
         </Texto>
       </Pressable>
@@ -697,7 +701,12 @@ export function PanelRegistrar({
   const extras = (
     <>
       {esperando > 0 ? (
-        <Texto variante="secundario" tono="secundario" testID="indicador-esperando-conexion">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLiveRegion="polite"
+          testID="indicador-esperando-conexion"
+        >
           {mensajeEsperandoConexion(esperando)}
         </Texto>
       ) : null}

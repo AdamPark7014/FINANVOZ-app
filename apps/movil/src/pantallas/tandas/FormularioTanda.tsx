@@ -176,7 +176,7 @@ export function FormularioTanda({
           : {}),
       });
     } catch {
-      setError('No pude guardar la tanda. Revisa los datos.');
+      setError(ERROR_GUARDAR_TANDA);
       return;
     }
     refrescar();
@@ -187,20 +187,20 @@ export function FormularioTanda({
     <View style={{ gap: espacio.m }} testID="formulario-tanda">
       <CampoTexto
         testID="tanda-nombre"
-        etiqueta="Nombre (opcional)"
-        ejemplo="Tanda de la oficina"
+        etiqueta={ETIQUETA_NOMBRE_OPCIONAL}
+        ejemplo={EJEMPLO_NOMBRE_TANDA}
         valor={nombre}
         alCambiar={setNombre}
       />
       <CampoMonto
         testID="tanda-aportacion"
-        etiqueta="¿Cuánto das en cada ronda?"
+        etiqueta={ETIQUETA_APORTACION}
         valorInicial={prellenado?.aportacion ?? null}
         alCambiar={setAportacion}
       />
       <Chips
         testID="tanda-frecuencia"
-        etiqueta="¿Cada cuándo?"
+        etiqueta={ETIQUETA_FRECUENCIA}
         opciones={OPCIONES_FRECUENCIA_TANDA}
         valor={frecuencia}
         alCambiar={setFrecuencia}

@@ -191,11 +191,12 @@ describe('onboarding', () => {
     tocar('onb-pagos-continuar');
 
     // O6: sin módulo nativo, "No disponible en este teléfono".
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(/notificaciones/);
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CAPTURA_AHORA_NO);
     expect(screen.getByTestId('onb-captura-pronto')).toHaveTextContent(/No disponible en este teléfono/);
     tocar('onb-captura-continuar');
 
     // O7: sugerencia del 10 % del ingreso ya escrita.
+    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_COLCHON_SIN_POR_AHORA);
     expect(screen.getByTestId('onb-colchon-monto')).toHaveProp('value', '1,300');
     tocar('onb-ver-mi-dia');
 

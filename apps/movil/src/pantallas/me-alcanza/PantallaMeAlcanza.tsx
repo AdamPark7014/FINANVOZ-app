@@ -494,7 +494,7 @@ function FilaEscenario({
     >
       <View
         accessible
-        accessibilityLabel={`${e.etiqueta}: ${e.porcentaje}${e.recomendado ? ', lo más seguro' : ''}`}
+        accessibilityLabel={`${e.etiqueta}: ${e.porcentaje}${e.recomendado ? SUFIJO_ACCESIBILIDAD_RECOMENDADA : ''}`}
         style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
       >
         <Texto variante="cuerpoFuerte" style={{ flex: 1 }} testID={`etiqueta-${e.tipo}`}>
@@ -506,7 +506,7 @@ function FilaEscenario({
       </View>
       {e.recomendado ? (
         <Texto variante="etiqueta" tono="acento" testID={`recomendado-${e.tipo}`}>
-          Lo más seguro
+          {ETIQUETA_OPCION_RECOMENDADA}
         </Texto>
       ) : null}
       {e.detalle ? (
@@ -516,7 +516,7 @@ function FilaEscenario({
       ) : null}
       {e.parcial ? (
         <Texto variante="secundario" tono="secundario">
-          Algunos pagos caen después de 2 años: no los revisé.
+          {TEXTO_PARCIAL_HORIZONTE}
         </Texto>
       ) : null}
       {e.tipo !== 'base' ? (

@@ -82,18 +82,18 @@ function TarjetaCobro({ t, testID }: { t: Extract<TarjetaTanda, { tipo: 'tanda_c
       ) : (
         <View style={{ gap: espacio.s }}>
           <Boton
-            etiqueta="Me tocó la tanda"
+            etiqueta={ETIQUETA_ME_TOCO}
             alPresionar={() => setCobrando(true)}
             testID={`${testID}-me-toco`}
           />
           <Boton
-            etiqueta="Todavía no"
+            etiqueta={ETIQUETA_TODAVIA_NO}
             variante="secundario"
             testID={`${testID}-todavia-no`}
             alPresionar={() => {
               todaviaNoCobroTanda(ctx, t.tandaId);
               refrescar();
-              mostrar({ mensaje: 'Va. Te pregunto mañana.' });
+              mostrar({ mensaje: MENSAJE_TODAVIA_NO_COBRO });
             }}
           />
         </View>

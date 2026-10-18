@@ -116,6 +116,16 @@ describe('preguntas de captura en Hoy', () => {
 });
 
 describe('Movimientos → capturas por revisar', () => {
+  it('con captura activa y sin pendientes muestra el estado vacío', () => {
+    const p = eCaptura();
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveTextContent(
+      TEXTO_CAPTURAS_POR_REVISAR_VACIO,
+    );
+    p.cerrar();
+  });
+
   it('la no reconocida muestra su texto y "Ya lo registré" la quita; "¿Fue a meses?" la vuelve compra a meses', async () => {
     const p = eCaptura();
     await ingerirNotificaciones(
@@ -295,6 +305,27 @@ function conCaptura(ctx: Contexto, puente: PuenteCaptura, ui: React.ReactNode) {
 }
 
 describe('O6 · activar la captura', () => {
+  it('si el permiso sigue denegado, muestra instrucciones y el aviso de denegado', async () => {
+    const p = eCaptura();
+    let permiso: 'concedido' | 'denegado' = 'denegado';
+    const apps: AppBancaria[] = [{ banco: 'banco_a', nombre: 'Banco A', paquete: 'mx.ejemplo.bancoa' }];
+    const puente = {
+      ...puenteFalso(),
+      estadoPermiso: jest.fn(async () => permiso),
+      abrirAjustesPermiso: jest.fn(async () => true),
+      appsBancariasInstaladas: jest.fn(async () => apps),
+    } as unknown as PuenteCaptura & { abrirAjustesPermiso: jest.Mock };
+    conCaptura(p.ctx, puente, <ActivarCaptura testID="o6" alTerminar={jest.fn()} />);
+    await act(async () => fireEvent.press(screen.getByTestId('o6-activar')));
+    await act(async () => fireEvent.press(screen.getByTestId('o6-ya')));
+    expect(screen.getByTestId('o6-permiso-denegado')).toBeTruthy();
+    expect(screen.getByText(PERMISO_DENEGADO)).toBeTruthy();
+    permiso = 'concedido';
+    await act(async () => fireEvent.press(screen.getByTestId('o6-ya')));
+    expect(screen.getByText('¿Qué apps de banco leo?')).toBeTruthy();
+    p.cerrar();
+  });
+
   it('divulgación → Activar abre el ajuste → al volver se eligen las apps y queda la lista blanca', async () => {
     const p = eCaptura();
     const puente = puenteFalso();

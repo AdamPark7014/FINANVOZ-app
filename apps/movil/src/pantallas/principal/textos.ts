@@ -202,6 +202,14 @@ export const TEXTO_MOVIMIENTOS_VACIO =
 /** Consulta filtrada sin resultados (`06 §6`). */
 export const TEXTO_MOVIMIENTOS_FILTRO_VACIO = 'No hay movimientos que coincidan.';
 
+export const TITULO_POR_REVISAR = 'Por revisar';
+export const TEXTO_POR_REVISAR =
+  'Las interpreto cuando tengas internet. Si ya lo registraste a mano, descártala.';
+export const TEXTO_MOVIMIENTOS_FILTRO_ACTIVO = 'Solo los movimientos de tu pregunta.';
+
+export const PREGUNTA_PASAR_A_MESES = '¿A cuántos meses sin intereses fue?';
+export const PISTA_ELEGIR_CUENTA_CONFIRMACION = 'Elige una cuenta en los chips de arriba.';
+
 // ——— Cuentas (`02 §11`) ———
 
 /** Tienes: sin efectivo, débito, billetera ni ahorro. */
@@ -213,6 +221,8 @@ export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamo
 
 /** Compromisos: nada en los próximos 30 días. */
 export const TEXTO_CUENTAS_COMPROMISOS_VACIO = 'No tienes pagos en los próximos 30 días.';
+
+export const SUBTITULO_CUENTAS_COMPROMISOS = 'Próximos 30 días';
 
 /** Contexto TalkBack de cada saldo en Cuentas (`02 §15`). */
 export function contextoSaldoTienes(nombre: string): string {

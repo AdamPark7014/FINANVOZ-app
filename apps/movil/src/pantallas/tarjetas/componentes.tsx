@@ -163,8 +163,13 @@ export function FormularioPago({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar pago" alPresionar={guardar} testID={`${testID}-guardar`} />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID={`${testID}-cancelar`} />
+      <Boton etiqueta={BTN_GUARDAR_PAGO} alPresionar={guardar} testID={`${testID}-guardar`} />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID={`${testID}-cancelar`}
+      />
     </View>
   );
 }
@@ -190,19 +195,19 @@ export function PreguntaLiquidarMeses({
     <Tarjeta testID={testID}>
       <Texto variante="cuerpoFuerte">{pregunta.pregunta}</Texto>
       <Texto variante="secundario" tono="secundario">
-        {`Tu ${pregunta.tarjeta} quedó con saldo a favor de ${formatearCentavos(pregunta.saldoAFavor)}. No lo sumo a tu dinero libre.`}
+        {textoSaldoAFavorTrasPago(pregunta.tarjeta, formatearCentavos(pregunta.saldoAFavor))}
       </Texto>
       <View style={{ gap: espacio.s }}>
         {pregunta.planes.map((p) => (
           <Boton
             key={p.planId}
-            etiqueta={`Sí, ${p.descripcion}`}
+            etiqueta={etiquetaSiLiquidar(p.descripcion)}
             testID={`${testID}-si-${p.planId}`}
             alPresionar={() => {
               try {
                 const l = liquidarMsi(ctx, p.planId);
                 avisarRegistro(
-                  `Listo: liquidaste ${p.descripcion} (${formatearCentavos(l.monto)}).`,
+                  mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)),
                   l.deshacer,
                 );
                 alTerminar?.();

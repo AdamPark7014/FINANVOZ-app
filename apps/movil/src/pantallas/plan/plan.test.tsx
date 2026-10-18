@@ -96,19 +96,19 @@ describe('pantalla del plan', () => {
     fireEvent.press(screen.getByTestId('candado-probabilidad'));
     expect(abrirPlan).toHaveBeenCalled();
 
-    await waitFor(() => expect(screen.getByTestId('plan-oferta-mensual')).toBeTruthy());
+    await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     expect(screen.getByText('Mensual: prueba 14 días gratis')).toBeTruthy();
     expect(screen.getByText('Después, $69.00 al mes. Cancela cuando quieras en Google Play.')).toBeTruthy();
     expect(screen.getByText('Anual: prueba 14 días gratis')).toBeTruthy();
 
     await act(async () => {
-      fireEvent.press(screen.getByTestId('plan-oferta-mensual'));
+      fireEvent.press(screen.getByTestId(ID.oferta('mensual')));
     });
-    expect(textoDe('plan-mensaje')).toBe('Listo. Ya tienes Plus.');
-    expect(textoDe('plan-titulo')).toBe('Tienes Plus · prueba gratis');
-    expect(textoDe('plan-detalle')).toBe('Te quedan 14 días de prueba; el 25 oct empieza el cobro.');
-    expect(screen.getByTestId('plan-administrar')).toBeTruthy();
-    expect(screen.queryByTestId('plan-oferta-mensual')).toBeNull();
+    expect(textoDe(ID.mensaje)).toBe(MENSAJE_LISTO);
+    expect(textoDe(ID.titulo)).toBe(TITULO_PLUS_PRUEBA);
+    expect(textoDe(ID.detalle)).toBe('Te quedan 14 días de prueba; el 25 oct empieza el cobro.');
+    expect(screen.getByTestId(ID.administrar)).toBeTruthy();
+    expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
     // Hoy ya muestra lo de Plus.
     expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
     expect(screen.getByTestId('tarjeta-del-dia')).toBeTruthy();
@@ -230,7 +230,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
       </>,
       { compras: tienda },
     );
-    await waitFor(() => expect(screen.getByTestId('plan-oferta-mensual')).toBeTruthy());
+    await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     await act(async () => {
       fireEvent.press(screen.getByTestId('plan-oferta-mensual'));
     });

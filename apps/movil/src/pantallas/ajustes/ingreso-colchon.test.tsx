@@ -199,9 +199,8 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     tocar('editar-ingreso-frecuencia-varia');
     tocar('editar-ingreso-guardar');
     expect(obtenerAjustes(ctx)).toMatchObject({ ingreso: null, ingresoVariable: true });
-    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(
-      'Tu ingreso varía: reparto tu dinero libre en 30 días.',
-    );
+    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(RESUMEN_INGRESO_VARIABLE);
+    expect(screen.getByTestId('ajustes-ingreso-confirmacion')).toHaveTextContent(CONFIRMACION_INGRESO_VARIABLE);
   });
 
   it('Volver sale sin guardar', () => {
