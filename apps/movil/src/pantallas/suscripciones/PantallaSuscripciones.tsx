@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import {
   convertirEnCompromiso,
   fijarNombreSuscripcion,
@@ -10,7 +10,7 @@ import {
   type SuscripcionVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, EstadoVacio, OBJETIVO_TACTIL_MIN, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import { mensajeError } from '../principal/textos';
 import {
   AYUDA_NOMBRE,
@@ -27,6 +27,10 @@ import {
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
+  ICONO_INACTIVAS_ABIERTA,
+  ICONO_INACTIVAS_CERRADA,
+  pistaInactivasSuscripciones,
+  TITULO_INACTIVAS,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
@@ -133,16 +137,59 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         />
       ))}
       {v.textoInactivas ? (
+        <SeccionInactivas textoInactivas={v.textoInactivas} cantidad={v.inactivas.length} />
+      ) : null}
+    </Pantalla>
+  );
+}
+
+function SeccionInactivas({ textoInactivas, cantidad }: { textoInactivas: string; cantidad: number }) {
+  const { c } = useTema();
+  const [abierta, setAbierta] = useState(true);
+  const tituloVisible =
+    cantidad === 1 ? TITULO_INACTIVAS : `${TITULO_INACTIVAS} (${cantidad})`;
+  return (
+    <Tarjeta testID="suscripciones-inactivas-seccion">
+      <Pressable
+        testID="suscripciones-inactivas-desplegar"
+        onPress={() => setAbierta((a) => !a)}
+        accessibilityRole="button"
+        accessibilityLabel={etiquetaInactivasSuscripciones(textoInactivas)}
+        accessibilityHint={pistaInactivasSuscripciones(abierta)}
+        accessibilityState={{ expanded: abierta }}
+        style={({ pressed }) => ({
+          minHeight: OBJETIVO_TACTIL_MIN,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: espacio.s,
+          opacity: pressed ? 0.85 : 1,
+        })}
+      >
+        <View style={{ flex: 1 }}>
+          <Texto variante="cuerpoFuerte" importantForAccessibility="no">
+            {tituloVisible}
+          </Texto>
+        </View>
+        <Texto
+          variante="cuerpoFuerte"
+          style={{ color: c.acentoTexto }}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {abierta ? ICONO_INACTIVAS_ABIERTA : ICONO_INACTIVAS_CERRADA}
+        </Texto>
+      </Pressable>
+      {abierta ? (
         <Texto
           variante="secundario"
           tono="secundario"
           testID="suscripciones-inactivas"
-          accessibilityLabel={etiquetaInactivasSuscripciones(v.textoInactivas)}
+          importantForAccessibility="no"
         >
-          {v.textoInactivas}
+          {textoInactivas}
         </Texto>
       ) : null}
-    </Pantalla>
+    </Tarjeta>
   );
 }
 

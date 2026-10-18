@@ -32,9 +32,20 @@ export function etiquetaVacioSuscripciones(): string {
   return `${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`;
 }
 
+/** Encabezado visible del acordeón de inactivas. */
+export const TITULO_INACTIVAS = 'Ya no se cobran';
+
+export const ICONO_INACTIVAS_CERRADA = '+';
+export const ICONO_INACTIVAS_ABIERTA = '−';
+
 /** TalkBack: pie de lista con suscripciones ya canceladas (`02 §15`). */
 export function etiquetaInactivasSuscripciones(texto: string): string {
   return `Suscripciones que ya no se cobran. ${texto}`;
+}
+
+/** Pista TalkBack al expandir o cerrar la lista de inactivas (`02 §15`). */
+export function pistaInactivasSuscripciones(abierta: boolean): string {
+  return abierta ? 'Pliega el detalle' : 'Despliega el detalle';
 }
 
 /** TalkBack: cuándo viene el siguiente cargo en la fila (`02 §15`). */

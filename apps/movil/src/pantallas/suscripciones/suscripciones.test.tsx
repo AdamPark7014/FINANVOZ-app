@@ -18,6 +18,7 @@ import {
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
+  pistaInactivasSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
 } from './textos';
 
@@ -107,10 +108,10 @@ describe('Suscripciones (02 §20)', () => {
     expect(screen.queryByTestId('suscripcion-disney-plus')).toBeNull();
     const inactivas = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';
     expect(textoDe('suscripciones-inactivas')).toBe(inactivas);
-    expect(screen.getByTestId('suscripciones-inactivas')).toHaveProp(
-      'accessibilityLabel',
-      etiquetaInactivasSuscripciones(inactivas),
-    );
+    const desplegar = screen.getByTestId('suscripciones-inactivas-desplegar');
+    expect(desplegar).toHaveProp('accessibilityLabel', etiquetaInactivasSuscripciones(inactivas));
+    expect(desplegar).toHaveProp('accessibilityHint', pistaInactivasSuscripciones(true));
+    expect(desplegar).toHaveProp('accessibilityState', { expanded: true });
   });
 
   it('Editar nombre: guarda "Dominio web" en la fila', () => {

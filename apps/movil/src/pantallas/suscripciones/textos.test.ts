@@ -9,6 +9,7 @@ import {
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
+  pistaInactivasSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
   TITULO_PANTALLA,
 } from './textos';
@@ -26,6 +27,11 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaInactivasSuscripciones('Ya no se cobran: Disney Plus')).toMatch(
       /^Suscripciones que ya no se cobran\./,
     );
+  });
+
+  it('acordeón inactivas: pista Despliega o Pliega', () => {
+    expect(pistaInactivasSuscripciones(false)).toMatch(/Despliega/);
+    expect(pistaInactivasSuscripciones(true)).toMatch(/Pliega/);
   });
 
   it('próximo cargo con contexto TalkBack', () => {
