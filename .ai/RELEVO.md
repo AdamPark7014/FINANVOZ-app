@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **Chip / Boton TalkBack:** `principal/Chip` reexporta el kit UI (hitSlop 48 dp en captura/arqueo/tandas); hints por omisión en chip y botón deshabilitado.
+- **EstadoVacio CTA:** prop opcional `pistaCta` (`accessibilityHint`); Tandas lista vacía con `PISTA_VACIO_TANDAS`.
 
 ## Hecho (acumulado reciente)
 
-- CampoMonto pista en palabras, personas vacío/alta, tarjetas lista. Ver `git log`.
+- Chip/Boton hints, CampoMonto, personas vacío. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (principal.test.tsx, etc.) — no mezclar.
+- WIP `componentes.test.tsx` (Boton/Chip hints) — turno anterior, no mezclar.
+- WIP paralelo (principal.test.tsx, etc.).
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack `ActivarCaptura` «Ahora no» o CTA Tandas (`boton-tandas`).
+2. TalkBack `ActivarCaptura` «Ahora no»; paridad `pistaCta` en compartidos/suscripciones.
 
 ## No tocar
 
