@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **Tandas detalle:** aserción de `tanda-titulo` como header TalkBack en la prueba de Volver del detalle.
+- **Personas:** prueba de `accessibilityLabel` en vacío de movimientos (`etiquetaVacioMovimientosPersona`, `02 §15`).
 
 ## Hecho (acumulado reciente)
 
-- Cuentas `BTN_AGREGAR_TARJETA_CREDITO` (`9845457`); onboarding O3/O4, tandas/captura a11y. Ver `git log`.
+- Onboarding tips en `textos.ts`, PreviaWidget TalkBack, headers varias pantallas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en captura/movimientos/suscripciones — revisar disco antes de reescribir.
+- WIP ajeno en disco (`git status`) — no mezclar sin revisar diff.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Unificar tips onboarding en `textos.ts` si falta O2/O6.
+2. Commits pequeños desde rescates WIP.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
