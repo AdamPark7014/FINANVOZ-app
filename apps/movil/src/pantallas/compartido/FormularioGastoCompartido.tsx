@@ -31,6 +31,7 @@ import {
   formatoProporcionReparto,
   OPCIONES_REPARTO,
   parsearProporcionReparto,
+  PISTA_GUARDAR_GASTO_COMPARTIDO,
   resumenGastoCompartido,
   TITULO_AGREGAR_GASTO,
   TITULO_REVISAR_GASTO,
@@ -139,7 +140,12 @@ export function FormularioGastoCompartido({
     <Tarjeta testID="formulario-gasto-compartido">
       <Texto variante="subtitulo">{prellenado ? TITULO_REVISAR_GASTO : TITULO_AGREGAR_GASTO}</Texto>
       {prellenado && total !== null && total > 0 ? (
-        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="compartido-resumen">
+        <Texto
+          variante="cuerpo"
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+          testID="compartido-resumen"
+        >
           {resumenGastoCompartido({
             descripcion: descripcion.trim(),
             total,
@@ -204,7 +210,12 @@ export function FormularioGastoCompartido({
         />
       ) : null}
       <MensajeError texto={error} />
-      <Boton testID="compartido-guardar" etiqueta={BTN_GUARDAR} alPresionar={guardar} />
+      <Boton
+        testID="compartido-guardar"
+        etiqueta={BTN_GUARDAR}
+        pista={PISTA_GUARDAR_GASTO_COMPARTIDO}
+        alPresionar={guardar}
+      />
       <Boton testID="compartido-cancelar" etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
     </Tarjeta>
   );

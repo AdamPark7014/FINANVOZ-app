@@ -115,7 +115,9 @@ describe('PantallaArqueo · vacío y errores', () => {
     fireEvent.press(screen.getByTestId('arqueo-exacto'));
     const sobrante = screen.queryByTestId('arqueo-sobrante-no_se');
     if (sobrante) fireEvent.press(sobrante);
+    expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityRole', 'alert');
     expect(textoDe('arqueo-mensaje-hecho')).toBe(mensajeCuadra());
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityHint', PISTA_LISTO);

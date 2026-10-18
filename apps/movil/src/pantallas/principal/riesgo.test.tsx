@@ -22,7 +22,11 @@ import {
   ProbabilidadHoy,
   TEXTO_RIESGO,
 } from './ProbabilidadHoy';
-import { ETIQUETA_PROBABILIDAD_CALCULANDO, etiquetaAvisoRiesgo } from './textos';
+import {
+  ETIQUETA_PROBABILIDAD_CALCULANDO,
+  etiquetaAvisoRiesgo,
+  FRASE_MARCA_PROBABILIDAD,
+} from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
 
@@ -51,12 +55,12 @@ async function conGastoDiario(monto: number, hasta: PlainDate) {
 }
 
 describe('ProbabilidadHoy · TalkBack', () => {
-  it('etiquetaAccesibleProbabilidad concatena la etiqueta de estimación', () => {
+  it('etiquetaAccesibleProbabilidad concatena estimación y la marca del 50 %', () => {
     expect(etiquetaAccesibleProbabilidad('87 % de llegar sin tocar tu colchón', 'estimación inicial')).toBe(
-      '87 % de llegar sin tocar tu colchón. estimación inicial',
+      `87 % de llegar sin tocar tu colchón. estimación inicial. ${FRASE_MARCA_PROBABILIDAD}`,
     );
     expect(etiquetaAccesibleProbabilidad('87 % de llegar sin tocar tu colchón', null)).toBe(
-      '87 % de llegar sin tocar tu colchón',
+      `87 % de llegar sin tocar tu colchón. ${FRASE_MARCA_PROBABILIDAD}`,
     );
   });
 

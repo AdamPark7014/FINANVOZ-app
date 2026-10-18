@@ -43,6 +43,7 @@ import {
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
   PISTA_ESCRIBIR_NOMBRE_PAREJA,
+  PISTA_GUARDAR_GASTO_COMPARTIDO,
   PISTA_PERMISO_CAMARA,
   PISTA_VISTA_CAMARA,
   PISTA_VOLVER_CUENTAS,
@@ -331,6 +332,11 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await dictar('Súper 1,200, pagué yo, 60/40');
     expect(screen.getByTestId('compartido-resumen').props.children).toBe(
       'Súper $1,200.00 · pagaste tú · tú 60 % / tu pareja 40 %',
+    );
+    expect(screen.getByTestId('compartido-resumen')).toHaveProp('importantForAccessibility', 'yes');
+    expect(screen.getByTestId('compartido-guardar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_GASTO_COMPARTIDO,
     );
     expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).movimientos).toHaveLength(0);
     expect(auditar(screen.toJSON() as never)).toEqual([]);

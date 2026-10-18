@@ -69,8 +69,10 @@ import {
   PISTA_LISTO,
   PISTA_MOSTRAR_COMO_LO_CALCULE,
   PISTA_OCULTAR_COMO_LO_CALCULE,
+  PISTA_RECUERDAMELO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PISTA_VER_MOVIMIENTOS,
+  pistaLoCompre,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
@@ -285,6 +287,10 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
+    expect(screen.getByTestId('lo-compre-msi')).toHaveProp(
+      'accessibilityHint',
+      pistaLoCompre('A 3 MSI con la Oro'),
+    );
     expect(screen.getByTestId('lo-compre-contado_hoy')).toBeTruthy();
     expect(screen.getByRole('button', { name: BTN_COMO_LO_CALCULE })).toBeTruthy();
     expect(screen.getByTestId('boton-otra-cuenta')).toHaveProp('accessibilityHint', PISTA_HACER_OTRA_CUENTA);
@@ -330,6 +336,7 @@ describe('¿Me alcanza?', () => {
       { notificaciones },
     );
     await screen.findByTestId('me-alcanza-resultado');
+    expect(screen.getByTestId('boton-recuerdamelo')).toHaveProp('accessibilityHint', PISTA_RECUERDAMELO);
     fireEvent.press(screen.getByTestId('boton-recuerdamelo'));
     await screen.findByTestId('recordatorio-programado');
     expect(textoDe('recordatorio-programado')).toBe(TEXTO_RECORDATORIO_PROGRAMADO);

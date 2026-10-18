@@ -266,6 +266,9 @@ export function etiquetaTarjetaDelDia(texto: string): string {
 /** Indicador mientras se calcula la probabilidad en Hoy (`02 §15`). */
 export const ETIQUETA_PROBABILIDAD_CALCULANDO = 'Calculando si llegas…';
 
+/** TalkBack en la barra de probabilidad: la marca vertical es P = 50 % (`02 §13`). */
+export const FRASE_MARCA_PROBABILIDAD = 'La marca es el 50 %.';
+
 /** Prefijo TalkBack del aviso bajo la probabilidad cuando P < 50 % (`02 §13`, `02 §15`). */
 export const ETIQUETA_AVISO_RIESGO = 'Aviso de riesgo';
 
@@ -356,6 +359,21 @@ export function etiquetaVacioMovimientos(conFiltro: boolean): string {
 export const PREGUNTA_PASAR_A_MESES = '¿A cuántos meses sin intereses fue?';
 export const PISTA_ELEGIR_CUENTA_CONFIRMACION = 'Elige una cuenta en los chips de arriba.';
 export const MENSAJE_ANULADO_MOVIMIENTO = 'Anulé el movimiento.';
+
+/** Fila de movimiento expandible (`02 §10`, TalkBack). */
+export const PISTA_MOSTRAR_DETALLE_MOVIMIENTO = 'Muestra el detalle';
+export const PISTA_OCULTAR_DETALLE_MOVIMIENTO = 'Oculta el detalle';
+
+/** Anular desde el detalle (`02 §10`, TalkBack). */
+export const TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO =
+  '¿Anular este movimiento? Sus montos vuelven a tus cuentas.';
+export const PISTA_ANULAR_MOVIMIENTO = 'Pide confirmación para anular este movimiento';
+export const PISTA_CONFIRMAR_ANULAR_MOVIMIENTO =
+  'Anula el movimiento y devuelve los montos a tus cuentas';
+
+export function etiquetaConfirmarAnularMovimiento(): string {
+  return etiquetaHablada(TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO);
+}
 
 // ——— Cuentas (`02 §11`) ———
 

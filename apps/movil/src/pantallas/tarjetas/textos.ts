@@ -88,6 +88,10 @@ export const ACCESIBILIDAD_TARJETA_NO_ENCONTRADA =
   'No encontré esa tarjeta. Usa Volver para regresar a Cuentas.';
 export const TITULO_PAGAR_TARJETA = 'Pagar tarjeta';
 export const BTN_PAGAR = 'Pagar';
+/** TalkBack: abre el formulario de pago en el detalle (`02 §15`). */
+export const PISTA_PAGAR_TARJETA = 'Registra cuánto pagaste y de qué cuenta salió';
+/** TalkBack: guarda el pago desde el detalle (`02 §15`). */
+export const PISTA_GUARDAR_PAGO_TARJETA = 'Guarda el pago en tu libro';
 export const CANDADO_COMPROMISO_12_MESES = 'Ver tus meses de los próximos 12 meses';
 export const TITULO_DESDE_ULTIMO_CORTE = 'Desde tu último corte';
 export const TITULO_DESDE_ALTA = 'Desde que la agregaste';
@@ -146,6 +150,12 @@ export function textoDeudaMeses(monto: string): string {
 export const ETIQUETA_SALDO_A_FAVOR = 'Saldo a favor';
 export const AYUDA_SALDO_A_FAVOR =
   'No se suma a tu dinero libre: se usa en tus próximas compras con esta tarjeta.';
+
+/** TalkBack: saldo a favor en el resumen del detalle (E4-07). */
+export function etiquetaAccesibleSaldoAFavorDetalle(monto: Centavos): string {
+  return `${ETIQUETA_SALDO_A_FAVOR}: ${cifraEnPalabras(monto, 'pesos')}. ${AYUDA_SALDO_A_FAVOR}`;
+}
+
 export const ETIQUETA_PNGI = 'Para no generar intereses';
 export function textoPagarPngiAntesDe(fechaLimite: string): string {
   return `Págalo a más tardar el ${fechaLimite}.`;

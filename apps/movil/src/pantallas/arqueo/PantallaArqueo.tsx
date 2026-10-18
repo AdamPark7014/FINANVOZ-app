@@ -180,7 +180,13 @@ function Arqueo({
   if (hecho) {
     return (
       <Tarjeta testID="arqueo-hecho">
-        <Texto variante="cuerpoFuerte" testID="arqueo-mensaje-hecho" accessibilityLiveRegion="polite">
+        <Texto
+          variante="cuerpoFuerte"
+          testID="arqueo-mensaje-hecho"
+          importantForAccessibility="yes"
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
           {hecho}
         </Texto>
         <Boton

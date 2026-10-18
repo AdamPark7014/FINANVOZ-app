@@ -81,6 +81,11 @@ export const ETIQUETA_CONTRASENA_NUEVA = 'Contraseña nueva';
 export const ETIQUETA_CONTRASENA = 'Contraseña del respaldo';
 export const ETIQUETA_CONFIRMAR_CONTRASENA = 'Escríbela otra vez';
 export const BTN_GUARDAR_CONTRASENA = 'Guardar contraseña';
+/** TalkBack al guardar la contraseña de cifrado (`02 §19`). */
+export const PISTA_GUARDAR_CONTRASENA =
+  'Guarda la llave que cifra tus respaldos en este teléfono';
+/** TalkBack al cerrar el formulario de contraseña (`02 §19`). */
+export const PISTA_CANCELAR_CONTRASENA = 'Cierra sin guardar la contraseña de respaldo';
 export const ERROR_CONTRASENAS_NO_COINCIDEN = 'Las contraseñas no coinciden.';
 export const MENSAJE_NO_GUARDAR_CONTRASENA = 'No pude guardar la contraseña. Intenta de nuevo.';
 

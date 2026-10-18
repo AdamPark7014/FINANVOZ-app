@@ -114,6 +114,8 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     expect(textoDe('division-tu-parte')).toBe('$300');
     expect(textoDe('division-te-deben')).toBe('$900');
     expect(textoDe('division-faltan')).toBe('Elige 3 personas (llevas 0).');
+    expect(screen.getByTestId('division-faltan')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('division-partes')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId(`division-origen-${p.nu}`).props.accessibilityState).toMatchObject({
       selected: true,
     });
@@ -325,6 +327,10 @@ describe('recordatorio de cobro', () => {
     });
     expect(n.vecesPedido()).toBe(1);
     expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct'));
+    expect(screen.getByTestId('persona-recordatorio-fecha')).toHaveProp(
+      'accessibilityLiveRegion',
+      'polite',
+    );
     expect(screen.getByTestId('boton-quitar-recordatorio')).toHaveProp(
       'accessibilityHint',
       PISTA_QUITAR_RECORDATORIO,

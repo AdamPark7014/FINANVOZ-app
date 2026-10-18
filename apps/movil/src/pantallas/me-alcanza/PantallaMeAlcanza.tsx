@@ -63,8 +63,10 @@ import {
   PISTA_LISTO,
   PISTA_MOSTRAR_COMO_LO_CALCULE,
   PISTA_OCULTAR_COMO_LO_CALCULE,
+  PISTA_RECUERDAMELO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PISTA_VER_MOVIMIENTOS,
+  pistaLoCompre,
   PREGUNTA_MSI,
   SUFIJO_ACCESIBILIDAD_RECOMENDADA,
   TEXTO_CALCULANDO,
@@ -499,11 +501,17 @@ function Resultado({
           etiqueta={vista.recordatorio.texto}
           variante="secundario"
           alPresionar={() => void recordar()}
+          pista={PISTA_RECUERDAMELO}
           testID="boton-recuerdamelo"
         />
       ) : null}
       {recordado ? (
-        <Texto variante="secundario" tono="secundario" testID="recordatorio-programado">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="recordatorio-programado"
+          accessibilityLiveRegion="polite"
+        >
           {TEXTO_RECORDATORIO_PROGRAMADO}
         </Texto>
       ) : null}
@@ -574,7 +582,12 @@ function FilaEscenario({
       ) : null}
       {e.tipo !== 'base' ? (
         comprado === e.clave ? (
-          <Texto variante="secundario" tono="acento" testID={`comprado-${e.tipo}`}>
+          <Texto
+            variante="secundario"
+            tono="acento"
+            testID={`comprado-${e.tipo}`}
+            accessibilityLiveRegion="polite"
+          >
             {TEXTO_YA_LO_REGISTRE}
           </Texto>
         ) : comprado === null ? (
@@ -582,7 +595,7 @@ function FilaEscenario({
             etiqueta={BTN_LO_COMPRE}
             variante="secundario"
             ancho="contenido"
-            pista={`Registra la compra: ${e.etiqueta}`}
+            pista={pistaLoCompre(e.etiqueta)}
             alPresionar={alComprar}
             testID={`lo-compre-${e.tipo}`}
           />

@@ -9,6 +9,7 @@ import {
   etiquetaPermisoCaptura,
   TITULO_REACTIVAR_CAPTURA,
   etiquetaVacioCapturasPorRevisar,
+  PISTA_AHORA_NO_ACTIVAR_CAPTURA,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
 } from './textos';
 
@@ -19,6 +20,7 @@ describe('captura/textos', () => {
       PERMISO_INSTRUCCION,
       PERMISO_DENEGADO,
       PISTA_YA_REGISTRE_AVISO,
+      PISTA_AHORA_NO_ACTIVAR_CAPTURA,
       PISTA_DESCARTAR_REACTIVAR_CAPTURA,
     ]) {
       expect(copy).not.toMatch(/!/);

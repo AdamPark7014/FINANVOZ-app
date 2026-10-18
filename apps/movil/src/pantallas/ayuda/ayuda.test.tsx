@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { Linking } from 'react-native';
 import { LEYENDA_ESTIMACION } from '../../servicios/deducciones';
 import { RESPONSABLE } from '../onboarding/aviso';
-import { auditar } from '../__pruebas__/accesibilidad';
+import { auditar, ordenDeLectura } from '../__pruebas__/accesibilidad';
 import {
   ASUNTO_CORREO_AYUDA,
   CORREO_AYUDA,
@@ -101,6 +101,8 @@ describe('pantalla de ayuda', () => {
     expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
     const faqRespaldo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo')!;
+    expect(ordenDeLectura(screen.toJSON()).filter((x) => x === faqRespaldo.pregunta)).toHaveLength(1);
+    expect(screen.getByTestId('ayuda-respuesta-respaldo')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByText(faqRespaldo.respuesta[0])).toHaveProp(
       'accessibilityLabel',
       etiquetaAccesibleParrafoRespuesta(faqRespaldo.respuesta[0], true),

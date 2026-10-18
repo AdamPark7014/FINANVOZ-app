@@ -8,19 +8,25 @@ import {
   type OpcionesBloques,
   type VistaProbabilidadHoy,
 } from '../../servicios';
+import { UMBRAL_RIESGO } from '../../avisos/riesgo';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
 import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
-import { ETIQUETA_PROBABILIDAD_CALCULANDO, etiquetaAvisoRiesgo } from './textos';
+import {
+  ETIQUETA_PROBABILIDAD_CALCULANDO,
+  etiquetaAvisoRiesgo,
+  FRASE_MARCA_PROBABILIDAD,
+} from './textos';
 import { useNotificaciones } from '../avisos/notificaciones';
 
 /** Aviso de riesgo en Hoy (P < 50 %, `02 §13`): sin cifras nuevas, solo qué significa la probabilidad. */
 export const TEXTO_RIESGO =
   'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
 
-/** TalkBack: la barra lleva el dato; el texto visible debajo no se repite (`ui/README.md`). */
+/** TalkBack: la barra lleva el dato, la marca del 50 % y la etiqueta; el pie visible queda oculto. */
 export function etiquetaAccesibleProbabilidad(texto: string, etiqueta: string | null): string {
-  return etiqueta ? `${texto}. ${etiqueta}` : texto;
+  const base = etiqueta ? `${texto}. ${etiqueta}` : texto;
+  return `${base}. ${FRASE_MARCA_PROBABILIDAD}`;
 }
 
 /**
@@ -112,6 +118,7 @@ export function ProbabilidadHoy({
     <View style={{ gap: espacio.xs }} testID="probabilidad-hoy">
       <Barra
         llenoBp={Math.round(vista.probabilidad * 10000)}
+        marcaBp={UMBRAL_RIESGO * 100}
         etiquetaAccesible={hablado}
         testID="probabilidad-barra"
       />

@@ -365,7 +365,11 @@ function Recordatorio({
     <Tarjeta testID="persona-recordatorio">
       {fecha ? (
         <>
-          <Texto variante="cuerpo" testID="persona-recordatorio-fecha">
+          <Texto
+            variante="cuerpo"
+            testID="persona-recordatorio-fecha"
+            accessibilityLiveRegion="polite"
+          >
             {mensajeRecordatorioCobro(fecha.etiqueta)}
           </Texto>
           <Boton

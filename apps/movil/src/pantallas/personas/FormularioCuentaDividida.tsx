@@ -182,7 +182,11 @@ export function FormularioCuentaDividida({
             deshabilitado={partes <= 2}
             testID="division-menos"
           />
-          <Texto variante="cuerpoFuerte" testID="division-partes">{`Entre ${partes}`}</Texto>
+          <Texto
+            variante="cuerpoFuerte"
+            testID="division-partes"
+            accessibilityLiveRegion="polite"
+          >{`Entre ${partes}`}</Texto>
           <Boton
             etiqueta="+"
             etiquetaAccesible="Uno más"
@@ -217,7 +221,12 @@ export function FormularioCuentaDividida({
       ) : null}
       <View style={{ gap: espacio.xs }}>
         <Texto variante="etiqueta">¿Con quién?</Texto>
-        <Texto variante="secundario" tono="secundario" testID="division-faltan">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="division-faltan"
+          accessibilityLiveRegion="polite"
+        >
           {textoFaltanPersonas(ajenas, elegidas.length)}
         </Texto>
         {personas.length === 0 ? (
@@ -249,6 +258,7 @@ export function FormularioCuentaDividida({
             variante="texto"
             ancho="contenido"
             alPresionar={() => agregar(nombre)}
+            pista={PISTA_AGREGAR_PERSONA}
             testID={`division-agregar-${nombre}`}
           />
         ))}

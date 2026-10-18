@@ -17,6 +17,8 @@ import {
   ETIQUETA_CONTRASENA_NUEVA,
   mensajeErrorRespaldo,
   MENSAJE_NO_GUARDAR_CONTRASENA,
+  PISTA_CANCELAR_CONTRASENA,
+  PISTA_GUARDAR_CONTRASENA,
   TEXTO_RESPALDOS_ANTERIORES,
 } from './textos';
 
@@ -74,7 +76,11 @@ export function FormularioContrasena({
 
   return (
     <>
-      <Texto variante="cuerpo" testID="respaldo-aviso-contrasena">
+      <Texto
+        variante="cuerpo"
+        testID="respaldo-aviso-contrasena"
+        accessibilityRole="alert"
+      >
         {AVISO_CONTRASENA}
       </Texto>
       {cambiando ? (
@@ -105,12 +111,15 @@ export function FormularioContrasena({
         cargando={guardando}
         deshabilitado={guardando || contrasena === '' || confirmacion === ''}
         alPresionar={() => void guardar()}
+        pista={PISTA_GUARDAR_CONTRASENA}
       />
       <Boton
+        testID="respaldo-contrasena-cancelar"
         variante="texto"
         etiqueta={BTN_CANCELAR}
         deshabilitado={guardando}
         alPresionar={alCancelar}
+        pista={PISTA_CANCELAR_CONTRASENA}
       />
     </>
   );

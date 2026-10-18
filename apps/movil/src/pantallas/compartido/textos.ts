@@ -122,6 +122,9 @@ export const ETIQUETA_PAGUE_YO = 'Pagué yo';
 export const ETIQUETA_REPARTO = '¿Cómo se reparte?';
 export const ETIQUETA_CON_QUE_PAGASTE = '¿Con qué pagaste?';
 export const BTN_GUARDAR = 'Guardar';
+/** Formulario de gasto compartido (`02 §27`). */
+export const PISTA_GUARDAR_GASTO_COMPARTIDO =
+  'Registra el gasto compartido en tu libro y lo comparte cuando haya red';
 
 export function etiquetaPagoPareja(nombre: string): string {
   return `Pagó ${nombre}`;

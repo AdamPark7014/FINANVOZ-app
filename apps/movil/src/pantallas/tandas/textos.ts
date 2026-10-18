@@ -17,6 +17,11 @@ export const PISTA_VER_CALENDARIO = 'Abre el calendario y las rondas de esta tan
 export const PREGUNTA_YA_DISTE = '¿Ya diste tu tanda?';
 export const PREGUNTA_HOY_COBRO = 'Hoy te toca cobrar tu tanda.';
 export const ETIQUETA_TODAVIA_NO = 'Todavía no';
+/** TalkBack al posponer la aportación en Hoy (`02 §18`). */
+export const PISTA_TODAVIA_NO_APORTACION =
+  'Pospone el registro; la sigo apartando y te pregunto mañana';
+/** TalkBack al posponer el cobro en Hoy (`02 §18`). */
+export const PISTA_TODAVIA_NO_COBRO = 'Pospone el cobro; te pregunto mañana';
 export const MENSAJE_TODAVIA_NO_APORTACION = 'La sigo apartando. Te pregunto mañana.';
 export const MENSAJE_TODAVIA_NO_COBRO = 'Va. Te pregunto mañana.';
 

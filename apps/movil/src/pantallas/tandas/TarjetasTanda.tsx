@@ -12,6 +12,8 @@ import {
   MENSAJE_TODAVIA_NO_APORTACION,
   MENSAJE_TODAVIA_NO_COBRO,
   PISTA_ME_TOCO,
+  PISTA_TODAVIA_NO_APORTACION,
+  PISTA_TODAVIA_NO_COBRO,
   PISTA_YA_LA_DI,
   TEXTO_NO_ES_INGRESO,
 } from './textos';
@@ -53,6 +55,7 @@ function TarjetaAportacion({
             etiqueta={ETIQUETA_TODAVIA_NO}
             variante="secundario"
             testID={`${testID}-todavia-no`}
+            pista={PISTA_TODAVIA_NO_APORTACION}
             alPresionar={() => {
               todaviaNo(ctx, { programadoId: t.programadoId, fecha: t.fecha });
               refrescar();
@@ -98,6 +101,7 @@ function TarjetaCobro({ t, testID }: { t: Extract<TarjetaTanda, { tipo: 'tanda_c
             etiqueta={ETIQUETA_TODAVIA_NO}
             variante="secundario"
             testID={`${testID}-todavia-no`}
+            pista={PISTA_TODAVIA_NO_COBRO}
             alPresionar={() => {
               todaviaNoCobroTanda(ctx, t.tandaId);
               refrescar();

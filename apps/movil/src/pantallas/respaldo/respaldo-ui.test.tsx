@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import type { Contexto } from '../../servicios';
 import { ProveedorControlApp, type ControlApp } from '../../sesion/ControlApp';
@@ -20,7 +20,9 @@ import {
   DESCRIPCION_ARCHIVO,
   PISTA_BORRAR_CUENTA,
   PISTA_CONFIRMAR_BORRAR_CUENTA,
+  PISTA_CANCELAR_CONTRASENA,
   PISTA_EXPORTAR_ARCHIVO,
+  PISTA_GUARDAR_CONTRASENA,
   PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
   PISTA_VOLVER_RESTAURAR,
@@ -55,6 +57,8 @@ describe('textos de respaldo (`02 §14`, §19)', () => {
       PISTA_CONFIRMAR_BORRAR_CUENTA,
       PISTA_RESPALDAR_AHORA,
       PISTA_EXPORTAR_ARCHIVO,
+      PISTA_GUARDAR_CONTRASENA,
+      PISTA_CANCELAR_CONTRASENA,
     ].join('\n');
     expect(ui).not.toMatch(/[!¡]/);
   });
@@ -98,6 +102,31 @@ describe('accesibilidad en pantalla respaldo', () => {
     );
     p.cerrar();
   }, 15_000);
+
+  it('formulario contraseña: aviso alert y pistas TalkBack en guardar y cancelar', () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    montar(
+      p.ctx,
+      <TarjetaRespaldo alRestaurar={jest.fn()} />,
+      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
+    );
+    fireEvent.press(screen.getByTestId('privacidad-respaldo-crear'));
+    expect(screen.getByTestId('respaldo-aviso-contrasena')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_CONTRASENA,
+    );
+    expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_CONTRASENA,
+    );
+    expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_CONTRASENA,
+    );
+    p.cerrar();
+  });
 
   it('TarjetaRespaldo muestra copy centralizado antes de crear contraseña', () => {
     const p = crearSesionPrueba('2026-10-11');

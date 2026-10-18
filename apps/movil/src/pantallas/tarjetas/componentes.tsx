@@ -20,6 +20,7 @@ import {
   BTN_CANCELAR,
   BTN_GUARDAR_PAGO,
   BTN_NO,
+  PISTA_GUARDAR_PAGO_TARJETA,
   ERROR_MONTO_PAGO,
   ERROR_ORIGEN_PAGO,
   ETIQUETA_MONTO_PAGO,
@@ -166,7 +167,12 @@ export function FormularioPago({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta={BTN_GUARDAR_PAGO} alPresionar={guardar} testID={`${testID}-guardar`} />
+      <Boton
+        etiqueta={BTN_GUARDAR_PAGO}
+        alPresionar={guardar}
+        testID={`${testID}-guardar`}
+        pista={PISTA_GUARDAR_PAGO_TARJETA}
+      />
       <Boton
         etiqueta={BTN_CANCELAR}
         variante="texto"

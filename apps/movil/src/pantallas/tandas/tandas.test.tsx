@@ -40,6 +40,8 @@ import {
   PISTA_GUARDAR_CAMBIOS,
   PISTA_GUARDAR_TANDA,
   PISTA_ME_TOCO,
+  PISTA_TODAVIA_NO_APORTACION,
+  PISTA_TODAVIA_NO_COBRO,
   PISTA_NUEVA_TANDA,
   PISTA_VACIO_TANDAS,
   PISTA_VER_CALENDARIO,
@@ -170,6 +172,10 @@ describe('Tandas (02 §18)', () => {
     crearTanda(p.ctx, entradaDe(v));
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     expect(screen.getByTestId('tarjeta-accion-0-ya-la-di')).toHaveProp('accessibilityHint', PISTA_YA_LA_DI);
+    expect(screen.getByTestId('tarjeta-accion-0-todavia-no')).toHaveProp(
+      'accessibilityHint',
+      PISTA_TODAVIA_NO_APORTACION,
+    );
   });
 
   it('Tarjeta de Hoy "Me tocó" tiene pista TalkBack', () => {
@@ -181,6 +187,7 @@ describe('Tandas (02 §18)', () => {
       .getAllByTestId(/^tarjeta-accion-\d$/)
       .find((n) => within(n).queryByText(PREGUNTA_HOY_COBRO))?.props.testID as string;
     expect(screen.getByTestId(`${testID}-me-toco`)).toHaveProp('accessibilityHint', PISTA_ME_TOCO);
+    expect(screen.getByTestId(`${testID}-todavia-no`)).toHaveProp('accessibilityHint', PISTA_TODAVIA_NO_COBRO);
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {

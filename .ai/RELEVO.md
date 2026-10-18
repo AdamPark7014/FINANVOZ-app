@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **PreviaWidget TalkBack:** `importantForAccessibility="yes"` en el resumen con live region (anuncia al cambiar «Ocultar montos»).
+- **Ayuda TalkBack:** FAQ sin doble lectura de la pregunta (`importantForAccessibility="no"` en el título visible); live region de respuesta con `importantForAccessibility="yes"`; test con `ordenDeLectura`.
 
 ## Hecho (acumulado reciente)
 
-- `PISTA_PREVIA_OCULTA`, error alert widget, captura Hoy. Ver `git log`.
+- PreviaWidget live region, captura Hoy, formulario movimiento. Ver `git log`.
 
 ## A medias — CUIDADO
 

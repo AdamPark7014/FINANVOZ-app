@@ -80,6 +80,12 @@ export const BTN_VER_MOVIMIENTOS = 'Ver los movimientos';
 /** TalkBack en el detalle de la simulación (`02 §19`). */
 export const PISTA_VER_MOVIMIENTOS = 'Abre los movimientos que usó esta simulación';
 export const BTN_LO_COMPRE = 'Lo compré';
+/** TalkBack en escenario (`02 §19`). */
+export function pistaLoCompre(etiqueta: string): string {
+  return `Registra la compra: ${etiqueta}`;
+}
+/** TalkBack al programar recordatorio (`02 §19`). */
+export const PISTA_RECUERDAMELO = 'Programa un aviso en tu teléfono para ese día';
 export const BTN_HACER_OTRA_CUENTA = 'Hacer otra cuenta';
 /** TalkBack en resultado (`02 §19`). */
 export const PISTA_HACER_OTRA_CUENTA = 'Vuelve al formulario para simular otra compra';

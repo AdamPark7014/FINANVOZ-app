@@ -25,6 +25,7 @@ import {
   PERMISO_INSTRUCCION,
   etiquetaPermisoCaptura,
   etiquetaSinAppsBanco,
+  PISTA_AHORA_NO_ACTIVAR_CAPTURA,
   TEXTO_SIN_APPS_BANCO,
   TITULO_ELEGIR_APPS,
   TITULO_PERMISO_NOTIFICACIONES,
@@ -129,6 +130,7 @@ export function ActivarCaptura({
       variante="texto"
       alPresionar={() => alTerminar(false)}
       testID={`${testID}-ahora-no`}
+      pista={PISTA_AHORA_NO_ACTIVAR_CAPTURA}
     />
   );
 

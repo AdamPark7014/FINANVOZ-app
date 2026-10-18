@@ -133,7 +133,9 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         })}
       >
         <View style={{ flex: 1 }}>
-          <Texto variante="cuerpoFuerte">{p.pregunta}</Texto>
+          <Texto variante="cuerpoFuerte" importantForAccessibility="no">
+            {p.pregunta}
+          </Texto>
         </View>
         <Texto
           variante="cuerpoFuerte"
@@ -145,7 +147,12 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         </Texto>
       </Pressable>
       {abierta ? (
-        <View style={{ gap: espacio.s }} testID={`ayuda-respuesta-${p.id}`} accessibilityLiveRegion="polite">
+        <View
+          style={{ gap: espacio.s }}
+          testID={`ayuda-respuesta-${p.id}`}
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+        >
           {p.respuesta.map((parrafo, i) => (
             <Texto
               key={parrafo}

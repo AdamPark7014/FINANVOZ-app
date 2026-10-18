@@ -26,6 +26,8 @@ import {
   BTN_LEER_PDF_BANCO,
   BTN_PAGAR,
   BTN_VOLVER,
+  etiquetaAccesibleSaldoAFavorDetalle,
+  PISTA_PAGAR_TARJETA,
   PISTA_VOLVER,
   CANDADO_COMPROMISO_12_MESES,
   ETIQUETA_DEBES,
@@ -163,7 +165,12 @@ function Detalle({
           />
         </Tarjeta>
       ) : (
-        <Boton etiqueta={BTN_PAGAR} alPresionar={() => setPanel('pagar')} testID="tarjeta-pagar" />
+        <Boton
+          etiqueta={BTN_PAGAR}
+          alPresionar={() => setPanel('pagar')}
+          testID="tarjeta-pagar"
+          pista={PISTA_PAGAR_TARJETA}
+        />
       )}
 
       <SeccionMeses planes={d.planes} />
@@ -286,11 +293,18 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
         </Texto>
       ) : null}
       {d.saldoAFavor > 0 ? (
-        <View testID="tarjeta-saldo-a-favor" style={{ gap: espacio.xxs }}>
-          <Dato etiqueta={ETIQUETA_SALDO_A_FAVOR} valor={formatearCentavos(d.saldoAFavor)} />
-          <Texto variante="secundario" tono="secundario">
-            {AYUDA_SALDO_A_FAVOR}
-          </Texto>
+        <View
+          testID="tarjeta-saldo-a-favor"
+          accessible
+          accessibilityLabel={etiquetaAccesibleSaldoAFavorDetalle(d.saldoAFavor)}
+          style={{ gap: espacio.xxs }}
+        >
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <Dato etiqueta={ETIQUETA_SALDO_A_FAVOR} valor={formatearCentavos(d.saldoAFavor)} />
+            <Texto variante="secundario" tono="secundario">
+              {AYUDA_SALDO_A_FAVOR}
+            </Texto>
+          </View>
         </View>
       ) : null}
       {d.ultimoCorte ? (

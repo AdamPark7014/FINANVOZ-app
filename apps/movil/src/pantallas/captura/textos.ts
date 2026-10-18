@@ -95,6 +95,10 @@ export function etiquetaSinAppsBanco(): string {
   return `${TITULO_ELEGIR_APPS}. ${TEXTO_SIN_APPS_BANCO}`;
 }
 
+/** TalkBack: «Ahora no» en el flujo ActivarCaptura (O6, `02 §15`). */
+export const PISTA_AHORA_NO_ACTIVAR_CAPTURA =
+  'Sale sin activar la captura; puedes activarla después en Ajustes › Captura';
+
 export const LISTA_CAPTURA_ACTIVA = 'La captura automática está activa.';
 export const LISTA_CAPTURA_APPS = (nombres: readonly string[]) =>
   `Listo: anotaré lo que avisen ${nombres.join(', ')}.`;
