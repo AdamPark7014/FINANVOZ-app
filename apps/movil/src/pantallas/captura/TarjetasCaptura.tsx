@@ -183,13 +183,15 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
     );
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte" accessibilityRole="header">
+      <Texto variante="cuerpoFuerte" importantForAccessibility="no">
         {TITULO_REACTIVAR_CAPTURA}
       </Texto>
       <Texto
         variante="secundario"
         tono="secundario"
         testID={`${testID}-cuerpo`}
+        accessibilityRole="alert"
+        accessibilityLiveRegion="polite"
         accessibilityLabel={etiquetaCuerpoReactivarCaptura()}
       >
         {CUERPO_REACTIVAR_CAPTURA}
@@ -226,13 +228,15 @@ export function TarjetaCapturaInactiva({ testID }: { testID: string }) {
   const { puente } = useCaptura();
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte" accessibilityRole="header">
+      <Texto variante="cuerpoFuerte" importantForAccessibility="no">
         {TITULO_CAPTURA_INACTIVA}
       </Texto>
       <Texto
         variante="secundario"
         tono="secundario"
         testID={`${testID}-guia`}
+        accessibilityRole="alert"
+        accessibilityLiveRegion="polite"
         accessibilityLabel={etiquetaGuiaCapturaInactiva(guiaCapturaInactiva(marcaTelefono()))}
       >
         {guiaCapturaInactiva(marcaTelefono())}
