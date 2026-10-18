@@ -27,6 +27,7 @@ import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
+import { TarjetaCapturaInactiva } from './TarjetasCaptura';
 import {
   BTN_NO_ES_MIA,
   etiquetaGuiaCapturaInactiva,
@@ -37,6 +38,7 @@ import {
   INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
+  PISTA_REVISAR_ACCESO_CAPTURA,
   PISTA_YA_REGISTRE_AVISO,
   TITULO_CAPTURA_INACTIVA,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
