@@ -90,6 +90,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER_DETALLE}
       />
       <View style={{ gap: espacio.xxs }}>
         <Texto variante="titulo" testID="tanda-titulo">
