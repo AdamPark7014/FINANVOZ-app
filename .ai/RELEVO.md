@@ -6,21 +6,23 @@
 
 ## Hecho en este turno
 
-- **suscripciones:** confirmaciones de acción con `accessibilityLiveRegion="polite"` en `suscripciones-mensaje` (TalkBack anuncia al convertir en compromiso, etc.); prueba en `suscripciones.test.tsx`.
+- **EditarTarjeta + CorregirSaldo:** errores, etiquetas de campos, chips, botones y ayuda/ejemplo de tasa centralizados en `tarjetas/textos.ts` (bloque §8 editar/corregir). Commit en remoto: `69cdc5f` (textos ampliado antes en `5f03c16`).
 
 ## Hecho (acumulado reciente)
 
-- plan `PISTA_VOLVER`, personas cuenta dividida, deducciones, tarjetas. Ver `git log`.
+- MesesYPagos copy, me-alcanza, captura, estados de cuenta. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno: onboarding, ajustes, respaldo tests — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local sin commitear: ajustes, onboarding, respaldo, `cf7706f` local si no está en remoto.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. Commitear o descartar WIP ajustes/onboarding/respaldo.
+3. `git push` del commit local pendiente si Adam quiere.
 
 ## No tocar
 
