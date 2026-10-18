@@ -157,6 +157,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
       <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirCompartidos={alAbrir} />,
     );
     expect(screen.getByTestId('seccion-compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('boton-compartidos')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('boton-compartidos').props.accessibilityLabel).toBe(BTN_COMPARTIDOS_CUENTAS);
     fireEvent.press(screen.getByTestId('boton-compartidos'));
     expect(alAbrir).toHaveBeenCalled();

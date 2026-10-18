@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Tandas TalkBack:** `PISTA_ME_TOCO` / `PISTA_YA_LA_DI` en tarjetas Hoy (`TarjetasTanda`); detalle con pistas editar/archivar/confirmar y tests (`c973f10`, `fa85b2e`, `45dcbca`). Arqueo: `arqueo-mensaje-hecho` liveRegion en test.
+- **TalkBack micro:** `widget.test.tsx` (PreviaWidget con pista + auditoría M13) y `compartido.test.tsx` (rol button en Cuentas→compartidos).
 
 ## Hecho (acumulado reciente)
 
-- Widget Vista previa, suscripciones, captura. Ver `git log`.
+- Hints crear/escanear compartidos, header vista previa widget, tandas, suscripciones. Ver `git log` (`bd3af07`, etc.).
 
 ## A medias — CUIDADO
 
-- WIP ajeno — `git status` antes de commitear.
-- M0 / EAS: Adam.
+- WIP paralelo en disco — `git status` antes de editar.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP paralelo.
+2. Seguir tanda a11y donde falte hint explícito.
 
 ## No tocar
 
