@@ -6,26 +6,25 @@
 
 ## Hecho en este turno
 
-- **TalkBack Widget/Captura (Ajustes):** encabezado «Vista previa» en `SeccionWidget` + test (`cfd4bdc`). `PreviaWidget` y `SeccionCaptura` ya cerrados en main (summary, hints, headers, etiquetas apagada/no disponible, «Aviso al capturar»).
+- **Micro TalkBack compartidos + suscripciones (`bd3af07`):** `PISTA_CREAR_CON_ALGUIEN` / `PISTA_ESCANEAR_CODIGO` en lista compartidos; `etiquetaAccesibleAyudaSuscripciones()` en ayuda de suscripciones; tests en `compartido.test.tsx` y `suscripciones.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Tandas/arqueo, ayuda FAQ, onboarding, suscripciones. Ver `git log`.
+- Widget/Captura Ajustes, tandas, arqueo. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (compartido/tandas/suscripciones) — `git status` antes de commitear.
+- WIP ajeno en disco (`captura-textos.test.tsx`, `ayuda.test.tsx`) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP paralelo si aplica.
+2. Pistas TalkBack en flujo QR/cámara compartidos si sigue a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

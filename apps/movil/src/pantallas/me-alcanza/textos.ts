@@ -60,7 +60,11 @@ export const BTN_CANCELAR = 'Cancelar';
 /** TalkBack mientras calcula (`02 §19`). */
 export const PISTA_CANCELAR = 'Detiene el cálculo y vuelve al formulario';
 export const BTN_INTENTAR_DE_NUEVO = 'Intentar de nuevo';
+/** TalkBack tras fallo de cálculo (`02 §19`). */
+export const PISTA_REINTENTAR_ME_ALCANZA = 'Vuelve a calcular con los mismos datos';
 export const BTN_CAMBIAR_DATOS = 'Cambiar los datos';
+/** TalkBack tras fallo de cálculo (`02 §19`). */
+export const PISTA_CAMBIAR_DATOS_ME_ALCANZA = 'Vuelve al formulario para editar precio o meses';
 export const BTN_LISTO = 'Listo';
 export const BTN_COMO_LO_CALCULE = 'Cómo lo calculé';
 export const BTN_OCULTAR_COMO_LO_CALCULE = 'Ocultar cómo lo calculé';
