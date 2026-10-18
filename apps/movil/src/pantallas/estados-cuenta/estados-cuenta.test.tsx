@@ -238,7 +238,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     montar(ctx, async () => ({ tipo: 'invalido' }));
     const aviso = await screen.findByTestId('estado-error');
     expect(aviso).toHaveTextContent(MENSAJE_INVALIDO);
-    expect(aviso.props.accessibilityLabel).toBe(`${ETIQUETA_AVISO_ESTADO}: ${MENSAJE_INVALIDO}`);
+    expect(aviso.props.accessibilityLabel).toBe(`${ETIQUETA_AVISO_ESTADO}. ${MENSAJE_INVALIDO}`);
   });
 
   it('banco desconocido, archivo inválido, demasiado grande, sin módulo y error al leer', async () => {
