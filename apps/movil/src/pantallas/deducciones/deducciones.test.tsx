@@ -123,6 +123,11 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
 });
 
 describe('Deducciones (02 §24, CA-M12-03)', () => {
+  it('TalkBack: volver regresa a Cuentas', () => {
+    renderConSesion(preparar(), <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    expect(screen.getByTestId('deducciones-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
   it('sin facturas del ejercicio lo explica', () => {
     const ctx = preparar();
     renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);

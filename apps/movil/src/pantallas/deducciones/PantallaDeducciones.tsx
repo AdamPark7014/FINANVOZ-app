@@ -130,6 +130,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER}
       />
       <Texto
         variante="titulo"
