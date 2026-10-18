@@ -9,19 +9,22 @@ import {
   type ModoAvisoCaptura,
 } from '../servicios/estado-captura';
 import type { Contexto } from '../servicios/contexto';
+import {
+  PREFIJO_AVISO_CAPTURA,
+  RUTA_AVISO_CAPTURA,
+  TITULO_AVISO_CAPTURA,
+  textoAvisoCaptura,
+} from '../avisos/captura';
+
+export {
+  PREFIJO_AVISO_CAPTURA,
+  RUTA_AVISO_CAPTURA,
+  TITULO_AVISO_CAPTURA,
+  textoAvisoCaptura,
+} from '../avisos/captura';
 
 /** Tope de frecuencia en modo agrupados (`02 §13`: agrupado cada 30 min). */
 export const INTERVALO_AGRUPADO_MS = 30 * 60 * 1000;
-
-export const PREFIJO_AVISO_CAPTURA = 'captura:';
-export const TITULO_AVISO_CAPTURA = 'Movimientos nuevos';
-export const RUTA_AVISO_CAPTURA = '/movimientos';
-
-/** Copy de la notificación; nunca lleva monto ni comercio. */
-export function textoAvisoCaptura(cantidad: number): string {
-  if (cantidad <= 0) return '';
-  return cantidad === 1 ? '1 movimiento nuevo' : `${cantidad} movimientos nuevos`;
-}
 
 export interface PublicadorAvisoCaptura {
   mostrar(cuerpo: string): Promise<void>;

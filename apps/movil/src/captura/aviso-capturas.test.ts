@@ -23,8 +23,8 @@ function ctxConConsentimiento() {
 
 describe('textoAvisoCaptura', () => {
   it('no lleva montos ni comercios', () => {
-    expect(textoAvisoCaptura(1)).toBe('1 movimiento nuevo');
-    expect(textoAvisoCaptura(3)).toBe('3 movimientos nuevos');
+    expect(textoAvisoCaptura(1)).toBe('1 movimiento nuevo. Revísalo en Movimientos.');
+    expect(textoAvisoCaptura(3)).toBe('3 movimientos nuevos. Revísalos en Movimientos.');
     expect(textoAvisoCaptura(0)).toBe('');
   });
 });
@@ -50,7 +50,10 @@ describe('avisarCapturasNuevas', () => {
     fijarModoAvisoCaptura(ctx, 'cada_uno');
     const pub = publicadorEnMemoria();
     await avisarCapturasNuevas(ctx, 2, pub, { enSegundoPlano: true, ahora: 1000 });
-    expect(pub.cuerpos()).toEqual(['1 movimiento nuevo', '1 movimiento nuevo']);
+    expect(pub.cuerpos()).toEqual([
+      '1 movimiento nuevo. Revísalo en Movimientos.',
+      '1 movimiento nuevo. Revísalo en Movimientos.',
+    ]);
   });
 
   it('modo nunca: no publica', async () => {
@@ -66,9 +69,9 @@ describe('avisarCapturasNuevas', () => {
     const pub = publicadorEnMemoria();
     const t0 = 1_000_000;
     await avisarCapturasNuevas(ctx, 2, pub, { enSegundoPlano: true, ahora: t0 });
-    expect(pub.cuerpos()).toEqual(['2 movimientos nuevos']);
+    expect(pub.cuerpos()).toEqual(['2 movimientos nuevos. Revísalos en Movimientos.']);
     await avisarCapturasNuevas(ctx, 1, pub, { enSegundoPlano: true, ahora: t0 + 5 * 60 * 1000 });
-    expect(pub.cuerpos()).toEqual(['2 movimientos nuevos']);
+    expect(pub.cuerpos()).toEqual(['2 movimientos nuevos. Revísalos en Movimientos.']);
     expect(acumularAvisoCaptura(ctx, 0).pendiente).toBe(1);
   });
 
@@ -81,7 +84,7 @@ describe('avisarCapturasNuevas', () => {
       enSegundoPlano: true,
       ahora: t0 + INTERVALO_AGRUPADO_MS,
     });
-    expect(pub.cuerpos()).toEqual(['4 movimientos nuevos']);
+    expect(pub.cuerpos()).toEqual(['4 movimientos nuevos. Revísalos en Movimientos.']);
   });
 });
 

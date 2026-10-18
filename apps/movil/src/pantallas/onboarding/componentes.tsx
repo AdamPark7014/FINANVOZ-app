@@ -117,6 +117,7 @@ export function PasoOnboarding({
   paso,
   titulo,
   ayuda,
+  tip,
   pie,
   children,
   testID,
@@ -124,6 +125,8 @@ export function PasoOnboarding({
   paso: number;
   titulo: string;
   ayuda?: string;
+  /** Consejo corto opcional (`02 §14`, tuteo). */
+  tip?: string;
   pie?: ReactNode;
   children?: ReactNode;
   testID: string;
@@ -142,6 +145,11 @@ export function PasoOnboarding({
       {ayuda ? (
         <Texto variante="cuerpo" tono="secundario">
           {ayuda}
+        </Texto>
+      ) : null}
+      {tip ? (
+        <Texto variante="secundario" tono="secundario" testID="onb-tip">
+          {tip}
         </Texto>
       ) : null}
       {children}

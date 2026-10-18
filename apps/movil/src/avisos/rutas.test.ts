@@ -8,7 +8,7 @@ import { PREFIJO_AVISO_RESPALDO } from './respaldo';
 import { PREFIJO_AVISO_RIESGO } from './riesgo';
 import { destinoDeAviso, RUTA_HOY, rutaDeAviso, rutaSegura } from './rutas';
 import { PREFIJO_AVISO_TANDA } from './tandas';
-import { PREFIJO_AVISO_CAPTURA } from '../captura/aviso-capturas';
+import { PREFIJO_AVISO_CAPTURA } from './captura';
 
 describe('ruta de cada aviso', () => {
   it.each([
