@@ -6,23 +6,21 @@
 
 ## Hecho en este turno
 
-- **Onboarding tips:** `TIP_*` canónicos en `tips.ts`; `textos.ts` solo reexporta (sin duplicar ni ciclo tips↔textos). Tests `tips.test.ts` + `textos.test.ts` (incl. O6 `TIP_CAPTURA_AHORA_NO`) en verde.
+- **Onboarding O1–O7:** tips en `tips.ts` (re-export `textos.ts`), TalkBack «Consejo» + pistas en CTAs; test O2 pista al marcar casilla.
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget a11y, TalkBack Hoy, suscripciones. Ver `git log`.
+- Cuentas list a11y, captura/ayuda leftovers, me-alcanza tests. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
-- WIP suelto en otros archivos — revisar `git status` antes de editar.
+- WIP local (`SeccionCaptura`, `Chip.test`, etc.) — no mezclar en commits de onboarding.
+- CI Windows; M0 Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio cuando toque el hito.
+2. Commitear o descartar WIP ajeno en disco.
 
 ## No tocar
 
