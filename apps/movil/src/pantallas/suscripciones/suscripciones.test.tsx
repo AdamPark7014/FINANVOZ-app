@@ -13,6 +13,7 @@ import {
   PISTA_AYUDA,
   PISTA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
@@ -97,6 +98,10 @@ describe('Suscripciones (02 §20)', () => {
     for (const [id, monto, proximo] of filas) {
       expect(textoDe(`suscripcion-${id}-monto`)).toBe(monto);
       expect(textoDe(`suscripcion-${id}-proximo`)).toBe(proximo);
+      expect(screen.getByTestId(`suscripcion-${id}-proximo`)).toHaveProp(
+        'accessibilityLabel',
+        etiquetaAccesibleProximoSuscripcion(proximo),
+      );
     }
     expect(screen.queryByTestId('suscripcion-disney-plus')).toBeNull();
     const inactivas = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';

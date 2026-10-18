@@ -1,5 +1,6 @@
 import {
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
@@ -23,6 +24,10 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaInactivasSuscripciones('Ya no se cobran: Disney Plus')).toMatch(
       /^Suscripciones que ya no se cobran\./,
     );
+  });
+
+  it('próximo cargo con contexto TalkBack', () => {
+    expect(etiquetaAccesibleProximoSuscripcion('próximo 14 oct')).toBe('Próximo cargo: próximo 14 oct');
   });
 
   it('ayuda en plural para varias filas', () => {

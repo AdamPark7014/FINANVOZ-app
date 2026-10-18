@@ -11,7 +11,12 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Texto } from '../../ui';
 import { mensajeError } from '../principal/textos';
-import { AYUDA_DATOS_COBRO, MENSAJES_DATOS_COBRO } from './textos';
+import {
+  AYUDA_DATOS_COBRO,
+  MENSAJES_DATOS_COBRO,
+  PISTA_CANCELAR_DATOS_COBRO,
+  PISTA_GUARDAR_DATOS_COBRO,
+} from './textos';
 
 /**
  * Datos para cobrar (`02 §17`): celular para DiMo y CLABE. Se capturan una vez (en Ajustes o la primera vez que
@@ -21,10 +26,12 @@ export function FormularioDatosCobro({
   alGuardar,
   alCancelar,
   etiquetaGuardar = 'Guardar',
+  pistaGuardar = PISTA_GUARDAR_DATOS_COBRO,
 }: {
   alGuardar: (datos: DatosCobro) => void;
   alCancelar?: () => void;
   etiquetaGuardar?: string;
+  pistaGuardar?: string;
 }) {
   const { ctx, refrescar } = useSesion();
   const [inicial] = useState(() => leerDatosCobro(ctx));

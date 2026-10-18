@@ -37,6 +37,11 @@ export function etiquetaInactivasSuscripciones(texto: string): string {
   return `Suscripciones que ya no se cobran. ${texto}`;
 }
 
+/** TalkBack: cuándo viene el siguiente cargo en la fila (`02 §15`). */
+export function etiquetaAccesibleProximoSuscripcion(textoProximo: string): string {
+  return `Próximo cargo: ${textoProximo}`;
+}
+
 export const ETIQUETA_NOMBRE = 'Nombre';
 export const AYUDA_NOMBRE = 'Así la verás en la lista';
 export const ETIQUETA_EDITAR_NOMBRE = 'Editar nombre';

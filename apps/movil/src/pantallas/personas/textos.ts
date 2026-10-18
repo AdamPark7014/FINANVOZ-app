@@ -15,6 +15,11 @@ export const ETIQUETA_GUARDAR = 'Guardar';
 /** TalkBack al registrar un pago recibido (`02 §19`). */
 export const PISTA_GUARDAR_PAGO = 'Guarda en el libro cuánto te pagó';
 export const ETIQUETA_GUARDAR_Y_COBRAR = 'Guardar y cobrar';
+/** TalkBack al guardar datos en Ajustes (`02 §19`). */
+export const PISTA_GUARDAR_DATOS_COBRO = 'Guarda tu celular o CLABE en este teléfono';
+/** TalkBack al guardar datos antes de compartir el cobro (`02 §19`). */
+export const PISTA_GUARDAR_Y_COBRAR = 'Guarda tus datos y abre el mensaje para cobrar';
+export const PISTA_CANCELAR_DATOS_COBRO = 'Cierra sin guardar tus datos para cobrar';
 export const ETIQUETA_MONTO = 'Monto';
 export const ETIQUETA_A_DONDE_LLEGO = '¿A dónde te llegó?';
 export const ETIQUETA_QUITAR_RECORDATORIO = 'Quitar recordatorio';

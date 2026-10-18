@@ -22,6 +22,7 @@ import {
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
@@ -204,7 +205,12 @@ function Fila({
           {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
         </Texto>
         {s.textoProximo ? (
-          <Texto variante="secundario" tono="secundario" testID={`${id}-proximo`}>
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID={`${id}-proximo`}
+            accessibilityLabel={etiquetaAccesibleProximoSuscripcion(s.textoProximo)}
+          >
             {s.textoProximo}
           </Texto>
         ) : null}

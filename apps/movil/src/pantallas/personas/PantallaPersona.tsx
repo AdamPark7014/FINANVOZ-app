@@ -30,6 +30,7 @@ import {
   ETIQUETA_GUARDAR,
   PISTA_GUARDAR_PAGO,
   ETIQUETA_GUARDAR_Y_COBRAR,
+  PISTA_GUARDAR_Y_COBRAR,
   ETIQUETA_MONTO,
   ETIQUETA_QUITAR_RECORDATORIO,
   PISTA_QUITAR_RECORDATORIO,
@@ -193,6 +194,7 @@ function Detalle({
           </Texto>
           <FormularioDatosCobro
             etiquetaGuardar={ETIQUETA_GUARDAR_Y_COBRAR}
+            pistaGuardar={PISTA_GUARDAR_Y_COBRAR}
             alGuardar={() => void cobrar()}
             alCancelar={() => setPanel(null)}
           />
