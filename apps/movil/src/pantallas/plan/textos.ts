@@ -6,6 +6,7 @@ import {
   type VistaPlan,
 } from '../../servicios';
 import type { OfertaPlus } from '../../suscripciones/tipos';
+import { etiquetaHablada } from '../../ui/formato';
 
 /** Redacción del plan (`01 §11`, `02 §14`): tuteo, sin tecnicismos; los precios los pone la tienda. */
 
@@ -29,6 +30,7 @@ export const ID = {
   notaTienda: 'plan-nota-tienda',
   notaSimulada: 'plan-nota-simulada',
   oferta: (periodo: 'mensual' | 'anual') => `plan-oferta-${periodo}` as const,
+  ofertaDetalle: (periodo: 'mensual' | 'anual') => `plan-oferta-detalle-${periodo}` as const,
   ajustesPlan: 'ajustes-plan',
   ajustesPlanTitulo: 'ajustes-plan-titulo',
   ajustesPlanDetalle: 'ajustes-plan-detalle',
@@ -76,6 +78,17 @@ export const MENSAJE_OFERTAS_VACIAS =
 export const SUFIJO_PLUS = ' · Plus';
 export const PISTA_ABRIR_PLANES = 'Abre los planes';
 export const PISTA_VER_PLANES = 'Abre la pantalla Finanvoz Plus';
+export const PISTA_ADMINISTRAR = 'Abre Google Play para administrar tu suscripción';
+export const PISTA_RESTAURAR = 'Busca compras de Plus en tu cuenta de Google';
+export const PISTA_INTENTAR = 'Vuelve a cargar los planes desde Google Play';
+
+/** TalkBack al elegir mensual o anual (`02 §15`). */
+export function pistaComprarOferta(o: OfertaPlus): string {
+  if (o.diasPrueba) return 'Inicia la prueba gratis en Google Play';
+  return o.periodo === 'mensual'
+    ? 'Contrata Plus mensual en Google Play'
+    : 'Contrata Plus anual en Google Play';
+}
 
 export function etiquetaCandadoPlus(texto: string): string {
   return `${texto}${SUFIJO_PLUS}`;
@@ -97,6 +110,32 @@ export const MENSAJE_LISTO = 'Listo. Ya tienes Plus.';
 /** TalkBack: compra o restauración fallida; el resto son avisos informativos. */
 export function esMensajeErrorPlan(texto: string): boolean {
   return texto === MENSAJE_ERROR_COMPRA || texto === MENSAJE_ERROR_OFERTAS;
+}
+
+/** TalkBack: tarjeta «tu plan» y el resumen en Ajustes (`02 §15`). */
+export function etiquetaAccesibleResumenPlan(titulo: string, detalle: string | null): string {
+  const base = `Tu plan. ${titulo}`;
+  return detalle ? `${base}. ${etiquetaHablada(detalle)}` : base;
+}
+
+/** TalkBack: precio bajo el botón de compra, con montos en palabras. */
+export function etiquetaAccesibleOfertaDetalle(detalle: string): string {
+  return etiquetaHablada(detalle);
+}
+
+/** TalkBack: aviso tras comprar, restaurar o error (montos en palabras si los hay). */
+export function etiquetaAccesibleMensajePlan(mensaje: string): string {
+  return etiquetaHablada(mensaje);
+}
+
+/** TalkBack: beneficio de la lista «Plus incluye». */
+export function etiquetaAccesibleBeneficioPlus(texto: string): string {
+  return etiquetaHablada(texto);
+}
+
+/** TalkBack: pie de la lista de beneficios (`02 §15`). */
+export function etiquetaAccesibleIncluyeGratis(): string {
+  return etiquetaHablada(INCLUYE_GRATIS);
 }
 
 /** "Tienes Plus · prueba gratis" y su detalle. */

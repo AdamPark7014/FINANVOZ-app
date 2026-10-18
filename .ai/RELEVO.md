@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Gastos compartidos (móvil):** micro TalkBack — pistas en lista, grupo, formulario y confirmación; encabezados; resumen dictado con `etiquetaHablada`; tarjetas de grupo con pista; test dictar estable por saldo.
+- **Plan (móvil, N582):** micro TalkBack — resumen dictado (`etiquetaAccesibleResumenPlan`), lista «Plus incluye», precios de oferta en palabras, live regions al cargar/vacío, pistas en compra/restaurar/administrar; `PuertaPlus` con encabezado y descripción hablada; tests en `plan.test.tsx` (11/11).
 
 ## Hecho (acumulado reciente)
 
-- ¿Me alcanza?, calculadora web a11y, tandas, onboarding TalkBack. Ver `git log`.
+- Gastos compartidos, ¿Me alcanza?, tandas, onboarding TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 

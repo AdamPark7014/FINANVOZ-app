@@ -8,6 +8,7 @@ import {
   ETIQUETA_CONOCER_PLUS,
   ETIQUETA_VOLVER,
   etiquetaAccesibilidadCandado,
+  etiquetaAccesibleBeneficioPlus,
   etiquetaCandadoPlus,
   ID,
   PISTA_ABRIR_PLANES,
@@ -70,8 +71,14 @@ export function PuertaPlus({
       testID={ID.puertaPlus}
     >
       <Tarjeta>
-        <Texto variante="subtitulo">{titulo}</Texto>
-        <Texto variante="cuerpo" tono="secundario">
+        <Texto variante="subtitulo" accessibilityRole="header">
+          {titulo}
+        </Texto>
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          accessibilityLabel={etiquetaAccesibleBeneficioPlus(descripcion)}
+        >
           {descripcion}
         </Texto>
         {abrirPlan ? (

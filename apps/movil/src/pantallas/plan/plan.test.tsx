@@ -24,6 +24,8 @@ import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { CANDADO_COMPROMISO_12_MESES } from '../tarjetas/textos';
 import { PantallaPlan, PuertaPlus, SeccionPlan } from '.';
 import {
+  etiquetaAccesibleOfertaDetalle,
+  etiquetaAccesibleResumenPlan,
   etiquetaCandadoPlus,
   etiquetaOferta,
   ID,
@@ -36,8 +38,12 @@ import {
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
   PISTA_ABRIR_PLANES,
+  PISTA_ADMINISTRAR,
+  PISTA_INTENTAR,
+  PISTA_RESTAURAR,
   PISTA_VER_PLANES,
   PISTA_VOLVER,
+  pistaComprarOferta,
   resumenPlan,
   TITULO_PLAN_GRATIS,
   TITULO_PLUS,
@@ -89,6 +95,32 @@ describe('pantalla del plan', () => {
     expect(screen.getByTestId(ID.volver)).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
+  it('TalkBack: resumen del plan, precio de oferta y pistas de compra', async () => {
+    const p = e510();
+    const tienda = crearComprasEnMemoria({ ahora: () => T0 });
+    montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: tienda });
+    expect(screen.getByTestId(ID.cargando)).toHaveProp('accessibilityLiveRegion', 'polite');
+    const resumen = resumenPlan(obtenerPlan(p.ctx));
+    expect(screen.getByTestId(ID.titulo)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle),
+    );
+    await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
+    const ofertas = await tienda.ofertas();
+    const mensual = ofertas.find((o) => o.periodo === 'mensual')!;
+    const e = etiquetaOferta(mensual);
+    expect(screen.getByTestId(ID.oferta('mensual'))).toHaveProp(
+      'accessibilityHint',
+      pistaComprarOferta(mensual),
+    );
+    expect(screen.getByTestId(ID.ofertaDetalle('mensual'))).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleOfertaDetalle(e.detalle),
+    );
+    expect(etiquetaAccesibleOfertaDetalle(e.detalle)).toMatch(/sesenta y nueve pesos/);
+    expect(screen.getByTestId(ID.restaurar)).toHaveProp('accessibilityHint', PISTA_RESTAURAR);
+  });
+
   it('Gratis: ofrece la prueba de 14 días con el precio de la tienda; comprar activa Plus en toda la app', async () => {
     const p = e510();
     const tienda = crearComprasEnMemoria({ ahora: () => T0 });
@@ -123,7 +155,7 @@ describe('pantalla del plan', () => {
     expect(textoDe(ID.mensaje)).toBe(MENSAJE_LISTO);
     expect(textoDe(ID.titulo)).toBe(resumenPlus.titulo);
     expect(textoDe(ID.detalle)).toBe(resumenPlus.detalle);
-    expect(screen.getByTestId(ID.administrar)).toBeTruthy();
+    expect(screen.getByTestId(ID.administrar)).toHaveProp('accessibilityHint', PISTA_ADMINISTRAR);
     expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
     // Hoy ya muestra lo de Plus.
     expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
@@ -159,6 +191,10 @@ describe('pantalla del plan', () => {
     const abrir = jest.fn();
     const { unmount } = montar(p.ctx, <SeccionPlan alAbrirPlan={abrir} />);
     expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLAN_GRATIS);
+    expect(screen.getByTestId(ID.ajustesPlanTitulo)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleResumenPlan(TITULO_PLAN_GRATIS, resumenPlan(obtenerPlan(p.ctx)).detalle),
+    );
     expect(screen.getByTestId(ID.ajustesPlanVer)).toHaveProp('accessibilityHint', PISTA_VER_PLANES);
     fireEvent.press(screen.getByTestId(ID.ajustesPlanVer));
     expect(abrir).toHaveBeenCalled();
@@ -182,7 +218,8 @@ describe('pantalla del plan', () => {
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: sinOfertas });
     await waitFor(() => expect(screen.getByTestId(ID.vacioOfertas)).toBeTruthy());
     expect(screen.getByTestId(ID.vacioOfertas)).toHaveTextContent(MENSAJE_OFERTAS_VACIAS);
-    expect(screen.getByTestId(ID.intentar)).toBeTruthy();
+    expect(screen.getByTestId(ID.intentar)).toHaveProp('accessibilityHint', PISTA_INTENTAR);
+    expect(screen.getByTestId(ID.vacioOfertas)).toHaveProp('accessibilityLiveRegion', 'polite');
   });
 
   it('¿Me alcanza? en Gratis explica que es de Plus; en Plus abre la pantalla', () => {

@@ -14,8 +14,17 @@ import {
   ETIQUETA_VER_PLANES,
   ETIQUETA_VOLVER,
   esMensajeErrorPlan,
+  etiquetaAccesibleBeneficioPlus,
+  etiquetaAccesibleIncluyeGratis,
+  etiquetaAccesibleMensajePlan,
+  etiquetaAccesibleOfertaDetalle,
+  etiquetaAccesibleResumenPlan,
+  PISTA_ADMINISTRAR,
+  PISTA_INTENTAR,
+  PISTA_RESTAURAR,
   PISTA_VER_PLANES,
   PISTA_VOLVER,
+  pistaComprarOferta,
   ID,
   INCLUYE_GRATIS,
   INCLUYE_PLUS,
@@ -122,11 +131,20 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       </Texto>
 
       <Tarjeta testID={ID.actual}>
-        <Texto variante="subtitulo" testID={ID.titulo}>
+        <Texto
+          variante="subtitulo"
+          testID={ID.titulo}
+          accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
+        >
           {resumen.titulo}
         </Texto>
         {resumen.detalle ? (
-          <Texto variante="cuerpo" tono="secundario" testID={ID.detalle}>
+          <Texto
+            variante="cuerpo"
+            tono="secundario"
+            testID={ID.detalle}
+            importantForAccessibility="no"
+          >
             {resumen.detalle}
           </Texto>
         ) : null}
@@ -135,6 +153,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             etiqueta={ETIQUETA_ADMINISTRAR}
             variante="secundario"
             alPresionar={() => void compras.administrar().catch(() => undefined)}
+            pista={PISTA_ADMINISTRAR}
             testID={ID.administrar}
           />
         ) : null}
@@ -142,12 +161,21 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
 
       <Tarjeta testID={ID.incluye}>
         <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
-        <View style={{ gap: espacio.xs }}>
+        <View accessibilityRole="list" style={{ gap: espacio.xs }}>
           {INCLUYE_PLUS.map((t) => (
-            <Texto key={t} variante="cuerpo">{`• ${t}`}</Texto>
+            <Texto
+              key={t}
+              variante="cuerpo"
+              accessibilityRole="listitem"
+              accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
+            >{`• ${t}`}</Texto>
           ))}
         </View>
-        <Texto variante="secundario" tono="secundario">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLabel={etiquetaAccesibleIncluyeGratis()}
+        >
           {INCLUYE_GRATIS}
         </Texto>
       </Tarjeta>
@@ -159,7 +187,12 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
               {MENSAJE_SIN_TIENDA}
             </Texto>
           ) : ofertas.tipo === 'cargando' ? (
-            <Texto variante="secundario" tono="secundario" testID={ID.cargando}>
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              accessibilityLiveRegion="polite"
+              testID={ID.cargando}
+            >
               {CARGANDO_OFERTAS}
             </Texto>
           ) : ofertas.tipo === 'error' ? (
@@ -178,18 +211,25 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
                 etiqueta={ETIQUETA_INTENTAR}
                 variante="secundario"
                 alPresionar={cargar}
+                pista={PISTA_INTENTAR}
                 testID={ID.intentar}
               />
             </>
           ) : ofertas.ofertas.length === 0 ? (
             <>
-              <Texto variante="cuerpo" tono="secundario" testID={ID.vacioOfertas}>
+              <Texto
+                variante="cuerpo"
+                tono="secundario"
+                accessibilityLiveRegion="polite"
+                testID={ID.vacioOfertas}
+              >
                 {MENSAJE_OFERTAS_VACIAS}
               </Texto>
               <Boton
                 etiqueta={ETIQUETA_INTENTAR}
                 variante="secundario"
                 alPresionar={cargar}
+                pista={PISTA_INTENTAR}
                 testID={ID.intentar}
               />
             </>
@@ -204,9 +244,15 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
                     cargando={ocupado === o.id}
                     deshabilitado={ocupado !== null}
                     alPresionar={() => void comprar(o.id)}
+                    pista={pistaComprarOferta(o)}
                     testID={ID.oferta(o.periodo)}
                   />
-                  <Texto variante="secundario" tono="secundario">
+                  <Texto
+                    variante="secundario"
+                    tono="secundario"
+                    testID={ID.ofertaDetalle(o.periodo)}
+                    accessibilityLabel={etiquetaAccesibleOfertaDetalle(e.detalle)}
+                  >
                     {e.detalle}
                   </Texto>
                 </View>
@@ -227,6 +273,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
           tono={esMensajeErrorPlan(mensaje) ? 'faltante' : undefined}
           accessibilityRole={esMensajeErrorPlan(mensaje) ? 'alert' : 'text'}
           accessibilityLiveRegion="polite"
+          accessibilityLabel={etiquetaAccesibleMensajePlan(mensaje)}
           importantForAccessibility="yes"
           testID={ID.mensaje}
         >
@@ -242,6 +289,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
           cargando={ocupado === 'restaurar'}
           deshabilitado={ocupado !== null}
           alPresionar={() => void restaurar()}
+          pista={PISTA_RESTAURAR}
           testID={ID.restaurar}
         />
       ) : null}
@@ -258,11 +306,20 @@ export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
   return (
     <Tarjeta testID={ID.ajustesPlan}>
       <Texto variante="subtitulo">{SECCION_AJUSTES}</Texto>
-      <Texto variante="cuerpo" testID={ID.ajustesPlanTitulo}>
+      <Texto
+        variante="cuerpo"
+        testID={ID.ajustesPlanTitulo}
+        accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
+      >
         {resumen.titulo}
       </Texto>
       {resumen.detalle ? (
-        <Texto variante="secundario" tono="secundario" testID={ID.ajustesPlanDetalle}>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID={ID.ajustesPlanDetalle}
+          importantForAccessibility="no"
+        >
           {resumen.detalle}
         </Texto>
       ) : null}
