@@ -65,9 +65,10 @@ export { MENSAJE_ERROR_GENERAL, MENSAJE_NO_ENTENDI, mensajeError };
 /** Placeholder del campo «Escribir» en el panel (`02 §5.9`). */
 export const EJEMPLO_CAMPO_REGISTRAR = 'tacos 80 en efectivo';
 
-/** Acciones en la tarjeta de respuesta de consulta (`06 §6`, RF-CON-01). */
+/** CTAs en tarjetas de consulta y explicar (`06 §6`, RF-CON-01 / RF-CON-02). */
 export const BTN_VER_PLUS = 'Ver Plus';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
+export const BTN_VER_MOVIMIENTOS_CHEVRON = 'Ver movimientos ›';
 export const BTN_LISTO = 'Listo';
 
 export const MENSAJE_POR_INTERPRETAR =

@@ -10,7 +10,12 @@ import {
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
-import { MENSAJE_EXPLICAR_SOLO_PLUS } from './textos';
+import {
+  BTN_LISTO,
+  BTN_VER_MOVIMIENTOS_CHEVRON,
+  BTN_VER_PLUS,
+  MENSAJE_EXPLICAR_SOLO_PLUS,
+} from './textos';
 
 export type ExplicacionMostrable = Extract<
   RespuestaExplicar,
@@ -94,7 +99,7 @@ export function TarjetaExplicacion({
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
         {mostrarVerPlus ? (
           <Boton
-            etiqueta="Ver Plus"
+            etiqueta={BTN_VER_PLUS}
             variante="secundario"
             ancho="contenido"
             alPresionar={abrirPlan}
@@ -103,14 +108,14 @@ export function TarjetaExplicacion({
         ) : null}
         {filtro && Object.keys(filtro).length > 0 && alVerMovimientos ? (
           <Boton
-            etiqueta="Ver movimientos ›"
+            etiqueta={BTN_VER_MOVIMIENTOS_CHEVRON}
             variante="secundario"
             ancho="contenido"
             alPresionar={() => alVerMovimientos(filtro)}
             testID="boton-ver-movimientos-explicar"
           />
         ) : null}
-        <Boton etiqueta="Listo" variante="texto" ancho="contenido" alPresionar={alCerrar} />
+        <Boton etiqueta={BTN_LISTO} variante="texto" ancho="contenido" alPresionar={alCerrar} />
       </View>
       {mostrarPie ? (
         <Texto variante="secundario" tono="secundario" testID="explicacion-pie">
