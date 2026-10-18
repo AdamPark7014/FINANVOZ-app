@@ -26,6 +26,7 @@ import { abrirPruebaPantalla, conEscenario, escenario, vector } from '../princip
 import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
+import { PISTA_CAPTURA_AHORA_NO } from '../onboarding/textos';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 import { guiaCapturaInactiva, TarjetaCapturaInactiva } from './TarjetasCaptura';
 import {
@@ -377,6 +378,17 @@ describe('O6 · activar la captura', () => {
     permiso = 'concedido';
     await act(async () => fireEvent.press(screen.getByTestId('o6-ya')));
     expect(screen.getByText('¿Qué apps de banco leo?')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('O6 onboarding sobreescribe la pista TalkBack de «Ahora no»', () => {
+    const p = eCaptura();
+    conCaptura(
+      p.ctx,
+      puenteFalso(),
+      <ActivarCaptura testID="onb" alTerminar={jest.fn()} pistaAhoraNo={PISTA_CAPTURA_AHORA_NO} />,
+    );
+    expect(screen.getByTestId('onb-ahora-no')).toHaveProp('accessibilityHint', PISTA_CAPTURA_AHORA_NO);
     p.cerrar();
   });
 

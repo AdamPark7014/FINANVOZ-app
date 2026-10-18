@@ -48,10 +48,13 @@ type Paso =
 export function ActivarCaptura({
   testID,
   alTerminar,
+  pistaAhoraNo = PISTA_AHORA_NO_ACTIVAR_CAPTURA,
 }: {
   testID: string;
   /** "Continuar" / "Ahora no": la captura quedó activa o no. */
   alTerminar: (activada: boolean) => void;
+  /** TalkBack en «Ahora no» (O6 onboarding usa `PISTA_CAPTURA_AHORA_NO`). */
+  pistaAhoraNo?: string;
 }) {
   const { ctx, refrescar } = useSesion();
   const { puente } = useCaptura();
@@ -130,7 +133,7 @@ export function ActivarCaptura({
       variante="texto"
       alPresionar={() => alTerminar(false)}
       testID={`${testID}-ahora-no`}
-      pista={PISTA_AHORA_NO_ACTIVAR_CAPTURA}
+      pista={pistaAhoraNo}
     />
   );
 
