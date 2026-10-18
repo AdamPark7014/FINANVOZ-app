@@ -6,20 +6,21 @@
 
 ## Hecho en este turno
 
-- **Arqueo efectivo TalkBack/copy:** textos compartidos en `arqueo/textos.ts` (tarjeta Hoy, `TarjetaArqueo`, confirmación `LISTO`/`ABRIR`, Cuentas `etiquetaContarEnCuenta`); pruebas accesibilidad arqueo por labels en chips; acumulado en commits recientes de Hoy/captura.
+- **Onboarding O1–O7:** tips en `tips.ts` (re-export `textos.ts`), `etiquetaTipOnboarding`, pistas TalkBack en CTAs O1–O7; tests onboarding en verde (`aaf0f92` y sucesivos).
 
 ## Hecho (acumulado reciente)
 
-- Hoy CTAs pistas, CampoMonto, PreviaWidget. Ver `git log`.
+- Hoy CTAs TalkBack, PreviaWidget, captura Ajustes. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (`tandas.test`, `ui/README`, etc.) — no mezclar sin revisar.
-- CI Windows, M0: Adam.
+- WIP ajeno si `git status` muestra cambios fuera de onboarding.
+- CI Windows; M0 Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. Descartar o commitear WIP local antes del siguiente turno.
 
 ## No tocar
 
