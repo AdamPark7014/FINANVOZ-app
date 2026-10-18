@@ -33,6 +33,20 @@ function preparar(): { ctx: Contexto } {
   return { ctx: { ...p.ctx, catalogoSuscripciones: v.catalogo } };
 }
 
+describe('textos de suscripciones', () => {
+  it('estado vacío sin cifras y ayuda en plural', () => {
+    expect(TEXTO_SUSCRIPCIONES_VACIO).not.toMatch(/\$/);
+    expect(PISTA_AYUDA).toContain('Conviértelas');
+  });
+
+  it('mensajes de acción y renombrar', () => {
+    expect(mensajeAccionSuscripcion('no_es', 'Dominio web')).toBe(
+      'Listo: Dominio web ya no aparece como suscripción.',
+    );
+    expect(mensajeNombreGuardado('Dominio web')).toBe('Listo: la llamo Dominio web.');
+  });
+});
+
 describe('Suscripciones (02 §20)', () => {
   it('CA-M10-01 · muestra las 5 activas con monto y fecha, el resumen, "antes $115" y Disney Plus aparte', () => {
     const { ctx } = preparar();
