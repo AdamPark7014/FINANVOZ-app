@@ -89,7 +89,9 @@ export function PantallaCuentas({
       </View>
 
       <Seccion titulo="Tienes" testID="seccion-tienes">
-        {v.tienes.length === 0 ? <Vacio texto="Todavía no agregas cuentas." /> : null}
+        {v.tienes.length === 0 ? (
+          <Vacio texto={TEXTO_CUENTAS_TIENES_VACIO} testID="cuentas-tienes-vacio" />
+        ) : null}
         {v.tienes.map((c) => (
           <Fila
             key={c.id}
@@ -110,7 +112,9 @@ export function PantallaCuentas({
       </Seccion>
 
       <Seccion titulo="Debes" testID="seccion-debes">
-        {v.debes.length === 0 ? <Vacio texto="No debes nada registrado." /> : null}
+        {v.debes.length === 0 ? (
+          <Vacio texto={TEXTO_CUENTAS_DEBES_VACIO} testID="cuentas-debes-vacio" />
+        ) : null}
         {v.debes.map((d) =>
           d.tipo === 'tarjeta' ? (
             <TarjetaCredito
@@ -156,7 +160,9 @@ export function PantallaCuentas({
       ) : null}
 
       <Seccion titulo="Compromisos" subtitulo="Próximos 30 días" testID="seccion-compromisos">
-        {v.compromisos.length === 0 ? <Vacio texto="No tienes pagos en los próximos 30 días." /> : null}
+        {v.compromisos.length === 0 ? (
+          <Vacio texto={TEXTO_CUENTAS_COMPROMISOS_VACIO} testID="cuentas-compromisos-vacio" />
+        ) : null}
         {v.compromisos.map((c) => (
           <Fila
             key={`${c.programadoId}:${c.fecha}`}

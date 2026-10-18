@@ -170,6 +170,16 @@ export function encabezadoFecha(diaSemana: string, diaMes: string): string {
   return capitalizar(`${diaSemana} ${mes}`.trim());
 }
 
+/** Héroe de Hoy (`02 §4`, `02 §4.2`): título, subtítulo y contexto de TalkBack de la cifra. */
+export const TITULO_HOY_PUEDES_GASTAR = 'Hoy puedes gastar';
+export const TITULO_HOY_LIBRE_NEGATIVO = 'Hoy:';
+export const CONTEXTO_CIFRA_HOY_PUEDES = TITULO_HOY_PUEDES_GASTAR;
+/** "Hoy: $0" en libre negativo; no decir "puedes gastar" cuando la cifra es cero por faltante. */
+export const CONTEXTO_CIFRA_LIBRE_NEGATIVO = 'Hoy';
+export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
+export const SUBTITULO_SIN_INGRESO =
+  'Así reparto tu dinero libre hasta tu próximo pago.';
+
 // ——— Modo explicar (`02 §22`) ———
 
 export const MENSAJE_EXPLICANDO = 'Revisando tus datos…';

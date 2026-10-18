@@ -32,7 +32,15 @@ import { CandadoPlus } from '../plan/CandadoPlus';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';
-import { encabezadoFecha } from './textos';
+import {
+  CONTEXTO_CIFRA_HOY_PUEDES,
+  CONTEXTO_CIFRA_LIBRE_NEGATIVO,
+  encabezadoFecha,
+  SUBTITULO_SIN_INGRESO,
+  TITULO_HOY_LIBRE_NEGATIVO,
+  TITULO_HOY_PUEDES_GASTAR,
+  TITULO_SIN_INGRESO,
+} from './textos';
 
 export interface NavegacionHoy {
   /** Movimientos; con filtro desde "Ver movimientos" de una consulta (`06 §6`). */
@@ -164,9 +172,9 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
   if (vista.estado === 'sin_ingreso') {
     return (
       <View style={{ gap: espacio.m }}>
-        <Texto variante="titulo">{vista.mensaje ?? 'Dime cada cuándo te pagan'}</Texto>
+        <Texto variante="titulo">{vista.mensaje ?? TITULO_SIN_INGRESO}</Texto>
         <Texto variante="secundario" tono="secundario">
-          Con eso reparto tu dinero libre hasta tu próximo pago.
+          {SUBTITULO_SIN_INGRESO}
         </Texto>
         <Boton
           etiqueta="Decir cada cuándo me pagan"

@@ -84,15 +84,15 @@ export function FormularioContrasena({
       ) : null}
       <CampoTexto
         testID="respaldo-contrasena"
-        etiqueta={cambiando ? 'Contraseña nueva' : 'Contraseña del respaldo'}
-        ayuda={`Al menos ${MIN_CONTRASENA_RESPALDO} caracteres. Una frase de varias palabras es fácil de recordar.`}
+        etiqueta={cambiando ? ETIQUETA_CONTRASENA_NUEVA : ETIQUETA_CONTRASENA}
+        ayuda={ayudaContrasena()}
         valor={contrasena}
         alCambiar={setContrasena}
         nativo={NATIVO_CONTRASENA}
       />
       <CampoTexto
         testID="respaldo-contrasena-confirmar"
-        etiqueta="Escríbela otra vez"
+        etiqueta={ETIQUETA_CONFIRMAR_CONTRASENA}
         valor={confirmacion}
         alCambiar={setConfirmacion}
         error={error}
