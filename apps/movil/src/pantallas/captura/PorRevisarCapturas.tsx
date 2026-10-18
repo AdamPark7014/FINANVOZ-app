@@ -236,7 +236,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
         ) : null}
       </View>
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}

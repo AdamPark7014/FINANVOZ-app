@@ -501,7 +501,9 @@ describe('Cuentas', () => {
     expect(textoDe(`cuenta-${p.e.cuentas.nu}-saldo`)).toBe('$2,000');
     expect(screen.getByText('internet')).toBeTruthy();
     expect(screen.getByText('mié 14')).toBeTruthy();
-    expect(screen.getByText(BTN_AJUSTES_CUENTAS)).toBeTruthy();
+    expect(screen.getByTestId('boton-ajustes').props.accessibilityLabel).toBe(
+      BTN_AJUSTES_CUENTAS_ACCESIBLE,
+    );
     fireEvent.press(screen.getByTestId('boton-ajustes'));
     expect(alAbrirAjustes).toHaveBeenCalled();
   });

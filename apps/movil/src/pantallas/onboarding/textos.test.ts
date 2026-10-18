@@ -14,6 +14,8 @@ import {
   etiquetaTipOnboarding,
   PASOS_ONBOARDING,
   PISTA_MARCAR_CASILLA_DATOS,
+  PISTA_ONB_CONTINUAR,
+  PISTA_ONB_EMPEZAR,
   TITULO_BIENVENIDA,
   TITULO_COLCHON,
   TITULO_CONSENTIMIENTO,
@@ -62,6 +64,21 @@ describe('textos de onboarding', () => {
 
   it('TalkBack del consejo antepone «Consejo»', () => {
     expect(etiquetaTipOnboarding(TIP_INGRESO_SALTAR)).toBe(`Consejo: ${TIP_INGRESO_SALTAR}`);
+    for (const tip of [
+      TIP_PAGOS_SALTAR,
+      TIP_CUENTAS_MINIMO,
+      TIP_COLCHON_SIN_POR_AHORA,
+      TIP_CAPTURA_AHORA_NO,
+    ]) {
+      expect(etiquetaTipOnboarding(tip)).toBe(`Consejo: ${tip}`);
+    }
+  });
+
+  it('pistas TalkBack de Empezar y Continuar describen el recorrido', () => {
+    expect(PISTA_ONB_EMPEZAR).toMatch(/recorrido/i);
+    expect(PISTA_ONB_CONTINUAR).toMatch(/siguiente paso/i);
+    expect(PISTA_ONB_EMPEZAR).not.toMatch(/!/);
+    expect(PISTA_ONB_CONTINUAR).not.toMatch(/!/);
   });
 
   it('O3 y O4 cumplen 02 §14: tuteo y sin exclamación', () => {

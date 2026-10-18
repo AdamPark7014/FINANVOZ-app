@@ -149,6 +149,9 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const b = en(B, <PantallaGrupoCompartido grupoId={grupo} alVolver={jest.fn()} />);
     await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Están a mano'));
     expect(screen.getByTestId('grupo-movimientos-vacio')).toHaveTextContent(TEXTO_GRUPO_MOVIMIENTOS_VACIO);
+    expect(screen.getByTestId('grupo-movimientos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioGrupoMovimientos(),
+    );
     fireEvent.press(screen.getByTestId('grupo-agregar'));
     fireEvent.changeText(screen.getByTestId('compartido-total'), '1200');
     fireEvent.changeText(screen.getByTestId('compartido-descripcion'), 'Súper');

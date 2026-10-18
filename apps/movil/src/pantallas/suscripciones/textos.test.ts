@@ -1,8 +1,10 @@
 import {
+  etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
   TEXTO_SUSCRIPCIONES_VACIO,
+  TITULO_PANTALLA,
 } from './textos';
 
 describe('textos de suscripciones (02 §20)', () => {

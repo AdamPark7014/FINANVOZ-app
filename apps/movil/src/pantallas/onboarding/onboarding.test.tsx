@@ -82,6 +82,7 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
     expect(screen.getByText(TITULO_BIENVENIDA)).toBeTruthy();
     expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
+    expect(screen.getByTestId('onb-empezar')).toHaveProp('accessibilityHint', PISTA_ONB_EMPEZAR);
   });
 
   it('CA-M2-05 · no se escribe nada antes de aceptar; al aceptar queda la evidencia', () => {
@@ -234,6 +235,18 @@ describe('onboarding', () => {
         ['BBVA', 420_000],
       ]),
     );
+  });
+
+  it('O5 · pagos fijos: pista TalkBack y fila agregada en palabras', () => {
+    aceptarConsentimiento(s.ctx, { datosFinancieros: true });
+    abrir('/onboarding/pagos-fijos');
+    expect(screen.getByTestId('onb-pagos-continuar')).toHaveProp('accessibilityHint', PISTA_PAGOS_SALTAR);
+    tocar('onb-pago-renta');
+    escribir('onb-pago-monto', '4,500');
+    escribir('onb-pago-dia', '1');
+    tocar('onb-pago-agregar');
+    expect(screen.getByTestId('onb-pagos-continuar')).toHaveProp('accessibilityHint', PISTA_PAGOS_CONTINUAR);
+    expect(screen.getByTestId(/^onb-pago-agregado-/).props.accessibilityLabel).toMatch(/pesos/);
   });
 
   it('con el onboarding completo, "/" lleva a Hoy', () => {

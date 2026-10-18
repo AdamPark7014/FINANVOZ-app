@@ -6,26 +6,28 @@
 
 ## Hecho en este turno
 
-- **Hoy CTAs TalkBack:** `PISTA_*` en `principal/textos.ts`; `PantallaHoy` usa `pista` → `accessibilityHint` (desglose, ingreso, arqueo, aviso, ¿Me alcanza?); tests `principal.test.tsx` y `app/(tabs)/hoy.test.tsx`.
+- **Compartidos:** `compartidos-titulo` con `accessibilityRole="header"` (TalkBack §15; ya cubierto en `compartido.test.tsx`).
 
 ## Hecho (acumulado reciente)
 
-- CampoMonto, PreviaWidget, captura/onboarding headers, suscripciones TalkBack. Ver `git log`.
+- Movimientos/Cuentas/Registrar headers, onboarding consent pista, EstadoVacio. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo: revisar `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. CTAs secundarios en tarjetas de acción de Hoy si hace falta más polish.
+2. Headers TalkBack en pantallas restantes si hace falta.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

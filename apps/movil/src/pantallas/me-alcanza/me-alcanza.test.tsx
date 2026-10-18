@@ -559,7 +559,9 @@ describe('Hoy · probabilidad de llegar', () => {
     expect(textoDe('probabilidad-etiqueta')).toBe('estimación inicial');
     expect(textoDe('probabilidad-texto')).toMatch(/^(< 1|> 99|\d{1,2}) % de llegar sin tocar tu colchón$/);
     const texto = textoDe('probabilidad-texto');
-    expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(texto);
+    const etiqueta = textoDe('probabilidad-etiqueta');
+    expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(`${texto}. ${etiqueta}`);
+    expect(screen.getByTestId('probabilidad-texto')).toHaveProp('importantForAccessibility', 'no');
     segunda.unmount();
 
     // CA-M6-06 en pantalla: al volver a abrir Hoy el mismo día sale lo mismo, al instante.
