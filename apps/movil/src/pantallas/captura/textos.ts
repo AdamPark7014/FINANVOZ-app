@@ -7,7 +7,7 @@ export const TITULO_CAPTURAS_POR_REVISAR = 'Capturas por revisar';
 export const INTRO_CAPTURAS_POR_REVISAR =
   'Vienen de avisos de tu banco. Confírmalas o corrige categoría y meses.';
 export const TEXTO_CAPTURAS_POR_REVISAR_VACIO =
-  'Todo al día. Si un aviso no queda claro, aparece aquí para que lo confirmes.';
+  'Todo al día. Cuando un aviso no quede claro, lo verás aquí para confirmarlo.';
 
 /** TalkBack: título de sección + copy del estado vacío (`02 §15`). */
 export function etiquetaVacioCapturasPorRevisar(): string {

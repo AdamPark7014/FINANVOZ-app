@@ -186,6 +186,7 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
         <Boton
           etiqueta="Decir cada cuándo me pagan"
           alPresionar={alConfigurarIngreso}
+          pista={PISTA_CONFIGURAR_INGRESO_HOY}
           testID="boton-configurar-ingreso"
         />
       </View>

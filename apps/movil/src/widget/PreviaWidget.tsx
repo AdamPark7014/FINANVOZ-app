@@ -40,10 +40,15 @@ export function PreviaWidget({
           style={estilos.fila}
           importantForAccessibility="no-hide-descendants"
         >
-          <Text importantForAccessibility="no" style={[estilos.titulo, { color: c.texto }]}>
+          <Text
+            testID="previa-widget-titulo"
+            importantForAccessibility="no"
+            style={[estilos.titulo, { color: c.texto }]}
+          >
             {vista.titulo}
           </Text>
           <Text
+            testID="previa-widget-cifra"
             importantForAccessibility="no"
             style={[
               estilos.cifra,

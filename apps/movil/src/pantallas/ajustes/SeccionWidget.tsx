@@ -39,7 +39,7 @@ export function SeccionWidget() {
       <Texto variante="secundario" tono="secundario" testID="ajustes-widget-instrucciones">
         {TEXTO_INSTRUCCION}
       </Texto>
-      <Texto variante="etiqueta" style={{ marginTop: espacio.m }}>
+      <Texto variante="etiqueta" testID="ajustes-widget-previa-etiqueta" style={{ marginTop: espacio.m }}>
         {ETIQUETA_PREVIA}
       </Texto>
       <View testID="ajustes-widget-previa" style={{ marginTop: espacio.xs }}>
