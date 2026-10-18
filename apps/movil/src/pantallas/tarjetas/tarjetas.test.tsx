@@ -38,6 +38,7 @@ import {
   AYUDA_SALDO_A_FAVOR,
   ERROR_ORIGEN_PAGO,
   TEXTO_TARJETA_NO_ENCONTRADA,
+  TITULO_CONFIRMAR_MSI,
   VACIO_MSI_TARJETA,
   VACIO_MOVIMIENTOS_TARJETA,
 } from './textos';
@@ -183,7 +184,7 @@ describe('Registrar', () => {
     fireEvent.changeText(screen.getByTestId('campo-registrar'), caso.texto);
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     const tarjeta = await screen.findByTestId('confirmacion-msi');
-    expect(within(tarjeta).getByText('Es un monto alto. Revísalo antes de guardar.')).toBeTruthy();
+    expect(within(tarjeta).getByText(TITULO_CONFIRMAR_MSI.monto_alto)).toBeTruthy();
     expect(within(tarjeta).getByText('Compra a 12 meses sin intereses')).toBeTruthy();
     expect(listarMovimientos(p.ctx)).toEqual([]);
 

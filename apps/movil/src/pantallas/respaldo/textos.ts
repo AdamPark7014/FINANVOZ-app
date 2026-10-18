@@ -15,6 +15,9 @@ export const ETIQUETA_VOLVER = 'Volver';
 /** TalkBack en Ajustes → Respaldo (`02 §15`). */
 export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
 export const PISTA_VOLVER = 'Cierra esta pantalla';
+/** TalkBack en restaurar (onboarding, privacidad o respaldo). */
+export const ACCESIBILIDAD_VOLVER_RESTAURAR = 'Volver';
+export const PISTA_VOLVER_RESTAURAR = 'Regresa al paso anterior';
 export const PISTA_BORRAR_CUENTA = 'Elimina tu cuenta de respaldo en la nube';
 export const TITULO_RESPALDO = 'Respaldo';
 export const SUBTITULO_NUBE = 'En la nube';

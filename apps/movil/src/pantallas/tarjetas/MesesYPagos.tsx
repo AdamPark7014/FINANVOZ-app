@@ -39,6 +39,7 @@ import {
   TITULO_COMPROMISO_MSI,
   TITULO_MESES_SIN_INTERESES,
   TITULO_PAGOS_PLANEADOS,
+  BTN_CANCELAR,
   textoConfirmarLiquidar,
   VACIO_MSI_TARJETA,
 } from './textos';
@@ -99,7 +100,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
               }
             }}
           />
-          <Boton etiqueta="Cancelar" variante="texto" alPresionar={() => setConfirmando(false)} />
+          <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={() => setConfirmando(false)} />
         </View>
       ) : null}
       {activo && !confirmando ? (
@@ -124,7 +125,12 @@ export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
   return (
     <Seccion titulo={TITULO_MESES_SIN_INTERESES} testID="tarjeta-meses">
       {planes.length === 0 ? (
-        <Texto variante="cuerpo" tono="secundario" testID="tarjeta-meses-vacio">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="tarjeta-meses-vacio"
+          accessibilityLiveRegion="polite"
+        >
           {VACIO_MSI_TARJETA}
         </Texto>
       ) : null}
@@ -299,7 +305,7 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
         </Texto>
       ) : null}
       <Boton etiqueta="Guardar pago planeado" alPresionar={guardar} testID="pago-planeado-guardar" />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alTerminar} />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
     </View>
   );
 }

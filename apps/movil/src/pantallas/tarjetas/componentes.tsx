@@ -11,7 +11,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
@@ -90,12 +90,15 @@ export function ElegirCuenta({
   const cuentas = useVista((ctx) => listarCuentas(ctx).tienes);
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="secundario">{pregunta}</Texto>
+      <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {pregunta}
+      </Texto>
       <GrupoChips
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={valor}
         alCambiar={alElegir}
         prefijoTestID={prefijoTestID}
+        etiqueta={pregunta}
       />
     </View>
   );

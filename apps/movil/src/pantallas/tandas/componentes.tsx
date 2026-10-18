@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { aportarTanda, cobrarTanda, listarCuentas, type MovimientoTanda } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Texto } from '../../ui';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { codigoError, mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import {

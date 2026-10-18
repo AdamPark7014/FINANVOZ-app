@@ -33,6 +33,11 @@ export const TEXTO_CARD_AJUSTES =
   'Respuestas a las dudas más comunes y nuestro correo de contacto.';
 export const BTN_ABRIR_DESDE_AJUSTES = 'Ver preguntas frecuentes';
 
+/** Alias con los nombres de `ajustes/textos.ts` (reexportar y quitar duplicados). */
+export const SECCION_AYUDA = SECCION_AJUSTES;
+export const TEXTO_AYUDA = TEXTO_CARD_AJUSTES;
+export const BTN_AYUDA = BTN_ABRIR_DESDE_AJUSTES;
+
 export const CONTACTO_TITULO = '¿No encontraste tu respuesta?';
 export const BTN_ESCRIBIR_CORREO = 'Escribir un correo';
 export const PISTA_ESCRIBIR_CORREO = 'Abre tu app de correo';

@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **movil/tarjetas:** copy de `TarjetaConfirmarMsi` centralizado en `textos.ts`; prueba `textos.test.ts`; test MSI usa constantes.
+- **movil/tarjetas:** copy en `textos.ts` (detalle, pago, MSI, vacíos); `Dato` accesible + título `header`; empty `tarjeta-meses-vacio`; `BTN_CANCELAR` unificado; barrel `index.ts`; pruebas vacío/a11y en `tarjetas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Invitación avisos, TarjetaExplicacion, privacidad barrel. Ver `git log`.
+- Oleadas copy movil (Ajustes, plan, captura, suscripciones, ayuda). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (FormularioMovimiento, estados-cuenta tests, plan tests…) — no mezclar.
+- WIP ajeno (principal, estados-cuenta, avisos, captura) — no mezclar.
+- Varios tests en `tarjetas.test.tsx` (Hoy/Cuentas) fallan por copy/testIDs fuera de tarjetas.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Siguiente pantalla con strings en `.tsx` (Movimientos, TarjetasInterpretacion, etc.).
+2. Estabilizar tests tarjetas/Hoy si hace falta en CI.
 
 ## No tocar
 

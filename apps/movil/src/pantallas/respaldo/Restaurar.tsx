@@ -11,6 +11,7 @@ import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, CampoTexto, Tarjeta, Texto } from '../../ui';
 import { FlujoCorreo, type CuentaConfirmada } from './FlujoCorreo';
 import {
+  ACCESIBILIDAD_VOLVER_RESTAURAR,
   AVISO_REEMPLAZA_DATOS,
   BTN_ABRIR_RESPALDO,
   BTN_CANCELAR,

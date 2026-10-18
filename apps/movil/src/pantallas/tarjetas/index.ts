@@ -3,6 +3,8 @@ export { FormularioTarjetaNueva, useFormularioTarjeta } from './FormularioTarjet
 export { FormularioPago, PreguntaLiquidarMeses } from './componentes';
 export { TarjetaConfirmarMsi } from './TarjetaConfirmarMsi';
 export {
+  BTN_CANCELAR,
+  ERROR_ORIGEN_PAGO,
   lineaCuotas,
   mensajeCompraMsi,
   mensajeTarjetaConfigurada,

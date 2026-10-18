@@ -11,6 +11,7 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
+import { BTN_CANCELAR } from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 type SiNo = 'si' | 'no';
@@ -277,7 +278,7 @@ export function FormularioTarjetaNueva({
   prellenado,
   alGuardar,
   alCancelar,
-  etiquetaCancelar = 'Cancelar',
+  etiquetaCancelar = BTN_CANCELAR,
 }: {
   prellenado?: TarjetaPorAgregar | null;
   alGuardar: (t: TarjetaCreada) => void;

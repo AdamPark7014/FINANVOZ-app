@@ -10,6 +10,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
+import { BTN_CANCELAR } from './textos';
 import {
   APOYO_CONFIRMAR_MSI,
   BTN_CANCELAR,
@@ -114,8 +115,8 @@ export function TarjetaConfirmarMsi({
       </View>
       <CampoTexto
         testID="msi-descripcion"
-        etiqueta="¿Qué compraste? (opcional)"
-        ejemplo="tele"
+        etiqueta={ETIQUETA_DESCRIPCION_MSI}
+        ejemplo={EJEMPLO_DESCRIPCION_MSI}
         valor={descripcion}
         alCambiar={setDescripcion}
       />
@@ -124,8 +125,18 @@ export function TarjetaConfirmarMsi({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar" alPresionar={guardar} deshabilitado={!completo} testID="boton-guardar-msi" />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="boton-cancelar-msi" />
+      <Boton
+        etiqueta={BTN_GUARDAR_MSI}
+        alPresionar={guardar}
+        deshabilitado={!completo}
+        testID="boton-guardar-msi"
+      />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID="boton-cancelar-msi"
+      />
     </Tarjeta>
   );
 }

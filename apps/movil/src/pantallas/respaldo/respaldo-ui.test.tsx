@@ -7,6 +7,7 @@ import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { PantallaRespaldo } from './PantallaRespaldo';
+import { Restaurar } from './Restaurar';
 import { TarjetaRespaldo } from './TarjetaRespaldo';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
 import {

@@ -8,7 +8,7 @@ import { Chips } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
-import { NOMBRE_MODO } from './textos';
+import { BTN_CANCELAR, NOMBRE_MODO } from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 
@@ -139,7 +139,7 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
         </Texto>
       ) : null}
       <Boton etiqueta="Guardar cambios" alPresionar={guardar} testID="editar-guardar" />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alTerminar} testID="editar-cancelar" />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} testID="editar-cancelar" />
     </View>
   );
 }
@@ -197,7 +197,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
           }
         }}
       />
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alTerminar} />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
     </View>
   );
 }

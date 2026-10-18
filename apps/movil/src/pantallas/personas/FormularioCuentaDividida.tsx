@@ -15,7 +15,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Cifra, espacio, formatearCentavos, Texto } from '../../ui';
-import { Chip, GrupoChips } from '../principal/Chip';
+import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
   ERROR_DIVISION_CATEGORIA,
@@ -25,6 +25,9 @@ import {
   TEXTO_CONTACTOS_VACIO,
   textoFaltanPersonas,
 } from './textos';
+
+const PREGUNTA_CATEGORIA_PARTE = 'Categoría de tu parte';
+const PREGUNTA_ORIGEN_DIVISION = '¿Con qué pagaste?';
 
 export type RegistradoDivision = Extract<ResultadoTexto, { resultado: 'registrado_division' }>;
 
@@ -266,16 +269,21 @@ export function FormularioCuentaDividida({
         </View>
       </View>
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">Categoría de tu parte</Texto>
+        <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
+          {PREGUNTA_CATEGORIA_PARTE}
+        </Texto>
         <GrupoChips
           opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
           valor={categoria}
           alCambiar={setCategoria}
           prefijoTestID="division-categoria"
+          etiqueta={PREGUNTA_CATEGORIA_PARTE}
         />
       </View>
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">¿Con qué pagaste?</Texto>
+        <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
+          {PREGUNTA_ORIGEN_DIVISION}
+        </Texto>
         {prellenado?.faltaOrigen?.motivo === 'no_encontrada' && prellenado.faltaOrigen.alias ? (
           <Texto variante="secundario" tono="secundario">
             {`No tengo una cuenta «${prellenado.faltaOrigen.alias}». ¿Con cuál fue?`}
@@ -286,6 +294,7 @@ export function FormularioCuentaDividida({
           valor={origenId}
           alCambiar={setOrigenId}
           prefijoTestID="division-origen"
+          etiqueta={PREGUNTA_ORIGEN_DIVISION}
         />
       </View>
       {intentado && pendiente ? (

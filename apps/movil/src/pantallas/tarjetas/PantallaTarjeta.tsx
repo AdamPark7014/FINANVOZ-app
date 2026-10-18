@@ -161,7 +161,12 @@ function Detalle({
         testID="tarjeta-movimientos"
       >
         {d.desdeElCorte.length === 0 ? (
-          <Texto variante="cuerpo" tono="secundario" testID="tarjeta-movimientos-vacio">
+          <Texto
+            variante="cuerpo"
+            tono="secundario"
+            testID="tarjeta-movimientos-vacio"
+            accessibilityLiveRegion="polite"
+          >
             {VACIO_MOVIMIENTOS_TARJETA}
           </Texto>
         ) : null}
@@ -188,7 +193,12 @@ function Detalle({
 
       <Seccion titulo={TITULO_ESTADOS_CUENTA} testID="tarjeta-estados">
         {d.estadosCuenta.length === 0 ? (
-          <Texto variante="cuerpo" tono="secundario" testID="tarjeta-estados-vacio">
+          <Texto
+            variante="cuerpo"
+            tono="secundario"
+            testID="tarjeta-estados-vacio"
+            accessibilityLiveRegion="polite"
+          >
             {textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
           </Texto>
         ) : null}

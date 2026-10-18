@@ -18,7 +18,7 @@ import { Barra, Boton, CampoMonto, CampoTexto, espacio, Pantalla, Tarjeta, Texto
 import { useNotificaciones } from '../avisos/notificaciones';
 import { MensajeError } from '../onboarding/componentes';
 import { leerEntero } from '../onboarding/ingreso';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
