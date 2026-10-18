@@ -171,6 +171,35 @@ Registros: en Logs → Edge Functions cada petición deja `{"usuario_hash":null,
 
 Solicitud ARCO o baja manual de una cuenta: usa `DELETE /respaldo/cuenta` con su sesión o, desde el panel, borra primero la carpeta `respaldos/<usuario>/` en Storage y después el usuario en Authentication (borrar solo el usuario deja sus archivos).
 
+### Limpiar anónimos huérfanos (pendiente 57)
+
+Instalaciones borradas y el flujo `email_exists` (entrar con OTP a una cuenta ya existente) dejan usuarios **anónimos** en Auth que ya no usa ningún teléfono. No tienen respaldo ni Plus; solo ocupan filas en Auth y tablas en cascada (`consentimiento`, conteos de NLU, etc.).
+
+| Archivo | Qué hace |
+|---|---|
+| `migrations/20261301000000_anonimos_sin_uso.sql` | Función `anonimos_sin_uso_candidatos(días)` (solo `service_role`): anónimo, sin correo confirmado, sin objetos en `respaldos/`, sin Plus/Negocio vigente, sin grupo compartido abierto, inactivo más de N días |
+| `_shared/auth/anonimo-sin-uso.ts` | Misma regla en TypeScript (Vitest); debe coincidir con la migración |
+| `scripts/limpiar-anonimos.mjs` | Adam la corre a mano o desde un cron fuera del repo; **simula** por defecto |
+
+**Criterio conservador:** si dudas, sube `--dias` (por defecto 90) antes de usar `--borrar`.
+
+1. `supabase db push` aplica `20261301000000_anonimos_sin_uso.sql`.
+2. Vista previa en el editor SQL (service role): `select * from anonimos_sin_uso_candidatos(90);`
+3. Simulación (solo cuenta candidatos):
+   ```powershell
+   cd services/proxy
+   $env:SUPABASE_URL="https://<ref>.supabase.co"
+   $env:SUPABASE_SERVICE_ROLE_KEY="<service role>"   # Settings → API; nunca al repositorio
+   node scripts/limpiar-anonimos.mjs --dias 90
+   node scripts/limpiar-anonimos.mjs --dias 90 --verbose   # lista uuid e inactivo_desde
+   ```
+4. Borrado real (irreversible; cascada en `consentimiento` y conteos):
+   ```powershell
+   node scripts/limpiar-anonimos.mjs --dias 90 --borrar
+   ```
+
+Programar: en Windows Task Scheduler, GitHub Actions con secretos del proyecto, o similar — **no** hace falta desplegar una Edge Function. No registra montos ni texto; solo conteos y, con `--verbose`, ids para auditoría.
+
 ## M10 · `llm-turno` (`POST /llm/turno`)
 
 Modo explicar (`docs/06-NLU.md §6`, `02 §22`): un turno **sin estado** de un bucle de herramientas. El teléfono manda la pregunta, las llamadas que pidió el modelo y los resultados **agregados** de sus herramientas de solo lectura (las ejecuta contra su libro); el proxy agrega el sistema fijo (`_shared/llm/prompt.ts`) y responde con las llamadas que pide el modelo o con su texto. Las cifras del texto las valida el teléfono: si alguna no aparece en un resultado de herramienta, muestra la respuesta en plantilla (regla 4). La lógica está en `supabase/functions/_shared/llm/` (Vitest); `llm-turno/index.ts` solo conecta Supabase y los proveedores.
