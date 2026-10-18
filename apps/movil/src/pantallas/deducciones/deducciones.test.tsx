@@ -136,6 +136,10 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveTextContent(
       tituloPantallaDeducciones(2026),
     );
+    expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveProp(
+      'accessibilityRole',
+      'header',
+    );
 
     const v = deduccionE13('E13-10');
     llenarPerfil('PEPJ800101AB', '300,000');

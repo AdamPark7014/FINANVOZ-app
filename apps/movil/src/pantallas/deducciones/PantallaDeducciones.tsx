@@ -130,7 +130,11 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         ancho="contenido"
         alPresionar={alVolver}
       />
-      <Texto variante="titulo" testID="deducciones-titulo-pantalla">
+      <Texto
+        variante="titulo"
+        testID="deducciones-titulo-pantalla"
+        accessibilityRole="header"
+      >
         {tituloPantallaDeducciones(v.ejercicio)}
       </Texto>
       {v.ejercicios.length > 1 ? (

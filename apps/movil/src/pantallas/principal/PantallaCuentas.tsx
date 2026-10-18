@@ -22,6 +22,7 @@ import {
   Texto,
 } from '../../ui';
 import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
+import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { EstadoVacio } from './EstadoVacio';
 import {
   contextoSaldoCompromiso,

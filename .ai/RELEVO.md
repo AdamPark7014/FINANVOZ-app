@@ -6,25 +6,28 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** botón Suscripciones usa `BTN_SUSCRIPCIONES_CUENTAS` en `suscripciones/textos.ts` (simétrico a deducciones).
+- **EstadoVacio:** prueba de `etiquetaAccesible` → `accessibilityLabel` (TalkBack con título de sección en Cuentas).
 
 ## Hecho (acumulado reciente)
 
-- Pestañas TalkBack, deducciones `BTN_DEDUCCIONES_CUENTAS`, onboarding copy en `textos.ts`. Ver `git log`.
+- Deducciones copy, tabs/hoy TalkBack, onboarding/captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 restante en `textos.ts` por pantalla si queda inline.
+2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

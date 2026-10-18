@@ -4,6 +4,9 @@ export const TITULO_PANTALLA = 'Suscripciones';
 export const ETIQUETA_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';
 
+/** Entrada desde Cuentas (`02 §20`). */
+export const BTN_SUSCRIPCIONES_CUENTAS = 'Ver mis suscripciones';
+
 /** Con filas activas: acciones por suscripción. */
 export const PISTA_AYUDA =
   'Conviértelas en compromiso y Hoy las aparta; o avisa si ya no las pagas o no son suscripción.';
