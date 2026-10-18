@@ -12,6 +12,10 @@ export const OPCIONES_FRECUENCIA_TANDA: readonly { valor: FrecuenciaTanda; etiqu
 /** "No es ingreso, y lo dice" (`02 §18`). */
 export const TEXTO_NO_ES_INGRESO = 'Esto es tu dinero de vuelta, no un ingreso.';
 
+/** Lista de tandas vacía (`02 §18`). */
+export const TEXTO_TANDAS_VACIO =
+  'Agrega tu tanda y aparto cada aportación el día que toca.';
+
 export const textoAportado = (centavos: number) => `Llevas ${formatearCentavos(centavos)} aportados`;
 export const textoEnRiesgo = (centavos: number) =>
   `Si la tanda se cae, arriesgas ${formatearCentavos(centavos)}`;

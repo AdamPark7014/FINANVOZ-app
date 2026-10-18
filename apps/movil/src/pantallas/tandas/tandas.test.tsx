@@ -60,6 +60,14 @@ const entradaDe = (v: VectorE11) => ({
 });
 
 describe('Tandas (02 §18)', () => {
+  it('sin tandas lo explica y deja crear una nueva', () => {
+    const p = preparar('2026-10-16');
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
+    expect(screen.getByTestId('tandas-vacio')).toBeTruthy();
+    expect(screen.getByTestId('tandas-nueva')).toBeTruthy();
+    expect(screen.queryByTestId(/^tanda-/)).toBeNull();
+  });
+
   it('CA-M8-03 · el formulario crea la tanda de E11-01 con su calendario y la ronda 4 como tu turno', () => {
     const v = vector<VectorE11>('E11-01');
     const esperado = v.esperado as RondaVector[];

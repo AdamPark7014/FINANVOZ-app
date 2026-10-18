@@ -35,7 +35,7 @@ export function PantallaAyuda({
       />
       <Texto variante="titulo">Ayuda</Texto>
       <Texto variante="cuerpo" tono="secundario">
-        Las dudas más comunes. Toca una pregunta para ver la respuesta.
+        Toca una pregunta para ver la respuesta.
       </Texto>
 
       <View style={{ gap: espacio.s }} testID="ayuda-preguntas">
@@ -52,7 +52,7 @@ export function PantallaAyuda({
       <Tarjeta testID="ayuda-contacto">
         <Texto variante="subtitulo">¿No encontraste tu respuesta?</Texto>
         <Texto variante="cuerpo">
-          {`Escríbenos a ${CORREO_AYUDA}. Cuéntanos qué pasó; nunca nos mandes contraseñas ni los datos de tus tarjetas.`}
+          {`Escríbenos a ${CORREO_AYUDA}. Cuéntanos qué pasó; no mandes contraseñas ni datos de tarjetas.`}
         </Texto>
         <Boton
           testID="ayuda-escribir"

@@ -3,7 +3,7 @@ import { listarTandas, type TandaCreada } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { Boton, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { FormularioTanda } from './FormularioTanda';
-import { textoEnRiesgo } from './textos';
+import { TEXTO_TANDAS_VACIO, textoEnRiesgo } from './textos';
 
 /**
  * Cuentas → Tandas (`02 §18`, gratis): tus tandas con su próxima aportación y lo que arriesgas, y "Nueva tanda"
@@ -41,8 +41,8 @@ export function PantallaTandas({
       ) : (
         <>
           {tandas.length === 0 ? (
-            <Texto variante="cuerpo" tono="secundario">
-              Agrega tu tanda y aparto cada aportación el día que toca.
+            <Texto variante="cuerpo" tono="secundario" testID="tandas-vacio">
+              {TEXTO_TANDAS_VACIO}
             </Texto>
           ) : null}
           {tandas.map((t) => (
