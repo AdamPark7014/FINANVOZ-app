@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **movil/tarjetas:** copy centralizado en `textos.ts` (pago, MSI, pagos planeados, liquidar); empty `tarjeta-meses-vacio` + movimientos/estados alineados; a11y (`Dato` accesible, título `header`); pruebas vacío y TalkBack en `tarjetas.test.tsx`.
+- **ayuda:** copy UI y FAQ en `textos.ts` (iconos +/-, bloque Ajustes con alias `SECCION_AYUDA` / `TEXTO_AYUDA` / `BTN_AYUDA`); exports en `index.ts`; vitest `textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Oleadas copy/a11y (principal, onboarding, tandas, privacidad, widget). Ver `git log` y `docs/ESTADO.md`.
+- Copy Ajustes, ingreso, cuentas, movimientos, suscripciones, Hoy tab. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento; varios tests de `tarjetas.test.tsx` fallan por `PantallaCuentas`/Hoy (testIDs/copy ajeno), no por este commit.
-- WIP local sin commitear (ingreso, arqueo, estados-cuenta, principal) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno sin commitear — no mezclar salvo pedido explícito.
+- `ajustes/textos.ts`: reexportar alias de ayuda y quitar duplicados.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Estabilizar tests tarjetas/Hoy si fallan en CI.
+2. Oleada Ajustes: `export { SECCION_AYUDA, TEXTO_AYUDA, BTN_AYUDA } from '../ayuda/textos'`.
 
 ## No tocar
 
