@@ -315,6 +315,11 @@ describe('tarjetas/textos · TalkBack', () => {
     expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe(
       'Tele, $500.00 al mes, faltan 6 de 12',
     );
+    expect(
+      etiquetaAccesibleEstadoCuentaTarjeta('10 nov', 450_000, 100_000, 350_000, '30 nov'),
+    ).toBe(
+      'Corte del 10 nov. Lo que debías el día de corte: cuatro mil quinientos pesos. Lo que ya pagaste desde entonces: mil pesos. Para no generar intereses: tres mil quinientos pesos. Fecha límite: 30 nov',
+    );
   });
 });
 

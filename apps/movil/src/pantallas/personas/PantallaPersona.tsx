@@ -374,7 +374,13 @@ function Recordatorio({
         </>
       )}
       {mensaje ? (
-        <Texto variante="secundario" tono="faltante" testID="persona-recordatorio-mensaje">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          testID="persona-recordatorio-mensaje"
+        >
           {mensaje}
         </Texto>
       ) : null}

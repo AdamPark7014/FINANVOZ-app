@@ -22,6 +22,7 @@ import {
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
+  etiquetaAccesibleResumenSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,

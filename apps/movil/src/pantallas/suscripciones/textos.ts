@@ -1,5 +1,7 @@
 /** Copy de Suscripciones (`02 §20`, tuteo). */
 
+import { etiquetaHablada } from '../../ui/formato';
+
 export const TITULO_PANTALLA = 'Suscripciones';
 export const ETIQUETA_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';
