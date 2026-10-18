@@ -13,6 +13,7 @@ import {
   PISTA_AGREGAR_DATOS_COBRO,
   PISTA_BORRAR_DATOS_COBRO,
   PISTA_CAMBIAR_DATOS_COBRO,
+  PISTA_RESUMEN_DATOS_COBRO,
   RESUMEN_VACIO,
   SECCION_DATOS_COBRO,
 } from './datos-cobro-textos';
@@ -46,7 +47,10 @@ export function SeccionDatosCobro() {
             variante="secundario"
             tono="secundario"
             testID="datos-cobro-resumen"
+            accessibilityLiveRegion="polite"
+            importantForAccessibility="yes"
             accessibilityLabel={etiquetaResumenDatosCobro(resumen)}
+            accessibilityHint={PISTA_RESUMEN_DATOS_COBRO}
           >
             {resumen}
           </Texto>

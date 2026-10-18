@@ -117,11 +117,7 @@ describe('accesibilidad en pantalla respaldo', () => {
       'accessibilityHint',
       PISTA_GUARDAR_CONTRASENA,
     );
-    expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
-      'accessibilityHint',
-      PISTA_GUARDAR_CONTRASENA,
-    );
-    expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
+    expect(screen.getByTestId('respaldo-contrasena-cancelar')).toHaveProp(
       'accessibilityHint',
       PISTA_CANCELAR_CONTRASENA,
     );

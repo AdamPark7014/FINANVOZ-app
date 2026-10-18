@@ -6,22 +6,21 @@
 
 ## Hecho en este turno
 
-- **Ayuda TalkBack:** FAQ sin doble lectura de la pregunta (`importantForAccessibility="no"` en el título visible); live region de respuesta con `importantForAccessibility="yes"`; test con `ordenDeLectura`.
+- **PantallaCuentas TalkBack:** pista en engrane Ajustes; `pistaCta` en Debes vacío hacia «Agregar tarjeta»; encabezado Compromisos agrupa «Próximos 30 días».
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget live region, captura Hoy, formulario movimiento. Ver `git log`.
+- ActivarCaptura, PreviaWidget, captura Hoy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP `componentes.test.tsx` (Boton/Chip hints) — turno anterior, no mezclar.
-- WIP paralelo (principal.test.tsx, etc.).
+- WIP paralelo en disco (onboarding, ajustes, captura, suscripciones, tandas, UI Chip, principal.test, etc.) — **no mezclar ni commitear sin revisar**.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack aviso retiro tarjeta en formulario o `ActivarCaptura` «Ahora no».
+2. Salvar o cerrar WIP paralelo; TalkBack hints en CTAs secundarios de Cuentas (Tandas, compartidos) si hace falta.
 
 ## No tocar
 

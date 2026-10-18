@@ -27,3 +27,7 @@ export function lineaResumenClabe(clabeFormateada: string): string {
 export function etiquetaResumenDatosCobro(texto: string): string {
   return `${SECCION_DATOS_COBRO}. ${texto}`;
 }
+
+/** TalkBack: el resumen cambia al guardar o borrar (`02 §17`). */
+export const PISTA_RESUMEN_DATOS_COBRO =
+  'Se actualiza cuando guardas o borras tu celular o CLABE';

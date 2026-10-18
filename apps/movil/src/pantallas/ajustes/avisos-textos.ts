@@ -49,5 +49,7 @@ export const PISTA_PERMITIR_AVISOS = 'Pide permiso para mandarte avisos en este 
 /** TalkBack cuando el permiso está denegado (`02 §12`). */
 export const PISTA_ABRIR_AJUSTES_AVISOS = 'Abre los ajustes del teléfono para activar avisos';
 
+/** TalkBack live region como alerta si la hora no entendió el formato (`02 §12`). */
 export const ERROR_FORMATO_HORA = 'Escribe las horas así: 22:00.';
+/** TalkBack live region al guardar horario (`02 §12`). */
 export const CONFIRMACION_HORARIO = 'Listo. Tus avisos ya usan este horario.';

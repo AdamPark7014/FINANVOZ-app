@@ -101,7 +101,12 @@ export function SeccionAvisos() {
       </Texto>
       {permiso !== null && permiso !== 'concedido' && notificaciones ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="secundario" testID="ajustes-avisos-sin-permiso">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="ajustes-avisos-sin-permiso"
+            accessibilityRole="alert"
+          >
             {AVISOS_APAGADOS_EN_TELEFONO}
           </Texto>
           <Boton
@@ -224,8 +229,10 @@ export function SeccionAvisos() {
       {mensaje ? (
         <Texto
           variante="secundario"
-          tono="secundario"
+          tono={mensaje === ERROR_FORMATO_HORA ? 'faltante' : 'acento'}
+          importantForAccessibility="yes"
           accessibilityLiveRegion="polite"
+          accessibilityRole={mensaje === ERROR_FORMATO_HORA ? 'alert' : undefined}
           testID="ajustes-avisos-mensaje"
         >
           {mensaje}

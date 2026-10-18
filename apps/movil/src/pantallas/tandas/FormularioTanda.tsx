@@ -238,7 +238,11 @@ export function FormularioTanda({
       />
       {propuesta ? (
         <Tarjeta testID="tanda-resumen">
-          <Texto variante="cuerpo">
+          <Texto
+            variante="cuerpo"
+            accessibilityLiveRegion="polite"
+            importantForAccessibility="yes"
+          >
             {textoResumenCobro(
               propuesta.cobro,
               etiquetaFecha(propuesta.fechaCobro),
@@ -270,7 +274,12 @@ export function FormularioTanda({
             alCambiar={setCobro}
           />
           {corregida ? (
-            <Texto variante="secundario" testID="tanda-ya-empezo-texto">
+            <Texto
+              variante="secundario"
+              testID="tanda-ya-empezo-texto"
+              accessibilityLiveRegion="polite"
+              importantForAccessibility="yes"
+            >
               {textoYaEmpezoCompleto(corregida)}
             </Texto>
           ) : null}
