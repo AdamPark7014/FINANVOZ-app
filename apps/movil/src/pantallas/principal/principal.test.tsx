@@ -375,6 +375,16 @@ describe('Registrar', () => {
 });
 
 describe('Cuentas', () => {
+  it('sin cuentas muestra el copy vacío en Tienes, Debes y Compromisos', () => {
+    const p = abrirPruebaPantalla();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveTextContent(TEXTO_CUENTAS_TIENES_VACIO);
+    expect(screen.getByTestId('cuentas-debes-vacio')).toHaveTextContent(TEXTO_CUENTAS_DEBES_VACIO);
+    expect(screen.getByTestId('cuentas-compromisos-vacio')).toHaveTextContent(TEXTO_CUENTAS_COMPROMISOS_VACIO);
+    p.cerrar();
+  });
+
   it('CA-M2-09 · con el préstamo de la jefa apartado Hoy sigue en $214; al apagar el interruptor sube', () => {
     const v = vector<VectorE4>('E4-09');
     const deuda = v.entrada.deudas_personas?.find((d) => d.contraparte === 'jefa');
