@@ -6,27 +6,24 @@
 
 ## Hecho en este turno
 
-- **TalkBack micro:** `compartido.test.tsx` (auditoría M13 en Cuentas→compartidos) y `widget.test.tsx` (PreviaWidget sin pista: rol summary, sin hint).
+- **TalkBack Ajustes widget/captura:** encabezado «Vista previa» junto a `PreviaWidget`; título Widget y «Aviso al capturar» ya con `accessibilityRole="header"`; tests `widget.test.tsx` y `captura-textos.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- EstadoVacio/componentes, principal/me-alcanza/arqueo, suscripciones, tandas. Ver `git log`.
+- EstadoVacio, principal/me-alcanza/arqueo, PreviaWidget ocultar montos. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP en disco (`git status`): principal/tarjetas — no mezclar sin revisar.
-- Stashes locales — no aplicar sin revisar.
+- Stashes / WIP paralelo — `git status` antes de editar.
 - CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Seguir hints TalkBack compartidos/captura si sigue la tanda a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
