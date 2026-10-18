@@ -1,18 +1,20 @@
 import { View } from 'react-native';
 import {
   AVISO_SIN_EXPLICACION,
+  obtenerPlan,
   PIE_EXPLICAR,
   type FiltroMovimientos,
   type LineaConsulta,
   type RespuestaExplicar,
 } from '../../servicios';
+import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 import { MENSAJE_EXPLICAR_SOLO_PLUS } from './textos';
 
 export type ExplicacionMostrable = Extract<
   RespuestaExplicar,
-  { tipo: 'explicacion' | 'plantilla' | 'solo_plus' }
+  { tipo: 'explicacion' | 'plantilla' | 'solo_plus' | 'limite' }
 >;
 
 function Lineas({ lineas }: { lineas: readonly LineaConsulta[] }) {
@@ -51,7 +53,14 @@ export function TarjetaExplicacion({
   alCerrar: () => void;
 }) {
   const { abrirPlan } = usePlanTienda();
-  const filtro = respuesta.tipo === 'solo_plus' ? null : respuesta.filtro;
+  const plan = useVista(obtenerPlan).plan;
+  const filtro =
+    respuesta.tipo === 'solo_plus' || respuesta.tipo === 'limite' ? null : respuesta.filtro;
+  const mostrarVerPlus =
+    abrirPlan &&
+    (respuesta.tipo === 'solo_plus' ||
+      (respuesta.tipo === 'limite' && respuesta.codigo === 'limite_mensual' && plan === 'gratis'));
+  const mostrarPie = respuesta.tipo !== 'solo_plus' && respuesta.tipo !== 'limite';
   return (
     <Tarjeta testID="respuesta-explicar">
       {respuesta.tipo === 'explicacion' ? (
@@ -77,8 +86,13 @@ export function TarjetaExplicacion({
           {MENSAJE_EXPLICAR_SOLO_PLUS}
         </Texto>
       ) : null}
+      {respuesta.tipo === 'limite' ? (
+        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="explicacion-limite">
+          {respuesta.mensaje}
+        </Texto>
+      ) : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-        {respuesta.tipo === 'solo_plus' && abrirPlan ? (
+        {mostrarVerPlus ? (
           <Boton
             etiqueta="Ver Plus"
             variante="secundario"
@@ -98,11 +112,11 @@ export function TarjetaExplicacion({
         ) : null}
         <Boton etiqueta="Listo" variante="texto" ancho="contenido" alPresionar={alCerrar} />
       </View>
-      {respuesta.tipo === 'solo_plus' ? null : (
+      {mostrarPie ? (
         <Texto variante="secundario" tono="secundario" testID="explicacion-pie">
           {PIE_EXPLICAR}
         </Texto>
-      )}
+      ) : null}
     </Tarjeta>
   );
 }

@@ -321,7 +321,11 @@ export function PanelRegistrar({
               if (e.tipo === 'sin_red') setMensaje(MENSAJE_EXPLICAR_SIN_RED);
               else if (e.tipo === 'error') setMensaje(MENSAJE_EXPLICAR_ERROR);
               else if (e.tipo === 'limite')
-                setMensaje(mensajeLimite(e.codigo, plan) ?? MENSAJE_EXPLICAR_ERROR);
+                setExplicacion({
+                  tipo: 'limite',
+                  codigo: e.codigo,
+                  mensaje: e.mensaje,
+                });
               else setExplicacion(e);
             })
             .catch(() => setMensaje(MENSAJE_EXPLICAR_ERROR))

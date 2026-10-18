@@ -79,4 +79,13 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
       'Necesito internet para responderte eso. Pregúntame de nuevo cuando tengas conexión.',
     );
   });
+
+  it('con cupo agotado muestra el aviso en la tarjeta explicar, sin Por revisar', async () => {
+    preparar([{ tipo: 'limite', codigo: 'limite_mensual' }]);
+    await escribir(golden('Q13').texto);
+    const limite = await screen.findByTestId('explicacion-limite');
+    expect(limite).toHaveTextContent('No pude responderte esta pregunta', { exact: false });
+    expect(limite).not.toHaveTextContent('Por revisar');
+    expect(screen.queryByTestId('explicacion-pie')).toBeNull();
+  });
 });
