@@ -8,7 +8,6 @@ import {
   TITULO_ELEGIR_MOVIMIENTO,
   TITULO_TARJETA_DEL_DIA,
 } from './textos';
-import { TEXTO_RIESGO } from './ProbabilidadHoy';
 
 describe('principal/textos · interpretación', () => {
   it('títulos de elegir movimiento en tuteo', () => {
@@ -28,6 +27,7 @@ describe('principal/textos · interpretación', () => {
   });
 
   it('aviso de riesgo en Hoy lleva prefijo para TalkBack', () => {
-    expect(etiquetaAvisoRiesgo(TEXTO_RIESGO)).toBe(`${ETIQUETA_AVISO_RIESGO}. ${TEXTO_RIESGO}`);
+    const cuerpo = 'Revisa qué viene antes de tu próximo ingreso.';
+    expect(etiquetaAvisoRiesgo(cuerpo)).toBe(`${ETIQUETA_AVISO_RIESGO}. ${cuerpo}`);
   });
 });

@@ -30,6 +30,7 @@ import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 import { guiaCapturaInactiva, TarjetaCapturaInactiva } from './TarjetasCaptura';
 import {
   BTN_NO_ES_MIA,
+  etiquetaCuerpoReactivarCaptura,
   etiquetaGuiaCapturaInactiva,
   etiquetaIntroCapturasPorRevisar,
   etiquetaPermisoCaptura,
@@ -40,6 +41,7 @@ import {
   PISTA_REVISAR_ACCESO_CAPTURA,
   PISTA_YA_REGISTRE_AVISO,
   TITULO_CAPTURA_INACTIVA,
+  TITULO_REACTIVAR_CAPTURA,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,
 } from './textos';
@@ -407,7 +409,11 @@ describe('O6 · activar la captura', () => {
     expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).toContain('reactivar_captura');
     const puente = puenteFalso();
     conCaptura(p.ctx, puente, <PantallaHoy navegacion={navegacionFalsa()} />);
-    expect(screen.getByText('Vuelve a activar la lectura de notificaciones')).toBeTruthy();
+    expect(screen.getByText(TITULO_REACTIVAR_CAPTURA)).toBeTruthy();
+    expect(screen.getByTestId(/-cuerpo$/)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaCuerpoReactivarCaptura(),
+    );
     expect(screen.getByTestId(/-reactivar$/)).toHaveProp('accessibilityHint', PISTA_ACTIVAR_CAPTURA);
     expect(screen.getByTestId(/-ahora-no$/)).toHaveProp(
       'accessibilityHint',

@@ -30,6 +30,7 @@ import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { ActivarCaptura } from './ActivarCaptura';
 import {
   CUERPO_REACTIVAR_CAPTURA,
+  etiquetaCuerpoReactivarCaptura,
   etiquetaGuiaCapturaInactiva,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
   PISTA_REVISAR_ACCESO_CAPTURA,

@@ -135,6 +135,18 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId('tanda-me-toco-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_COBRO);
   });
 
+  it('calendario de rondas: cada fila tiene etiqueta TalkBack', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    const d = detalleTanda(p.ctx, tandaId);
+    renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+    const calendario = screen.getByTestId('tanda-calendario');
+    for (const r of d.rondas) {
+      expect(within(calendario).getByLabelText(etiquetaAccesibleRondaTanda(r, false))).toBeTruthy();
+    }
+  });
+
   it('formulario nueva tanda: Guardar y Cancelar tienen pista TalkBack', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
@@ -388,5 +400,17 @@ describe('copy centralizado (textos.ts)', () => {
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/lista de tandas/i);
     expect(ACCESIBILIDAD_TANDA_ARCHIVADA).toMatch(/aportaciones futuras/i);
     expect(PISTA_GUARDAR_TANDA).toMatch(/aportación/i);
+    expect(etiquetaAccesibleRondaTanda(
+      {
+        t: 4,
+        fecha: '2026-11-06',
+        etiqueta: 'vie 6',
+        esCobro: true,
+        estado: 'pendiente',
+        enRiesgo: 150_000,
+        porAportar: 450_000,
+      },
+      false,
+    )).toMatch(/tu turno/i);
   });
 });

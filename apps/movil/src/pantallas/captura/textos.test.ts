@@ -4,8 +4,10 @@ import {
   PERMISO_INSTRUCCION,
   PISTA_YA_REGISTRE_AVISO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
+  etiquetaCuerpoReactivarCaptura,
   etiquetaIntroCapturasPorRevisar,
   etiquetaPermisoCaptura,
+  TITULO_REACTIVAR_CAPTURA,
   etiquetaVacioCapturasPorRevisar,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
 } from './textos';
@@ -32,6 +34,7 @@ describe('captura/textos', () => {
   it('etiquetas TalkBack incluyen el título de sección', () => {
     expect(etiquetaVacioCapturasPorRevisar()).toMatch(/Capturas por revisar/);
     expect(etiquetaIntroCapturasPorRevisar()).toMatch(/Capturas por revisar/);
+    expect(etiquetaCuerpoReactivarCaptura()).toMatch(new RegExp(TITULO_REACTIVAR_CAPTURA));
     expect(etiquetaPermisoCaptura(false)).toMatch(/Acceso a notificaciones/);
     expect(etiquetaPermisoCaptura(false)).toMatch(/ajustes restringidos/);
     expect(etiquetaPermisoCaptura(true)).toMatch(/Ajustes del teléfono/);
