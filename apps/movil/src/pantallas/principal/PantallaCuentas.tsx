@@ -9,7 +9,6 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
-  Barra,
   Boton,
   Cifra,
   espacio,
@@ -348,67 +347,6 @@ function Fila({
       ) : null}
       </Tarjeta>
     </View>
-  );
-}
-
-function TarjetaCredito({ d, t, alAbrir }: { d: CuentaDebes; t: TarjetaVista | null; alAbrir?: () => void }) {
-  const aFavor = d.saldo < 0;
-  return (
-    <Tarjeta
-      testID={`cuenta-${d.id}`}
-      {...(alAbrir
-        ? { alPresionar: alAbrir, etiquetaAccesible: d.nombre, pista: 'Abre el detalle de la tarjeta' }
-        : {})}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <View style={{ flex: 1, gap: espacio.xxs }}>
-          <Texto variante="cuerpoFuerte">{d.nombre}</Texto>
-          <Texto variante="secundario" tono="secundario">
-            {aFavor ? 'Saldo a favor' : 'Tarjeta de crédito'}
-          </Texto>
-        </View>
-        <Cifra
-          centavos={aFavor ? -d.saldo : d.saldo}
-          contexto={contextoSaldoTarjeta(d.nombre, aFavor)}
-          testID={`cuenta-${d.id}-saldo`}
-        />
-      </View>
-      {d.meses > 0 ? (
-        <Texto variante="secundario" testID={`cuenta-${d.id}-meses`}>
-          {`Meses sin intereses que faltan: ${formatearCentavos(d.meses)}`}
-        </Texto>
-      ) : null}
-      {aFavor ? (
-        <Texto variante="secundario" tono="secundario">
-          No se suma a tu dinero libre.
-        </Texto>
-      ) : null}
-      {t && t.pngi > 0 ? (
-        <Texto variante="secundario" testID={`cuenta-${d.id}-pngi`}>
-          {`Para no generar intereses: ${formatearCentavos(t.pngi)} antes del ${t.etiquetaFechaLimite}`}
-        </Texto>
-      ) : t ? (
-        <Texto variante="secundario" tono="secundario" testID={`cuenta-${d.id}-limite-pago`}>
-          {`Fecha límite: ${t.etiquetaFechaLimite} · próximo corte: ${t.etiquetaProximoCorte}`}
-        </Texto>
-      ) : null}
-      {t ? (
-        <>
-          <Barra
-            llenoBp={t.usoBp}
-            marcaBp={UMBRAL_USO_BP}
-            etiquetaAccesible={`Usas ${t.usoPorcentaje} % de tu límite`}
-          />
-          <Texto variante="secundario" tono="secundario">
-            {`Usas ${t.usoPorcentaje} % de tu límite de ${formatearCentavos(t.limiteCredito)}`}
-          </Texto>
-        </>
-      ) : d.limiteCredito !== null ? (
-        <Texto variante="secundario" tono="secundario">
-          {`Límite: ${formatearCentavos(d.limiteCredito)}`}
-        </Texto>
-      ) : null}
-    </Tarjeta>
   );
 }
 
