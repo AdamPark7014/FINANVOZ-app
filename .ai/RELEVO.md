@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **Ajustes › Captura TalkBack (micro):** título con `header`; etiquetas habladas apagada / no disponible; lista vacía (0 apps); tests `captura-textos` + aserción en `ingreso-colchon.test`.
+- **Tarjetas / onboarding TalkBack:** pruebas de `preguntaTarjetaConfirmarMsi`, `etiquetaSiLiquidar`; tip O2 en `etiquetaTipOnboarding`. Acumulado: helpers vacíos/filas MSI, pistas O1, jest `tarjetas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- TalkBack Hoy/Movimientos/Cuentas, onboarding, captura activa en palabras. Ver `git log`.
+- Chip/Movimientos, arqueo, suscripciones, CampoMonto. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows; M0 Adam.
-- WIP ajeno: no mezclar en commits de captura.
+- WIP ajeno (`ayuda`, `principal`) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack captura activa con puente mockeado (Activar/Desactivar hints en test de integración).
+2. Commits pequeños del WIP paralelo.
 
 ## No tocar
 

@@ -66,6 +66,7 @@ describe('textos de onboarding', () => {
   it('TalkBack del consejo antepone «Consejo»', () => {
     expect(etiquetaTipOnboarding(TIP_INGRESO_SALTAR)).toBe(`Consejo: ${TIP_INGRESO_SALTAR}`);
     for (const tip of [
+      TIP_CONSENTIMIENTO,
       TIP_PAGOS_SALTAR,
       TIP_CUENTAS_MINIMO,
       TIP_COLCHON_SIN_POR_AHORA,
