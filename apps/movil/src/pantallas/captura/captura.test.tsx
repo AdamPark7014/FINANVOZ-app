@@ -27,14 +27,13 @@ import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
-import { TarjetaCapturaInactiva } from './TarjetasCaptura';
+import { guiaCapturaInactiva, TarjetaCapturaInactiva } from './TarjetasCaptura';
 import {
   BTN_NO_ES_MIA,
   etiquetaGuiaCapturaInactiva,
   etiquetaIntroCapturasPorRevisar,
   etiquetaPermisoCaptura,
   etiquetaVacioCapturasPorRevisar,
-  guiaCapturaInactiva,
   INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
@@ -128,6 +127,16 @@ describe('preguntas de captura en Hoy', () => {
     expect(screen.getByTestId(/-guia$/)).toHaveProp(
       'accessibilityLabel',
       etiquetaGuiaCapturaInactiva(guia),
+    );
+    p.cerrar();
+  });
+
+  it('captura inactiva: Revisar el acceso trae pista TalkBack', () => {
+    const p = eCaptura();
+    conCaptura(p.ctx, puenteFalso(), <TarjetaCapturaInactiva testID="inactiva" />);
+    expect(screen.getByTestId('inactiva-revisar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_REVISAR_ACCESO_CAPTURA,
     );
     p.cerrar();
   });
