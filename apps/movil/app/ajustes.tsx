@@ -85,6 +85,7 @@ export default function Ajustes() {
         variante="texto"
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={() => router.back()}
       />
       <Texto variante="titulo">{TITULO}</Texto>

@@ -7,6 +7,7 @@ import {
   ETIQUETA_NUEVA_TANDA,
   ETIQUETA_VER_CALENDARIO,
   ETIQUETA_VOLVER,
+  PISTA_VOLVER,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
   textoEnRiesgo,
@@ -37,6 +38,7 @@ export function PantallaTandas({
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER}
       />
       <Texto variante="titulo">{TITULO_TANDAS}</Texto>
       {nueva ? (

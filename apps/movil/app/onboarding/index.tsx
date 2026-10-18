@@ -1,5 +1,12 @@
 import { useRouter } from 'expo-router';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
+import {
+  AYUDA_BIENVENIDA,
+  BTN_ONB_CONTINUAR,
+  BTN_ONB_EMPEZAR,
+  CUERPO_BIENVENIDA,
+  TITULO_BIENVENIDA,
+} from '../../src/pantallas/onboarding/textos';
 import { BTN_ONBOARDING_RESTAURAR } from '../../src/pantallas/respaldo';
 import { obtenerConsentimiento } from '../../src/servicios';
 import { useVista } from '../../src/sesion/ProveedorSesion';
@@ -16,13 +23,13 @@ export default function Bienvenida() {
     <PasoOnboarding
       testID="onb-bienvenida"
       paso={1}
-      titulo="Sabe cada día cuánto puedes gastar"
-      ayuda="Sin quedarte corto antes de tu próximo pago. Te toma unos 4 minutos y todo se queda en tu teléfono."
+      titulo={TITULO_BIENVENIDA}
+      ayuda={AYUDA_BIENVENIDA}
       pie={
         <>
           <Boton
             testID="onb-empezar"
-            etiqueta={yaAcepto ? 'Continuar' : 'Empezar'}
+            etiqueta={yaAcepto ? BTN_ONB_CONTINUAR : BTN_ONB_EMPEZAR}
             alPresionar={() => router.push(yaAcepto ? '/onboarding/ingreso' : '/onboarding/consentimiento')}
           />
           {/* Teléfono nuevo (`02 §19`): restaurar un respaldo en lugar de empezar de cero. */}
@@ -36,7 +43,7 @@ export default function Bienvenida() {
       }
     >
       <Texto variante="cuerpo">
-        Anota lo que tienes, lo que debes y tus pagos fijos. Finanvoz hace las cuentas por ti.
+        {CUERPO_BIENVENIDA}
       </Texto>
     </PasoOnboarding>
   );

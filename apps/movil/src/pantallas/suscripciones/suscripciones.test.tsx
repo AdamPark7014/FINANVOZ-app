@@ -85,6 +85,7 @@ describe('Suscripciones (02 §20)', () => {
     const antes = obtenerHoy(ctx).reservado;
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
+    expect(screen.getByTestId('suscripciones-mensaje')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(textoDe('suscripciones-mensaje')).toBe(mensajeAccionSuscripcion('compromiso', 'Netflix'));
     expect(screen.getByTestId('suscripcion-netflix-apartada')).toBeTruthy();
     expect(screen.queryByTestId('suscripcion-netflix-compromiso')).toBeNull();

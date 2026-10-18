@@ -30,6 +30,7 @@ import {
   TIP_INGRESO_SALTAR,
   TIP_PAGOS_SALTAR,
 } from './tips';
+import { etiquetaProgresoOnboarding, TITULO_BIENVENIDA } from './textos';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
 const RUTAS = {
@@ -72,6 +73,8 @@ describe('onboarding', () => {
     const r = abrir('/');
     expect(r.getPathname()).toBe('/onboarding');
     expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
+    expect(screen.getByText(TITULO_BIENVENIDA)).toBeTruthy();
+    expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
   });
 
   it('CA-M2-05 · no se escribe nada antes de aceptar; al aceptar queda la evidencia', () => {

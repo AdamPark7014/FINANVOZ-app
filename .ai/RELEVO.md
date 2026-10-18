@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Respaldo a11y:** `accessibilityRole="header"` y `testID` en títulos de `PantallaRespaldo` y `Restaurar`; aserciones en `respaldo-ui.test.tsx`.
+- **suscripciones:** confirmaciones de acción con `accessibilityLiveRegion="polite"` en `suscripciones-mensaje` (TalkBack anuncia al convertir en compromiso, etc.); prueba en `suscripciones.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Ayuda/privacidad headers y alert; plan/tarjetas copy. Ver `git log`.
+- plan `PISTA_VOLVER`, personas cuenta dividida, deducciones, tarjetas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (principal, tarjetas tests) — no mezclar.
+- WIP ajeno: onboarding, ajustes, respaldo tests — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
@@ -26,7 +26,6 @@
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
-- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 

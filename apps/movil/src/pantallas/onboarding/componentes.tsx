@@ -2,9 +2,9 @@ import { useEffect, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
+import { etiquetaProgresoOnboarding, textoProgresoOnboarding } from './textos';
 
-/** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
-export const PASOS_ONBOARDING = 7;
+export { ERROR_GUARDAR, PASOS_ONBOARDING } from './textos';
 
 export interface OpcionChip<T> {
   valor: T;
@@ -138,8 +138,13 @@ export function PasoOnboarding({
   }, [registrarEvento, paso]);
   return (
     <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} pie={pie}>
-      <Texto variante="secundario" tono="secundario">
-        {`Paso ${paso} de ${PASOS_ONBOARDING}`}
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID="onb-progreso"
+        accessibilityLabel={etiquetaProgresoOnboarding(paso)}
+      >
+        {textoProgresoOnboarding(paso)}
       </Texto>
       <Texto variante="titulo">{titulo}</Texto>
       {ayuda ? (
@@ -167,4 +172,3 @@ export function MensajeError({ texto }: { texto: string | null }) {
   );
 }
 
-export const ERROR_GUARDAR = 'No pude guardar eso. Revisa los datos e intenta de nuevo.';

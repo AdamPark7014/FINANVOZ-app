@@ -23,6 +23,7 @@ import {
   ETIQUETA_ME_TOCO,
   ETIQUETA_NOMBRE,
   ETIQUETA_VOLVER,
+  PISTA_VOLVER_DETALLE,
   ETIQUETA_YA_LA_DI,
   ERROR_NOMBRE_TANDA_VACIO,
   etiquetaEstadoRonda,
@@ -61,7 +62,13 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
   if (!existe) {
     return (
       <Pantalla testID="pantalla-tanda" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Boton
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER_DETALLE}
+        />
         <Texto variante="cuerpo" tono="secundario" testID="tanda-no-encontrada">
           {TEXTO_TANDA_NO_ENCONTRADA}
         </Texto>

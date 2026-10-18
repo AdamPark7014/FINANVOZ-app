@@ -134,6 +134,7 @@ describe('ajustes', () => {
 
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(screen.getByTestId('ajustes-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('ajustes-abrir-ayuda'));
     expect(r.getPathname()).toBe('/ayuda');

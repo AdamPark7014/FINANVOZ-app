@@ -28,6 +28,8 @@ import {
   PREGUNTA_YA_DISTE,
   TEXTO_NO_ES_INGRESO,
   TEXTO_TANDA_NO_ENCONTRADA,
+  PISTA_VOLVER,
+  PISTA_VOLVER_DETALLE,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
   mensajeAportacion,
@@ -86,6 +88,12 @@ describe('Tandas (02 §18)', () => {
       '\n',
     );
     expect(ui).not.toMatch(/[!¡]/);
+  });
+
+  it('Volver en la lista tiene pista TalkBack', () => {
+    const p = preparar('2026-10-16');
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
+    expect(screen.getByTestId('tandas-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {

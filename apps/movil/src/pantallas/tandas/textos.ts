@@ -83,6 +83,10 @@ export const MENSAJE_TANDA_GUARDADA =
 
 /** Detalle (`tandas/[id]`). */
 export const ETIQUETA_VOLVER = 'Volver';
+/** Lista (`Cuentas → Tandas`). */
+export const PISTA_VOLVER = 'Regresa a Cuentas';
+/** Detalle de una tanda. */
+export const PISTA_VOLVER_DETALLE = 'Regresa a la lista de tandas';
 export const TEXTO_TANDA_NO_ENCONTRADA = 'No encontré esa tanda.';
 export const TEXTO_TANDA_ARCHIVADA = 'Archivada · ya no aparto aportaciones';
 export const ETIQUETA_YA_LA_DI = 'Ya la di';

@@ -65,7 +65,8 @@ describe('accesibilidad en pantalla respaldo', () => {
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_VOLVER);
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
-    expect(screen.getByText(TITULO_RESPALDO)).toBeTruthy();
+    expect(screen.getByTestId('respaldo-titulo')).toHaveTextContent(TITULO_RESPALDO);
+    expect(screen.getByTestId('respaldo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('privacidad-respaldo-crear')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('privacidad-respaldo-restaurar')).toHaveProp(
       'accessibilityLabel',
@@ -101,6 +102,8 @@ describe('accesibilidad en pantalla respaldo', () => {
       ACCESIBILIDAD_VOLVER_RESTAURAR,
     );
     expect(screen.getByTestId('restaurar-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_RESTAURAR);
+    expect(screen.getByTestId('restaurar-titulo')).toHaveTextContent(TITULO_RESTAURAR);
+    expect(screen.getByTestId('restaurar-titulo')).toHaveProp('accessibilityRole', 'header');
     p.cerrar();
   });
 });
