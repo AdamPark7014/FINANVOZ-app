@@ -153,7 +153,7 @@ export const LEYENDA_ESTIMACION =
   'Estimación para apartar dinero y preparar tu declaración. No sustituye a tu contador ni presenta declaraciones ante el SAT.';
 
 export const MENSAJE_SIN_PARAMETROS =
-  'Todavía no puedo estimar tus deducciones de este año: un contador está revisando los topes y las reglas. En cuanto estén validados, aquí verás cuánto llevas. Tus facturas ya quedan guardadas.';
+  'Todavía no puedo estimar tus deducciones de este año: un contador está validando topes y reglas. En cuanto termine, aquí verás cuánto llevas. Tus facturas ya quedan guardadas.';
 
 export interface FacturaVista {
   readonly uuid: string;

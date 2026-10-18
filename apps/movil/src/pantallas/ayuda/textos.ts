@@ -139,8 +139,8 @@ export const PREGUNTAS_FRECUENTES: readonly PreguntaFrecuente[] = [
     id: 'facturas',
     pregunta: '¿Cómo funcionan las facturas y las deducciones?',
     respuesta: [
-      'Comparte XML de facturas, un ZIP del SAT o impórtalos en Deducciones. Solo versión 4.0 y solo en tu teléfono.',
-      'Con Plus, RFC e ingresos del año ves totales deducibles y qué no cuenta. Si aún no puede estimar, un contador revisa topes del año; tus facturas ya quedan guardadas.',
+      'Comparte el XML de cada factura o un ZIP (portal del SAT o correo) desde Deducciones. Solo leo versión 4.0; todo queda en tu teléfono.',
+      'Con Plus, con tu RFC e ingresos del año ves cuánto llevas deducible y qué no cuenta. Si todavía no puede estimar, un contador valida topes y reglas; tus facturas ya quedan guardadas.',
       LEYENDA_ESTIMACION,
     ],
   },

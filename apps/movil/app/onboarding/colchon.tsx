@@ -3,8 +3,8 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
 import { TIP_COLCHON_SIN_POR_AHORA } from '../../src/pantallas/onboarding/tips';
+import { sugerenciaMontoColchon10 } from '../../src/pantallas/ajustes/colchon-textos';
 import {
-  ayudaSugerenciaColchonOnboarding,
   AYUDA_COLCHON_ONB,
   BTN_SIN_COLCHON_POR_AHORA,
   BTN_VER_MI_DIA,

@@ -14,8 +14,13 @@ export const BTN_APARTAR_COLCHON = 'Apartar un colchón';
 
 export const AYUDA_SIN_SUGERENCIA = 'Escribe 0 si no quieres colchón.';
 
+/** O7 y Ajustes › Colchón: sugerencia del 10 % del ingreso del periodo. */
+export function sugerenciaMontoColchon10(sugerido: Centavos): string {
+  return `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan.`;
+}
+
 export function ayudaColchon(sugerido: Centavos): string {
-  return `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan. Escribe 0 si no quieres colchón.`;
+  return `${sugerenciaMontoColchon10(sugerido)} Escribe 0 si no quieres colchón.`;
 }
 
 export function resumenConColchon(monto: Centavos): string {

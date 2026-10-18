@@ -6,7 +6,7 @@ export const ETIQUETA_VOLVER = 'Volver';
 /** Candado Plus al entrar desde Cuentas. */
 export const TITULO_PUERTA_PLUS = 'Tus deducciones del año';
 export const DESCRIPCION_PUERTA_PLUS =
-  'Con Plus, comparte tus facturas con Finanvoz y te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías ahorrar.';
+  'Con Plus, comparte tus facturas y te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías pagar de menos.';
 
 export function tituloPantallaDeducciones(ejercicio: number): string {
   return `Deducciones ${ejercicio}`;
@@ -28,11 +28,12 @@ export const ETIQUETA_CANCELAR = 'Cancelar';
 export const BTN_CAMBIAR_PERFIL = 'Cambiar mi RFC o mis ingresos';
 
 export const BTN_IMPORTAR_FACTURAS = 'Importar facturas (XML o ZIP)';
-export const MENSAJE_IMPORTAR_ERROR = 'No pude leer esos archivos. Intenta de nuevo.';
+export const MENSAJE_IMPORTAR_ERROR =
+  'No pude leer esos archivos. Vuelve a compartirlos o elígelos otra vez.';
 
 /** Lista de facturas del ejercicio vacía (`02 §24`). */
 export const TEXTO_FACTURAS_VACIO =
-  'Todavía no tienes facturas de este año. Compártelas con Finanvoz desde tu correo o el portal del SAT (el XML o un ZIP), o elígelas aquí.';
+  'Todavía no tienes facturas de este año. Comparte el XML o un ZIP desde tu correo, el portal del SAT o el botón de abajo.';
 
 export const TITULO_TUS_FACTURAS = 'Tus facturas';
 

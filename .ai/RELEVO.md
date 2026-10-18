@@ -6,24 +6,23 @@
 
 ## Hecho en este turno
 
-- **Cuentas · Te deben:** botón «Cobrar» con `etiquetaAccesible` «Cobrar a {nombre}» (`PantallaCuentas` / `Fila`).
+- **captura:** copy de `PreguntasCaptura` centralizado en `captura/textos.ts` (`MESES_CAPTURA`, avisos, títulos dinámicos); tests CA-M5-09 con testID/hidden.
 
 ## Hecho (acumulado reciente)
 
-- Vacíos Cuentas TalkBack, PreviaWidget, onboarding textos, captura copy. Ver `git log`.
+- Chip TalkBack, EstadoVacio, onboarding copy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear: tabs `_layout`, `ingreso`, `widget.test`, `captura.test`, etc. — no mezclar al reescribir.
-- WIP: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE`).
+- WIP rescate `Chip.test.tsx` (`c6e1566`).
+- Conflictos/index: `EditarTarjeta.tsx`, `RELEVO.md` (otro agente).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajeno en tabs/onboarding.
-3. Centralizar copy O3–O7 restante en `textos.ts`.
+2. Integrar o descartar rescate Chip.test.
 
 ## No tocar
 

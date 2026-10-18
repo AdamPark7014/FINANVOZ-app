@@ -16,11 +16,14 @@ import {
   TITULO_BIENVENIDA,
   TITULO_COLCHON,
   TITULO_CONSENTIMIENTO,
+  TIP_CUENTAS_MINIMO,
+  TIP_INGRESO_SALTAR,
+  TITULO_CUENTAS,
   TITULO_INGRESO,
   TITULO_PAGOS_FIJOS,
   textoProgresoOnboarding,
-  ayudaSugerenciaColchonOnboarding,
 } from './textos';
+import { sugerenciaMontoColchon10 } from '../ajustes/colchon-textos';
 
 describe('textos de onboarding', () => {
   it('O1 y O2 cumplen 02 §14: tuteo y sin exclamación', () => {
@@ -58,5 +61,14 @@ describe('textos de onboarding', () => {
     expect(textoProgresoOnboarding(1)).toBe('Paso 1 de 7');
     expect(PASOS_ONBOARDING).toBe(7);
     expect(etiquetaProgresoOnboarding(3)).toBe('Paso 3 de 7 del recorrido inicial');
+  });
+
+  it('O3 y O4 cumplen 02 §14: tuteo y sin exclamación', () => {
+    for (const texto of [TITULO_INGRESO, TIP_INGRESO_SALTAR, TITULO_CUENTAS, TIP_CUENTAS_MINIMO]) {
+      expect(texto).not.toMatch(/!/);
+      expect(texto).not.toMatch(/por favor/i);
+    }
+    expect(TIP_INGRESO_SALTAR).toMatch(/«Saltar por ahora»/);
+    expect(TIP_CUENTAS_MINIMO).toMatch(/«Continuar»/);
   });
 });
