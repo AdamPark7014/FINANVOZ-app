@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **ProbabilidadHoy / riesgo:** copy centralizado en `textos.ts` (`TEXTO_AVISO_RIESGO_HOY`); aviso con `tono="faltante"` y `importantForAccessibility="yes"` para TalkBack al aparecer bajo P < 50 %.
+- **ActivarCaptura TalkBack:** test de pista en «Ahora no»; live region + testID en mensajes de error del flujo O6.
 
 ## Hecho (acumulado reciente)
 
-- Marca 50 % en barra, `FRASE_MARCA_PROBABILIDAD`, PreviaWidget, Chip hints. Ver `git log`.
+- `PISTA_AHORA_NO_ACTIVAR_CAPTURA` (rescate 029f5a9), captura Hoy, ayuda FAQ. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, captura, suscripciones, movimientos, etc.) — no mezclar en commits ajenos.
+- WIP masivo fuera de `captura/` (onboarding, principal, ui…) — no mezclar en commits de captura.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack aviso retiro tarjeta en formulario movimiento o `CampoMonto` deshabilitado.
+2. TalkBack aviso retiro tarjeta en formulario movimiento.
 
 ## No tocar
 
