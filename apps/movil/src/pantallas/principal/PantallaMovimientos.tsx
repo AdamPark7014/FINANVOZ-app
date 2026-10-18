@@ -167,7 +167,7 @@ export function PantallaMovimientos({
       {filtro ? (
         <Tarjeta testID="movimientos-filtro">
           <Texto
-            variant="secundario"
+            variante="secundario"
             accessibilityLabel={etiquetaFiltroMovimientosActivo()}
             accessibilityLiveRegion="polite"
           >

@@ -18,6 +18,8 @@ import {
   ETIQUETA_PAGO_MONTO_FIJO,
   ETIQUETA_PAGO_MONTO_VARIABLE,
   etiquetaAgregarPago,
+  PISTA_PAGOS_CONTINUAR,
+  PISTA_PAGOS_SALTAR,
   TIP_PAGOS_SALTAR,
   TITULO_PAGOS_FIJOS,
 } from '../../src/pantallas/onboarding/textos';

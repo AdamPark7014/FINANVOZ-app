@@ -78,6 +78,8 @@ export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
 export const AYUDA_PAGO_VARIABLE =
   'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
 export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
+export const PISTA_PAGOS_SALTAR = 'Pasa al siguiente paso sin registrar pagos fijos';
+export const PISTA_PAGOS_CONTINUAR = 'Pasa a activar la captura automática';
 
 export function etiquetaAgregarPago(concepto: string): string {
   return `Agregar ${concepto}`;

@@ -30,6 +30,7 @@ import {
   PISTA_GUARDAR_PAGO,
   PISTA_VOLVER,
   TEXTO_CONTACTOS_VACIO,
+  etiquetaVacioMovimientosPersona,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
   TIP_SALDO_TE_DEBEN,
@@ -331,6 +332,9 @@ describe('estados vacíos (es-MX)', () => {
     const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
     renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
     expect(textoDe('persona-movimientos-vacio')).toBe(TEXTO_MOVIMIENTOS_PERSONA_VACIO);
+    expect(screen.getByTestId('persona-movimientos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioMovimientosPersona(),
+    );
     expect(screen.getByTestId('persona-movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 

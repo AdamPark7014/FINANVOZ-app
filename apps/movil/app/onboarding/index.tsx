@@ -5,6 +5,8 @@ import {
   BTN_ONB_CONTINUAR,
   BTN_ONB_EMPEZAR,
   CUERPO_BIENVENIDA,
+  PISTA_ONB_CONTINUAR,
+  PISTA_ONB_EMPEZAR,
   TITULO_BIENVENIDA,
 } from '../../src/pantallas/onboarding/textos';
 import { BTN_ONBOARDING_RESTAURAR } from '../../src/pantallas/respaldo';

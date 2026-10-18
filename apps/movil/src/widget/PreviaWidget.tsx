@@ -72,7 +72,12 @@ export function PreviaWidget({
         </View>
       ) : (
         <View testID="previa-widget-solo-texto" importantForAccessibility="no-hide-descendants">
-          <Text importantForAccessibility="no" style={[estilos.titulo, { color: c.texto }]} numberOfLines={2}>
+          <Text
+            testID="previa-widget-texto"
+            importantForAccessibility="no"
+            style={[estilos.titulo, { color: c.texto }]}
+            numberOfLines={2}
+          >
             {vista.texto}
           </Text>
         </View>

@@ -304,7 +304,12 @@ export function PantallaMeAlcanza({
 
       {estado.tipo === 'error' ? (
         <View style={{ gap: espacio.m }} testID="me-alcanza-fallo">
-          <Texto variante="cuerpo" testID="me-alcanza-error-calculo">
+          <Texto
+            variante="cuerpo"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            testID="me-alcanza-error-calculo"
+          >
             {ERROR_CALCULO}
           </Texto>
           <Boton

@@ -8,6 +8,8 @@ import {
   BTN_SIN_COLCHON_POR_AHORA,
   BTN_VER_MI_DIA,
   ETIQUETA_COLCHON,
+  PISTA_COLCHON_SALTAR,
+  PISTA_VER_MI_DIA,
   TIP_COLCHON_SIN_POR_AHORA,
   TITULO_COLCHON,
 } from '../../src/pantallas/onboarding/textos';

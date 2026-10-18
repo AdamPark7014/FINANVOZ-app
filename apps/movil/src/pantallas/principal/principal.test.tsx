@@ -27,6 +27,7 @@ import {
   etiquetaVacioCuentasCompromisos,
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
+  etiquetaFiltroMovimientosActivo,
   etiquetaVacioMovimientos,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
