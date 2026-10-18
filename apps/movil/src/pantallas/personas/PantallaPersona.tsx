@@ -205,7 +205,9 @@ function Detalle({
       {d.saldo > 0 ? <Recordatorio personaId={personaId} fecha={d.recordatorio} /> : null}
 
       <View style={{ gap: espacio.s }}>
-        <Texto variante="subtitulo">{TITULO_MOVIMIENTOS}</Texto>
+        <Texto variante="subtitulo" testID="persona-movimientos-titulo">
+          {TITULO_MOVIMIENTOS}
+        </Texto>
         {d.movimientos.length === 0 ? (
           <Texto variante="cuerpo" tono="secundario" testID="persona-movimientos-vacio">
             {TEXTO_MOVIMIENTOS_PERSONA_VACIO}

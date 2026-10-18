@@ -330,6 +330,7 @@ describe('estados vacíos (es-MX)', () => {
     const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
     renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
     expect(textoDe('persona-movimientos-vacio')).toBe(TEXTO_MOVIMIENTOS_PERSONA_VACIO);
+    expect(screen.getByTestId('persona-movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('con saldo a favor muestra el tip de dinero libre', () => {
