@@ -196,6 +196,7 @@ export function PantallaCuentas({
                       accion: {
                         etiqueta: 'Cobrar',
                         etiquetaAccesible: `Cobrar a ${p.nombre}`,
+                        pista: PISTA_COBRAR_DESDE_CUENTAS,
                         alPresionar: () => alAbrirPersona(p.id),
                       },
                     }
@@ -316,7 +317,7 @@ function Fila({
   centavos: number;
   contextoSaldo: string;
   testID?: string;
-  accion?: { etiqueta: string; etiquetaAccesible?: string; alPresionar: () => void };
+  accion?: { etiqueta: string; etiquetaAccesible?: string; pista?: string; alPresionar: () => void };
 }) {
   return (
     <View accessibilityRole="listitem" {...(testID ? { testID } : {})}>
@@ -347,6 +348,7 @@ function Fila({
           ancho="contenido"
           alPresionar={accion.alPresionar}
           {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
+          {...(accion.pista ? { pista: accion.pista } : {})}
           {...(testID ? { testID: `${testID}-accion` } : {})}
         />
       ) : null}
