@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **TalkBack compartidos / widget:** tests en `compartido.test.tsx` (Volver con `PISTA_VOLVER_CUENTAS`, vacío con `etiquetaExplicita`, botón desde Cuentas) y `widget.test.tsx` (auditoría M13 en PreviaWidget).
+- **principal.test:** quita import sin uso `registrarTexto`.
 
 ## Hecho (acumulado reciente)
 
-- Captura permiso, suscripciones, tandas, principal. Ver `git log`.
+- Grupo compartido header, SeccionWidget, Movimientos pistas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`git status`): ajustes, ayuda, tandas tests — no mezclar; salvar si hace falta.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `accessibilityHint` restantes compartidos / captura si sigue la tanda a11y.
+2. Headers TalkBack en pantallas restantes si hace falta.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
