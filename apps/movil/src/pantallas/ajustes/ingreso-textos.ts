@@ -3,7 +3,10 @@ import { etiquetaFecha } from '../../servicios';
 import { formatearCentavos } from '../../ui';
 import { OPCIONES_DIA_SEMANA } from '../onboarding/ingreso';
 
-/** Redacción Ajustes › Ingreso (`02 §3`, `02 §12`, `02 §14`): tuteo; montos y fechas vienen de `servicios/` y `ui/`. */
+/**
+ * Redacción Ajustes › Ingreso (`02 §3`, `02 §12`, `02 §14`): tuteo; montos y fechas vienen de `servicios/` y `ui/`.
+ * UI: `SeccionIngreso`, `EditarIngreso`, `FormularioIngreso`; resumen en `ingreso.ts`.
+ */
 
 export const SECCION_INGRESO = 'Ingreso';
 export const ETIQUETA_CAMBIAR_INGRESO = 'Cambiar mi ingreso';
