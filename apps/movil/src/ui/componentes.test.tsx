@@ -180,7 +180,7 @@ describe('EstadoVacio', () => {
     expect(vacio).toHaveTextContent('Todavía no hay movimientos.');
     expect(vacio.props.accessibilityLiveRegion).toBe('polite');
     expect(vacio.props.accessibilityRole).toBe('text');
-    expect(vacio.props.accessibilityLabel).toBe('Todavía no hay movimientos.');
+    expect(vacio.props.accessibilityLabel).toBe('Aún no hay movimientos.');
   });
 
   it('lee cifras del copy en palabras cuando no hay etiquetaAccesible', () => {
