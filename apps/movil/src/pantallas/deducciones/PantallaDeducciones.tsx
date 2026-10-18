@@ -26,14 +26,50 @@ import { Chips, MensajeError } from '../onboarding/componentes';
 import { PuertaPlus } from '../plan/CandadoPlus';
 import { mensajeError } from '../principal/textos';
 import type { ArchivosFacturas } from './archivos';
-import { LEYENDA_ESTIMACION, TEXTO_FACTURAS_VACIO, TEXTO_IMPORTAR_VACIO } from './textos';
-
-export const PEDIR_PERFIL =
-  'Para estimar, necesito tu RFC, tus ingresos brutos del año (los de tu constancia de sueldos, incluidos los exentos) y, si la tienes, tu base gravable.';
-export const PERFIL_EN_TELEFONO = 'Se guardan solo en tu teléfono.';
-export const ERROR_RFC = 'Revisa tu RFC: son 13 letras y números, como aparece en tu constancia.';
-export const ERROR_INGRESOS = 'Escribe tus ingresos brutos del año.';
-export const MENSAJE_IMPORTAR_ERROR = 'No pude leer esos archivos. Intenta de nuevo.';
+import {
+  AYUDA_BASE_GRAVABLE,
+  BTN_CAMBIAR_PERFIL,
+  BTN_CANCELADA_SAT,
+  BTN_GUARDAR_ALUMNO_NIVEL,
+  BTN_IMPORTAR_FACTURAS,
+  BTN_NO_CANCELADA_SAT,
+  BTN_OCULTAR_FACTURA,
+  BTN_RECUPERAR_FACTURA,
+  BTN_VER_DEDUCCIONES,
+  BTN_YA_LA_PAGUE,
+  DESCRIPCION_PUERTA_PLUS,
+  ERROR_INGRESOS,
+  ERROR_RFC,
+  EJEMPLO_RFC,
+  ETIQUETA_BENEFICIARIO_LENTES,
+  ETIQUETA_CANCELAR,
+  ETIQUETA_COLEGIATURA_DE_QUIEN,
+  ETIQUETA_FORMA_PAGO,
+  ETIQUETA_GUARDAR,
+  ETIQUETA_IMPORTACION_LISTO,
+  ETIQUETA_INGRESOS_BRUTOS,
+  ETIQUETA_LENTES,
+  ETIQUETA_NIVEL,
+  ETIQUETA_NO_DEDUCIBLES,
+  ETIQUETA_RFC,
+  ETIQUETA_BASE_GRAVABLE,
+  ETIQUETA_VOLVER,
+  ESTADO_DEDUCIBLE,
+  LEYENDA_ESTIMACION,
+  MENSAJE_IMPORTAR_ERROR,
+  PEDIR_PERFIL,
+  PERFIL_EN_TELEFONO,
+  TITULO_FACTURAS_OCULTAS,
+  TITULO_IMPORTAR_COMPARTIDAS,
+  TITULO_PUERTA_PLUS,
+  TITULO_TUS_FACTURAS,
+  TEXTO_FACTURAS_OCULTAS,
+  TEXTO_FACTURAS_VACIO,
+  TEXTO_IMPORTAR_LEYENDO,
+  TEXTO_IMPORTAR_VACIO,
+  tituloPantallaDeducciones,
+  DESC_LENTES,
+} from './textos';
 /**
  * Personal → Deducciones (`02 §24`, RF-FIS-01…03, Plus): importar facturas, pedir el perfil fiscal la primera vez,
  * "Llevas $25,900 deducibles en 2026 (estimación)" por tipo, lo que no es deducible con su motivo, el ISR que
@@ -50,8 +86,8 @@ export function PantallaDeducciones({
   return (
     <PuertaPlus
       funcion="deducciones"
-      titulo="Tus deducciones del año"
-      descripcion="Con Plus, comparte tus facturas con Finanvoz y te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías ahorrar."
+      titulo={TITULO_PUERTA_PLUS}
+      descripcion={DESCRIPCION_PUERTA_PLUS}
       alVolver={alVolver}
     >
       <Deducciones alVolver={alVolver} archivos={archivos} />

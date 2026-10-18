@@ -68,6 +68,23 @@ export const NOTA_TIENDA =
 
 export const MENSAJE_SIN_TIENDA = 'Las suscripciones todavía no están disponibles en esta versión.';
 export const MENSAJE_ERROR_OFERTAS = 'No pude cargar los planes. Revisa tu internet e intenta de nuevo.';
+export const MENSAJE_OFERTAS_VACIAS =
+  'Google Play no devolvió planes por ahora. Revisa tu conexión e intenta de nuevo.';
+
+export const SUFIJO_PLUS = ' · Plus';
+export const PISTA_ABRIR_PLANES = 'Abre los planes';
+
+export function etiquetaCandadoPlus(texto: string): string {
+  return `${texto}${SUFIJO_PLUS}`;
+}
+
+export function etiquetaAccesibilidadCandado(texto: string): string {
+  return `${texto}. Disponible con Plus`;
+}
+
+export const TITULO_PLAN_GRATIS = 'Plan Gratis';
+export const TITULO_PLUS = 'Tienes Plus';
+export const TITULO_PLUS_PRUEBA = 'Tienes Plus · prueba gratis';
 export const MENSAJE_ERROR_COMPRA = 'No se completó la compra. No se te cobró nada; intenta de nuevo.';
 export const MENSAJE_PENDIENTE =
   'Tu pago quedó pendiente en Google Play. Cuando se confirme, se activa Plus.';
@@ -81,15 +98,15 @@ export function resumenPlan(v: VistaPlan): { titulo: string; detalle: string | n
     if (v.enPrueba) {
       const dias = v.diasRestantes === 1 ? '1 día' : `${v.diasRestantes ?? 0} días`;
       return {
-        titulo: 'Tienes Plus · prueba gratis',
+        titulo: TITULO_PLUS_PRUEBA,
         detalle: v.renovara
           ? `Te quedan ${dias} de prueba${hasta ? `; el ${hasta} empieza el cobro` : ''}.`
           : `Te quedan ${dias} de prueba. Cancelaste: no se te cobrará y después vuelves a Gratis.`,
       };
     }
-    if (!hasta) return { titulo: 'Tienes Plus', detalle: null };
+    if (!hasta) return { titulo: TITULO_PLUS, detalle: null };
     return {
-      titulo: 'Tienes Plus',
+      titulo: TITULO_PLUS,
       detalle: v.renovara
         ? `Se renueva el ${hasta}.`
         : `Cancelaste: tienes Plus hasta el ${hasta} y después vuelves a Gratis.`,

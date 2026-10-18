@@ -49,7 +49,7 @@ describe('Lista de espera', () => {
     contestar('ana@ejemplo.mx');
     enviar();
     expect(fetch).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toMatch(/aviso de privacidad/);
+    expect(screen.getByRole('alert').textContent).toBe(LISTA_ESPERA_ERROR_CONSENTIMIENTO);
   });
 
   it('CA-M0-05 · rechaza correos inválidos', () => {
@@ -97,7 +97,7 @@ describe('Lista de espera', () => {
     enviar();
     expect(fetch).not.toHaveBeenCalled();
     expect(screen.getByRole('alert').textContent).toBe(
-      'Falta contestar: ¿Tu banco te avisa con una notificación en cada compra?',
+      listaEsperaErrorFaltaUna(LISTA_ESPERA_PREGUNTAS[1]!.texto),
     );
     const grupo = screen.getByRole('radiogroup', { name: /tu banco te avisa/i });
     expect(grupo.getAttribute('aria-invalid')).toBe('true');
@@ -116,7 +116,7 @@ describe('Lista de espera', () => {
     fireEvent.change(screen.getByLabelText(/tu correo/i), { target: { value: 'ana@ejemplo.mx' } });
     enviar();
     expect(screen.getByRole('alert').textContent).toBe(
-      'Faltan 4 preguntas por contestar. Empieza por: ¿Usas Android o iPhone?',
+      listaEsperaErrorFaltanVarias(4, LISTA_ESPERA_PREGUNTAS[0]!.texto),
     );
     expect(document.activeElement).toBe(screen.getByLabelText('Android'));
     expect(document.querySelectorAll('[aria-invalid="true"]')).toHaveLength(4);

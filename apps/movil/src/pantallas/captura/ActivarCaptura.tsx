@@ -11,6 +11,24 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 import { Casilla } from '../onboarding/componentes';
+import {
+  ALTERNATIVA_NO_DISPONIBLE,
+  CUERPO_NO_DISPONIBLE,
+  DIVULGACION_CAPTURA,
+  ETIQUETA_NO_DISPONIBLE,
+  INTRO_ELEGIR_APPS,
+  LISTA_CAPTURA_ACTIVA,
+  LISTA_CAPTURA_APPS,
+  LISTA_CAPTURA_POR_REVISAR,
+  PERMISO_AYUDA_ANDROID,
+  PERMISO_DENEGADO,
+  PERMISO_INSTRUCCION,
+  TEXTO_SIN_APPS_BANCO,
+  TITULO_ELEGIR_APPS,
+  TITULO_PERMISO_NOTIFICACIONES,
+} from './textos';
+
+export { DIVULGACION_CAPTURA };
 
 type Paso =
   | { tipo: 'no_disponible' }
@@ -18,17 +36,6 @@ type Paso =
   | { tipo: 'permiso'; denegado: boolean }
   | { tipo: 'apps'; apps: readonly AppBancaria[] }
   | { tipo: 'lista'; nombres: readonly string[] };
-
-/** Divulgación destacada antes del acceso a notificaciones (`08 §3.1`, RF-PRI-02), palabra por palabra. */
-export const DIVULGACION_CAPTURA = {
-  titulo: 'Registrar tus compras automáticamente',
-  parrafos: [
-    'Finanvoz puede leer las notificaciones de las apps de banco que elijas para registrar tus compras, retiros y transferencias sin que tengas que anotarlas.',
-    'Solo leemos las apps que marques. Las demás notificaciones se ignoran en tu teléfono y no se guardan.',
-    'El contenido se procesa en tu teléfono y no se envía a nuestros servidores.',
-    'Puedes desactivarlo cuando quieras en Ajustes.',
-  ],
-} as const;
 
 /**
  * Activar la captura (O6, `02 §3`; Ajustes → Captura): divulgación destacada → "Activar" abre el ajuste del
@@ -129,15 +136,12 @@ export function ActivarCaptura({
         <>
           <Tarjeta testID={`${testID}-pronto`}>
             <Texto variante="etiqueta" tono="acento">
-              No disponible en este teléfono
+              {ETIQUETA_NO_DISPONIBLE}
             </Texto>
-            <Texto variante="cuerpo">
-              Finanvoz anota tus compras con los avisos de tu banco en Android, con la app instalada desde la
-              tienda.
-            </Texto>
+            <Texto variante="cuerpo">{CUERPO_NO_DISPONIBLE}</Texto>
           </Tarjeta>
           <Texto variante="cuerpo" tono="secundario">
-            Por ahora, dicta o escribe tus gastos: «tacos 80 en efectivo».
+            {ALTERNATIVA_NO_DISPONIBLE}
           </Texto>
           {continuar(false)}
         </>
