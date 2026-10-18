@@ -14,8 +14,8 @@ describe('formatoWidget (presentación)', () => {
 
   it('tamaño de fuente según longitud de la cifra', () => {
     expect(tamanoFuenteCifra('$214')).toBe(22);
-    expect(tamanoFuenteCifra('$12,345')).toBe(20);
-    expect(tamanoFuenteCifra('$123,456.78')).toBe(18);
+    expect(tamanoFuenteCifra('$123,456')).toBe(20);
+    expect(tamanoFuenteCifra('$1,234,567.89')).toBe(18);
   });
 
   it('TalkBack lee centavos cuando la cifra trae decimales', () => {

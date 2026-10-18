@@ -222,6 +222,10 @@ describe('nivel 0 · gasto compartido con la pareja (02 §27)', () => {
 });
 
 describe('nivel 0 · responde null ante la duda', () => {
+  it('ingreso por depósito rechaza monto cero', () => {
+    expect(reglas('me depositaron 0')).toBeNull();
+  });
+
   const NULOS = [
     'me quedan 85 pesos en efectivo',
     'tengo 4,200 en BBVA',

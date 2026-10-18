@@ -149,7 +149,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
               <Texto variante="cuerpo" tono="faltante" testID="plan-error">
                 {MENSAJE_ERROR_OFERTAS}
               </Texto>
-              <Boton etiqueta="Intentar de nuevo" variante="secundario" alPresionar={cargar} />
+              <Boton etiqueta={ETIQUETA_INTENTAR} variante="secundario" alPresionar={cargar} />
             </>
           ) : (
             ofertas.ofertas.map((o) => {
@@ -173,7 +173,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
           )}
           {compras?.simulada ? (
             <Texto variante="secundario" tono="secundario">
-              Compra simulada: esta build de desarrollo no tiene tienda y no cobra nada.
+              {NOTA_COMPRA_SIMULADA}
             </Texto>
           ) : null}
         </View>
@@ -187,7 +187,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
 
       {compras ? (
         <Boton
-          etiqueta="Restaurar compras"
+          etiqueta={ETIQUETA_RESTAURAR}
           variante="texto"
           ancho="contenido"
           cargando={ocupado === 'restaurar'}
@@ -208,7 +208,7 @@ export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
   const resumen = resumenPlan(useVista(obtenerPlan));
   return (
     <Tarjeta testID="ajustes-plan">
-      <Texto variante="subtitulo">Plan</Texto>
+      <Texto variante="subtitulo">{SECCION_AJUSTES}</Texto>
       <Texto variante="cuerpo" testID="ajustes-plan-titulo">
         {resumen.titulo}
       </Texto>
@@ -218,7 +218,7 @@ export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Ver planes"
+        etiqueta={ETIQUETA_VER_PLANES}
         variante="secundario"
         alPresionar={alAbrirPlan}
         testID="ajustes-plan-ver"

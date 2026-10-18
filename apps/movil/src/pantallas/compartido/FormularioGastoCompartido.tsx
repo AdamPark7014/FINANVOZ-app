@@ -113,10 +113,10 @@ export function FormularioGastoCompartido({
   const miParteBpVista = repartoOtra?.ok ? repartoOtra.miParteBp : reparto;
 
   const guardar = () => {
-    if (total === null || total <= 0) return setError('Escribe cuánto fue el gasto.');
+    if (total === null || total <= 0) return setError(ERROR_MONTO_GASTO);
     const miParteBp = miParteBpAlGuardar();
     if (categoria === null || quien === null || miParteBp === null)
-      return setError('Elige en qué fue, quién pagó y cómo se reparte.');
+      return setError(ERROR_CAMPOS_GASTO);
     try {
       agregarGastoCompartido(ctx, deps, grupoId, {
         total,
@@ -136,7 +136,7 @@ export function FormularioGastoCompartido({
 
   return (
     <Tarjeta testID="formulario-gasto-compartido">
-      <Texto variante="subtitulo">{prellenado ? 'Revisa el gasto compartido' : 'Agregar gasto'}</Texto>
+      <Texto variante="subtitulo">{prellenado ? TITULO_REVISAR_GASTO : TITULO_AGREGAR_GASTO}</Texto>
       {prellenado && total !== null && total > 0 ? (
         <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="compartido-resumen">
           {resumenGastoCompartido({
@@ -149,37 +149,37 @@ export function FormularioGastoCompartido({
       ) : null}
       <CampoMonto
         testID="compartido-total"
-        etiqueta="¿Cuánto fue?"
+        etiqueta={ETIQUETA_MONTO_GASTO}
         valorInicial={prellenado?.total ?? null}
         alCambiar={setTotal}
       />
       <CampoTexto
         testID="compartido-descripcion"
-        etiqueta="¿Qué fue? (opcional)"
+        etiqueta={ETIQUETA_DESCRIPCION_GASTO}
         valor={descripcion}
         alCambiar={setDescripcion}
-        ejemplo="Súper"
+        ejemplo={EJEMPLO_DESCRIPCION_GASTO}
       />
       <Chips
         testID="compartido-categoria"
-        etiqueta="Categoría"
+        etiqueta={ETIQUETA_CATEGORIA_GASTO}
         opciones={opcionesCategoria}
         valor={categoria}
         alCambiar={setCategoria}
       />
       <Chips
         testID="compartido-quien"
-        etiqueta="¿Quién pagó?"
+        etiqueta={ETIQUETA_QUIEN_PAGO}
         opciones={[
           { valor: 'yo', etiqueta: 'Pagué yo' },
-          { valor: 'otro', etiqueta: `Pagó ${nombrePareja}` },
+          { valor: 'otro', etiqueta: etiquetaPagoPareja(nombrePareja) },
         ]}
         valor={quien}
         alCambiar={setQuien}
       />
       <Chips
         testID="compartido-reparto"
-        etiqueta="¿Cómo se reparte?"
+        etiqueta={ETIQUETA_REPARTO}
         opciones={OPCIONES_REPARTO}
         valor={otraActiva ? null : reparto}
         alCambiar={elegirRepartoChip}
@@ -196,15 +196,15 @@ export function FormularioGastoCompartido({
       {quien === 'yo' && cuentas.length > 0 ? (
         <Chips
           testID="compartido-cuenta"
-          etiqueta="¿Con qué pagaste?"
+          etiqueta={ETIQUETA_CON_QUE_PAGASTE}
           opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
           valor={cuentaId}
           alCambiar={setCuentaId}
         />
       ) : null}
       <MensajeError texto={error} />
-      <Boton testID="compartido-guardar" etiqueta="Guardar" alPresionar={guardar} />
-      <Boton testID="compartido-cancelar" etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} />
+      <Boton testID="compartido-guardar" etiqueta={BTN_GUARDAR} alPresionar={guardar} />
+      <Boton testID="compartido-cancelar" etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
     </Tarjeta>
   );
 }

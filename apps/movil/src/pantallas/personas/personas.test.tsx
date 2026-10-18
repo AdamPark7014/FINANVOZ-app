@@ -294,6 +294,27 @@ describe('recordatorio de cobro', () => {
   });
 });
 
+describe('estados vacíos (es-MX)', () => {
+  it('persona inexistente', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
+    expect(screen.getByTestId('persona-no-encontrada')).toBeTruthy();
+  });
+
+  it('sin movimientos lo explica', () => {
+    const p = conEscenario('e4-01');
+    const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
+    renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('persona-movimientos-vacio')).toBeTruthy();
+  });
+
+  it('cuenta dividida sin contactos', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <FormularioCuentaDividida alGuardar={jest.fn()} />);
+    expect(screen.getByTestId('division-contactos-vacio')).toBeTruthy();
+  });
+});
+
 describe('Ajustes → Datos para cobrar', () => {
   it('agrega, cambia y borra', () => {
     const p = conAmigos();
