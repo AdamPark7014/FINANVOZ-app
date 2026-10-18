@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **Onboarding O3/O4:** quitado re-export circular `textos.ts` → `tips.ts`; `TIP_INGRESO_SALTAR` y `TIP_CUENTAS_MINIMO` viven otra vez en `textos.ts` ( `tips.ts` sigue reexportando desde ahí).
+- **Tandas detalle:** aserción de `tanda-titulo` como header TalkBack en la prueba de Volver del detalle.
 
 ## Hecho (acumulado reciente)
 
-- Personas/tandas/principal a11y y copy; widget/estados-cuenta tests. Ver `git log`.
+- Onboarding textos O3/O4, ayuda/tandas/captura a11y, Chip en ui. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en personas/principal/ui/tarjetas — revisar `git status` antes de editar.
+- WIP paralelo en captura/movimientos/suscripciones — revisar disco antes de reescribir.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajeno al onboarding si sigue en el árbol.
-3. M11 negocio cuando toque el hito.
+2. Unificar tips onboarding en `textos.ts` si falta O2/O6.
 
 ## No tocar
 

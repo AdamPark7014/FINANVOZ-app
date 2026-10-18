@@ -162,30 +162,35 @@ function Detalle({
         testID="tarjeta-movimientos"
       >
         {d.desdeElCorte.length === 0 ? (
-          <Texto
-            variante="cuerpo"
-            tono="secundario"
+          <EstadoVacio
+            texto={VACIO_MOVIMIENTOS_TARJETA}
             testID="tarjeta-movimientos-vacio"
-            accessibilityLiveRegion="polite"
-          >
-            {VACIO_MOVIMIENTOS_TARJETA}
-          </Texto>
+            etiquetaAccesible={etiquetaVacioMovimientosTarjeta(
+              d.ultimoCorte ? TITULO_DESDE_ULTIMO_CORTE : TITULO_DESDE_ALTA,
+            )}
+          />
         ) : null}
         {d.desdeElCorte.map((m) => {
           const titulo =
             m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_TITULO;
+          const fecha = etiquetaDiaMes(m.fecha);
+          const monto = formatearCentavos(m.monto);
+          const esSalida = m.sentido === 'salida';
           return (
             <View
               key={m.id}
+              accessible
+              accessibilityLabel={etiquetaAccesibleMovimientoTarjeta(titulo, fecha, monto, esSalida)}
               style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
             >
-              <Texto variante="secundario" style={{ flex: 1 }}>
-                {`${titulo} · ${etiquetaDiaMes(m.fecha)}`}
+              <Texto variante="secundario" style={{ flex: 1 }} importantForAccessibility="no">
+                {`${titulo} · ${fecha}`}
               </Texto>
               <Cifra
-                centavos={m.sentido === 'salida' ? -m.monto : m.monto}
+                centavos={esSalida ? -m.monto : m.monto}
                 tamano="secundario"
                 contexto={titulo}
+                importantForAccessibility="no"
               />
             </View>
           );

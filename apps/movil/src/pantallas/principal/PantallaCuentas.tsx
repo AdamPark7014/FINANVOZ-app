@@ -162,7 +162,7 @@ export function PantallaCuentas({
         )}
         {alAgregarTarjeta ? (
           <Boton
-            etiqueta="Agregar tarjeta de crédito"
+            etiqueta={BTN_AGREGAR_TARJETA_CREDITO}
             variante="texto"
             ancho="contenido"
             alPresionar={alAgregarTarjeta}
