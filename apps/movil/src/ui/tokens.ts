@@ -22,34 +22,43 @@ export interface Colores {
   superficie: string;
   /** Superficie elevada o presionada. */
   superficieAlterna: string;
-  /** Borde decorativo de tarjetas y separadores (no identifica un control). */
+  /**
+   * Borde decorativo de tarjetas y separadores (no identifica un control). ≥ 1.5:1 contra `superficie`
+   * para distinguir la tarjeta; no entra en WCAG 1.4.11.
+   */
   borde: string;
   /**
    * Borde de controles: campos sin foco, interruptor apagado y opciones sin elegir. ≥ 3:1 contra `fondo`,
    * `superficie` y `superficieAlterna` (WCAG 1.4.11, contraste de componentes; pase de M13).
    */
   bordeControl: string;
+  /** Texto principal; ≥ 4.5:1 (AA) sobre `fondo`, `superficie` y `superficieAlterna`. */
   texto: string;
+  /** Texto secundario y pestañas inactivas; ≥ 4.5:1 sobre `fondo`, `superficie` y `superficieAlterna`. */
   textoSecundario: string;
   /** Texto deshabilitado; solo para elementos inactivos (exentos de AA). */
   textoDeshabilitado: string;
-  /** El único color de acento: botones primarios, pestaña activa, interruptores. */
+  /**
+   * El único color de acento: botones primarios, pestaña activa, interruptores. ≥ 3:1 contra `fondo`,
+   * `superficie` y `superficieAlterna` (WCAG 1.4.11).
+   */
   acento: string;
-  /** Texto e íconos sobre `acento`. */
+  /** Texto e íconos sobre `acento`; ≥ 4.5:1 (AA). */
   sobreAcento: string;
-  /** Acento como texto sobre `fondo` o `superficie` (enlaces y botón de texto). */
+  /** Acento como texto sobre `fondo`, `superficie` o `superficieAlterna` (enlaces y botón de texto); ≥ 4.5:1. */
   acentoTexto: string;
   /**
    * Solo para el faltante (02-UX §14: "nunca en rojo salvo el faltante"). Siempre acompañado
-   * de texto: ninguna información solo por color.
+   * de texto: ninguna información solo por color. ≥ 4.5:1 sobre `fondo`, `superficie` y `superficieAlterna`.
    */
   faltante: string;
-  /** Fondo del aviso inferior (toast). */
+  /** Fondo del aviso inferior (toast); contraste con `sobreAviso` y `avisoAccion`. */
   aviso: string;
+  /** Texto del aviso; ≥ 4.5:1 sobre `aviso`. */
   sobreAviso: string;
-  /** Acción dentro del aviso ("Deshacer"). */
+  /** Acción dentro del aviso ("Deshacer"); ≥ 4.5:1 sobre `aviso`. */
   avisoAccion: string;
-  /** Anillo de foco y de campo activo. */
+  /** Anillo de foco y de campo activo; ≥ 3:1 contra `fondo` y `superficie` (WCAG 1.4.11). */
   foco: string;
   /** Velo detrás de hojas y del bloqueo. */
   velo: string;
@@ -99,7 +108,10 @@ export const colores: Record<EsquemaColor, Colores> = {
 /** Degradado de marca (bienvenida, ícono, bloqueo). */
 export const degradadoMarca = [marca.claro, marca.oscuro] as const;
 
-/** Escala de espaciado en dp (base 4). */
+/**
+ * Escala de espaciado en dp (base 4). En `gap` y `padding` de pantallas usa solo estos valores
+ * (y `margenPantalla`); guía en `README.md` de esta carpeta.
+ */
 export const espacio = {
   xxs: 2,
   xs: 4,
