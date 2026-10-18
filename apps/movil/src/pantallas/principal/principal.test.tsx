@@ -442,9 +442,12 @@ describe('Cuentas', () => {
 
   it('cada saldo trae accessibilityLabel con contexto y la cifra en palabras (02 §15)', () => {
     const p = conEscenario('e4-01');
+    const bbvaId = p.e.cuentas.bbva as string;
+    const bbva = listarCuentas(p.ctx).tienes.find((c) => c.id === bbvaId);
+    if (!bbva) throw new Error('e4-01 sin BBVA en Tienes');
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
-    expect(screen.getByTestId(`cuenta-${p.e.cuentas.bbva}-saldo`).props.accessibilityLabel).toBe(
-      `${contextoSaldoTienes('BBVA')} ${cifraEnPalabras(359_000)}`,
+    expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
+      `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(359_000)}`,
     );
     expect(screen.getByTestId(`cuenta-${p.e.cuentas.nu}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoTarjeta('Nu', false)} ${cifraEnPalabras(200_000)}`,

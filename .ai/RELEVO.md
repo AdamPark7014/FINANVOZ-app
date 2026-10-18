@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **PantallaCuentas:** vacíos con `etiquetaVacioCuentas*` + `EstadoVacio.etiquetaAccesible`; `cuentas-titulo` y `seccion-*-titulo` header; botones Cobrar/Ver/Contar con etiqueta TalkBack contextual (ya en `e605751` / batch previo).
-- **principal.test:** aserción de saldo BBVA usa el nombre real de la cuenta en e4-01 (no asumir «BBVA» corto).
+- **Cuentas:** botón Gastos compartidos usa `BTN_COMPARTIDOS_CUENTAS` en `compartido/textos.ts` (simétrico a suscripciones y deducciones).
 
 ## Hecho (acumulado reciente)
 
-- Deducciones, tabs, onboarding/captura, Chip. Ver `git log`.
+- Pestañas TalkBack, copy Cuentas en `textos.ts`, onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal params: Adam.
+- M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+2. Centralizar copy O5–O7 tips duplicados (`tips.ts` vs `textos.ts`) si conviene un solo export.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
