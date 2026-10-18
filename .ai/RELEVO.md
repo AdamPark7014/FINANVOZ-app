@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **Hoy:** aviso de riesgo con `accessibilityLiveRegion="assertive"` + prueba (`48a576f`).
-- **Movimientos:** `testID` por día en encabezados de grupo + prueba (`e46fdd5`).
+- **Movimientos:** aserción TalkBack `accessibilityRole="header"` en encabezado de día (`movimientos-dia-*`).
 
 ## Hecho (acumulado reciente)
 
-- O4 `PISTA_CUENTAS_CONTINUAR`, personas vacío TalkBack, Cuentas CTAs. Ver `git log`.
+- Cuentas BTN Ajustes/tarjeta centralizados; captura/personas; onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en disco (`git status`) — no reescribir; salvar o commitear en turno aparte.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP captura/me-alcanza/tarjetas sin mezclar batches.
+2. Headers TalkBack en pantallas restantes (Registrar, etc.) si hace falta.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
