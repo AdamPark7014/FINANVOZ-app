@@ -7,6 +7,9 @@ import {
   BTN_INVITACION_AVISOS_NO,
   BTN_INVITACION_AVISOS_SI,
   CUERPO_INVITACION_AVISOS,
+  etiquetaAccesibleInvitacionAvisos,
+  PISTA_INVITACION_AVISOS_NO,
+  PISTA_INVITACION_AVISOS_SI,
   TITULO_INVITACION_AVISOS,
 } from './textos';
 
@@ -43,14 +46,24 @@ export function InvitacionAvisos() {
 
   if (!notificaciones || !hayTarjetas || oculta || permiso !== 'sin_preguntar') return null;
   return (
-    <Tarjeta testID="invitacion-avisos">
-      <Texto variante="cuerpoFuerte">{TITULO_INVITACION_AVISOS}</Texto>
-      <Texto variante="secundario" tono="secundario">
+    <Tarjeta testID="invitacion-avisos" accionesAnidadas>
+      <Texto variante="cuerpoFuerte" testID="invitacion-avisos-titulo" importantForAccessibility="no">
+        {TITULO_INVITACION_AVISOS}
+      </Texto>
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID="invitacion-avisos-cuerpo"
+        accessibilityRole="alert"
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={etiquetaAccesibleInvitacionAvisos()}
+      >
         {CUERPO_INVITACION_AVISOS}
       </Texto>
       <Boton
         etiqueta={BTN_INVITACION_AVISOS_SI}
         testID="invitacion-avisos-si"
+        pista={PISTA_INVITACION_AVISOS_SI}
         alPresionar={() => {
           setOculta(true);
           notificaciones
@@ -67,6 +80,7 @@ export function InvitacionAvisos() {
         etiqueta={BTN_INVITACION_AVISOS_NO}
         variante="texto"
         testID="invitacion-avisos-no"
+        pista={PISTA_INVITACION_AVISOS_NO}
         alPresionar={() => {
           descartadaEnSesion = true;
           setOculta(true);
