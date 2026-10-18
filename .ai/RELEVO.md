@@ -6,23 +6,23 @@
 
 ## Hecho en este turno
 
-- **PreviaWidget:** prueba «ocultar montos» alinea vista real, label hablado y `within` + `includeHiddenElements` (TalkBack simétrico con fila con cifra).
+- **Onboarding O4:** quitada definición duplicada de `TIP_CUENTAS_MINIMO` en `textos.ts`; sigue reexportándose desde `tips.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Fiscal deducciones, TalkBack headers, tabs/onboarding/widget. Ver `git log`.
+- Persona: `PISTA_VOLVER` en volver, título con `accessibilityRole="header"`; deducciones/suscripciones/cuentas copy en `textos.ts`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP en disco (personas, onboarding) — no mezclar sin leer diff.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal params: Adam.
+- M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio + paquete contador cuando toque el hito.
-3. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+2. Revisar otros tips O5–O7 por duplicado en `textos.ts` vs `tips.ts`.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
