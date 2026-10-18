@@ -6,27 +6,28 @@
 
 ## Hecho en este turno
 
-- **onboarding:** copy O2 (consentimiento) centralizado en `textos.ts` y cableado en `consentimiento.tsx`; prueba §14 ampliada en `textos.test.ts`. O1 + progreso TalkBack ya en `textos.ts`.
+- **ajustes:** `PISTA_VOLVER` + hint TalkBack en Volver (cf7706f/34f6fee); `testID` en tarjeta Bloqueo.
 
 ## Hecho (acumulado reciente)
 
-- ui a11y EstadoVacio/Boton/CampoTexto, tandas, suscripciones. Ver `git log`.
+- Copy/a11y móvil, EstadoVacio ui, onboarding. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE` sin commitear).
+- WIP ajeno: deducciones, principal/Chip, onboarding — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 en `textos.ts` (ingreso, cuentas, pagos-fijos, colchon, tarjeta).
+2. Commits pequeños del WIP pendiente.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- `captura/` / `tarjetas/` WIP ajeno salvo pedido explícito.
 
 ## Estimación rápida
 
