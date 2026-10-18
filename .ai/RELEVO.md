@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Onboarding:** tips O3–O7 viven en `tips.ts`; `textos.ts` solo reexporta (sin ciclo tips↔textos).
+- **Onboarding tips:** copy O3–O7 vive en `tips.ts`; `textos.ts` reexporta para pantallas y pruebas (sin ciclo `tips` ↔ `textos`).
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget test, deducciones/plan/estado-cuenta a11y, personas Cobrar. Ver `git log`.
+- Personas/tandas/cuentas TalkBack, widget/deducciones/arqueo, principal tests. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Typecheck móvil: TS pendientes (`MesesYPagos`, `ConfirmacionRegistro`, etc.).
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal params: Adam.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Copy O3–O7 restante en `textos.ts` (no tips).
+2. `TIP_CAPTURA_AHORA_NO` / O6: mismo patrón si hace falta reexport en `textos.ts`.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
