@@ -33,7 +33,6 @@ import {
   PISTA_NO_ES,
   PISTA_VOLVER,
   TEXTO_HOY_APARTA,
-  etiquetaVacioSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
   TITULO_PANTALLA,
   type AccionSuscripcion,

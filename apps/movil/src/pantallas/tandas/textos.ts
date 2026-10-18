@@ -9,11 +9,7 @@ export const TITULO_TANDAS = 'Tandas';
 /** Entrada desde Cuentas (`02 §18`). */
 export const BTN_TANDAS_CUENTAS = 'Ver mis tandas';
 export const ETIQUETA_NUEVA_TANDA = 'Nueva tanda';
-/** TalkBack en lista vacía o con tandas (`02 §18`). */
-export const PISTA_NUEVA_TANDA = 'Abre el formulario para registrar tu tanda';
 export const ETIQUETA_VER_CALENDARIO = 'Ver calendario';
-/** TalkBack al abrir el detalle desde la lista (`02 §18`). */
-export const PISTA_VER_CALENDARIO = 'Abre el calendario y las acciones de esta tanda';
 
 /** Tarjetas de Hoy (debe coincidir con `servicios/tandas.ts`). */
 export const PREGUNTA_YA_DISTE = '¿Ya diste tu tanda?';
@@ -159,6 +155,10 @@ export const TEXTO_NO_ES_INGRESO = 'Esto es tu dinero de vuelta, no un ingreso.'
 /** Lista de tandas vacía (`02 §18`). */
 export const TEXTO_TANDAS_VACIO =
   'Agrega tu tanda y aparto cada aportación el día que toca.';
+
+export function etiquetaVacioTandas(): string {
+  return `${TITULO_TANDAS}. ${TEXTO_TANDAS_VACIO}`;
+}
 
 export const textoAportado = (centavos: number) => `Llevas ${formatearCentavos(centavos)} aportados`;
 export const textoEnRiesgo = (centavos: number) =>

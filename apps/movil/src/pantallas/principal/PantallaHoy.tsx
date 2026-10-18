@@ -179,7 +179,7 @@ export function PantallaHoy({
         <Boton
           etiqueta="¿Me alcanza?"
           variante="secundario"
-          pista="Calcula si te alcanza para una compra"
+          pista={PISTA_ME_ALCANZA_HOY}
           alPresionar={() => navegacion.alAbrirMeAlcanza?.()}
           testID="boton-me-alcanza"
         />

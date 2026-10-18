@@ -587,15 +587,11 @@ export function ImportarCompartidas({
       {estado.tipo === 'listo' ? <ResultadoImportacionTarjeta r={estado.r} /> : null}
       {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
       {estado.tipo === 'vacio' ? (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
+        <EstadoVacio
+          texto={TEXTO_IMPORTAR_VACIO}
           testID="importar-vacio"
-          accessibilityRole="text"
-          accessibilityLabel={TEXTO_IMPORTAR_VACIO}
-        >
-          {TEXTO_IMPORTAR_VACIO}
-        </Texto>
+          etiquetaAccesible={etiquetaVacioImportar()}
+        />
       ) : null}
       {estado.tipo !== 'leyendo' ? (
         <>
