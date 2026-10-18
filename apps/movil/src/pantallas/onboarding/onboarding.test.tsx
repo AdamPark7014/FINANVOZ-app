@@ -30,8 +30,10 @@ import {
   TIP_INGRESO_SALTAR,
   TIP_PAGOS_SALTAR,
 } from './tips';
+import { etiquetaHablada } from '../../ui';
 import {
   etiquetaProgresoOnboarding,
+  etiquetaProximoPagoOnboarding,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
   PISTA_ONB_EMPEZAR,
@@ -194,6 +196,9 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
     escribir('onb-ingreso-monto', '13,000');
     expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/jue 15/);
+    expect(screen.getByTestId('onb-proximo-pago').props.accessibilityLabel).toBe(
+      etiquetaHablada(etiquetaProximoPagoOnboarding('jue 15 oct 2026')),
+    );
     tocar('onb-ingreso-continuar');
     expect(r.getPathname()).toBe('/onboarding/cuentas');
 

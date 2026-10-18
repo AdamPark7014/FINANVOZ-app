@@ -32,6 +32,7 @@ import {
   etiquetaVacioCapturasPorRevisar,
   INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
+  PISTA_YA_REGISTRE_AVISO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,
 } from './textos';
@@ -156,6 +157,10 @@ describe('Movimientos → capturas por revisar', () => {
     expect(screen.getByTestId('capturas-por-revisar')).toBeTruthy();
     expect(screen.getByTestId('capturas-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('capturas-por-revisar-intro')).toHaveTextContent(INTRO_CAPTURAS_POR_REVISAR);
+    expect(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_YA_REGISTRE_AVISO,
+    );
     expect(
       within(screen.getByTestId(`captura-${noReconocida?.capturaId}`)).getByRole('header'),
     ).toBeTruthy();

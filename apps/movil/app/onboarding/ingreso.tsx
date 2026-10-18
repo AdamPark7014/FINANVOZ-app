@@ -1,6 +1,7 @@
 import type { Centavos, DiaSemana, PlainDate } from '@cartera/core';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import {
   Chips,
   ERROR_GUARDAR,
@@ -20,6 +21,7 @@ import {
   ETIQUETA_MONTO_INGRESO,
   ETIQUETA_PROXIMA_VEZ_INGRESO,
   ETIQUETA_PROXIMO_PAGO,
+  etiquetaProximoPagoOnboarding,
   PISTA_INGRESO_SALTAR,
   PISTA_ONB_CONTINUAR,
   TIP_INGRESO_SALTAR,
@@ -43,7 +45,7 @@ import {
   proximoPago,
 } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Tarjeta, Texto } from '../../src/ui';
+import { Boton, CampoMonto, CampoTexto, etiquetaHablada, Tarjeta, Texto } from '../../src/ui';
 
 /** O3 · Ingreso (`02 §3`): frecuencia en chips, monto y próximo pago precalculado. Saltar = ingreso variable. */
 export default function Ingreso() {
@@ -170,12 +172,23 @@ export default function Ingreso() {
             alCambiar={setFinDeSemana}
           />
           {proximo ? (
-            <Tarjeta testID="onb-proximo-pago">
-              <Texto variante="secundario" tono="secundario">
-                {ETIQUETA_PROXIMO_PAGO}
-              </Texto>
-              <Texto variante="subtitulo">{etiquetaFecha(proximo)}</Texto>
-            </Tarjeta>
+            <View
+              testID="onb-proximo-pago"
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel={etiquetaHablada(
+                etiquetaProximoPagoOnboarding(etiquetaFecha(proximo)),
+              )}
+            >
+              <Tarjeta>
+                <Texto variante="secundario" tono="secundario" accessibilityElementsHidden>
+                  {ETIQUETA_PROXIMO_PAGO}
+                </Texto>
+                <Texto variante="subtitulo" accessibilityElementsHidden>
+                  {etiquetaFecha(proximo)}
+                </Texto>
+              </Tarjeta>
+            </View>
           ) : null}
         </>
       )}

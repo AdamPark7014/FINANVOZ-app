@@ -52,6 +52,11 @@ export const AYUDA_MONTO_INGRESO = 'Lo que te llega a la cuenta, ya con descuent
 export const ETIQUETA_FIN_DE_SEMANA_INGRESO = 'Si cae en fin de semana te pagan:';
 export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
+/** TalkBack O3: la fecha calculada no depende solo del subtítulo visual. */
+export function etiquetaProximoPagoOnboarding(fechaLegible: string): string {
+  return `${ETIQUETA_PROXIMO_PAGO}: ${fechaLegible}`;
+}
+
 /** O4 · Cuentas */
 export const TITULO_CUENTAS = '¿Con qué pagas?';
 export const PISTA_CUENTAS_CONTINUAR = 'Pasa a tus pagos fijos del mes';

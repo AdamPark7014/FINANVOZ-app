@@ -14,6 +14,14 @@ export function etiquetaVacioCapturasPorRevisar(): string {
   return `${TITULO_CAPTURAS_POR_REVISAR}. ${TEXTO_CAPTURAS_POR_REVISAR_VACIO}`;
 }
 
+/** TalkBack en CTAs de capturas por revisar (`02 §6`, `02 §15`). */
+export const PISTA_REGISTRAR_AVISO = 'Abre el formulario para anotar este aviso a mano';
+export const PISTA_YA_REGISTRE_AVISO = 'Quita este aviso de la lista; ya lo anotaste';
+export const PISTA_DESCARTAR_AVISO = 'Quita este aviso sin registrarlo';
+export const PISTA_CONFIRMAR_CAPTURA = 'Confirma que la captura está correcta';
+export const PISTA_CAPTURA_DE_CONTADO = 'Indica que no fue a meses sin intereses';
+export const PISTA_CAMBIAR_CATEGORIA_CAPTURA = 'Elige otra categoría para esta captura';
+
 export const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
 export const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
 export const AVISO_SIN_TEXTO =

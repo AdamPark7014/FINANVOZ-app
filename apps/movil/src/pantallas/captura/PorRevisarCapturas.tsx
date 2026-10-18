@@ -29,6 +29,12 @@ import {
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   TITULO_CAPTURAS_POR_REVISAR,
   TITULO_SIN_COMERCIO,
+  PISTA_CAMBIAR_CATEGORIA_CAPTURA,
+  PISTA_CAPTURA_DE_CONTADO,
+  PISTA_CONFIRMAR_CAPTURA,
+  PISTA_DESCARTAR_AVISO,
+  PISTA_REGISTRAR_AVISO,
+  PISTA_YA_REGISTRE_AVISO,
 } from './textos';
 
 const MOTIVO: Record<CapturaPorRevisar['motivos'][number], string> = {
@@ -131,6 +137,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
               refrescar();
               alRegistrar();
             }}
+            pista={PISTA_REGISTRAR_AVISO}
             testID={`${testID}-registrar`}
           />
           <Boton
@@ -139,6 +146,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             alPresionar={() =>
               hacer(() => marcarNoReconocidaRevisada(ctx, c.capturaId), 'Listo, lo quité de la lista.')
             }
+            pista={PISTA_YA_REGISTRE_AVISO}
             testID={`${testID}-ya`}
           />
           <Boton
@@ -147,6 +155,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             alPresionar={() =>
               hacer(() => marcarNoReconocidaRevisada(ctx, c.capturaId), 'Listo, lo descarté.')
             }
+            pista={PISTA_DESCARTAR_AVISO}
             testID={`${testID}-descartar`}
           />
         </View>
@@ -223,6 +232,9 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
           <Boton
             etiqueta={c.motivos.includes('fue_a_meses') ? 'No, fue de contado' : 'Está bien así'}
             alPresionar={() => hacer(() => confirmarCaptura(ctx, c.capturaId), 'Listo, revisado.')}
+            pista={
+              c.motivos.includes('fue_a_meses') ? PISTA_CAPTURA_DE_CONTADO : PISTA_CONFIRMAR_CAPTURA
+            }
             testID={`${testID}-confirmar`}
           />
         ) : null}
@@ -231,6 +243,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
             etiqueta="Cambiar categoría"
             variante="texto"
             alPresionar={() => setCambiando(true)}
+            pista={PISTA_CAMBIAR_CATEGORIA_CAPTURA}
             testID={`${testID}-cambiar`}
           />
         ) : null}

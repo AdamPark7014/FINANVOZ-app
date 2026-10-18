@@ -11,7 +11,9 @@ import {
   ERROR_GUARDAR,
   ERROR_PAGO_FIJO_INCOMPLETO,
   etiquetaProgresoOnboarding,
+  etiquetaProximoPagoOnboarding,
   etiquetaTipOnboarding,
+  ETIQUETA_PROXIMO_PAGO,
   PASOS_ONBOARDING,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
@@ -55,6 +57,12 @@ describe('textos de onboarding', () => {
       expect(texto).not.toMatch(/por favor/i);
     }
     expect(AYUDA_BIENVENIDA).toMatch(/\btu\b/i);
+  });
+
+  it('TalkBack O3 antepone la etiqueta al próximo pago calculado', () => {
+    expect(etiquetaProximoPagoOnboarding('jue 15 oct 2026')).toBe(
+      `${ETIQUETA_PROXIMO_PAGO}: jue 15 oct 2026`,
+    );
   });
 
   it('TalkBack del progreso describe el recorrido inicial', () => {

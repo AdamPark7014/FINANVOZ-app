@@ -134,7 +134,11 @@ export function PantallaMovimientos({
           <Texto variante="subtitulo" testID="movimientos-por-revisar-titulo" accessibilityRole="header">
             {TITULO_POR_REVISAR}
           </Texto>
-          <Texto variante="secundario" tono="secundario">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="movimientos-por-revisar-intro"
+          >
             {TEXTO_POR_REVISAR}
           </Texto>
           {/* Las que ya entendí pero necesitan que confirmes algo llevan "Revisar". */}

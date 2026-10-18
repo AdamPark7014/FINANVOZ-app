@@ -36,6 +36,7 @@ import {
   TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
+  TEXTO_POR_REVISAR,
   MENSAJE_ANULADO_MOVIMIENTO,
   SUBTITULO_SIN_INGRESO,
   TITULO_SIN_INGRESO,
@@ -551,6 +552,7 @@ describe('Movimientos', () => {
     const [frase] = listarPorInterpretar(p.ctx);
     expect(frase).toBeTruthy();
     expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveTextContent(TEXTO_POR_REVISAR);
     expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
       'accessibilityHint',
       PISTA_DESCARTAR_FRASE,

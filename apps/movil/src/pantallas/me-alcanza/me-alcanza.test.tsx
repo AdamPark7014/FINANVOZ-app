@@ -56,6 +56,7 @@ import {
   ERROR_PRECIO,
   ETIQUETA_OPCION_RECOMENDADA,
   ETIQUETA_PROGRESO,
+  SUFIJO_ACCESIBILIDAD_RECOMENDADA,
   etiquetaVacioDatosInsuficientes,
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
@@ -267,6 +268,9 @@ describe('¿Me alcanza?', () => {
     expect(textoDe('etiqueta-msi')).toBe('A 3 MSI con la Oro');
     expect(textoDe('etiqueta-esperar')).toBe('El jue 15, con tu quincena');
     expect(textoDe('etiqueta-base')).toBe('Sin comprarlos');
+    expect(screen.getByLabelText(`A 3 MSI con la Oro: 89 %${SUFIJO_ACCESIBILIDAD_RECOMENDADA}`)).toBeTruthy();
+    expect(screen.getByTestId('etiqueta-msi')).toHaveProp('importantForAccessibility', 'no');
+    expect(screen.getByTestId('porcentaje-msi')).toHaveProp('importantForAccessibility', 'no');
     // La recomendada se marca con texto, no solo con color (`02 §15`).
     expect(screen.getByText(ETIQUETA_OPCION_RECOMENDADA)).toBeTruthy();
     expect(screen.getByTestId('recomendado-msi')).toBeTruthy();

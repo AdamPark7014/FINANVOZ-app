@@ -539,10 +539,10 @@ function FilaEscenario({
         accessibilityLabel={`${e.etiqueta}: ${e.porcentaje}${e.recomendado ? SUFIJO_ACCESIBILIDAD_RECOMENDADA : ''}`}
         style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
       >
-        <Texto variante="cuerpoFuerte" style={{ flex: 1 }} testID={`etiqueta-${e.tipo}`}>
+        <Texto variante="cuerpoFuerte" style={{ flex: 1 }} testID={`etiqueta-${e.tipo}`} importantForAccessibility="no">
           {e.etiqueta}
         </Texto>
-        <Texto variante="cuerpoFuerte" testID={`porcentaje-${e.tipo}`}>
+        <Texto variante="cuerpoFuerte" testID={`porcentaje-${e.tipo}`} importantForAccessibility="no">
           {e.porcentaje}
         </Texto>
       </View>

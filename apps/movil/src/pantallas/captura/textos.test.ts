@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PERMISO_DENEGADO,
   PERMISO_INSTRUCCION,
+  PISTA_YA_REGISTRE_AVISO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   etiquetaPermisoCaptura,
   etiquetaVacioCapturasPorRevisar,
@@ -9,7 +10,12 @@ import {
 
 describe('captura/textos', () => {
   it('vacío y permisos cumplen 02 §14 (sin exclamación)', () => {
-    for (const copy of [TEXTO_CAPTURAS_POR_REVISAR_VACIO, PERMISO_INSTRUCCION, PERMISO_DENEGADO]) {
+    for (const copy of [
+      TEXTO_CAPTURAS_POR_REVISAR_VACIO,
+      PERMISO_INSTRUCCION,
+      PERMISO_DENEGADO,
+      PISTA_YA_REGISTRE_AVISO,
+    ]) {
       expect(copy).not.toMatch(/!/);
     }
   });
