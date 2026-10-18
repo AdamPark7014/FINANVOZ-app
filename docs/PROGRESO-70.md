@@ -6,6 +6,18 @@ Documento denso tras oleadas **W1–W9** y **V1–V20** en `FINANVOZ-app`. Fábr
 
 ---
 
+## H9 · Analítica (flake)
+
+| Veredicto | Detalle |
+|---|---|
+| **Estable** | Sin flake reproducible en analítica/corrección (2026-10-17). Jest móvil `testPathPattern=analitica`: **8/8**. Vitest `analitica.test.ts` + lista blanca: **11/11** en corrida acotada. |
+
+**Paths clave:** `apps/movil/src/pantallas/principal/ConfirmacionRegistro.tsx` (`EnlaceAnaliticaCorreccion`), `apps/movil/src/servicios/correcciones.ts` (`enlaceAnaliticaCorreccion`, `camposCorreccionAnalitica`), tests `analitica-correccion-voz.test.tsx`, `analitica-captura.test.tsx`, `pantallas/analitica.test.tsx`, `src/analitica/analitica.test.ts`, `src/analitica/eventos.ts`, `src/servicios/explicar.test.ts` (evento `modo_explicar`).
+
+**No confundir con:** flake histórico de **RNF-01** (`rendimiento.test.ts`, E4/E8 bajo carga) — mitigado en `b852b4a` pero puede fallar en Windows lento; suites **proxy** PGlite (`compartido/rls`, etc.) por timeout de entorno.
+
+---
+
 ## Tabla de avance (%)
 
 | Métrica | % | Qué cuenta |
@@ -19,11 +31,20 @@ Documento denso tras oleadas **W1–W9** y **V1–V20** en `FINANVOZ-app`. Fábr
 | Track | % | Nota |
 |---:|---:|---|
 | 1 · FinanVoz first | **69** | Código ~93 %; camino a tienda ~36 % |
-| 2 · Estándar | **48** | ESTADO/LANZAMIENTO/relevo; `pnpm test` verde en HEAD (RLS PGlite puede flakear en Windows bajo carga) |
+| 2 · Estándar | **48** | ESTADO/LANZAMIENTO/relevo; analítica estable (H9); CI global: RNF-01/proxy PGlite según máquina |
 | 3 · Fábrica | **12** | ADR coexistencia; sin `apply.mjs` sobre este monorepo |
 | 4 · RestaurantOS | **8** (piloto) | Stub en portfolio; `food/RestaurantOS` maduro aparte |
 
 Objetivo «70 % en 2 días»: **cumplido en código FinanVoz**; **no** en lanzamiento medible ni en plan four-track completo.
+
+---
+
+## Oleadas W / V (paths en repo)
+
+| Oleada | Qué | Paths (muestra) |
+|---|---|---|
+| **W1–W9** | NLU/proxy, pulido móvil, avisos, captura, analítica lista blanca, build | `services/proxy/supabase/functions/nlu-interpretar/`, `apps/movil/src/avisos/rutas.ts`, `apps/movil/src/captura/tarea.ts`, `apps/movil/src/analitica/`, `apps/movil/src/servicios/correcciones.ts`, `apps/movil/app.config.ts`, `eas.json`, `apps/calculadora/` |
+| **V1–V20** | Personas/tandas, suscripciones, widget, explicar, deducciones, E8 SQL, compartido | `apps/movil/src/pantallas/personas/`, `apps/movil/src/pantallas/tandas/`, `apps/movil/src/tareas/diaria.ts`, `apps/movil/src/widget/`, `apps/movil/src/servicios/explicar.ts`, `apps/movil/src/servicios/historial.ts`, `packages/sincronizacion/`, `packages/core/src/simulador/` |
 
 ---
 
