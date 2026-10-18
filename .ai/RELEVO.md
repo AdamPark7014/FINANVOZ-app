@@ -1,26 +1,26 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-17
+- **Fecha:** 2026-10-18
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **UI tests TalkBack:** corrige expect de `EstadoVacio` (copy «Todavía…») y micro test de cifras en palabras en vacíos.
+- **Cuentas:** prueba del engrane Ajustes usa `accessibilityLabel` (`BTN_AJUSTES_CUENTAS_ACCESIBLE`), no `getByText` del emoji visible.
 
 ## Hecho (acumulado reciente)
 
-- `EstadoVacio` + `etiquetaCampoMonto`; me-alcanza pistas; CampoMonto en pesos. Ver `git log`.
+- Por revisar header, deducciones/suscripciones CTAs TalkBack, onboarding tips. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: ajustes, movimientos, Chip.test — revisar `git status` antes de editar.
-- CI Windows; M0 Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajustes/movimientos en disco.
+2. Push commits locales si quedan ahead de origin.
 
 ## No tocar
 
