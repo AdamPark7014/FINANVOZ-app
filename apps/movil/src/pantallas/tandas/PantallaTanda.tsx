@@ -6,7 +6,6 @@ import {
   editarTanda,
   listarCuentas,
   type DetalleTanda,
-  type RondaTandaVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
@@ -14,19 +13,33 @@ import { Chips, MensajeError } from '../onboarding/componentes';
 import { Seccion } from '../tarjetas/componentes';
 import { codigoError, mensajeError } from '../principal/textos';
 import { ElegirCuentaTanda, MeTocoLaTanda, useYaLaDi } from './componentes';
-import { textoAportado, textoEnRiesgo, textoPorAportar, TEXTO_NO_ES_INGRESO } from './textos';
-
-const ESTADO_RONDA: Record<NonNullable<RondaTandaVista['estado']>, string> = {
-  pendiente: 'Por dar',
-  cubierta: 'Ya la diste',
-  omitida: 'Ya la habías dado',
-};
-
-function etiquetaRonda(r: RondaTandaVista, archivada: boolean): string {
-  if (!r.estado) return 'Más adelante';
-  if (archivada && r.estado === 'omitida') return 'Cancelada';
-  return ESTADO_RONDA[r.estado];
-}
+import {
+  ETIQUETA_ARCHIVAR_TANDA,
+  ETIQUETA_CANCELAR,
+  ETIQUETA_CUENTA_APORTACION,
+  ETIQUETA_CUENTA_PREGUNTAR,
+  ETIQUETA_EDITAR_NOMBRE_CUENTA,
+  ETIQUETA_GUARDAR_CAMBIOS,
+  ETIQUETA_ME_TOCO,
+  ETIQUETA_NOMBRE,
+  ETIQUETA_VOLVER,
+  ETIQUETA_YA_LA_DI,
+  ERROR_NOMBRE_TANDA_VACIO,
+  etiquetaEstadoRonda,
+  TEXTO_CONFIRMAR_ARCHIVAR,
+  TEXTO_NO_ES_INGRESO,
+  TEXTO_TANDA_ARCHIVADA,
+  TEXTO_TANDA_NO_ENCONTRADA,
+  textoAportado,
+  textoCobras,
+  textoDespuesRondaRiesgo,
+  textoEnRiesgo,
+  textoLineaRonda,
+  textoPorAportar,
+  textoProximaAportacion,
+  textoSubtituloTanda,
+  TITULO_CALENDARIO,
+} from './textos';
 
 /**
  * Detalle de una tanda (`02 §18`): calendario de rondas con la tuya marcada (E11), "Llevas $1,500 aportados",
@@ -48,8 +61,10 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
   if (!existe) {
     return (
       <Pantalla testID="pantalla-tanda" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta="Volver" variante="texto" ancho="contenido" alPresionar={alVolver} />
-        <Texto variante="cuerpo">No encontré esa tanda.</Texto>
+        <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Texto variante="cuerpo" tono="secundario" testID="tanda-no-encontrada">
+          {TEXTO_TANDA_NO_ENCONTRADA}
+        </Texto>
       </Pantalla>
     );
   }
