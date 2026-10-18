@@ -65,6 +65,7 @@ import {
   PISTA_CALCULAR,
   PISTA_CAMBIAR_DATOS_ME_ALCANZA,
   PISTA_CANCELAR,
+  PISTA_HACER_OTRA_CUENTA,
   PISTA_LISTO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
@@ -283,7 +284,7 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
     expect(screen.getByTestId('lo-compre-contado_hoy')).toBeTruthy();
     expect(screen.getByRole('button', { name: BTN_COMO_LO_CALCULE })).toBeTruthy();
-    expect(screen.getByTestId('boton-otra-cuenta')).toBeTruthy();
+    expect(screen.getByTestId('boton-otra-cuenta')).toHaveProp('accessibilityHint', PISTA_HACER_OTRA_CUENTA);
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
     // Texto fijo de `08 §1`.

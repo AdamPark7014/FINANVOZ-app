@@ -59,6 +59,7 @@ import {
   PISTA_CALCULAR,
   PISTA_CAMBIAR_DATOS_ME_ALCANZA,
   PISTA_CANCELAR,
+  PISTA_HACER_OTRA_CUENTA,
   PISTA_LISTO,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
@@ -517,6 +518,7 @@ function Resultado({
         variante="texto"
         ancho="contenido"
         alPresionar={alOtraCuenta}
+        pista={PISTA_HACER_OTRA_CUENTA}
         testID="boton-otra-cuenta"
       />
     </View>

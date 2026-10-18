@@ -75,6 +75,8 @@ export const BTN_OCULTAR_COMO_LO_CALCULE = 'Ocultar cómo lo calculé';
 export const BTN_VER_MOVIMIENTOS = 'Ver los movimientos';
 export const BTN_LO_COMPRE = 'Lo compré';
 export const BTN_HACER_OTRA_CUENTA = 'Hacer otra cuenta';
+/** TalkBack en resultado (`02 §19`). */
+export const PISTA_HACER_OTRA_CUENTA = 'Vuelve al formulario para simular otra compra';
 export const BTN_DESHACER = 'Deshacer';
 
 export const MENSAJE_AVISO_RECORDATORIO = 'Listo: te lo recuerdo ese día.';
