@@ -36,7 +36,7 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
       <Boton
         testID="ajustes-cambiar-ingreso"
         variante="secundario"
-        etiqueta={configurado ? 'Cambiar mi ingreso' : 'Decir cada cu?ndo me pagan'}
+        etiqueta={configurado ? ETIQUETA_CAMBIAR_INGRESO : ETIQUETA_CONFIGURAR_INGRESO}
         alPresionar={alCambiar}
       />
     </Tarjeta>

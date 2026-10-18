@@ -6,27 +6,30 @@
 
 ## Hecho en este turno
 
-- **O6 captura:** verificado en `main` — tip es-MX permiso de notificaciones (`TIP_CAPTURA_AHORA_NO` + `captura.tsx` + pruebas); origin al día.
+- **deducciones:** empty state es-MX — `TEXTO_FACTURAS_VACIO` / `TEXTO_IMPORTAR_VACIO`, `deducciones-sin-facturas` / `importar-vacio`, test en `deducciones.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-Ver `git log` (tips onboarding O2/O6/O7, captura, ajustes ingreso, etc.).
+Ver `docs/ESTADO.md` y `git log` (empty states tandas/personas/suscripciones, ¿Me alcanza?, captura O6, etc.).
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (no commitear mezclado): principal, tarjetas, respaldo, calculadora, arqueo, etc.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- CI: `publicar-ejemplos.test.ts` y `rendimiento.test.ts` (RNF-01) pueden fallar en Windows.
+- M0 / Expo / teléfono / legal / fiscal: sin cambio (Adam).
+- `semilla.ts` / `semilla.test.ts`: typecheck preexistentes en movil (no tocados).
+- Otro agente: cambios sin commitear en ajustes/ingreso — no mezclar.
 
 ## Siguiente paso
 
-1. Adam — M0 / EAS.
-2. Teléfono — flujos compartido e ingreso.
+1. Adam — M0 y EAS (LANZAMIENTO sentadas 1–2).
+2. Teléfono — CA-M12-02 importar facturas.
+3. Commits pequeños por oleada de copy en working tree.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `packages/core` E*, vectores a mano.
-- Archivos sin commitear del otro turno.
+- `packages/core` E*, `eas.json`, `app.config`, vectores a mano.
+- Working tree ajeno sin commitear salvo el pedido del turno.
 
 ## Estimación rápida
 

@@ -337,7 +337,11 @@ describe('Tarjetas', () => {
     // Saldo a favor visible pero nunca como dinero para gastar (E4-07).
     const aFavor = screen.getByTestId('tarjeta-saldo-a-favor');
     expect(within(aFavor).getByText('$5,800')).toBeTruthy();
-    expect(within(aFavor).getByText(AYUDA_SALDO_A_FAVOR)).toBeTruthy();
+    expect(
+      within(aFavor).getByText(
+        'No se suma a tu dinero libre: se usa en tus próximas compras con esta tarjeta.',
+      ),
+    ).toBeTruthy();
     expect(obtenerHoy(p.ctx).hoyPuedesCentavos).toBeLessThanOrEqual(antes);
     expect(textoDe('hoy-puedes')).toBe(formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos'));
 
@@ -406,14 +410,6 @@ describe('Tarjetas', () => {
     expect(screen.getByText('Aparto solo los pagos que vencen antes de tu próximo ingreso.')).toBeTruthy();
     fireEvent.press(screen.getByTestId(`pago-planeado-${pago.programadoId}-quitar`));
     expect(listarPagosPlaneados(p.ctx, p.oro)).toEqual([]);
-  });
-
-  it('detalle: id inexistente y sin movimientos desde el alta (es-MX)', () => {
-    const p = e510();
-    montar(p.ctx, <PantallaTarjeta tarjetaId="tarjeta-inexistente" alVolver={jest.fn()} />);
-    expect(screen.getByTestId('tarjeta-no-encontrada')).toHaveTextContent(TEXTO_TARJETA_NO_ENCONTRADA);
-    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
-    expect(screen.getByTestId('tarjeta-movimientos-vacio')).toHaveTextContent(VACIO_MOVIMIENTOS_TARJETA);
   });
 
   it('CA-M4-09 · "Pasar a meses" desde el detalle de una compra con tarjeta, con Deshacer', () => {

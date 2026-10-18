@@ -78,7 +78,7 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
     <>
       <Chips
         testID={`${prefijo}-frecuencia`}
-        etiqueta="¿Cada cuándo te pagan?"
+        etiqueta={PREGUNTA_FRECUENCIA}
         opciones={OPCIONES_FRECUENCIA}
         valor={valores.frecuencia}
         alCambiar={(v) => cambiar('frecuencia', v)}
@@ -86,14 +86,14 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
 
       {variable ? (
         <Texto variante="cuerpo" tono="secundario">
-          Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.
+          {TEXTO_INGRESO_VARIABLE}
         </Texto>
       ) : (
         <>
           {valores.frecuencia === 'semanal' ? (
             <Chips
               testID={`${prefijo}-dia-semana`}
-              etiqueta="¿Qué día te pagan?"
+              etiqueta={PREGUNTA_DIA_SEMANA}
               opciones={OPCIONES_DIA_SEMANA}
               valor={valores.diaSemana}
               alCambiar={(v) => cambiar('diaSemana', v)}
@@ -102,7 +102,7 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
           {valores.frecuencia === 'catorcenal' ? (
             <Chips
               testID={`${prefijo}-ancla`}
-              etiqueta="¿Cuándo te pagan la próxima vez?"
+              etiqueta={PREGUNTA_PROXIMA_VEZ}
               opciones={fechas}
               valor={valores.ancla}
               alCambiar={(v) => cambiar('ancla', v)}
@@ -111,8 +111,8 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
           {valores.frecuencia === 'mensual' ? (
             <CampoTexto
               testID={`${prefijo}-dia-mes`}
-              etiqueta="¿Qué día del mes te pagan?"
-              ejemplo="30"
+              etiqueta={PREGUNTA_DIA_MES}
+              ejemplo={EJEMPLO_DIA_MES}
               teclado="number-pad"
               valor={valores.diaMesTexto}
               alCambiar={(v) => cambiar('diaMesTexto', v)}
