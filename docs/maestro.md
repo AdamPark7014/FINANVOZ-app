@@ -19,6 +19,14 @@ No hay carpeta `e2e/` en el repo; Maestro es el E2E Android previsto en `docs/03
 3. Dispositivo visible: `adb devices`.
 4. Para **registrar por texto**, el NLU nivel 0 basta (modo avión OK). No hace falta proxy ni Plus.
 
+## Tips Android
+
+- Usa el **dev client** (`com.finanvoz.app`); Expo Go no sirve para estos flujos.
+- Deja **un solo** dispositivo en `adb devices` (emulador o teléfono, no ambos).
+- En el emulador, pon animaciones en **0×** (Opciones de desarrollador) para menos flakes en `extendedWaitUntil`.
+- Si `launchApp` hace timeout al arrancar Metro: `$env:MAESTRO_DRIVER_STARTUP_TIMEOUT = "60000"` y vuelve a correr.
+- Tras un fallo a medias, el siguiente run con `clearState: true` (onboarding) limpia datos; si no, `adb shell pm clear com.finanvoz.app`.
+
 ## Cómo correr
 
 Desde la raíz del monorepo (`FINANVOZ-app`):
