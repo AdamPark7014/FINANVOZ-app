@@ -6,27 +6,29 @@
 
 ## Hecho en este turno
 
-- **movil/privacidad:** copy en `textos.ts`; barrel `pantallas/privacidad/index.ts`; rutas `privacidad`, `terminos`, `reconsentimiento` y `aviso-privacidad` importan desde el barrel; pruebas `textos.test.ts` y `reconsentimiento-textos.test.ts`.
+- **deducciones:** copy centralizado en `textos.ts`, testIDs (`deducciones-titulo-pantalla`, `deducciones-tus-facturas`, `importar-leyendo`, empty states), pruebas enlazadas a constantes es-MX.
 
 ## Hecho (acumulado reciente)
 
-- Oleadas copy/a11y (principal, onboarding, tandas, widget). Ver `git log` y `docs/ESTADO.md`.
+- Oleadas copy/a11y (principal, onboarding, tandas, privacidad, widget). Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (ingreso, arqueo, estados-cuenta, principal) — no mezclar.
+- WIP local sin commitear (tabs, estados-cuenta, tandas, suscripciones, etc.) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP ajeno si Adam lo pide.
+2. CA-M12-02 importar facturas en teléfono.
+3. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- Working tree ajeno sin commitear salvo el pedido del turno.
 
 ## Estimación rápida
 
