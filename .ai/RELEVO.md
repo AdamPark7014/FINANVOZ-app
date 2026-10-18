@@ -6,7 +6,7 @@
 
 ## Hecho en este turno
 
-- **movil:** `app/ajustes.tsx` consume el copy de `src/pantallas/ajustes/textos.ts` vía `index.ts` (textos ya en main desde 33dd907).
+- **movil/principal/Chip.tsx:** TalkBack — `accessibilityLabel` en chip (`etiquetaAccesible`), texto oculto al lector; `GrupoChips.etiqueta` en radiogroup (71f6727); JSDoc alineado.
 
 ## Hecho (acumulado reciente)
 
@@ -17,13 +17,13 @@ Ver `docs/ESTADO.md` y `git log` (M16 compartido copy, ¿Me alcanza?, oleadas W/
 - CI: `publicar-ejemplos.test.ts` y `rendimiento.test.ts` (RNF-01) pueden fallar en Windows.
 - M0 / Expo / teléfono / legal / fiscal: sin cambio (Adam).
 - `semilla.ts` / `semilla.test.ts`: typecheck preexistentes en movil (no tocados).
-- Otros WIP locales en pantallas (ingreso, deducciones, etc.) — no commiteados en este turno.
+- Otros WIP locales en pantallas — no commiteados en este turno.
 
 ## Siguiente paso
 
 1. Adam — M0 y EAS (LANZAMIENTO sentadas 1–2).
 2. Teléfono — validar flujo compartido con cámara (140–141).
-3. Estabilizar CI sin tocar umbral RNF-01 salvo acuerdo.
+3. Pasar `etiqueta` a cada `GrupoChips` donde ya hay pregunta visible.
 
 ## No tocar
 
