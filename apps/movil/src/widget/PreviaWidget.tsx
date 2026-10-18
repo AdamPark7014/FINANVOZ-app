@@ -51,6 +51,7 @@ export function PreviaWidget({
           </Text>
           <Text
             testID="previa-widget-cifra"
+            accessibilityElementsHidden
             importantForAccessibility="no"
             style={[
               estilos.cifra,
@@ -66,6 +67,7 @@ export function PreviaWidget({
           </Text>
           <Text
             testID="previa-widget-detalle"
+            accessibilityElementsHidden
             importantForAccessibility="no"
             style={[estilos.detalle, { color: c.textoSecundario }]}
           >

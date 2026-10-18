@@ -27,6 +27,7 @@ import {
   ETIQUETA_VOLVER,
   instruccionQrTrasCrear,
   PISTA_VOLVER_CUENTAS,
+  etiquetaVacioCompartidos,
   TEXTO_COMPARTIDOS_VACIO,
   TITULO_GASTOS_COMPARTIDOS,
 } from './textos';

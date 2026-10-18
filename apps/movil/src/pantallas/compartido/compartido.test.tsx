@@ -135,6 +135,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
     expect(screen.getByTestId('compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('compartidos-vacio')).toHaveTextContent(TEXTO_COMPARTIDOS_VACIO);
+    expect(screen.getByTestId('compartidos-vacio').props.accessibilityLabel).toBe(etiquetaVacioCompartidos());
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     A.cerrar();
   });

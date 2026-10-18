@@ -87,10 +87,11 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     expect(previa.props.accessibilityLabel).not.toMatch(/\$|\d/);
     expect(JSON.stringify(screen.toJSON())).not.toMatch(/\$|214/);
     expect(auditar(screen.toJSON())).toEqual([]);
-    expect(
-      within(previa).getByTestId('previa-widget-solo-texto', { includeHiddenElements: true }).props
-        .importantForAccessibility,
-    ).toBe('no-hide-descendants');
+    const soloTextoVista = within(previa).getByTestId('previa-widget-solo-texto', {
+      includeHiddenElements: true,
+    });
+    expect(soloTextoVista.props.accessibilityElementsHidden).toBe(true);
+    expect(soloTextoVista.props.importantForAccessibility).toBe('no-hide-descendants');
     expect(
       within(previa).getByTestId('previa-widget-texto', { includeHiddenElements: true }).props
         .importantForAccessibility,

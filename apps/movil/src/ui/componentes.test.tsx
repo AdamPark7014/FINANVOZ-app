@@ -201,6 +201,11 @@ describe('EstadoVacio', () => {
     );
     expect(screen.getByTestId('vacio')).toHaveProp('accessibilityLabel', 'Debes. No debes nada.');
   });
+
+  it('pasa auditoría con etiqueta explícita (sin cifras sueltas)', () => {
+    render(<EstadoVacio texto="Todavía no hay movimientos." testID="vacio" />);
+    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
+  });
 });
 
 describe('CampoMonto', () => {

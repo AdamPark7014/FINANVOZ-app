@@ -189,6 +189,7 @@ describe('Registrar', () => {
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     const tarjeta = await screen.findByTestId('confirmacion-msi');
     expect(within(tarjeta).getByText(TITULO_CONFIRMAR_MSI.monto_alto)).toBeTruthy();
+    expect(within(tarjeta).getByTestId('confirmacion-msi-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(within(tarjeta).getByText('Compra a 12 meses sin intereses')).toBeTruthy();
     expect(listarMovimientos(p.ctx)).toEqual([]);
 

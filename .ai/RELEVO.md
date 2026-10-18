@@ -6,27 +6,26 @@
 
 ## Hecho en este turno
 
-- **Captura copy:** `captura/textos.test.ts` ancla vacío por revisar, permiso O6 y helpers TalkBack (`etiquetaVacioCapturasPorRevisar`, `etiquetaPermisoCaptura`).
+- **UI kit TalkBack:** `EstadoVacio` (`etiquetaHablada` por defecto), `CampoMonto` vía `etiquetaCampoMonto`; micro tests `componentes.test.tsx` + `formato.test.ts`.
+- **Suscripciones:** `textos.test.ts` (vacío/inactivas).
 
 ## Hecho (acumulado reciente)
 
-- Me alcanza header, Hoy CTAs pistas, onboarding tips. Ver `git log`.
+- Captura, Cuentas CTAs, me-alcanza pistas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP paralelo en otras pantallas — no mezclar sin revisar disco.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio cuando toque el hito.
+2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
