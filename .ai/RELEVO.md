@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **EstadoVacio CTA:** prop opcional `pistaCta` (`accessibilityHint`); Tandas lista vacía con `PISTA_VACIO_TANDAS`.
+- **Formulario movimiento TalkBack:** `PISTA_GUARDAR_MOVIMIENTO` en botón Guardar; prueba en `FormularioMovimiento.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Chip/Boton hints, CampoMonto, personas vacío. Ver `git log`.
+- Chip/Boton hints, CampoMonto, personas vacío/alta, Agregar persona. Ver `git log`.
 
 ## A medias — CUIDADO
 
@@ -21,7 +21,7 @@
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack `ActivarCaptura` «Ahora no»; paridad `pistaCta` en compartidos/suscripciones.
+2. TalkBack aviso retiro tarjeta en formulario o `ActivarCaptura` «Ahora no».
 
 ## No tocar
 
