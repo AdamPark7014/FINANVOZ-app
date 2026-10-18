@@ -8,6 +8,7 @@ import {
   type MensajeTurno,
 } from '@cartera/nlu';
 import { responderConsulta, type LineaConsulta, type RespuestaConsulta } from './consultas';
+import type { EventoAnalitica } from '../analitica/eventos';
 import type { Contexto } from './contexto';
 import type { FiltroMovimientos } from './movimientos';
 import type { NivelNube } from './nube';
@@ -18,8 +19,9 @@ import { funcionesPlan } from './plan';
  * pasada?") resueltas con un bucle de herramientas. El modelo (vía `POST /llm/turno`) pide consultas de solo
  * lectura; el teléfono las ejecuta contra su libro con las mismas plantillas de `consultas` y le devuelve solo el
  * resultado agregado. La respuesta del modelo se muestra solo si cada cifra que escribe aparece en algún resultado
- * (regla 4); si no, se muestra la respuesta en plantilla con "No pude explicarlo mejor". Nada de esto se
- * registra (regla 9) y nada escribe en el libro.
+ * (regla 4); si no, se muestra la respuesta en plantilla con "No pude explicarlo mejor". Solo sale el evento
+ * `modo_explicar` de la lista blanca (resultado y vueltas); nada más se registra (regla 9) y nada escribe en el
+ * libro.
  */
 
 /** Llamadas a herramientas por pregunta (`06 §6`). */
@@ -41,13 +43,19 @@ const PLANTILLA_POR_OMISION: readonly ConsultaHerramienta[] = [
 
 export type RespuestaExplicar =
   /** La explicación del modelo, con todas sus cifras verificadas. */
-  | { readonly tipo: 'explicacion'; readonly texto: string; readonly filtro: FiltroMovimientos }
+  | {
+      readonly tipo: 'explicacion';
+      readonly texto: string;
+      readonly filtro: FiltroMovimientos;
+      readonly vueltas: number;
+    }
   /** La validación falló (o el modelo no terminó): respuestas en plantilla de lo que se consultó. */
   | {
       readonly tipo: 'plantilla';
       readonly aviso: typeof AVISO_SIN_EXPLICACION;
       readonly respuestas: readonly RespuestaConsulta[];
       readonly filtro: FiltroMovimientos;
+      readonly vueltas: number;
     }
   /** En Gratis (o el servidor dice que Plus ya no está vigente): no se pregunta nada. */
   | { readonly tipo: 'solo_plus' }
@@ -57,6 +65,7 @@ export type RespuestaExplicar =
 
 export interface OpcionesExplicar {
   readonly nube?: NivelNube | null;
+  readonly registrarEvento?: (evento: EventoAnalitica) => void;
 }
 
 /** Resultado que viaja al modelo: la frase y las filas de la plantilla, sin ids ni filtros. */
@@ -73,10 +82,29 @@ function serializar(r: RespuestaConsulta): string {
 const filtroDe = (respuestas: readonly RespuestaConsulta[]): FiltroMovimientos =>
   respuestas.find((r) => Object.keys(r.filtro).length > 0)?.filtro ?? {};
 
-function plantilla(ctx: Contexto, respuestas: readonly RespuestaConsulta[]): RespuestaExplicar {
+function emitirModoExplicar(opciones: OpcionesExplicar, resultado: 'explicacion' | 'plantilla', vueltas: number) {
+  opciones.registrarEvento?.({
+    nombre: 'modo_explicar',
+    propiedades: { resultado, vueltas },
+  });
+}
+
+function plantilla(
+  ctx: Contexto,
+  respuestas: readonly RespuestaConsulta[],
+  vueltas: number,
+  opciones: OpcionesExplicar,
+): RespuestaExplicar {
   const lista =
     respuestas.length > 0 ? respuestas : PLANTILLA_POR_OMISION.map((c) => responderConsulta(ctx, c));
-  return { tipo: 'plantilla', aviso: AVISO_SIN_EXPLICACION, respuestas: lista, filtro: filtroDe(lista) };
+  emitirModoExplicar(opciones, 'plantilla', vueltas);
+  return {
+    tipo: 'plantilla',
+    aviso: AVISO_SIN_EXPLICACION,
+    respuestas: lista,
+    filtro: filtroDe(lista),
+    vueltas,
+  };
 }
 
 /** Ejecuta una llamada del modelo. Argumentos inválidos o una herramienta desconocida no ejecutan nada. */
@@ -115,23 +143,32 @@ export async function explicar(
   const mensajes: MensajeTurno[] = [{ rol: 'usuario', texto: pregunta.trim().slice(0, PREGUNTA_MAXIMA) }];
   const resultados: string[] = [];
   const respuestas: RespuestaConsulta[] = [];
+  let vueltas = 0;
 
   // Una vuelta por llamada como máximo, más la respuesta final.
   for (let vuelta = 0; vuelta <= LLAMADAS_MAXIMAS_EXPLICAR; vuelta++) {
+    vueltas += 1;
     const r = await cliente.turno(mensajes, HERRAMIENTAS_EXPLICAR);
     if (r.tipo === 'solo_plus') return { tipo: 'solo_plus' };
     if (r.tipo === 'limite') return { tipo: 'limite', codigo: r.codigo };
     if (r.tipo !== 'ok') {
       // A media pregunta, lo ya consultado se muestra en plantilla.
-      if (respuestas.length > 0) return plantilla(ctx, respuestas);
+      if (respuestas.length > 0) return plantilla(ctx, respuestas, vueltas, opciones);
       return r.tipo === 'sin_red' ? { tipo: 'sin_red' } : { tipo: 'error' };
     }
 
     if (r.salida.tipo === 'respuesta') {
       const v = validarCifras(r.salida.texto, resultados);
-      return v.ok
-        ? { tipo: 'explicacion', texto: r.salida.texto, filtro: filtroDe(respuestas) }
-        : plantilla(ctx, respuestas);
+      if (v.ok) {
+        emitirModoExplicar(opciones, 'explicacion', vueltas);
+        return {
+          tipo: 'explicacion',
+          texto: r.salida.texto,
+          filtro: filtroDe(respuestas),
+          vueltas,
+        };
+      }
+      return plantilla(ctx, respuestas, vueltas, opciones);
     }
 
     // Solo herramientas que existen (el proxy rechaza una conversación con otras) y las que caben.
@@ -147,5 +184,5 @@ export async function explicar(
       mensajes.push({ rol: 'herramienta', id: l.id, nombre: l.nombre, resultado: e.resultado });
     }
   }
-  return plantilla(ctx, respuestas);
+  return plantilla(ctx, respuestas, vueltas, opciones);
 }

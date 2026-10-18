@@ -6,8 +6,8 @@ import { z } from 'zod';
  * número chico acotado: no cabe un monto, un comercio, un alias, un nombre, un RFC ni un texto. Un evento con
  * una propiedad de más, un valor fuera de catálogo o un nombre desconocido se descarta completo.
  *
- * Entran los eventos de M2–M7, `plantillas_remotas` y `widget` (M10); los de respaldo, suscripciones, negocio y
- * paquete para el contador se agregan con su hito.
+ * Entran los eventos de M2–M7, `plantillas_remotas`, `widget` y `modo_explicar` (M10); los de respaldo,
+ * suscripciones, negocio y paquete para el contador se agregan con su hito.
  */
 export const EVENTOS_PERMITIDOS = {
   app_abierta: z.strictObject({}),
@@ -63,6 +63,14 @@ export const EVENTOS_PERMITIDOS = {
   }),
   /** Agregar o quitar el widget "Hoy puedes" (`02 §21`); la tarea sin interfaz lo deja pendiente. */
   widget: z.strictObject({ evento: z.enum(['agregado', 'quitado']) }),
+  /**
+   * Modo explicar terminó con respuesta (`06 §6`, `02 §22`): si el modelo pasó la validación de cifras o cayó en
+   * plantilla; cuántas vueltas a `/llm/turno` (1–4). Sin pregunta, montos ni texto de la respuesta.
+   */
+  modo_explicar: z.strictObject({
+    resultado: z.enum(['explicacion', 'plantilla']),
+    vueltas: z.int().min(1).max(4),
+  }),
 } as const;
 
 type Eventos = typeof EVENTOS_PERMITIDOS;

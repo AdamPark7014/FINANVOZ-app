@@ -292,7 +292,7 @@ export function PanelRegistrar({
           setTexto('');
           // Modo explicar (`02 §22`): varias vueltas con la nube; las cifras ya vienen verificadas.
           setExplicando(true);
-          explicar(ctx, r.pregunta, { nube })
+          explicar(ctx, r.pregunta, { nube, registrarEvento })
             .then((e) => {
               if (e.tipo === 'sin_red') setMensaje(MENSAJE_EXPLICAR_SIN_RED);
               else if (e.tipo === 'error') setMensaje(MENSAJE_EXPLICAR_ERROR);
@@ -338,6 +338,7 @@ export function PanelRegistrar({
       nube,
       plan,
       refrescar,
+      registrarEvento,
       terminarRevision,
     ],
   );

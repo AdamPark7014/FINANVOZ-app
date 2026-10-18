@@ -72,6 +72,7 @@ const VALIDOS: EventoAnalitica[] = [
   { nombre: 'plan', propiedades: { evento: 'paywall_visto' } },
   { nombre: 'plantillas_remotas', propiedades: { version: 2, resultado: 'aceptada' } },
   { nombre: 'widget', propiedades: { evento: 'agregado' } },
+  { nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 2 } },
 ];
 
 describe('analítica con opt-in (03 §8, RNF-05)', () => {
@@ -152,6 +153,13 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       { nombre: 'plantillas_remotas', propiedades: { version: 0, resultado: 'sin_red' } },
       { nombre: 'widget', propiedades: { evento: 'Hoy puedes $214' } },
       { nombre: 'widget', propiedades: { evento: 'agregado', cifra: '$214' } },
+      { nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 0 } },
+      { nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 5 } },
+      {
+        nombre: 'modo_explicar',
+        propiedades: { resultado: 'plantilla', vueltas: 2, pregunta: '¿por qué no me alcanzó la quincena?' },
+      },
+      { nombre: 'modo_explicar', propiedades: { resultado: '$1,850 en plantilla', vueltas: 2 } },
       { nombre: 'app_abierta' },
       'app_abierta',
       null,
@@ -193,6 +201,8 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
         'sin_red',
         'agregado',
         'quitado',
+        'explicacion',
+        'plantilla',
       ),
     );
     fc.assert(

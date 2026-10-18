@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { extraerCifras, validarCifras } from '@cartera/nlu';
 import { listarCuentas } from './cuentas';
+import type { EventoAnalitica } from '../analitica/eventos';
 import { AVISO_SIN_EXPLICACION, explicar, LLAMADAS_MAXIMAS_EXPLICAR } from './explicar';
 import { registrarMovimiento } from './formulario';
 import { listarMovimientos } from './movimientos';
@@ -174,6 +175,38 @@ describe('Q13 del golden set (06 §6)', () => {
   });
 });
 
+describe('analítica modo_explicar (03 §8, pendiente 87)', () => {
+  it('emite resultado y vueltas al terminar; no en solo_plus, sin_red, límite ni error', async () => {
+    const p = semilla();
+    const eventos: EventoAnalitica[] = [];
+    const registrarEvento = (e: EventoAnalitica) => eventos.push(e);
+
+    const ok = conTurnos([pide(['mayores_gastos']), responde('En 30 días lo que más pesa es comida fuera ($1,200).')]);
+    await explicar(p.ctx, '¿en qué se me va el dinero?', { nube: ok.nube, registrarEvento });
+    expect(eventos).toEqual([{ nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 2 } }]);
+
+    eventos.length = 0;
+    const plant = conTurnos([
+      pide(['comparar_periodos', { categoria: 'comida' }], ['mayores_gastos']),
+      responde('Gastaste $1,900 más en comida que el mes pasado.'),
+    ]);
+    await explicar(p.ctx, golden('Q13').texto, { nube: plant.nube, registrarEvento });
+    expect(eventos).toEqual([{ nombre: 'modo_explicar', propiedades: { resultado: 'plantilla', vueltas: 2 } }]);
+
+    eventos.length = 0;
+    await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'solo_plus' }]).nube, registrarEvento });
+    await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'sin_red' }]).nube, registrarEvento });
+    await explicar(p.ctx, '¿?', {
+      nube: conTurnos([{ tipo: 'limite', codigo: 'limite_mensual' }]).nube,
+      registrarEvento,
+    });
+    expect(
+      await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'error', codigo: 'proveedor', status: 502 }]).nube, registrarEvento }),
+    ).toEqual({ tipo: 'error' });
+    expect(eventos).toEqual([]);
+  });
+});
+
 describe('modo explicar: límites y fallas', () => {
   it('Gratis: solo_plus sin preguntar nada a la nube', async () => {
     const p = semilla({ plus: false });
@@ -226,7 +259,7 @@ describe('modo explicar: límites y fallas', () => {
       responde('No tengo datos de esas fechas.'),
     ]);
     const r = await explicar(p.ctx, '¿cuánto gasté el 30 de febrero?', { nube: t.nube });
-    expect(r).toEqual({ tipo: 'explicacion', texto: 'No tengo datos de esas fechas.', filtro: {} });
+    expect(r).toMatchObject({ tipo: 'explicacion', texto: 'No tengo datos de esas fechas.', filtro: {}, vueltas: 2 });
     expect(t.resultados()).toEqual(['{"error":"argumentos_invalidos"}']);
   });
 
