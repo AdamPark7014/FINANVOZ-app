@@ -361,7 +361,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
       {opcion === 'cuenta' ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaCual}
+            {PREGUNTA_DE_CUAL}
           </Texto>
           <GrupoChips
             opciones={[
@@ -377,38 +377,38 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
                 v.startsWith('s:')
                   ? { origen: 'salida', capturaId: v.slice(2) }
                   : { origen: 'cuenta', cuentaId: v.slice(2) },
-                'Listo: registré el pago de tu tarjeta.',
+                AVISO_PAGO_TARJETA,
               )
             }
             prefijoTestID={`${testID}-origen`}
-            etiqueta={preguntaCual}
+            etiqueta={PREGUNTA_DE_CUAL}
           />
         </View>
       ) : null}
       {opcion === 'alguien' ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaDebe}
+            {PREGUNTA_SE_LO_DEBES}
           </Texto>
           <GrupoChips
             opciones={[
-              { valor: 'si', etiqueta: 'Sí, se lo debo' },
-              { valor: 'no', etiqueta: 'No, me lo regalaron' },
+              { valor: 'si', etiqueta: ETIQUETA_DEBE_SI },
+              { valor: 'no', etiqueta: ETIQUETA_DEBE_NO },
             ]}
             valor={debe}
             alCambiar={(v) => {
-              if (v === 'no') contestar({ origen: 'regalo' }, 'Listo: lo anoté como un regalo.');
+              if (v === 'no') contestar({ origen: 'regalo' }, AVISO_PAGO_REGALO);
               else setDebe(v);
             }}
             prefijoTestID={`${testID}-debe`}
-            etiqueta={preguntaDebe}
+            etiqueta={PREGUNTA_SE_LO_DEBES}
           />
           {debe === 'si' ? (
             <ElegirPersona
               testID={testID}
-              pregunta="¿Quién la pagó?"
+              pregunta={PREGUNTA_QUIEN_PAGO}
               alElegir={(personaId) =>
-                contestar({ origen: 'persona', personaId }, 'Listo: anoté que se lo debes.')
+                contestar({ origen: 'persona', personaId }, AVISO_PAGO_DEBES)
               }
             />
           ) : null}

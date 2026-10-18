@@ -13,6 +13,7 @@ import {
 import { ProveedorSesion, useSesion } from '../sesion/ProveedorSesion';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { SeccionWidget } from '../pantallas/ajustes/SeccionWidget';
+import { PISTA_PREVIA } from '../pantallas/ajustes/widget-textos';
 import { SincronizarWidget } from './SincronizarWidget';
 import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
 import { WidgetHoy } from './WidgetHoy';
