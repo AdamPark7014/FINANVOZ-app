@@ -50,7 +50,7 @@ export function PantallaAyuda({
         etiquetaAccesible={ACCESIBILIDAD_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo" testID="ayuda-titulo">
+      <Texto variante="titulo" testID="ayuda-titulo" accessibilityRole="header">
         {TITULO}
       </Texto>
       <Texto variante="cuerpo" tono="secundario" testID="ayuda-intro">
@@ -69,7 +69,7 @@ export function PantallaAyuda({
       </View>
 
       <Tarjeta testID="ayuda-contacto">
-        <Texto variante="subtitulo" testID="ayuda-contacto-titulo">
+        <Texto variante="subtitulo" testID="ayuda-contacto-titulo" accessibilityRole="header">
           {CONTACTO_TITULO}
         </Texto>
         <Texto variante="cuerpo" testID="ayuda-contacto-cuerpo">
@@ -87,6 +87,7 @@ export function PantallaAyuda({
           <Texto
             variante="secundario"
             tono="faltante"
+            accessibilityRole="alert"
             accessibilityLiveRegion="polite"
             testID="ayuda-sin-correo"
           >

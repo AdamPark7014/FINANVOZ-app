@@ -8,13 +8,45 @@ import { Chips } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
-import { BTN_CANCELAR, MENSAJE_SALDO_SIN_CAMBIO, NOMBRE_MODO } from './textos';
+import {
+  AYUDA_TASA_ANUAL,
+  BTN_CANCELAR,
+  BTN_CORREGIR_SALDO,
+  BTN_GUARDAR_CAMBIOS,
+  EJEMPLO_TASA_ANUAL,
+  ERROR_CORREGIR_SALDO,
+  ERROR_DIA_CORTE,
+  ERROR_DIA_LIMITE_PAGO,
+  ERROR_DIAS_PARA_PAGAR,
+  ERROR_GUARDAR_TARJETA,
+  ERROR_LIMITE_CREDITO,
+  ERROR_NOMBRE_TARJETA,
+  ERROR_SALDO_SEGUN_BANCO,
+  ERROR_TASA_ANUAL,
+  ERROR_ULTIMOS4_TARJETA,
+  ETIQUETA_DIA_CORTE,
+  ETIQUETA_DIA_LIMITE_PAGO,
+  ETIQUETA_DIAS_PARA_PAGAR,
+  ETIQUETA_LIMITE_CREDITO,
+  ETIQUETA_NOMBRE_TARJETA,
+  ETIQUETA_SALDO_SEGUN_BANCO,
+  ETIQUETA_SENTIDO_A_FAVOR,
+  ETIQUETA_SENTIDO_DEBO,
+  ETIQUETA_TASA_ANUAL,
+  ETIQUETA_ULTIMOS4,
+  MENSAJE_SALDO_SIN_CAMBIO,
+  NOMBRE_MODO,
+  OPCION_LIMITE_DIA_MES,
+  OPCION_LIMITE_DIAS_DESPUES,
+  PREGUNTA_MODO_LIMITE,
+  PREGUNTA_MODO_PAGO,
+} from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 
 const OPCIONES_LIMITE: readonly { valor: ModoLimite; etiqueta: string }[] = [
-  { valor: 'dia', etiqueta: 'Un día del mes' },
-  { valor: 'dias', etiqueta: 'Días después del corte' },
+  { valor: 'dia', etiqueta: OPCION_LIMITE_DIA_MES },
+  { valor: 'dias', etiqueta: OPCION_LIMITE_DIAS_DESPUES },
 ];
 const OPCIONES_MODO: readonly { valor: 'totalero' | 'plan'; etiqueta: string }[] = [
   { valor: 'totalero', etiqueta: NOMBRE_MODO.totalero },
@@ -46,22 +78,17 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
   const [error, setError] = useState<string | null>(null);
 
   const guardar = () => {
-    if (nombre.trim() === '') return setError('Escribe el nombre de la tarjeta.');
-    if (ultimos4 !== '' && !/^\d{4}$/.test(ultimos4))
-      return setError('Los últimos 4 son cuatro números, o déjalo vacío.');
+    if (nombre.trim() === '') return setError(ERROR_NOMBRE_TARJETA);
+    if (ultimos4 !== '' && !/^\d{4}$/.test(ultimos4)) return setError(ERROR_ULTIMOS4_TARJETA);
     const diaCorte = leerDiaMes(corte);
-    if (diaCorte === null) return setError('Escribe el día de corte, del 1 al 31.');
+    if (diaCorte === null) return setError(ERROR_DIA_CORTE);
     const limite = modoLimite === 'dia' ? leerDiaMes(limitePago) : leerEntero(limitePago, 1, 60);
     if (limite === null) {
-      return setError(
-        modoLimite === 'dia'
-          ? 'Escribe el día límite de pago, del 1 al 31.'
-          : 'Escribe cuántos días tienes para pagar después del corte.',
-      );
+      return setError(modoLimite === 'dia' ? ERROR_DIA_LIMITE_PAGO : ERROR_DIAS_PARA_PAGAR);
     }
-    if (limiteCredito === null || limiteCredito <= 0) return setError('Escribe tu límite de crédito.');
+    if (limiteCredito === null || limiteCredito <= 0) return setError(ERROR_LIMITE_CREDITO);
     const tasaBp = tasa.trim() === '' ? null : leerTasa(tasa);
-    if (tasa.trim() !== '' && tasaBp === null) return setError('Escribe la tasa así: 45.5');
+    if (tasa.trim() !== '' && tasaBp === null) return setError(ERROR_TASA_ANUAL);
     try {
       const r = editarTarjeta(ctx, d.id, {
         nombre: nombre.trim(),
@@ -75,16 +102,16 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
       avisarRegistro(`Guardé los cambios de tu ${nombre.trim()}.`, r.deshacer ?? undefined);
       alTerminar();
     } catch {
-      setError('No pude guardar la tarjeta. Revisa el día de corte y el día límite.');
+      setError(ERROR_GUARDAR_TARJETA);
     }
   };
 
   return (
     <View style={{ gap: espacio.m }} testID="editar-tarjeta">
-      <CampoTexto testID="editar-nombre" etiqueta="Nombre" valor={nombre} alCambiar={setNombre} />
+      <CampoTexto testID="editar-nombre" etiqueta={ETIQUETA_NOMBRE_TARJETA} valor={nombre} alCambiar={setNombre} />
       <CampoTexto
         testID="editar-ultimos4"
-        etiqueta="Últimos 4 números (opcional)"
+        etiqueta={ETIQUETA_ULTIMOS4}
         teclado="number-pad"
         valor={ultimos4}
         alCambiar={setUltimos4}
@@ -113,22 +140,22 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
       />
       <CampoMonto
         testID="editar-limite-credito"
-        etiqueta="Límite de crédito"
+        etiqueta={ETIQUETA_LIMITE_CREDITO}
         valorInicial={d.limiteCredito}
         alCambiar={setLimiteCredito}
       />
       <Chips
         testID="editar-modo"
-        etiqueta="¿Cómo la pagas?"
+        etiqueta={PREGUNTA_MODO_PAGO}
         opciones={OPCIONES_MODO}
         valor={modo}
         alCambiar={setModo}
       />
       <CampoTexto
         testID="editar-tasa"
-        etiqueta="Tasa anual (opcional)"
-        ayuda="Solo la uso para decirte qué tarjeta conviene pagar primero."
-        ejemplo="45.5"
+        etiqueta={ETIQUETA_TASA_ANUAL}
+        ayuda={AYUDA_TASA_ANUAL}
+        ejemplo={EJEMPLO_TASA_ANUAL}
         teclado="decimal-pad"
         valor={tasa}
         alCambiar={setTasa}

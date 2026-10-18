@@ -13,6 +13,7 @@ import {
   ETIQUETA_RESTAURAR,
   ETIQUETA_VER_PLANES,
   ETIQUETA_VOLVER,
+  PISTA_VOLVER,
   ID,
   INCLUYE_GRATIS,
   INCLUYE_PLUS,
@@ -111,6 +112,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER}
         testID={ID.volver}
       />
       <Texto variante="titulo">{TITULO_PANTALLA}</Texto>

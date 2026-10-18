@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **personas / cuenta dividida:** `ETIQUETA_CATEGORIA_PARTE` y `ETIQUETA_ORIGEN_DIVISION` en `textos.ts`; `FormularioCuentaDividida` sin strings locales; `ERROR_DIVISION_ORIGEN` apunta a la misma etiqueta (TalkBack del radiogroup alineado con validación); prueba de textos.
+- **tarjetas:** `BTN_QUITAR_PAGO_PLANEADO` en `textos.ts` + `MesesYPagos.tsx`. Push `c7593cf`.
 
 ## Hecho (acumulado reciente)
 
-- me-alcanza, tandas, estados de cuenta, respaldo, consulta: copy/a11y. Ver `git log`.
+- Copy/a11y móvil (MSI, me-alcanza, personas, privacidad). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Working tree ajeno (turno anterior): `PreguntasCaptura.tsx`, `EditarTarjeta.tsx`, `tarjetas/textos.ts` — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local: ajustes, ayuda, plan, `EditarTarjeta`, `textos.ts`/`textos.test.ts` — no mezclar.
+- Stash `wip ajeno deducciones principal` (deducciones, principal, personas.test).
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP captura/tarjetas según Adam.
+2. Commits pequeños del WIP pendiente.
 
 ## No tocar
 

@@ -35,6 +35,7 @@ import {
   MENSAJE_OFERTAS_VACIAS,
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
+  PISTA_VOLVER,
   resumenPlan,
   TITULO_PLAN_GRATIS,
   TITULO_PLUS,
@@ -79,6 +80,12 @@ async function escribir(frase: string) {
 }
 
 describe('pantalla del plan', () => {
+  it('Volver anuncia pista para cerrar la pantalla', () => {
+    const p = e510();
+    montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />);
+    expect(screen.getByTestId(ID.volver)).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
   it('Gratis: ofrece la prueba de 14 días con el precio de la tienda; comprar activa Plus en toda la app', async () => {
     const p = e510();
     const tienda = crearComprasEnMemoria({ ahora: () => T0 });

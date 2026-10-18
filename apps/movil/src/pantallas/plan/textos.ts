@@ -40,6 +40,7 @@ export const TITULO_PANTALLA = 'Finanvoz Plus';
 export const SECCION_INCLUYE = 'Plus incluye';
 export const SECCION_AJUSTES = 'Plan';
 export const ETIQUETA_VOLVER = 'Volver';
+export const PISTA_VOLVER = 'Cierra esta pantalla';
 export const ETIQUETA_VER_PLANES = 'Ver planes';
 export const ETIQUETA_CONOCER_PLUS = 'Conocer Plus';
 export const ETIQUETA_ADMINISTRAR = 'Administrar en Google Play';

@@ -142,7 +142,9 @@ describe('pantalla de ayuda', () => {
   it('expone testID estables en título, intro y contacto', () => {
     render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={jest.fn(async () => {})} />);
     expect(screen.getByTestId('ayuda-titulo')).toHaveTextContent(TITULO);
+    expect(screen.getByTestId('ayuda-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ayuda-intro')).toHaveTextContent(INTRO);
     expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveTextContent(CONTACTO_TITULO);
+    expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 });
