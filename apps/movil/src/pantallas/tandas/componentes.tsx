@@ -8,6 +8,7 @@ import { codigoError, mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import {
   ETIQUETA_CANCELAR,
+  PISTA_CANCELAR_COBRO,
   mensajeAportacion,
   mensajeCobro,
   PREGUNTA_CUENTA_LLEGO,
@@ -100,7 +101,14 @@ export function MeTocoLaTanda({
         }}
       />
       {alTerminar ? (
-        <Boton etiqueta={ETIQUETA_CANCELAR} variante="texto" ancho="contenido" alPresionar={alTerminar} />
+        <Boton
+          testID={`${testID}-cancelar`}
+          etiqueta={ETIQUETA_CANCELAR}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alTerminar}
+          pista={PISTA_CANCELAR_COBRO}
+        />
       ) : null}
       {error ? (
         <Texto variante="secundario" tono="faltante">

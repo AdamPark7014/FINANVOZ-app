@@ -6,27 +6,26 @@
 
 ## Hecho en este turno
 
-- **Ayuda TalkBack:** `ayuda.test.tsx` ancla `ACCESIBILIDAD_VOLVER` en botón Volver (`bb2f7e4`, push main).
-- **Principal (main):** cola por revisar, filtro `PISTA_VER_TODOS`, CTAs en `principal.test.tsx`.
+- **Ajustes TalkBack:** encabezados `accessibilityRole="header"` en Datos para cobrar y Avisos (`ajustes-datos-cobro-titulo`, `ajustes-avisos-titulo`).
+- **Tests:** anclas en `personas.test.tsx`, `riesgo.test.tsx`; Ayuda — `accessibilityLabel` volver/correo y rol `alert` sin app de correo.
 
 ## Hecho (acumulado reciente)
 
-- Tandas detalle inexistente, Movimientos/me-alcanza, widget. Ver `git log`.
+- Widget, captura, me-alcanza. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local (ajustes, personas, riesgo) — salvar antes de mezclar.
+- WIP local — salvar antes de mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack CTAs resultado me-alcanza.
+2. Barra+pie duplicado en `PantallaCuentas` si sigue a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

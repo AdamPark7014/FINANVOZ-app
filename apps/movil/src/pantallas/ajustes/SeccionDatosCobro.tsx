@@ -31,7 +31,9 @@ export function SeccionDatosCobro() {
 
   return (
     <Tarjeta testID="ajustes-datos-cobro">
-      <Texto variante="subtitulo">{SECCION_DATOS_COBRO}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-datos-cobro-titulo" accessibilityRole="header">
+        {SECCION_DATOS_COBRO}
+      </Texto>
       {editando ? (
         <FormularioDatosCobro alGuardar={() => setEditando(false)} alCancelar={() => setEditando(false)} />
       ) : (

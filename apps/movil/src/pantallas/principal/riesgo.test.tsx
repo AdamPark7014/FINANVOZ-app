@@ -9,6 +9,7 @@ import {
 } from '../../servicios';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
+import { SECCION_AVISOS } from '../ajustes/avisos-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
 import {
@@ -127,6 +128,8 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
   it('Ajustes → Avisos apaga "Riesgo de no llegar"', async () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <SeccionAvisos />);
+    expect(screen.getByTestId('ajustes-avisos-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(SECCION_AVISOS)).toBeTruthy();
     await screen.findByTestId('ajustes-aviso-riesgo');
     expect(obtenerPreferenciasAvisos(p.ctx).riesgo).toBe(true);
     fireEvent.press(screen.getByTestId('ajustes-aviso-riesgo'));

@@ -93,7 +93,9 @@ export function SeccionAvisos() {
 
   return (
     <Tarjeta testID="ajustes-avisos">
-      <Texto variante="subtitulo">{SECCION_AVISOS}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-avisos-titulo" accessibilityRole="header">
+        {SECCION_AVISOS}
+      </Texto>
       {permiso !== null && permiso !== 'concedido' && notificaciones ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" tono="secundario" testID="ajustes-avisos-sin-permiso">

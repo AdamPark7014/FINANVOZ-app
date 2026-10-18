@@ -31,6 +31,7 @@ import {
   ETIQUETA_CUENTA_APORTACION_OPCIONAL,
   ETIQUETA_FRECUENCIA,
   ETIQUETA_GUARDAR_TANDA,
+  PISTA_CANCELAR_FORMULARIO,
   PISTA_GUARDAR_TANDA,
   ETIQUETA_NOMBRE_OPCIONAL,
   ETIQUETA_PARTICIPANTES,
@@ -282,7 +283,13 @@ export function FormularioTanda({
         alPresionar={guardar}
         pista={PISTA_GUARDAR_TANDA}
       />
-      <Boton testID="tanda-cancelar" variante="texto" etiqueta={ETIQUETA_CANCELAR} alPresionar={alCancelar} />
+      <Boton
+        testID="tanda-cancelar"
+        variante="texto"
+        etiqueta={ETIQUETA_CANCELAR}
+        alPresionar={alCancelar}
+        pista={PISTA_CANCELAR_FORMULARIO}
+      />
     </View>
   );
 }

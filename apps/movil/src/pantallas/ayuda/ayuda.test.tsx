@@ -11,6 +11,7 @@ import {
   PREGUNTAS_FRECUENTES,
 } from './index';
 import {
+  ACCESIBILIDAD_ESCRIBIR_CORREO,
   ACCESIBILIDAD_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
@@ -132,6 +133,7 @@ describe('pantalla de ayuda', () => {
     const abrir = jest.fn(async () => true);
     render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={abrir} />);
     expect(screen.getByText(/gerencia@nexara\.com\.mx/)).toBeTruthy();
+    expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_ESCRIBIR_CORREO);
     expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityHint', PISTA_ESCRIBIR_CORREO);
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
     expect(abrir).toHaveBeenCalledWith('mailto:gerencia@nexara.com.mx?subject=Ayuda%20con%20Finanvoz');
@@ -144,6 +146,7 @@ describe('pantalla de ayuda', () => {
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
     expect(abrir).toHaveBeenCalledWith(enlaceCorreoAyuda());
     expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(mensajeSinAppCorreo(CORREO_AYUDA));
+    expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityRole', 'alert');
     expect(auditar(screen.toJSON())).toEqual([]);
   });
 

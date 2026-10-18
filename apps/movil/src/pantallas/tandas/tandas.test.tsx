@@ -131,6 +131,8 @@ describe('Tandas (02 §18)', () => {
     );
     expect(screen.getByTestId('tanda-editar-abrir')).toHaveProp('accessibilityHint', PISTA_EDITAR_NOMBRE_CUENTA);
     expect(screen.getByTestId('tanda-archivar-abrir')).toHaveProp('accessibilityHint', PISTA_ARCHIVAR_TANDA);
+    fireEvent.press(screen.getByTestId('tanda-me-toco'));
+    expect(screen.getByTestId('tanda-me-toco-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_COBRO);
   });
 
   it('formulario nueva tanda: Guardar y Cancelar tienen pista TalkBack', () => {
@@ -327,6 +329,7 @@ describe('Tandas (02 §18)', () => {
 
     fireEvent.press(screen.getByTestId('tanda-editar-abrir'));
     expect(screen.getByTestId('tanda-editar-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_CAMBIOS);
+    expect(screen.getByTestId('tanda-editar-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_EDICION);
     fireEvent.changeText(screen.getByTestId('tanda-editar-nombre'), 'Tanda vecinos');
     fireEvent.press(screen.getByTestId(`tanda-editar-cuenta-${p.efectivo}`));
     fireEvent.press(screen.getByTestId('tanda-editar-guardar'));
@@ -334,6 +337,7 @@ describe('Tandas (02 §18)', () => {
     expect(detalleTanda(p.ctx, tandaId).cuentaOrigenId).toBe(p.efectivo);
 
     fireEvent.press(screen.getByTestId('tanda-archivar-abrir'));
+    expect(screen.getByTestId('tanda-archivar-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ARCHIVAR);
     expect(screen.getByTestId('tanda-archivar-confirmar')).toHaveProp(
       'accessibilityHint',
       PISTA_CONFIRMAR_ARCHIVAR,
