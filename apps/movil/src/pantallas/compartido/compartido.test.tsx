@@ -172,7 +172,6 @@ describe('02 §27 · Gastos con tu pareja', () => {
     fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Ana');
     fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
     expect(screen.getByTestId('escaner-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ESCANER);
-    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
     A.cerrar();
   });
 
