@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Ajustes › Widget · TalkBack:** `PISTA_OCULTAR_MONTOS` en el interruptor «Ocultar montos» (prop `pista` opcional en `Interruptor`); tests en `widget.test.tsx` y `componentes.test.tsx`.
+- **Ajustes · Datos para cobrar y Avisos:** `PISTA_*` en botones Agregar/Cambiar/Borrar, Permitir avisos y Guardar horario; tests en `personas.test.tsx` y `riesgo.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget (etiqueta «Vista previa», liveRegion, pista), error alert, respaldo, captura. Ver `git log`.
+- Ficha persona, respaldo TalkBack, captura, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, me-alcanza, personas) — no mezclar en commits ajenos.
+- WIP paralelo (onboarding, arqueo, ayuda, respaldo) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Más `PISTA` en respaldo o CTA Tandas (`boton-tandas`).
+2. `PISTA` en CTA Tandas desde Cuentas (`boton-tandas`).
 
 ## No tocar
 
