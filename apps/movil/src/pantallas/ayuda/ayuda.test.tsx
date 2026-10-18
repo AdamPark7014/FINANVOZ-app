@@ -15,7 +15,9 @@ import {
   ACCESIBILIDAD_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
-  ETIQUETA_RESPUESTA,
+  etiquetaAccesibleCuerpoContacto,
+  etiquetaAccesibleParrafoRespuesta,
+  etiquetaAccesibleSinAppCorreo,
   ETIQUETA_VOLVER,
   INTRO,
   mensajeSinAppCorreo,
@@ -98,9 +100,10 @@ describe('pantalla de ayuda', () => {
     expect(boton).toHaveProp('accessibilityState', { expanded: false });
     expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
-    expect(screen.getByTestId('ayuda-respuesta-respaldo')).toHaveProp(
+    const respaldo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo')!;
+    expect(screen.getByText(respaldo.respuesta[0]).parent).toHaveProp(
       'accessibilityLabel',
-      ETIQUETA_RESPUESTA,
+      etiquetaAccesibleParrafoRespuesta(respaldo.respuesta[0], true),
     );
     expect(screen.getByTestId('ayuda-pregunta-respaldo')).toHaveProp('accessibilityState', {
       expanded: true,
@@ -133,6 +136,10 @@ describe('pantalla de ayuda', () => {
     const abrir = jest.fn(async () => true);
     render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={abrir} />);
     expect(screen.getByText(/gerencia@nexara\.com\.mx/)).toBeTruthy();
+    expect(screen.getByTestId('ayuda-contacto-cuerpo')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleCuerpoContacto(CORREO_AYUDA),
+    );
     expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_ESCRIBIR_CORREO);
     expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityHint', PISTA_ESCRIBIR_CORREO);
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
