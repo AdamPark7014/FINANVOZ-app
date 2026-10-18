@@ -256,6 +256,8 @@ export function importarCfdi(ctx: Contexto, archivos: readonly ArchivoCfdi[]): R
 
 /** Etiquetas del usuario por factura (`05 §E13.2`). */
 export const EtiquetasGuardadas = z.strictObject({
+  /** La factura no se muestra ni cuenta; el XML sigue guardado y se puede recuperar. */
+  oculta: z.boolean().optional(),
   lentes: z.boolean().optional(),
   beneficiario: z.string().trim().min(1).max(60).optional(),
   alumno: z.string().trim().min(1).max(60).optional(),
@@ -267,17 +269,20 @@ export const EtiquetasGuardadas = z.strictObject({
     .optional(),
 });
 
+/** Etiquetas locales además de las que usa E13.2 (`oculta` no va al motor). */
+export type EtiquetasCfdiLocal = EtiquetaCfdi & { readonly oculta?: boolean };
+
 /** Una factura guardada: lo que leyó E13.1 (del XML guardado) y lo que dijo el usuario. */
 export interface CfdiGuardado {
   readonly leido: CfdiLeido;
-  readonly etiquetas: EtiquetaCfdi;
+  readonly etiquetas: EtiquetasCfdiLocal;
   readonly estatus: 'vigente' | 'cancelado' | 'desconocido';
 }
 
-function etiquetasDe(json: string): EtiquetaCfdi {
+function etiquetasDe(json: string): EtiquetasCfdiLocal {
   const r = EtiquetasGuardadas.safeParse(JSON.parse(json));
   if (!r.success) throw new ErrorDominio('etiquetas_invalidas', 'las etiquetas de la factura no son válidas');
-  const e: EtiquetaCfdi = {};
+  const e: EtiquetasCfdiLocal = {};
   for (const [k, v] of Object.entries(r.data)) if (v !== undefined) Object.assign(e, { [k]: v });
   return e;
 }
@@ -303,8 +308,8 @@ export function listarCfdiGuardados(ctx: Contexto): CfdiGuardado[] {
 export function etiquetarCfdi(
   ctx: Contexto,
   uuid: string,
-  cambios: { readonly [K in keyof EtiquetaCfdi]?: EtiquetaCfdi[K] | undefined },
-): EtiquetaCfdi {
+  cambios: { readonly [K in keyof EtiquetasCfdiLocal]?: EtiquetasCfdiLocal[K] | undefined },
+): EtiquetasCfdiLocal {
   exigirConsentimiento(ctx);
   return enTransaccion(ctx, () => {
     const fila = ctx.db.select({ etiquetas: cfdi.etiquetas }).from(cfdi).where(eq(cfdi.uuid, uuid)).get();
@@ -327,4 +332,18 @@ export function etiquetarCfdi(
 /** Cuántas facturas hay guardadas (para decir "Importa tus facturas" o no). */
 export function contarCfdi(ctx: Contexto): number {
   return ctx.db.select({ n: count() }).from(cfdi).get()?.n ?? 0;
+}
+
+/** Estatus que dio el usuario (`05 §E13.2`): vigente, cancelada en el SAT o desconocido. */
+export function actualizarEstatusCfdi(
+  ctx: Contexto,
+  uuid: string,
+  estatus: CfdiGuardado['estatus'],
+): void {
+  exigirConsentimiento(ctx);
+  enTransaccion(ctx, () => {
+    const cambios = ctx.db.update(cfdi).set({ estatus }).where(eq(cfdi.uuid, uuid)).run();
+    if ((cambios as { changes: number }).changes === 0)
+      throw new ErrorDominio('cfdi_inexistente', 'la factura no existe');
+  });
 }

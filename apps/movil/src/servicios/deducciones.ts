@@ -12,7 +12,13 @@ import {
 } from '@cartera/core';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { cuentaPorId } from './catalogo';
-import { etiquetarCfdi, listarCfdiGuardados, type CfdiGuardado } from './cfdi';
+import {
+  actualizarEstatusCfdi,
+  etiquetarCfdi,
+  listarCfdiGuardados,
+  type CfdiGuardado,
+} from './cfdi';
+import { listarPersonas } from './personas';
 import { cargarConfigFiscal } from './config-fiscal';
 import type { Contexto } from './contexto';
 import type { EntradaMovimiento } from './formulario';
@@ -101,6 +107,30 @@ const NOMBRE_USO: Readonly<Record<string, string>> = {
 /** Uso de las facturas en las que se ofrece "Son lentes ópticos" (los lentes se facturan como gasto médico). */
 const USO_LENTES = 'D01';
 
+/** Clave de beneficiario de lentes para el titular (`05 §E13.2`, oráculo). */
+export const BENEFICIARIO_TITULAR = 'titular';
+
+const claveBeneficiarioPersona = (cuentaId: string) => `p:${cuentaId}`;
+
+/** "Yo" y cada persona registrada, para el tope de lentes por beneficiario. */
+export function opcionesBeneficiarioLentes(ctx: Contexto): readonly { readonly valor: string; readonly etiqueta: string }[] {
+  return [
+    { valor: BENEFICIARIO_TITULAR, etiqueta: 'Yo' },
+    ...listarPersonas(ctx).map((p) => ({
+      valor: claveBeneficiarioPersona(p.cuentaId),
+      etiqueta: p.nombre,
+    })),
+  ];
+}
+
+function etiquetaBeneficiario(
+  clave: string | null | undefined,
+  opciones: readonly { readonly valor: string; readonly etiqueta: string }[],
+): string | null {
+  if (clave === null || clave === undefined) return null;
+  return opciones.find((o) => o.valor === clave)?.etiqueta ?? null;
+}
+
 const NOMBRE_NIVEL: Readonly<Record<string, string>> = {
   preescolar: 'Preescolar',
   primaria: 'Primaria',
@@ -145,6 +175,10 @@ export interface FacturaVista {
   readonly nivel: string | null;
   readonly ofreceLentes: boolean;
   readonly lentes: boolean;
+  readonly beneficiarioLentes: string | null;
+  readonly textoBeneficiarioLentes: string | null;
+  /** El usuario la marcó cancelada (E13.2). */
+  readonly marcadaCancelada: boolean;
   /** Factura en parcialidades (PPD): "Ya la pagué". */
   readonly enPagos: boolean;
   readonly pagoConfirmado: FormaPagoConfirmado | null;
@@ -163,6 +197,9 @@ interface Comunes {
   /** Años con facturas (y el actual), del más reciente al más antiguo. */
   readonly ejercicios: readonly number[];
   readonly facturas: readonly FacturaVista[];
+  /** Importadas por error: no se muestran ni cuentan, pero se pueden recuperar. */
+  readonly ocultas: readonly FacturaVista[];
+  readonly beneficiariosLentes: readonly { readonly valor: string; readonly etiqueta: string }[];
 }
 
 export type VistaDeducciones =
@@ -202,6 +239,7 @@ function factura(
   g: CfdiGuardado,
   config: ConfigFiscal | null,
   motivo: MotivoExclusion | null | undefined,
+  beneficiarios: readonly { readonly valor: string; readonly etiqueta: string }[],
 ): FacturaVista {
   const c = g.leido;
   const conAlumno = usosConAlumno(config);
@@ -223,6 +261,13 @@ function factura(
     nivel: g.etiquetas.nivel ?? null,
     ofreceLentes: uso === USO_LENTES,
     lentes: g.etiquetas.lentes === true,
+    beneficiarioLentes:
+      g.etiquetas.lentes === true ? (g.etiquetas.beneficiario ?? BENEFICIARIO_TITULAR) : null,
+    textoBeneficiarioLentes:
+      g.etiquetas.lentes === true
+        ? etiquetaBeneficiario(g.etiquetas.beneficiario ?? BENEFICIARIO_TITULAR, beneficiarios)
+        : null,
+    marcadaCancelada: g.estatus === 'cancelado',
     enPagos: c.metodo_pago === 'PPD',
     pagoConfirmado: g.etiquetas.pagado === true ? formaConfirmada(g.etiquetas.forma_pago) : null,
   };
@@ -241,13 +286,23 @@ export function obtenerDeducciones(ctx: Contexto, ejercicioPedido?: number): Vis
   const ejercicios = [
     ...new Set([anioDe(ctx.reloj.hoy()), ...guardados.map((g) => anioDe(g.leido.fecha))]),
   ].sort((a, b) => b - a);
-  const delAnio = guardados.filter((g) => anioDe(g.leido.fecha) === ejercicio);
+  const delAnioTodos = guardados.filter((g) => anioDe(g.leido.fecha) === ejercicio);
+  const delAnio = delAnioTodos.filter((g) => g.etiquetas.oculta !== true);
+  const ocultasRaw = delAnioTodos.filter((g) => g.etiquetas.oculta === true);
+  const beneficiariosLentes = opcionesBeneficiarioLentes(ctx);
   const perfil = obtenerPerfilFiscal(ctx);
   const carga = cargarConfigFiscal(ctx, ejercicio);
   const config = carga.estado === 'lista' ? carga.config : null;
-  const comunes = { ejercicio, ejercicios };
+  const comunes = { ejercicio, ejercicios, beneficiariosLentes };
+  const mapFactura = (g: CfdiGuardado, motivo?: MotivoExclusion | null) =>
+    factura(g, config, motivo, beneficiariosLentes);
   if (!perfil) {
-    return { ...comunes, estado: 'sin_perfil', facturas: delAnio.map((g) => factura(g, config, undefined)) };
+    return {
+      ...comunes,
+      estado: 'sin_perfil',
+      facturas: delAnio.map((g) => mapFactura(g, undefined)),
+      ocultas: ocultasRaw.map((g) => mapFactura(g, undefined)),
+    };
   }
   if (!config) {
     return {
@@ -255,7 +310,8 @@ export function obtenerDeducciones(ctx: Contexto, ejercicioPedido?: number): Vis
       estado: 'sin_parametros',
       perfil,
       mensaje: MENSAJE_SIN_PARAMETROS,
-      facturas: delAnio.map((g) => factura(g, null, undefined)),
+      facturas: delAnio.map((g) => mapFactura(g, undefined)),
+      ocultas: ocultasRaw.map((g) => mapFactura(g, undefined)),
     };
   }
 
@@ -265,7 +321,8 @@ export function obtenerDeducciones(ctx: Contexto, ejercicioPedido?: number): Vis
   const etiquetas = Object.fromEntries(delAnio.map((g) => [g.leido.uuid, g.etiquetas]));
   const r = estimarDeducciones(cfdis, perfil.ingresos, ejercicio, perfil.rfc, config.deducciones, etiquetas);
   const motivos = new Map(r.excluidos.map((e) => [e.uuid, e.motivo]));
-  const facturas = delAnio.map((g) => factura(g, config, motivos.get(g.leido.uuid) ?? null));
+  const facturas = delAnio.map((g) => mapFactura(g, motivos.get(g.leido.uuid) ?? null));
+  const ocultas = ocultasRaw.map((g) => mapFactura(g, null));
 
   const porTipo = Object.entries(r.por_uso).map(([uso, u]) => {
     const nombre = NOMBRE_USO[uso] ?? uso;
@@ -298,6 +355,7 @@ export function obtenerDeducciones(ctx: Contexto, ejercicioPedido?: number): Vis
     estado: 'listo',
     perfil,
     facturas,
+    ocultas,
     total: r.total_deducible,
     titulo: `Llevas ${pesos(r.total_deducible)} deducibles en ${ejercicio} (estimación)`,
     porTipo,
@@ -329,7 +387,30 @@ export function asignarAlumnoNivel(ctx: Contexto, uuid: string, alumno: string, 
 
 /** "Son lentes ópticos": aplica el tope de lentes por beneficiario (el titular, si no se dice otro). */
 export function marcarLentes(ctx: Contexto, uuid: string, lentes: boolean): void {
-  etiquetarCfdi(ctx, uuid, { lentes: lentes ? true : undefined });
+  if (lentes) etiquetarCfdi(ctx, uuid, { lentes: true });
+  else etiquetarCfdi(ctx, uuid, { lentes: undefined, beneficiario: undefined });
+}
+
+/** Beneficiario del tope de lentes (debe ser una opción de `opcionesBeneficiarioLentes`). */
+export function asignarBeneficiarioLentes(ctx: Contexto, uuid: string, beneficiario: string): void {
+  const valido = opcionesBeneficiarioLentes(ctx).some((o) => o.valor === beneficiario);
+  if (!valido) throw new ErrorDominio('beneficiario_invalido', 'beneficiario inválido');
+  etiquetarCfdi(ctx, uuid, { lentes: true, beneficiario });
+}
+
+/** La cancelaron en el SAT: deja de contar (E13.2). */
+export function marcarFacturaCancelada(ctx: Contexto, uuid: string, cancelada: boolean): void {
+  actualizarEstatusCfdi(ctx, uuid, cancelada ? 'cancelado' : 'vigente');
+}
+
+/** "La importé por error": se oculta de la lista y de la estimación; el XML sigue guardado. */
+export function ocultarFacturaImportada(ctx: Contexto, uuid: string): void {
+  etiquetarCfdi(ctx, uuid, { oculta: true });
+}
+
+/** Vuelve a mostrar una factura oculta. */
+export function recuperarFactura(ctx: Contexto, uuid: string): void {
+  etiquetarCfdi(ctx, uuid, { oculta: undefined });
 }
 
 /** Aviso preventivo (`02 §24`, RF-FIS-03, CA-M12-04): al registrar salud en efectivo. */

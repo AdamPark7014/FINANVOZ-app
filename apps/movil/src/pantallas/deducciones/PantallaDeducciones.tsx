@@ -3,12 +3,16 @@ import type { Centavos } from '@cartera/core';
 import { View } from 'react-native';
 import {
   asignarAlumnoNivel,
+  asignarBeneficiarioLentes,
   confirmarPagoFactura,
   FORMAS_PAGO_CONFIRMADO,
   guardarPerfilFiscal,
   importarCfdi,
+  marcarFacturaCancelada,
   marcarLentes,
+  ocultarFacturaImportada,
   obtenerDeducciones,
+  recuperarFactura,
   type ArchivoCfdi,
   type FacturaVista,
   type FormaPagoConfirmado,
@@ -141,6 +145,20 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
       {v.facturas.map((f) => (
         <FilaFactura key={f.uuid} f={f} v={v} />
       ))}
+
+      {v.ocultas.length > 0 ? (
+        <View style={{ gap: espacio.s }}>
+          <Texto variante="subtitulo" testID="deducciones-ocultas-titulo">
+            Importadas por error
+          </Texto>
+          <Texto variante="secundario" tono="secundario">
+            No cuentan en tu estimación. Puedes volver a mostrarlas.
+          </Texto>
+          {v.ocultas.map((f) => (
+            <FilaFacturaOculta key={f.uuid} f={f} />
+          ))}
+        </View>
+      ) : null}
 
       {v.estado !== 'sin_perfil' && !editando ? (
         <Boton
@@ -350,13 +368,24 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
       ) : null}
 
       {f.ofreceLentes && v.estado !== 'sin_perfil' ? (
-        <Interruptor
-          etiqueta="Son lentes ópticos"
-          descripcion="Los lentes tienen su propio tope en el año."
-          valor={f.lentes}
-          alCambiar={(valor) => hacer(() => marcarLentes(ctx, f.uuid, valor))}
-          testID={`${id}-lentes`}
-        />
+        <View style={{ gap: espacio.xs }}>
+          <Interruptor
+            etiqueta="Son lentes ópticos"
+            descripcion="Los lentes tienen su propio tope en el año."
+            valor={f.lentes}
+            alCambiar={(valor) => hacer(() => marcarLentes(ctx, f.uuid, valor))}
+            testID={`${id}-lentes`}
+          />
+          {f.lentes && v.beneficiariosLentes.length > 0 ? (
+            <Chips
+              etiqueta="¿De quién son?"
+              opciones={v.beneficiariosLentes}
+              valor={f.beneficiarioLentes}
+              alCambiar={(ben) => hacer(() => asignarBeneficiarioLentes(ctx, f.uuid, ben))}
+              testID={`${id}-beneficiario`}
+            />
+          ) : null}
+        </View>
       ) : null}
 
       {f.enPagos && f.pagoConfirmado === null && !pagando ? (
@@ -386,7 +415,47 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
           {`Pagada con ${FORMAS_PAGO_CONFIRMADO.find((x) => x.valor === f.pagoConfirmado)?.etiqueta.toLowerCase() ?? ''}`}
         </Texto>
       ) : null}
+      {v.estado !== 'sin_perfil' ? (
+        <View style={{ gap: espacio.xxs }}>
+          <Boton
+            etiqueta={f.marcadaCancelada ? 'Ya no está cancelada' : 'La cancelaron en el SAT'}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={() => hacer(() => marcarFacturaCancelada(ctx, f.uuid, !f.marcadaCancelada))}
+            testID={`${id}-cancelada`}
+          />
+          <Boton
+            etiqueta="La importé por error"
+            variante="texto"
+            ancho="contenido"
+            alPresionar={() => hacer(() => ocultarFacturaImportada(ctx, f.uuid))}
+            testID={`${id}-ocultar`}
+          />
+        </View>
+      ) : null}
       <MensajeError texto={error} />
+    </Tarjeta>
+  );
+}
+
+function FilaFacturaOculta({ f }: { f: FacturaVista }) {
+  const { ctx, refrescar } = useSesion();
+  const id = `factura-oculta-${f.uuid}`;
+  return (
+    <Tarjeta testID={id}>
+      <Texto variante="cuerpoFuerte">{f.emisor}</Texto>
+      <Texto variante="secundario" tono="secundario">
+        {[f.textoFecha, f.textoTotal].filter(Boolean).join(' · ')}
+      </Texto>
+      <Boton
+        etiqueta="Volver a mostrar"
+        variante="secundario"
+        alPresionar={() => {
+          recuperarFactura(ctx, f.uuid);
+          refrescar();
+        }}
+        testID={`${id}-recuperar`}
+      />
     </Tarjeta>
   );
 }

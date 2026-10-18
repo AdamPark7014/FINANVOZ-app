@@ -8,17 +8,24 @@ import { contarCfdi, importarCfdi, resumenImportacion, TEXTO_RECHAZO, type Archi
 import type { Contexto } from './contexto';
 import {
   asignarAlumnoNivel,
+  asignarBeneficiarioLentes,
   AVISO_DEDUCIBLE_EFECTIVO,
+  BENEFICIARIO_TITULAR,
   confirmarPagoFactura,
   guardarPerfilFiscal,
+  marcarFacturaCancelada,
   marcarLentes,
   MENSAJE_SIN_PARAMETROS,
   normalizarRfc,
   obtenerDeducciones,
   obtenerPerfilFiscal,
+  ocultarFacturaImportada,
+  opcionesBeneficiarioLentes,
+  recuperarFactura,
   TEXTO_MOTIVO_EXCLUSION,
   type VistaDeducciones,
 } from './deducciones';
+import { crearPersona } from './personas';
 import { listarCuentas } from './cuentas';
 import { registrarMovimiento } from './formulario';
 import { registrarTexto } from './registrar';
@@ -285,6 +292,51 @@ describe('CA-M12-03 · deducciones del año con E13.config_prueba', () => {
     for (const texto of Object.values(TEXTO_MOTIVO_EXCLUSION)) {
       expect(texto).not.toMatch(/PPD|PUE|CFDI|uso|ejercicio|receptor|exclusi/i);
     }
+  });
+
+  it('marcar cancelada, ocultar por error y beneficiario de lentes', () => {
+    const { ctx } = conSemilla(configFiscalPrueba());
+    importarCfdi(ctx, [zipFixture()]);
+    comoE1310(ctx);
+    const dentista = uuidDe('c01_dentista_debito.xml');
+    const lentes = uuidDe('c03_lentes_tarjeta.xml');
+    const antes = lista(obtenerDeducciones(ctx));
+    expect(antes.facturas).toHaveLength(8);
+    expect(antes.ocultas).toHaveLength(0);
+
+    const montoDentista = antes.facturas.find((f) => f.uuid === dentista)?.total;
+    if (montoDentista === undefined) throw new Error('falta la factura del dentista');
+    marcarFacturaCancelada(ctx, dentista, true);
+    const cancelada = lista(obtenerDeducciones(ctx));
+    expect(cancelada.total).toBe(antes.total - montoDentista);
+    expect(cancelada.facturas.find((f) => f.uuid === dentista)).toMatchObject({
+      marcadaCancelada: true,
+      estado: 'no_deducible',
+      motivo: 'cancelado',
+    });
+    marcarFacturaCancelada(ctx, dentista, false);
+    expect(lista(obtenerDeducciones(ctx)).total).toBe(antes.total);
+
+    ocultarFacturaImportada(ctx, dentista);
+    const oculta = lista(obtenerDeducciones(ctx));
+    expect(oculta.facturas).toHaveLength(7);
+    expect(oculta.ocultas).toHaveLength(1);
+    expect(oculta.ocultas[0]?.uuid).toBe(dentista);
+    expect(oculta.total).toBe(antes.total - montoDentista);
+    recuperarFactura(ctx, dentista);
+    expect(lista(obtenerDeducciones(ctx)).facturas).toHaveLength(8);
+
+    const hija = crearPersona(ctx, { nombre: 'Ana' });
+    const opciones = opcionesBeneficiarioLentes(ctx);
+    expect(opciones[0]).toEqual({ valor: BENEFICIARIO_TITULAR, etiqueta: 'Yo' });
+    expect(opciones.some((o) => o.valor === `p:${hija}` && o.etiqueta === 'Ana')).toBe(true);
+    asignarBeneficiarioLentes(ctx, lentes, `p:${hija}`);
+    expect(lista(obtenerDeducciones(ctx)).facturas.find((f) => f.uuid === lentes)).toMatchObject({
+      lentes: true,
+      beneficiarioLentes: `p:${hija}`,
+      textoBeneficiarioLentes: 'Ana',
+    });
+    expect(() => asignarBeneficiarioLentes(ctx, lentes, 'desconocido')).toThrow(/beneficiario/);
   });
 });
 

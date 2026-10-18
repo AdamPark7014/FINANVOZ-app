@@ -17,6 +17,7 @@ import {
   uuidDe,
 } from '../../servicios/__pruebas__/fiscal';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
+import { crearPersona } from '../../servicios/personas';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { activarPlus, conEscenario } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
@@ -192,6 +193,29 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     renderConSesion(ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirDeducciones={alAbrir} />);
     fireEvent.press(screen.getByTestId('boton-deducciones'));
     expect(alAbrir).toHaveBeenCalled();
+  });
+
+  it('cancelada, importada por error y beneficiario de lentes', async () => {
+    const ctx = preparar();
+    const luisaId = crearPersona(ctx, { nombre: 'Luisa' });
+    renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    llenarPerfil('PEPJ800101AB1', '300,000');
+    await importarDesdePantalla();
+
+    const dentista = uuidDe('c01_dentista_debito.xml');
+    const lentes = uuidDe('c03_lentes_tarjeta.xml');
+    fireEvent.press(screen.getByTestId(`factura-${dentista}-cancelada`));
+    expect(textoDe(`factura-${dentista}-estado`)).toMatch(/cancelada/i);
+
+    fireEvent.press(screen.getByTestId(`factura-${dentista}-ocultar`));
+    expect(screen.queryByTestId(`factura-${dentista}`)).toBeNull();
+    expect(screen.getByTestId('deducciones-ocultas-titulo')).toBeTruthy();
+    fireEvent.press(screen.getByTestId(`factura-oculta-${dentista}-recuperar`));
+    expect(screen.getByTestId(`factura-${dentista}`)).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId(`factura-${lentes}-lentes`));
+    fireEvent.press(screen.getByTestId(`factura-${lentes}-beneficiario-p:${luisaId}`));
+    expect(screen.getByTestId(`factura-${lentes}-beneficiario-p:${luisaId}`)).toBeTruthy();
   });
 });
 
