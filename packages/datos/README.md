@@ -1,0 +1,5 @@
+# @cartera/datos
+
+Esquema Drizzle, migraciones SQL locales (SQLCipher vía `expo-sqlite`) y `Libro.registrar` — libro inmutable de partida doble (`docs/04-DATOS.md`, ADR-012). Sin React ni red; la app abre la base en `apps/movil/src/db/` y las pruebas usan `better-sqlite3` en `src/__pruebas__/base.ts`.
+
+> **Tip migraciones:** cada cambio de esquema es un par nuevo: `migraciones/NNNN_nombre.sql` y una entrada en `meta/_journal.json` (`idx` consecutivo desde 0, `tag` = nombre del archivo sin `.sql`, `when` en ms **estrictamente mayor** que la anterior — si queda atrás, el migrador la salta). Nunca edites un `.sql` ya aplicado en dispositivos o pruebas; corrige con otra migración numerada. Entre sentencias usa el marcador Drizzle `--> statement-breakpoint`; triggers, `CHECK`, vistas e `INSERT` de semillas que el kit no genere van a mano en ese mismo archivo. Alinea `src/esquema.ts` (`TABLAS_000N`) y agrega casos en `src/migracion.test.ts`. `src/journal.test.ts` ya exige que no haya `.sql` huérfanos ni tags fuera de orden.
