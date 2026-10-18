@@ -7,6 +7,7 @@ import {
   Boton,
   CampoMonto,
   CampoTexto,
+  EstadoVacio,
   Cifra,
   ERROR_FORMATO_MONTO,
   Interruptor,
@@ -78,6 +79,13 @@ describe('Boton', () => {
     render(<Boton etiqueta="Ver qué viene" alPresionar={() => {}} variante={v} />);
     expect(screen.getByRole('button')).toHaveStyle({ minHeight: 48, minWidth: 48 });
   });
+
+  it('cargando anuncia ocupado y deshabilitado en TalkBack', () => {
+    render(<Boton etiqueta="Guardar" alPresionar={() => {}} cargando />);
+    const boton = screen.getByRole('button', { name: 'Guardar' });
+    expect(boton.props.accessibilityState).toEqual({ disabled: true, busy: true });
+    expect(boton).toBeDisabled();
+  });
 });
 
 describe('Interruptor', () => {
@@ -120,6 +128,31 @@ describe('CampoTexto', () => {
     expect(alCambiar).toHaveBeenCalledWith('coca 25');
     expect(screen.getByText('Falta el monto. Escríbelo con números.')).toBeTruthy();
     expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true });
+  });
+
+  it('la ayuda visible no duplica la pista del campo', () => {
+    render(
+      <CampoTexto
+        etiqueta="Notas"
+        valor=""
+        alCambiar={() => {}}
+        ayuda="Opcional. Solo para ti."
+      />,
+    );
+    const campo = screen.getByLabelText('Notas');
+    expect(campo.props.accessibilityHint).toBe('Opcional. Solo para ti.');
+    expect(screen.getByText('Opcional. Solo para ti.', { includeHiddenElements: true }).props.accessibilityElementsHidden).toBe(
+      true,
+    );
+  });
+});
+
+describe('EstadoVacio', () => {
+  it('anuncia el copy con live region', () => {
+    render(<EstadoVacio texto="Aún no hay movimientos." testID="vacio" />);
+    const vacio = screen.getByTestId('vacio');
+    expect(vacio).toHaveTextContent('Aún no hay movimientos.');
+    expect(vacio.props.accessibilityLiveRegion).toBe('polite');
   });
 });
 

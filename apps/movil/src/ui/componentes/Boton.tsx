@@ -50,7 +50,7 @@ export function Boton({
       accessibilityRole="button"
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
       accessibilityHint={pista}
-      accessibilityState={{ disabled: deshabilitado, busy: cargando }}
+      accessibilityState={{ disabled: inactivo, busy: cargando }}
       hitSlop={variante === 'texto' ? espacio.s : undefined}
       style={({ pressed }) => [
         {

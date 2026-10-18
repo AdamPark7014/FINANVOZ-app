@@ -83,7 +83,8 @@ describe('accesibilidad en pantalla respaldo', () => {
       <TarjetaRespaldo alRestaurar={jest.fn()} />,
       { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
     );
-    expect(screen.getByText(SUBTITULO_ARCHIVO)).toBeTruthy();
+    expect(screen.getByTestId('privacidad-respaldo-titulo')).toHaveTextContent(SUBTITULO_ARCHIVO);
+    expect(screen.getByTestId('privacidad-respaldo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(DESCRIPCION_ARCHIVO)).toBeTruthy();
     p.cerrar();
   });

@@ -1,17 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import {
   AYUDA_BIENVENIDA,
+  BTN_ACEPTAR_CONTINUAR,
+  CASILLA_DATOS_FINANCIEROS,
   CUERPO_BIENVENIDA,
   ERROR_GUARDAR,
   etiquetaProgresoOnboarding,
   PASOS_ONBOARDING,
   TITULO_BIENVENIDA,
+  TITULO_CONSENTIMIENTO,
   textoProgresoOnboarding,
 } from './textos';
 
 describe('textos de onboarding', () => {
-  it('O1 cumple 02 §14: tuteo y sin exclamación', () => {
-    for (const texto of [TITULO_BIENVENIDA, AYUDA_BIENVENIDA, CUERPO_BIENVENIDA, ERROR_GUARDAR]) {
+  it('O1 y O2 cumplen 02 §14: tuteo y sin exclamación', () => {
+    for (const texto of [
+      TITULO_BIENVENIDA,
+      AYUDA_BIENVENIDA,
+      CUERPO_BIENVENIDA,
+      ERROR_GUARDAR,
+      TITULO_CONSENTIMIENTO,
+      BTN_ACEPTAR_CONTINUAR,
+      CASILLA_DATOS_FINANCIEROS,
+    ]) {
       expect(texto).not.toMatch(/!/);
       expect(texto).not.toMatch(/por favor/i);
     }

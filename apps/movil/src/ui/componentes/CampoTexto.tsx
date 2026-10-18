@@ -81,7 +81,12 @@ export function CampoTexto({
           {error}
         </Texto>
       ) : ayuda ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {ayuda}
         </Texto>
       ) : null}

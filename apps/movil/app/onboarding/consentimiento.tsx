@@ -9,6 +9,15 @@ import {
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
 import { TIP_CONSENTIMIENTO } from '../../src/pantallas/onboarding/tips';
+import {
+  BTN_ACEPTAR_CONTINUAR,
+  BTN_LEER_AVISO_COMPLETO,
+  CASILLA_DATOS_FINANCIEROS,
+  CASILLA_ESTADISTICAS_OPCIONAL,
+  PISTA_MARCAR_CASILLA_DATOS,
+  TITULO_AVISO_SIMPLIFICADO,
+  TITULO_CONSENTIMIENTO,
+} from '../../src/pantallas/onboarding/textos';
 import { aceptarConsentimiento } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
 import { Boton, espacio, Tarjeta, Texto } from '../../src/ui';
@@ -39,20 +48,20 @@ export default function Consentimiento() {
     <PasoOnboarding
       testID="onb-consentimiento"
       paso={2}
-      titulo="Tus datos son tuyos"
+      titulo={TITULO_CONSENTIMIENTO}
       tip={TIP_CONSENTIMIENTO}
       pie={
         <Boton
           testID="onb-aceptar"
-          etiqueta="Aceptar y continuar"
+          etiqueta={BTN_ACEPTAR_CONTINUAR}
           deshabilitado={!acepta}
-          {...(acepta ? {} : { pista: 'Primero marca la casilla de tus datos financieros' })}
+          {...(acepta ? {} : { pista: PISTA_MARCAR_CASILLA_DATOS })}
           alPresionar={aceptar}
         />
       }
     >
       <Tarjeta>
-        <Texto variante="subtitulo">Aviso de privacidad</Texto>
+        <Texto variante="subtitulo">{TITULO_AVISO_SIMPLIFICADO}</Texto>
         <View style={{ gap: espacio.s }}>
           {AVISO_SIMPLIFICADO.map((punto) => (
             <Texto key={punto} variante="secundario">
@@ -64,13 +73,13 @@ export default function Consentimiento() {
           testID="onb-aviso-completo"
           variante="texto"
           ancho="contenido"
-          etiqueta="Leer el aviso completo"
+          etiqueta={BTN_LEER_AVISO_COMPLETO}
           alPresionar={() => router.push('/aviso-privacidad')}
         />
       </Tarjeta>
       <Casilla
         testID="onb-casilla-datos"
-        etiqueta="Acepto que Finanvoz guarde y use mis datos financieros para funcionar, como dice el aviso."
+        etiqueta={CASILLA_DATOS_FINANCIEROS}
         valor={acepta}
         alCambiar={setAcepta}
       />

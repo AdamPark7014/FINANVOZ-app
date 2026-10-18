@@ -17,5 +17,6 @@ export { Cifra, type CifraProps } from './componentes/Cifra';
 export { Interruptor, type InterruptorProps } from './componentes/Interruptor';
 export { CampoTexto, type CampoTextoProps } from './componentes/CampoTexto';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
+export { EstadoVacio } from './componentes/EstadoVacio';
 export { Barra, type BarraProps } from './componentes/Barra';
 export { Aviso, useAviso, type AccionAviso, type AvisoProps, type DatosAviso } from './componentes/Aviso';

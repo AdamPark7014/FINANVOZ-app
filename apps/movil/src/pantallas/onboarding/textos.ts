@@ -14,6 +14,17 @@ export const CUERPO_BIENVENIDA =
 export const BTN_ONB_EMPEZAR = 'Empezar';
 export const BTN_ONB_CONTINUAR = 'Continuar';
 
+/** O2 · Consentimiento */
+export const TITULO_CONSENTIMIENTO = 'Tus datos son tuyos';
+export const TITULO_AVISO_SIMPLIFICADO = 'Aviso de privacidad';
+export const BTN_ACEPTAR_CONTINUAR = 'Aceptar y continuar';
+export const BTN_LEER_AVISO_COMPLETO = 'Leer el aviso completo';
+export const PISTA_MARCAR_CASILLA_DATOS = 'Primero marca la casilla de tus datos financieros';
+export const CASILLA_DATOS_FINANCIEROS =
+  'Acepto que Finanvoz guarde y use mis datos financieros para funcionar, como dice el aviso.';
+export const CASILLA_ESTADISTICAS_OPCIONAL =
+  'Compartir estadísticas anónimas de uso para mejorar la app (opcional).';
+
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
   return `Paso ${paso} de ${total}`;
