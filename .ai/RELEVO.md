@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **TalkBack tarjetas captura Hoy:** aviso `alert` + live region en reactivar e inactiva; título visual sin duplicar lectura.
+- **Widget TalkBack:** `PISTA_PREVIA_OCULTA` en vista previa cuando «Ocultar montos» está encendido; tests en `widget.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Chip/Boton hints, CampoMonto, personas vacío/alta, formulario movimiento. Ver `git log`.
+- Formulario Guardar, Chip/Boton, CampoMonto, captura Hoy alert. Ver `git log`.
 
 ## A medias — CUIDADO
 
