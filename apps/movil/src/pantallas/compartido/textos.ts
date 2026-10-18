@@ -49,6 +49,11 @@ export const BTN_ANULAR = 'Anular';
 export const TITULO_LO_COMPARTIDO = 'Lo compartido';
 /** Grupo abierto sin movimientos compartidos aún (`02 §27`). */
 export const TEXTO_GRUPO_MOVIMIENTOS_VACIO = 'Todavía no hay gastos compartidos.';
+
+export function etiquetaVacioGrupoMovimientos(): string {
+  return `${TITULO_LO_COMPARTIDO}. ${TEXTO_GRUPO_MOVIMIENTOS_VACIO}`;
+}
+
 export const ETIQUETA_ANULADO = 'Anulado';
 export const ETIQUETA_POR_COMPARTIR = 'Por compartir';
 export const ETIQUETA_A_DONDE_LLEGO = '¿A dónde te llegó?';

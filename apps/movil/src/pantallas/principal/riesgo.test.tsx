@@ -44,6 +44,27 @@ async function conGastoDiario(monto: number, hasta: PlainDate) {
   return p;
 }
 
+describe('ProbabilidadHoy · TalkBack', () => {
+  it('etiquetaAccesibleProbabilidad concatena la etiqueta de estimación', () => {
+    expect(etiquetaAccesibleProbabilidad('87 % de llegar sin tocar tu colchón', 'estimación inicial')).toBe(
+      '87 % de llegar sin tocar tu colchón. estimación inicial',
+    );
+    expect(etiquetaAccesibleProbabilidad('87 % de llegar sin tocar tu colchón', null)).toBe(
+      '87 % de llegar sin tocar tu colchón',
+    );
+  });
+
+  it('calculando anuncia una sola vez; con resultado la barra lleva el texto y el visible queda oculto', async () => {
+    const p = await conGastoDiario(1_000, '2026-10-27');
+    montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
+    const texto = screen.getByTestId('probabilidad-texto').props.children as string;
+    expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(
+      etiquetaAccesibleProbabilidad(texto, screen.queryByTestId('probabilidad-etiqueta')?.props.children ?? null),
+    );
+    expect(screen.getByTestId('probabilidad-texto')).toHaveProp('importantForAccessibility', 'no');
+  });
+});
+
 describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
   it('muestra el aviso y deja programada la notificación del siguiente inicio de día', async () => {
     const p = await conGastoDiario(40_000, '2026-10-27');

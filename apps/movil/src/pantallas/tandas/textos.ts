@@ -9,7 +9,9 @@ export const TITULO_TANDAS = 'Tandas';
 /** Entrada desde Cuentas (`02 §18`). */
 export const BTN_TANDAS_CUENTAS = 'Ver mis tandas';
 export const ETIQUETA_NUEVA_TANDA = 'Nueva tanda';
+export const PISTA_NUEVA_TANDA = 'Crea una tanda con aportación, turno y fechas';
 export const ETIQUETA_VER_CALENDARIO = 'Ver calendario';
+export const PISTA_VER_CALENDARIO = 'Abre el calendario y las rondas de esta tanda';
 
 /** Tarjetas de Hoy (debe coincidir con `servicios/tandas.ts`). */
 export const PREGUNTA_YA_DISTE = '¿Ya diste tu tanda?';

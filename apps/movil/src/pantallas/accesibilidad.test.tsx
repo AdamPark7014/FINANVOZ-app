@@ -163,11 +163,14 @@ describe('accesibilidad (CA-M7-05)', () => {
     fireEvent.press(screen.getByTestId('arqueo-otra'));
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '700');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
-    expect(
-      screen.getByRole('radiogroup', {
-        name: 'Traes sesenta pesos más de lo esperado. ¿De dónde salió?',
-      }),
-    ).toBeTruthy();
+    expect(screen.getByTestId('arqueo-sobrante-me_dieron')).toHaveProp(
+      'accessibilityLabel',
+      'Me dieron dinero',
+    );
+    expect(screen.getByTestId('arqueo-sobrante-no_se')).toHaveProp(
+      'accessibilityLabel',
+      'No sé, solo corrígelo',
+    );
     sinHallazgos();
     p.cerrar();
   });

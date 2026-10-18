@@ -202,7 +202,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
       />
       <CampoMonto testID="corregir-monto" etiqueta={ETIQUETA_SALDO_SEGUN_BANCO} alCambiar={setMonto} />
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}

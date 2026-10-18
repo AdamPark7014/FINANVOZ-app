@@ -174,9 +174,9 @@ describe('CampoTexto', () => {
 
 describe('EstadoVacio', () => {
   it('anuncia el copy con live region', () => {
-    render(<EstadoVacio texto="Aún no hay movimientos." testID="vacio" />);
+    render(<EstadoVacio texto="Todavía no hay movimientos." testID="vacio" />);
     const vacio = screen.getByTestId('vacio');
-    expect(vacio).toHaveTextContent('Aún no hay movimientos.');
+    expect(vacio).toHaveTextContent('Todavía no hay movimientos.');
     expect(vacio.props.accessibilityLiveRegion).toBe('polite');
   });
 

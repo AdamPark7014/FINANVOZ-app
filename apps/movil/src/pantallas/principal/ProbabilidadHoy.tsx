@@ -97,23 +97,34 @@ export function ProbabilidadHoy({
   if (vista.estado === 'sin_ingreso') return null;
   if (vista.estado === 'datos_insuficientes') {
     return (
-      <Texto variante="secundario" tono="secundario" testID="probabilidad-mensaje">
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID="probabilidad-mensaje"
+        accessibilityLiveRegion="polite"
+      >
         {vista.mensaje}
       </Texto>
     );
   }
+  const hablado = etiquetaAccesibleProbabilidad(vista.texto, vista.etiqueta);
   return (
     <View style={{ gap: espacio.xs }} testID="probabilidad-hoy">
       <Barra
         llenoBp={Math.round(vista.probabilidad * 10000)}
-        etiquetaAccesible={vista.texto}
+        etiquetaAccesible={hablado}
         testID="probabilidad-barra"
       />
-      <Texto variante="secundario" testID="probabilidad-texto">
+      <Texto variante="secundario" testID="probabilidad-texto" importantForAccessibility="no">
         {vista.texto}
       </Texto>
       {vista.etiqueta ? (
-        <Texto variante="secundario" tono="secundario" testID="probabilidad-etiqueta">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="probabilidad-etiqueta"
+          importantForAccessibility="no"
+        >
           {vista.etiqueta}
         </Texto>
       ) : null}
