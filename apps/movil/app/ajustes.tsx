@@ -93,7 +93,7 @@ export default function Ajustes() {
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
       <SeccionColchon />
 
-      <Tarjeta>
+      <Tarjeta testID="ajustes-seccion-bloqueo">
         <Texto variante="subtitulo">{SECCION_BLOQUEO}</Texto>
         <Interruptor
           testID="ajustes-bloqueo"

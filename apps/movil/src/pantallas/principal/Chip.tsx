@@ -4,6 +4,18 @@ import { espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, Texto, useTema } 
 export interface OpcionChip<T extends string> {
   readonly valor: T;
   readonly etiqueta: string;
+  /** TalkBack si el texto visible no basta (p. ej. montos o «Caro ×2»). */
+  readonly etiquetaAccesible?: string;
+}
+
+function etiquetaChipHablada(etiqueta: string, etiquetaAccesible?: string): string {
+  if (etiquetaAccesible) return etiquetaHablada(etiquetaAccesible);
+  const veces = /^(.+) ×(\d+)$/.exec(etiqueta);
+  if (veces) {
+    const [, nombre, n] = veces;
+    return etiquetaHablada(`${nombre}, ${n} veces`);
+  }
+  return etiquetaHablada(etiqueta);
 }
 
 /** Pregunta visible arriba del grupo; TalkBack usa `etiqueta` en `GrupoChips`. */
@@ -39,10 +51,8 @@ export function Chip({
       testID={testID}
       onPress={alPresionar}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
-      accessibilityLabel={etiquetaHablada(etiquetaAccesible ?? etiqueta)}
-      accessibilityState={
-        multiple ? { checked: seleccionado } : { selected: seleccionado, checked: seleccionado }
-      }
+      accessibilityLabel={etiquetaChipHablada(etiqueta, etiquetaAccesible)}
+      accessibilityState={multiple ? { checked: seleccionado } : { selected: seleccionado }}
       style={({ pressed }) => ({
         minHeight: OBJETIVO_TACTIL_MIN,
         paddingHorizontal: espacio.l,
@@ -92,6 +102,7 @@ export function GrupoChips<T extends string>({
           etiqueta={o.etiqueta}
           seleccionado={valor === o.valor}
           alPresionar={() => alCambiar(o.valor)}
+          {...(o.etiquetaAccesible ? { etiquetaAccesible: o.etiquetaAccesible } : {})}
           {...(prefijoTestID ? { testID: `${prefijoTestID}-${o.valor}` } : {})}
         />
       ))}
