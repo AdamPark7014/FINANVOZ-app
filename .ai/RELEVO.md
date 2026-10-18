@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **PantallaHoy / avisos una vez:** texto del aviso con `accessibilityRole="alert"` y `accessibilityLiveRegion="polite"`; prueba en `principal.test.tsx` (CA-M2-12).
+- **plan:** `PISTA_VOLVER` en `textos.ts`; botón Volver de `PantallaPlan` con `pista` (TalkBack); prueba `accessibilityHint` en `plan.test.tsx`.
+- **personas (commit previo en main):** etiquetas cuenta dividida centralizadas en `textos.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Copy y a11y móvil (tarjetas, personas, me-alcanza, captura). Ver `git log`.
+- deducciones, tarjetas MesesYPagos, privacidad, me-alcanza, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Working tree ajeno: `ajustes`, `ayuda`, `plan`, `EditarTarjeta`/`textos` tarjetas — no mezclar en commits ajenos.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP ajeno: `ajustes.tsx`, `PantallaAyuda`, `tarjetas/textos.ts` — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear WIP ajeno cuando toque.
+2. `git push` tras commits locales pendientes si Adam quiere remoto al día.
 
 ## No tocar
 

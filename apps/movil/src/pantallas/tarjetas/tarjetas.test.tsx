@@ -36,7 +36,9 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { PantallaTarjeta } from './PantallaTarjeta';
 import {
   AYUDA_SALDO_A_FAVOR,
+  BTN_AGREGAR_PAGO_PLANEADO,
   ERROR_ORIGEN_PAGO,
+  mensajePagoPlaneadoApartado,
   TEXTO_TARJETA_NO_ENCONTRADA,
   TITULO_CONFIRMAR_MSI,
   VACIO_MSI_TARJETA,
@@ -553,5 +555,12 @@ describe('Avisos', () => {
     fireEvent.press(await screen.findByTestId('invitacion-avisos-no'));
     expect(screen.queryByTestId('invitacion-avisos')).toBeNull();
     expect(n.vecesPedido()).toBe(0);
+  });
+});
+
+describe('tarjetas/textos · pagos planeados', () => {
+  it('copy centralizado del botón y del aviso al apartar', () => {
+    expect(BTN_AGREGAR_PAGO_PLANEADO).toBe('Agregar pago planeado');
+    expect(mensajePagoPlaneadoApartado(50_000)).toBe('Listo: aparto $500.00 para cada pago planeado.');
   });
 });
