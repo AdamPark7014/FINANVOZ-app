@@ -160,7 +160,7 @@ export function PantallaMeAlcanza({
       ...(descripcion.trim() !== '' ? { descripcion: descripcion.trim() } : {}),
       ...(n !== undefined ? { meses: n } : {}),
     });
-    if (!r.success || precio === null || precio <= 0) return setError('Escribe un precio mayor a $0.');
+    if (!r.success || precio === null || precio <= 0) return setError(ERROR_PRECIO);
     iniciar(r.data);
   };
 
@@ -224,11 +224,7 @@ export function PantallaMeAlcanza({
               testID="me-alcanza-meses-otro"
             />
           ) : null}
-          {error ? (
-            <Texto variante="secundario" tono="faltante" testID="me-alcanza-error">
-              {error}
-            </Texto>
-          ) : null}
+          <MensajeError texto={error} />
           <Boton etiqueta="Calcular" alPresionar={enviar} testID="boton-calcular-me-alcanza" />
         </View>
       ) : null}
@@ -252,7 +248,9 @@ export function PantallaMeAlcanza({
 
       {estado.tipo === 'error' ? (
         <View style={{ gap: espacio.m }} testID="me-alcanza-fallo">
-          <Texto variante="cuerpo">No pude calcularlo. Intenta de nuevo.</Texto>
+          <Texto variante="cuerpo" testID="me-alcanza-error-calculo">
+            {ERROR_CALCULO}
+          </Texto>
           <Boton etiqueta="Intentar de nuevo" alPresionar={() => iniciar(estado.consulta)} />
           <Boton
             etiqueta="Cambiar los datos"
@@ -267,6 +265,9 @@ export function PantallaMeAlcanza({
           <Texto variante="subtitulo">{estado.vista.titulo}</Texto>
           <Texto variante="cuerpo" testID="me-alcanza-mensaje">
             {estado.vista.mensaje}
+          </Texto>
+          <Texto variante="secundario" tono="secundario" testID="me-alcanza-datos-ayuda">
+            {AYUDA_DATOS_INSUFICIENTES}
           </Texto>
           <Boton etiqueta="Listo" variante="secundario" alPresionar={alCerrar} />
         </View>
@@ -341,7 +342,7 @@ function Resultado({
       setRecordado(true);
       mostrar({ mensaje: 'Listo: te lo recuerdo ese día.' });
     } catch {
-      setMensajeRecordatorio('No pude programar el aviso. Intenta de nuevo.');
+      setMensajeRecordatorio(ERROR_RECORDATORIO);
     }
   };
 

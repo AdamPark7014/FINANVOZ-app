@@ -16,6 +16,27 @@ import { Boton, CampoMonto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta
 import { Casilla } from '../onboarding/componentes';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
+import {
+  CERRAR,
+  CONFIRMAR,
+  CONTINUAR,
+  ETIQUETA_MONTO_TRAES,
+  ETIQUETA_OTRA_CANTIDAD,
+  LISTO,
+  mensajeCuadra,
+  mensajeEfectivoQuedo,
+  mensajeSumaPropuesta,
+  OPCIONES_SOBRANTE,
+  PASO_MARCAR_AYUDA,
+  PASO_MARCAR_TITULO,
+  QUIEN_TE_PAGO,
+  SIN_CUENTA_EFECTIVO,
+  TITULO,
+  textoDeberiasTraer,
+  textoFaltante,
+  textoSobrante,
+  TOTAL,
+} from './textos';
 
 type Paso = 'marcar' | 'cantidad' | 'resultado';
 
@@ -51,9 +72,9 @@ export function PantallaArqueo({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">Contar mi efectivo</Texto>
+        <Texto variante="titulo">{TITULO}</Texto>
         <Boton
-          etiqueta="Cerrar"
+          etiqueta={CERRAR}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
@@ -68,7 +89,7 @@ export function PantallaArqueo({
         />
       ) : (
         <Texto variante="cuerpo" tono="secundario" testID="arqueo-sin-efectivo">
-          No llevas una cuenta de efectivo. Agrégala en Cuentas para poder contarla.
+          {SIN_CUENTA_EFECTIVO}
         </Texto>
       )}
     </Pantalla>
@@ -127,7 +148,7 @@ function Arqueo({
     try {
       const c = calcularArqueo(ctx, entrada(efectivoReal));
       if (c.accion === 'ninguna') {
-        confirmar(entrada(efectivoReal), 'Listo: tu efectivo cuadra.');
+        confirmar(entrada(efectivoReal), mensajeCuadra());
         return;
       }
       setReal(efectivoReal);
@@ -142,7 +163,7 @@ function Arqueo({
     return (
       <Tarjeta testID="arqueo-hecho">
         <Texto variante="cuerpoFuerte">{hecho}</Texto>
-        <Boton etiqueta="Listo" alPresionar={alCerrar} testID="arqueo-listo" />
+        <Boton etiqueta={LISTO} alPresionar={alCerrar} testID="arqueo-listo" />
       </Tarjeta>
     );
   }
@@ -151,9 +172,9 @@ function Arqueo({
     <View style={{ gap: espacio.l }}>
       {paso === 'marcar' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-marcar">
-          <Texto variante="subtitulo">Antes: ¿pagaste alguno de estos en efectivo?</Texto>
+          <Texto variante="subtitulo">{PASO_MARCAR_TITULO}</Texto>
           <Texto variante="secundario" tono="secundario">
-            Los que marques pasan a tu efectivo antes de contar, para no contarlos dos veces.
+            {PASO_MARCAR_AYUDA}
           </Texto>
           {inicial.porAsignar.map((g) => (
             <Casilla
@@ -166,19 +187,19 @@ function Arqueo({
               testID={`arqueo-marcar-${g.transaccionId}`}
             />
           ))}
-          <Boton etiqueta="Continuar" alPresionar={() => setPaso('cantidad')} testID="arqueo-continuar" />
+          <Boton etiqueta={CONTINUAR} alPresionar={() => setPaso('cantidad')} testID="arqueo-continuar" />
         </View>
       ) : null}
 
       {paso === 'cantidad' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-cantidad">
           <Texto variante="subtitulo" testID="arqueo-esperado">
-            {`Deberías traer ${formatearCentavos(esperado)} en efectivo. ¿Cuánto traes?`}
+            {textoDeberiasTraer(esperado)}
           </Texto>
           <GrupoChips
             opciones={[
               { valor: 'exacto', etiqueta: formatearCentavos(esperado) },
-              { valor: 'otra', etiqueta: 'Otra cantidad' },
+              { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
             ]}
             valor={otra ? 'otra' : null}
             alCambiar={(v) => (v === 'exacto' ? calcular(esperado) : setOtra(true))}
@@ -187,14 +208,14 @@ function Arqueo({
           {otra ? (
             <>
               <CampoMonto
-                etiqueta="¿Cuánto traes?"
+                etiqueta={ETIQUETA_MONTO_TRAES}
                 valorInicial={real}
                 alCambiar={setReal}
                 autoFocus={efectivoInicial === undefined}
                 testID="arqueo-monto"
               />
               <Boton
-                etiqueta="Continuar"
+                etiqueta={CONTINUAR}
                 deshabilitado={real === null}
                 alPresionar={() => real !== null && calcular(real)}
                 testID="arqueo-calcular"
@@ -211,7 +232,7 @@ function Arqueo({
             alConfirmar={(propuesta) =>
               confirmar(
                 { ...entrada(calculo.efectivoReal), propuesta },
-                `Listo: tu efectivo quedó en ${formatearCentavos(calculo.efectivoReal)}.`,
+                mensajeEfectivoQuedo(calculo.efectivoReal),
               )
             }
           />
@@ -221,7 +242,7 @@ function Arqueo({
             alResponder={(sobrante) =>
               confirmar(
                 { ...entrada(calculo.efectivoReal), sobrante },
-                `Listo: tu efectivo quedó en ${formatearCentavos(calculo.efectivoReal)}.`,
+                mensajeEfectivoQuedo(calculo.efectivoReal),
               )
             }
           />
@@ -251,7 +272,7 @@ function Faltante({
   return (
     <View style={{ gap: espacio.s }} testID="arqueo-faltante">
       <Texto variante="subtitulo">
-        {`Faltan ${formatearCentavos(calculo.hueco)}. Lo repartí según tus gastos en efectivo:`}
+        {textoFaltante(calculo.hueco)}
       </Texto>
       <Tarjeta>
         {calculo.propuesta.map((p, i) => (
@@ -264,8 +285,8 @@ function Faltante({
           />
         ))}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Texto variante="cuerpoFuerte">Total</Texto>
-          <Cifra centavos={suma} contexto="Total" testID="arqueo-propuesta-total" />
+          <Texto variante="cuerpoFuerte">{TOTAL}</Texto>
+          <Cifra centavos={suma} contexto={TOTAL} testID="arqueo-propuesta-total" />
         </View>
       </Tarjeta>
       {error ? (
@@ -274,12 +295,10 @@ function Faltante({
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Confirmar"
+        etiqueta={CONFIRMAR}
         alPresionar={() => {
           if (suma !== calculo.hueco) {
-            setError(
-              `La suma debe ser ${formatearCentavos(calculo.hueco)}; ahora es ${formatearCentavos(suma)}.`,
-            );
+            setError(mensajeSumaPropuesta(calculo.hueco, suma));
             return;
           }
           alConfirmar(
@@ -309,16 +328,16 @@ function Sobrante({
   return (
     <View style={{ gap: espacio.s }} testID="arqueo-sobrante">
       <Texto variante="subtitulo">
-        {`Traes ${formatearCentavos(-calculo.hueco)} más de lo esperado. ¿De dónde salió?`}
+        {textoSobrante(-calculo.hueco)}
       </Texto>
       <GrupoChips
         opciones={[
-          { valor: 'me_dieron' as OpcionSobrante, etiqueta: 'Me dieron dinero' },
+          { valor: 'me_dieron' as OpcionSobrante, etiqueta: OPCIONES_SOBRANTE.me_dieron },
           ...(teDeben.length > 0
-            ? [{ valor: 'me_pagaron' as OpcionSobrante, etiqueta: 'Me pagaron lo que me debían' }]
+            ? [{ valor: 'me_pagaron' as OpcionSobrante, etiqueta: OPCIONES_SOBRANTE.me_pagaron }]
             : []),
-          { valor: 'anote_de_mas' as OpcionSobrante, etiqueta: 'Anoté algo de más' },
-          { valor: 'no_se' as OpcionSobrante, etiqueta: 'No sé (ajustar)' },
+          { valor: 'anote_de_mas' as OpcionSobrante, etiqueta: OPCIONES_SOBRANTE.anote_de_mas },
+          { valor: 'no_se' as OpcionSobrante, etiqueta: OPCIONES_SOBRANTE.no_se },
         ]}
         valor={opcion}
         alCambiar={(o) => {
@@ -329,7 +348,7 @@ function Sobrante({
       />
       {opcion === 'me_pagaron' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario">¿Quién te pagó?</Texto>
+          <Texto variante="secundario">{QUIEN_TE_PAGO}</Texto>
           <GrupoChips
             opciones={teDeben.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
             valor={null}

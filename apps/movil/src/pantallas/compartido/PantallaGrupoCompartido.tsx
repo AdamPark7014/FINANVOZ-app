@@ -219,15 +219,13 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
               alCambiar={setCuentaPago}
             />
           ) : null}
-          <Boton testID="grupo-saldar-confirmar" etiqueta="Registrar pago" alPresionar={saldar} />
+          <Boton testID="grupo-saldar-confirmar" etiqueta={BTN_REGISTRAR_PAGO} alPresionar={saldar} />
         </Tarjeta>
       ) : null}
 
       {panel === 'codigo' && qr ? (
         <Tarjeta testID="grupo-codigo">
-          <Texto variante="cuerpo">
-            {`Pídele a ${g.nombre} que toque "Volver a vincular" y escanee este código. Sirve una sola vez y vence en 10 minutos.`}
-          </Texto>
+          <Texto variante="cuerpo">{instruccionQrMostrarCodigo(g.nombre)}</Texto>
           <CodigoQr texto={qr} testID="grupo-qr" />
         </Tarjeta>
       ) : null}

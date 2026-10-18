@@ -1,0 +1,50 @@
+import type { Centavos } from '@cartera/core';
+import { formatearCentavos } from '../../ui';
+
+/** Redacción del arqueo (`02 §7`, `02 §14`): tuteo, sin tecnicismos contables. */
+
+export const TITULO = 'Contar mi efectivo';
+export const CERRAR = 'Cerrar';
+export const LISTO = 'Listo';
+export const CONTINUAR = 'Continuar';
+export const CONFIRMAR = 'Confirmar';
+export const TOTAL = 'Total';
+
+export const SIN_CUENTA_EFECTIVO =
+  'No llevas una cuenta de efectivo. Agrégala en Cuentas para poder contarla.';
+
+export const PASO_MARCAR_TITULO = 'Antes: ¿pagaste alguno de estos en efectivo?';
+export const PASO_MARCAR_AYUDA =
+  'Los que marques pasan a tu efectivo antes de contar, para no contarlos dos veces.';
+
+export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
+export const ETIQUETA_MONTO_TRAES = '¿Cuánto traes?';
+
+export const OPCIONES_SOBRANTE = {
+  me_dieron: 'Me dieron dinero',
+  me_pagaron: 'Me pagaron lo que me debían',
+  anote_de_mas: 'Anoté algo de más',
+  no_se: 'No sé, solo corrígelo',
+} as const;
+
+export const QUIEN_TE_PAGO = '¿Quién te pagó?';
+
+export const mensajeCuadra = (): string => 'Listo: tu efectivo cuadra.';
+
+export const mensajeEfectivoQuedo = (monto: Centavos): string =>
+  `Listo: tu efectivo quedó en ${formatearCentavos(monto)}.`;
+
+/** "Deberías traer $640 en efectivo. ¿Cuánto traes?" */
+export const textoDeberiasTraer = (esperado: Centavos): string =>
+  `Deberías traer ${formatearCentavos(esperado)} en efectivo. ¿Cuánto traes?`;
+
+/** "Faltan $340. Lo repartí según tus gastos en efectivo:" */
+export const textoFaltante = (hueco: Centavos): string =>
+  `Faltan ${formatearCentavos(hueco)}. Lo repartí según tus gastos en efectivo:`;
+
+/** "Traes $15 más de lo esperado. ¿De dónde salió?" */
+export const textoSobrante = (extra: Centavos): string =>
+  `Traes ${formatearCentavos(extra)} más de lo esperado. ¿De dónde salió?`;
+
+export const mensajeSumaPropuesta = (debe: Centavos, tiene: Centavos): string =>
+  `Los montos deben sumar ${formatearCentavos(debe)}; ahora suman ${formatearCentavos(tiene)}.`;

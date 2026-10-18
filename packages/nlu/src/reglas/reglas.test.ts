@@ -49,6 +49,10 @@ describe('nivel 0 · formas aceptadas', () => {
     expect(reglas('traigo 0 en efectivo')).toEqual({ intencion: 'arqueo', efectivo_real: 0 });
   });
 
+  it('arqueo en la cartera admite cero (misma gramática que efectivo)', () => {
+    expect(reglas('traigo 0 en la cartera')).toEqual({ intencion: 'arqueo', efectivo_real: 0 });
+  });
+
   it('montos mexicanos a centavos', () => {
     expect(gasto('uber 1,250.5')).toMatchObject({ monto: 125050 });
     expect(gasto('uber 1250')).toMatchObject({ monto: 125000 });

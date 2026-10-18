@@ -17,7 +17,6 @@ import {
   construirVistaMeAlcanza,
   listarMovimientos,
   listarPlanesMsi,
-  MENSAJE_DATOS_INSUFICIENTES,
   obtenerHoy,
   registrarMovimiento,
   TEXTO_SIN_TARJETA_PARA_MSI,
@@ -45,7 +44,14 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { abrirMeAlcanza, tomarConsultaPendiente } from '.';
-import { MENSAJE_CANCELADO, PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
+import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
+import {
+  AYUDA_DATOS_INSUFICIENTES,
+  ERROR_PRECIO,
+  MENSAJE_CANCELADO,
+  MENSAJE_DATOS_INSUFICIENTES,
+  MENSAJE_PERMISO_AVISOS,
+} from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
 const sinEspera = { ceder: () => Promise.resolve() };

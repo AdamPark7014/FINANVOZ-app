@@ -34,7 +34,7 @@ describe('avisarCapturasNuevas', () => {
     const ctx = ctxConConsentimiento();
     const pub = publicadorEnMemoria();
     await avisarCapturasNuevas(ctx, 3, pub, { enSegundoPlano: true, ahora: 1000 });
-    expect(pub.cuerpos()).toEqual(['3 movimientos nuevos']);
+    expect(pub.cuerpos()).toEqual(['3 movimientos nuevos. Revísalos en Movimientos.']);
     expect(acumularAvisoCaptura(ctx, 0).pendiente).toBe(0);
   });
 
