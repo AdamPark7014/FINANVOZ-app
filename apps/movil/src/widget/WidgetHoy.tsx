@@ -2,8 +2,8 @@
 // La biblioteca recorre el árbol llamando a los componentes como funciones: sin hooks ni React Compiler.
 import { FlexWidget, TextWidget, type HexColor } from 'react-native-android-widget';
 import type { VistaWidget } from '../servicios';
-import { etiquetaHablada } from '../ui/formato';
 import { colores, type EsquemaColor } from '../ui/tokens';
+import { detalleConSeparador, etiquetaAccesibleWidget, tamanoFuenteCifra } from './formatoWidget';
 
 /** Nombre del widget en `app.json` (config plugin) y al pedir una actualización. */
 export const NOMBRE_WIDGET = 'HoyPuedes';
@@ -18,11 +18,12 @@ const hex = (c: string) => c as HexColor;
 export function WidgetHoy({ vista, esquema }: { vista: VistaWidget; esquema: EsquemaColor }) {
   const c = colores[esquema];
   const texto = { color: hex(c.texto), fontSize: 16 } as const;
+  const tamCifra = vista.cifra ? tamanoFuenteCifra(vista.cifra) : 22;
   return (
     <FlexWidget
       clickAction="OPEN_URI"
       clickActionData={{ uri: vista.enlace }}
-      accessibilityLabel={etiquetaHablada(vista.texto)}
+      accessibilityLabel={etiquetaAccesibleWidget(vista)}
       style={{
         height: 'match_parent',
         width: 'match_parent',
@@ -41,11 +42,11 @@ export function WidgetHoy({ vista, esquema }: { vista: VistaWidget; esquema: Esq
           <TextWidget
             key="cifra"
             text={vista.cifra}
-            style={{ color: hex(c.acentoTexto), fontSize: 22, fontWeight: 'bold' }}
+            style={{ color: hex(c.acentoTexto), fontSize: tamCifra, fontWeight: 'bold' }}
           />,
           <TextWidget
             key="detalle"
-            text={`· ${vista.detalle}`}
+            text={detalleConSeparador(vista.detalle) ?? ''}
             style={{ color: hex(c.textoSecundario), fontSize: 16 }}
           />,
         ]

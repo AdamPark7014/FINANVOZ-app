@@ -14,6 +14,7 @@ import { ProveedorSesion, useSesion } from '../sesion/ProveedorSesion';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { SeccionWidget } from '../pantallas/ajustes/SeccionWidget';
 import { SincronizarWidget } from './SincronizarWidget';
+import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
 import { WidgetHoy } from './WidgetHoy';
 import { actualizarWidget } from './actualizar';
 
@@ -36,6 +37,15 @@ function textos(a: Arbol): string[] {
   const propios = a.type === 'TextWidget' ? [String(a.props.text)] : [];
   return [...propios, ...(a.children ?? []).flatMap(textos)];
 }
+
+describe('PreviaWidget (vista previa en Ajustes)', () => {
+  it('muestra la misma línea de ejemplo que e4-01', () => {
+    render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" />);
+    expect(screen.getByText('Hoy puedes')).toBeTruthy();
+    expect(screen.getByText('$214')).toBeTruthy();
+    expect(screen.getByText('· 4 días')).toBeTruthy();
+  });
+});
 
 describe('WidgetHoy (componente del widget)', () => {
   it('claro y oscuro usan los tokens de cada esquema', () => {
