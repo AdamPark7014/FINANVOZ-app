@@ -14,7 +14,7 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { enTransaccion, type Contexto } from './contexto';
 import { listarOcurrencias } from './ocurrencias';
 
-const { transaccionVigente, transaccion, arqueo, auditoria } = esquema;
+const { transaccionVigente, transaccion, arqueo, auditoria, asiento, cuenta, ocurrencia } = esquema;
 
 /** Tipos que pueden aportar consumo a E8 (`04 §3.1`); el resto se descarta sin leer sus asientos. */
 const TIPOS_CONSUMO = ['gasto', 'cuenta_dividida', 'ajuste_arqueo', 'reembolso'];
@@ -45,39 +45,55 @@ export function transaccionesHistorial(
   desde: PlainDate,
   hasta: PlainDate,
 ): TransaccionHistorial[] {
+  const filtroConsumo = and(
+    inArray(transaccionVigente.tipo, TIPOS_CONSUMO),
+    gte(transaccionVigente.fecha, desde),
+    lte(transaccionVigente.fecha, hasta),
+  );
+
   const filas = ctx.db
     .select({
       id: transaccionVigente.id,
       fecha: transaccionVigente.fecha,
       tipo: transaccionVigente.tipo,
       extraordinaria: transaccionVigente.extraordinaria,
-      // Subconsultas correlacionadas con nombres calificados (Drizzle no califica columnas de una sola tabla).
-      montoGasto: sql<number>`coalesce((
-        select sum(a.monto) from asiento a
-        inner join cuenta c on c.id = a.cuenta_id
-        where a.transaccion_id = "transaccion_vigente"."id"
-          and c.naturaleza = 'gasto' and c.espacio = 'personal'
-      ), 0)`,
-      cubre: sql<number>`exists (
-        select 1 from ocurrencia o
-        where o.transaccion_id = "transaccion_vigente"."id" and o.estado = 'cubierta'
-      )`,
     })
     .from(transaccionVigente)
-    .where(
-      and(
-        inArray(transaccionVigente.tipo, TIPOS_CONSUMO),
-        gte(transaccionVigente.fecha, desde),
-        lte(transaccionVigente.fecha, hasta),
-      ),
-    )
+    .where(filtroConsumo)
     .orderBy(asc(transaccionVigente.fecha), asc(transaccionVigente.id))
     .all();
+
+  const montosPorTx = new Map(
+    ctx.db
+      .select({
+        transaccionId: asiento.transaccionId,
+        total: sql<number>`coalesce(sum(${asiento.monto}), 0)`,
+      })
+      .from(asiento)
+      .innerJoin(cuenta, eq(cuenta.id, asiento.cuentaId))
+      .innerJoin(transaccionVigente, eq(transaccionVigente.id, asiento.transaccionId))
+      .where(and(eq(cuenta.naturaleza, 'gasto'), eq(cuenta.espacio, 'personal'), filtroConsumo))
+      .groupBy(asiento.transaccionId)
+      .all()
+      .map((f) => [f.transaccionId, Number(f.total)] as const),
+  );
+
+  const cubreOcurrencia = new Set(
+    ctx.db
+      .select({ transaccionId: ocurrencia.transaccionId })
+      .from(ocurrencia)
+      .innerJoin(transaccionVigente, eq(transaccionVigente.id, ocurrencia.transaccionId))
+      .where(and(eq(ocurrencia.estado, 'cubierta'), filtroConsumo))
+      .all()
+      .map((f) => f.transaccionId)
+      .filter((id): id is string => id !== null),
+  );
+
   return filas.map((f) => ({
     fecha: f.fecha,
     tipo: f.tipo,
-    monto_gasto: Number(f.montoGasto),
-    ...(Number(f.cubre) === 1 ? { cubre_ocurrencia: true } : {}),
+    monto_gasto: montosPorTx.get(f.id) ?? 0,
+    ...(cubreOcurrencia.has(f.id) ? { cubre_ocurrencia: true } : {}),
     ...(f.extraordinaria === 1 ? { extraordinaria: true } : {}),
     ...(f.tipo === 'ajuste_arqueo' ? { arqueo_anterior: arqueoAnterior(ctx, f.id) } : {}),
   }));
