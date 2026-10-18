@@ -85,7 +85,7 @@ export default function Consentimiento() {
       />
       <Casilla
         testID="onb-casilla-estadisticas"
-        etiqueta="Compartir estadísticas anónimas de uso para mejorar la app (opcional)."
+        etiqueta={CASILLA_ESTADISTICAS_OPCIONAL}
         valor={estadisticas}
         alCambiar={setEstadisticas}
       />
