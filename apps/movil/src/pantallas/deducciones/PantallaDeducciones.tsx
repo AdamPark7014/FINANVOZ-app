@@ -561,7 +561,12 @@ export function ImportarCompartidas({
         {TITULO_IMPORTAR_COMPARTIDAS}
       </Texto>
       {estado.tipo === 'leyendo' ? (
-        <Texto variante="cuerpo" tono="secundario" testID="importar-leyendo">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="importar-leyendo"
+          accessibilityLiveRegion="polite"
+        >
           {TEXTO_IMPORTAR_LEYENDO}
         </Texto>
       ) : null}

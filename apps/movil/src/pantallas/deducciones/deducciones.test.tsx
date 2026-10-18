@@ -70,6 +70,15 @@ function llenarPerfil(rfc: string, ingresos: string) {
 }
 
 describe('Importar por la hoja de compartir (CA-M12-02)', () => {
+  it('mientras lee facturas, TalkBack anuncia el aviso de espera', () => {
+    const ctx = preparar();
+    renderConSesion(
+      ctx,
+      <ImportarCompartidas leer={() => new Promise(() => {})} alVerDeducciones={jest.fn()} />,
+    );
+    expect(screen.getByTestId('importar-leyendo')).toHaveProp('accessibilityLiveRegion', 'polite');
+  });
+
   it('el ZIP de fixtures/cfdi: "Importé 8 facturas; 1 no es versión 4.0"; compartirlo otra vez no duplica', async () => {
     const ctx = preparar({ plus: false, config: false });
     const leer = jest.fn(async () => [zipFixture()]);
