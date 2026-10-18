@@ -14,7 +14,7 @@
 
 ## A medias — CUIDADO
 
-- WIP paralelo en `apps/calculadora` (Aviso, Calculadora, `index.html`) — no mezclar sin `git status`.
+- WIP paralelo en `apps/calculadora` (`Calculadora.tsx` / test) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
