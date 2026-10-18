@@ -10,6 +10,7 @@ import {
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { SeccionDatosCobro } from '../ajustes/SeccionDatosCobro';
+import { SECCION_DATOS_COBRO } from '../ajustes/datos-cobro-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { conEscenario, golden } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
@@ -362,6 +363,13 @@ describe('estados vacíos (es-MX)', () => {
 });
 
 describe('Ajustes → Datos para cobrar', () => {
+  it('titulo de seccion es encabezado TalkBack', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <SeccionDatosCobro />);
+    expect(screen.getByTestId('ajustes-datos-cobro-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(SECCION_DATOS_COBRO)).toBeTruthy();
+  });
+
   it('agrega, cambia y borra', () => {
     const p = conAmigos();
     renderConSesion(p.ctx, <SeccionDatosCobro />);

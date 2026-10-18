@@ -30,7 +30,12 @@ import {
   ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   TEXTO_TANDA_NO_ENCONTRADA,
   PISTA_ARCHIVAR_TANDA,
+  PISTA_CANCELAR_ARCHIVAR,
+  PISTA_CANCELAR_COBRO,
+  PISTA_CANCELAR_EDICION,
+  PISTA_CANCELAR_FORMULARIO,
   PISTA_CONFIRMAR_ARCHIVAR,
+  PISTA_GUARDAR_TANDA,
   PISTA_EDITAR_NOMBRE_CUENTA,
   PISTA_GUARDAR_CAMBIOS,
   PISTA_GUARDAR_TANDA,
@@ -126,6 +131,14 @@ describe('Tandas (02 §18)', () => {
     );
     expect(screen.getByTestId('tanda-editar-abrir')).toHaveProp('accessibilityHint', PISTA_EDITAR_NOMBRE_CUENTA);
     expect(screen.getByTestId('tanda-archivar-abrir')).toHaveProp('accessibilityHint', PISTA_ARCHIVAR_TANDA);
+  });
+
+  it('formulario nueva tanda: Guardar y Cancelar tienen pista TalkBack', () => {
+    const p = preparar('2026-10-16');
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('tandas-nueva'));
+    expect(screen.getByTestId('tanda-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_TANDA);
+    expect(screen.getByTestId('tanda-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_FORMULARIO);
   });
 
   it('Ver calendario en la lista tiene pista TalkBack', () => {
