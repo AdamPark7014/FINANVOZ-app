@@ -6,28 +6,29 @@
 
 ## Hecho en este turno
 
-- **Onboarding tips:** copy O3–O7 vive en `tips.ts`; `textos.ts` reexporta para pantallas y pruebas (sin ciclo `tips` ↔ `textos`).
+- **Fiscal M12 (`02 §24`):** copy pulido deducciones/ayuda/`MENSAJE_SIN_PARAMETROS`, CTA Cuentas, pruebas Plus (en main: `cdc4119`, `12d3abf`, `d0eabaf`).
+- **Negocio M11:** sin UI en app.
 
 ## Hecho (acumulado reciente)
 
-- Personas/tandas/cuentas TalkBack, widget/deducciones/arqueo, principal tests. Ver `git log`.
+- Onboarding tips en `tips.ts`; headers TalkBack varias pantallas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP local (ayuda PISTA_VOLVER, tandas, onboarding) — `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- M0 / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `TIP_CAPTURA_AHORA_NO` / O6: mismo patrón si hace falta reexport en `textos.ts`.
-3. M11 negocio cuando toque el hito.
+2. M11 negocio + paquete contador.
+3. PISTA volver en ayuda/compartidos si falta.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
+- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
