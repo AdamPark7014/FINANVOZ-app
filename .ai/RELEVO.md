@@ -6,28 +6,26 @@
 
 ## Hecho en este turno
 
-- **Cuentas → Tandas:** prueba ancla `BTN_TANDAS_CUENTAS`, header de sección y `boton-tandas` en `principal.test.tsx`.
+- **Onboarding O3/O4:** copy ingreso/cuentas en `onboarding/textos.ts`; pantallas importan desde ahí. Sin reexport circular `textos` ↔ `tips` (`43574fd`).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips en `textos.ts`, CTAs Cuentas centralizados, TalkBack pestañas/widget. Ver `git log`.
+- O5/O7 en textos, cuentas atajos, tabs TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP ajeno en móvil (personas, principal, widget) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Rescates WIP en commits pequeños (`git log --grep=rescate`).
-3. M11 negocio cuando toque el hito.
+2. Tips O2/O6 en `textos` si se quiere un solo módulo.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
