@@ -29,6 +29,7 @@ import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { CandadoPlus } from '../plan/CandadoPlus';
+import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';

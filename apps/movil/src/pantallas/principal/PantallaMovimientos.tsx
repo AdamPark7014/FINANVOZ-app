@@ -195,7 +195,12 @@ export function PantallaMovimientos({
 
       {dias.map((d) => (
         <View key={d.fecha} style={{ gap: espacio.s }}>
-          <Texto variante="etiqueta" tono="secundario" accessibilityRole="header">
+          <Texto
+            variante="etiqueta"
+            tono="secundario"
+            accessibilityRole="header"
+            testID={`movimientos-dia-${d.fecha}`}
+          >
             {d.etiqueta}
           </Texto>
           {d.movimientos.map((m) => (

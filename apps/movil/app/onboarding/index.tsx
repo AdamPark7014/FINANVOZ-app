@@ -32,6 +32,7 @@ export default function Bienvenida() {
           <Boton
             testID="onb-empezar"
             etiqueta={yaAcepto ? BTN_ONB_CONTINUAR : BTN_ONB_EMPEZAR}
+            pista={yaAcepto ? PISTA_ONB_CONTINUAR : PISTA_ONB_EMPEZAR}
             alPresionar={() => router.push(yaAcepto ? '/onboarding/ingreso' : '/onboarding/consentimiento')}
           />
           {/* Teléfono nuevo (`02 §19`): restaurar un respaldo en lugar de empezar de cero. */}
