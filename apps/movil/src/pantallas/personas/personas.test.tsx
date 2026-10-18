@@ -26,6 +26,7 @@ import {
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
   PISTA_COBRAR,
+  PISTA_YA_ME_PAGO,
   PISTA_VOLVER,
   TEXTO_CONTACTOS_VACIO,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
@@ -156,6 +157,7 @@ describe('CA-M8-02 · Cobrar', () => {
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} compartir={compartir} />);
     expect(textoDe('persona-saldo')).toBe('$300');
     expect(screen.getByTestId('boton-cobrar')).toHaveProp('accessibilityHint', PISTA_COBRAR);
+    expect(screen.getByTestId('boton-ya-me-pago')).toHaveProp('accessibilityHint', PISTA_YA_ME_PAGO);
 
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-cobrar'));
@@ -328,6 +330,7 @@ describe('estados vacíos (es-MX)', () => {
     const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
     renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
     expect(textoDe('persona-movimientos-vacio')).toBe(TEXTO_MOVIMIENTOS_PERSONA_VACIO);
+    expect(screen.getByTestId('persona-movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('con saldo a favor muestra el tip de dinero libre', () => {

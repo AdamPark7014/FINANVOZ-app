@@ -6,23 +6,24 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** botón Gastos compartidos usa `BTN_COMPARTIDOS_CUENTAS` en `compartido/textos.ts` (simétrico a suscripciones y deducciones).
+- **Personas:** `PISTA_YA_ME_PAGO` en «Ya me pagó»; antes `PISTA_COBRAR`, `PISTA_VOLVER` (TalkBack `02 §19`); pruebas en `personas.test.tsx`.
+- **¿Me alcanza?:** `PISTA_CALCULAR` en Calcular (`89f4685`).
 
 ## Hecho (acumulado reciente)
 
-- Pestañas TalkBack, copy Cuentas en `textos.ts`, onboarding. Ver `git log`.
+- Onboarding/tabs/captura/widget/deducciones/arqueo TalkBack y copy. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
+- M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O5–O7 tips duplicados (`tips.ts` vs `textos.ts`) si conviene un solo export.
-3. M11 negocio cuando toque el hito.
+2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+3. Recordatorio cobrar / más CTAs personas si otro pase M13.
 
 ## No tocar
 
