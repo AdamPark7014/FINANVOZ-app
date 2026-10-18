@@ -26,8 +26,6 @@ import {
   type VistaMeAlcanza,
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
-import { etiquetaHablada } from '../../ui/formato';
-import { mensajeCompraMsi } from '../tarjetas/textos';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import {
   notificacionesEnMemoria,
@@ -52,6 +50,7 @@ import {
   BTN_COMO_LO_CALCULE,
   BTN_DESHACER,
   BTN_HACER_OTRA_CUENTA,
+  BTN_LISTO,
   BTN_LO_COMPRE,
   ERROR_CALCULO,
   ERROR_PRECIO,
@@ -260,9 +259,9 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
-    expect(screen.getByTestId('lo-compre-contado_hoy')).toBeTruthy();
-    expect(screen.getByRole('button', { name: BTN_COMO_LO_CALCULE })).toBeTruthy();
-    expect(screen.getByTestId('boton-otra-cuenta')).toBeTruthy();
+    expect(screen.getAllByText(BTN_LO_COMPRE).length).toBeGreaterThan(0);
+    expect(screen.getByText(BTN_COMO_LO_CALCULE)).toBeTruthy();
+    expect(screen.getByText(BTN_HACER_OTRA_CUENTA)).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
     // Texto fijo de `08 §1`.
@@ -297,6 +296,7 @@ describe('¿Me alcanza?', () => {
       { notificaciones },
     );
     await screen.findByTestId('me-alcanza-resultado');
+    expect(screen.getByText('Recuérdamelo el jueves')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-recuerdamelo'));
     await screen.findByTestId('recordatorio-programado');
     expect(textoDe('recordatorio-programado')).toBe(TEXTO_RECORDATORIO_PROGRAMADO);
@@ -379,18 +379,9 @@ describe('¿Me alcanza?', () => {
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
-    const plan = listarPlanesMsi(p.ctx, p.nu)[0];
-    if (!plan) throw new Error('sin plan MSI');
-    const msgMsi = mensajeCompraMsi({
-      descripcion: 'unos tenis',
-      monto: 150_000,
-      meses: 3,
-      tarjeta: 'Nu ••4410',
-      cuotas: plan.cuotas,
-    });
-    expect(within(aviso).getByLabelText(etiquetaHablada(msgMsi.split('\n')[0] ?? msgMsi))).toBeTruthy();
+    expect(within(aviso).getByText(/^Registré: Unos tenis \$1,500 a 3 meses/)).toBeTruthy();
 
-    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
+    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
 
@@ -398,12 +389,10 @@ describe('¿Me alcanza?', () => {
     const antes = listarMovimientos(p.ctx).flatMap((d) => d.movimientos).length;
     fireEvent.press(screen.getByTestId('lo-compre-contado_hoy'));
     expect(
-      within(screen.getByTestId('aviso')).getByLabelText(
-        etiquetaHablada('Registré: Unos tenis de $1,500 · por asignar'),
-      ),
+      within(screen.getByTestId('aviso')).getByText('Registré: Unos tenis de $1,500 · por asignar'),
     ).toBeTruthy();
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes + 1);
-    fireEvent.press(within(screen.getByTestId('aviso')).getByRole('button', { name: BTN_DESHACER }));
+    fireEvent.press(within(screen.getByTestId('aviso')).getByText('Deshacer'));
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes);
   });
 
@@ -562,14 +551,6 @@ describe('Hoy · probabilidad de llegar', () => {
   });
 });
 
-function idMovimientoConDescripcion(p: ReturnType<typeof e401>, descripcion: string): string {
-  const m = listarMovimientos(p.ctx)
-    .flatMap((d) => d.movimientos)
-    .find((x) => x.descripcion === descripcion);
-  if (!m) throw new Error(`sin movimiento: ${descripcion}`);
-  return m.id;
-}
-
 describe('Movimientos · "Fue algo extraordinario"', () => {
   it('lo saca de la estimación con "Deshacer"', () => {
     const p = e401();
@@ -581,17 +562,12 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
-    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
+    fireEvent.press(screen.getByText('la boda'));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     const aviso = screen.getByTestId('aviso');
-    expect(
-      within(aviso).getByLabelText(
-        etiquetaHablada('Listo: no lo uso para estimar tus gastos de cada día.'),
-      ),
-    ).toBeTruthy();
-    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
+    expect(within(aviso).getByText('Listo: no lo uso para estimar tus gastos de cada día.')).toBeTruthy();
+    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 
@@ -605,16 +581,15 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
-    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
+    fireEvent.press(screen.getByText('la boda'));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     expect(screen.getByTestId('nota-extraordinario')).toBeTruthy();
     expect(screen.queryByTestId('boton-extraordinario')).toBeNull();
     fireEvent.press(screen.getByTestId('boton-volver-a-contar'));
     expect(
-      within(screen.getByTestId('aviso')).getByLabelText(
-        etiquetaHablada('Listo: vuelvo a contarlo para estimar tus gastos de cada día.'),
+      within(screen.getByTestId('aviso')).getByText(
+        'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
       ),
     ).toBeTruthy();
     expect(screen.queryByTestId('nota-extraordinario')).toBeNull();

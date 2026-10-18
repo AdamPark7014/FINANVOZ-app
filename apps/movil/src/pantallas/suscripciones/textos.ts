@@ -29,7 +29,6 @@ export const PISTA_NO_ES = 'Dejo de tratarla como cargo recurrente';
 
 export type AccionSuscripcion = 'compromiso' | 'cancelada' | 'no_es';
 
-/** Toast tras acción en fila (compromiso, cancelada, no es suscripción). */
 export function mensajeAccionSuscripcion(accion: AccionSuscripcion, nombre: string): string {
   switch (accion) {
     case 'compromiso':
@@ -41,7 +40,6 @@ export function mensajeAccionSuscripcion(accion: AccionSuscripcion, nombre: stri
   }
 }
 
-/** Toast al guardar el nombre local de una suscripción. */
 export function mensajeNombreGuardado(nombre: string): string {
   return `Listo: la llamo ${nombre}.`;
 }

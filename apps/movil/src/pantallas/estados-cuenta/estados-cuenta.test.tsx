@@ -18,7 +18,7 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { esPdfCompartido } from './compartido';
 import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
-import { ERROR_CONTRASENA_PDF, MENSAJE_ESCANEADO, TEXTO_SIN_NUEVOS } from './textos';
+import { ERROR_CONTRASENA_PDF, MENSAJE_ESCANEADO } from './textos';
 
 const PDF = join(__dirname, '../../../../../fixtures/pdf');
 
@@ -146,7 +146,6 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     expect(await screen.findByTestId('estado-resumen-texto')).toHaveTextContent(
       /: 42 movimientos; ya tenías todos; el saldo al corte coincide$/,
     );
-    expect(screen.getByTestId('estado-sin-nuevos')).toHaveTextContent(TEXTO_SIN_NUEVOS);
   });
 
   it('quitar un nuevo de la lista no lo agrega', async () => {

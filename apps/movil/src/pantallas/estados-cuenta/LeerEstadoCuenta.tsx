@@ -10,6 +10,7 @@ import {
   type LecturaEstadoCuenta,
   type PropuestaConciliacionEstado,
   type RenglonDudoso,
+  type RenglonEstado,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
@@ -149,7 +150,7 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo" testID="estado-cuenta-titulo">
+      <Texto variante="titulo" accessibilityRole="header">
         {TITULO_PANTALLA}
       </Texto>
       {estado.tipo === 'leyendo' ? (
@@ -220,11 +221,9 @@ function Aviso({ texto, alSalir, testID }: { texto: string; alSalir: () => void;
     <>
       <Texto
         variante="cuerpo"
-        tono="secundario"
         testID={testID}
         accessibilityLiveRegion="polite"
-        accessibilityRole="text"
-        accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}: ${texto}`}
+        accessibilityLabel={`${ETIQUETA_AVISO_ESTADO}. ${texto}`}
       >
         {texto}
       </Texto>
@@ -248,9 +247,7 @@ function PedirContrasena({
   };
   return (
     <>
-      <Texto variante="cuerpo" testID="estado-contrasena-aviso" accessibilityLiveRegion="polite">
-        {MENSAJE_CONTRASENA}
-      </Texto>
+      <Texto variante="cuerpo">{MENSAJE_CONTRASENA}</Texto>
       <CampoTexto
         etiqueta={ETIQUETA_CONTRASENA_PDF}
         valor={contrasena}
@@ -353,8 +350,13 @@ function Revisar({
   };
   return (
     <>
-      <Tarjeta testID="estado-resumen" etiquetaAccesible={ETIQUETA_RESUMEN_ESTADO} accionesAnidadas>
-        <Texto variante="cuerpo" testID="estado-resumen-texto" accessibilityLiveRegion="polite">
+      <Tarjeta testID="estado-resumen">
+        <Texto
+          variante="cuerpo"
+          testID="estado-resumen-texto"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={`${ETIQUETA_RESUMEN_ESTADO}. ${resumen}`}
+        >
           {resumen}
         </Texto>
         {a.cuadra === false ? (
@@ -382,7 +384,7 @@ function Revisar({
           {a.nuevos.map((n) => (
             <Casilla
               key={n.indice}
-              etiqueta={etiquetaRenglonEstado(n)}
+              etiqueta={etiquetaRenglon(n)}
               valor={!quitados.has(n.indice)}
               alCambiar={(v) =>
                 setQuitados((q) => {
@@ -446,7 +448,7 @@ function Dudoso({
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
       <Texto variante="secundario" tono="secundario">
-        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
+        {preguntaEsMismoMovimiento(d)}
       </Texto>
       <Chips
         etiqueta={etiquetaChipsDudoso(d.descripcion)}

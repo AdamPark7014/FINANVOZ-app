@@ -92,9 +92,7 @@ function Marco({
 }) {
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
-        {titulo}
-      </Texto>
+      <Texto variante="cuerpoFuerte">{titulo}</Texto>
       <Texto variante="secundario" tono="secundario">
         {detalle}
       </Texto>
@@ -132,16 +130,13 @@ function ElegirPersona({
   const [nombre, setNombre] = useState('');
   return (
     <View style={{ gap: espacio.s }}>
-      <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-        {pregunta}
-      </Texto>
+      <Texto variante="secundario">{pregunta}</Texto>
       {personas.length > 0 ? (
         <GrupoChips
           opciones={personas.map((p) => ({ valor: p.cuentaId, etiqueta: p.nombre }))}
           valor={null}
           alCambiar={alElegir}
           prefijoTestID={`${testID}-persona`}
-          etiqueta={pregunta}
         />
       ) : null}
       <CampoTexto
@@ -181,13 +176,10 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
   const [categorias] = useState(() => listarCategorias(ctx, 'gasto'));
   const contestar = (r: RespuestaSalida, mensaje: string) =>
     responder(() => responderSalidaSinPareja(ctx, p.capturaId, r), mensaje);
-  const titulo = `¿A quién le mandaste ${formatearCentavos(p.monto)}?`;
-  const preguntaCual = '¿A cuál?';
-  const preguntaGasto = '¿Qué pagaste?';
   return (
     <Marco
       testID={testID}
-      titulo={titulo}
+      titulo={`¿A quién le mandaste ${formatearCentavos(p.monto)}?`}
       detalle={`Salió de ${p.cuenta} el ${etiquetaFecha(p.fecha)} y no vi a dónde llegó.`}
       error={error}
     >
@@ -204,13 +196,10 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
           else setOpcion(o);
         }}
         prefijoTestID={testID}
-        etiqueta={titulo}
       />
       {opcion === 'cuenta' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaCual}
-          </Texto>
+          <Texto variante="secundario">¿A cuál?</Texto>
           <GrupoChips
             opciones={[
               ...p.entradas.map((e) => ({
@@ -231,7 +220,6 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
               contestar(r, 'Listo: lo cuento como un movimiento entre tus cuentas.');
             }}
             prefijoTestID={`${testID}-destino`}
-            etiqueta={preguntaCual}
           />
         </View>
       ) : null}
@@ -246,9 +234,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
       ) : null}
       {opcion === 'gasto' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaGasto}
-          </Texto>
+          <Texto variante="secundario">¿Qué pagaste?</Texto>
           <GrupoChips
             opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
             valor={null}
@@ -256,7 +242,6 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
               contestar({ destino: 'gasto', categoria }, 'Listo: lo anoté como un gasto.')
             }
             prefijoTestID={`${testID}-categoria`}
-            etiqueta={preguntaGasto}
           />
         </View>
       ) : null}
@@ -275,12 +260,10 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
   const cuentas = useCuentasPropias(p.tarjeta);
   const contestar = (r: RespuestaPago, mensaje: string) =>
     responder(() => responderPagoSinOrigen(ctx, p.capturaId, r), mensaje);
-  const titulo = `¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`;
-  const preguntaDebe = '¿Se lo tienes que pagar?';
   return (
     <Marco
       testID={testID}
-      titulo={titulo}
+      titulo={`¿De dónde salió el pago de ${formatearCentavos(p.monto)} a tu ${p.tarjeta}?`}
       detalle={`Llegó el ${etiquetaFecha(p.fecha)} y no vi de qué cuenta salió.`}
       error={error}
     >
@@ -296,7 +279,6 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
           else setOpcion(o);
         }}
         prefijoTestID={testID}
-        etiqueta={titulo}
       />
       {opcion === 'cuenta' ? (
         <GrupoChips
@@ -321,9 +303,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
       ) : null}
       {opcion === 'alguien' ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaDebe}
-          </Texto>
+          <Texto variante="secundario">¿Se lo tienes que pagar?</Texto>
           <GrupoChips
             opciones={[
               { valor: 'si', etiqueta: 'Sí, se lo debo' },
@@ -335,7 +315,6 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
               else setDebe(v);
             }}
             prefijoTestID={`${testID}-debe`}
-            etiqueta={preguntaDebe}
           />
           {debe === 'si' ? (
             <ElegirPersona
@@ -367,7 +346,6 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
     : `Llegó un aviso de ${p.banco}. ¿En qué cuenta fue?`;
   const asociar = (cuentaId: string) =>
     responder(() => asociarCuentaCaptura(ctx, p.capturaId, cuentaId), 'Listo: ya sé de qué cuenta es.');
-  const preguntaCandidatas = '¿Es alguna de estas?';
   return (
     <Marco
       testID={testID}
@@ -395,15 +373,12 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
         <>
           {p.candidatas.length > 0 ? (
             <View style={{ gap: espacio.xs }}>
-              <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-                {preguntaCandidatas}
-              </Texto>
+              <Texto variante="secundario">¿Es alguna de estas?</Texto>
               <GrupoChips
                 opciones={p.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
                 valor={null}
                 alCambiar={asociar}
                 prefijoTestID={`${testID}-cuenta`}
-                etiqueta={preguntaCandidatas}
               />
             </View>
           ) : null}
@@ -539,11 +514,10 @@ function FueAMeses({ p, testID }: { p: Pregunta<'fue_a_meses'>; testID: string }
   const { responder, error } = useResponder();
   const [errorMeses, setErrorMeses] = useState<string | null>(null);
   const que = p.comercio ? `${p.comercio} ` : '';
-  const titulo = '¿Fue a meses?';
   return (
     <Marco
       testID={testID}
-      titulo={titulo}
+      titulo="¿Fue a meses?"
       detalle={`${que}${formatearCentavos(p.monto)} con tu ${p.tarjeta} · ${etiquetaFecha(p.fecha)}`}
       error={error ?? errorMeses}
     >

@@ -27,6 +27,12 @@ describe('tips de onboarding', () => {
     }
   });
 
+  it('van en tuteo (02 §14)', () => {
+    for (const tip of TODOS_LOS_TIPS) {
+      expect(tip).toMatch(/\b(tu|tus|toca|marques|toques|activas|configuras|agregas|quieres|puedes)\b/i);
+    }
+  });
+
   it('TIP_CONSENTIMIENTO recuerda que nada se guarda hasta aceptar', () => {
     expect(TIP_CONSENTIMIENTO).toMatch(/tu teléfono/);
     expect(TIP_CONSENTIMIENTO).toMatch(/«Aceptar y continuar»/);
