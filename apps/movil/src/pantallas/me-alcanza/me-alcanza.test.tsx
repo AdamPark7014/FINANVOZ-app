@@ -58,6 +58,7 @@ import {
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
+  PISTA_CALCULAR,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
@@ -434,6 +435,12 @@ describe('¿Me alcanza?', () => {
     expect(screen.queryByTestId('me-alcanza-resultado')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-fallo')).toBeNull();
     expect(screen.getByTestId('me-alcanza-formulario')).toBeTruthy();
+  });
+
+  it('TalkBack en Calcular (`02 §19`)', () => {
+    const p = e401();
+    montar(p.ctx, <PantallaMeAlcanza alCerrar={jest.fn()} />);
+    expect(screen.getByTestId('boton-calcular-me-alcanza')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
   });
 
   it('el formulario valida el precio y calcula con lo escrito', async () => {

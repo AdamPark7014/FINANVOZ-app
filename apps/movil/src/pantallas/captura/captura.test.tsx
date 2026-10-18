@@ -84,11 +84,11 @@ describe('preguntas de captura en Hoy', () => {
     expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).toContain('pregunta_captura');
 
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
-    expect(screen.getByText('¿A quién le mandaste $4,200?')).toBeTruthy();
-    fireEvent.press(screen.getByText('A otra cuenta mía'));
-    fireEvent.press(screen.getByText('Una que no llevo aquí'));
+    expect(screen.getByText(tituloSalidaSinPareja(420_000))).toBeTruthy();
+    fireEvent.press(screen.getByText(ETIQUETA_SALIDA_CUENTA));
+    fireEvent.press(screen.getByText(ETIQUETA_CUENTA_EXTERNA));
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.transito)).toBe(0);
-    expect(screen.queryByText('¿A quién le mandaste $4,200?')).toBeNull();
+    expect(screen.queryByText(tituloSalidaSinPareja(420_000))).toBeNull();
     p.cerrar();
   });
 
@@ -101,7 +101,7 @@ describe('preguntas de captura en Hoy', () => {
     await ingerirNotificaciones(p.ctx, [n], opciones);
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText(/Detecté una tarjeta ••4321 de Banco B/)).toBeTruthy();
-    fireEvent.press(screen.getByText('No es mía'));
+    fireEvent.press(screen.getByText(BTN_NO_ES_MIA));
     expect(screen.queryByText(/Detecté una tarjeta/)).toBeNull();
     expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).not.toContain('pregunta_captura');
     p.cerrar();

@@ -53,6 +53,7 @@ import {
   MENSAJE_CANCELADO,
   MENSAJE_PERMISO_AVISOS,
   MENSAJE_SIN_AVISOS,
+  PISTA_CALCULAR,
   PREGUNTA_MSI,
   SUFIJO_ACCESIBILIDAD_RECOMENDADA,
   TEXTO_CALCULANDO,
@@ -264,7 +265,12 @@ export function PantallaMeAlcanza({
             />
           ) : null}
           <MensajeError texto={error} />
-          <Boton etiqueta={BTN_CALCULAR} alPresionar={enviar} testID="boton-calcular-me-alcanza" />
+          <Boton
+            etiqueta={BTN_CALCULAR}
+            alPresionar={enviar}
+            pista={PISTA_CALCULAR}
+            testID="boton-calcular-me-alcanza"
+          />
         </View>
       ) : null}
 
