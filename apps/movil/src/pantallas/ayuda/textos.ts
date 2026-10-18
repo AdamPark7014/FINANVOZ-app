@@ -33,7 +33,7 @@ export const TEXTO_CARD_AJUSTES =
   'Respuestas a las dudas más comunes y nuestro correo de contacto.';
 export const BTN_ABRIR_DESDE_AJUSTES = 'Ver preguntas frecuentes';
 
-/** Alias con los nombres de `ajustes/textos.ts` (reexportar y quitar duplicados). */
+/** Alias con los nombres de Ajustes; `ajustes/textos.ts` reexporta desde aquí. */
 export const SECCION_AYUDA = SECCION_AJUSTES;
 export const TEXTO_AYUDA = TEXTO_CARD_AJUSTES;
 export const BTN_AYUDA = BTN_ABRIR_DESDE_AJUSTES;
