@@ -70,7 +70,9 @@ export function PantallaRespaldo({
         pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">{TITULO_RESPALDO}</Texto>
+      <Texto variante="titulo" testID="respaldo-titulo" accessibilityRole="header">
+        {TITULO_RESPALDO}
+      </Texto>
       {nube ? (
         <TarjetaNube
           nube={nube}

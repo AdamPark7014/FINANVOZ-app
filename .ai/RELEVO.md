@@ -6,28 +6,27 @@
 
 ## Hecho en este turno
 
-- **plan:** `PISTA_VOLVER` en `textos.ts`; botón Volver de `PantallaPlan` con `pista` (TalkBack); prueba `accessibilityHint` en `plan.test.tsx`.
-- **personas (commit previo en main):** etiquetas cuenta dividida centralizadas en `textos.ts`.
+- **Respaldo a11y:** `accessibilityRole="header"` y `testID` en títulos de `PantallaRespaldo` y `Restaurar`; aserciones en `respaldo-ui.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- deducciones, tarjetas MesesYPagos, privacidad, me-alcanza, tandas. Ver `git log`.
+- Ayuda/privacidad headers y alert; plan/tarjetas copy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno: `ajustes.tsx`, `PantallaAyuda`, `tarjetas/textos.ts` — no mezclar.
+- WIP ajeno (principal, tarjetas tests) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `git push` tras commits locales pendientes si Adam quiere remoto al día.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- `PanelRegistrar.tsx` (otro agente).
 
 ## Estimación rápida
 

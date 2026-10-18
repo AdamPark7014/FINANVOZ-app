@@ -1,6 +1,8 @@
 /** Redacción de Ajustes (`02 §12`, `02 §14`): tuteo; cifras y estado vienen de `servicios/`. */
 
 export const ETIQUETA_VOLVER = 'Volver';
+/** TalkBack: botón atrás en la pantalla raíz de Ajustes. */
+export const PISTA_VOLVER = 'Regresa a donde estabas';
 export const TITULO = 'Ajustes';
 
 export const MENSAJE_NO_GUARDAR = 'No pude guardar el cambio. Intenta de nuevo.';

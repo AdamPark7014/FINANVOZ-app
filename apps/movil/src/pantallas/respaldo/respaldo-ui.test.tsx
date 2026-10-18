@@ -22,6 +22,7 @@ import {
   PISTA_VOLVER_RESTAURAR,
   SUBTITULO_ARCHIVO,
   TITULO_RESPALDO,
+  TITULO_RESTAURAR,
 } from './textos';
 
 function montar(ctx: Contexto, ui: ReactNode, control: ControlApp) {

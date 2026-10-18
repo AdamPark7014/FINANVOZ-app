@@ -125,7 +125,9 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
         deshabilitado={trabajando}
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">{TITULO_RESTAURAR}</Texto>
+      <Texto variante="titulo" testID="restaurar-titulo" accessibilityRole="header">
+        {TITULO_RESTAURAR}
+      </Texto>
       <Texto variante="cuerpo" tono="secundario">
         {nube ? INTRO_RESTAURAR_NUBE : INTRO_RESTAURAR_ARCHIVO}
       </Texto>
