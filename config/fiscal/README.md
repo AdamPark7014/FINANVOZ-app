@@ -39,3 +39,4 @@ sha256sum config/fiscal/2026.json
 | Archivo | Notas |
 |---|---|
 | `2026.json` | `por_validar`; pendientes 90–93. No inventar tasas en código ni en blogs sin validar contador + INEGI (`10 §5`). |
+| `README.md` | Este archivo. Parseo CFDI (sin config): `packages/fiscal/README.md`. |
