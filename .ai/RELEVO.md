@@ -6,21 +6,23 @@
 
 ## Hecho en este turno
 
-- **Captura UI:** header TalkBack en aviso no reconocido; `testID` cancelar en formulario cuenta nueva (`PreguntasCaptura`).
+- **Onboarding tips:** `TIP_*` canónicos en `tips.ts`; `textos.ts` solo reexporta (sin duplicar ni ciclo tips↔textos). Tests `tips.test.ts` + `textos.test.ts` (incl. O6 `TIP_CAPTURA_AHORA_NO`) en verde.
 
 ## Hecho (acumulado reciente)
 
-- PantallaCuentas filas en `4d5d5d9`; Ajustes ingreso/colchón, Hoy, captura. Ver `git log`.
+- PreviaWidget a11y, TalkBack Hoy, suscripciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (onboarding tests, EditarTarjeta, EstadoVacio, etc.) — no mezclar.
-- CI Windows, M0: Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP suelto en otros archivos — revisar `git status` antes de editar.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Tips O2/O6 en `textos` si se quiere un solo módulo.
+2. M11 negocio cuando toque el hito.
 
 ## No tocar
 

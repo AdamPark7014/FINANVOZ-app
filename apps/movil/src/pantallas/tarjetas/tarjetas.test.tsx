@@ -580,6 +580,6 @@ describe('Avisos', () => {
 describe('tarjetas/textos · pagos planeados', () => {
   it('copy centralizado del botón y del aviso al apartar', () => {
     expect(BTN_AGREGAR_PAGO_PLANEADO).toBe('Agregar pago planeado');
-    expect(mensajePagoPlaneadoApartado(50_000)).toBe('Listo: aparto $500.00 para cada pago planeado.');
+    expect(mensajePagoPlaneadoApartado(50_000)).toBe('Listo: aparto $500 para cada pago planeado.');
   });
 });
