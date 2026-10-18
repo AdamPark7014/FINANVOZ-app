@@ -16,14 +16,20 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
 import {
+  AYUDA_PDF_ESCANEADO,
+  ERROR_CONTRASENA_PDF,
+  ETIQUETA_CONTRASENA_PDF,
+  MENSAJE_CONTRASENA,
   MENSAJE_DEMASIADO_GRANDE,
   MENSAJE_ERROR_GUARDAR,
   MENSAJE_ESCANEADO,
   MENSAJE_INVALIDO,
+  MENSAJE_LEYENDO,
   MENSAJE_NO_DISPONIBLE,
   NOMBRE_TIPO_RENGLON,
   preguntaConciliacion,
   resumenEstado,
+  TITULO_PANTALLA,
 } from './textos';
 
 /** Lee el texto del PDF en el teléfono (el módulo nativo en la app; uno falso en las pruebas). */
@@ -114,10 +120,10 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo">Estado de cuenta</Texto>
+      <Texto variante="titulo">{TITULO_PANTALLA}</Texto>
       {estado.tipo === 'leyendo' ? (
-        <Texto variante="cuerpo" tono="secundario" testID="estado-leyendo">
-          Leyendo tu estado de cuenta…
+        <Texto variante="cuerpo" tono="secundario" testID="estado-leyendo" accessibilityLiveRegion="polite">
+          {MENSAJE_LEYENDO}
         </Texto>
       ) : null}
       {estado.tipo === 'contrasena' ? (
@@ -204,13 +210,13 @@ function PedirContrasena({
   };
   return (
     <>
-      <Texto variante="cuerpo">Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.</Texto>
+      <Texto variante="cuerpo">{MENSAJE_CONTRASENA}</Texto>
       <CampoTexto
-        etiqueta="Contraseña del PDF"
+        etiqueta={ETIQUETA_CONTRASENA_PDF}
         valor={contrasena}
         alCambiar={setContrasena}
         alEnviar={abrir}
-        error={incorrecta ? 'Esa contraseña no abre el PDF. Intenta de nuevo.' : null}
+        error={incorrecta ? ERROR_CONTRASENA_PDF : null}
         nativo={{ secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false }}
         testID="estado-contrasena"
       />
@@ -238,11 +244,7 @@ function Lectura({
           <Texto variante="subtitulo" testID="estado-escaneado" accessibilityLiveRegion="polite">
             {MENSAJE_ESCANEADO}
           </Texto>
-          <Aviso
-            texto="Descarga el estado de cuenta desde la app o la página de tu banco: ese sí trae texto."
-            alSalir={alSalir}
-            testID="estado-escaneado-ayuda"
-          />
+          <Aviso texto={AYUDA_PDF_ESCANEADO} alSalir={alSalir} testID="estado-escaneado-ayuda" />
         </>
       );
     case 'no_reconocido':

@@ -18,7 +18,7 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { esPdfCompartido } from './compartido';
 import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
-import { MENSAJE_ESCANEADO } from './textos';
+import { ERROR_CONTRASENA_PDF, MENSAJE_ESCANEADO } from './textos';
 
 const PDF = join(__dirname, '../../../../../fixtures/pdf');
 
@@ -202,9 +202,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     expect(screen.getByTestId('estado-abrir').props.accessibilityState).toMatchObject({ disabled: true });
     fireEvent.changeText(screen.getByTestId('estado-contrasena'), 'otra');
     await presionar('estado-abrir');
-    expect(screen.getByTestId('estado-contrasena').props.accessibilityHint).toBe(
-      'Esa contraseña no abre el PDF. Intenta de nuevo.',
-    );
+    expect(screen.getByTestId('estado-contrasena').props.accessibilityHint).toBe(ERROR_CONTRASENA_PDF);
     expect(screen.getByTestId('estado-contrasena').props.secureTextEntry).toBe(true);
     fireEvent.changeText(screen.getByTestId('estado-contrasena'), 'PRUEBA2026');
     await presionar('estado-abrir');

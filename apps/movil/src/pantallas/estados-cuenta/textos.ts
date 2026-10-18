@@ -2,6 +2,23 @@ import type { Centavos } from '@cartera/core';
 import { etiquetaDiaMes, type AnalisisEstadoCuenta, type PropuestaConciliacionEstado } from '../../servicios';
 import { formatearCentavos } from '../../ui';
 
+export const TITULO_PANTALLA = 'Estado de cuenta';
+
+/** Selector del sistema (`app/estado-cuenta`) mientras la persona elige el PDF. */
+export const MENSAJE_ELEGIR_PDF = 'Elige el PDF de tu estado de cuenta…';
+
+/** Extracción en el teléfono (sin subir el archivo). */
+export const MENSAJE_LEYENDO = 'Leyendo tu estado de cuenta…';
+
+export const MENSAJE_CONTRASENA =
+  'Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.';
+export const ETIQUETA_CONTRASENA_PDF = 'Contraseña del PDF';
+export const ERROR_CONTRASENA_PDF = 'Esa contraseña no abre el PDF. Intenta de nuevo.';
+
+/** Qué hacer tras CA-M15-03 (PDF escaneado). */
+export const AYUDA_PDF_ESCANEADO =
+  'Descarga el estado de cuenta desde la app o la página de tu banco: ese sí trae texto.';
+
 /** `07 §8`: los PDF escaneados (imagen) no se soportan. Texto exacto de CA-M15-03. */
 export const MENSAJE_ESCANEADO = 'No puedo leer PDFs escaneados';
 

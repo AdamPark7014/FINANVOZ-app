@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { extraerTextoPdf } from '../src/captura/puente';
 import { LeerEstadoCuenta } from '../src/pantallas/estados-cuenta';
+import { MENSAJE_ELEGIR_PDF } from '../src/pantallas/estados-cuenta/textos';
 import { borrarCopia, elegirPdf } from '../src/pantallas/estados-cuenta/expo';
 import { Pantalla, Texto } from '../src/ui';
 
@@ -30,8 +31,8 @@ export default function EstadoCuentaRuta() {
   if (!uri) {
     return (
       <Pantalla bordes={['top', 'left', 'right', 'bottom']}>
-        <Texto variante="cuerpo" tono="secundario">
-          Elige el PDF de tu estado de cuenta…
+        <Texto variante="cuerpo" tono="secundario" testID="estado-elegir-pdf" accessibilityLiveRegion="polite">
+          {MENSAJE_ELEGIR_PDF}
         </Texto>
       </Pantalla>
     );
