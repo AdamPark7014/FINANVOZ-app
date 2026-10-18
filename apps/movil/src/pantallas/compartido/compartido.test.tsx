@@ -124,6 +124,10 @@ async function vincular(A: Telefono, B: Telefono): Promise<string> {
 }
 
 describe('02 §27 · Gastos con tu pareja', () => {
+  it('ancla copy del botón en Cuentas', () => {
+    expect(BTN_COMPARTIDOS_CUENTAS).toBe('Gastos con tu pareja');
+  });
+
   it('lista vacía muestra copy y testID', () => {
     const servidor = servidorCompartidoFalso();
     const A = telefono(servidor, 'usuario-a');

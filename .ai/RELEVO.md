@@ -6,26 +6,28 @@
 
 ## Hecho en este turno
 
-- **Captura UI:** copy vacío por revisar + permiso notificaciones; `EstadoVacio` sin apps banco; TalkBack `etiquetaPermisoCaptura` en O6/Ajustes.
+- **Movimientos:** `movimientos-titulo` con `accessibilityRole="header"` (TalkBack §15, simétrico a Cuentas).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding textos O3/O4, cuentas/tandas TalkBack. Ver `git log`.
+- Cuentas/ajustes CTAs centralizados, captura/personas vacíos, onboarding tips, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en móvil (personas, principal, widget) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Tips O2/O6 en `textos` si se quiere un solo módulo.
+2. Headers TalkBack en pantallas restantes (Registrar, etc.) si hace falta.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
