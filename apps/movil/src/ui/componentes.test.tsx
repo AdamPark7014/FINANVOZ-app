@@ -238,9 +238,14 @@ describe('CampoMonto', () => {
   it('marca el texto que no es monto', () => {
     const alCambiar = jest.fn();
     render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
-    fireEvent.changeText(screen.getByLabelText('Monto en pesos'), '12.345');
+    const campo = screen.getByLabelText('Monto en pesos');
+    fireEvent.changeText(campo, '12.345');
     expect(alCambiar).toHaveBeenLastCalledWith(null);
     expect(screen.getByText(ERROR_FORMATO_MONTO)).toBeTruthy();
+    expect(campo.props.accessibilityState).toEqual({ invalid: true, disabled: false });
+    expect(campo.props.accessibilityHint).toBe(
+      'No entendí ese monto. Escríbelo así: mil quinientos pesos con cincuenta centavos',
+    );
   });
 
   it('muestra el valor inicial sin signo de pesos', () => {
