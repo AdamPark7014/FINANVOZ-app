@@ -70,6 +70,10 @@ describe('Lista de espera', () => {
     enviar();
     expect(fetch).not.toHaveBeenCalled();
     expect(screen.getByRole('alert').textContent).toBe(LISTA_ESPERA_ERROR_CORREO);
+    const campo = screen.getByLabelText(/tu correo/i);
+    expect(campo.getAttribute('aria-invalid')).toBe('true');
+    expect(campo.getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.activeElement).toBe(campo);
   });
 
   it('envía solo correo, respuestas y consentimiento, sin montos', async () => {
@@ -81,6 +85,9 @@ describe('Lista de espera', () => {
       'true',
     );
     await waitFor(() => expect(screen.getByRole('heading', { name: LISTA_ESPERA_TITULO_EXITO })).toBeTruthy());
+    const exito = screen.getByRole('status');
+    expect(exito.getAttribute('aria-live')).toBe('polite');
+    expect(exito.getAttribute('aria-atomic')).toBe('true');
     expect(screen.getByText(listaEsperaTextoExito('Finanvoz'))).toBeTruthy();
     const cuerpo = JSON.parse((fetch.mock.calls[0]?.[1] as RequestInit).body as string) as Record<
       string,

@@ -42,6 +42,8 @@ export function ListaEspera() {
   const [faltan, setFaltan] = useState<readonly ListaEsperaClave[]>([]);
   const [envio, setEnvio] = useState<Envio>('inicial');
   const grupos = useRef<Partial<Record<ListaEsperaClave, HTMLFieldSetElement | null>>>({});
+  const correoRef = useRef<HTMLInputElement>(null);
+  const idErrorForm = `${id}-error-form`;
 
   function responder(clave: ListaEsperaClave, valor: string) {
     setRespuestas((r) => ({ ...r, [clave]: valor }));
@@ -54,7 +56,10 @@ export function ListaEspera() {
   async function enviar(e: FormEvent) {
     e.preventDefault();
     setFaltan([]);
-    if (!CORREO_VALIDO.test(correo.trim())) return setError(LISTA_ESPERA_ERROR_CORREO);
+    if (!CORREO_VALIDO.test(correo.trim())) {
+      correoRef.current?.focus();
+      return setError(LISTA_ESPERA_ERROR_CORREO);
+    }
     const sinContestar = LISTA_ESPERA_PREGUNTAS.filter((p) => !respuestas[p.clave]);
     const primera = sinContestar[0];
     if (primera) {
@@ -91,7 +96,7 @@ export function ListaEspera() {
 
   if (envio === 'listo') {
     return (
-      <section className="tarjeta" aria-live="polite">
+      <section className="tarjeta" role="status" aria-live="polite" aria-atomic="true">
         <h2>{LISTA_ESPERA_TITULO_EXITO}</h2>
         <p>{listaEsperaTextoExito(MARCA)}</p>
       </section>
@@ -106,11 +111,18 @@ export function ListaEspera() {
         <div className="campo">
           <label htmlFor={`${id}-correo`}>{LISTA_ESPERA_ETIQUETA_CORREO}</label>
           <input
+            ref={correoRef}
             id={`${id}-correo`}
             type="email"
             autoComplete="email"
             value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            aria-required="true"
+            aria-invalid={error === LISTA_ESPERA_ERROR_CORREO || undefined}
+            aria-describedby={error === LISTA_ESPERA_ERROR_CORREO ? idErrorForm : undefined}
+            onChange={(e) => {
+              setCorreo(e.target.value);
+              if (error === LISTA_ESPERA_ERROR_CORREO) setError(null);
+            }}
           />
         </div>
         {LISTA_ESPERA_PREGUNTAS.map((p) => {
@@ -164,11 +176,19 @@ export function ListaEspera() {
           <a href="./aviso-de-privacidad.html">{LISTA_ESPERA_ENLACE_AVISO}</a>.
         </p>
         <label className="consentimiento">
-          <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={acepta}
+            aria-required="true"
+            onChange={(e) => {
+              setAcepta(e.target.checked);
+              if (error === LISTA_ESPERA_ERROR_CONSENTIMIENTO) setError(null);
+            }}
+          />
           {LISTA_ESPERA_CONSENTIMIENTO}
         </label>
         {error && (
-          <p className="error" role="alert">
+          <p id={idErrorForm} className="error" role="alert">
             {error}
           </p>
         )}
