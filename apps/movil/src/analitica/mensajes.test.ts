@@ -21,6 +21,7 @@ describe('mensajes técnicos de analítica (regla 9)', () => {
       expect(MENSAJE_TECNICO_ENVIO_HTTP.toLowerCase()).not.toContain(s.toLowerCase());
     }
     expect(MENSAJE_TECNICO_ENVIO_HTTP).not.toMatch(/\$|\d{3,}/);
+    expect(MENSAJE_TECNICO_ENVIO_HTTP.length).toBeLessThanOrEqual(200);
   });
 
   it('el código HTTP es estable y válido para Sentry', () => {
