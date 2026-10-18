@@ -71,10 +71,17 @@ const entradaDe = (v: VectorE11) => ({
 });
 
 describe('Tandas (02 §18)', () => {
+  it('la UI fija vive en textos.ts sin exclamaciones', () => {
+    const ui = [TITULO_TANDAS, TEXTO_TANDAS_VACIO, PREGUNTA_YA_DISTE, PREGUNTA_HOY_COBRO, TEXTO_NO_ES_INGRESO].join(
+      '\n',
+    );
+    expect(ui).not.toMatch(/[!¡]/);
+  });
+
   it('sin tandas lo explica y deja crear una nueva', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
-    expect(screen.getByTestId('tandas-vacio')).toBeTruthy();
+    expect(screen.getByTestId('tandas-vacio')).toHaveTextContent(TEXTO_TANDAS_VACIO);
     expect(screen.getByTestId('tandas-nueva')).toBeTruthy();
     expect(screen.queryByTestId(/^tanda-/)).toBeNull();
   });
@@ -87,7 +94,7 @@ describe('Tandas (02 §18)', () => {
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={alAbrirTanda} />);
 
     fireEvent.press(screen.getByTestId('tandas-nueva'));
-    fireEvent.changeText(screen.getByTestId('tanda-nombre'), 'Tanda de la oficina');
+    fireEvent.changeText(screen.getByTestId('tanda-nombre'), EJEMPLO_NOMBRE_TANDA);
     fireEvent.changeText(screen.getByTestId('tanda-aportacion'), '500');
     fireEvent.press(screen.getByTestId('tanda-frecuencia-semanal'));
     fireEvent.changeText(screen.getByTestId('tanda-participantes'), '10');

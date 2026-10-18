@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **movil/tandas:** `FormularioTanda` y `TarjetasTanda` consumen `textos.ts` (errores, etiquetas, mensajes Todavía no); test mínimo de copy centralizado en `tandas.test.tsx`.
+- **movil/onboarding:** tips O3 (ingreso), O4 (cuentas) y O5 (pagos fijos) en `tips.ts`, cableados en `app/onboarding/`; pruebas en `tips.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Copy Ajustes (widget, captura, ingreso), suscripciones, respaldo, deducciones (WIP local ajeno). Ver `git log` y `docs/ESTADO.md`.
+- Copy privacidad/compartido/captura, suscripciones, Ajustes, ingreso, plan, respaldo README. Ver `git log`.
 
 ## A medias — CUIDADO
 
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local sin commitear (ajustes/widget, captura, respaldo, plan, calculadora, etc.) — no mezclar.
+- WIP local sin commitear (ajustes, deducciones, personas, tandas, etc.) — turno anterior; no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Seguir centralizando copy en `tarjetas/` (formularios) o commits del WIP ajeno si Adam lo pide.
+2. Tips onboarding O4 tarjeta «Agregar después» u otras áreas de la lista (plan, estados-cuenta a11y) si siguen pendientes.
 
 ## No tocar
 
