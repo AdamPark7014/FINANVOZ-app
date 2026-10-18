@@ -15,6 +15,7 @@ import {
   type ResultadoNube,
   type ResultadoResolutor,
 } from '@cartera/nlu';
+/** Escritura bloqueada en solo lectura vía `exigirConsentimiento` (captura, arqueo y demás servicios igual). */
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
@@ -59,8 +60,8 @@ import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './prefe
 import {
   aportarTanda,
   cobrarTanda,
+  listarTandas,
   proponerTandaPorVoz,
-  tandaUnica,
   type MovimientoTanda,
   type PropuestaTanda,
 } from './tandas';
@@ -118,6 +119,19 @@ export interface PropuestaCuentaDividida {
  * Gasto compartido dictado (`02 §27`): siempre se confirma antes de compartirlo; "Guardar" llama
  * `agregarGastoCompartido`. Lo que no se dijo (quién pagó, con quién si hay varios grupos) lo pregunta la tarjeta.
  */
+/** Aportación o cobro de tanda dictado que necesita confirmación (varias tandas, cuenta ambigua, aproximado o monto alto). */
+export interface PropuestaTandaConfirmar {
+  readonly tipo: 'aportacion_tanda' | 'cobro_tanda';
+  readonly monto: Centavos;
+  readonly fecha: PlainDate;
+  /** Si solo hay una tanda activa, ya viene elegida. */
+  readonly tandaId: string | null;
+  readonly tandas: readonly { readonly id: string; readonly nombre: string }[];
+  readonly cuentaId: string | null;
+  readonly faltaCuenta: Omit<CuentaPorElegir, 'campo'> | null;
+  readonly claveIdempotencia?: string;
+}
+
 export interface PropuestaGastoCompartido {
   readonly total: Centavos;
   readonly descripcion: string | null;
@@ -260,6 +274,12 @@ export type ResultadoTexto =
   | { readonly resultado: 'configurado'; readonly compromiso: CompromisoConfigurado }
   /** TK01 "entré a una tanda…": formulario prellenado con el calendario de E11; "Guardar" llama `crearTanda`. */
   | { readonly resultado: 'tanda_por_crear'; readonly propuesta: PropuestaTanda }
+  /** "Di mi tanda" / "me tocó la tanda" (TK02) que necesita confirmación; "Guardar" llama `confirmarTanda`. */
+  | {
+      readonly resultado: 'confirmar_tanda';
+      readonly motivo: 'monto_alto' | 'cuenta' | 'aproximado' | 'tanda';
+      readonly propuesta: PropuestaTandaConfirmar;
+    }
   /** "Di mi tanda" / "me tocó la tanda" (TK02) con una sola tanda activa: ni gasto ni ingreso. */
   | {
       readonly resultado: 'registrado_tanda';
@@ -649,10 +669,20 @@ export function confirmarCuentaDividida(
   });
 }
 
+function motivoConfirmarTanda(
+  m: Movimiento,
+  tandas: number,
+): Extract<ResultadoTexto, { resultado: 'confirmar_tanda' }>['motivo'] {
+  if (m.monto > TOPE_OPTIMISTA) return 'monto_alto';
+  if (m.aproximado) return 'aproximado';
+  if (tandas > 1) return 'tanda';
+  return 'cuenta';
+}
+
 /**
  * Aportación o cobro de tanda dictados (`06 §3`, TK02): con una sola tanda activa, cuenta resuelta y sin
- * confirmación pendiente (`06 §7`) se registra directo; si no, `null` (va al formulario). `undefined` si la frase
- * no habla de tandas.
+ * confirmación pendiente (`06 §7`) se registra directo; si no, tarjeta `confirmar_tanda` (o `null` sin tandas).
+ * `undefined` si la frase no habla de tandas.
  */
 function registrarTandaInterpretada(
   ctx: Contexto,
@@ -664,15 +694,38 @@ function registrarTandaInterpretada(
   const [m] = movimientos;
   if (movimientos.length !== 1 || !m || (m.espacio ?? 'personal') !== 'personal') return null;
   if (m.tipo !== 'aportacion_tanda' && m.tipo !== 'cobro_tanda') return null;
-  if (m.aproximado || m.monto > TOPE_OPTIMISTA) return null;
-  const tandaId = tandaUnica(ctx);
-  if (!tandaId) return null;
+
   const esCobro = m.tipo === 'cobro_tanda';
+  const tandas = listarTandas(ctx).map((t) => ({ id: t.id, nombre: t.nombre }));
+  const tandaId = tandas.length === 1 ? (tandas[0]?.id ?? null) : null;
   const r = resolver(esCobro ? m.destino : m.origen, esCobro ? 'entra' : 'sale', cuentas, true);
-  if (!('id' in r)) return null;
+  const cuentaId = 'id' in r ? r.id : null;
+  const faltaCuenta = 'falta' in r ? r.falta : null;
+  const necesitaConfirmar =
+    m.aproximado || m.monto > TOPE_OPTIMISTA || tandas.length !== 1 || faltaCuenta !== null;
+
+  if (necesitaConfirmar) {
+    if (tandas.length === 0) return null;
+    return {
+      resultado: 'confirmar_tanda',
+      motivo: motivoConfirmarTanda(m, tandas.length),
+      propuesta: {
+        tipo: m.tipo,
+        monto: m.monto,
+        fecha: m.fecha,
+        tandaId,
+        tandas,
+        cuentaId,
+        faltaCuenta,
+        ...(frase.fraseId ? { claveIdempotencia: `frase:${frase.fraseId}:0` } : {}),
+      },
+    };
+  }
+
+  if (!tandaId || !cuentaId) return null;
   const comunes = {
     tandaId,
-    cuentaId: r.id,
+    cuentaId,
     monto: m.monto,
     origen: frase.origen,
     ...(frase.fraseId ? { claveIdempotencia: `frase:${frase.fraseId}:0` } : {}),
@@ -681,6 +734,38 @@ function registrarTandaInterpretada(
     ? cobrarTanda(ctx, { ...comunes, fecha: m.fecha })
     : aportarTanda(ctx, { ...comunes, fechaPago: m.fecha });
   return { resultado: 'registrado_tanda', tipo: m.tipo, movimiento };
+}
+
+/**
+ * "Guardar" de la confirmación de aportación o cobro de tanda dictado (TK02). Devuelve el token de Deshacer.
+ */
+export function confirmarTanda(
+  ctx: Contexto,
+  entrada: {
+    readonly tandaId: string;
+    readonly cuentaId: string;
+    readonly monto: Centavos;
+    readonly tipo: 'aportacion_tanda' | 'cobro_tanda';
+    readonly fecha: PlainDate;
+    readonly claveIdempotencia?: string;
+  },
+  origen: OrigenDictado,
+  opciones: { aprender?: { alias: string } } = {},
+): Extract<ResultadoTexto, { resultado: 'registrado_tanda' }> {
+  exigirConsentimiento(ctx);
+  const esCobro = entrada.tipo === 'cobro_tanda';
+  const comunes = {
+    tandaId: entrada.tandaId,
+    cuentaId: entrada.cuentaId,
+    monto: entrada.monto,
+    origen,
+    ...(entrada.claveIdempotencia ? { claveIdempotencia: entrada.claveIdempotencia } : {}),
+  };
+  const movimiento = esCobro
+    ? cobrarTanda(ctx, { ...comunes, fecha: entrada.fecha })
+    : aportarTanda(ctx, { ...comunes, fechaPago: entrada.fecha });
+  if (opciones.aprender) aprenderAlias(ctx, opciones.aprender.alias, entrada.cuentaId);
+  return { resultado: 'registrado_tanda', tipo: entrada.tipo, movimiento };
 }
 
 function registrarMsiInterpretado(

@@ -90,6 +90,22 @@ export function mensajeFueraDeAlcance(motivo: FueraDeAlcance): string {
   return 'Eso no lo puedo hacer. Te ayudo con tus gastos, ingresos y pagos.';
 }
 
+/** Títulos de la tarjeta de confirmación de tanda por voz (TK02, `06 §7`). */
+export const TITULO_CONFIRMAR_TANDA: Record<
+  Extract<ResultadoTexto, { resultado: 'confirmar_tanda' }>['motivo'],
+  string
+> = {
+  monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
+  tanda: '¿De cuál tanda hablas?',
+  cuenta: 'Confirma la tanda y la cuenta.',
+  aproximado: 'Confírmame la cuenta.',
+};
+
+export const PREGUNTA_CUENTA_TANDA = {
+  aportacion: '¿De qué cuenta salió?',
+  cobro: '¿A qué cuenta llegó?',
+} as const;
+
 export const MENSAJE_NO_ENCONTRE = 'No encontré ese movimiento.';
 export const MENSAJE_SIN_DUPLICADOS = 'No vi movimientos repetidos.';
 

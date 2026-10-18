@@ -53,6 +53,7 @@ import { mensajeAportacion, mensajeCobro } from '../tandas/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
+import { TarjetaConfirmarTanda } from './TarjetaConfirmarTanda';
 import { ConfirmacionRegistro } from './ConfirmacionRegistro';
 import { TarjetaConsulta } from './TarjetaConsulta';
 import { TarjetaExplicacion, type ExplicacionMostrable } from './TarjetaExplicacion';
@@ -91,6 +92,7 @@ type ConTarjeta = Extract<
       | 'confirmar_msi'
       | 'confirmar_division'
       | 'confirmar_compartido'
+      | 'confirmar_tanda'
       | 'tarjeta_por_agregar'
       | 'tanda_por_crear';
   }
@@ -266,6 +268,7 @@ export function PanelRegistrar({
         case 'confirmar_msi':
         case 'confirmar_division':
         case 'confirmar_compartido':
+        case 'confirmar_tanda':
         case 'tarjeta_por_agregar':
         case 'tanda_por_crear':
           if (medicion.current) medicion.current.pregunto = true;
@@ -494,6 +497,14 @@ export function PanelRegistrar({
             refrescar();
             avisarRegistro(MENSAJE_COMPARTIDO_GUARDADO);
           }}
+          alCancelar={() => setTarjeta(null)}
+        />
+      ) : null}
+      {tarjeta?.datos.resultado === 'confirmar_tanda' ? (
+        <TarjetaConfirmarTanda
+          datos={tarjeta.datos}
+          origen={tarjeta.origen}
+          alGuardar={(r) => mostrar(r, tarjeta.origen)}
           alCancelar={() => setTarjeta(null)}
         />
       ) : null}

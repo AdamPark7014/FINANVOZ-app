@@ -4,14 +4,27 @@ import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { deshacer, registrarMovimiento } from './formulario';
 import { listarMovimientos } from './movimientos';
 import { agregarCuenta, agregarTarjetaCredito } from './onboarding';
+import type { PlainDate, Regla } from '@cartera/core';
 import {
   confirmarRegistro,
+  confirmarTanda,
   contarPorInterpretar,
   descartarPorInterpretar,
   listarPorInterpretar,
   registrarTexto,
+  TOPE_OPTIMISTA,
 } from './registrar';
-import { abrirPrueba } from './__pruebas__/base';
+import { crearTanda } from './tandas';
+import { abrirPrueba, golden, vector } from './__pruebas__/base';
+import { nubeFalsa } from './__pruebas__/nube';
+
+interface VectorE11 {
+  aportacion: number;
+  participantes: number;
+  turno: number;
+  regla: Regla;
+  inicio: PlainDate;
+}
 
 function conCuentas() {
   const p = abrirPrueba();
@@ -181,5 +194,75 @@ describe('formulario de movimiento', () => {
       monto: 1_000,
       comercio: 'OXXO',
     });
+  });
+});
+
+describe('confirmar tanda por voz (TK02, pendiente 41)', () => {
+  const entradaTanda = () => {
+    const v = vector<VectorE11>('E11-01');
+    return {
+      nombre: 'Tanda vecinos',
+      aportacion: v.aportacion,
+      participantes: v.participantes,
+      turno: v.turno,
+      regla: v.regla,
+      inicio: v.inicio,
+    };
+  };
+
+  function conTanda(hoy: PlainDate = '2026-10-11') {
+    const p = abrirPrueba(hoy);
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const efectivo = agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 100_000 });
+    const bbva = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 1_000_000 });
+    const { tandaId } = crearTanda(p.ctx, entradaTanda());
+    return { ...p, efectivo, bbva, tandaId };
+  }
+
+  it('monto mayor a $5,000 pide confirmación aunque haya una sola tanda', async () => {
+    const p = conTanda();
+    const texto = 'me tocó la tanda, me dieron seis mil en efectivo';
+    const f = nubeFalsa({
+      [texto]: {
+        intencion: 'registrar',
+        movimientos: [
+          {
+            tipo: 'cobro_tanda',
+            monto: TOPE_OPTIMISTA + 100_000,
+            fecha: '2026-10-11',
+            destino: { tipo: 'efectivo' },
+          },
+        ],
+      },
+    });
+    const r = await registrarTexto(p.ctx, texto, 'voz', { nube: f.nube });
+    expect(r).toMatchObject({
+      resultado: 'confirmar_tanda',
+      motivo: 'monto_alto',
+      propuesta: {
+        tipo: 'cobro_tanda',
+        monto: TOPE_OPTIMISTA + 100_000,
+        tandaId: p.tandaId,
+        cuentaId: p.efectivo,
+      },
+    });
+  });
+
+  it('confirmarTanda registra el cobro tras elegir tanda y cuenta', () => {
+    const p = conTanda();
+    const r = confirmarTanda(
+      p.ctx,
+      {
+        tandaId: p.tandaId,
+        cuentaId: p.efectivo,
+        monto: 500_000,
+        tipo: 'cobro_tanda',
+        fecha: '2026-10-11',
+      },
+      'voz',
+    );
+    expect(r.resultado).toBe('registrado_tanda');
+    expect(r.movimiento).toMatchObject({ monto: 500_000, cuenta: 'Cartera' });
+    expect(p.ctx.libro.saldo(p.efectivo)).toBe(600_000);
   });
 });

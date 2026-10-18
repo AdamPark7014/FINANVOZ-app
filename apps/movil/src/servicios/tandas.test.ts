@@ -10,14 +10,17 @@ import { agregarCuenta, configurarIngreso } from './onboarding';
 import { registrarTexto } from './registrar';
 import {
   aportarTanda,
+  archivarTanda,
   cobrarTanda,
   crearTanda,
   detalleTanda,
+  editarTanda,
   listarTandas,
   proponerTanda,
   reglaDeFrecuencia,
   todaviaNoCobroTanda,
 } from './tandas';
+import { programadoPorId } from './programados';
 import { abrirPrueba, golden, vector } from './__pruebas__/base';
 import { nubeFalsa } from './__pruebas__/nube';
 
@@ -330,6 +333,64 @@ describe('tandas (M8, E11)', () => {
     expect(detalleTanda(p.ctx, tandaId)).toMatchObject({ enRiesgo: 250_000, cobrada: false });
   });
 
+  it('archivar: activa=0, programado inactivo, pendientes omitidas; el detalle y el libro siguen', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId, programadoId, cuentaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    aportarTanda(p.ctx, { tandaId, fecha: '2026-10-16', cuentaId: p.efectivo });
+    const antes = obtenerHoy(p.ctx);
+    expect(antes.desglose.compromisos).toBe(100_000);
+
+    archivarTanda(p.ctx, tandaId);
+    expect(listarTandas(p.ctx)).toEqual([]);
+    expect(detalleTanda(p.ctx, tandaId)).toMatchObject({
+      activa: false,
+      aportado: 50_000,
+      nombre: 'Tanda de la oficina',
+    });
+    expect(p.ctx.db.select().from(esquema.tanda).where(eq(esquema.tanda.id, tandaId)).get()?.activa).toBe(0);
+    expect(programadoPorId(p.ctx, programadoId).activo).toBeFalsy();
+    const dArchivada = detalleTanda(p.ctx, tandaId);
+    expect(dArchivada.rondas.find((r) => r.fecha === '2026-10-16')?.estado).toBe('cubierta');
+    expect(dArchivada.rondas.filter((r) => r.estado === 'pendiente')).toEqual([]);
+    expect(dArchivada.rondas.filter((r) => r.estado === 'omitida').map((r) => r.fecha)).toEqual([
+      '2026-10-23',
+      '2026-10-30',
+      '2026-11-06',
+      '2026-11-13',
+      '2026-11-20',
+      '2026-11-27',
+      '2026-12-04',
+      '2026-12-11',
+      '2026-12-18',
+    ]);
+    expect(obtenerHoy(p.ctx).desglose.compromisos).toBe(0);
+    expect(p.ctx.libro.saldo(cuentaId)).toBe(50_000);
+    expect(() => aportarTanda(p.ctx, { tandaId, fecha: '2026-10-23', cuentaId: p.bbva })).toThrow(/archivada/);
+  });
+
+  it('editar: cambia nombre y cuenta de aportación, no el monto', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId, programadoId, cuentaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    editarTanda(p.ctx, tandaId, { nombre: 'Tanda del gym', cuentaId: p.efectivo });
+    expect(detalleTanda(p.ctx, tandaId)).toMatchObject({
+      nombre: 'Tanda del gym',
+      aportacion: v.aportacion,
+      cuentaOrigenId: p.efectivo,
+    });
+    expect(programadoPorId(p.ctx, programadoId)).toMatchObject({
+      concepto: 'Tanda del gym',
+      monto: v.aportacion,
+      cuentaId: p.efectivo,
+    });
+    expect(p.ctx.db.select().from(esquema.cuenta).where(eq(esquema.cuenta.id, cuentaId)).get()?.nombre).toBe(
+      'Tanda del gym',
+    );
+    archivarTanda(p.ctx, tandaId);
+    expect(() => editarTanda(p.ctx, tandaId, { nombre: 'Otra' })).toThrow(/archivada/);
+  });
+
   it('valida la entrada: turno dentro de los participantes, cuenta líquida y regla válida', () => {
     const v = vector<VectorE11>('E11-01');
     const p = preparar('2026-10-16');
@@ -386,11 +447,39 @@ describe('tandas por voz', () => {
     expect(p.ctx.libro.saldo(p.efectivo)).toBe(100_000 + 500_000);
   });
 
-  it('TK02 sin tandas o con varias no adivina: no lo registra', async () => {
+  it('TK02 sin tandas no adivina: no lo registra', async () => {
     const p = preparar('2026-10-11');
     const caso = golden('TK02');
     const f = nubeFalsa({ [caso.texto]: caso.esperado });
     const r = await registrarTexto(p.ctx, caso.texto, 'voz', { nube: f.nube });
     expect(r).toEqual({ resultado: 'no_soportado', motivo: 'tipo_movimiento' });
+  });
+
+  it('TK02 con varias tandas abre confirmación en lugar de registrar directo', async () => {
+    const p = preparar('2026-10-11');
+    const v = vector<VectorE11>('E11-01');
+    crearTanda(p.ctx, { ...entradaDe(v), nombre: 'Tanda A' });
+    crearTanda(p.ctx, {
+      ...entradaDe(v),
+      nombre: 'Tanda B',
+      inicio: '2026-11-01',
+    });
+    const caso = golden('TK02');
+    const f = nubeFalsa({ [caso.texto]: caso.esperado });
+    const r = await registrarTexto(p.ctx, caso.texto, 'voz', { nube: f.nube });
+    expect(r).toMatchObject({
+      resultado: 'confirmar_tanda',
+      motivo: 'tanda',
+      propuesta: {
+        tipo: 'cobro_tanda',
+        monto: 500_000,
+        tandaId: null,
+        tandas: [
+          { nombre: 'Tanda A' },
+          { nombre: 'Tanda B' },
+        ],
+        cuentaId: p.efectivo,
+      },
+    });
   });
 });
