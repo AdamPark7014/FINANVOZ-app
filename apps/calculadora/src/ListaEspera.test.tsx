@@ -13,7 +13,14 @@ vi.mock('./config', () => ({
   RESPONSABLE_DEFINIDO: true,
 }));
 
-import { LISTA_ESPERA_TITULO_EXITO, listaEsperaTextoExito } from './textos';
+import {
+  LISTA_ESPERA_ERROR_CONSENTIMIENTO,
+  LISTA_ESPERA_PREGUNTAS,
+  LISTA_ESPERA_TITULO_EXITO,
+  listaEsperaErrorFaltaUna,
+  listaEsperaErrorFaltanVarias,
+  listaEsperaTextoExito,
+} from './textos';
 
 const { ListaEspera } = await import('./ListaEspera');
 

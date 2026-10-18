@@ -30,6 +30,11 @@ const TEMAS = [
 const todoElTexto = (p: (typeof PREGUNTAS_FRECUENTES)[number]) => [p.pregunta, ...p.respuesta].join('\n');
 
 describe('contenido de la ayuda', () => {
+  it('la UI fija vive en textos.ts sin exclamaciones', () => {
+    const ui = [TITULO, ETIQUETA_VOLVER, BTN_ESCRIBIR_CORREO, mensajeSinAppCorreo(CORREO_AYUDA)].join('\n');
+    expect(ui).not.toMatch(/[!¡]/);
+  });
+
   it('son 10 preguntas, una por tema, con ids únicos y respuesta', () => {
     expect(PREGUNTAS_FRECUENTES).toHaveLength(10);
     expect(PREGUNTAS_FRECUENTES.map((p) => p.id)).toEqual(TEMAS);
@@ -116,9 +121,7 @@ describe('pantalla de ayuda', () => {
     render(<PantallaAyuda alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
     expect(abrir).toHaveBeenCalledWith(enlaceCorreoAyuda());
-    expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(
-      'No encontré una app de correo en tu teléfono. Escríbenos desde tu correo a gerencia@nexara.com.mx.',
-    );
+    expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(mensajeSinAppCorreo(CORREO_AYUDA));
     expect(auditar(screen.toJSON())).toEqual([]);
   });
 
@@ -127,5 +130,11 @@ describe('pantalla de ayuda', () => {
     render(<PantallaAyuda alVolver={volver} />);
     fireEvent.press(screen.getByTestId('ayuda-volver'));
     expect(volver).toHaveBeenCalled();
+  });
+
+  it('expone testID estables en título e intro', () => {
+    render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={jest.fn(async () => {})} />);
+    expect(screen.getByTestId('ayuda-titulo')).toHaveTextContent(TITULO);
+    expect(screen.getByTestId('ayuda-intro')).toBeTruthy();
   });
 });

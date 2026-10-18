@@ -60,6 +60,7 @@ export function CampoTexto({
         onBlur={() => setEnfocado(false)}
         accessibilityLabel={etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
+        accessibilityState={{ invalid: conError }}
         {...nativo}
         style={[
           tipo.cuerpo,

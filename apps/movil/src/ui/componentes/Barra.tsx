@@ -18,12 +18,14 @@ const acotar = (bp: number) => Math.max(0, Math.min(10000, bp)) / 100;
 /** Barra horizontal sobria (`02 §16`: las barras viven en Tarjetas y Cuentas). Solo dibuja lo que recibe. */
 export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 10, testID }: BarraProps) {
   const { c } = useTema();
+  const porcentaje = Math.round(acotar(llenoBp));
   return (
     <View
       testID={testID}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={etiquetaAccesible}
+      accessibilityValue={{ min: 0, max: 100, now: porcentaje, text: `${porcentaje}%` }}
       style={{
         height: alto,
         borderRadius: radio.pastilla,

@@ -16,6 +16,7 @@ export interface PantallaProps {
   testID?: string;
 }
 
+/** Contenedor con área segura, desplazamiento opcional y pie fijo fuera del scroll. */
 export function Pantalla({
   children,
   desplazable = true,

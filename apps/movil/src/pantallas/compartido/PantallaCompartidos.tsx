@@ -126,8 +126,8 @@ export function PantallaCompartidos({
       {modo.tipo === 'lista' ? (
         <>
           {grupos.length === 0 ? (
-            <Texto variante="cuerpo" tono="secundario">
-              {TEXTO_LISTA_VACIA}
+            <Texto variante="cuerpo" tono="secundario" testID="compartidos-vacio">
+              {TEXTO_COMPARTIDOS_VACIO}
             </Texto>
           ) : null}
           {grupos.map((g) => (

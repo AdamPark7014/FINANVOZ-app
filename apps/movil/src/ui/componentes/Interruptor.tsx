@@ -41,7 +41,11 @@ export function Interruptor({
         paddingVertical: espacio.s,
       }}
     >
-      <View style={{ flex: 1, gap: espacio.xxs }}>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{ flex: 1, gap: espacio.xxs }}
+      >
         <Texto variante="cuerpo">{etiqueta}</Texto>
         {descripcion ? (
           <Texto variante="secundario" tono="secundario">

@@ -300,8 +300,8 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
       <Texto variante="subtitulo">{TITULO_LO_COMPARTIDO}</Texto>
       {g.movimientos.length === 0 ? (
-        <Texto variante="cuerpo" tono="secundario">
-          {TEXTO_SIN_GASTOS_COMPARTIDOS}
+        <Texto variante="cuerpo" tono="secundario" testID="grupo-movimientos-vacio">
+          {TEXTO_GRUPO_MOVIMIENTOS_VACIO}
         </Texto>
       ) : null}
       {g.movimientos.map((m) => (

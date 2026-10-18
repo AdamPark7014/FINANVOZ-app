@@ -21,6 +21,7 @@ export interface BotonProps {
   testID?: string;
 }
 
+/** Botón táctil ≥ 48 dp; etiqueta hablada con cifras en palabras; `accessibilityState` refleja deshabilitado y carga. */
 export function Boton({
   etiqueta,
   alPresionar,
@@ -69,7 +70,11 @@ export function Boton({
         style,
       ]}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}
+      >
         {cargando ? <ActivityIndicator color={colorTexto} /> : null}
         <Text style={[tipo.etiqueta, { fontSize: 16, color: colorTexto, textAlign: 'center' }]}>
           {etiqueta}

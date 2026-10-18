@@ -157,6 +157,9 @@ export function textoConsentimiento(version: string, fecha: string): string {
   return `Aceptaste el aviso de privacidad (versión ${version}) el ${etiquetaDiaMes(fecha)} ${fecha.slice(0, 4)}.`;
 }
 
+export const TEXTO_SIN_CONSENTIMIENTO =
+  'Todavía no consta aquí que aceptaste el aviso; al abrir la app te lo pedimos de nuevo si hace falta.';
+
 export function lineaPersonas(n: number): string {
   return cuenta(
     n,

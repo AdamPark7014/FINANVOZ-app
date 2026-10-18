@@ -162,7 +162,7 @@ export function cifraEnPalabras(c: Centavos, modo: ModoCifra = 'auto'): string {
 /** Una cifra con el formato de `formatearCentavos` dentro de un texto: `$1,099.90`, `−$374`, `$0.05`. */
 const CIFRA_EN_TEXTO = /([−-])?\$(\d{1,3}(?:,\d{3})*)(?:\.(\d{2}))?/g;
 
-/** ¿El texto trae alguna cifra de dinero con formato de la UI? */
+/** ¿El texto trae alguna cifra de dinero con formato de la UI (`$` seguido de dígitos)? */
 export function tieneCifra(texto: string): boolean {
   return /\$\d/.test(texto);
 }

@@ -45,7 +45,8 @@ export const BTN_REGISTRAR_PAGO = 'Registrar pago';
 export const BTN_DEJAR_DE_COMPARTIR = 'Dejar de compartir';
 export const BTN_ANULAR = 'Anular';
 export const TITULO_LO_COMPARTIDO = 'Lo compartido';
-export const TEXTO_SIN_GASTOS_COMPARTIDOS = 'Todavía no hay gastos compartidos.';
+/** Grupo abierto sin movimientos compartidos aún (`02 §27`). */
+export const TEXTO_GRUPO_MOVIMIENTOS_VACIO = 'Todavía no hay gastos compartidos.';
 export const ETIQUETA_ANULADO = 'Anulado';
 export const ETIQUETA_POR_COMPARTIR = 'Por compartir';
 export const ETIQUETA_A_DONDE_LLEGO = '¿A dónde te llegó?';

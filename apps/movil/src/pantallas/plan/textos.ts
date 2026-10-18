@@ -9,6 +9,33 @@ import type { OfertaPlus } from '../../suscripciones/tipos';
 
 /** Redacción del plan (`01 §11`, `02 §14`): tuteo, sin tecnicismos; los precios los pone la tienda. */
 
+/** `testID` estables para pruebas y Maestro (`02 §12` Plan). */
+export const ID = {
+  pantalla: 'pantalla-plan',
+  volver: 'plan-volver',
+  actual: 'plan-actual',
+  titulo: 'plan-titulo',
+  detalle: 'plan-detalle',
+  administrar: 'plan-administrar',
+  incluye: 'plan-incluye',
+  sinTienda: 'plan-sin-tienda',
+  cargando: 'plan-cargando',
+  errorOfertas: 'plan-error-ofertas',
+  vacioOfertas: 'plan-vacio-ofertas',
+  intentar: 'plan-intentar',
+  mensaje: 'plan-mensaje',
+  restaurar: 'plan-restaurar',
+  notaTienda: 'plan-nota-tienda',
+  notaSimulada: 'plan-nota-simulada',
+  oferta: (periodo: 'mensual' | 'anual') => `plan-oferta-${periodo}` as const,
+  ajustesPlan: 'ajustes-plan',
+  ajustesPlanTitulo: 'ajustes-plan-titulo',
+  ajustesPlanDetalle: 'ajustes-plan-detalle',
+  ajustesPlanVer: 'ajustes-plan-ver',
+  puertaPlus: 'puerta-plus',
+  puertaPlusConocer: 'puerta-plus-conocer',
+} as const;
+
 export const TITULO_PANTALLA = 'Finanvoz Plus';
 export const SECCION_INCLUYE = 'Plus incluye';
 export const SECCION_AJUSTES = 'Plan';
