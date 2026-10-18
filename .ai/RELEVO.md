@@ -6,8 +6,7 @@
 
 ## Hecho en este turno
 
-- **Deducciones (fiscal, `02 §24`):** copy pulido en `deducciones/textos.ts` (Plus, vacío, importar, ocultas); `MENSAJE_SIN_PARAMETROS` en `servicios/deducciones.ts`; FAQ facturas en `ayuda/textos.ts`; botón Cuentas centralizado (`BTN_DEDUCCIONES_CUENTAS`).
-- **Salvado previo:** WIP tabs/hoy/suscripciones en commit `64608c7` (relevo salvar).
+- **PreviaWidget:** `testID="previa-widget-solo-texto"` en rama sin cifra; prueba TalkBack simétrica con la fila con montos.
 
 ## Hecho (acumulado reciente)
 

@@ -67,6 +67,14 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
       'no',
     );
   });
+
+  it('modo solo texto oculta el copy interno como la fila con cifra', () => {
+    const soloTexto = construirVistaWidget(null, { ocultarMontos: true });
+    render(<PreviaWidget vista={soloTexto} esquema="claro" />);
+    expect(screen.getByTestId('previa-widget-solo-texto').props.importantForAccessibility).toBe(
+      'no-hide-descendants',
+    );
+  });
 });
 
 describe('WidgetHoy (componente del widget)', () => {
