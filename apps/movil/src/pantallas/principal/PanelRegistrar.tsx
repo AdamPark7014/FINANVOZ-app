@@ -54,7 +54,7 @@ import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
 import { TarjetaConfirmarTanda } from './TarjetaConfirmarTanda';
-import { ConfirmacionRegistro, EnlaceAnaliticaCorreccion } from './ConfirmacionRegistro';
+import { ConfirmacionRegistro } from './ConfirmacionRegistro';
 import { TarjetaConsulta } from './TarjetaConsulta';
 import { TarjetaExplicacion, type ExplicacionMostrable } from './TarjetaExplicacion';
 import { TarjetaAclarar, TarjetaDuplicados, TarjetaElegir } from './TarjetasInterpretacion';
@@ -688,7 +688,6 @@ export function PanelRegistrar({
       esperando > 0;
     return (
       <View style={{ gap: espacio.s }} testID="panel-registrar">
-        <EnlaceAnaliticaCorreccion />
         {hayRespuestas ? (
           <ScrollView
             style={{ maxHeight: altoVentana * ALTO_MAX_RESPUESTAS }}
@@ -707,7 +706,6 @@ export function PanelRegistrar({
 
   return (
     <View style={{ gap: espacio.m }} testID="panel-registrar">
-      <EnlaceAnaliticaCorreccion />
       {respuestas}
       {controles}
       {extras}
