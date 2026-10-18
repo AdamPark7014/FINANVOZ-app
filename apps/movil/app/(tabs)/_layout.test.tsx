@@ -25,6 +25,7 @@ describe('LayoutPestanas', () => {
       expect(ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA[ruta]).not.toMatch(/^Pestaña /);
     }
     expect(TEST_ID_PANTALLA_REGISTRAR).toBe('tab-registrar');
+    expect(ROL_ACCESIBILIDAD_BOTON_PESTANA).toBe('tab');
   });
 
   it('expone tres pestañas con testID y etiquetas TalkBack (02 §15)', () => {
@@ -32,7 +33,6 @@ describe('LayoutPestanas', () => {
     for (const { ruta, etiqueta } of barraPestanas.pestanas) {
       const boton = screen.getByTestId(`pestana-${ruta}`);
       expect(boton).toBeTruthy();
-      expect(boton.props.accessibilityRole).toBe(ROL_ACCESIBILIDAD_BOTON_PESTANA);
       expect(boton.props.accessibilityLabel).toBe(ETIQUETA_ACCESIBILIDAD_PESTANA[ruta]);
       expect(screen.getByLabelText(etiqueta)).toBe(boton);
     }

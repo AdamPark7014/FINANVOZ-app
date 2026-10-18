@@ -170,7 +170,7 @@ export default function Ingreso() {
           {proximo ? (
             <Tarjeta testID="onb-proximo-pago">
               <Texto variante="secundario" tono="secundario">
-                Tu próximo pago
+                {ETIQUETA_PROXIMO_PAGO}
               </Texto>
               <Texto variante="subtitulo">{etiquetaFecha(proximo)}</Texto>
             </Tarjeta>

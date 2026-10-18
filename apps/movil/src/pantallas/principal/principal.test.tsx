@@ -396,9 +396,17 @@ describe('Cuentas', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.getByTestId('cuentas-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('seccion-tienes-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveTextContent(TEXTO_CUENTAS_TIENES_VACIO);
+    expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('cuentas-tienes-vacio').props.accessibilityLabel).toBe(etiquetaVacioCuentasTienes());
     expect(screen.getByTestId('cuentas-debes-vacio')).toHaveTextContent(TEXTO_CUENTAS_DEBES_VACIO);
+    expect(screen.getByTestId('cuentas-debes-vacio').props.accessibilityLabel).toBe(etiquetaVacioCuentasDebes());
     expect(screen.getByTestId('cuentas-compromisos-vacio')).toHaveTextContent(TEXTO_CUENTAS_COMPROMISOS_VACIO);
+    expect(screen.getByTestId('cuentas-compromisos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioCuentasCompromisos(),
+    );
     p.cerrar();
   });
 

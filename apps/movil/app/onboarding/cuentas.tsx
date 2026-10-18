@@ -8,7 +8,29 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
-import { TIP_CUENTAS_MINIMO } from '../../src/pantallas/onboarding/tips';
+import {
+  AYUDA_EFECTIVO_ONB,
+  BTN_AGREGAR_CUENTA_ONB,
+  BTN_AGREGAR_DEBITO_BILLETERA,
+  BTN_AGREGAR_TARJETA_CREDITO,
+  BTN_ONB_CANCELAR,
+  BTN_ONB_CONTINUAR,
+  EJEMPLO_NOMBRE_BILLETERA,
+  EJEMPLO_NOMBRE_DEBITO,
+  ERROR_CUENTA_INCOMPLETA,
+  ETIQUETA_CUENTA_GENERICA,
+  ETIQUETA_CHIP_AHORRO,
+  ETIQUETA_CHIP_BILLETERA,
+  ETIQUETA_CHIP_DEBITO,
+  ETIQUETA_EFECTIVO_ONB,
+  ETIQUETA_NOMBRE_CUENTA,
+  ETIQUETA_SALDO_CUENTA_ONB,
+  ETIQUETA_TARJETA_DEBES,
+  ETIQUETAS_SUBTIPO_CUENTA,
+  SUFIJO_TIENES,
+  TIP_CUENTAS_MINIMO,
+  TITULO_CUENTAS,
+} from '../../src/pantallas/onboarding/textos';
 import { agregarCuenta, agregarEfectivo, listarCuentas } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../src/ui';
@@ -16,17 +38,10 @@ import { Boton, CampoMonto, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '.
 type TipoCuenta = 'debito' | 'billetera' | 'ahorro';
 
 const OPCIONES_TIPO: readonly { valor: TipoCuenta; etiqueta: string }[] = [
-  { valor: 'debito', etiqueta: 'Débito' },
-  { valor: 'billetera', etiqueta: 'Billetera' },
-  { valor: 'ahorro', etiqueta: 'Ahorro' },
+  { valor: 'debito', etiqueta: ETIQUETA_CHIP_DEBITO },
+  { valor: 'billetera', etiqueta: ETIQUETA_CHIP_BILLETERA },
+  { valor: 'ahorro', etiqueta: ETIQUETA_CHIP_AHORRO },
 ];
-
-const ETIQUETA_TIPO: Record<string, string> = {
-  efectivo: 'Efectivo',
-  debito: 'Débito',
-  billetera: 'Billetera',
-  ahorro: 'Ahorro',
-};
 
 /**
  * O4 · Cuentas (`02 §3`): el efectivo es el mínimo; débito, billeteras y tarjetas de crédito (§3.1) son
@@ -48,7 +63,7 @@ export default function Cuentas() {
 
   const agregar = () => {
     if (nombre.trim() === '' || saldo === null) {
-      setError('Escribe el nombre y el saldo de la cuenta.');
+      setError(ERROR_CUENTA_INCOMPLETA);
       return;
     }
     try {
@@ -80,15 +95,15 @@ export default function Cuentas() {
     <PasoOnboarding
       testID="onb-cuentas"
       paso={4}
-      titulo="¿Con qué pagas?"
+      titulo={TITULO_CUENTAS}
       tip={TIP_CUENTAS_MINIMO}
-      pie={<Boton testID="onb-cuentas-continuar" etiqueta="Continuar" alPresionar={continuar} />}
+      pie={<Boton testID="onb-cuentas-continuar" etiqueta={BTN_ONB_CONTINUAR} alPresionar={continuar} />}
     >
       {tieneEfectivo ? null : (
         <CampoMonto
           testID="onb-efectivo"
-          etiqueta="¿Cuánto efectivo traes ahorita?"
-          ayuda="Si no sabes exacto, pon lo que calcules. Lo ajustas después."
+          etiqueta={ETIQUETA_EFECTIVO_ONB}
+          ayuda={AYUDA_EFECTIVO_ONB}
           alCambiar={setEfectivo}
         />
       )}
@@ -100,7 +115,7 @@ export default function Cuentas() {
               <Texto variante="cuerpoFuerte">{c.nombre}</Texto>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Texto variante="secundario" tono="secundario">
-                  {`${ETIQUETA_TIPO[c.subtipo] ?? 'Cuenta'} · tienes`}
+                  {`${ETIQUETAS_SUBTIPO_CUENTA[c.subtipo] ?? ETIQUETA_CUENTA_GENERICA}${SUFIJO_TIENES}`}
                 </Texto>
                 <Cifra centavos={c.saldo} contexto={`En ${c.nombre} tienes`} />
               </View>
@@ -111,7 +126,7 @@ export default function Cuentas() {
               <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Texto variante="secundario" tono="secundario">
-                  Tarjeta de crédito · debes
+                  {ETIQUETA_TARJETA_DEBES}
                 </Texto>
                 <Cifra centavos={t.saldo + t.meses} contexto={`En ${t.nombre} debes`} />
               </View>
@@ -125,16 +140,16 @@ export default function Cuentas() {
           <Chips testID="onb-cuenta-tipo" opciones={OPCIONES_TIPO} valor={tipo} alCambiar={setTipo} />
           <CampoTexto
             testID="onb-cuenta-nombre"
-            etiqueta="Nombre"
-            ejemplo={tipo === 'billetera' ? 'Mercado Pago' : 'BBVA'}
+            etiqueta={ETIQUETA_NOMBRE_CUENTA}
+            ejemplo={tipo === 'billetera' ? EJEMPLO_NOMBRE_BILLETERA : EJEMPLO_NOMBRE_DEBITO}
             valor={nombre}
             alCambiar={setNombre}
           />
-          <CampoMonto testID="onb-cuenta-saldo" etiqueta="¿Cuánto tienes hoy?" alCambiar={setSaldo} />
-          <Boton testID="onb-cuenta-agregar" etiqueta="Agregar cuenta" alPresionar={agregar} />
+          <CampoMonto testID="onb-cuenta-saldo" etiqueta={ETIQUETA_SALDO_CUENTA_ONB} alCambiar={setSaldo} />
+          <Boton testID="onb-cuenta-agregar" etiqueta={BTN_AGREGAR_CUENTA_ONB} alPresionar={agregar} />
           <Boton
             variante="texto"
-            etiqueta="Cancelar"
+            etiqueta={BTN_ONB_CANCELAR}
             alPresionar={() => {
               setFormulario(false);
               setError(null);
@@ -145,14 +160,14 @@ export default function Cuentas() {
         <Boton
           testID="onb-agregar-cuenta"
           variante="secundario"
-          etiqueta="Agregar débito o billetera"
+          etiqueta={BTN_AGREGAR_DEBITO_BILLETERA}
           alPresionar={() => setFormulario(true)}
         />
       )}
       <Boton
         testID="onb-agregar-tarjeta"
         variante="secundario"
-        etiqueta="Agregar tarjeta de crédito"
+        etiqueta={BTN_AGREGAR_TARJETA_CREDITO}
         alPresionar={() => router.push('/onboarding/tarjeta')}
       />
       <MensajeError texto={error} />

@@ -28,8 +28,6 @@ import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../ser
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 import {
   BTN_NO_ES_MIA,
-  ETIQUETA_SALIDA_CUENTA,
-  ETIQUETA_CUENTA_EXTERNA,
   PERMISO_DENEGADO,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   tituloSalidaSinPareja,
@@ -85,8 +83,8 @@ describe('preguntas de captura en Hoy', () => {
 
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText(tituloSalidaSinPareja(420_000), { hidden: true })).toBeTruthy();
-    fireEvent.press(screen.getByText(ETIQUETA_SALIDA_CUENTA));
-    fireEvent.press(screen.getByText(ETIQUETA_CUENTA_EXTERNA));
+    fireEvent.press(screen.getByTestId('tarjeta-accion-0-cuenta'));
+    fireEvent.press(screen.getByTestId('tarjeta-accion-0-destino-externa'));
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.transito)).toBe(0);
     expect(screen.queryByText(tituloSalidaSinPareja(420_000), { hidden: true })).toBeNull();
     p.cerrar();
