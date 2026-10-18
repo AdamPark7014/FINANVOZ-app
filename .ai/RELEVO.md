@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Widget TalkBack:** `PISTA_PREVIA_OCULTA` en vista previa cuando «Ocultar montos» está encendido; tests en `widget.test.tsx`.
+- **PreviaWidget TalkBack:** `importantForAccessibility="yes"` en el resumen con live region (anuncia al cambiar «Ocultar montos»).
 
 ## Hecho (acumulado reciente)
 
-- Formulario Guardar, Chip/Boton, CampoMonto, captura Hoy alert. Ver `git log`.
+- `PISTA_PREVIA_OCULTA`, error alert widget, captura Hoy. Ver `git log`.
 
 ## A medias — CUIDADO
 
