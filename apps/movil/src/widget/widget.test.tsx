@@ -75,6 +75,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     expect(within(previa).getByText('Hoy puedes', { hidden: true }).props.importantForAccessibility).toBe(
       'no',
     );
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
   });
 
   it('modo solo texto oculta el copy interno como la fila con cifra', () => {
