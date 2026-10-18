@@ -225,7 +225,11 @@ describe('CA-M8-02 · Cobrar', () => {
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
+    expect(screen.getByTestId('persona-ya-me-pago-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(TITULO_YA_ME_PAGO)).toBeTruthy();
     expect(screen.getByTestId('boton-guardar-pago-persona')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO);
+    fireEvent.press(screen.getByTestId('boton-guardar-pago-persona'));
+    expect(screen.getByTestId('persona-ya-me-pago-faltante')).toHaveProp('accessibilityRole', 'alert');
   });
 
   it('"Ya me pagó" de Caro deja su saldo en 0 y sale de Te deben', () => {

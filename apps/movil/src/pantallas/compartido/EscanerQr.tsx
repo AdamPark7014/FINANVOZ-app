@@ -50,6 +50,7 @@ export function EscanerQr({
           <Boton
             testID="escaner-permiso"
             etiqueta={BTN_PERMITIR_CAMARA}
+            pista={PISTA_PERMISO_CAMARA}
             alPresionar={() => {
               pedirPermiso().catch(() => {});
             }}

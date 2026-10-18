@@ -124,7 +124,7 @@ export function PantallaCompartidos({
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
-        pista={modo.tipo === 'lista' ? PISTA_VOLVER_CUENTAS : undefined}
+        pista={modo.tipo === 'lista' ? PISTA_VOLVER_CUENTAS : PISTA_VOLVER_LISTA}
         alPresionar={modo.tipo === 'lista' ? alVolver : volverALista}
       />
       <Texto variante="titulo" testID="compartidos-titulo" accessibilityRole="header">
