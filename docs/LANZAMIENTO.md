@@ -19,6 +19,8 @@
 
 Cierra los pendientes **11** (Supabase + `lista-espera`) y **12** (dominio, Pages, GitHub, primer despliegue). Nada de esto asume cuentas ya creadas: cada paso empieza en blanco hasta que lo marques tú.
 
+> **Tip M0 (11–12):** Cierra el paso 3 (Supabase desplegado y OPTIONS 204 con `Origin: https://finanvoz.com`) antes del paso 5 (`VITE_LISTA_ESPERA_URL`); si inviertes el orden, Pages publica pero el alta en producción falla por CORS o URL vacía.
+
 ### Hecho en el repositorio (no repetir en consola)
 
 | Pieza | Dónde | Notas |
