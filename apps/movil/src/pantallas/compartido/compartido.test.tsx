@@ -19,9 +19,10 @@ import { servidorCompartidoFalso } from '../../servicios/__pruebas__/compartido'
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { crearMotorFalso } from '../principal/__pruebas__/arnes';
+import { crearMotorFalso, renderConSesion } from '../principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../principal/__pruebas__/base';
 import { PanelRegistrar } from '../principal/PanelRegistrar';
+import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';

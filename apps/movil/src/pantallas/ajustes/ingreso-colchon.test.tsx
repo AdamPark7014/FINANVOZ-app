@@ -16,6 +16,7 @@ import {
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { auditar } from '../__pruebas__/accesibilidad';
+import { ETIQUETA_CAPTURA_NO_DISPONIBLE } from './captura-textos';
 import { etiquetaCampoMonto } from '../../ui/formato';
 import { ayudaColchon, ETIQUETA_MONTO_COLCHON } from './colchon-textos';
 import {

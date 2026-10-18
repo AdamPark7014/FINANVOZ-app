@@ -104,6 +104,7 @@ describe('PantallaArqueo · vacío y errores', () => {
     if (continuar) fireEvent.press(continuar);
     fireEvent.press(screen.getByTestId('arqueo-exacto'));
     fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
     fireEvent.press(screen.getByTestId('arqueo-listo'));
     expect(alCerrar).toHaveBeenCalled();

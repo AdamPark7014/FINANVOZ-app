@@ -6,27 +6,27 @@
 
 ## Hecho en este turno
 
-- **CampoMonto / Ajustes / Captura a11y:** `etiquetaCampoMonto` en UI; tests ingreso-colchón (`17dbca9`, `a142c21`), captura cuenta nueva + `textos.test.ts` (`a36fc17`), micro `componentes`/`EstadoVacio` (`2745805`).
+- **Me alcanza / tandas / suscripciones:** copy en `textos.ts`, vacíos con `EstadoVacio` + etiquetas TalkBack, pistas (cerrar, cancelar, nueva tanda, calendario), inactivas suscripciones; tests en `me-alcanza.test.tsx`, `tandas.test.tsx`, `suscripciones.test.tsx`, `textos.test.ts`.
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones, Hoy CTAs, por revisar captura. Ver `git log`.
+- Hoy, Cuentas, captura, ayuda. Ver `git log` (`9b35bb1`, `6493a56`, `4b55a65`, `b3e5b5a`).
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`git status`: compartido, tarjetas, riesgo…) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP ajeno (`git status`): no mezclar.
+- CA-M6-05 probabilidad: intermitente en local.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack en dispositivo (CA-M7-05 en ESTADO).
+2. `accessibilityHint` botones tandas/compartidos desde Cuentas.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
+- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

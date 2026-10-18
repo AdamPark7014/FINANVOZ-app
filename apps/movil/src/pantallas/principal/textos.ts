@@ -312,6 +312,15 @@ export const TEXTO_MOVIMIENTOS_FILTRO_ACTIVO = 'Solo los movimientos de tu pregu
 /** CTA «Registrar» en la pestaña Movimientos (`02 §15`). */
 export const PISTA_REGISTRAR_MOVIMIENTO = 'Abre el formulario para registrar un gasto o ingreso';
 
+/** Quita el filtro de una consulta en Movimientos (`06 §6`, TalkBack). */
+export const PISTA_VER_TODOS_MOVIMIENTOS = 'Quita el filtro y muestra todos tus movimientos';
+
+/** Frase en cola «Por revisar» (`02 §10`, TalkBack). */
+export const PISTA_REVISAR_FRASE = 'Abre el formulario para confirmar este registro';
+
+/** Descartar frase en «Por revisar» (`02 §10`, TalkBack). */
+export const PISTA_DESCARTAR_FRASE = 'Elimina esta frase de la cola por revisar';
+
 /** Filtro de consulta activo en Movimientos (`06 §6`, TalkBack). */
 export function etiquetaFiltroMovimientosActivo(): string {
   return `Movimientos. ${TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}`;

@@ -26,7 +26,16 @@ export const PISTA_ACTIVAR_CAPTURA = 'Activa la lectura de notificaciones de las
 export const ESTADO_APAGADA = 'Apagada.';
 export const ESTADO_NO_DISPONIBLE = 'No disponible en este teléfono.';
 
+/** TalkBack cuando la captura está apagada (visible: {@link ESTADO_APAGADA}). */
+export const ETIQUETA_CAPTURA_APAGADA = 'Captura automática apagada';
+/** TalkBack sin módulo nativo (visible: {@link ESTADO_NO_DISPONIBLE}). */
+export const ETIQUETA_CAPTURA_NO_DISPONIBLE =
+  'Captura automática no disponible en este teléfono';
+
+const SIN_APPS_EN_LISTA = 'Activa: aún no hay apps de banco en la lista.';
+
 export function textoCapturaActiva(cantidadApps: number): string {
+  if (cantidadApps === 0) return SIN_APPS_EN_LISTA;
   return cantidadApps === 1
     ? 'Activa: leo los avisos de 1 app de banco.'
     : `Activa: leo los avisos de ${cantidadApps} apps de banco.`;
@@ -34,6 +43,7 @@ export function textoCapturaActiva(cantidadApps: number): string {
 
 /** TalkBack: el conteo de apps en palabras (`02 §15`). */
 export function etiquetaCapturaActiva(cantidadApps: number): string {
+  if (cantidadApps === 0) return SIN_APPS_EN_LISTA;
   const apps =
     cantidadApps === 1
       ? 'una app de banco'
