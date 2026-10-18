@@ -20,7 +20,7 @@ import { abrirSesion } from '../../servicios/sesion';
 import { notificacionesEnMemoria } from '../avisos/notificaciones';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { PISTA_VOLVER } from './textos';
+import { PISTA_AYUDA, PISTA_VOLVER } from './textos';
 
 /**
  * La raíz real (`app/_layout.tsx`) con la apertura nativa sustituida: cada `abrirSesion` entrega una base nueva

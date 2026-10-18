@@ -105,6 +105,7 @@ describe('onboarding', () => {
     expect(conteoTablas()).toEqual(antes);
 
     tocar('onb-casilla-datos');
+    expect(screen.getByTestId('onb-aceptar')).toHaveProp('accessibilityHint', PISTA_ONB_CONTINUAR);
     tocar('onb-aceptar');
     expect(r.getPathname()).toBe('/onboarding/ingreso');
     expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);

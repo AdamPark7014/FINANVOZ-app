@@ -145,7 +145,8 @@ export function PantallaHoy({
           </Texto>
           {navegacion.alAbrirArqueo ? (
             <Boton
-              etiqueta="Contar mi efectivo"
+              etiqueta={TITULO_CONTAR_EFECTIVO}
+              etiquetaAccesible={ACCESIBILIDAD_ABRIR}
               variante="texto"
               ancho="contenido"
               alPresionar={() => navegacion.alAbrirArqueo?.()}

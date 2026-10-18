@@ -161,6 +161,7 @@ export default function Ajustes() {
           testID="ajustes-abrir-ayuda"
           variante="secundario"
           etiqueta={BTN_AYUDA}
+          pista={PISTA_AYUDA}
           alPresionar={() => router.push('/ayuda')}
         />
       </Tarjeta>
