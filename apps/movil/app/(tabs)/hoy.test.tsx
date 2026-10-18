@@ -10,6 +10,7 @@ jest.mock('expo-router', () => ({
     navigate: jest.fn(),
     push: jest.fn(),
   }),
+  useFocusEffect: jest.fn(),
 }));
 
 jest.mock('../../src/compartido/expo', () => ({
