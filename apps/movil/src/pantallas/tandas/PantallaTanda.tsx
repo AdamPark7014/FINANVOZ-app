@@ -307,6 +307,7 @@ function Ajustes({
             setEditando(false);
             setError(null);
           }}
+          pista={PISTA_CANCELAR_EDICION}
         />
         {error ? <MensajeError texto={error} /> : null}
       </Tarjeta>
