@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Me alcanza / tandas / suscripciones:** copy en `textos.ts`, vacíos con `EstadoVacio` + etiquetas TalkBack, pistas (cerrar, cancelar, nueva tanda, calendario), inactivas suscripciones; tests en `me-alcanza.test.tsx`, `tandas.test.tsx`, `suscripciones.test.tsx`, `textos.test.ts`.
+- **Arqueo efectivo TalkBack/copy:** `arqueo/textos.ts` (`AYUDA_POR_ASIGNAR`, `ACCESIBILIDAD_ABRIR`/`LISTO`, `etiquetaContarEnCuenta`); `TarjetasCaptura`, `PantallaArqueo`, `PantallaHoy`, `PantallaCuentas`; tests `accesibilidad.test.tsx` + `arqueo.test.tsx` (`682a231`, `4ef5253`, `4d5d5d9`, `f744751`).
 
 ## Hecho (acumulado reciente)
 
-- Hoy, Cuentas, captura, ayuda. Ver `git log` (`9b35bb1`, `6493a56`, `4b55a65`, `b3e5b5a`).
+- Me alcanza, tandas, suscripciones, Hoy CTAs. Ver `git log` (`a36fc17`).
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`git status`): no mezclar.
+- WIP ajeno en working tree — no mezclar sin revisar `git status`.
 - CA-M6-05 probabilidad: intermitente en local.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. `accessibilityHint` botones tandas/compartidos desde Cuentas.
+2. Cerrar WIP paralelo en commits pequeños.
 
 ## No tocar
 
