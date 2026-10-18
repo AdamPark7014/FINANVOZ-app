@@ -92,6 +92,7 @@ function TarjetaCobro({ t, testID }: { t: Extract<TarjetaTanda, { tipo: 'tanda_c
             etiqueta={ETIQUETA_ME_TOCO}
             alPresionar={() => setCobrando(true)}
             testID={`${testID}-me-toco`}
+            pista={PISTA_ME_TOCO}
           />
           <Boton
             etiqueta={ETIQUETA_TODAVIA_NO}

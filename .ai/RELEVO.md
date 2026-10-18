@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **TalkBack micro (principal / me-alcanza / arqueo):** ya en `main` — `principal.test.tsx` (Hoy sin ingreso header+hint, Movimientos filtro/por revisar), `me-alcanza.test.tsx` (cabecera, datos insuficientes `etiquetaVacioDatosInsuficientes`), `arqueo.test.tsx` (vacío `etiquetaVacioSinEfectivo`, Listo `ACCESIBILIDAD_LISTO` con `queryByTestId` sobrante). Commit clave arqueo: `00e47a2`.
+- **`EstadoVacio` / `componentes.test`:** `etiquetaEstadoVacio` en `formato.ts` (Todavía→Aún + cifras en palabras); componente + tests (live region, rol `text`, auditoría); JSDoc TalkBack (`faac215`, helper `918d5f2`).
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones, O5, tandas, Cuentas list a11y. Ver `git log`.
+- Principal/me-alcanza/arqueo TalkBack, suscripciones, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Stashes locales (`git stash list`) — no aplicar sin revisar.
+- Stashes locales — no aplicar sin revisar.
 - WIP en disco de otros agentes — `git status` antes de editar.
 - CI Windows, M0: Adam.
 

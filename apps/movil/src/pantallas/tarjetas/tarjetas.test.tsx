@@ -306,8 +306,8 @@ describe('tarjetas/textos · TalkBack', () => {
     expect(etiquetaAccesibleDato('Próximo corte', '28 oct')).toBe('Próximo corte: 28 oct');
     expect(etiquetaAccesibleUsoTarjeta(42)).toBe('Usas 42 % de tu límite');
     expect(
-      etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', '$150.00', true),
-    ).toBe('Oxxo, 12 oct, gasto $150.00');
+      etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', 15_000, true),
+    ).toBe('Oxxo, 12 oct, gasto ciento cincuenta pesos');
     expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe(
       'Tele, $500.00 al mes, faltan 6 de 12',
     );
