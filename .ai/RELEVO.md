@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **movil/principal:** copy de `TarjetasInterpretacion` (elegir, duplicados, aclarar) en `textos.ts`; `interpretacion-textos.test.ts`.
+- **movil/estados-cuenta:** copy centralizado en `textos.ts`, empty `TEXTO_SIN_NUEVOS`, a11y (headers, `accessibilityLabel` aviso/resumen), `LeerEstadoCuenta` sin basura al final; jest `estados-cuenta.test.tsx` en verde.
 
 ## Hecho (acumulado reciente)
 
-- TarjetaConfirmarMsi, invitación avisos, Hoy, deducciones. Ver `git log`.
+- Pulir UI tarjetas/respaldo y copy en otras pantallas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local (me-alcanza, tandas, respaldo…) — no mezclar.
+- WIP ajeno (captura, principal, tandas) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Pantallas con strings sueltos (Movimientos, TarjetaConfirmarTanda chips, etc.).
+2. Commits pequeños del WIP ajeno o siguiente carpeta con copy inline.
 
 ## No tocar
 
