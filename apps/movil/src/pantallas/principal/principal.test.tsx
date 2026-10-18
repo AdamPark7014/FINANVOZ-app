@@ -6,6 +6,7 @@ import {
   agregarPagoFijo,
   agregarTarjetaCredito,
   configurarIngreso,
+  etiquetaFecha,
   crearPersona,
   fijarColchon,
   listarMovimientos,

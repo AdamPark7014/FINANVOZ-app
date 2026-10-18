@@ -16,6 +16,8 @@ export interface PreguntaFrecuente {
 
 export const ETIQUETA_VOLVER = 'Volver';
 export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
+/** TalkBack: acción del botón volver (desde Ajustes). */
+export const PISTA_VOLVER = 'Regresa a Ajustes';
 
 export const TITULO = 'Ayuda';
 export const INTRO = 'Toca una pregunta para ver la respuesta.';

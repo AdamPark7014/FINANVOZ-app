@@ -5,6 +5,7 @@ import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES } from './pregunt
 import {
   ACCESIBILIDAD_ESCRIBIR_CORREO,
   ACCESIBILIDAD_VOLVER,
+  PISTA_VOLVER,
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
   ETIQUETA_VOLVER,
@@ -48,6 +49,7 @@ export function PantallaAyuda({
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
       <Texto variante="titulo" testID="ayuda-titulo" accessibilityRole="header">

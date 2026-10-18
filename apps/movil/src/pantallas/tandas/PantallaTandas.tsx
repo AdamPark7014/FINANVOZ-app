@@ -40,7 +40,7 @@ export function PantallaTandas({
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto variante="titulo" testID="tandas-titulo">
+      <Texto variante="titulo" testID="tandas-titulo" accessibilityRole="header">
         {TITULO_TANDAS}
       </Texto>
       {nueva ? (
