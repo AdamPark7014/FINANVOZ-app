@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Capturas por revisar TalkBack:** `PISTA_*` en CTAs de `PorRevisarCapturas`; `testID` intro frases por interpretar en `PantallaMovimientos`; tests en `captura.test` y `principal.test`.
+- **O3 TalkBack:** `etiquetaProximoPagoOnboarding` + tarjeta `onb-proximo-pago` anuncia fecha en una frase; tests en `onboarding.test` / `textos.test`.
 
 ## Hecho (acumulado reciente)
 
-- Movimientos/me-alcanza, compartidos, widget, tandas. Ver `git log`.
+- Capturas por revisar, movimientos, widget, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 

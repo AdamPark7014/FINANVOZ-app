@@ -336,6 +336,28 @@ describe('Tarjetas', () => {
     expect(screen.getByTestId('tarjeta-uso')).toHaveProp('importantForAccessibility', 'no');
   });
 
+  it('TalkBack: cada corte cerrado en el historial se anuncia de una pieza', () => {
+    const p = e510();
+    p.reloj.fijar('2026-12-15');
+    procesarApertura(p.ctx);
+    const e0 = detalleTarjeta(p.ctx, p.oro).estadosCuenta[0];
+    expect(e0).toBeTruthy();
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    const fechaCorte = etiquetaDiaMes(e0!.corte);
+    const fechaLimite = etiquetaDiaMes(e0!.limite);
+    expect(
+      screen.getByLabelText(
+        etiquetaAccesibleEstadoCuentaTarjeta(
+          fechaCorte,
+          e0!.saldoCorte,
+          e0!.pagosPosteriores,
+          e0!.pngi,
+          fechaLimite,
+        ),
+      ),
+    ).toBeTruthy();
+  });
+
   it('tarjeta inexistente: volver usa la misma pista TalkBack', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <PantallaTarjeta tarjetaId="contraparte:tarjeta:inexistente" alVolver={jest.fn()} />);

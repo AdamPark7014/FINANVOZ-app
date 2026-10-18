@@ -384,6 +384,7 @@ describe('copy centralizado (textos.ts)', () => {
     expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/Volver/);
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/lista de tandas/i);
+    expect(ACCESIBILIDAD_TANDA_ARCHIVADA).toMatch(/aportaciones futuras/i);
     expect(PISTA_GUARDAR_TANDA).toMatch(/aportación/i);
   });
 });
