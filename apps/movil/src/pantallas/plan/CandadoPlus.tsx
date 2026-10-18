@@ -66,9 +66,9 @@ export function PuertaPlus({
           {descripcion}
         </Texto>
         {abrirPlan ? (
-          <Boton etiqueta="Conocer Plus" alPresionar={abrirPlan} testID="puerta-plus-conocer" />
+          <Boton etiqueta={ETIQUETA_CONOCER_PLUS} alPresionar={abrirPlan} testID="puerta-plus-conocer" />
         ) : null}
-        {alVolver ? <Boton etiqueta="Volver" variante="texto" alPresionar={alVolver} /> : null}
+        {alVolver ? <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" alPresionar={alVolver} /> : null}
       </Tarjeta>
     </View>
   );

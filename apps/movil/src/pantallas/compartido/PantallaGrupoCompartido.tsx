@@ -254,18 +254,18 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
       {g.abierto && panel === 'ninguno' && !g.revincular ? (
         <>
-          <Boton testID="grupo-agregar" etiqueta="Agregar gasto" alPresionar={() => setPanel('agregar')} />
+          <Boton testID="grupo-agregar" etiqueta={BTN_AGREGAR_GASTO} alPresionar={() => setPanel('agregar')} />
           {g.saldo.debe !== null ? (
             <Boton
               testID="grupo-saldar-abrir"
-              etiqueta="Saldar"
+              etiqueta={BTN_SALDAR}
               variante="secundario"
               alPresionar={() => setPanel('saldar')}
             />
           ) : null}
           <Boton
             testID="grupo-mostrar-codigo"
-            etiqueta="Mostrar código"
+            etiqueta={BTN_MOSTRAR_CODIGO}
             variante="secundario"
             cargando={ocupado}
             alPresionar={() => {
@@ -285,10 +285,10 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         </>
       ) : null}
 
-      <Texto variante="subtitulo">Lo compartido</Texto>
+      <Texto variante="subtitulo">{TITULO_LO_COMPARTIDO}</Texto>
       {g.movimientos.length === 0 ? (
         <Texto variante="cuerpo" tono="secundario">
-          Todavía no hay gastos compartidos.
+          {TEXTO_SIN_GASTOS_COMPARTIDOS}
         </Texto>
       ) : null}
       {g.movimientos.map((m) => (
@@ -305,18 +305,18 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
           ) : null}
           {m.anulado && !m.noCompartido ? (
             <Texto variante="secundario" tono="secundario">
-              Anulado
+              {ETIQUETA_ANULADO}
             </Texto>
           ) : null}
           {m.pendiente ? (
             <Texto variante="secundario" tono="secundario">
-              Por compartir
+              {ETIQUETA_POR_COMPARTIR}
             </Texto>
           ) : null}
           {m.anulable && panel === 'ninguno' ? (
             <Boton
               testID={`mov-compartido-${m.id}-anular`}
-              etiqueta="Anular"
+              etiqueta={BTN_ANULAR}
               variante="texto"
               ancho="contenido"
               alPresionar={() => anular(m.id)}
@@ -328,7 +328,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
       {g.abierto && panel === 'ninguno' ? (
         <Boton
           testID="grupo-salir-abrir"
-          etiqueta="Dejar de compartir"
+          etiqueta={BTN_DEJAR_DE_COMPARTIR}
           variante="texto"
           alPresionar={() => setPanel('salir')}
         />

@@ -13,12 +13,26 @@ import { Boton, CampoMonto, CampoTexto, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import {
   AYUDA_PROPORCION,
+  BTN_CANCELAR,
+  BTN_GUARDAR,
+  EJEMPLO_DESCRIPCION_GASTO,
   EJEMPLO_PROPORCION,
+  ERROR_CAMPOS_GASTO,
+  ERROR_MONTO_GASTO,
+  ETIQUETA_CATEGORIA_GASTO,
+  ETIQUETA_CON_QUE_PAGASTE,
+  ETIQUETA_DESCRIPCION_GASTO,
+  ETIQUETA_MONTO_GASTO,
   ETIQUETA_OTRA_PROPORCION,
+  ETIQUETA_QUIEN_PAGO,
+  ETIQUETA_REPARTO,
+  etiquetaPagoPareja,
   formatoProporcionReparto,
   OPCIONES_REPARTO,
   parsearProporcionReparto,
   resumenGastoCompartido,
+  TITULO_AGREGAR_GASTO,
+  TITULO_REVISAR_GASTO,
 } from './textos';
 
 type Quien = 'yo' | 'otro';

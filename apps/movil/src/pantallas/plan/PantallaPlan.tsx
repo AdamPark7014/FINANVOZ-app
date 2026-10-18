@@ -114,7 +114,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
         ) : null}
         {vista.plan === 'plus' && compras ? (
           <Boton
-            etiqueta="Administrar en Google Play"
+            etiqueta={ETIQUETA_ADMINISTRAR}
             variante="secundario"
             alPresionar={() => void compras.administrar().catch(() => undefined)}
             testID="plan-administrar"
@@ -123,7 +123,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       </Tarjeta>
 
       <Tarjeta>
-        <Texto variante="subtitulo">Plus incluye</Texto>
+        <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
         <View style={{ gap: espacio.xs }}>
           {INCLUYE_PLUS.map((t) => (
             <Texto key={t} variante="cuerpo">{`• ${t}`}</Texto>
@@ -142,7 +142,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             </Texto>
           ) : ofertas.tipo === 'cargando' ? (
             <Texto variante="secundario" tono="secundario" testID="plan-cargando">
-              Cargando planes…
+              {CARGANDO_OFERTAS}
             </Texto>
           ) : ofertas.tipo === 'error' || ofertas.ofertas.length === 0 ? (
             <>
