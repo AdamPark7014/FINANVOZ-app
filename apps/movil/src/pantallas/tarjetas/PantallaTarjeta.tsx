@@ -204,7 +204,12 @@ function Detalle({
               <Texto variante="secundario" style={{ flex: 1 }} importantForAccessibility="no">
                 {`${titulo} · ${fecha}`}
               </Texto>
-              <Cifra centavos={esSalida ? -m.monto : m.monto} tamano="secundario" contexto={titulo} />
+              <Cifra
+                centavos={esSalida ? -m.monto : m.monto}
+                tamano="secundario"
+                contexto={titulo}
+                importantForAccessibility="no"
+              />
             </View>
           );
         })}

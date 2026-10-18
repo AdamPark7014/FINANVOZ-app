@@ -12,6 +12,7 @@ import {
   mensajeNombreGuardado,
   PISTA_AYUDA,
   PISTA_VOLVER,
+  etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
 } from './textos';

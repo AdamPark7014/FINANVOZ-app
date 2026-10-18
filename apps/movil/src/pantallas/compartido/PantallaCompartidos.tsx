@@ -121,7 +121,7 @@ export function PantallaCompartidos({
         pista={modo.tipo === 'lista' ? PISTA_VOLVER_CUENTAS : undefined}
         alPresionar={modo.tipo === 'lista' ? alVolver : volverALista}
       />
-      <Texto variante="titulo" testID="compartidos-titulo">
+      <Texto variante="titulo" testID="compartidos-titulo" accessibilityRole="header">
         {TITULO_GASTOS_COMPARTIDOS}
       </Texto>
 

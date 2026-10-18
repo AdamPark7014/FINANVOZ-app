@@ -6,28 +6,24 @@
 
 ## Hecho en este turno
 
-- **Hoy (Plus):** prueba ancla `etiquetaTarjetaDelDia` en `interpretacion-textos.test.ts` (TalkBack título + tip).
+- **Arqueo efectivo TalkBack/copy:** textos compartidos en `arqueo/textos.ts` (tarjeta Hoy, `TarjetaArqueo`, confirmación `LISTO`/`ABRIR`, Cuentas `etiquetaContarEnCuenta`); pruebas accesibilidad arqueo por labels en chips; acumulado en commits recientes de Hoy/captura.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips en `tips.ts`, captura/cuentas headers, ProbabilidadHoy. Ver `git log`.
+- Hoy CTAs pistas, CampoMonto, PreviaWidget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP paralelo (`tandas.test`, `ui/README`, etc.) — no mezclar sin revisar.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. CTAs inline restantes en Cuentas si conviene centralizar.
-3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

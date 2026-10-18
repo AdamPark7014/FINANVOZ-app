@@ -21,6 +21,7 @@ import {
   Tarjeta,
   Texto,
 } from '../../ui';
+import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';

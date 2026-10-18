@@ -31,3 +31,12 @@ export function textoCapturaActiva(cantidadApps: number): string {
     ? 'Activa: leo los avisos de 1 app de banco.'
     : `Activa: leo los avisos de ${cantidadApps} apps de banco.`;
 }
+
+/** TalkBack: el conteo de apps en palabras (`02 §15`). */
+export function etiquetaCapturaActiva(cantidadApps: number): string {
+  const apps =
+    cantidadApps === 1
+      ? 'una app de banco'
+      : `${enteroEnPalabras(cantidadApps)} apps de banco`;
+  return `Activa: leo los avisos de ${apps}.`;
+}

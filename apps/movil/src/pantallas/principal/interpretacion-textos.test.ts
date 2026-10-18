@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   etiquetaBotonElegirMovimiento,
+  etiquetaTarjetaDelDia,
   TITULO_DUPLICADOS,
   TITULO_ELEGIR_MOVIMIENTO,
+  TITULO_TARJETA_DEL_DIA,
 } from './textos';
 
 describe('principal/textos · interpretación', () => {

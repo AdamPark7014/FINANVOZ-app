@@ -20,6 +20,7 @@ import {
   PASO_MARCAR_TITULO,
   TEXTO_SIN_CUENTA_EFECTIVO,
   TITULO,
+  etiquetaContarEnCuenta,
   textoDeberiasTraer,
   textoFaltante,
   textoSobrante,

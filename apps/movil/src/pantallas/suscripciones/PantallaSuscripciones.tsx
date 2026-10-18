@@ -10,8 +10,7 @@ import {
   type SuscripcionVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
-import { EstadoVacio } from '../principal/EstadoVacio';
+import { Boton, CampoTexto, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { mensajeError } from '../principal/textos';
 import {
   AYUDA_NOMBRE,
@@ -22,6 +21,7 @@ import {
   ETIQUETA_NOMBRE,
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
+  etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,

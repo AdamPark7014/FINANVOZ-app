@@ -20,6 +20,11 @@ export function etiquetaVacioSuscripciones(): string {
   return `${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`;
 }
 
+/** TalkBack: pie de lista con suscripciones ya canceladas (`02 §15`). */
+export function etiquetaInactivasSuscripciones(texto: string): string {
+  return `Suscripciones que ya no se cobran. ${texto}`;
+}
+
 export const ETIQUETA_NOMBRE = 'Nombre';
 export const AYUDA_NOMBRE = 'Así la verás en la lista';
 export const ETIQUETA_EDITAR_NOMBRE = 'Editar nombre';

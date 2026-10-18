@@ -4,6 +4,9 @@ import { formatearCentavos } from '../../ui';
 /** Redacción del arqueo (`02 §7`, `02 §14`): tuteo, sin tecnicismos contables. */
 
 export const TITULO = 'Contar mi efectivo';
+
+/** TalkBack en Cuentas › fila de efectivo. */
+export const etiquetaContarEnCuenta = (nombre: string): string => `${TITULO} en ${nombre}`;
 export const CERRAR = 'Cerrar';
 /** TalkBack: más contexto que el botón «Cerrar». */
 export const ACCESIBILIDAD_CERRAR = 'Cerrar conteo de efectivo';
