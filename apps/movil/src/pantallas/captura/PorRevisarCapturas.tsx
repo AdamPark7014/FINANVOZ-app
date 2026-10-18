@@ -20,6 +20,15 @@ import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { MESES_CAPTURA } from './PreguntasCaptura';
 
+/** Redacción de capturas por revisar (`02 §6`, `02 §14`). */
+const TITULO_SECCION = 'Capturas por revisar';
+const INTRO_SECCION =
+  'Vienen de avisos de tu banco. Confírmalas o corrige categoría y meses.';
+const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
+const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
+const AVISO_SIN_TEXTO =
+  'El aviso no traía detalle. Si fue un gasto o un ingreso, regístralo tú.';
+
 const MOTIVO: Record<CapturaPorRevisar['motivos'][number], string> = {
   fue_a_meses: '¿Fue a meses?',
   sin_categoria: '¿Qué fue?',
@@ -40,9 +49,9 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
   if (lista.length === 0) return null;
   return (
     <View style={{ gap: espacio.s }} testID="capturas-por-revisar">
-      <Texto variante="subtitulo">Capturas por revisar</Texto>
+      <Texto variante="subtitulo">{TITULO_SECCION}</Texto>
       <Texto variante="secundario" tono="secundario">
-        Las registré con los avisos de tu banco. Confírmalas o corrígelas.
+        {INTRO_SECCION}
       </Texto>
       {lista.map((c) => (
         <FilaCaptura key={c.capturaId} c={c} alRegistrar={alRegistrar} />
@@ -79,7 +88,13 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
     return (
       <Tarjeta testID={testID}>
         <Texto variante="cuerpoFuerte">{`${c.banco} mandó un aviso que no entendí`}</Texto>
-        {texto ? <Texto variante="cuerpo">{`«${texto}»`}</Texto> : null}
+        {texto ? (
+          <Texto variante="cuerpo">{`«${texto}»`}</Texto>
+        ) : (
+          <Texto variante="secundario" tono="secundario">
+            {AVISO_SIN_TEXTO}
+          </Texto>
+        )}
         <Texto variante="secundario" tono="secundario">
           {`${etiquetaDiaMes(c.fecha)} · si fue un movimiento, regístralo tú.`}
         </Texto>
@@ -115,8 +130,8 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
     );
   }
 
-  const titulo = c.comercio ?? c.banco;
-  const subtitulo = [c.cuenta, nombreCategoria ?? 'sin categoría', etiquetaDiaMes(c.fecha)]
+  const titulo = c.comercio ?? c.banco ?? TITULO_SIN_COMERCIO;
+  const subtitulo = [c.cuenta, nombreCategoria ?? ETIQUETA_SIN_CATEGORIA, etiquetaDiaMes(c.fecha)]
     .filter((x) => x)
     .join(' · ');
   const preguntaCategoria = c.motivos.includes('sin_categoria') || cambiando;
