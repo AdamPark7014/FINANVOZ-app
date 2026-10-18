@@ -76,6 +76,7 @@ export const BTN_LEER_PDF_BANCO = 'Leer el PDF de tu banco';
 export const TITULO_CONFIGURACION = 'Configuración';
 export const BTN_EDITAR_TARJETA = 'Editar tarjeta';
 export const BTN_CORREGIR_SALDO = 'Corregir saldo';
+export const MENSAJE_SALDO_SIN_CAMBIO = 'Ese ya era el saldo. No cambié nada.';
 
 export function textoPrimerCorteEnApp(etiquetaProximoCorte: string): string {
   return `Tu primer corte con la app es el ${etiquetaProximoCorte}.`;
@@ -180,6 +181,12 @@ export function textoConfirmarLiquidar(descripcion: string, restante: string): s
 export function mensajeLiquidacionPlan(descripcion: string, monto: string): string {
   return `Listo: liquidaste ${descripcion} (${monto}).`;
 }
+
+export const BTN_SI_LIQUIDAR = 'Sí, liquidar';
+export const BTN_LIQUIDAR_MESES = 'Liquidar meses';
+export const BTN_GUARDAR_PAGO_PLANEADO = 'Guardar pago planeado';
+export const ERROR_MONTO_PAGO_PLANEADO = 'Escribe cuánto vas a pagar cada vez.';
+export const ERROR_DIA_PAGO_PLANEADO = 'Escribe el día del mes, del 1 al 31.';
 
 /** Formulario "Pagar tarjeta" y pregunta de liquidar meses. */
 export const ETIQUETA_MONTO_PAGO = '¿Cuánto pagaste?';

@@ -8,7 +8,7 @@ import { Chips } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
-import { BTN_CANCELAR, NOMBRE_MODO } from './textos';
+import { BTN_CANCELAR, MENSAJE_SALDO_SIN_CAMBIO, NOMBRE_MODO } from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 
@@ -189,7 +189,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
                 transaccionId: r.transaccionId,
               });
             } else {
-              mostrar({ mensaje: 'Ese ya era el saldo. No cambié nada.' });
+              mostrar({ mensaje: MENSAJE_SALDO_SIN_CAMBIO });
             }
             alTerminar();
           } catch {
