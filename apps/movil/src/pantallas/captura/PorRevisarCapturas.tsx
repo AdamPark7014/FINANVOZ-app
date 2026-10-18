@@ -179,7 +179,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
       ))}
       {c.motivos.includes('fue_a_meses') ? (
         <GrupoChips
-          opciones={MESES_CAPTURA.map((n) => ({ valor: n as string, etiqueta: `${n} meses` }))}
+          opciones={MESES_CAPTURA.map((n) => ({ valor: n as string, etiqueta: etiquetaMesesChip(n) }))}
           valor={null}
           alCambiar={(n) => {
             setError(null);

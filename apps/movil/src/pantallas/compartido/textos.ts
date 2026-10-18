@@ -10,6 +10,8 @@ export const ETIQUETA_VOLVER = 'Volver';
 /** Botón Volver en la lista de grupos (vuelve a Cuentas). */
 export const PISTA_VOLVER_CUENTAS = 'Regresa a Cuentas';
 export const TITULO_GASTOS_COMPARTIDOS = 'Gastos compartidos';
+/** Entrada desde Cuentas (`02 §27`). */
+export const BTN_COMPARTIDOS_CUENTAS = 'Gastos con tu pareja';
 /** Sin grupos vinculados (`02 §27`). */
 export const TEXTO_COMPARTIDOS_VACIO =
   'Crea un grupo con tu pareja o escanea su código. Los dos ven lo compartido; cada quien conserva su libro privado.';

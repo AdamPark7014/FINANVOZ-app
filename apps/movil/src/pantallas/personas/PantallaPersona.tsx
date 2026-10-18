@@ -131,7 +131,7 @@ function Detalle({
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto variante="titulo" testID="persona-nombre">
+      <Texto variante="titulo" testID="persona-nombre" accessibilityRole="header">
         {d.nombre}
       </Texto>
       <Tarjeta>

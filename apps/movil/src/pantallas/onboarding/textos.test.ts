@@ -66,4 +66,13 @@ describe('textos de onboarding', () => {
     expect(TIP_INGRESO_SALTAR).toMatch(/«Saltar por ahora»/);
     expect(TIP_CUENTAS_MINIMO).toMatch(/«Continuar»/);
   });
+
+  it('O5 y O7 tips de saltar cumplen 02 §14', () => {
+    for (const texto of [TIP_PAGOS_SALTAR, TIP_COLCHON_SIN_POR_AHORA]) {
+      expect(texto).not.toMatch(/!/);
+      expect(texto).not.toMatch(/por favor/i);
+    }
+    expect(TIP_PAGOS_SALTAR).toMatch(/«Saltar por ahora»/);
+    expect(TIP_COLCHON_SIN_POR_AHORA).toMatch(/«Sin colchón por ahora»/);
+  });
 });

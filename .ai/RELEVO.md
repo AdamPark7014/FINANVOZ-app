@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Tabs:** `pestanas-textos.test` fija `ROL_ACCESIBILIDAD_BOTON_PESTANA` en `tab` (TalkBack §15).
+- **Onboarding:** prueba O5/O7 en `textos.test.ts` fija copy de `TIP_PAGOS_SALTAR` y `TIP_COLCHON_SIN_POR_AHORA` (02 §14, botones «Saltar» / «Sin colchón»).
 
 ## Hecho (acumulado reciente)
 
-- Plan `tituloPantalla`, colchón `sugerenciaMontoColchon10`, onboarding/tabs/captura/deducciones. Ver `git log`.
+- Tabs `ROL_ACCESIBILIDAD_BOTON_PESTANA`, plan `tituloPantalla`, movimientos `etiquetaVacioMovimientos`, personas/deducciones TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
