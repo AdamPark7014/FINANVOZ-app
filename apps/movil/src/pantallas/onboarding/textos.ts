@@ -41,6 +41,7 @@ export const CASILLA_ESTADISTICAS_OPCIONAL =
 export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
 export const BTN_ONB_SALTAR = 'Saltar por ahora';
 export const PISTA_INGRESO_SALTAR = 'Calcularé tu día con los próximos 30 días';
+export const PISTA_COMPLETAR_INGRESO = 'Completa los datos de tu ingreso arriba';
 export const CUERPO_INGRESO_VARIABLE =
   'Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.';
 export const ETIQUETA_DIA_SEMANA_INGRESO = '¿Qué día te pagan?';

@@ -35,6 +35,7 @@ import { etiquetaHablada } from '../../ui';
 import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
+  PISTA_COMPLETAR_INGRESO,
   PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
   PISTA_ONB_CONTINUAR,
@@ -121,6 +122,10 @@ describe('onboarding', () => {
     tocar('onb-aceptar');
     expect(r.getPathname()).toBe('/onboarding/ingreso');
     expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
+    expect(screen.getByTestId('onb-ingreso-continuar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_COMPLETAR_INGRESO,
+    );
     expect(obtenerConsentimiento(s.ctx)).toMatchObject({
       datos_financieros: true,
       estadisticas: false,

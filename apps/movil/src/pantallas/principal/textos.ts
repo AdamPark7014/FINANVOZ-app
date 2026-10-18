@@ -322,6 +322,11 @@ export const PISTA_REGISTRAR_MOVIMIENTO = 'Abre el formulario para registrar un 
 /** Quita el filtro de una consulta en Movimientos (`06 §6`, TalkBack). */
 export const PISTA_VER_TODOS_MOVIMIENTOS = 'Quita el filtro y muestra todos tus movimientos';
 
+/** TalkBack: título de sección + intro cuando hay frases pendientes (`02 §10`, `02 §15`). */
+export function etiquetaIntroPorRevisar(): string {
+  return `${TITULO_POR_REVISAR}. ${TEXTO_POR_REVISAR}`;
+}
+
 /** Frase en cola «Por revisar» (`02 §10`, TalkBack). */
 export const PISTA_REVISAR_FRASE = 'Abre el formulario para confirmar este registro';
 

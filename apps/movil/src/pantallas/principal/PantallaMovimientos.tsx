@@ -39,6 +39,7 @@ import {
   resumenMovimiento,
   PREGUNTA_PASAR_A_MESES,
   etiquetaFiltroMovimientosActivo,
+  etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
   TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
@@ -138,6 +139,7 @@ export function PantallaMovimientos({
             variante="secundario"
             tono="secundario"
             testID="movimientos-por-revisar-intro"
+            accessibilityLabel={etiquetaIntroPorRevisar()}
           >
             {TEXTO_POR_REVISAR}
           </Texto>
@@ -218,49 +220,56 @@ export function PantallaMovimientos({
           >
             {d.etiqueta}
           </Texto>
-          {d.movimientos.map((m) => (
-            <FilaMovimiento
-              key={m.id}
-              m={m}
-              abierto={abierto === m.id}
-              aMeses={conTarjeta.has(m.id)}
-              {...(alAbrirPersona ? { alAbrirPersona } : {})}
-              alAbrirDetalle={(id) => setAbierto(id)}
-              alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
-              alAnular={() => {
-                try {
-                  anularMovimiento(ctx, m.id);
-                  setAbierto(null);
-                  refrescar();
-                  mostrar({ mensaje: MENSAJE_ANULADO_MOVIMIENTO });
-                } catch (e) {
-                  mostrar({ mensaje: mensajeError(e) });
-                }
-              }}
-              alExtraordinario={() => {
-                // "Fue algo extraordinario" (`04 §3`, `05 §E8.2`): no cuenta para estimar si llegas.
-                const marcar = !m.extraordinaria;
-                try {
-                  marcarExtraordinaria(ctx, m.id, marcar);
-                  refrescar();
-                  mostrar({
-                    mensaje: marcar
-                      ? 'Listo: no lo uso para estimar tus gastos de cada día.'
-                      : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
-                    accion: {
-                      etiqueta: 'Deshacer',
-                      alPresionar: () => {
-                        marcarExtraordinaria(ctx, m.id, !marcar);
-                        refrescar();
-                      },
-                    },
-                  });
-                } catch (e) {
-                  mostrar({ mensaje: mensajeError(e) });
-                }
-              }}
-            />
-          ))}
+          <View
+            accessibilityRole="list"
+            testID={`movimientos-lista-${d.fecha}`}
+            style={{ gap: espacio.s }}
+          >
+            {d.movimientos.map((m) => (
+              <View key={m.id} accessibilityRole="listitem" testID={`movimiento-fila-${m.id}`}>
+                <FilaMovimiento
+                  m={m}
+                  abierto={abierto === m.id}
+                  aMeses={conTarjeta.has(m.id)}
+                  {...(alAbrirPersona ? { alAbrirPersona } : {})}
+                  alAbrirDetalle={(id) => setAbierto(id)}
+                  alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
+                  alAnular={() => {
+                    try {
+                      anularMovimiento(ctx, m.id);
+                      setAbierto(null);
+                      refrescar();
+                      mostrar({ mensaje: MENSAJE_ANULADO_MOVIMIENTO });
+                    } catch (e) {
+                      mostrar({ mensaje: mensajeError(e) });
+                    }
+                  }}
+                  alExtraordinario={() => {
+                    // "Fue algo extraordinario" (`04 §3`, `05 §E8.2`): no cuenta para estimar si llegas.
+                    const marcar = !m.extraordinaria;
+                    try {
+                      marcarExtraordinaria(ctx, m.id, marcar);
+                      refrescar();
+                      mostrar({
+                        mensaje: marcar
+                          ? 'Listo: no lo uso para estimar tus gastos de cada día.'
+                          : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+                        accion: {
+                          etiqueta: 'Deshacer',
+                          alPresionar: () => {
+                            marcarExtraordinaria(ctx, m.id, !marcar);
+                            refrescar();
+                          },
+                        },
+                      });
+                    } catch (e) {
+                      mostrar({ mensaje: mensajeError(e) });
+                    }
+                  }}
+                />
+              </View>
+            ))}
+          </View>
         </View>
       ))}
       <View style={{ height: espacio.xxxl }} />

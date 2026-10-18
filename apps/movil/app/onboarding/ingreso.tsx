@@ -22,6 +22,7 @@ import {
   ETIQUETA_PROXIMA_VEZ_INGRESO,
   ETIQUETA_PROXIMO_PAGO,
   etiquetaProximoPagoOnboarding,
+  PISTA_COMPLETAR_INGRESO,
   PISTA_INGRESO_SALTAR,
   PISTA_ONB_CONTINUAR,
   TIP_INGRESO_SALTAR,
@@ -101,7 +102,7 @@ export default function Ingreso() {
             testID="onb-ingreso-continuar"
             etiqueta={BTN_ONB_CONTINUAR}
             deshabilitado={!completo}
-            pista={completo ? PISTA_ONB_CONTINUAR : undefined}
+            pista={completo ? PISTA_ONB_CONTINUAR : PISTA_COMPLETAR_INGRESO}
             alPresionar={guardar}
           />
           <Boton
