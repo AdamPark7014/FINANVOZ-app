@@ -32,6 +32,7 @@ export function PreviaWidget({
       testID="previa-widget"
       accessibilityRole="summary"
       accessibilityLiveRegion="polite"
+      importantForAccessibility="yes"
       accessibilityLabel={`${ETIQUETA_PREVIA}. ${etiquetaAccesibleWidget(vista)}`}
       {...(pistaAccesible ? { accessibilityHint: pistaAccesible } : {})}
       style={[estilos.contenedor, { backgroundColor: c.superficie, borderColor: c.borde }]}

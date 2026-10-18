@@ -75,6 +75,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
       'Vista previa. Hoy puedes doscientos catorce pesos · 4 días',
     );
     expect(previa.props.accessibilityLiveRegion).toBe('polite');
+    expect(previa.props.importantForAccessibility).toBe('yes');
     expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
     const fila = within(previa).getByTestId('previa-widget-fila', { includeHiddenElements: true });
     expect(fila.props.accessibilityElementsHidden).toBe(true);
