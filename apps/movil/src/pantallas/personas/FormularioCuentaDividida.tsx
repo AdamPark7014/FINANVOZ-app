@@ -84,10 +84,15 @@ export function FormularioCuentaDividida({
   const pendiente = faltante();
 
   const alternar = (id: string) => {
-    setElegidas((xs) =>
-      xs.includes(id) ? xs.filter((x) => x !== id) : xs.length < ajenas ? [...xs, id] : xs,
-    );
+    setElegidas((xs) => {
+      if (xs.length < ajenas) return [...xs, id];
+      const idx = xs.lastIndexOf(id);
+      if (idx >= 0) return [...xs.slice(0, idx), ...xs.slice(idx + 1)];
+      return xs;
+    });
   };
+
+  const vecesElegida = (id: string) => elegidas.filter((x) => x === id).length;
 
   const cambiarPartes = (n: number) => {
     const siguiente = Math.min(MAX_PARTES, Math.max(2, n));
@@ -203,16 +208,19 @@ export function FormularioCuentaDividida({
           {textoFaltanPersonas(ajenas, elegidas.length)}
         </Texto>
         <View accessibilityRole="list" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-          {personas.map((p) => (
-            <Chip
-              key={p.cuentaId}
-              etiqueta={p.nombre}
-              seleccionado={elegidas.includes(p.cuentaId)}
-              multiple
-              alPresionar={() => alternar(p.cuentaId)}
-              testID={`division-persona-${p.cuentaId}`}
-            />
-          ))}
+          {personas.map((p) => {
+            const veces = vecesElegida(p.cuentaId);
+            return (
+              <Chip
+                key={p.cuentaId}
+                etiqueta={veces > 1 ? `${p.nombre} ×${veces}` : p.nombre}
+                seleccionado={veces > 0}
+                multiple
+                alPresionar={() => alternar(p.cuentaId)}
+                testID={`division-persona-${p.cuentaId}`}
+              />
+            );
+          })}
         </View>
         {porAgregar.map((nombre) => (
           <Boton

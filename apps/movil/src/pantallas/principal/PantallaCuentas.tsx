@@ -115,7 +115,11 @@ export function PantallaCuentas({
               {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
             />
           ) : (
-            <PersonaDebes key={d.id} d={d} />
+            <PersonaDebes
+              key={d.id}
+              d={d}
+              {...(alAbrirPersona ? { alAbrirPersona } : {})}
+            />
           ),
         )}
         {alAgregarTarjeta ? (
@@ -334,7 +338,13 @@ function TarjetaCredito({ d, t, alAbrir }: { d: CuentaDebes; t: TarjetaVista | n
 }
 
 /** Persona a la que le debes con "Apartar lo que le debo" (E4, CA-M2-09). */
-function PersonaDebes({ d }: { d: CuentaDebes }) {
+function PersonaDebes({
+  d,
+  alAbrirPersona,
+}: {
+  d: CuentaDebes;
+  alAbrirPersona?: (personaId: string) => void;
+}) {
   const { ctx, refrescar } = useSesion();
   return (
     <Tarjeta testID={`cuenta-${d.id}`}>
@@ -347,6 +357,15 @@ function PersonaDebes({ d }: { d: CuentaDebes }) {
         </View>
         <Cifra centavos={d.saldo} contexto={`Le debes a ${d.nombre}`} testID={`cuenta-${d.id}-saldo`} />
       </View>
+      {alAbrirPersona ? (
+        <Boton
+          etiqueta="Ver"
+          variante="texto"
+          ancho="contenido"
+          alPresionar={() => alAbrirPersona(d.id)}
+          testID={`cuenta-${d.id}-accion`}
+        />
+      ) : null}
       <Interruptor
         etiqueta="Apartar lo que le debo"
         descripcion={

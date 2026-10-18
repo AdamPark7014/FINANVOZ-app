@@ -10,6 +10,7 @@ import {
   fijarColchon,
   listarMovimientos,
   obtenerHoy,
+  registrarCuentaDividida,
   registrarPrestamo,
 } from '../../servicios';
 import { formatearCentavos } from '../../ui';
@@ -412,5 +413,30 @@ describe('Movimientos', () => {
     expect(screen.getByText('Anulé el movimiento.')).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
     expect(listarMovimientos(p.ctx)).toEqual([]);
+  });
+
+  it('detalle: "Ver …" abre la persona del movimiento', () => {
+    const p = conEscenario('e4-01');
+    const caro = crearPersona(p.ctx, { nombre: 'Caro' });
+    const nu = p.e.cuentas.nu as string;
+    registrarCuentaDividida(p.ctx, {
+      total: 120_000,
+      partes: 4,
+      personaIds: [caro, caro, caro],
+      origenId: nu,
+      categoria: 'comida_fuera',
+      descripcion: 'la cena',
+    });
+    const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
+    const alAbrirPersona = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <PantallaMovimientos alRegistrar={jest.fn()} alAbrirPersona={alAbrirPersona} />,
+    );
+    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
+    fireEvent.press(screen.getByTestId(`movimiento-persona-${id}-${caro}`));
+    expect(alAbrirPersona).toHaveBeenCalledWith(caro);
+    const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
+    expect(mov?.personas).toEqual([{ id: caro, nombre: 'Caro' }]);
   });
 });

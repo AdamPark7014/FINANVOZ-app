@@ -6,6 +6,7 @@ import {
   listarCuentas,
   listarMovimientos,
   registrarCuentaDividida,
+  registrarPrestamo,
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { SeccionDatosCobro } from '../ajustes/SeccionDatosCobro';
@@ -203,6 +204,40 @@ describe('CA-M8-02 · Cobrar', () => {
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={alAbrirPersona} />);
     fireEvent.press(screen.getByTestId(`te-debe-${p.caro}-accion`));
     expect(alAbrirPersona).toHaveBeenCalledWith(p.caro);
+  });
+
+  it('Debes: "Ver" abre el detalle de la persona', () => {
+    const p = conAmigos();
+    registrarPrestamo(p.ctx, {
+      tipo: 'prestamo_recibido',
+      personaId: p.caro,
+      cuentaId: p.bbva,
+      monto: 50_000,
+    });
+    const alAbrirPersona = jest.fn();
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={alAbrirPersona} />);
+    fireEvent.press(screen.getByTestId(`cuenta-${p.caro}-accion`));
+    expect(alAbrirPersona).toHaveBeenCalledWith(p.caro);
+  });
+
+  it('formulario: la misma persona puede ocupar más de una parte (×2 en el chip)', () => {
+    const p = conAmigos();
+    renderConSesion(p.ctx, <PantallaRegistrar alCerrar={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('tipo-cuenta_dividida'));
+    fireEvent.changeText(screen.getByTestId('division-total'), '1.01');
+    fireEvent.press(screen.getByTestId('division-mas'));
+    fireEvent.press(screen.getByTestId('division-mas'));
+    expect(textoDe('division-partes')).toBe('Entre 4');
+    fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
+    fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
+    fireEvent.press(screen.getByTestId(`division-persona-${p.juan}`));
+    expect(screen.getByText('✓ Caro ×2')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('division-categoria-comida_fuera'));
+    fireEvent.press(screen.getByTestId(`division-origen-${p.bbva}`));
+    fireEvent.press(screen.getByTestId('boton-guardar-division'));
+    expect(p.ctx.libro.saldo(p.caro)).toBe(50);
+    expect(p.ctx.libro.saldo(p.juan)).toBe(25);
+    expect(p.ctx.libro.saldo('cat:personal:comida_fuera')).toBe(26);
   });
 });
 

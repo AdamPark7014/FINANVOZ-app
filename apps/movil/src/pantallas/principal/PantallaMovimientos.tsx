@@ -37,6 +37,7 @@ export function PantallaMovimientos({
   alRevisar,
   filtro = null,
   alQuitarFiltro,
+  alAbrirPersona,
 }: {
   alRegistrar: () => void;
   /** Abre Registrar con una frase que la nube ya entendió pero necesita confirmación. */
@@ -44,6 +45,8 @@ export function PantallaMovimientos({
   /** "Ver movimientos" de una consulta (`06 §6`): solo los movimientos que suman en la respuesta. */
   filtro?: FiltroMovimientos | null;
   alQuitarFiltro?: () => void;
+  /** Detalle del movimiento → persona (`02 §17`, pendiente 34). */
+  alAbrirPersona?: (personaId: string) => void;
 }) {
   const { ctx, version, refrescar } = useSesion();
   const claveFiltro = JSON.stringify(filtro ?? {});
@@ -162,6 +165,7 @@ export function PantallaMovimientos({
               m={m}
               abierto={abierto === m.id}
               aMeses={conTarjeta.has(m.id)}
+              {...(alAbrirPersona ? { alAbrirPersona } : {})}
               alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
               alAnular={() => {
                 try {
@@ -268,6 +272,7 @@ function FilaMovimiento({
   alTocar,
   alAnular,
   alExtraordinario,
+  alAbrirPersona,
 }: {
   m: MovimientoVista;
   abierto: boolean;
@@ -275,6 +280,7 @@ function FilaMovimiento({
   alTocar: () => void;
   alAnular: () => void;
   alExtraordinario: () => void;
+  alAbrirPersona?: (personaId: string) => void;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [pasando, setPasando] = useState(false);
@@ -306,6 +312,18 @@ function FilaMovimiento({
           {m.llegaA.length > 0 ? (
             <Texto variante="secundario">{`Llegó a: ${m.llegaA.join(', ')}`}</Texto>
           ) : null}
+          {alAbrirPersona
+            ? m.personas.map((p) => (
+                <Boton
+                  key={p.id}
+                  etiqueta={`Ver ${p.nombre}`}
+                  variante="texto"
+                  ancho="contenido"
+                  alPresionar={() => alAbrirPersona(p.id)}
+                  testID={`movimiento-persona-${m.id}-${p.id}`}
+                />
+              ))
+            : null}
           {m.categoria ? <Texto variante="secundario">{`Categoría: ${m.categoria}`}</Texto> : null}
           {m.reemplazaA ? <Historial id={m.id} /> : null}
           <Texto variante="secundario" tono="secundario">

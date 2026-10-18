@@ -20,6 +20,7 @@ export default function Movimientos() {
       }
       alRegistrar={() => router.navigate('/registrar')}
       alRevisar={(id) => router.navigate({ pathname: '/registrar', params: { frase: id } })}
+      alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
     />
   );
 }

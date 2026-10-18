@@ -24,6 +24,8 @@ export interface MovimientoVista {
   readonly saleDe: readonly string[];
   /** "Llegó a": cuentas propias, tarjetas o personas cargadas. */
   readonly llegaA: readonly string[];
+  /** Personas del movimiento (cuenta `contraparte:persona`), sin repetir id. */
+  readonly personas: readonly { readonly id: string; readonly nombre: string }[];
   readonly categoria: string | null;
   readonly porRevisar: boolean;
   /** Marcado como "Fue algo extraordinario": no cuenta para estimar el gasto diario (`05 §E8.2`). */
@@ -122,6 +124,13 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     )
       continue;
     const propias = suyos.filter((a) => a.c.naturaleza !== 'gasto' && a.c.naturaleza !== 'ingreso');
+    const personasPorId = new Map<string, string>();
+    for (const a of suyos) {
+      if (a.c.naturaleza === 'contraparte' && a.c.subtipo === 'persona' && a.monto !== 0) {
+        personasPorId.set(a.c.id, a.c.nombre);
+      }
+    }
+    const personas = [...personasPorId.entries()].map(([id, nombre]) => ({ id, nombre }));
     const insignias: Insignia[] = [];
     if (AUTOMATICOS.has(t.origen)) insignias.push('automatico');
     if (t.estimada === 1) insignias.push('estimado');
@@ -139,6 +148,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
       sentido: SALIDA.has(t.tipo) ? 'salida' : ENTRADA.has(t.tipo) ? 'entrada' : 'neutro',
       saleDe: propias.filter((a) => a.monto < 0).map((a) => a.c.nombre),
       llegaA: propias.filter((a) => a.monto > 0).map((a) => a.c.nombre),
+      personas,
       categoria: categoria?.nombre ?? null,
       porRevisar: t.porRevisar === 1,
       extraordinaria: t.extraordinaria === 1,

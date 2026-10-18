@@ -15,7 +15,7 @@ export const MAX_PARTES = 50;
 
 /**
  * Cuenta dividida que pagaste tú (`05 §E12.1`, caso 8 de `04 §4`): `total` entre `partes` (tú incluido). Cada
- * persona de `personaIds` (cuentas `contraparte:persona`, una por parte ajena y sin repetir) queda debiendo su
+ * persona de `personaIds` (cuentas `contraparte:persona`, una entrada por parte ajena; puede repetirse) queda debiendo su
  * parte; tu parte va a la categoría. `origenId` es con qué pagaste (o `pasivo:por_asignar`).
  */
 export const EntradaCuentaDividida = z
@@ -32,7 +32,6 @@ export const EntradaCuentaDividida = z
     descripcion: z.string().trim().min(1).max(200).optional(),
   })
   .refine((e) => e.personaIds.length === e.partes - 1, { message: 'una persona por parte ajena' })
-  .refine((e) => new Set(e.personaIds).size === e.personaIds.length, { message: 'personas repetidas' })
   .refine((e) => e.total >= e.partes, { message: 'cada parte debe ser mayor que cero' });
 export type EntradaCuentaDividida = z.infer<typeof EntradaCuentaDividida>;
 
@@ -135,9 +134,8 @@ export function resolverParticipantes(
     const [clave] = normalizarAliases([n]);
     const ids = clave ? [...(porAlias.get(clave) ?? [])] : [];
     const [unico] = ids;
-    if (ids.length === 1 && unico) {
-      if (!personaIds.includes(unico)) personaIds.push(unico);
-    } else sinResolver.push(n);
+    if (ids.length === 1 && unico) personaIds.push(unico);
+    else sinResolver.push(n);
   }
   return { personaIds, sinResolver };
 }

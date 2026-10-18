@@ -118,12 +118,30 @@ describe('registrarCuentaDividida', () => {
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.porAsignar)).toBe(-65_000);
   });
 
-  it('rechaza personas repetidas, de menos, o una cuenta que no es persona', () => {
+  it('la misma persona puede deber más de una parte; el centavo sobrante va a tu parte', () => {
+    const p = base();
+    const r = registrarCuentaDividida(p.ctx, {
+      total: 101,
+      partes: 4,
+      personaIds: [p.caro, p.caro, p.juan],
+      origenId: p.bbva,
+      categoria: 'comida_fuera',
+    });
+    expect(asientosDe(p, r.transaccionId)).toEqual([
+      ['cat:personal:comida_fuera', 26],
+      [p.caro, 25],
+      [p.caro, 25],
+      [p.juan, 25],
+      [p.bbva, -101],
+    ]);
+    expect(p.ctx.libro.saldo(p.caro)).toBe(50);
+    expect(p.ctx.libro.saldo(p.juan)).toBe(25);
+    expect(r.reparto?.parteUsuario).toBe(26);
+  });
+
+  it('rechaza partes de menos o una cuenta que no es persona', () => {
     const p = base();
     const comun = { total: 120_000, partes: 4, origenId: p.nu, categoria: 'comida_fuera' };
-    expect(() => registrarCuentaDividida(p.ctx, { ...comun, personaIds: [p.caro, p.caro, p.juan] })).toThrow(
-      ErrorDominio,
-    );
     expect(() => registrarCuentaDividida(p.ctx, { ...comun, personaIds: [p.caro, p.juan] })).toThrow(
       ErrorDominio,
     );
