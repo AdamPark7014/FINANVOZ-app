@@ -6,7 +6,7 @@
 
 ## Hecho en este turno
 
-- **Cuentas list a11y:** listas semánticas (`accessibilityRole=list` / `listitem`), títulos de fila ocultos a TalkBack cuando el saldo ya trae contexto; test ancla en `principal.test.tsx`.
+- **Captura UI:** header TalkBack en aviso no reconocido; `testID` cancelar en formulario cuenta nueva (`PreguntasCaptura`).
 
 ## Hecho (acumulado reciente)
 
