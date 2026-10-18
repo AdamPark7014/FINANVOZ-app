@@ -6,26 +6,26 @@
 
 ## Hecho en este turno
 
-- **TalkBack micro:** `widget.test.tsx` (PreviaWidget con pista + auditoría M13) y `compartido.test.tsx` (rol button en Cuentas→compartidos).
+- **TalkBack tarjeta:** barra de uso con `etiquetaAccesibleBarraUsoTarjeta`; pie `tarjeta-uso` oculto (en main vía rescates previos).
+- **`6392ddb`:** test widget — `PISTA_PREVIA` y auditoría en Ajustes → Widget.
 
 ## Hecho (acumulado reciente)
 
-- Hints crear/escanear compartidos, header vista previa widget, tandas, suscripciones. Ver `git log` (`bd3af07`, etc.).
+- Captura, tandas, principal. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en disco — `git status` antes de editar.
-- CI Windows, M0: Adam.
+- WIP local sin commitear (si aparece en `git status`) — salvar antes de mezclar.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Seguir tanda a11y donde falte hint explícito.
+2. Barra+pie duplicado en `PantallaCuentas` si sigue a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
