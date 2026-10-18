@@ -20,6 +20,12 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaVacioSuscripciones()).toBe(`${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`);
   });
 
+  it('inactivas incluyen contexto para TalkBack', () => {
+    expect(etiquetaInactivasSuscripciones('Ya no se cobran: Disney Plus')).toMatch(
+      /^Suscripciones que ya no se cobran\./,
+    );
+  });
+
   it('ayuda en plural para varias filas', () => {
     expect(PISTA_AYUDA).toContain('Conviértelas');
   });
