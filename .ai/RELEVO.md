@@ -6,22 +6,20 @@
 
 ## Hecho en este turno
 
-- **Movimientos / Probabilidad TalkBack:** CTAs con `PISTA_*` ya en main (Registrar, Ver todos, Revisar, Descartar); test encabezado «Por revisar» (`movimientos-por-revisar-titulo`); ProbabilidadHoy calculando/datos insuficientes en `riesgo.test.tsx`.
+- **Chip / Movimientos / principal (TalkBack):** `Chip.test.tsx` (estado, hitSlop, radiogroup); `principal.test.tsx` (título, días, filtro/vacíos `liveRegion`, filas habladas, anular por etiqueta).
 
 ## Hecho (acumulado reciente)
 
-- Hoy héroe, tarjeta del día, onboarding O1–O7, captura/ajustes a11y. Ver `git log`.
+- Widget/EstadoVacio, suscripciones, onboarding O1–O7. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco — revisar `git status` antes de editar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP ajeno (`git status`) — no mezclar.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. No mezclar commits a11y con WIP ajeno.
 
 ## No tocar
 
