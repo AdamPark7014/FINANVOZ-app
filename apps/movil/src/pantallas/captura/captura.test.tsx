@@ -409,6 +409,20 @@ describe('O6 · activar la captura', () => {
     p.cerrar();
   });
 
+  it('ActivarCaptura: error de flujo usa live region para TalkBack', async () => {
+    const p = eCaptura();
+    const puente = {
+      ...puenteFalso(),
+      abrirAjustesPermiso: jest.fn(async () => {
+        throw new Error('fallo');
+      }),
+    } as unknown as PuenteCaptura;
+    conCaptura(p.ctx, puente, <ActivarCaptura testID="o6" alTerminar={jest.fn()} />);
+    await act(async () => fireEvent.press(screen.getByTestId('o6-activar')));
+    expect(screen.getByTestId('o6-error')).toHaveProp('accessibilityLiveRegion', 'polite');
+    p.cerrar();
+  });
+
   it('tras restaurar, Hoy pide reactivarla y "Activar" recorre el mismo flujo hasta la lista blanca (pendiente 47)', async () => {
     const p = eCaptura();
     activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
