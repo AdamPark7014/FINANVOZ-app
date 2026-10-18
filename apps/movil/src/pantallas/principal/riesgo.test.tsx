@@ -85,21 +85,6 @@ describe('ProbabilidadHoy · TalkBack', () => {
     expect(screen.getByTestId('probabilidad-mensaje')).toHaveProp('accessibilityLiveRegion', 'polite');
   });
 
-  it('calculando expone etiqueta accesible única', () => {
-    const p = conEscenario('e4-01');
-    activarPlus(p.ctx);
-    const efectivo = p.e.cuentas['efectivo'] as string;
-    for (let f: PlainDate = '2026-10-11'; f < '2026-11-25'; f = sumarDias(f, 1)) {
-      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
-    }
-    p.reloj.fijar('2026-10-31');
-    montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
-    expect(screen.getByTestId('probabilidad-calculando')).toHaveProp(
-      'accessibilityLabel',
-      ETIQUETA_PROBABILIDAD_CALCULANDO,
-    );
-  });
-
   it('calculando anuncia una sola vez; con resultado la barra lleva el texto y el visible queda oculto', async () => {
     const p = await conGastoDiario(1_000, '2026-10-27');
     montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);

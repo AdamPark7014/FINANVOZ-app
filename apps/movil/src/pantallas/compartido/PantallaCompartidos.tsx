@@ -129,9 +129,11 @@ export function PantallaCompartidos({
       {modo.tipo === 'lista' ? (
         <>
           {grupos.length === 0 ? (
-            <Texto variante="cuerpo" tono="secundario" testID="compartidos-vacio">
-              {TEXTO_COMPARTIDOS_VACIO}
-            </Texto>
+            <EstadoVacio
+              texto={TEXTO_COMPARTIDOS_VACIO}
+              testID="compartidos-vacio"
+              etiquetaAccesible={etiquetaVacioCompartidos()}
+            />
           ) : null}
           {grupos.map((g) => (
             <Tarjeta

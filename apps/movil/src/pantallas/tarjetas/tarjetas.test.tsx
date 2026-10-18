@@ -290,6 +290,28 @@ describe('Registrar', () => {
   });
 });
 
+describe('tarjetas/textos · TalkBack', () => {
+  it('vacíos de movimientos y estados antepone el título de sección', () => {
+    expect(etiquetaVacioMovimientosTarjeta(TITULO_DESDE_ULTIMO_CORTE)).toBe(
+      `${TITULO_DESDE_ULTIMO_CORTE}. ${VACIO_MOVIMIENTOS_TARJETA}`,
+    );
+    expect(etiquetaVacioEstadosTarjeta('Tu primer corte con la app es el 28 oct.')).toBe(
+      `${TITULO_ESTADOS_CUENTA}. Tu primer corte con la app es el 28 oct.`,
+    );
+  });
+
+  it('filas del resumen y movimientos leen etiqueta, uso y gasto o abono', () => {
+    expect(etiquetaAccesibleDato('Próximo corte', '28 oct')).toBe('Próximo corte: 28 oct');
+    expect(etiquetaAccesibleUsoTarjeta(42)).toBe('Usas 42 % de tu límite');
+    expect(
+      etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', '$150.00', true),
+    ).toBe('Oxxo, 12 oct, gasto $150.00');
+    expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe(
+      'Tele, $500.00 al mes, faltan 6 de 12',
+    );
+  });
+});
+
 describe('Tarjetas', () => {
   it('TalkBack: volver regresa a Cuentas', () => {
     const p = conEscenario('e4-01');
