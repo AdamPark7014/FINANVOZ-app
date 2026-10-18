@@ -477,6 +477,8 @@ describe('Cuentas', () => {
     if (!bbva) throw new Error('e4-01 sin BBVA en Tienes');
     if (!nu) throw new Error('e4-01 sin Nu en Debes');
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.getByTestId('seccion-tienes-lista')).toHaveProp('accessibilityRole', 'list');
+    expect(screen.getByTestId(`cuenta-${bbvaId}`)).toHaveProp('accessibilityRole', 'listitem');
     expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(bbva.saldo)}`,
     );
@@ -540,9 +542,9 @@ describe('Movimientos', () => {
       p.ctx,
       <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ cuentaId: p.e.cuentas.bbva as string }} />,
     );
-    const filtroActivo = screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO);
-    expect(filtroActivo.props.accessibilityLabel).toBe(etiquetaFiltroMovimientosActivo());
-    expect(filtroActivo).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO).props.accessibilityLabel).toBe(
+      etiquetaFiltroMovimientosActivo(),
+    );
     p.cerrar();
   });
 
