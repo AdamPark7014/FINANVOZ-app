@@ -28,11 +28,74 @@ import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { useFormularioTarjeta } from '../tarjetas/FormularioTarjetaNueva';
 import { mensajeCompraMsi } from '../tarjetas/textos';
+import {
+  AVISO_CUENTA_AGREGADA,
+  AVISO_CUENTA_ASOCIADA,
+  AVISO_CUENTA_NO_MIA,
+  AVISO_DUPLICADO_MISMO,
+  AVISO_DUPLICADO_OTRO,
+  AVISO_MSI_NO,
+  AVISO_PAGO_DEBES,
+  AVISO_PAGO_REGALO,
+  AVISO_PAGO_TARJETA,
+  AVISO_SALIDA_ENTRE_CUENTAS,
+  AVISO_SALIDA_GASTO,
+  AVISO_SALIDA_OTRO,
+  AVISO_SALIDA_PRESTAMO,
+  AYUDA_SALDO_HOY,
+  BTN_AGREGAR_CUENTA,
+  BTN_CANCELAR,
+  BTN_GUARDAR,
+  BTN_GUARDAR_CUENTA,
+  BTN_GUARDAR_TARJETA,
+  BTN_NO_ES_MIA,
+  BTN_NO_ES_OTRO,
+  BTN_SI_AGREGALA,
+  BTN_SI_ES_MISMO,
+  CUENTA_NUEVA_UNA_CUENTA,
+  CUENTA_NUEVA_UNA_TARJETA,
+  detalleCuentaNueva,
+  detalleDuplicado,
+  detalleFueAMeses,
+  detallePagoSinOrigen,
+  detalleSalidaSinPareja,
+  descripcionDuplicado,
+  EJEMPLO_NOMBRE_PERSONA,
+  ERROR_GUARDAR_CUENTA,
+  ERROR_NOMBRE_CUENTA,
+  ERROR_SALDO_CUENTA,
+  ETIQUETA_CUENTA_EXTERNA,
+  ETIQUETA_DEBE_NO,
+  ETIQUETA_DEBE_SI,
+  ETIQUETA_MSI_NO,
+  ETIQUETA_NOMBRE_CUENTA,
+  ETIQUETA_OTRA_PERSONA,
+  ETIQUETA_PAGO_ALGUIEN,
+  ETIQUETA_PAGO_CUENTA,
+  ETIQUETA_PAGO_EXTERNA,
+  ETIQUETA_SALDO_HOY,
+  ETIQUETA_SALIDA_CUENTA,
+  ETIQUETA_SALIDA_GASTO,
+  ETIQUETA_SALIDA_OTRO,
+  ETIQUETA_SALIDA_PRESTAMO,
+  etiquetaMesesChip,
+  MESES_CAPTURA,
+  PREGUNTA_A_CUAL,
+  PREGUNTA_DE_CUAL,
+  PREGUNTA_ES_ALGUNA_DE_ESTAS,
+  PREGUNTA_QUIEN_PAGO,
+  PREGUNTA_A_QUIEN_PRESTASTE,
+  PREGUNTA_QUE_PAGASTE,
+  PREGUNTA_SE_LO_DEBES,
+  tituloCuentaNuevaDetectada,
+  tituloCuentaNuevaSinUltimos4,
+  tituloDuplicado,
+  tituloPagoSinOrigen,
+  tituloSalidaSinPareja,
+  TITULO_FUE_A_MESES,
+} from './textos';
 
 type Pregunta<T extends PreguntaCaptura['tipo']> = Extract<PreguntaCaptura, { tipo: T }>;
-
-/** Meses comunes de "¿Fue a meses?" (`02 §6`). */
-export const MESES_CAPTURA = ['3', '6', '9', '12', '18', '24'] as const;
 
 /** Las preguntas de captura de Hoy (`02 §6`, prioridad 5 de `02 §4.1`). */
 export function TarjetaPreguntaCaptura({ pregunta, testID }: { pregunta: PreguntaCaptura; testID: string }) {
@@ -145,14 +208,14 @@ function ElegirPersona({
         />
       ) : null}
       <CampoTexto
-        etiqueta="Otra persona"
+        etiqueta={ETIQUETA_OTRA_PERSONA}
         valor={nombre}
         alCambiar={setNombre}
-        ejemplo="Juan"
+        ejemplo={EJEMPLO_NOMBRE_PERSONA}
         testID={`${testID}-nombre`}
       />
       <Boton
-        etiqueta="Guardar"
+        etiqueta={BTN_GUARDAR}
         variante="secundario"
         deshabilitado={nombre.trim() === ''}
         alPresionar={() => {
@@ -181,26 +244,24 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
   const [categorias] = useState(() => listarCategorias(ctx, 'gasto'));
   const contestar = (r: RespuestaSalida, mensaje: string) =>
     responder(() => responderSalidaSinPareja(ctx, p.capturaId, r), mensaje);
-  const titulo = `¿A quién le mandaste ${formatearCentavos(p.monto)}?`;
-  const preguntaCual = '¿A cuál?';
-  const preguntaGasto = '¿Qué pagaste?';
+  const titulo = tituloSalidaSinPareja(p.monto);
   return (
     <Marco
       testID={testID}
       titulo={titulo}
-      detalle={`Salió de ${p.cuenta} el ${etiquetaFecha(p.fecha)} y no vi a dónde llegó.`}
+      detalle={detalleSalidaSinPareja(p.cuenta, etiquetaFecha(p.fecha))}
       error={error}
     >
       <GrupoChips
         opciones={[
-          { valor: 'cuenta', etiqueta: 'A otra cuenta mía' },
-          { valor: 'prestamo', etiqueta: 'Le presté' },
-          { valor: 'gasto', etiqueta: 'Pagué algo' },
-          { valor: 'otro', etiqueta: 'Otro' },
+          { valor: 'cuenta', etiqueta: ETIQUETA_SALIDA_CUENTA },
+          { valor: 'prestamo', etiqueta: ETIQUETA_SALIDA_PRESTAMO },
+          { valor: 'gasto', etiqueta: ETIQUETA_SALIDA_GASTO },
+          { valor: 'otro', etiqueta: ETIQUETA_SALIDA_OTRO },
         ]}
         valor={opcion}
         alCambiar={(o) => {
-          if (o === 'otro') contestar({ destino: 'otro' }, 'Va. Lo dejo en Por revisar.');
+          if (o === 'otro') contestar({ destino: 'otro' }, AVISO_SALIDA_OTRO);
           else setOpcion(o);
         }}
         prefijoTestID={testID}

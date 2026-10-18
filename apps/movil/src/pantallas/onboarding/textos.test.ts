@@ -3,10 +3,12 @@ import {
   AYUDA_BIENVENIDA,
   BTN_ACEPTAR_CONTINUAR,
   CASILLA_DATOS_FINANCIEROS,
+  CASILLA_ESTADISTICAS_OPCIONAL,
   CUERPO_BIENVENIDA,
   ERROR_GUARDAR,
   etiquetaProgresoOnboarding,
   PASOS_ONBOARDING,
+  PISTA_MARCAR_CASILLA_DATOS,
   TITULO_BIENVENIDA,
   TITULO_CONSENTIMIENTO,
   textoProgresoOnboarding,
@@ -22,6 +24,8 @@ describe('textos de onboarding', () => {
       TITULO_CONSENTIMIENTO,
       BTN_ACEPTAR_CONTINUAR,
       CASILLA_DATOS_FINANCIEROS,
+      CASILLA_ESTADISTICAS_OPCIONAL,
+      PISTA_MARCAR_CASILLA_DATOS,
     ]) {
       expect(texto).not.toMatch(/!/);
       expect(texto).not.toMatch(/por favor/i);

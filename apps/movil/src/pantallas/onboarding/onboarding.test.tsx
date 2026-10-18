@@ -30,7 +30,7 @@ import {
   TIP_INGRESO_SALTAR,
   TIP_PAGOS_SALTAR,
 } from './tips';
-import { etiquetaProgresoOnboarding, TITULO_BIENVENIDA } from './textos';
+import { etiquetaProgresoOnboarding, PISTA_MARCAR_CASILLA_DATOS, TITULO_BIENVENIDA } from './textos';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
 const RUTAS = {
@@ -89,6 +89,7 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-casilla-estadisticas')).toHaveProp('accessibilityState', {
       checked: false,
     });
+    expect(screen.getByTestId('onb-aceptar')).toHaveProp('accessibilityHint', PISTA_MARCAR_CASILLA_DATOS);
     tocar('onb-aceptar');
     expect(r.getPathname()).toBe('/onboarding/consentimiento');
     expect(obtenerConsentimiento(s.ctx)).toBeNull();
