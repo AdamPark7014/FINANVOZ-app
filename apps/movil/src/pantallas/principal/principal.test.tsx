@@ -37,6 +37,7 @@ import {
   etiquetaVacioMovimientos,
   TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
+  TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO,
   TEXTO_MOVIMIENTOS_VACIO,
   TEXTO_POR_REVISAR,
   MENSAJE_ANULADO_MOVIMIENTO,
@@ -579,6 +580,10 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
+  it('confirmación anular usa etiqueta hablada centralizada', () => {
+    expect(etiquetaConfirmarAnularMovimiento()).toContain(TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO);
+  });
+
   it('Registrar trae accessibilityHint para TalkBack (`02 §15`)', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
