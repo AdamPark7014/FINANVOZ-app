@@ -12,6 +12,7 @@ import type { OfertaPlus } from '../../suscripciones/tipos';
 /** `testID` estables para pruebas y Maestro (`02 §12` Plan). */
 export const ID = {
   pantalla: 'pantalla-plan',
+  tituloPantalla: 'plan-titulo-pantalla',
   volver: 'plan-volver',
   actual: 'plan-actual',
   titulo: 'plan-titulo',

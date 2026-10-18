@@ -473,6 +473,9 @@ describe('Movimientos', () => {
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_VACIO);
+    expect(screen.getByTestId('movimientos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioMovimientos(false),
+    );
     p.cerrar();
 
     const p2 = conEscenario('e4-01');
@@ -484,6 +487,9 @@ describe('Movimientos', () => {
       />,
     );
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_FILTRO_VACIO);
+    expect(screen.getByTestId('movimientos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioMovimientos(true),
+    );
     p2.cerrar();
   });
 

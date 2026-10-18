@@ -2,13 +2,13 @@ import type { Centavos } from '@cartera/core';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
-import { TIP_COLCHON_SIN_POR_AHORA } from '../../src/pantallas/onboarding/tips';
 import { sugerenciaMontoColchon10 } from '../../src/pantallas/ajustes/colchon-textos';
 import {
   AYUDA_COLCHON_ONB,
   BTN_SIN_COLCHON_POR_AHORA,
   BTN_VER_MI_DIA,
   ETIQUETA_COLCHON,
+  TIP_COLCHON_SIN_POR_AHORA,
   TITULO_COLCHON,
 } from '../../src/pantallas/onboarding/textos';
 import { colchonSugerido, completarOnboarding, fijarColchon } from '../../src/servicios';

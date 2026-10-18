@@ -8,7 +8,6 @@ import {
   MensajeError,
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
-import { TIP_PAGOS_SALTAR } from '../../src/pantallas/onboarding/tips';
 import {
   AYUDA_PAGO_VARIABLE,
   AYUDA_PAGOS_FIJOS,
@@ -19,6 +18,7 @@ import {
   ETIQUETA_PAGO_MONTO_FIJO,
   ETIQUETA_PAGO_MONTO_VARIABLE,
   etiquetaAgregarPago,
+  TIP_PAGOS_SALTAR,
   TITULO_PAGOS_FIJOS,
 } from '../../src/pantallas/onboarding/textos';
 import { leerDiaMes } from '../../src/pantallas/onboarding/ingreso';

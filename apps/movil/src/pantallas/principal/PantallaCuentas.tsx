@@ -235,7 +235,7 @@ export function PantallaCuentas({
       {alAbrirSuscripciones ? (
         <Seccion titulo="Suscripciones" testID="seccion-suscripciones">
           <Boton
-            etiqueta="Ver mis suscripciones"
+            etiqueta={BTN_SUSCRIPCIONES_CUENTAS}
             variante="secundario"
             alPresionar={alAbrirSuscripciones}
             testID="boton-suscripciones"

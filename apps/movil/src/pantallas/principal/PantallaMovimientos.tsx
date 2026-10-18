@@ -180,6 +180,7 @@ export function PantallaMovimientos({
         <EstadoVacio
           testID="movimientos-vacio"
           texto={filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
+          etiquetaAccesible={etiquetaVacioMovimientos(filtro != null)}
         />
       ) : null}
 

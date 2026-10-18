@@ -4,6 +4,7 @@ import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
   propsContenedorPestana,
   propsContenedorRegistrar,
+  ROL_ACCESIBILIDAD_BOTON_PESTANA,
   TEST_ID_PANTALLA_PESTANA,
   TEST_ID_PANTALLA_REGISTRAR,
   testIdBotonPestana,
