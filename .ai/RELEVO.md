@@ -6,26 +6,28 @@
 
 ## Hecho en este turno
 
-- **Cuentas:** `BTN_TANDAS_CUENTAS` en `tandas/textos.ts` + import en `PantallaCuentas` (cierra uso huérfano en main).
+- **Onboarding:** tips O3–O7 viven en `tips.ts`; `textos.ts` solo reexporta (sin ciclo tips↔textos).
 
 ## Hecho (acumulado reciente)
 
-- Atajos Cuentas centralizados (compartidos, suscripciones, deducciones), onboarding/tabs. Ver `git log`.
+- PreviaWidget test, deducciones/plan/estado-cuenta a11y, personas Cobrar. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (deducciones, onboarding, principal.test) — no mezclar sin revisar `git status`.
+- Typecheck móvil: TS pendientes (`MesesYPagos`, `ConfirmacionRegistro`, etc.).
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajeno si sigue sucio.
+2. Copy O3–O7 restante en `textos.ts` (no tips).
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
