@@ -77,18 +77,25 @@ export function FormularioDatosCobro({
         <Texto
           variante="secundario"
           tono="faltante"
+          accessibilityRole="alert"
           accessibilityLiveRegion="polite"
           testID="error-datos-cobro"
         >
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta={etiquetaGuardar} alPresionar={guardar} testID="boton-guardar-datos-cobro" />
+      <Boton
+        etiqueta={etiquetaGuardar}
+        alPresionar={guardar}
+        pista={pistaGuardar}
+        testID="boton-guardar-datos-cobro"
+      />
       {alCancelar ? (
         <Boton
           etiqueta="Cancelar"
           variante="texto"
           alPresionar={alCancelar}
+          pista={PISTA_CANCELAR_DATOS_COBRO}
           testID="boton-cancelar-datos-cobro"
         />
       ) : null}
