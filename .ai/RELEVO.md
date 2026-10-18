@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **movil/ajustes/ingreso:** `SeccionIngreso` y `FormularioIngreso` consumen `ingreso-textos.ts` (labels es-MX); corregido `cuándo` roto en el botón de configurar ingreso.
+- **O6 captura:** verificado en `main` — tip es-MX permiso de notificaciones (`TIP_CAPTURA_AHORA_NO` + `captura.tsx` + pruebas); origin al día.
 
 ## Hecho (acumulado reciente)
 
-- `ingreso-textos.ts`, `EditarIngreso`, `ingreso.ts` ya centralizaban copy; ver `git log` en `apps/movil/src/pantallas/ajustes/`.
+Ver `git log` (tips onboarding O2/O6/O7, captura, ajustes ingreso, etc.).
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (no commitear mezclado): `principal.test.tsx`, `PantallaTarjeta.tsx`, respaldo, calculadora, etc.
+- WIP local ajeno (no commitear mezclado): principal, tarjetas, respaldo, calculadora, arqueo, etc.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 
 ## Siguiente paso
@@ -26,6 +26,7 @@
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
 - `packages/core` E*, vectores a mano.
+- Archivos sin commitear del otro turno.
 
 ## Estimación rápida
 

@@ -172,7 +172,7 @@ export function FormularioMovimiento({
   return (
     <View style={{ gap: espacio.l }} testID="formulario-movimiento">
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="etiqueta">¿Qué pasó?</Texto>
+        <Texto variante="etiqueta">{ETIQUETA_QUE_PASO}</Texto>
         <GrupoChips
           opciones={TIPOS.map((t) => ({ valor: t, etiqueta: NOMBRE_TIPO_FORMULARIO[t] }))}
           valor={tipoElegido}

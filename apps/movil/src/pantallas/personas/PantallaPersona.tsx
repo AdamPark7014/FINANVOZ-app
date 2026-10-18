@@ -21,10 +21,30 @@ import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
 import {
+  AYUDA_PEDIR_DATOS_COBRO,
+  ERROR_MONTO_MAYOR_CERO,
+  ETIQUETA_A_DONDE_LLEGO,
+  ETIQUETA_COBRAR,
+  ETIQUETA_GUARDAR,
+  ETIQUETA_GUARDAR_Y_COBRAR,
+  ETIQUETA_MONTO,
+  ETIQUETA_QUITAR_RECORDATORIO,
+  ETIQUETA_VOLVER,
+  ETIQUETA_YA_ME_PAGO,
   etiquetaSaldoPersona,
   MENSAJE_COMPARTIR_NO_DISPONIBLE,
+  MENSAJE_ERROR_RECORDATORIO,
+  MENSAJE_PERMISO_AVISOS,
+  MENSAJE_SIN_AVISOS,
+  mensajeRecordatorioCobro,
+  mensajeRegistroCobro,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
+  TIP_SALDO_TE_DEBEN,
+  TITULO_MOVIMIENTOS,
+  TITULO_PEDIR_DATOS_COBRO,
+  TITULO_RECORDATORIO_COBRO,
+  TITULO_YA_ME_PAGO,
 } from './textos';
 
 /** Abre la hoja de compartir del sistema con el mensaje (WhatsApp, SMS, lo que elijas). */
@@ -33,9 +53,6 @@ export type Compartir = (mensaje: string) => Promise<void>;
 const compartirSistema: Compartir = async (mensaje) => {
   await Share.share({ message: mensaje });
 };
-
-const MENSAJE_SIN_AVISOS = 'No puedo programar avisos en este teléfono.';
-const MENSAJE_PERMISO_AVISOS = 'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.';
 
 type Panel = 'datos' | 'pago' | null;
 
@@ -57,7 +74,7 @@ export function PantallaPersona({
   if (!existe) {
     return (
       <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta="Volver" variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
         <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
           {TEXTO_PERSONA_NO_ENCONTRADA}
         </Texto>
