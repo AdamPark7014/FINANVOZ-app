@@ -78,6 +78,7 @@ export function SeccionCaptura() {
               variante="secundario"
               alPresionar={() => setActivando(true)}
               testID="ajustes-captura-activar"
+              pista={PISTA_ACTIVAR_CAPTURA}
             />
           ) : null}
         </>
