@@ -69,6 +69,9 @@ describe('tarjetas/textos · TalkBack', () => {
   it('filas del resumen y movimientos leen etiqueta y valor', () => {
     expect(etiquetaAccesibleDato('Próximo corte', '28 oct')).toBe('Próximo corte: 28 oct');
     expect(etiquetaAccesibleUsoTarjeta(42)).toBe('Usas 42 % de tu límite');
+    expect(etiquetaAccesibleBarraUsoTarjeta(4, 3_000_000)).toBe(
+      'Usas 4 % de tu límite de treinta mil pesos. La marca es el 30 %.',
+    );
     expect(etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', 15_000, true)).toBe(
       'Oxxo, 12 oct, gasto ciento cincuenta pesos',
     );

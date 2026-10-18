@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **`EstadoVacio` / `componentes.test`:** `etiquetaEstadoVacio` en `formato.ts` (Todavía→Aún + cifras en palabras); componente + tests (live region, rol `text`, auditoría); JSDoc TalkBack (`faac215`, helper `918d5f2`).
+- **Movimientos TalkBack:** test encabezado «Por revisar» (`movimientos-por-revisar-titulo` → `header`). CTAs `PISTA_*` (Registrar, Ver todos, Revisar, Descartar) y ProbabilidadHoy ya en main.
 
 ## Hecho (acumulado reciente)
 
-- Principal/me-alcanza/arqueo TalkBack, suscripciones, tandas. Ver `git log`.
+- Tandas Hoy, Hoy héroe/probabilidad, onboarding O1–O7. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Stashes locales — no aplicar sin revisar.
-- WIP en disco de otros agentes — `git status` antes de editar.
-- CI Windows, M0: Adam.
+- WIP ajeno (tarjetas, tandas) — revisar `git status` antes de editar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. No mezclar commits a11y con WIP ajeno.
 
 ## No tocar
 

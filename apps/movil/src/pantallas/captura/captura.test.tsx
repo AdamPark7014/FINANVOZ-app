@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -156,6 +156,9 @@ describe('Movimientos → capturas por revisar', () => {
     expect(screen.getByTestId('capturas-por-revisar')).toBeTruthy();
     expect(screen.getByTestId('capturas-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('capturas-por-revisar-intro')).toHaveTextContent(INTRO_CAPTURAS_POR_REVISAR);
+    expect(
+      within(screen.getByTestId(`captura-${noReconocida?.capturaId}`)).getByRole('header'),
+    ).toBeTruthy();
     expect(screen.getByText(/Consulta tu estado de cuenta en la app/)).toBeTruthy();
     fireEvent.press(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`));
     expect(screen.queryByText(/Consulta tu estado de cuenta en la app/)).toBeNull();

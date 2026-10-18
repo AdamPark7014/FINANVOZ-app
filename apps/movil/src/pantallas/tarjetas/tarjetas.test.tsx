@@ -322,6 +322,17 @@ describe('Tarjetas', () => {
     expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 
+  it('TalkBack: barra de uso anuncia límite y marca; el pie visual no se repite', () => {
+    const p = e510();
+    const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tarjeta-barra-uso')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleBarraUsoTarjeta(t?.usoPorcentaje ?? 0, t?.limiteCredito ?? 0),
+    );
+    expect(screen.getByTestId('tarjeta-uso')).toHaveProp('importantForAccessibility', 'no');
+  });
+
   it('tarjeta inexistente: volver usa la misma pista TalkBack', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <PantallaTarjeta tarjetaId="contraparte:tarjeta:inexistente" alVolver={jest.fn()} />);

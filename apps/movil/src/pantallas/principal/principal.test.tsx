@@ -605,6 +605,7 @@ describe('Movimientos', () => {
     screen.unmount();
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     const [frase] = listarPorInterpretar(p.ctx);
+    expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
       'accessibilityHint',
       PISTA_DESCARTAR_FRASE,

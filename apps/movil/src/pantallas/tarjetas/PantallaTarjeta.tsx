@@ -314,10 +314,10 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
       <Barra
         llenoBp={d.usoBp}
         marcaBp={UMBRAL_USO_BP}
-        etiquetaAccesible={etiquetaAccesibleUsoTarjeta(d.usoPorcentaje)}
+        etiquetaAccesible={etiquetaAccesibleBarraUsoTarjeta(d.usoPorcentaje, d.limiteCredito)}
         testID="tarjeta-barra-uso"
       />
-      <Texto variante="secundario" tono="secundario" testID="tarjeta-uso">
+      <Texto variante="secundario" tono="secundario" testID="tarjeta-uso" importantForAccessibility="no">
         {textoUsoLimiteTarjeta(d.usoPorcentaje, formatearCentavos(d.limiteCredito))}
       </Texto>
     </Tarjeta>
