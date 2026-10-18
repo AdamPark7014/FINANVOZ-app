@@ -1,6 +1,7 @@
 import type { ConsultaMeAlcanza } from '../../servicios';
 
 export { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
+export * from './textos';
 export { avisoRecordatorio, PREFIJO_RECORDATORIO_COMPRA } from './recordatorio';
 
 /**

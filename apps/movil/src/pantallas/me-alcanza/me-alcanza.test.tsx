@@ -390,9 +390,9 @@ describe('¿Me alcanza?', () => {
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByText(/^Registré: Unos tenis \$1,500 a 3 meses/)).toBeTruthy();
+    expect(within(aviso).getByRole('text').props.accessibilityLabel).toMatch(/Unos tenis/);
 
-    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
+    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
 
@@ -400,10 +400,12 @@ describe('¿Me alcanza?', () => {
     const antes = listarMovimientos(p.ctx).flatMap((d) => d.movimientos).length;
     fireEvent.press(screen.getByTestId('lo-compre-contado_hoy'));
     expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Unos tenis de $1,500 · por asignar'),
+      within(screen.getByTestId('aviso')).getByLabelText(
+        etiquetaHablada('Registré: Unos tenis de $1,500 · por asignar'),
+      ),
     ).toBeTruthy();
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes + 1);
-    fireEvent.press(within(screen.getByTestId('aviso')).getByText('Deshacer'));
+    fireEvent.press(within(screen.getByTestId('aviso')).getByRole('button', { name: BTN_DESHACER }));
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(antes);
   });
 
@@ -562,6 +564,14 @@ describe('Hoy · probabilidad de llegar', () => {
   });
 });
 
+function idMovimientoConDescripcion(p: ReturnType<typeof e401>, descripcion: string): string {
+  const m = listarMovimientos(p.ctx)
+    .flatMap((d) => d.movimientos)
+    .find((x) => x.descripcion === descripcion);
+  if (!m) throw new Error(`sin movimiento: ${descripcion}`);
+  return m.id;
+}
+
 describe('Movimientos · "Fue algo extraordinario"', () => {
   it('lo saca de la estimación con "Deshacer"', () => {
     const p = e401();
@@ -573,12 +583,17 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
+    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByText('la boda'));
+    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByText('Listo: no lo uso para estimar tus gastos de cada día.')).toBeTruthy();
-    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
+    expect(
+      within(aviso).getByLabelText(
+        etiquetaHablada('Listo: no lo uso para estimar tus gastos de cada día.'),
+      ),
+    ).toBeTruthy();
+    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 
@@ -592,15 +607,16 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
+    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByText('la boda'));
+    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     expect(screen.getByTestId('nota-extraordinario')).toBeTruthy();
     expect(screen.queryByTestId('boton-extraordinario')).toBeNull();
     fireEvent.press(screen.getByTestId('boton-volver-a-contar'));
     expect(
-      within(screen.getByTestId('aviso')).getByText(
-        'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+      within(screen.getByTestId('aviso')).getByLabelText(
+        etiquetaHablada('Listo: vuelvo a contarlo para estimar tus gastos de cada día.'),
       ),
     ).toBeTruthy();
     expect(screen.queryByTestId('nota-extraordinario')).toBeNull();
