@@ -6,24 +6,27 @@
 
 ## Hecho en este turno
 
-- **Tandas:** prueba detalle aserta `PISTA_ME_TOCO` en `tanda-me-toco` (TalkBack al registrar cobro).
+- **Me alcanza / tandas / suscripciones (UI):** copy centralizado, vacíos con `EstadoVacio` + etiquetas TalkBack, pistas en lista (nueva tanda, calendario, cancelar/cerrar en me-alcanza), inactivas suscripciones; quita import duplicado en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones/compartidos leftovers, Ajustes captura activa, Cuentas CTAs. Ver `git log`.
+- Hoy, Cuentas, captura, ayuda, deducciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP ajeno (`git status`): no mezclar.
+- CA-M6-05 probabilidad: intermitente en local.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. `accessibilityHint` en botones tandas/compartidos desde Cuentas (paridad suscripciones).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
