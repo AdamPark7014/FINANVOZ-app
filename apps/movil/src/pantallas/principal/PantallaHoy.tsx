@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import {
   etiquetaDiaMes,
   etiquetaFecha,
@@ -19,10 +19,15 @@ import {
   Cifra,
   cifraEnPalabras,
   espacio,
+  etiquetaHablada,
   formatearCentavos,
+  hitSlopTactil,
+  OBJETIVO_TACTIL_MIN,
   Pantalla,
+  radio,
   Tarjeta,
   Texto,
+  tipo,
   useTema,
 } from '../../ui';
 import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
@@ -115,7 +120,8 @@ export function PantallaHoy({
           ) : (
             <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
           )}
-          <Boton
+          <BotonDesglose
+            expandido={verDesglose}
             etiqueta={
               verDesglose
                 ? 'Ocultar desglose'
@@ -123,9 +129,6 @@ export function PantallaHoy({
                   ? 'Ver qué viene'
                   : 'Ver de dónde sale'
             }
-            variante="texto"
-            ancho="contenido"
-            alPresionar={() => setVerDesglose((v) => !v)}
             pista={
               verDesglose
                 ? PISTA_OCULTAR_DESGLOSE
@@ -133,14 +136,19 @@ export function PantallaHoy({
                   ? PISTA_VER_QUE_VIENE
                   : PISTA_VER_DESGLOSE
             }
-            testID="boton-desglose"
+            alPresionar={() => setVerDesglose((v) => !v)}
           />
           {verDesglose ? <Desglose vista={vista} /> : null}
         </>
       ) : null}
       {vista.efectivoMenosPreciso ? (
         <Tarjeta testID="efectivo-menos-preciso">
-          <Texto variante="secundario">
+          <Texto
+            variante="secundario"
+            testID="efectivo-menos-preciso-texto"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+          >
             Tu efectivo es menos preciso: hace más de una semana que no lo cuentas.
           </Texto>
           {navegacion.alAbrirArqueo ? (
@@ -189,6 +197,50 @@ export function PantallaHoy({
       {/* Espacio para que el aviso inferior (encima del pie) no tape el último botón. */}
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>
+  );
+}
+
+/** Desplegar el desglose: TalkBack anuncia expandido/colapsado (`02 §15`). */
+function BotonDesglose({
+  etiqueta,
+  pista,
+  expandido,
+  alPresionar,
+}: {
+  etiqueta: string;
+  pista: string;
+  expandido: boolean;
+  alPresionar: () => void;
+}) {
+  const { c } = useTema();
+  return (
+    <Pressable
+      testID="boton-desglose"
+      onPress={alPresionar}
+      accessibilityRole="button"
+      accessibilityLabel={etiquetaHablada(etiqueta)}
+      accessibilityHint={pista}
+      accessibilityState={{ expanded: expandido }}
+      hitSlop={hitSlopTactil}
+      style={({ pressed }) => ({
+        minHeight: OBJETIVO_TACTIL_MIN,
+        minWidth: OBJETIVO_TACTIL_MIN,
+        paddingHorizontal: espacio.s,
+        paddingVertical: espacio.m,
+        borderRadius: radio.m,
+        alignSelf: 'flex-start',
+        justifyContent: 'center',
+        opacity: pressed ? 0.85 : 1,
+      })}
+    >
+      <Text
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[tipo.etiqueta, { fontSize: 16, color: c.acentoTexto, textAlign: 'center' }]}
+      >
+        {etiqueta}
+      </Text>
+    </Pressable>
   );
 }
 

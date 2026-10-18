@@ -42,6 +42,8 @@ import {
   BTN_CANCELADA_SAT,
   BTN_GUARDAR_ALUMNO_NIVEL,
   BTN_IMPORTAR_FACTURAS,
+  ETIQUETA_EJERCICIO,
+  PISTA_IMPORTAR_FACTURAS,
   BTN_NO_CANCELADA_SAT,
   BTN_OCULTAR_FACTURA,
   BTN_RECUPERAR_FACTURA,
@@ -153,6 +155,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
       </Texto>
       {v.ejercicios.length > 1 ? (
         <Chips
+          etiqueta={ETIQUETA_EJERCICIO}
           opciones={v.ejercicios.map((a) => ({ valor: a, etiqueta: String(a) }))}
           valor={v.ejercicio}
           alCambiar={(a) => {
@@ -187,11 +190,12 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         variante="secundario"
         cargando={importando}
         alPresionar={importar}
+        pista={PISTA_IMPORTAR_FACTURAS}
       />
       <MensajeError texto={error} />
       {resultado ? <ResultadoImportacionTarjeta r={resultado} alCerrar={() => setResultado(null)} /> : null}
 
-      <Texto variante="subtitulo" testID="deducciones-tus-facturas">
+      <Texto variante="subtitulo" testID="deducciones-tus-facturas" accessibilityRole="header">
         {TITULO_TUS_FACTURAS}
       </Texto>
       {v.facturas.length === 0 ? (
@@ -207,7 +211,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
 
       {v.ocultas.length > 0 ? (
         <View style={{ gap: espacio.s }}>
-          <Texto variante="subtitulo" testID="deducciones-ocultas-titulo">
+          <Texto variante="subtitulo" testID="deducciones-ocultas-titulo" accessibilityRole="header">
             {TITULO_FACTURAS_OCULTAS}
           </Texto>
           <Texto variante="secundario" tono="secundario" testID="deducciones-ocultas-ayuda">

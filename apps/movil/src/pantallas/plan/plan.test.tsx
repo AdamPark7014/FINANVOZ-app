@@ -35,6 +35,8 @@ import {
   MENSAJE_OFERTAS_VACIAS,
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
+  PISTA_ABRIR_PLANES,
+  PISTA_VER_PLANES,
   PISTA_VOLVER,
   resumenPlan,
   TITULO_PLAN_GRATIS,
@@ -143,6 +145,8 @@ describe('pantalla del plan', () => {
       fireEvent.press(screen.getByTestId(ID.oferta('anual')));
     });
     expect(textoDe(ID.mensaje)).toBe(MENSAJE_ERROR_COMPRA);
+    expect(screen.getByTestId(ID.mensaje)).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId(ID.mensaje)).toHaveProp('accessibilityLiveRegion', 'polite');
     await act(async () => {
       fireEvent.press(screen.getByTestId(ID.restaurar));
     });
@@ -155,6 +159,7 @@ describe('pantalla del plan', () => {
     const abrir = jest.fn();
     const { unmount } = montar(p.ctx, <SeccionPlan alAbrirPlan={abrir} />);
     expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLAN_GRATIS);
+    expect(screen.getByTestId(ID.ajustesPlanVer)).toHaveProp('accessibilityHint', PISTA_VER_PLANES);
     fireEvent.press(screen.getByTestId(ID.ajustesPlanVer));
     expect(abrir).toHaveBeenCalled();
     unmount();
@@ -190,6 +195,7 @@ describe('pantalla del plan', () => {
     );
     const { unmount } = montar(p.ctx, ui, { abrirPlan });
     expect(screen.getByText('¿Me alcanza? es de Plus')).toBeTruthy();
+    expect(screen.getByTestId(ID.puertaPlusConocer)).toHaveProp('accessibilityHint', PISTA_ABRIR_PLANES);
     fireEvent.press(screen.getByTestId(ID.puertaPlusConocer));
     expect(abrirPlan).toHaveBeenCalled();
     unmount();

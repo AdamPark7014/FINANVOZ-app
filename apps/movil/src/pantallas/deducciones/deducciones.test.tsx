@@ -35,6 +35,7 @@ import {
   etiquetaVacioImportar,
   TITULO_PUERTA_PLUS,
   TITULO_TUS_FACTURAS,
+  PISTA_IMPORTAR_FACTURAS,
   PISTA_VOLVER,
   tituloPantallaDeducciones,
 } from './textos';
@@ -130,6 +131,15 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
   it('TalkBack: volver regresa a Cuentas', () => {
     renderConSesion(preparar(), <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
     expect(screen.getByTestId('deducciones-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
+  it('TalkBack: importar, sección facturas y año', () => {
+    renderConSesion(preparar(), <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    expect(screen.getByTestId('deducciones-importar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_IMPORTAR_FACTURAS,
+    );
+    expect(screen.getByTestId('deducciones-tus-facturas')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('sin facturas del ejercicio lo explica', () => {
@@ -260,7 +270,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
 
     fireEvent.press(screen.getByTestId(`factura-${dentista}-ocultar`));
     expect(screen.queryByTestId(`factura-${dentista}`)).toBeNull();
-    expect(screen.getByTestId('deducciones-ocultas-titulo')).toBeTruthy();
+    expect(screen.getByTestId('deducciones-ocultas-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(textoDe('deducciones-ocultas-ayuda')).toBe(TEXTO_FACTURAS_OCULTAS);
     fireEvent.press(screen.getByTestId(`factura-oculta-${dentista}-recuperar`));
     expect(screen.getByTestId(`factura-${dentista}`)).toBeTruthy();

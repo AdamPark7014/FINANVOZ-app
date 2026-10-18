@@ -75,6 +75,7 @@ export const MENSAJE_OFERTAS_VACIAS =
 
 export const SUFIJO_PLUS = ' · Plus';
 export const PISTA_ABRIR_PLANES = 'Abre los planes';
+export const PISTA_VER_PLANES = 'Abre la pantalla Finanvoz Plus';
 
 export function etiquetaCandadoPlus(texto: string): string {
   return `${texto}${SUFIJO_PLUS}`;
@@ -92,6 +93,11 @@ export const MENSAJE_PENDIENTE =
   'Tu pago quedó pendiente en Google Play. Cuando se confirme, se activa Plus.';
 export const MENSAJE_RESTAURADO_SIN_PLUS = 'No encontré una suscripción de Plus en tu cuenta de Google.';
 export const MENSAJE_LISTO = 'Listo. Ya tienes Plus.';
+
+/** TalkBack: compra o restauración fallida; el resto son avisos informativos. */
+export function esMensajeErrorPlan(texto: string): boolean {
+  return texto === MENSAJE_ERROR_COMPRA || texto === MENSAJE_ERROR_OFERTAS;
+}
 
 /** "Tienes Plus · prueba gratis" y su detalle. */
 export function resumenPlan(v: VistaPlan): { titulo: string; detalle: string | null } {

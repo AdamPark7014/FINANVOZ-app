@@ -29,6 +29,9 @@ export const ETIQUETA_CANCELAR = 'Cancelar';
 export const BTN_CAMBIAR_PERFIL = 'Cambiar mi RFC o mis ingresos';
 
 export const BTN_IMPORTAR_FACTURAS = 'Importar facturas (XML o ZIP)';
+/** TalkBack: acción principal de la pantalla (`02 §15`). */
+export const PISTA_IMPORTAR_FACTURAS = 'Elige archivos XML o un ZIP desde tu teléfono';
+export const ETIQUETA_EJERCICIO = 'Año';
 export const MENSAJE_IMPORTAR_ERROR =
   'No pude leer esos archivos. Vuelve a compartirlos o elígelos otra vez.';
 

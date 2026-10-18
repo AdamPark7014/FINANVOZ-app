@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **PantallaRegistrar:** TalkBack en Cerrar (`etiquetaAccesible`, `pista`) y encabezado en «O llena los datos».
+- **Plan (TalkBack):** mensaje post-compra con `alert`/`liveRegion` en errores; aviso de ofertas como alerta; pistas en Ajustes → Ver planes y PuertaPlus (Conocer Plus / Volver).
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones inactivas acordeón; onboarding/captura O6, PreviaWidget. Ver `git log`.
+- Suscripciones, Registrar, onboarding/captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (onboarding, principal, ayuda) — no mezclar sin `git status`.
+- WIP sin commitear en `deducciones/` y `principal/` (otro turno) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

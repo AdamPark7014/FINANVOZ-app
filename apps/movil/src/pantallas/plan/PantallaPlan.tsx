@@ -13,6 +13,8 @@ import {
   ETIQUETA_RESTAURAR,
   ETIQUETA_VER_PLANES,
   ETIQUETA_VOLVER,
+  esMensajeErrorPlan,
+  PISTA_VER_PLANES,
   PISTA_VOLVER,
   ID,
   INCLUYE_GRATIS,
@@ -162,7 +164,14 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             </Texto>
           ) : ofertas.tipo === 'error' ? (
             <>
-              <Texto variante="cuerpo" tono="faltante" testID={ID.errorOfertas}>
+              <Texto
+                variante="cuerpo"
+                tono="faltante"
+                accessibilityRole="alert"
+                accessibilityLiveRegion="polite"
+                importantForAccessibility="yes"
+                testID={ID.errorOfertas}
+              >
                 {MENSAJE_ERROR_OFERTAS}
               </Texto>
               <Boton
@@ -213,7 +222,14 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       ) : null}
 
       {mensaje ? (
-        <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID={ID.mensaje}>
+        <Texto
+          variante="cuerpo"
+          tono={esMensajeErrorPlan(mensaje) ? 'faltante' : undefined}
+          accessibilityRole={esMensajeErrorPlan(mensaje) ? 'alert' : 'text'}
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+          testID={ID.mensaje}
+        >
           {mensaje}
         </Texto>
       ) : null}
@@ -254,6 +270,7 @@ export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
         etiqueta={ETIQUETA_VER_PLANES}
         variante="secundario"
         alPresionar={alAbrirPlan}
+        pista={PISTA_VER_PLANES}
         testID={ID.ajustesPlanVer}
       />
     </Tarjeta>

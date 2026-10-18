@@ -11,6 +11,7 @@ import {
   etiquetaCandadoPlus,
   ID,
   PISTA_ABRIR_PLANES,
+  PISTA_VOLVER,
 } from './textos';
 
 /**
@@ -77,11 +78,18 @@ export function PuertaPlus({
           <Boton
             etiqueta={ETIQUETA_CONOCER_PLUS}
             alPresionar={abrirPlan}
+            pista={PISTA_ABRIR_PLANES}
             testID={ID.puertaPlusConocer}
           />
         ) : null}
         {alVolver ? (
-          <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" alPresionar={alVolver} testID={ID.volver} />
+          <Boton
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER}
+            testID={ID.volver}
+          />
         ) : null}
       </Tarjeta>
     </View>

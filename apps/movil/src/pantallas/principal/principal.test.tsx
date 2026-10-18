@@ -106,9 +106,11 @@ describe('Hoy', () => {
     const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
     renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_DESGLOSE);
+    expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: false });
     expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
     fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_OCULTAR_DESGLOSE);
+    expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: true });
     p.cerrar();
   });
 
