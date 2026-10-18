@@ -1,3 +1,4 @@
+/** Copy de estados de cuenta en PDF (`02 §26`, M15); las cifras vienen de motores, no de aquí. */
 import type { Centavos, PlainDate } from '@cartera/core';
 import {
   etiquetaDiaMes,
