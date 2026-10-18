@@ -506,7 +506,7 @@ describe('Cuentas', () => {
       p.ctx,
       <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTandas={alAbrirTandas} />,
     );
-    expect(screen.getByText(BTN_TANDAS_CUENTAS)).toBeTruthy();
+    expect(screen.getByTestId('boton-tandas').props.accessibilityLabel).toBe(BTN_TANDAS_CUENTAS);
     expect(screen.getByTestId('seccion-tandas-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('boton-tandas'));
     expect(alAbrirTandas).toHaveBeenCalled();
