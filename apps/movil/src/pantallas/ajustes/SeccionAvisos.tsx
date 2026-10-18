@@ -182,7 +182,13 @@ export function SeccionAvisos() {
         alCambiar={setHora}
         nativo={{ keyboardType: 'numbers-and-punctuation', maxLength: 5 }}
       />
-      <Texto variante="etiqueta">{ETIQUETA_HORARIO_SILENCIOSO}</Texto>
+      <Texto
+        variante="etiqueta"
+        testID="ajustes-avisos-horario-titulo"
+        accessibilityRole="header"
+      >
+        {ETIQUETA_HORARIO_SILENCIOSO}
+      </Texto>
       <Texto variante="secundario" tono="secundario">
         {DESC_HORARIO_SILENCIOSO}
       </Texto>

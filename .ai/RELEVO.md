@@ -6,15 +6,16 @@
 
 ## Hecho en este turno
 
-- **Captura · TalkBack reactivar:** `etiquetaCuerpoReactivarCaptura` en cuerpo de `TarjetaReactivarCaptura`; tests en `captura.test.tsx` y `textos.test.ts`.
+- **Ayuda · TalkBack:** FAQ lee cada párrafo al expandir; correo de contacto y aviso sin app con dirección en palabras (`d6237c9`, `d7a7f33`, `19a2050`, `27cd18d`).
+- **Captura · TalkBack reactivar:** `etiquetaCuerpoReactivarCaptura` (commits paralelos en main).
 
 ## Hecho (acumulado reciente)
 
-- Intro/guía/pistas captura por revisar e inactiva, respaldo, ayuda. Ver `git log`.
+- Intro/guía/pistas captura, respaldo, personas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (ajustes, personas, principal, ayuda) — no mezclar en commits ajenos.
+- WIP paralelo (ajustes, personas, principal) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

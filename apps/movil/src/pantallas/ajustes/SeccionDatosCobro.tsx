@@ -7,6 +7,7 @@ import {
   BTN_AGREGAR,
   BTN_BORRAR,
   BTN_CAMBIAR,
+  etiquetaResumenDatosCobro,
   lineaResumenCelular,
   lineaResumenClabe,
   PISTA_AGREGAR_DATOS_COBRO,
@@ -41,7 +42,12 @@ export function SeccionDatosCobro() {
         <FormularioDatosCobro alGuardar={() => setEditando(false)} alCancelar={() => setEditando(false)} />
       ) : (
         <>
-          <Texto variante="secundario" tono="secundario" testID="datos-cobro-resumen">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="datos-cobro-resumen"
+            accessibilityLabel={etiquetaResumenDatosCobro(resumen)}
+          >
             {resumen}
           </Texto>
           <Boton

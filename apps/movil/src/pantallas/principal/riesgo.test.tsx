@@ -9,7 +9,12 @@ import {
 } from '../../servicios';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
-import { PISTA_GUARDAR_HORARIO, PISTA_PERMITIR_AVISOS, SECCION_AVISOS } from '../ajustes/avisos-textos';
+import {
+  ETIQUETA_HORARIO_SILENCIOSO,
+  PISTA_GUARDAR_HORARIO,
+  PISTA_PERMITIR_AVISOS,
+  SECCION_AVISOS,
+} from '../ajustes/avisos-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
 import {
@@ -135,6 +140,8 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     await screen.findByTestId('ajustes-avisos-permitir');
     expect(screen.getByTestId('ajustes-avisos-permitir')).toHaveProp('accessibilityHint', PISTA_PERMITIR_AVISOS);
     expect(screen.getByTestId('ajustes-guardar-horario')).toHaveProp('accessibilityHint', PISTA_GUARDAR_HORARIO);
+    expect(screen.getByTestId('ajustes-avisos-horario-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByText(ETIQUETA_HORARIO_SILENCIOSO)).toBeTruthy();
   });
 
   it('Ajustes → Avisos apaga "Riesgo de no llegar"', async () => {

@@ -11,9 +11,11 @@ import {
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { SeccionDatosCobro } from '../ajustes/SeccionDatosCobro';
 import {
+  etiquetaResumenDatosCobro,
   PISTA_AGREGAR_DATOS_COBRO,
   PISTA_BORRAR_DATOS_COBRO,
   PISTA_CAMBIAR_DATOS_COBRO,
+  RESUMEN_VACIO,
   SECCION_DATOS_COBRO,
 } from '../ajustes/datos-cobro-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
@@ -407,6 +409,10 @@ describe('Ajustes → Datos para cobrar', () => {
     expect(screen.getByTestId('boton-editar-datos-cobro')).toHaveProp(
       'accessibilityHint',
       PISTA_AGREGAR_DATOS_COBRO,
+    );
+    expect(screen.getByTestId('datos-cobro-resumen')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaResumenDatosCobro(RESUMEN_VACIO),
     );
   });
 

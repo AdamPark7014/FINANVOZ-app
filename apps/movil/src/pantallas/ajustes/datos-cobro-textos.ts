@@ -22,3 +22,8 @@ export function lineaResumenCelular(celularFormateado: string): string {
 export function lineaResumenClabe(clabeFormateada: string): string {
   return `CLABE: ${clabeFormateada}`;
 }
+
+/** TalkBack del resumen bajo el título de sección (`02 §15`). */
+export function etiquetaResumenDatosCobro(texto: string): string {
+  return `${SECCION_DATOS_COBRO}. ${texto}`;
+}
