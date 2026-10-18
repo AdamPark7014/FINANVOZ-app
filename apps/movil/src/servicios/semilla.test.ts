@@ -7,6 +7,7 @@ import { obtenerHoy } from './hoy';
 import { listarOcurrencias } from './ocurrencias';
 import { listarPersonas } from './personas';
 import { cargarEscenario } from './semilla';
+import { listarSuscripciones } from './suscripciones';
 import { abrirPrueba, escenario } from './__pruebas__/base';
 
 describe('cargador de escenarios semilla', () => {
@@ -35,6 +36,26 @@ describe('cargador de escenarios semilla', () => {
       ['internet', '2026-10-14', 'pendiente'],
       ['renta', '2026-10-31', 'pendiente'],
     ]);
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
+  });
+
+  it('e14-01: gastos E14-01 desde efectivo y catálogo vacío (CA-M10-01)', () => {
+    const p = abrirPrueba();
+    const e = cargarEscenario(p.ctx, escenario('e14-01'));
+    expect(e.hoy).toBe('2026-10-11');
+    expect(e.catalogoSuscripciones).toEqual([]);
+    const ctx = { ...p.ctx, catalogoSuscripciones: e.catalogoSuscripciones };
+    const s = listarSuscripciones(ctx);
+    expect(s.textoResumen).toBe('Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)');
+    expect(s.activas.map((x) => x.nombre)).toEqual([
+      'Estudio Yoga',
+      'Smart Fit',
+      'Netflix',
+      'Spotify',
+      'Dominio Web',
+    ]);
+    expect(s.inactivas.map((x) => x.nombre)).toEqual(['Disney Plus']);
+    expect(s.activas.find((x) => x.nombre === 'Spotify')?.textoAntes).toBe('antes $115');
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 

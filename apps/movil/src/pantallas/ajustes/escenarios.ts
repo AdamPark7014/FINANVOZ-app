@@ -7,4 +7,5 @@ export const ESCENARIOS_DEV: readonly { id: string; cargar: () => unknown }[] = 
   { id: 'e4-01', cargar: () => require('../../../../../fixtures/escenarios/e4-01.json') },
   { id: 'e5-10', cargar: () => require('../../../../../fixtures/escenarios/e5-10.json') },
   { id: 'e-captura', cargar: () => require('../../../../../fixtures/escenarios/e-captura.json') },
+  { id: 'e14-01', cargar: () => require('../../../../../fixtures/escenarios/e14-01.json') },
 ];

@@ -1,0 +1,276 @@
+{
+  "id": "e14-01",
+  "descripcion": "Libro equivalente al vector E14-01 sobre la base e4-01: Cuentas → Suscripciones muestra 5 activas, «Pagas unos $1,626 al mes», «antes $115» en Spotify y Disney Plus en «Ya no se cobran» (CA-M10-01, pendiente 64).",
+  "hoy": "2026-10-11",
+  "colchon": 20000,
+  "ingreso": {
+    "concepto": "quincena",
+    "monto": 650000,
+    "regla": {
+      "tipo": "quincenal_15_ultimo",
+      "ajuste": "anterior"
+    },
+    "ultimo_recibido": "2026-09-30"
+  },
+  "cuentas": [
+    {
+      "clave": "efectivo",
+      "subtipo": "efectivo",
+      "nombre": "Cartera",
+      "saldo": 64000,
+      "alias": [
+        "efectivo",
+        "cartera"
+      ]
+    },
+    {
+      "clave": "bbva",
+      "subtipo": "debito",
+      "nombre": "BBVA Débito ••5521",
+      "ultimos4": "5521",
+      "saldo": 359000,
+      "alias": [
+        "bbva",
+        "nomina"
+      ]
+    },
+    {
+      "clave": "nu",
+      "subtipo": "tarjeta_credito",
+      "nombre": "Nu ••4410",
+      "ultimos4": "4410",
+      "saldo": 200000,
+      "alias": [
+        "nu",
+        "morada"
+      ],
+      "tarjeta": {
+        "dia_corte": 28,
+        "dia_limite_pago": 18,
+        "limite_credito": 1500000,
+        "modo": "totalero"
+      }
+    }
+  ],
+  "compromisos_unicos": [
+    {
+      "concepto": "tanda",
+      "fecha": "2026-10-13",
+      "monto": 50000,
+      "cuenta": "bbva"
+    },
+    {
+      "concepto": "internet",
+      "fecha": "2026-10-14",
+      "monto": 67400,
+      "cuenta": "bbva"
+    },
+    {
+      "concepto": "renta",
+      "fecha": "2026-10-31",
+      "monto": 450000,
+      "cuenta": "bbva"
+    }
+  ],
+  "catalogo_suscripciones": [],
+  "gastos_e14": {
+    "cuenta": "efectivo",
+    "gastos": [
+      {
+        "fecha": "2025-10-08",
+        "monto": 35000,
+        "comercio": "DOMINIO WEB MX"
+      },
+      {
+        "fecha": "2026-04-20",
+        "monto": 15900,
+        "comercio": "DISNEY PLUS"
+      },
+      {
+        "fecha": "2026-05-20",
+        "monto": 15900,
+        "comercio": "DISNEY PLUS"
+      },
+      {
+        "fecha": "2026-06-05",
+        "monto": 11500,
+        "comercio": "SPOTIFY"
+      },
+      {
+        "fecha": "2026-06-20",
+        "monto": 15900,
+        "comercio": "DISNEY PLUS"
+      },
+      {
+        "fecha": "2026-07-05",
+        "monto": 12900,
+        "comercio": "SPOTIFY"
+      },
+      {
+        "fecha": "2026-07-14",
+        "monto": 21900,
+        "comercio": "NETFLIX"
+      },
+      {
+        "fecha": "2026-07-20",
+        "monto": 15900,
+        "comercio": "DISNEY PLUS"
+      },
+      {
+        "fecha": "2026-08-01",
+        "monto": 59900,
+        "comercio": "SMART FIT"
+      },
+      {
+        "fecha": "2026-08-05",
+        "monto": 12900,
+        "comercio": "SPOTIFY"
+      },
+      {
+        "fecha": "2026-08-12",
+        "monto": 1900,
+        "comercio": "ICLOUD"
+      },
+      {
+        "fecha": "2026-08-14",
+        "monto": 21900,
+        "comercio": "NETFLIX"
+      },
+      {
+        "fecha": "2026-09-01",
+        "monto": 4500,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-09-01",
+        "monto": 59900,
+        "comercio": "SMART FIT"
+      },
+      {
+        "fecha": "2026-09-03",
+        "monto": 2500,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-09-04",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-09-05",
+        "monto": 12900,
+        "comercio": "SPOTIFY"
+      },
+      {
+        "fecha": "2026-09-10",
+        "monto": 6000,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-09-11",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-09-11",
+        "monto": 1900,
+        "comercio": "ICLOUD"
+      },
+      {
+        "fecha": "2026-09-12",
+        "monto": 1900,
+        "comercio": "ICLOUD"
+      },
+      {
+        "fecha": "2026-09-14",
+        "monto": 21900,
+        "comercio": "NETFLIX"
+      },
+      {
+        "fecha": "2026-09-18",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-09-25",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-09-28",
+        "monto": 3000,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-10-01",
+        "monto": 59900,
+        "comercio": "SMART FIT"
+      },
+      {
+        "fecha": "2026-10-02",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-10-02",
+        "monto": 2500,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-10-05",
+        "monto": 12900,
+        "comercio": "SPOTIFY"
+      },
+      {
+        "fecha": "2026-10-08",
+        "monto": 35000,
+        "comercio": "DOMINIO WEB MX"
+      },
+      {
+        "fecha": "2026-10-09",
+        "monto": 15000,
+        "comercio": "ESTUDIO YOGA"
+      },
+      {
+        "fecha": "2026-10-09",
+        "monto": 8000,
+        "comercio": "OXXO PUEBLA 123"
+      },
+      {
+        "fecha": "2026-10-10",
+        "monto": 4900,
+        "comercio": "NETFLIX"
+      },
+      {
+        "fecha": "2026-10-12",
+        "monto": 1900,
+        "comercio": "ICLOUD"
+      }
+    ]
+  },
+  "esperado": {
+    "vector": "E14-01",
+    "suscripciones": {
+      "texto_resumen": "Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)",
+      "activas": [
+        "Estudio Yoga",
+        "Smart Fit",
+        "Netflix",
+        "Spotify",
+        "Dominio Web"
+      ],
+      "inactivas": [
+        "Disney Plus"
+      ],
+      "texto_inactivas": "Ya no se cobran: Disney Plus (último cargo 20 jul)",
+      "spotify_antes": "antes $115"
+    },
+    "hoy": {
+      "vector": "E4-01",
+      "hoy_puedes_pesos": 214,
+      "dias": 4,
+      "libre": 85600,
+      "reservado": 317400
+    }
+  }
+}

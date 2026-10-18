@@ -105,8 +105,11 @@ export default function Raiz() {
             cargarEscenario: (datos: unknown) =>
               reemplazarSesion(() => {
                 // El reloj se fija en el `hoy` del escenario hasta el próximo arranque en frío.
-                const hoy = (datos as { hoy: string }).hoy;
-                const nueva = abrirSesion(relojFijo(hoy, Date.now()));
+                const esc = datos as { hoy: string; catalogo_suscripciones?: readonly string[] };
+                const nueva = abrirSesion(relojFijo(esc.hoy, Date.now()));
+                if (esc.catalogo_suscripciones !== undefined) {
+                  Object.assign(nueva.ctx, { catalogoSuscripciones: esc.catalogo_suscripciones });
+                }
                 try {
                   cargarEscenario(nueva.ctx, datos);
                 } catch (error) {

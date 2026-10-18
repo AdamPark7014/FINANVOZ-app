@@ -19,7 +19,7 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `pdf/generar.mjs` | Genera los estados de cuenta en PDF **sintéticos** de M15 y, de los mismos datos, su texto (`.txt`) y lo que debe leerse (`.json`); `--verificar` comprueba que los archivos coinciden byte a byte | `packages/core` (prueba) |
 | `pdf/banco_{b,e,f}.pdf`, `.txt`, `.json` | Tres bancos ficticios: Banco B (42 movimientos en dos páginas, CA-M15-02), Banco E (dos fechas por renglón, abonos `CR`) y Banco F (fechas sin año, acentos, kerning); `banco_e.protegido.pdf` (contraseña `PRUEBA2026`) y `escaneado.pdf` (solo una imagen) | `nucleo-jvm` (PDFBox extrae el `.txt`), `packages/core` (CA-M15-01), `apps/movil` (CA-M15-02 y 03) |
 | `pdf/analizadores.ejemplo.json` | Analizadores **sintéticos** de esos tres bancos (`07 §8`); solo en builds de desarrollo | `packages/core`, `apps/movil` |
-| `escenarios/*.json` | Estados de usuario para cargar en la app de desarrollo y verificar pantallas: `e4-01`, `e5-10`, `e-captura`, `e-negocio` | Cargador de semillas de `apps/movil` |
+| `escenarios/*.json` | Estados de usuario para cargar en la app de desarrollo y verificar pantallas: `e4-01`, `e5-10`, `e-captura`, `e14-01`, `e-negocio` | Cargador de semillas de `apps/movil` |
 
 ## Cómo usar los vectores
 
@@ -34,6 +34,7 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 - Crea las cuentas con sus alias y, para cada una, una transacción `saldo_inicial` con fecha `hoy − 1` contra `capital:saldos_iniciales`. En tarjetas, `saldo` es deuda (positiva en el archivo, pasivo en el libro). En contactos, `te_debe` crea el saldo de la cuenta por cobrar.
 - Crea el ingreso recurrente como programado con `define_horizonte = 1` y marca como cubierta la ocurrencia `ultimo_recibido`.
 - Crea cada elemento de `compromisos_unicos` como programado de egreso con regla `{ "tipo": "unica", "fecha": … }` (sus ocurrencias quedan pendientes).
+- `gastos_e14` (`e14-01`): registra cada gasto con comercio desde la cuenta indicada (por omisión `efectivo`), con categoría `suscripciones` salvo comercios `OXXO*` en `antojos`, igual que un libro equivalente al vector E14-01. `catalogo_suscripciones` (opcional) fija el catálogo semilla de E14 en el contexto de desarrollo (`[]` reproduce E14-01).
 - `espacios` (solo `e-negocio`): crea cada cuenta en su espacio (con `comision_bp` si la trae). `ventas_registradas` y `gastos_registrados` crean, en la cuenta indicada, una venta (`ingreso` `ventas`) y un gasto por periodo, fechados el último día del periodo (el periodo en curso, `hoy − 1`), para que E15 tenga base. En las cuentas con movimientos registrados, el saldo inicial se fecha el primer día del periodo más antiguo y vale `saldo − ventas + gastos`, de modo que al terminar de cargar el saldo es el del archivo (`esperado.carga`).
 - `captura`: fija la lista blanca de paquetes y, si la prueba lo pide, inyecta las notificaciones del archivo indicado en la cola del módulo de captura (sin `adb`).
 - Fija el reloj de la app en `hoy` (solo builds de desarrollo).

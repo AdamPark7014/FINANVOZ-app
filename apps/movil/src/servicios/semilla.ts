@@ -9,6 +9,7 @@ import { insertarCuenta } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
 import { registrarSaldoInicial } from './onboarding';
 import { crearPersona } from './personas';
+import { registrarMovimiento } from './formulario';
 import { insertarProgramado } from './programados';
 
 const { cuenta, tarjeta, ocurrencia } = esquema;
@@ -64,6 +65,17 @@ export const Escenario = z.looseObject({
       z.object({ concepto: z.string(), fecha: Fecha, monto: z.int().min(1), cuenta: z.string().optional() }),
     )
     .default([]),
+  /** Gastos con comercio del vector E14 (`e14-01`); categoría `suscripciones`, salvo OXXO en `antojos`. */
+  gastos_e14: z
+    .object({
+      cuenta: z.string().default('efectivo'),
+      gastos: z.array(
+        z.object({ fecha: Fecha, monto: z.int().min(1), comercio: z.string().min(1) }),
+      ),
+    })
+    .optional(),
+  /** Catálogo semilla de E14 en builds de desarrollo (vacío = comportamiento de E14-01). */
+  catalogo_suscripciones: z.array(z.string()).optional(),
   espacios: z.unknown().optional(),
   esperado: z.unknown().optional(),
 });
@@ -78,12 +90,32 @@ export interface EscenarioCargado {
   readonly contactos: Readonly<Record<string, string>>;
   readonly ingresoId: string | null;
   readonly esperado: unknown;
+  /** Si viene en el escenario, fijar en el contexto antes de abrir Suscripciones (E14-01 usa `[]`). */
+  readonly catalogoSuscripciones?: readonly string[];
+}
+
+function registrarGastosE14Semilla(
+  ctx: Contexto,
+  gastos: readonly { fecha: string; monto: number; comercio: string }[],
+  origenId: string,
+): void {
+  for (const g of gastos) {
+    registrarMovimiento(ctx, {
+      tipo: 'gasto',
+      fecha: g.fecha,
+      monto: g.monto,
+      comercio: g.comercio,
+      categoria: g.comercio.startsWith('OXXO') ? 'antojos' : 'suscripciones',
+      origenId,
+    });
+  }
 }
 
 /**
  * Cargador de escenarios semilla (`fixtures/README.md`, solo builds de desarrollo): cuentas con alias y
  * `saldo_inicial` en `hoy − 1`, tarjetas (saldo = deuda), contactos (`te_debe`), ingreso con
- * `define_horizonte = 1` y su `ultimo_recibido` cubierto, compromisos únicos y colchón. Exige una base sin
+ * `define_horizonte = 1` y su `ultimo_recibido` cubierto, compromisos únicos, `gastos_e14` (M10) y colchón.
+ * Exige una base sin
  * datos del usuario. El espacio negocio (`e-negocio`) llega con M11.
  */
 export function cargarEscenario(ctx: Contexto, datos: unknown): EscenarioCargado {
@@ -176,8 +208,21 @@ export function cargarEscenario(ctx: Contexto, datos: unknown): EscenarioCargado
         cuentaId: cuentaDe(c.cuenta),
       });
     }
+    if (e.gastos_e14) {
+      const origen = cuentaDe(e.gastos_e14.cuenta);
+      if (!origen) throw new ErrorDominio('escenario_invalido', 'gastos_e14 sin cuenta de origen');
+      registrarGastosE14Semilla(ctx, e.gastos_e14.gastos, origen);
+    }
     fijarColchon(ctx, e.colchon);
     completarOnboarding(ctx);
-    return { id: e.id, hoy: e.hoy, cuentas, contactos, ingresoId, esperado: e.esperado };
+    return {
+      id: e.id,
+      hoy: e.hoy,
+      cuentas,
+      contactos,
+      ingresoId,
+      esperado: e.esperado,
+      catalogoSuscripciones: e.catalogo_suscripciones,
+    };
   });
 }
