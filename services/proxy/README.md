@@ -57,6 +57,8 @@ Errores, siempre `{ "error": "<código>" }`:
 
 Con 502 o 504 la interpretación se devuelve al cupo del usuario (no al tope global: la llamada pudo costar).
 
+> **Tip:** El cupo se restaura solo si el proxy responde **502** o **504** (`devolver_interpretacion`); un **200** con `aclarar/no_entendi` sí cuenta. Si la app aborta antes de recibir la respuesta, el consumo ya hecho no se devuelve — mantén `TIEMPO_MAXIMO_LLM_MS` (10 s, `packages/nlu/src/cliente/cliente.ts`) por encima de `PRESUPUESTO_TOTAL_MS` (7 s, `_shared/nlu/proveedores.ts`).
+
 ### Desplegar
 
 1. `supabase db push` aplica `20261013000000_nlu_uso.sql`.
