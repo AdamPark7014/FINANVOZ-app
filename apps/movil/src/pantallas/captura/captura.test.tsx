@@ -155,6 +155,7 @@ describe('Movimientos → capturas por revisar', () => {
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     expect(screen.getByTestId('capturas-por-revisar')).toBeTruthy();
     expect(screen.getByTestId('capturas-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('capturas-por-revisar-intro')).toHaveTextContent(INTRO_CAPTURAS_POR_REVISAR);
     expect(screen.getByText(/Consulta tu estado de cuenta en la app/)).toBeTruthy();
     fireEvent.press(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`));
     expect(screen.queryByText(/Consulta tu estado de cuenta en la app/)).toBeNull();

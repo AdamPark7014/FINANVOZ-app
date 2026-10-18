@@ -178,6 +178,12 @@ export function etiquetaHablada(texto: string): string {
   });
 }
 
+/** TalkBack de `EstadoVacio`: cifras en palabras y «Todavía» → «Aún» al inicio (más natural al oír). */
+export function etiquetaEstadoVacio(texto: string): string {
+  const hablado = etiquetaHablada(texto);
+  return hablado.startsWith('Todavía ') ? `Aún ${hablado.slice('Todavía '.length)}` : hablado;
+}
+
 /** Campo editable de pesos (02-UX §15): nombre + monto escrito en palabras, sin leer dígitos sueltos. */
 export function etiquetaCampoMonto(etiqueta: string, texto: string): string {
   const nombre = `${etiquetaHablada(etiqueta)} en pesos`;

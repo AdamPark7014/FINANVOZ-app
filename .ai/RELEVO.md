@@ -6,26 +6,27 @@
 
 ## Hecho en este turno
 
-- **Suscripciones / O5 pagos fijos (TalkBack):** fila con encabezado, mensaje `alert` si error, vacío `EstadoVacio`, auditoría estricta E14; O5 pistas continuar/saltar y fila agregada en palabras (`onboarding.test.tsx`).
-- **UI kit:** `EstadoVacio` / `CampoMonto` TalkBack; tests `componentes.test.tsx`.
+- **Compartido:** imports faltantes (`BTN_COMPARTIDOS_CUENTAS`, `etiquetaVacioCompartidos`) en `compartido.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Cuentas CTAs, captura, me-alcanza. Ver `git log`.
+- Suscripciones/deducciones CTAs Cuentas; Movimientos por revisar; captura Ajustes. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (`PreviaWidget`, etc.) — no mezclar sin `git status`.
-- CI Windows, M0: Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas.
+2. Prueba `Cuentas abre Compartidos` con header + `accessibilityLabel` (paridad suscripciones).
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

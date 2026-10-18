@@ -27,12 +27,15 @@ import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
 import {
+  BTN_COMPARTIDOS_CUENTAS,
   ETIQUETA_ACCESIBILIDAD_QR_UNION,
   ETIQUETA_CON_QUIEN_COMPARTES,
   ERROR_NOMBRE_PAREJA,
   MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
+  PISTA_VOLVER_CUENTAS,
+  etiquetaVacioCompartidos,
   etiquetaVacioGrupoMovimientos,
   TEXTO_COMPARTIDOS_VACIO,
   TEXTO_GRUPO_MOVIMIENTOS_VACIO,
