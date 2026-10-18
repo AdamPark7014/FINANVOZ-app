@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Plan (TalkBack):** mensaje post-compra con `alert`/`liveRegion` en errores; aviso de ofertas como alerta; pistas en Ajustes → Ver planes y PuertaPlus (Conocer Plus / Volver).
+- **PantallaHoy:** botón desglose con `accessibilityState.expanded`; aviso «efectivo menos preciso» con `alert` y live region; test en `principal.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones, Registrar, onboarding/captura. Ver `git log`.
+- Plan TalkBack, suscripciones, Registrar, onboarding/captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP sin commitear en `deducciones/` y `principal/` (otro turno) — no mezclar sin `git status`.
+- WIP en `deducciones/` y `principal/` (otros turnos) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
