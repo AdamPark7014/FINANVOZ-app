@@ -35,7 +35,9 @@ export function SeccionWidget() {
 
   return (
     <Tarjeta testID="ajustes-widget">
-      <Texto variante="subtitulo">{SECCION_WIDGET}</Texto>
+      <Texto variante="subtitulo" testID="ajustes-widget-titulo" accessibilityRole="header">
+        {SECCION_WIDGET}
+      </Texto>
       <Texto variante="secundario" tono="secundario" testID="ajustes-widget-instrucciones">
         {TEXTO_INSTRUCCION}
       </Texto>

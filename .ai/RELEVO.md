@@ -6,25 +6,27 @@
 
 ## Hecho en este turno
 
-- **TalkBack tandas/ajustes/captura:** ya en `main` (estado captura con `etiquetaCapturaActiva`, título `ajustes-captura-titulo`, por-revisar, tandas vacío/pistas). Push al remoto verificado.
+- **TalkBack compartidos / widget:** tests en `compartido.test.tsx` (Volver con `PISTA_VOLVER_CUENTAS`, vacío con `etiquetaExplicita`, botón desde Cuentas) y `widget.test.tsx` (auditoría M13 en PreviaWidget).
 
 ## Hecho (acumulado reciente)
 
-- `fc59f44` test header Por revisar; `b6d720a` TalkBack captura activa Ajustes; tandas PISTA_* / EstadoVacio. Ver `git log`.
+- Captura permiso, suscripciones, tandas, principal. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ayuda/compartido en working tree — no commitear sin revisar diff.
-- M0 / EAS: Adam.
+- WIP ajeno en disco (`git status`): ajustes, ayuda, tandas tests — no mezclar; salvar si hace falta.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP ayuda/compartido en commit aparte.
+2. `accessibilityHint` restantes compartidos / captura si sigue la tanda a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
