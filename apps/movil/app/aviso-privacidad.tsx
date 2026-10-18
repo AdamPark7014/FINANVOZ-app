@@ -7,7 +7,7 @@ import {
   PISTA_VOLVER,
   TIP_AVISO_PRIVACIDAD,
   TITULO_AVISO_PRIVACIDAD,
-} from '../src/pantallas/privacidad/textos';
+} from '../src/pantallas/privacidad';
 import { VERSION_CONSENTIMIENTO } from '../src/servicios';
 import { Boton, espacio, Pantalla, Texto } from '../src/ui';
 
