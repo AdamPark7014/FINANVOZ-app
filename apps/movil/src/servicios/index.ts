@@ -8,8 +8,14 @@ export { crearGeneradorSecuencial, crearGeneradorUuidV7 } from './ids';
 export { etiquetaDiaMes, etiquetaFecha } from './formato';
 export {
   aceptarConsentimiento,
+  compararVersionAviso,
+  enSoloLectura,
   obtenerConsentimiento,
+  obtenerHistorialConsentimiento,
+  rechazarReconsentimiento,
+  requiereReconsentimiento,
   VERSION_CONSENTIMIENTO,
+  versionAvisoDesactualizada,
   type EvidenciaConsentimiento,
 } from '../privacidad/consentimiento';
 export {

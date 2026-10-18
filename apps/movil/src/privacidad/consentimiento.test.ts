@@ -11,7 +11,17 @@ import {
 import { crearPersona } from '../servicios/personas';
 import { registrarTexto } from '../servicios/registrar';
 import { abrirPrueba } from '../servicios/__pruebas__/base';
-import { aceptarConsentimiento, obtenerConsentimiento, VERSION_CONSENTIMIENTO } from './consentimiento';
+import { exportarJson } from './exportar';
+import {
+  aceptarConsentimiento,
+  enSoloLectura,
+  exigirConsentimiento,
+  obtenerConsentimiento,
+  obtenerHistorialConsentimiento,
+  rechazarReconsentimiento,
+  requiereReconsentimiento,
+  VERSION_CONSENTIMIENTO,
+} from './consentimiento';
 
 const TABLAS_DE_USUARIO = [
   'contacto',
@@ -99,5 +109,34 @@ describe('consentimiento con evidencia', () => {
     expect(aceptarConsentimiento(p.ctx, { datosFinancieros: true, estadisticas: true })).toEqual(evidencia);
     agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 10_000 });
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
+  });
+
+  it('pendiente 31 · aviso desactualizado pide reconsentimiento; rechazar deja solo lectura; aceptar archiva en historial', async () => {
+    const p = abrirPrueba();
+    const vieja = '2026-10-m2';
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true, version: vieja });
+    agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 10_000 });
+
+    expect(requiereReconsentimiento(p.ctx)).toBe(true);
+    expect(enSoloLectura(p.ctx)).toBe(false);
+
+    rechazarReconsentimiento(p.ctx);
+    expect(requiereReconsentimiento(p.ctx)).toBe(false);
+    expect(enSoloLectura(p.ctx)).toBe(true);
+    expect(() => exigirConsentimiento(p.ctx)).toThrow(expect.objectContaining({ codigo: 'solo_lectura' }));
+    expect(() =>
+      agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'Nu', saldo: 0, institucion: 'nu' }),
+    ).toThrow(expect.objectContaining({ codigo: 'solo_lectura' }));
+    await expect(registrarTexto(p.ctx, 'coca 25 en efectivo')).rejects.toMatchObject({ codigo: 'solo_lectura' });
+    expect(() => exportarJson(p.ctx)).not.toThrow();
+
+    const nueva = aceptarConsentimiento(p.ctx, { datosFinancieros: true, medio: 'reconsentimiento' });
+    expect(nueva.version).toBe(VERSION_CONSENTIMIENTO);
+    expect(nueva.medio).toBe('reconsentimiento');
+    expect(enSoloLectura(p.ctx)).toBe(false);
+    expect(obtenerHistorialConsentimiento(p.ctx)).toEqual([
+      expect.objectContaining({ version: vieja, medio: 'onboarding' }),
+    ]);
+    agregarCuenta(p.ctx, { subtipo: 'billetera', nombre: 'Mercado', saldo: 0 });
   });
 });

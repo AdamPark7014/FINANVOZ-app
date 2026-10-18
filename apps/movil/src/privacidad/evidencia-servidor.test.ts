@@ -45,6 +45,22 @@ describe('evidencia del consentimiento en el servidor (08 §2, §7.1)', () => {
     p2.base.cerrar();
   });
 
+  it('al aceptar una versión nueva del aviso vuelve a quedar pendiente de enviar', async () => {
+    const p = abrirPrueba();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true, version: '2026-10-m2' });
+    const enviar = vi.fn<PuertoEvidencia['enviar']>(async () => true);
+    expect(await sincronizarEvidencia(p.ctx, { enviar })).toBe(true);
+    expect(evidenciaPendiente(p.ctx)).toBe(false);
+
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true, medio: 'reconsentimiento' });
+    expect(evidenciaPendiente(p.ctx)).toBe(true);
+    expect(await sincronizarEvidencia(p.ctx, { enviar })).toBe(true);
+    expect(enviar).toHaveBeenLastCalledWith(
+      expect.objectContaining({ version_aviso: '2026-10-m7' }),
+    );
+    p.base.cerrar();
+  });
+
   it('el puerto inserta en /rest/v1/consentimiento con la sesión anónima; 201 y 409 cuentan como enviada', async () => {
     const llamadas: [string, RequestInit][] = [];
     const respuestas = [401, 201, 409, 500];
