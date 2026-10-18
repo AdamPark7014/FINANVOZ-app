@@ -49,6 +49,16 @@ describe('Suscripciones (02 §20)', () => {
     expect(textoDe('suscripciones-inactivas')).toBe('Ya no se cobran: Disney Plus (último cargo 20 jul)');
   });
 
+  it('Editar nombre: guarda "Dominio web" en la fila', () => {
+    const { ctx } = preparar();
+    renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('suscripcion-dominio-web-editar-nombre'));
+    fireEvent.changeText(screen.getByTestId('suscripcion-dominio-web-nombre'), 'Dominio web');
+    fireEvent.press(screen.getByTestId('suscripcion-dominio-web-guardar-nombre'));
+    expect(textoDe('suscripciones-mensaje')).toBe('Listo: la llamo Dominio web.');
+    expect(screen.getByText('Dominio web')).toBeTruthy();
+  });
+
   it('Convertir en compromiso: Hoy aparta Netflix y la fila lo dice', () => {
     const { ctx } = preparar();
     const antes = obtenerHoy(ctx).reservado;
@@ -58,6 +68,16 @@ describe('Suscripciones (02 §20)', () => {
     expect(screen.getByTestId('suscripcion-netflix-apartada')).toBeTruthy();
     expect(screen.queryByTestId('suscripcion-netflix-compromiso')).toBeNull();
     expect(obtenerHoy(ctx).reservado - antes).toBe(21_900);
+  });
+
+  it('"Ya la cancelé" en un compromiso la oculta y deja de apartarla', () => {
+    const { ctx } = preparar();
+    renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
+    const reservado = obtenerHoy(ctx).reservado;
+    fireEvent.press(screen.getByTestId('suscripcion-netflix-cancelada'));
+    expect(screen.queryByTestId('suscripcion-netflix')).toBeNull();
+    expect(obtenerHoy(ctx).reservado).toBeLessThan(reservado);
   });
 
   it('Ya la cancelé y No es suscripción la quitan de la lista y del resumen', () => {

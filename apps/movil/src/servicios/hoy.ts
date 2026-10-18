@@ -23,13 +23,14 @@ import { preguntasCoberturaPendientes } from './cobertura';
 import { capturaInactiva, reactivarCapturaPendiente } from './estado-captura';
 import { listarCapturasPorRevisar, preguntasCaptura, type PreguntaCaptura } from './preguntas-captura';
 import type { Contexto } from './contexto';
-import { dias as textoDias, etiquetaFecha } from './formato';
+import { dias as textoDias, etiquetaFecha, pesos } from './formato';
 import { preguntasLiquidarPendientes, type PlanPorLiquidar } from './msi';
 import { listarOcurrencias, pospuestaHoy } from './ocurrencias';
 import { escribirAjuste, leerAjuste } from './preferencias';
 import { contarPorInterpretar } from './registrar';
 import { ingresoPrincipal } from './programados';
 import { programadosDeTandas, tarjetasTanda, type TarjetaTanda } from './tandas';
+import { listarAumentosSuscripcionPendientes } from './suscripciones';
 import { cuotasMsiPendientes, tarjetasActivas } from './tarjetas';
 import { pagosQueVencen, tarjetaDelDia, type TarjetaDelDia } from './vista-tarjetas';
 
@@ -79,6 +80,18 @@ export type TarjetaAccion =
       /** "¿Este pago fue la renta?" */
       readonly pregunta: string;
       /** "Sí" → `confirmarCobertura`; "No" → `rechazarCobertura`. */
+      readonly opciones: readonly ['si', 'no'];
+    }
+  | {
+      /** 5. Suscripción en compromiso con aumento de precio (E14): confirmar antes de reservar el monto nuevo. */
+      readonly tipo: 'aumento_suscripcion';
+      readonly comercio: string;
+      readonly nombre: string;
+      readonly montoNuevo: Centavos;
+      readonly montoReservado: Centavos;
+      readonly programadoId: string;
+      readonly pregunta: string;
+      /** "Sí" → `aceptarAumentoSuscripcion`; "No" → `mantenerMontoSuscripcion`. */
       readonly opciones: readonly ['si', 'no'];
     }
   | {
@@ -481,6 +494,18 @@ function tarjetasDeAccion(
   const catalogo = catalogoApp();
   for (const pregunta of preguntasCaptura(ctx, catalogo))
     tarjetas.push({ tipo: 'pregunta_captura', pregunta });
+  for (const a of listarAumentosSuscripcionPendientes(ctx)) {
+    tarjetas.push({
+      tipo: 'aumento_suscripcion',
+      comercio: a.comercio,
+      nombre: a.nombre,
+      montoNuevo: a.montoNuevo,
+      montoReservado: a.montoReservado,
+      programadoId: a.programadoId,
+      pregunta: `${a.nombre} ahora cobra ${pesos(a.montoNuevo)} (antes apartaba ${pesos(a.montoReservado)}). ¿Actualizo lo que aparto?`,
+      opciones: ['si', 'no'],
+    });
+  }
   for (const q of preguntasCoberturaPendientes(ctx)) {
     tarjetas.push({
       tipo: 'confirmar_cobertura',

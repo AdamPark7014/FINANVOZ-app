@@ -4,7 +4,7 @@ import { esquema } from '@cartera/datos';
 import { Regla as ReglaZod } from '@cartera/nlu';
 import type { Contexto } from './contexto';
 
-const { programado } = esquema;
+const { programado, ocurrencia } = esquema;
 
 export interface ProgramadoLeido {
   readonly id: string;
@@ -115,3 +115,28 @@ export function insertarProgramado(
     .run();
   return id;
 }
+
+/** Desactiva un programado y quita sus ocurrencias pendientes (no son del libro). */
+export function desactivarProgramado(ctx: Contexto, programadoId: string): void {
+  ctx.db.update(programado).set({ activo: 0 }).where(eq(programado.id, programadoId)).run();
+  ctx.db
+    .delete(ocurrencia)
+    .where(and(eq(ocurrencia.programadoId, programadoId), eq(ocurrencia.estado, 'pendiente')))
+    .run();
+}
+
+/** Cambia el monto reservado de un programado activo (p. ej. suscripción en compromiso). */
+export function actualizarMontoProgramado(ctx: Contexto, programadoId: string, monto: Centavos): void {
+  if (!Number.isSafeInteger(monto) || monto <= 0) {
+    throw new ErrorDominio('monto_invalido', 'el monto debe ser mayor que cero');
+  }
+  ctx.db.update(programado).set({ monto }).where(eq(programado.id, programadoId)).run();
+}
+
+/** Concepto visible del programado (p. ej. nombre editado de una suscripción). */
+export function actualizarConceptoProgramado(ctx: Contexto, programadoId: string, concepto: string): void {
+  const t = concepto.trim();
+  if (!t) throw new ErrorDominio('concepto_vacio', 'escribe un nombre');
+  ctx.db.update(programado).set({ concepto: t }).where(eq(programado.id, programadoId)).run();
+}
+

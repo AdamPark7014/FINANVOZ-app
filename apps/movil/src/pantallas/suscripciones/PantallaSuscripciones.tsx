@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import {
   convertirEnCompromiso,
+  fijarNombreSuscripcion,
   listarSuscripciones,
   marcarNoEsSuscripcion,
   yaLaCancele,
@@ -9,7 +10,7 @@ import {
   type SuscripcionVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { mensajeError } from '../principal/textos';
 
 type Accion = 'compromiso' | 'cancelada' | 'no_es';
@@ -74,7 +75,20 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         </Texto>
       ) : null}
       {v.activas.map((s) => (
-        <Fila key={s.comercio} s={s} alHacer={(a) => hacer(a, s)} />
+        <Fila
+          key={`${s.comercio}-${s.nombre}`}
+          s={s}
+          alHacer={(a) => hacer(a, s)}
+          alRenombrar={(nombre) => {
+            try {
+              fijarNombreSuscripcion(ctx, s.comercio, nombre);
+              setMensaje({ texto: `Listo: la llamo ${nombre}.`, error: false });
+            } catch (e) {
+              setMensaje({ texto: mensajeError(e), error: true });
+            }
+            refrescar();
+          }}
+        />
       ))}
       {v.textoInactivas ? (
         <Texto variante="secundario" tono="secundario" testID="suscripciones-inactivas">
@@ -85,12 +99,58 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
   );
 }
 
-function Fila({ s, alHacer }: { s: SuscripcionVista; alHacer: (a: Accion) => void }) {
+function Fila({
+  s,
+  alHacer,
+  alRenombrar,
+}: {
+  s: SuscripcionVista;
+  alHacer: (a: Accion) => void;
+  alRenombrar: (nombre: string) => void;
+}) {
   const id = `suscripcion-${s.comercio.replace(/ /g, '-').toLowerCase()}`;
+  const [editandoNombre, setEditandoNombre] = useState(false);
+  const [nombre, setNombre] = useState(s.nombre);
+  const guardarNombre = () => {
+    const t = nombre.trim();
+    if (!t || t === s.nombre) {
+      setEditandoNombre(false);
+      setNombre(s.nombre);
+      return;
+    }
+    alRenombrar(t);
+    setEditandoNombre(false);
+  };
   return (
     <Tarjeta testID={id}>
       <View style={{ gap: espacio.xxs }}>
-        <Texto variante="cuerpoFuerte">{s.nombre}</Texto>
+        {editandoNombre ? (
+          <CampoTexto
+            etiqueta="Nombre"
+            valor={nombre}
+            alCambiar={setNombre}
+            testID={`${id}-nombre`}
+            alEnviar={guardarNombre}
+          />
+        ) : (
+          <Texto variante="cuerpoFuerte">{s.nombre}</Texto>
+        )}
+        {!editandoNombre ? (
+          <Boton
+            testID={`${id}-editar-nombre`}
+            etiqueta="Editar nombre"
+            variante="texto"
+            ancho="contenido"
+            alPresionar={() => setEditandoNombre(true)}
+          />
+        ) : (
+          <Boton
+            testID={`${id}-guardar-nombre`}
+            etiqueta="Guardar nombre"
+            variante="secundario"
+            alPresionar={guardarNombre}
+          />
+        )}
         <Texto variante="cuerpo" testID={`${id}-monto`}>
           {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
         </Texto>
@@ -101,9 +161,18 @@ function Fila({ s, alHacer }: { s: SuscripcionVista; alHacer: (a: Accion) => voi
         ) : null}
       </View>
       {s.compromiso ? (
-        <Texto variante="secundario" tono="acento" testID={`${id}-apartada`}>
-          Hoy ya la aparta.
-        </Texto>
+        <View style={{ gap: espacio.xs }}>
+          <Texto variante="secundario" tono="acento" testID={`${id}-apartada`}>
+            Hoy ya la aparta.
+          </Texto>
+          <Boton
+            testID={`${id}-cancelada`}
+            etiqueta="Ya la cancelé"
+            variante="texto"
+            ancho="contenido"
+            alPresionar={() => alHacer('cancelada')}
+          />
+        </View>
       ) : (
         <View style={{ gap: espacio.xs }}>
           <Boton

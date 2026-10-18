@@ -20,8 +20,14 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { enTransaccion, type Contexto } from './contexto';
 import { etiquetaDiaMes, etiquetaFecha, miles, pesos } from './formato';
 import { materializarOcurrencias } from './ocurrencias';
-import { escribirAjuste, leerAjuste } from './preferencias';
-import { insertarProgramado } from './programados';
+import { borrarAjuste, escribirAjuste, leerAjuste } from './preferencias';
+import {
+  actualizarConceptoProgramado,
+  actualizarMontoProgramado,
+  desactivarProgramado,
+  insertarProgramado,
+  programadoPorId,
+} from './programados';
 
 const { asiento, cuenta, suscripcion, transaccionVigente: tv } = esquema;
 
@@ -92,6 +98,26 @@ const NoEsSuscripcion = z.array(z.string());
 const CLAVE_NO_ES = 'suscripciones:no_es';
 /** Fecha de la última detección de la tarea diaria. */
 const CLAVE_ULTIMA = 'suscripciones:ultima_deteccion';
+/** Nombres visibles por comercio normalizado (pendiente 66). */
+const CLAVE_NOMBRES = 'suscripciones:nombres';
+/** Aumentos de precio en suscripciones-compromiso pendientes de confirmar en Hoy (pendiente 65). */
+const CLAVE_AUMENTOS = 'suscripciones:aumentos_pendientes';
+
+const Nombres = z.record(z.string(), z.string());
+const AumentoPendiente = z.object({
+  montoNuevo: z.number().int().positive(),
+  montoReservado: z.number().int().positive(),
+  programadoId: z.string(),
+});
+const AumentosPendientes = z.record(z.string(), AumentoPendiente);
+
+export type AumentoSuscripcionPendiente = {
+  readonly comercio: string;
+  readonly nombre: string;
+  readonly montoNuevo: Centavos;
+  readonly montoReservado: Centavos;
+  readonly programadoId: string;
+};
 
 function noEsSuscripcion(ctx: Contexto): ReadonlySet<string> {
   return new Set(leerAjuste(ctx, CLAVE_NO_ES, NoEsSuscripcion) ?? []);
@@ -136,9 +162,14 @@ export function procesarSuscripciones(ctx: Contexto): Suscripcion[] {
       }
       if (previa.ultimoCargo === s.ultimo_cargo && previa.montoTipico === s.monto_tipico) continue;
       const reaparece = previa.estado === 'ignorada' && s.ultimo_cargo > previa.ultimoCargo;
+      const compromiso = sincronizarCompromiso(ctx, s, previa);
       ctx.db
         .update(suscripcion)
-        .set({ ...datos, ...(reaparece ? { estado: 'detectada' as const } : {}) })
+        .set({
+          ...datos,
+          ...(reaparece ? { estado: 'detectada' as const } : {}),
+          ...compromiso,
+        })
         .where(eq(suscripcion.comercioNormalizado, s.comercio))
         .run();
     }
@@ -208,6 +239,77 @@ function nombreDe(comercio: string): string {
     .join(' ');
 }
 
+function nombresPersonalizados(ctx: Contexto): Readonly<Record<string, string>> {
+  return leerAjuste(ctx, CLAVE_NOMBRES, Nombres) ?? {};
+}
+
+/** Nombre visible: ajuste local o título del comercio normalizado. */
+export function nombreVisible(ctx: Contexto, comercio: string): string {
+  return nombresPersonalizados(ctx)[comercio] ?? nombreDe(comercio);
+}
+
+function leerAumentosPendientes(ctx: Contexto): Record<string, z.infer<typeof AumentoPendiente>> {
+  return leerAjuste(ctx, CLAVE_AUMENTOS, AumentosPendientes) ?? {};
+}
+
+function guardarAumentosPendientes(
+  ctx: Contexto,
+  mapa: Record<string, z.infer<typeof AumentoPendiente>>,
+): void {
+  if (Object.keys(mapa).length === 0) borrarAumentosPendientes(ctx);
+  else escribirAjuste(ctx, CLAVE_AUMENTOS, AumentosPendientes, mapa);
+}
+
+function borrarAumentosPendientes(ctx: Contexto): void {
+  borrarAjuste(ctx, CLAVE_AUMENTOS);
+}
+
+function quitarAumentoPendiente(ctx: Contexto, comercio: string): void {
+  const mapa = leerAumentosPendientes(ctx);
+  if (!(comercio in mapa)) return;
+  const { [comercio]: _, ...resto } = mapa;
+  guardarAumentosPendientes(ctx, resto);
+}
+
+function registrarAumentoPendiente(
+  ctx: Contexto,
+  comercio: string,
+  montoNuevo: Centavos,
+  montoReservado: Centavos,
+  programadoId: string,
+): void {
+  guardarAumentosPendientes(ctx, {
+    ...leerAumentosPendientes(ctx),
+    [comercio]: { montoNuevo, montoReservado, programadoId },
+  });
+}
+
+/** Sincroniza el programado de una suscripción en compromiso con lo que detectó E14. */
+function sincronizarCompromiso(
+  ctx: Contexto,
+  s: Suscripcion,
+  previa: typeof suscripcion.$inferSelect,
+): Partial<typeof suscripcion.$inferInsert> {
+  if (previa.estado !== 'compromiso' || !previa.programadoId) return {};
+  const programadoId = previa.programadoId;
+  if (s.estado !== 'activa') {
+    desactivarProgramado(ctx, programadoId);
+    quitarAumentoPendiente(ctx, s.comercio);
+    return { estado: 'detectada', programadoId: null };
+  }
+  const prog = programadoPorId(ctx, programadoId);
+  if (!prog.activo) return { estado: 'detectada', programadoId: null };
+  if (s.monto_tipico > prog.monto) {
+    registrarAumentoPendiente(ctx, s.comercio, s.monto_tipico, prog.monto, programadoId);
+    return {};
+  }
+  if (s.monto_tipico !== prog.monto) {
+    actualizarMontoProgramado(ctx, programadoId, s.monto_tipico);
+    quitarAumentoPendiente(ctx, s.comercio);
+  }
+  return {};
+}
+
 function textoProximo(p: Periodicidad, fecha: PlainDate, hoy: PlainDate): string {
   if (p === 'semanal') return `próximo ${etiquetaFecha(fecha)} ${etiquetaDiaMes(fecha).split(' ')[1]}`;
   const anio = partes(fecha).anio;
@@ -215,6 +317,7 @@ function textoProximo(p: Periodicidad, fecha: PlainDate, hoy: PlainDate): string
 }
 
 function vista(
+  ctx: Contexto,
   s: Suscripcion,
   fila: typeof suscripcion.$inferSelect | undefined,
   hoy: PlainDate,
@@ -222,7 +325,7 @@ function vista(
   const compromiso = fila?.estado === 'compromiso';
   return {
     comercio: s.comercio,
-    nombre: nombreDe(s.comercio),
+    nombre: nombreVisible(ctx, s.comercio),
     periodicidad: s.periodicidad,
     monto: s.monto_tipico,
     montoAnterior: s.monto_anterior,
@@ -255,10 +358,10 @@ export function listarSuscripciones(ctx: Contexto): VistaSuscripciones {
   const r = resumenActivas(visibles);
   const activas = visibles
     .filter((s) => s.estado === 'activa')
-    .map((s) => vista(s, tabla.get(s.comercio), hoy));
+    .map((s) => vista(ctx, s, tabla.get(s.comercio), hoy));
   const inactivas = visibles
     .filter((s) => s.estado !== 'activa')
-    .map((s) => vista(s, tabla.get(s.comercio), hoy));
+    .map((s) => vista(ctx, s, tabla.get(s.comercio), hoy));
   return {
     activas,
     inactivas,
@@ -317,7 +420,7 @@ export function convertirEnCompromiso(ctx: Contexto, comercio: string): { progra
     }
     const programadoId = insertarProgramado(ctx, {
       tipo: 'egreso',
-      concepto: nombreDe(s.comercio),
+      concepto: nombreVisible(ctx, s.comercio),
       monto: s.monto_tipico,
       regla: s.regla,
       desde: sumarDias(s.ultimo_cargo, 1),
@@ -339,12 +442,17 @@ export function yaLaCancele(ctx: Contexto, comercio: string): void {
   exigirConsentimiento(ctx);
   enTransaccion(ctx, () => {
     const { fila } = exigirVisible(ctx, comercio);
-    if (fila.estado === 'compromiso') {
-      throw new ErrorDominio('suscripcion_ya_compromiso', 'esa suscripción ya es un compromiso');
+    if (fila.estado === 'compromiso' && fila.programadoId) {
+      desactivarProgramado(ctx, fila.programadoId);
+      quitarAumentoPendiente(ctx, comercio);
     }
     ctx.db
       .update(suscripcion)
-      .set({ estado: 'ignorada' satisfies EstadoTabla, actualizadaEn: ctx.reloj.ahora() })
+      .set({
+        estado: 'ignorada' satisfies EstadoTabla,
+        programadoId: null,
+        actualizadaEn: ctx.reloj.ahora(),
+      })
       .where(eq(suscripcion.comercioNormalizado, comercio))
       .run();
   });
@@ -366,6 +474,51 @@ export function marcarNoEsSuscripcion(ctx: Contexto, comercio: string): void {
     const actuales = leerAjuste(ctx, CLAVE_NO_ES, NoEsSuscripcion) ?? [];
     escribirAjuste(ctx, CLAVE_NO_ES, NoEsSuscripcion, [...new Set([...actuales, comercio])].sort());
   });
+}
+
+/** Cambia el nombre visible de una suscripción (ajuste JSON local, sin migración). */
+export function fijarNombreSuscripcion(ctx: Contexto, comercio: string, nombre: string): void {
+  exigirConsentimiento(ctx);
+  const t = nombre.trim();
+  if (!t) throw new ErrorDominio('nombre_vacio', 'escribe un nombre');
+  enTransaccion(ctx, () => {
+    exigirVisible(ctx, comercio);
+    const mapa = { ...nombresPersonalizados(ctx), [comercio]: t };
+    escribirAjuste(ctx, CLAVE_NOMBRES, Nombres, mapa);
+    const fila = filasTabla(ctx).get(comercio);
+    if (fila?.programadoId) actualizarConceptoProgramado(ctx, fila.programadoId, t);
+  });
+}
+
+/** Aumentos de precio en suscripciones-compromiso que Hoy debe confirmar antes de reservar el monto nuevo. */
+export function listarAumentosSuscripcionPendientes(ctx: Contexto): readonly AumentoSuscripcionPendiente[] {
+  return Object.entries(leerAumentosPendientes(ctx)).map(([comercio, a]) => ({
+    comercio,
+    nombre: nombreVisible(ctx, comercio),
+    montoNuevo: a.montoNuevo,
+    montoReservado: a.montoReservado,
+    programadoId: a.programadoId,
+  }));
+}
+
+/** "Sí": aparta el monto nuevo en el programado de la suscripción. */
+export function aceptarAumentoSuscripcion(ctx: Contexto, comercio: string): void {
+  exigirConsentimiento(ctx);
+  enTransaccion(ctx, () => {
+    const pendiente = leerAumentosPendientes(ctx)[comercio];
+    if (!pendiente) {
+      throw new ErrorDominio('aumento_inexistente', 'ese cambio de precio ya no está pendiente');
+    }
+    actualizarMontoProgramado(ctx, pendiente.programadoId, pendiente.montoNuevo);
+    quitarAumentoPendiente(ctx, comercio);
+    materializarOcurrencias(ctx);
+  });
+}
+
+/** "No": sigue apartando el monto anterior hasta que aceptes. */
+export function mantenerMontoSuscripcion(ctx: Contexto, comercio: string): void {
+  exigirConsentimiento(ctx);
+  quitarAumentoPendiente(ctx, comercio);
 }
 
 /** Q12 · "¿qué suscripciones tengo?" (`06 §6`): la frase del resumen y una línea por activa. */

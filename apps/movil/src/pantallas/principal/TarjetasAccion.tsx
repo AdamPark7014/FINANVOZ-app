@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import {
+  aceptarAumentoSuscripcion,
   confirmarCobertura,
   confirmarIngresoRecibido,
   listarCuentas,
+  mantenerMontoSuscripcion,
   omitirOcurrencia,
   rechazarCobertura,
   todaviaNo,
@@ -27,6 +29,7 @@ type Compromiso = Extract<TarjetaAccion, { tipo: 'compromiso_vencido' }>;
 type Ingreso = Extract<TarjetaAccion, { tipo: 'ingreso_no_llego' }>;
 type PagoTarjeta = Extract<TarjetaAccion, { tipo: 'pago_tarjeta' }>;
 type Cobertura = Extract<TarjetaAccion, { tipo: 'confirmar_cobertura' }>;
+type AumentoSuscripcion = Extract<TarjetaAccion, { tipo: 'aumento_suscripcion' }>;
 
 /** Tarjetas de acción de Hoy (02-UX §4.1); el servicio ya las ordena y limita a dos. */
 export function TarjetasAccion({
@@ -49,6 +52,8 @@ export function TarjetasAccion({
             return <TarjetaPagoTarjeta key={`pago:${t.tarjetaId}:${t.corte}`} t={t} testID={testID} />;
           case 'confirmar_cobertura':
             return <TarjetaCobertura key={`cob:${t.programadoId}:${t.fecha}`} t={t} testID={testID} />;
+          case 'aumento_suscripcion':
+            return <TarjetaAumentoSuscripcion key={`sub:${t.comercio}`} t={t} testID={testID} />;
           case 'liquidar_msi':
             return <PreguntaLiquidarMeses key={`liq:${t.tarjetaId}`} pregunta={t} testID={testID} />;
           case 'compromiso_vencido':
@@ -273,6 +278,45 @@ function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
 }
 
 /** 5. "¿Este pago fue la renta?" (E3.5 con monto distinto): Sí cubre el pago fijo; No lo deja pendiente. */
+function TarjetaAumentoSuscripcion({ t, testID }: { t: AumentoSuscripcion; testID: string }) {
+  const { ctx, refrescar } = useSesion();
+  const mostrar = useMostrarAviso();
+  const [error, setError] = useState<string | null>(null);
+  const responder = (si: boolean) => {
+    try {
+      if (si) aceptarAumentoSuscripcion(ctx, t.comercio);
+      else mantenerMontoSuscripcion(ctx, t.comercio);
+      refrescar();
+      mostrar({
+        mensaje: si
+          ? `Listo: aparto ${t.nombre} a ${formatearCentavos(t.montoNuevo)}.`
+          : `Va. Sigo apartando ${formatearCentavos(t.montoReservado)} por ahora.`,
+      });
+    } catch (e) {
+      setError(mensajeError(e));
+    }
+  };
+  return (
+    <Tarjeta testID={testID}>
+      <Texto variante="cuerpoFuerte">{t.pregunta}</Texto>
+      <View style={{ gap: espacio.s }}>
+        <Boton etiqueta="Sí, actualiza" alPresionar={() => responder(true)} testID={`${testID}-si`} />
+        <Boton
+          etiqueta="No, déjalo como está"
+          variante="secundario"
+          alPresionar={() => responder(false)}
+          testID={`${testID}-no`}
+        />
+      </View>
+      {error ? (
+        <Texto variante="secundario" tono="faltante">
+          {error}
+        </Texto>
+      ) : null}
+    </Tarjeta>
+  );
+}
+
 function TarjetaCobertura({ t, testID }: { t: Cobertura; testID: string }) {
   const { ctx, refrescar } = useSesion();
   const mostrar = useMostrarAviso();

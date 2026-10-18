@@ -11,9 +11,14 @@ import { programadoPorId } from './programados';
 import { registrarTexto } from './registrar';
 import { cargarEscenario } from './semilla';
 import {
+  aceptarAumentoSuscripcion,
   convertirEnCompromiso,
+  fijarNombreSuscripcion,
+  listarAumentosSuscripcionPendientes,
   listarSuscripciones,
+  mantenerMontoSuscripcion,
   marcarNoEsSuscripcion,
+  procesarSuscripciones,
   procesarSuscripcionesDelDia,
   yaLaCancele,
 } from './suscripciones';
@@ -192,6 +197,75 @@ describe('Suscripciones (M10, 02 §20, CA-M10-01)', () => {
       .where(eq(esquema.suscripcion.comercioNormalizado, 'SMART FIT'))
       .get();
     expect(fila).toMatchObject({ estado: 'detectada', ultimoCargo: '2026-11-01' });
+  });
+
+  it('"Ya la cancelé" en un compromiso desactiva el programado y deja de apartarlo', () => {
+    const p = libroE14();
+    const antes = obtenerHoy(p.ctx).reservado;
+    const { programadoId } = convertirEnCompromiso(p.ctx, 'NETFLIX');
+    expect(obtenerHoy(p.ctx).reservado - antes).toBe(21_900);
+    yaLaCancele(p.ctx, 'NETFLIX');
+    expect(programadoPorId(p.ctx, programadoId).activo).toBe(false);
+    expect(obtenerHoy(p.ctx).reservado).toBe(antes);
+    expect(listarSuscripciones(p.ctx).activas.some((x) => x.comercio === 'NETFLIX')).toBe(false);
+  });
+
+  it('el nombre visible se guarda en ajuste y actualiza el concepto del compromiso', () => {
+    const p = libroE14();
+    fijarNombreSuscripcion(p.ctx, 'DOMINIO WEB', 'Dominio web');
+    expect(listarSuscripciones(p.ctx).activas.find((x) => x.comercio === 'DOMINIO WEB')?.nombre).toBe(
+      'Dominio web',
+    );
+    const { programadoId } = convertirEnCompromiso(p.ctx, 'NETFLIX');
+    fijarNombreSuscripcion(p.ctx, 'NETFLIX', 'Disney+');
+    expect(programadoPorId(p.ctx, programadoId).concepto).toBe('Disney+');
+    expect(listarSuscripciones(p.ctx).activas.find((x) => x.comercio === 'NETFLIX')?.nombre).toBe('Disney+');
+  });
+
+  it('aumento de precio en compromiso pregunta en Hoy antes de reservar el monto nuevo', () => {
+    const p = libroE14();
+    const { programadoId } = convertirEnCompromiso(p.ctx, 'NETFLIX');
+    expect(programadoPorId(p.ctx, programadoId).monto).toBe(21_900);
+    for (const fecha of ['2026-11-14', '2026-12-14', '2027-01-14', '2027-02-14'] as const) {
+      p.reloj.fijar(fecha);
+      registrarMovimiento(p.ctx, {
+        tipo: 'gasto',
+        monto: 31_900,
+        comercio: 'NETFLIX',
+        categoria: 'suscripciones',
+        origenId: p.efectivo,
+      });
+    }
+    procesarSuscripciones(p.ctx);
+    expect(programadoPorId(p.ctx, programadoId).monto).toBe(21_900);
+    expect(listarAumentosSuscripcionPendientes(p.ctx)).toEqual([
+      expect.objectContaining({ comercio: 'NETFLIX', montoNuevo: 31_900, montoReservado: 21_900 }),
+    ]);
+    aceptarAumentoSuscripcion(p.ctx, 'NETFLIX');
+    expect(programadoPorId(p.ctx, programadoId).monto).toBe(31_900);
+    expect(listarAumentosSuscripcionPendientes(p.ctx)).toEqual([]);
+    expect(obtenerHoy(p.ctx).reservadoDetalle).toContainEqual(
+      expect.objectContaining({ concepto: 'Netflix', monto: 31_900 }),
+    );
+  });
+
+  it('"No" en un aumento pendiente sigue reservando el monto anterior', () => {
+    const p = libroE14();
+    const { programadoId } = convertirEnCompromiso(p.ctx, 'NETFLIX');
+    for (const fecha of ['2026-11-14', '2026-12-14', '2027-01-14', '2027-02-14'] as const) {
+      p.reloj.fijar(fecha);
+      registrarMovimiento(p.ctx, {
+        tipo: 'gasto',
+        monto: 31_900,
+        comercio: 'NETFLIX',
+        categoria: 'suscripciones',
+        origenId: p.efectivo,
+      });
+    }
+    procesarSuscripciones(p.ctx);
+    mantenerMontoSuscripcion(p.ctx, 'NETFLIX');
+    expect(programadoPorId(p.ctx, programadoId).monto).toBe(21_900);
+    expect(listarAumentosSuscripcionPendientes(p.ctx)).toEqual([]);
   });
 
   it('sin gastos con comercio no hay resumen', () => {
