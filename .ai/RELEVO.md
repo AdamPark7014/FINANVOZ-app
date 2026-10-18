@@ -6,26 +6,29 @@
 
 ## Hecho en este turno
 
-- **widget / Ajustes:** copy `widget-textos`, `PreviaWidget` TalkBack (hint + textos internos ocultos); tests `widget.test.tsx`. En origin: `cd86735`, `376d74d`, `05a3ce3`. RELEVO handoff pushed: `fda009b`.
+- **Compartidos:** prueba ancla `BTN_COMPARTIDOS_CUENTAS` (entrada desde Cuentas; copy ya en `compartido/textos.ts`).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips, Cuentas, pestañas TalkBack. Ver `git log`.
+- CTAs Cuentas centralizados (`BTN_*_CUENTAS`, tarjeta, ajustes), TalkBack pestañas/pantallas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP personas/tandas (`afb16af` rescate u otros) — usar `salvar` antes de editar.
+- **Sin commitear (no tocar):** `PantallaMovimientos.tsx`, `principal.test.tsx` y otros WIP del turno paralelo.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Integrar rescates WIP en commits pequeños.
+2. Cerrar/rescatar WIP Movimientos y principal.test cuando toque.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- Archivos sin commitear listados arriba.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
