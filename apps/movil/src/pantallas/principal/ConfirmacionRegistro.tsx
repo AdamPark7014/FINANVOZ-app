@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import {
   confirmarRegistro,
@@ -8,6 +8,8 @@ import {
   type PropuestaMovimiento,
   type ResultadoTexto,
 } from '../../servicios';
+import { enlaceAnaliticaCorreccion } from '../../servicios/correcciones';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
@@ -31,6 +33,16 @@ function pregunta(f: CuentaPorElegir): string {
 }
 
 const clave = (i: number, campo: CuentaPorElegir['campo']) => `${i}:${campo}`;
+
+/** Montar una vez en Registrar: enlaza `aplicarCorreccion` con la analítica opt-in (pendiente 30, voz). */
+export function EnlaceAnaliticaCorreccion() {
+  const registrarEvento = useAnalitica();
+  useEffect(() => {
+    enlaceAnaliticaCorreccion(registrarEvento);
+    return () => enlaceAnaliticaCorreccion(null);
+  }, [registrarEvento]);
+  return null;
+}
 
 /**
  * Tarjeta de confirmación (02-UX §5.3): una fila por movimiento con las cuentas que faltan como chips, y

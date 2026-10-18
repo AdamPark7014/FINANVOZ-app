@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { ErrorDominio, minFecha, sumarDias, type Centavos, type PlainDate } from '@cartera/core';
 import { CUENTAS_SISTEMA, esquema, type TransaccionNueva } from '@cartera/datos';
 import { normalizarAlias, type Ajuste } from '@cartera/nlu';
+import type { EventoAnalitica } from '../analitica/eventos';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { aprenderAlias, aprenderCategoria } from './aprendizaje';
 import { cuentaPorId, idCategoriaDe } from './catalogo';
@@ -179,6 +180,45 @@ export interface ResultadoCorreccion {
 
 export type OrigenCorreccion = 'voz' | 'texto' | 'manual';
 
+/** Valores de `correccion.campo` en la lista blanca (`03 §8`). */
+export type CampoCorreccionAnalitica = Extract<
+  EventoAnalitica,
+  { nombre: 'correccion' }
+>['propiedades']['campo'];
+
+/** Qué campos del catálogo cambió una corrección (sin alias ni textos libres). */
+export function camposCorreccionAnalitica(cambios: CambiosResueltos): readonly CampoCorreccionAnalitica[] {
+  const campos: CampoCorreccionAnalitica[] = [];
+  if (cambios.monto !== undefined) campos.push('monto');
+  if (cambios.fecha !== undefined) campos.push('fecha');
+  if (cambios.categoria !== undefined) campos.push('categoria');
+  if (cambios.origenId !== undefined) campos.push('cuenta');
+  if (cambios.descripcion !== undefined) campos.push('descripcion');
+  return campos;
+}
+
+let registrarEventoCorreccion: ((evento: EventoAnalitica) => void) | null = null;
+
+/** Enlaza la analítica opt-in al aplicar correcciones (voz/texto); la pantalla de registro lo monta una vez. */
+export function enlaceAnaliticaCorreccion(registrar: ((evento: EventoAnalitica) => void) | null): void {
+  registrarEventoCorreccion = registrar;
+}
+
+function notificarCorreccionAnalitica(
+  registrar: ((evento: EventoAnalitica) => void) | undefined,
+  cambios: CambiosResueltos,
+): void {
+  const emitir = registrar ?? registrarEventoCorreccion;
+  if (!emitir) return;
+  for (const campo of camposCorreccionAnalitica(cambios)) {
+    try {
+      emitir({ nombre: 'correccion', propiedades: { campo } });
+    } catch {
+      // La analítica nunca debe romper una corrección.
+    }
+  }
+}
+
 /**
  * Corrige un movimiento (RF-REG-06): `Libro.reemplazar` anula la original con su transacción espejo y registra
  * la versión corregida con `reemplaza_a` (regla 2). Conserva tipo, descripción y comercio salvo lo que cambia.
@@ -188,10 +228,15 @@ export function aplicarCorreccion(
   ctx: Contexto,
   transaccionId: string,
   cambios: CambiosResueltos,
-  opciones: { origen?: OrigenCorreccion; claveIdempotencia?: string } = {},
+  opciones: {
+    origen?: OrigenCorreccion;
+    claveIdempotencia?: string;
+    /** Si viene, emite `correccion {campo}` por cada campo cambiado (misma forma que captura). */
+    registrarEvento?: (evento: EventoAnalitica) => void;
+  } = {},
 ): ResultadoCorreccion {
   exigirConsentimiento(ctx);
-  return enTransaccion(ctx, () => {
+  const resultado = enTransaccion(ctx, () => {
     if (estaAnulada(ctx, transaccionId)) throw new ErrorDominio('ya_anulada', 'ese movimiento ya no está');
     exigirNoCompartido(ctx, transaccionId);
     const antes = resumenTransaccion(ctx, transaccionId);
@@ -262,6 +307,8 @@ export function aplicarCorreccion(
       deshacer: `r:${r.nueva.id}:${transaccionId}`,
     };
   });
+  notificarCorreccionAnalitica(opciones.registrarEvento, cambios);
+  return resultado;
 }
 
 /** Asientos y datos de `id` como transacción nueva (para restaurar lo anulado o corregido). */

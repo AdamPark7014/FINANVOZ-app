@@ -4,6 +4,7 @@ import { aleatorioNode } from '../db/node';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { estadisticasActivas, fijarEstadisticas } from '../privacidad/estadisticas';
 import { abrirPrueba } from '../servicios/__pruebas__/base';
+import { camposCorreccionAnalitica } from '../servicios/correcciones';
 import { crearAnalitica, type EnvioAnalitica } from './cliente';
 import {
   EVENTOS_PERMITIDOS,
@@ -234,6 +235,25 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
     expect(() => analitica.registrar(p.ctx, { nombre: 'app_abierta', propiedades: {} })).not.toThrow();
     await new Promise((r) => setTimeout(r, 0));
     p.base.cerrar();
+  });
+
+  it('camposCorreccionAnalitica solo produce valores del enum correccion.campo', () => {
+    const permitidos = new Set(['monto', 'categoria', 'cuenta', 'fecha', 'descripcion', 'tipo', 'otro']);
+    for (const campo of camposCorreccionAnalitica({
+      monto: 1,
+      categoria: 'comida_fuera',
+      origenId: 'x',
+      fecha: '2026-10-11',
+      descripcion: 'x',
+    })) {
+      expect(permitidos).toContain(campo);
+    }
+    expect(
+      validarEvento(
+        { nombre: 'correccion', propiedades: { campo: camposCorreccionAnalitica({ monto: 1 })[0]! } },
+        BANCOS,
+      ),
+    ).toEqual({ nombre: 'correccion', propiedades: { campo: 'monto' } });
   });
 
   it('validarEvento y bucketLatencia', () => {
