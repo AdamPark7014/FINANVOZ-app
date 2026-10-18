@@ -32,7 +32,7 @@ Documento denso tras oleadas **W1–W9** y **V1–V20** en `FINANVOZ-app`. Fábr
 |---:|---:|---|
 | 1 · FinanVoz first | **69** | Código ~93 %; camino a tienda ~36 % |
 | 2 · Estándar | **48** | ESTADO/LANZAMIENTO/relevo; analítica estable (H9); CI global: RNF-01/proxy PGlite según máquina |
-| 3 · Fábrica | **12** | ADR coexistencia; sin `apply.mjs` sobre este monorepo |
+| 3 · Fábrica | **12** | PRODUCTOS ~48–51 % overall (otro repo); ADR coexistencia; sin `apply.mjs` sobre este monorepo |
 | 4 · RestaurantOS | **8** (piloto) | Stub en portfolio; `food/RestaurantOS` maduro aparte |
 
 Objetivo «70 % en 2 días»: **cumplido en código FinanVoz**; **no** en lanzamiento medible ni en plan four-track completo.
