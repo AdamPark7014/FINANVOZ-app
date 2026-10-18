@@ -20,7 +20,7 @@ import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { useMostrarAviso } from './ProveedorAvisos';
 import { codigoError, mensajeError } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
@@ -214,12 +214,15 @@ function ElegirCuenta({
   const [cuentas] = useState(() => listarCuentas(ctx).tienes);
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="secundario">{pregunta}</Texto>
+      <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {pregunta}
+      </Texto>
       <GrupoChips
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={null}
         alCambiar={alElegir}
         prefijoTestID={testID}
+        etiqueta={pregunta}
       />
     </View>
   );

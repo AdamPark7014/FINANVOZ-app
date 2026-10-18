@@ -150,7 +150,7 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo" accessibilityRole="header">
+      <Texto variante="titulo" testID="estado-cuenta-titulo">
         {TITULO_PANTALLA}
       </Texto>
       {estado.tipo === 'leyendo' ? (

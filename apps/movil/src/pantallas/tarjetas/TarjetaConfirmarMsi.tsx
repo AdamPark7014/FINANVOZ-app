@@ -8,7 +8,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
   APOYO_CONFIRMAR_MSI,
@@ -90,26 +90,35 @@ export function TarjetaConfirmarMsi({
       </Texto>
       {faltaTarjeta ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="secundario">
-            {preguntaTarjetaConfirmarMsi(faltaTarjeta)}
+          {(() => {
+            const preguntaTarjeta = preguntaTarjetaConfirmarMsi(faltaTarjeta);
+            return (
+              <>
+          <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaTarjeta}
           </Texto>
           <GrupoChips
             opciones={faltaTarjeta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
             valor={tarjeta}
             alCambiar={setTarjeta}
             prefijoTestID="msi-tarjeta"
+            etiqueta={preguntaTarjeta}
           />
+              </>
+            );
+          })()}
         </View>
       ) : null}
       <View style={{ gap: espacio.xs }}>
-        <Texto variante="secundario" tono="secundario">
-          ¿En qué categoría va?
+        <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+          {PREGUNTA_CATEGORIA_MSI}
         </Texto>
         <GrupoChips
           opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
           valor={categoria}
           alCambiar={setCategoria}
           prefijoTestID="msi-categoria"
+          etiqueta={PREGUNTA_CATEGORIA_MSI}
         />
       </View>
       <CampoTexto

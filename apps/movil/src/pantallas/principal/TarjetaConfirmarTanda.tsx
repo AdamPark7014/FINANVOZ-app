@@ -4,7 +4,7 @@ import { confirmarTanda, type OrigenDictado, type ResultadoTexto } from '../../s
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { TEXTO_NO_ES_INGRESO } from '../tandas/textos';
-import { GrupoChips } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { mensajeError, PREGUNTA_CUENTA_TANDA, TITULO_CONFIRMAR_TANDA } from './textos';
 
 type ConfirmarTanda = Extract<ResultadoTexto, { resultado: 'confirmar_tanda' }>;
@@ -63,6 +63,13 @@ export function TarjetaConfirmarTanda({
     }
   };
 
+  const preguntaTanda = '¿De cuál tanda?';
+  const preguntaCuenta = propuesta.faltaCuenta
+    ? propuesta.faltaCuenta.motivo === 'no_encontrada' && propuesta.faltaCuenta.alias
+      ? `No tengo una cuenta «${propuesta.faltaCuenta.alias}». ¿Cuál fue?`
+      : PREGUNTA_CUENTA_TANDA[esCobro ? 'cobro' : 'aportacion']
+    : null;
+
   return (
     <Tarjeta testID="confirmacion-tanda">
       <Texto variante="subtitulo">{TITULO_CONFIRMAR_TANDA[motivo]}</Texto>
@@ -79,29 +86,29 @@ export function TarjetaConfirmarTanda({
       ) : null}
       {propuesta.tandas.length > 1 ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="secundario">
-            ¿De cuál tanda?
+          <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaTanda}
           </Texto>
           <GrupoChips
             opciones={propuesta.tandas.map((t) => ({ valor: t.id, etiqueta: t.nombre }))}
             valor={tandaId}
             alCambiar={setTandaId}
             prefijoTestID="tanda-confirmar-tanda"
+            etiqueta={preguntaTanda}
           />
         </View>
       ) : null}
-      {propuesta.faltaCuenta ? (
+      {preguntaCuenta ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="secundario">
-            {propuesta.faltaCuenta.motivo === 'no_encontrada' && propuesta.faltaCuenta.alias
-              ? `No tengo una cuenta «${propuesta.faltaCuenta.alias}». ¿Cuál fue?`
-              : PREGUNTA_CUENTA_TANDA[esCobro ? 'cobro' : 'aportacion']}
+          <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaCuenta}
           </Texto>
           <GrupoChips
-            opciones={propuesta.faltaCuenta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+            opciones={propuesta.faltaCuenta!.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
             valor={cuentaId}
             alCambiar={setCuentaId}
             prefijoTestID="tanda-confirmar-cuenta"
+            etiqueta={preguntaCuenta}
           />
         </View>
       ) : null}

@@ -48,11 +48,9 @@ import { abrirMeAlcanza, tomarConsultaPendiente } from '.';
 import { PantallaMeAlcanza, type CalcularMeAlcanza } from './PantallaMeAlcanza';
 import {
   AYUDA_DATOS_INSUFICIENTES,
+  BTN_CALCULAR,
   BTN_COMO_LO_CALCULE,
   BTN_DESHACER,
-  BTN_HACER_OTRA_CUENTA,
-  BTN_LISTO,
-  BTN_LO_COMPRE,
   ERROR_CALCULO,
   ERROR_PRECIO,
   ETIQUETA_OPCION_RECOMENDADA,
@@ -63,7 +61,6 @@ import {
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
-  etiquetaChipMeses,
 } from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
@@ -240,7 +237,8 @@ describe('¿Me alcanza?', () => {
     montar(p.ctx, <PantallaMeAlcanza calcular={jest.fn()} alCerrar={jest.fn()} />);
     expect(screen.getByText(TITULO)).toBeTruthy();
     expect(screen.getByText(PREGUNTA_MSI)).toBeTruthy();
-    expect(screen.getByText(etiquetaChipMeses('6'))).toBeTruthy();
+    expect(screen.getByTestId('me-alcanza-meses-6')).toBeTruthy();
+    expect(screen.getByRole('button', { name: etiquetaHablada(BTN_CALCULAR) })).toBeTruthy();
   });
 
   it('CA-M6-03 · con el resultado de E8-22 muestra "< 1 %", "89 %", "79 %", "90 %" y la recomendación', async () => {

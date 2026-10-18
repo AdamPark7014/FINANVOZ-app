@@ -10,7 +10,7 @@ import {
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
-import { GrupoChips } from './Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import {
   BTN_BORRAR_DUPLICADO,
   BTN_DUPLICADOS_OK,
@@ -90,25 +90,32 @@ export function TarjetaElegir({
     }
   };
 
+  const tituloElegir = TITULO_ELEGIR_MOVIMIENTO[datos.accion];
+  const preguntaCuenta = falta ? preguntaCuentaElegirMovimiento(falta) : null;
+
   return (
     <Tarjeta testID="tarjeta-elegir">
-      <Texto variante="subtitulo">{TITULO_ELEGIR_MOVIMIENTO[datos.accion]}</Texto>
+      <Texto variante="subtitulo" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {tituloElegir}
+      </Texto>
       <GrupoChips
         opciones={datos.candidatos.map((m) => ({ valor: m.id, etiqueta: etiquetaMovimiento(m) }))}
         valor={movimiento}
         alCambiar={setMovimiento}
         prefijoTestID="elegir-movimiento"
+        etiqueta={tituloElegir}
       />
-      {falta ? (
+      {preguntaCuenta ? (
         <View style={{ gap: espacio.xs }}>
-          <Texto variante="secundario" tono="secundario">
-            {preguntaCuentaElegirMovimiento(falta)}
+          <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {preguntaCuenta}
           </Texto>
           <GrupoChips
-            opciones={falta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+            opciones={falta!.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
             valor={cuenta}
             alCambiar={setCuenta}
             prefijoTestID="elegir-cuenta"
+            etiqueta={preguntaCuenta}
           />
         </View>
       ) : null}
@@ -213,13 +220,16 @@ export function TarjetaAclarar({
 }) {
   return (
     <Tarjeta testID="tarjeta-aclarar">
-      <Texto variante="subtitulo">{datos.pregunta}</Texto>
+      <Texto variante="subtitulo" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {datos.pregunta}
+      </Texto>
       {datos.opciones.length > 0 ? (
         <GrupoChips
           opciones={datos.opciones.map((o) => ({ valor: o, etiqueta: o }))}
           valor={null}
           alCambiar={(o) => alElegir(`${datos.texto}, ${o}`)}
           prefijoTestID="aclarar"
+          etiqueta={datos.pregunta}
         />
       ) : (
         <Texto variante="secundario" tono="secundario">
