@@ -13,6 +13,7 @@
 
 ## Hecho (acumulado reciente)
 
+- **Onboarding:** O1–O2 + progreso/pista en `onboarding/textos.ts`; O3 `TITULO_INGRESO`; `MensajeError` con rol alert (commits `34f6fee`, `b12634a`, `d887552`, `59af8d8`).
 - Chip/GrupoChips TalkBack, ajustes header, EstadoVacio/Boton/Campo, suscripciones live region. Ver `git log`.
 
 ## A medias — CUIDADO

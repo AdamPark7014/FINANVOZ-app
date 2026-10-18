@@ -120,13 +120,17 @@ export default function PagosFijos() {
           />
           <CampoTexto
             testID="onb-pago-dia"
-            etiqueta="¿Qué día del mes?"
+            etiqueta={ETIQUETA_PAGO_DIA_MES}
             ejemplo="5"
             teclado="number-pad"
             valor={dia}
             alCambiar={setDia}
           />
-          <Boton testID="onb-pago-agregar" etiqueta={`Agregar ${sugerido.concepto}`} alPresionar={agregar} />
+          <Boton
+            testID="onb-pago-agregar"
+            etiqueta={etiquetaAgregarPago(sugerido.concepto)}
+            alPresionar={agregar}
+          />
         </Tarjeta>
       ) : null}
       {agregados.length > 0 ? (
