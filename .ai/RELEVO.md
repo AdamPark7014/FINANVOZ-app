@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Tarjetas · TalkBack lista (Cuentas → Debes):** `etiquetaAccesibleTarjetaEnLista` + `TarjetaCreditoLista`; la fila ya no anuncia solo el nombre (deuda, fechas, PNGI y barra con límite y 30 %).
+- **Personas · TalkBack vacío y alta:** `EstadoVacio` + `etiquetaVacioContactosDivision` en cuenta dividida sin contactos; `PISTA_AGREGAR_PERSONA` en Agregar (división y formulario de movimiento).
 
 ## Hecho (acumulado reciente)
 
-- Ayuda FAQ/correo, captura reactivar, respaldo aviso. Ver `git log`.
+- CampoMonto hints, tarjetas lista TalkBack, ayuda FAQ. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (ajustes, personas, principal fuera de fila tarjeta) — no mezclar.
+- WIP `principal.test.tsx` (turno anterior) — no mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso

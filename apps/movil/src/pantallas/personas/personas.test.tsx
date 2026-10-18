@@ -33,6 +33,7 @@ import {
   MENSAJE_PERMISO_AVISOS,
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
+  PISTA_AGREGAR_PERSONA,
   PISTA_COBRAR,
   PISTA_YA_ME_PAGO,
   PISTA_GUARDAR_DATOS_COBRO,
@@ -45,6 +46,7 @@ import {
   TITULO_PEDIR_DATOS_COBRO,
   TITULO_YA_ME_PAGO,
   TEXTO_CONTACTOS_VACIO,
+  etiquetaVacioContactosDivision,
   etiquetaVacioMovimientosPersona,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
@@ -393,6 +395,13 @@ describe('estados vacíos (es-MX)', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <FormularioCuentaDividida alGuardar={jest.fn()} />);
     expect(textoDe('division-contactos-vacio')).toBe(TEXTO_CONTACTOS_VACIO);
+    expect(screen.getByTestId('division-contactos-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioContactosDivision(),
+    );
+    expect(screen.getByTestId('division-boton-agregar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_AGREGAR_PERSONA,
+    );
     expect(screen.getByTestId('boton-guardar-division')).toHaveProp(
       'accessibilityHint',
       PISTA_GUARDAR_DIVISION,

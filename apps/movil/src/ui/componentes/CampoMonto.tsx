@@ -1,6 +1,6 @@
 import type { Centavos } from '@cartera/core';
 import { useState } from 'react';
-import { etiquetaCampoMonto, formatearCentavos, leerPesos } from '../formato';
+import { etiquetaCampoMonto, formatearCentavos, leerPesos, pistaCampoMonto } from '../formato';
 import { CampoTexto } from './CampoTexto';
 
 export interface CampoMontoProps {
@@ -37,6 +37,8 @@ export function CampoMonto({
     valorInicial === null ? '' : formatearCentavos(valorInicial, 'auto').replace('$', ''),
   );
   const invalido = texto.trim() !== '' && leerPesos(texto) === null;
+  const mensajeError = error ?? (invalido ? ERROR_FORMATO_MONTO : null);
+  const pista = mensajeError ?? ayuda;
   return (
     <CampoTexto
       etiqueta={etiqueta}
@@ -48,7 +50,8 @@ export function CampoMonto({
       ejemplo="0.00"
       teclado="decimal-pad"
       etiquetaAccesible={etiquetaCampoMonto(etiqueta, texto)}
-      error={error ?? (invalido ? ERROR_FORMATO_MONTO : null)}
+      error={mensajeError}
+      {...(pista === undefined ? {} : { nativo: { accessibilityHint: pistaCampoMonto(pista) } })}
       {...(ayuda === undefined ? {} : { ayuda })}
       {...(deshabilitado === undefined ? {} : { deshabilitado })}
       {...(autoFocus === undefined ? {} : { autoFocus })}

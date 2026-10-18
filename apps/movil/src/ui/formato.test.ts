@@ -6,6 +6,7 @@ import {
   etiquetaCampoMonto,
   etiquetaEstadoVacio,
   etiquetaHablada,
+  pistaCampoMonto,
   formatearCentavos,
   leerPesos,
   tieneCifra,
@@ -120,6 +121,14 @@ describe('etiquetaCampoMonto', () => {
 
   it('texto inválido no inventa cifras (solo el nombre del campo)', () => {
     expect(etiquetaCampoMonto('Monto', '12.345')).toBe('Monto en pesos');
+  });
+});
+
+describe('pistaCampoMonto', () => {
+  it('lee la cifra de ejemplo del error de formato en palabras', () => {
+    expect(pistaCampoMonto('No entendí ese monto. Escríbelo así: 1,500.50')).toBe(
+      'No entendí ese monto. Escríbelo así: mil quinientos pesos con cincuenta centavos',
+    );
   });
 });
 

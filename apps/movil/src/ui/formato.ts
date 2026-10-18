@@ -190,3 +190,15 @@ export function etiquetaCampoMonto(etiqueta: string, texto: string): string {
   const centavos = leerPesos(texto);
   return centavos === null ? nombre : `${nombre}, ${cifraEnPalabras(centavos, 'centavos')}`;
 }
+
+/** Montos escritos como en el teclado (sin `$`), p. ej. el ejemplo del error de formato. */
+const MONTO_EN_PISTA = /\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+\.\d{1,2}/g;
+
+/** Pista TalkBack de ayuda o error en `CampoMonto`: cifras de ejemplo en palabras, no dígitos sueltos. */
+export function pistaCampoMonto(pista: string): string {
+  const conSigno = etiquetaHablada(pista);
+  return conSigno.replace(MONTO_EN_PISTA, (trozo) => {
+    const centavos = leerPesos(trozo);
+    return centavos === null ? trozo : cifraEnPalabras(centavos, 'centavos');
+  });
+}

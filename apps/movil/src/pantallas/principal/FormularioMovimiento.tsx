@@ -14,7 +14,7 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Texto } from '../../ui';
 import { FormularioCuentaDividida } from '../personas/FormularioCuentaDividida';
-import { mensajeCuentaDividida } from '../personas/textos';
+import { mensajeCuentaDividida, PISTA_AGREGAR_PERSONA } from '../personas/textos';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE, type OpcionChip } from './Chip';
 import {
   AVISO_RETIRO_EFECTIVO_TARJETA,
@@ -265,6 +265,7 @@ export function FormularioMovimiento({
                 ancho="contenido"
                 alPresionar={agregarPersona}
                 deshabilitado={nuevaPersona.trim() === ''}
+                pista={PISTA_AGREGAR_PERSONA}
                 testID="boton-agregar-persona"
               />
             </View>

@@ -14,7 +14,7 @@ import {
   type ResultadoTexto,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Cifra, espacio, formatearCentavos, Texto } from '../../ui';
+import { Boton, CampoMonto, CampoTexto, Cifra, espacio, EstadoVacio, formatearCentavos, Texto } from '../../ui';
 import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
@@ -24,9 +24,11 @@ import {
   ERROR_DIVISION_TOTAL,
   ETIQUETA_CATEGORIA_PARTE,
   ETIQUETA_ORIGEN_DIVISION,
+  PISTA_AGREGAR_PERSONA,
   PISTA_CANCELAR_DIVISION,
   PISTA_GUARDAR_DIVISION,
   TEXTO_CONTACTOS_VACIO,
+  etiquetaVacioContactosDivision,
   textoFaltanPersonas,
 } from './textos';
 
@@ -219,9 +221,11 @@ export function FormularioCuentaDividida({
           {textoFaltanPersonas(ajenas, elegidas.length)}
         </Texto>
         {personas.length === 0 ? (
-          <Texto variante="cuerpo" tono="secundario" testID="division-contactos-vacio">
-            {TEXTO_CONTACTOS_VACIO}
-          </Texto>
+          <EstadoVacio
+            texto={TEXTO_CONTACTOS_VACIO}
+            testID="division-contactos-vacio"
+            etiquetaAccesible={etiquetaVacioContactosDivision()}
+          />
         ) : null}
         <View accessibilityRole="list" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
           {personas.map((p) => {
@@ -265,6 +269,7 @@ export function FormularioCuentaDividida({
             ancho="contenido"
             alPresionar={() => agregar(nuevaPersona)}
             deshabilitado={nuevaPersona.trim() === ''}
+            pista={PISTA_AGREGAR_PERSONA}
             testID="division-boton-agregar"
           />
         </View>

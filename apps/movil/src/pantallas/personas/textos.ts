@@ -102,9 +102,20 @@ export function etiquetaVacioMovimientosPersona(): string {
   return `${TITULO_MOVIMIENTOS}. ${TEXTO_MOVIMIENTOS_PERSONA_VACIO}`;
 }
 
+/** Cuenta dividida / formulario: selector de contactos. */
+export const ETIQUETA_CON_QUIEN = '¿Con quién?';
+
 /** Cuenta dividida: aún no hay contactos guardados. */
 export const TEXTO_CONTACTOS_VACIO =
   'Todavía no tienes contactos. Escribe abajo a quien te debe y elige a cada uno.';
+
+/** Vacío de contactos en cuenta dividida: sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioContactosDivision(): string {
+  return `${ETIQUETA_CON_QUIEN}. ${TEXTO_CONTACTOS_VACIO}`;
+}
+
+/** TalkBack al guardar un contacto nuevo desde el formulario (`02 §19`). */
+export const PISTA_AGREGAR_PERSONA = 'Guarda el nombre en tus contactos para poder elegirlo';
 
 export const ERROR_DIVISION_TOTAL = 'Escribe cuánto fue en total.';
 export const ERROR_DIVISION_REPARTO = 'El total no alcanza para repartirlo entre todos.';
