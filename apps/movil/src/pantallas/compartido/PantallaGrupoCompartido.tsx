@@ -17,12 +17,33 @@ import {
   type ResultadoAccion,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, etiquetaHablada, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
 import { FormularioGastoCompartido } from './FormularioGastoCompartido';
-import { TEXTO_SALIR } from './textos';
+import {
+  BTN_AGREGAR_GASTO,
+  BTN_ANULAR,
+  BTN_CANCELAR,
+  BTN_DEJAR_DE_COMPARTIR,
+  BTN_MOSTRAR_CODIGO,
+  BTN_REGISTRAR_PAGO,
+  BTN_SALDAR,
+  BTN_VOLVER_A_VINCULAR,
+  ETIQUETA_A_DONDE_LLEGO,
+  ETIQUETA_ANULADO,
+  ETIQUETA_CON_QUE_PAGASTE,
+  ETIQUETA_POR_COMPARTIR,
+  ETIQUETA_VOLVER,
+  instruccionQrMostrarCodigo,
+  instruccionRevincularGrupo,
+  TEXTO_SALIR,
+  TEXTO_SIN_GASTOS_COMPARTIDOS,
+  textoPendientesCompartir,
+  textoRegistroPagoSaldar,
+  TITULO_LO_COMPARTIDO,
+} from './textos';
 
 type Panel = 'ninguno' | 'agregar' | 'saldar' | 'codigo' | 'revincular' | 'salir';
 
@@ -148,7 +169,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
     <Pantalla testID="pantalla-grupo-compartido" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="grupo-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={panel === 'ninguno' ? alVolver : () => setPanel('ninguno')}
@@ -164,19 +185,17 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
       ) : null}
       {g.pendientes > 0 ? (
         <Texto variante="secundario" tono="secundario" testID="grupo-pendientes">
-          {g.pendientes === 1 ? '1 movimiento por compartir' : `${g.pendientes} movimientos por compartir`}
+          {textoPendientesCompartir(g.pendientes)}
         </Texto>
       ) : null}
       <MensajeError texto={error} />
 
       {g.revincular && panel !== 'revincular' ? (
         <Tarjeta testID="grupo-revincular">
-          <Texto variante="cuerpo">
-            {`Este teléfono ya no está vinculado al grupo. Pídele a ${g.nombre} que toque "Mostrar código" y escanéalo.`}
-          </Texto>
+          <Texto variante="cuerpo">{instruccionRevincularGrupo(g.nombre)}</Texto>
           <Boton
             testID="grupo-revincular-escanear"
-            etiqueta="Volver a vincular"
+            etiqueta={BTN_VOLVER_A_VINCULAR}
             alPresionar={() => setPanel('revincular')}
           />
         </Tarjeta>
@@ -203,17 +222,11 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
       {panel === 'saldar' && g.saldo.debe !== null ? (
         <Tarjeta testID="grupo-saldar">
-          <TextoCifras
-            texto={
-              g.saldo.debe === 'yo'
-                ? `Registra que le pagaste ${formatearCentavos(g.saldo.monto)} a ${g.nombre}.`
-                : `Registra que ${g.nombre} te pagó ${formatearCentavos(g.saldo.monto)}.`
-            }
-          />
+          <TextoCifras texto={textoRegistroPagoSaldar(g.saldo.debe, g.nombre, g.saldo.monto)} />
           {cuentas.length > 0 ? (
             <Chips
               testID="grupo-saldar-cuenta"
-              etiqueta={g.saldo.debe === 'yo' ? '¿Con qué pagaste?' : '¿A dónde te llegó?'}
+              etiqueta={g.saldo.debe === 'yo' ? ETIQUETA_CON_QUE_PAGASTE : ETIQUETA_A_DONDE_LLEGO}
               opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
               valor={cuentaPago}
               alCambiar={setCuentaPago}

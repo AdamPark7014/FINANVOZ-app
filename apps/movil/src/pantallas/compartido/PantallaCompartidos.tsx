@@ -14,6 +14,22 @@ import { Boton, CampoTexto, etiquetaHablada, Pantalla, Tarjeta, Texto } from '..
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
+import {
+  AVISO_REVINCULAR_LISTA,
+  AYUDA_NOMBRE_PAREJA,
+  BTN_CREAR_CODIGO,
+  BTN_CREAR_CON_ALGUIEN,
+  BTN_ESCANEAR_CODIGO,
+  BTN_ESCANEAR_SU_CODIGO,
+  BTN_LISTO,
+  ERROR_NOMBRE_PAREJA,
+  ETIQUETA_NOMBRE_PAREJA,
+  ETIQUETA_VOLVER,
+  instruccionQrTrasCrear,
+  TEXTO_LISTA_VACIA,
+  TITULO_GASTOS_COMPARTIDOS,
+} from './textos';
+
 type Modo =
   | { tipo: 'lista' }
   | { tipo: 'crear' }
@@ -57,7 +73,7 @@ export function PantallaCompartidos({
 
   const crear = async () => {
     if (nombre.trim() === '') {
-      setError('Escribe cómo se llama tu pareja.');
+      setError(ERROR_NOMBRE_PAREJA);
       return;
     }
     setOcupado(true);
@@ -98,18 +114,18 @@ export function PantallaCompartidos({
     <Pantalla testID="pantalla-compartidos" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="compartidos-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={modo.tipo === 'lista' ? alVolver : volverALista}
       />
-      <Texto variante="titulo">Gastos compartidos</Texto>
+      <Texto variante="titulo">{TITULO_GASTOS_COMPARTIDOS}</Texto>
 
       {modo.tipo === 'lista' ? (
         <>
           {grupos.length === 0 ? (
             <Texto variante="cuerpo" tono="secundario">
-              Comparte gastos con tu pareja: los dos ven lo mismo y cada quien conserva su libro privado.
+              {TEXTO_LISTA_VACIA}
             </Texto>
           ) : null}
           {grupos.map((g) => (
@@ -130,19 +146,19 @@ export function PantallaCompartidos({
               ) : null}
               {g.revincular ? (
                 <Texto variante="secundario" tono="faltante">
-                  Vuelve a vincular este teléfono
+                  {AVISO_REVINCULAR_LISTA}
                 </Texto>
               ) : null}
             </Tarjeta>
           ))}
           <Boton
             testID="compartidos-crear"
-            etiqueta="Crear con alguien"
+            etiqueta={BTN_CREAR_CON_ALGUIEN}
             alPresionar={() => setModo({ tipo: 'crear' })}
           />
           <Boton
             testID="compartidos-escanear"
-            etiqueta="Escanear código"
+            etiqueta={BTN_ESCANEAR_CODIGO}
             variante="secundario"
             alPresionar={() => setModo({ tipo: 'unirse', escaneando: false })}
           />
@@ -153,15 +169,15 @@ export function PantallaCompartidos({
         <>
           <CampoTexto
             testID="compartidos-nombre"
-            etiqueta="¿Cómo se llama tu pareja?"
+            etiqueta={ETIQUETA_NOMBRE_PAREJA}
             valor={nombre}
             alCambiar={setNombre}
-            ayuda="Solo se guarda en tu teléfono."
+            ayuda={AYUDA_NOMBRE_PAREJA}
           />
           <MensajeError texto={error} />
           <Boton
             testID="compartidos-crear-codigo"
-            etiqueta="Crear código"
+            etiqueta={BTN_CREAR_CODIGO}
             cargando={ocupado}
             alPresionar={() => void crear()}
           />
@@ -170,11 +186,9 @@ export function PantallaCompartidos({
 
       {modo.tipo === 'qr' ? (
         <>
-          <Texto variante="cuerpo">
-            {`Pídele a ${modo.nombre} que abra Finanvoz → Cuentas → Gastos compartidos → Escanear código. El código sirve una sola vez y vence en 10 minutos.`}
-          </Texto>
+          <Texto variante="cuerpo">{instruccionQrTrasCrear(modo.nombre)}</Texto>
           <CodigoQr texto={modo.qr} testID="compartidos-qr" />
-          <Boton testID="compartidos-listo" etiqueta="Listo" alPresionar={() => alAbrirGrupo(modo.grupoId)} />
+          <Boton testID="compartidos-listo" etiqueta={BTN_LISTO} alPresionar={() => alAbrirGrupo(modo.grupoId)} />
         </>
       ) : null}
 
@@ -185,18 +199,18 @@ export function PantallaCompartidos({
           <>
             <CampoTexto
               testID="compartidos-nombre"
-              etiqueta="¿Cómo se llama tu pareja?"
+              etiqueta={ETIQUETA_NOMBRE_PAREJA}
               valor={nombre}
               alCambiar={setNombre}
-              ayuda="Solo se guarda en tu teléfono."
+              ayuda={AYUDA_NOMBRE_PAREJA}
             />
             <MensajeError texto={error} />
             <Boton
               testID="compartidos-abrir-escaner"
-              etiqueta="Escanear su código"
+              etiqueta={BTN_ESCANEAR_SU_CODIGO}
               cargando={ocupado}
               alPresionar={() => {
-                if (nombre.trim() === '') setError('Escribe cómo se llama tu pareja.');
+                if (nombre.trim() === '') setError(ERROR_NOMBRE_PAREJA);
                 else {
                   setError(null);
                   setModo({ tipo: 'unirse', escaneando: true });

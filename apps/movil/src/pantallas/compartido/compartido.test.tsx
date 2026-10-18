@@ -26,7 +26,15 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
-import { parsearProporcionReparto } from './textos';
+import {
+  ETIQUETA_ACCESIBILIDAD_QR_UNION,
+  ETIQUETA_CON_QUIEN_COMPARTES,
+  ERROR_NOMBRE_PAREJA,
+  MENSAJE_COMPARTIDO_GUARDADO,
+  MENSAJE_SIN_PAREJA,
+  parsearProporcionReparto,
+  TEXTO_SALIR,
+} from './textos';
 
 // La cámara falsa "lee" el QR que la prueba deja en `mockQr` al tocarla.
 let mockQr = '';
@@ -86,9 +94,7 @@ async function vincular(A: Telefono, B: Telefono): Promise<string> {
   await act(async () => {
     fireEvent.press(screen.getByTestId('compartidos-crear-codigo'));
   });
-  expect(screen.getByTestId('compartidos-qr').props.accessibilityLabel).toBe(
-    'Código QR para unirse a tu grupo compartido',
-  );
+  expect(screen.getByTestId('compartidos-qr').props.accessibilityLabel).toBe(ETIQUETA_ACCESIBILIDAD_QR_UNION);
   expect(auditar(screen.toJSON() as never)).toEqual([]);
   const [grupo] = listarGruposCompartidos(A.ctx, A.deps.almacen);
   if (!grupo) throw new Error('sin grupo');
@@ -104,7 +110,7 @@ async function vincular(A: Telefono, B: Telefono): Promise<string> {
   const b = en(B, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={abrirB} />);
   fireEvent.press(screen.getByTestId('compartidos-escanear'));
   fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
-  expect(screen.getByText('Escribe cómo se llama tu pareja.')).toBeTruthy();
+  expect(screen.getByText(ERROR_NOMBRE_PAREJA)).toBeTruthy();
   fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Ana');
   fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
   await act(async () => {
@@ -166,9 +172,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const a = en(A, <PantallaGrupoCompartido grupoId={grupo} alVolver={jest.fn()} />);
     await waitFor(() => expect(screen.getByTestId('grupo-saldo').props.children).toBe('Están a mano'));
     fireEvent.press(screen.getByTestId('grupo-salir-abrir'));
-    expect(
-      screen.getByText('Si sales, el grupo se cierra para los dos. Cada quien conserva lo que ya registró.'),
-    ).toBeTruthy();
+    expect(screen.getByText(TEXTO_SALIR)).toBeTruthy();
     await act(async () => {
       fireEvent.press(screen.getByTestId('grupo-salir-confirmar'));
     });
@@ -216,7 +220,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
       });
     };
     await dictar('Súper 1,200, pagué yo, 60/40');
-    expect(screen.getByText('Primero vincúlate con tu pareja en Gastos compartidos.')).toBeTruthy();
+    expect(screen.getByText(MENSAJE_SIN_PAREJA)).toBeTruthy();
 
     const creado = await crearGrupoCompartido(A.ctx, A.deps, 'Beto');
     if (!creado.ok) throw new Error(creado.error);
@@ -230,7 +234,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('compartido-guardar'));
     });
-    expect(await screen.findByText('Listo: lo agregué a tus gastos compartidos.')).toBeTruthy();
+    expect(await screen.findByText(MENSAJE_COMPARTIDO_GUARDADO)).toBeTruthy();
     expect(screen.queryByTestId('formulario-gasto-compartido')).toBeNull();
     expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).saldo.texto).toBe(
       'Beto te debe $480',
@@ -250,7 +254,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
-    expect(screen.getByText('¿Con quién lo compartes?')).toBeTruthy();
+    expect(screen.getByText(ETIQUETA_CON_QUIEN_COMPARTES)).toBeTruthy();
     const [, caro] = listarGruposCompartidos(A.ctx, A.deps.almacen);
     fireEvent.press(screen.getByTestId(`confirmar-compartido-grupo-${caro?.id}`));
     expect(screen.getByTestId('compartido-resumen').props.children).toBe(
