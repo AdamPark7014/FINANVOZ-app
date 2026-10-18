@@ -6,22 +6,24 @@
 
 ## Hecho en este turno
 
-- **Chip / GrupoChips:** TalkBack — radio solo `selected`; «×N» → «, N veces»; `OpcionChip.etiquetaAccesible`; pruebas `Chip.test.tsx`.
+- **ajustes:** título con `accessibilityRole="header"` y `testID="ajustes-titulo"`; aserción en `ajustes.test.tsx`.
+- **Chip:** TalkBack + `Chip.test.tsx` (commit previo en main).
 
 ## Hecho (acumulado reciente)
 
-- ajustes header, EstadoVacio/Boton/Campo, suscripciones live region. Ver `git log`.
+- widget/captura a11y, EstadoVacio/Boton/Campo. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear: `PantallaTanda`, `EstadoVacio`, `Boton`, `CampoTexto`, `componentes.test.tsx`, etc. (turno anterior).
+- WIP local: `PreguntasCaptura.tsx`, `PantallaRespaldo.tsx` sin commitear.
+- WIP: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE`).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP ajustes/onboarding/tanda.
+2. Cerrar WIP captura/respaldo/tanda.
 3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
