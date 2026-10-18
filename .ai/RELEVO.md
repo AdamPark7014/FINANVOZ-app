@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **TalkBack tandas/arqueo:** `TarjetasTanda` pistas en Hoy (`655a159`); tests ancla calendario/ya-la-di/me-tocó, `arqueo-mensaje-hecho` liveRegion, copy `ACCESIBILIDAD_*` y pistas (`c973f10`).
+- **TalkBack Widget/Captura (Ajustes):** encabezado «Vista previa» en `SeccionWidget` + test (`cfd4bdc`). `PreviaWidget` y `SeccionCaptura` ya cerrados en main (summary, hints, headers, etiquetas apagada/no disponible, «Aviso al capturar»).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding, suscripciones, Me alcanza, widget. Ver `git log`.
+- Tandas/arqueo, ayuda FAQ, onboarding, suscripciones. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (ayuda/tarjetas/captura) — revisar `git status` antes de commitear.
+- WIP local ajeno (compartido/tandas/suscripciones) — `git status` antes de commitear.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP paralelo.
+2. Commits pequeños del WIP paralelo si aplica.
 
 ## No tocar
 
