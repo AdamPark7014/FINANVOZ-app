@@ -42,6 +42,7 @@ import {
   escenario,
   vector,
 } from '../principal/__pruebas__/base';
+import { etiquetaAccesibleProbabilidad } from '../principal/ProbabilidadHoy';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
@@ -668,7 +669,9 @@ describe('Hoy · probabilidad de llegar', () => {
     expect(textoDe('probabilidad-texto')).toMatch(/^(< 1|> 99|\d{1,2}) % de llegar sin tocar tu colchón$/);
     const texto = textoDe('probabilidad-texto');
     const etiqueta = textoDe('probabilidad-etiqueta');
-    expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(`${texto}. ${etiqueta}`);
+    expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(
+      etiquetaAccesibleProbabilidad(texto, etiqueta),
+    );
     expect(screen.getByTestId('probabilidad-texto')).toHaveProp('importantForAccessibility', 'no');
     segunda.unmount();
 

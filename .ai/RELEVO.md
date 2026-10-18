@@ -6,15 +6,15 @@
 
 ## Hecho en este turno
 
-- **Tandas (móvil):** micro TalkBack — etiquetas en lista, detalle, formulario y tarjetas de Hoy; montos en palabras; `role="list"` y alertas en errores; tests en `tandas.test.tsx`. Commit `72eae6e`.
+- **¿Me alcanza? (móvil):** micro TalkBack — anuncio al terminar/fallar/vacío (`announceForAccessibility`), resumen con live region, calculando agrupado, escenarios con detalle en etiqueta, vacío con header/alert (`6425b98`); test probabilidad en suite alineado.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding, calculadora, otras pantallas a11y. Ver `git log`.
+- Calculadora web a11y, tandas, onboarding TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (arqueo, compartido, estados-cuenta, me-alcanza, personas, principal, ayuda) — **no mezclar** sin `git status`.
+- WIP paralelo (principal, ayuda) — no mezclar sin `git status`.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
