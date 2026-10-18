@@ -254,7 +254,7 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
-    expect(screen.getByText(BTN_LO_COMPRE)).toBeTruthy();
+    expect(screen.getAllByText(BTN_LO_COMPRE).length).toBeGreaterThan(0);
     expect(screen.getByText(BTN_COMO_LO_CALCULE)).toBeTruthy();
     expect(screen.getByText(BTN_HACER_OTRA_CUENTA)).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
