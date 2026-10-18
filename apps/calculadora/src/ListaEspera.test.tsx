@@ -77,6 +77,41 @@ describe('Lista de espera', () => {
     });
   });
 
+  it('si falta una pregunta, dice cuál, la marca y lleva el foco a ella', () => {
+    render(<ListaEspera />);
+    fireEvent.change(screen.getByLabelText(/tu correo/i), { target: { value: 'ana@ejemplo.mx' } });
+    for (const opcion of ['Android', 'De $50 a $99', 'Mi negocio o freelance']) {
+      fireEvent.click(screen.getByLabelText(opcion));
+    }
+    fireEvent.click(screen.getByLabelText(/acepto/i));
+    enviar();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Falta contestar: ¿Tu banco te avisa con una notificación en cada compra?',
+    );
+    const grupo = screen.getByRole('radiogroup', { name: /tu banco te avisa/i });
+    expect(grupo.getAttribute('aria-invalid')).toBe('true');
+    expect(
+      screen.getByRole('radiogroup', { name: /android o iphone/i }).getAttribute('aria-invalid'),
+    ).toBeNull();
+    expect(document.activeElement).toBe(screen.getByLabelText('Sí, siempre'));
+
+    fireEvent.click(screen.getByLabelText('A veces'));
+    expect(grupo.getAttribute('aria-invalid')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('si faltan varias, dice cuántas y empieza por la primera', () => {
+    render(<ListaEspera />);
+    fireEvent.change(screen.getByLabelText(/tu correo/i), { target: { value: 'ana@ejemplo.mx' } });
+    enviar();
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Faltan 4 preguntas por contestar. Empieza por: ¿Usas Android o iPhone?',
+    );
+    expect(document.activeElement).toBe(screen.getByLabelText('Android'));
+    expect(document.querySelectorAll('[aria-invalid="true"]')).toHaveLength(4);
+  });
+
   it('avisa cuando el servidor limita los intentos', async () => {
     fetch.mockResolvedValue({ ok: false, status: 429 });
     render(<ListaEspera />);

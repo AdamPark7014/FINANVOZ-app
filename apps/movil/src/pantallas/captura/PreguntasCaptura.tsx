@@ -19,6 +19,7 @@ import {
   type RespuestaPago,
   type RespuestaSalida,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
@@ -336,6 +337,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
  */
 function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: string }) {
   const { ctx } = useSesion();
+  const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
   const [agregando, setAgregando] = useState(false);
   const que = p.sugerencia === 'tarjeta_credito' ? 'una tarjeta' : 'una cuenta';
@@ -389,7 +391,11 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
             etiqueta="No es mía"
             variante="texto"
             alPresionar={() =>
-              responder(() => descartarCaptura(ctx, p.capturaId), 'Va. No registré ese movimiento.')
+              responder(() => {
+                descartarCaptura(ctx, p.capturaId);
+                // La captura lo atribuyó a una cuenta tuya y no lo era.
+                registrarEvento({ nombre: 'correccion', propiedades: { campo: 'cuenta' } });
+              }, 'Va. No registré ese movimiento.')
             }
             testID={`${testID}-no-es-mia`}
           />
@@ -468,6 +474,7 @@ function FormularioCuentaCaptura({
 /** E9.3 `preguntar`: "¿Es lo mismo que «Coca» del vie 9?". */
 function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) {
   const { ctx } = useSesion();
+  const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
   const que = p.dictado.descripcion ? `«${p.dictado.descripcion}»` : 'lo que anotaste';
   return (
@@ -488,7 +495,11 @@ function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) 
         etiqueta="No, es otro"
         variante="secundario"
         alPresionar={() =>
-          responder(() => responderDuplicado(ctx, p.capturaId, 'otro'), 'Listo: lo registré aparte.')
+          responder(() => {
+            responderDuplicado(ctx, p.capturaId, 'otro');
+            // La captura lo emparejó con lo que dictaste y era otro movimiento.
+            registrarEvento({ nombre: 'correccion', propiedades: { campo: 'otro' } });
+          }, 'Listo: lo registré aparte.')
         }
         testID={`${testID}-otro`}
       />

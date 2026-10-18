@@ -6,6 +6,7 @@
  * Regla 9: no registra nada en logs; el texto solo llega a la base cifrada.
  */
 import type { CatalogoPlantillas } from '@cartera/core';
+import type { EventoAnalitica } from '../analitica/eventos';
 import { procesarApertura } from '../servicios/apertura';
 import type { Contexto } from '../servicios/contexto';
 import { registrarCaptura, purgarTextosCaptura, type ResultadoCaptura } from '../servicios/capturas';
@@ -19,6 +20,11 @@ export interface OpcionesIngesta {
   readonly sha256: Sha256Hex;
   /** Solo builds de depuración: acepta `com.android.shell` con la etiqueta del banco (`07 §2.5`). */
   readonly depuracion: boolean;
+  /**
+   * Analítica (`03 §8`, RF-CAP-06): `captura {banco_id, reconocida}` por cada captura nueva de un banco del
+   * catálogo. Nunca el texto, el monto ni el comercio; el cliente vuelve a validar y respeta el opt-in.
+   */
+  readonly registrarEvento?: (evento: EventoAnalitica) => void;
 }
 
 /** Registra las notificaciones en el orden recibido. Repetirlas no crea nada nuevo (huella, CA-M5-10). */
@@ -50,6 +56,15 @@ export async function ingerirNotificaciones(
     registrarSenalesCaptura(ctx, { ultimoEvento: ultimo });
   }
   purgarTextosCaptura(ctx);
+  if (opciones.registrarEvento) {
+    for (const r of resultados) {
+      if (!r.nueva || r.banco === null) continue;
+      opciones.registrarEvento({
+        nombre: 'captura',
+        propiedades: { banco_id: r.banco, reconocida: r.reconocida },
+      });
+    }
+  }
   return resultados;
 }
 

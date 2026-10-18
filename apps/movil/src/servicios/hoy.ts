@@ -20,7 +20,7 @@ import { procesarApertura } from './apertura';
 import { arqueoPendiente, efectivoMenosPreciso, type ArqueoPendiente } from './arqueo';
 import { avisosPendientes, type Aviso } from './avisos';
 import { preguntasCoberturaPendientes } from './cobertura';
-import { capturaInactiva } from './estado-captura';
+import { capturaInactiva, reactivarCapturaPendiente } from './estado-captura';
 import { listarCapturasPorRevisar, preguntasCaptura, type PreguntaCaptura } from './preguntas-captura';
 import type { Contexto } from './contexto';
 import { dias as textoDias, etiquetaFecha } from './formato';
@@ -121,6 +121,10 @@ export type TarjetaAccion =
       /** "$640" (exacto, un toque) u "Otra cantidad" (abre el arqueo); con por asignar viejos, abre el paso 1. */
       readonly opciones: readonly ['exacto', 'otra_cantidad', 'ahora_no'];
     } & ArqueoPendiente)
+  | {
+      /** 5. Tras restaurar un respaldo: "Vuelve a activar la lectura de notificaciones" (pendiente 47). */
+      readonly tipo: 'reactivar_captura';
+    }
   | {
       /** 5. RF-CAP-07: "No he visto notificaciones de tu banco en 3 días." */
       readonly tipo: 'captura_inactiva';
@@ -470,8 +474,9 @@ function tarjetasDeAccion(
   // 4. Arqueo pendiente (`02 §7`).
   const arqueo = arqueoPendiente(ctx);
   if (arqueo) tarjetas.push({ tipo: 'arqueo', ...arqueo, opciones: ['exacto', 'otra_cantidad', 'ahora_no'] });
-  // 5. Preguntas: captura inactiva y de captura (`02 §6`), cobertura con monto distinto (E3.5) y liquidar
-  // meses (E6.2).
+  // 5. Preguntas: reactivar la captura tras restaurar, captura inactiva y de captura (`02 §6`), cobertura con
+  // monto distinto (E3.5) y liquidar meses (E6.2).
+  if (reactivarCapturaPendiente(ctx)) tarjetas.push({ tipo: 'reactivar_captura' });
   if (capturaInactiva(ctx)) tarjetas.push({ tipo: 'captura_inactiva' });
   const catalogo = catalogoApp();
   for (const pregunta of preguntasCaptura(ctx, catalogo))

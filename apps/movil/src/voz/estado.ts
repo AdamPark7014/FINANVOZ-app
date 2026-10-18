@@ -91,7 +91,7 @@ export function clasificarErrorMotor(codigo: CodigoErrorMotor): ErrorDictado | '
 export const MENSAJES_DICTADO: Record<ErrorDictado | 'sin_permiso', string> = {
   sin_permiso: 'Para dictar, permite el micrófono en los ajustes del teléfono. También puedes escribirlo.',
   no_disponible: 'Tu teléfono no tiene dictado disponible. Escríbelo y lo registro igual.',
-  sin_voz: 'No te escuché. Mantén presionado y habla, o escríbelo.',
+  sin_voz: 'No te escuché. Toca para hablar y di tu gasto, o escríbelo.',
   red: 'El dictado necesita internet en este teléfono. Escríbelo o inténtalo de nuevo.',
   ocupado: 'El micrófono está ocupado. Intenta de nuevo en un momento.',
   audio: 'No pude usar el micrófono. Intenta de nuevo o escríbelo.',

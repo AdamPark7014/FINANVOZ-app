@@ -31,8 +31,15 @@ export function conTransaccionesAnidables(db: BaseDatos): BaseDatos {
       db.run(sql.raw(`release savepoint ${punto}`));
       return resultado;
     } catch (error) {
-      db.run(sql.raw(`rollback to savepoint ${punto}`));
-      db.run(sql.raw(`release savepoint ${punto}`));
+      try {
+        db.run(sql.raw(`rollback to savepoint ${punto}`));
+        db.run(sql.raw(`release savepoint ${punto}`));
+      } catch (fallo) {
+        // Sin `release` tras un rollback fallido: liberar el savepoint fusionaría los cambios a medias en la
+        // exterior. Lo que importa es el error original; el del rollback va como causa.
+        if (error instanceof Error && error.cause === undefined)
+          Object.defineProperty(error, 'cause', { value: fallo, configurable: true, writable: true });
+      }
       throw error;
     } finally {
       profundidad -= 1;

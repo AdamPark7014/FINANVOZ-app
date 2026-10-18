@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { crearClienteNube, crearClienteTurno, HERRAMIENTAS_EXPLICAR } from '@cartera/nlu';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CONTEXTO,
   en,
@@ -8,8 +9,17 @@ import {
   respuestaAnthropic,
   respuestaOpenAI,
 } from './__pruebas__/dobles.ts';
-import { interpretar, NO_ENTENDI } from './interpretar.ts';
-import { crearAnthropic, crearOpenAI } from './proveedores.ts';
+import { crearPresupuesto, interpretar, NO_ENTENDI } from './interpretar.ts';
+import {
+  type Adaptador,
+  crearAnthropic,
+  crearOpenAI,
+  FallaProveedor,
+  type NombreProveedor,
+  PRESUPUESTO_TOTAL_MS,
+  TIEMPO_MAXIMO_MS,
+  TIEMPO_MINIMO_INTENTO_MS,
+} from './proveedores.ts';
 import { validarInterpretacion } from './validar.ts';
 
 const salida = (i: unknown) => JSON.stringify({ interpretacion: i });
@@ -146,5 +156,131 @@ describe('interpretar (06 §2, §10.1; 03 §6)', () => {
   it('si el reintento por validación falla en red, responde no_entendi', async () => {
     const { opciones } = preparar([json(respuestaAnthropic('{}')), json({}, 500)]);
     expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({ ok: true, desenlace: 'no_entendi' });
+  });
+});
+
+describe('presupuesto total de la petición (P1: el teléfono no se rinde antes que el proxy)', () => {
+  // Cada paso avanza el reloj inyectado `ms` (lo que "tardó" el proveedor) y responde o falla.
+  type Paso = { ms: number; texto?: string; falla?: FallaProveedor };
+
+  function armar(principal: Paso[], alterno: Paso[] = []) {
+    const reloj = { t: 0 };
+    const llamadas: NombreProveedor[] = [];
+    const adaptador = (nombre: NombreProveedor, pasos: Paso[]): Adaptador => ({
+      nombre,
+      modelo: `${nombre}-x`,
+      nulable: false,
+      async llamar() {
+        llamadas.push(nombre);
+        const paso = pasos.shift();
+        if (!paso) throw new Error('sin paso preparado');
+        reloj.t += paso.ms;
+        if (paso.falla) throw paso.falla;
+        return { texto: paso.texto ?? '', tokens_entrada: 10, tokens_salida: 5 };
+      },
+    });
+    const opciones = {
+      adaptadores: [adaptador('anthropic', principal), adaptador('openai', alterno)],
+      validar: validarInterpretacion,
+      ahora: () => reloj.t,
+    };
+    return { opciones, llamadas };
+  }
+
+  it('cada intento recibe min(tope, restante); el primero no lee el reloj; bajo el mínimo, ninguno', () => {
+    let t = 0;
+    const ahora = vi.fn(() => t);
+    const plazo = crearPresupuesto(
+      { ahora, tiempoMaximoMs: 4000, presupuestoMs: 7000, tiempoMinimoIntentoMs: 1500 },
+      0,
+    );
+    expect(plazo()).toBe(4000);
+    expect(ahora).not.toHaveBeenCalled();
+    t = 2000;
+    expect(plazo()).toBe(4000);
+    t = 4000;
+    expect(plazo()).toBe(3000);
+    t = 5500;
+    expect(plazo()).toBe(1500);
+    t = 5501;
+    expect(plazo()).toBeNull();
+    expect(crearPresupuesto({ ahora: () => 0 }, 0)()).toBe(Math.min(TIEMPO_MAXIMO_MS, PRESUPUESTO_TOTAL_MS));
+  });
+
+  it('principal lento que agota el presupuesto → no se llama al alterno; tiempo_agotado (cupo devuelto)', async () => {
+    const { opciones, llamadas } = armar(
+      [{ ms: PRESUPUESTO_TOTAL_MS - TIEMPO_MINIMO_INTENTO_MS + 1, falla: new FallaProveedor('tiempo') }],
+      [{ ms: 100, texto: salida(INTERPRETACION) }],
+    );
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: false,
+      codigo: 'tiempo_agotado',
+      proveedor: 'anthropic',
+      llamadas: 1,
+    });
+    expect(llamadas).toEqual(['anthropic']);
+  });
+
+  it('5xx rápido del principal → el alterno sí se llama porque queda tiempo', async () => {
+    const { opciones, llamadas } = armar(
+      [{ ms: 300, falla: new FallaProveedor('servidor', 503) }],
+      [{ ms: 1200, texto: salida(INTERPRETACION) }],
+    );
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: true,
+      proveedor: 'openai',
+      interpretacion: INTERPRETACION,
+      latencia_ms: 1500,
+      llamadas: 2,
+    });
+    expect(llamadas).toEqual(['anthropic', 'openai']);
+  });
+
+  it('respuesta inválida sin presupuesto para reparar → no hay reintento: aclarar/no_entendi', async () => {
+    const { opciones, llamadas } = armar([
+      { ms: 6000, texto: 'no es json' },
+      { ms: 100, texto: salida(INTERPRETACION) },
+    ]);
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: true,
+      desenlace: 'no_entendi',
+      interpretacion: NO_ENTENDI,
+      llamadas: 1,
+    });
+    expect(llamadas).toEqual(['anthropic']);
+  });
+
+  it('respuesta inválida con presupuesto → sí se repara', async () => {
+    const { opciones, llamadas } = armar([
+      { ms: 2000, texto: 'no es json' },
+      { ms: 1000, texto: salida(INTERPRETACION) },
+    ]);
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: true,
+      desenlace: 'reintento_validacion',
+      llamadas: 2,
+    });
+    expect(llamadas).toEqual(['anthropic', 'anthropic']);
+  });
+
+  it('coherencia: los clientes del teléfono esperan más que el presupuesto del proxy, con margen de red', async () => {
+    const margenRedMs = 2000;
+    vi.useFakeTimers();
+    try {
+      const senales: AbortSignal[] = [];
+      const transporte = (_: string, p: { signal: AbortSignal }) => {
+        senales.push(p.signal);
+        return new Promise<never>(() => undefined);
+      };
+      const nube = crearClienteNube({ url: 'https://x', obtenerToken: async () => 'jwt', transporte });
+      const turno = crearClienteTurno({ url: 'https://x', obtenerToken: async () => 'jwt', transporte });
+      void nube.interpretar('x', CONTEXTO as never);
+      void turno.turno([{ rol: 'usuario', texto: 'x' }], HERRAMIENTAS_EXPLICAR);
+      await vi.advanceTimersByTimeAsync(PRESUPUESTO_TOTAL_MS + margenRedMs);
+      expect(senales).toHaveLength(2);
+      expect(senales.every((s) => !s.aborted)).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

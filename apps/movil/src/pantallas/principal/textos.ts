@@ -74,7 +74,8 @@ export const MENSAJE_GUARDADA: Record<MotivoPorInterpretar, string> = {
 export const MENSAJE_NO_SOPORTADO: Record<MotivoNoSoportado, string> = {
   tipo_movimiento: 'Todavía no registro ese tipo de movimiento hablando. Usa el formulario.',
   intencion: 'Eso todavía no lo hago. Llega pronto.',
-  ajuste: 'Eso todavía no lo configuro hablando. Hazlo en Ajustes.',
+  ajuste:
+    'Eso todavía no lo configuro hablando. Tu ingreso y tu colchón los cambias en Ajustes; tus tarjetas, en Cuentas.',
   consulta: 'Todavía no sé responder esa pregunta.',
   meses_sin_tarjeta: MENSAJE_MESES_SIN_TARJETA,
   correccion: MENSAJE_CORRECCION_NO_SOPORTADA,

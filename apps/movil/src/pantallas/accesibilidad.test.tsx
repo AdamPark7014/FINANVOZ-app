@@ -55,7 +55,7 @@ describe('accesibilidad (CA-M7-05)', () => {
     );
     expect(i(/^Ocultar desglose$/)).toBeGreaterThan(i('4 días para tu quincena (jue 15)'));
     expect(i('Libre: ochocientos cincuenta y seis pesos')).toBeGreaterThan(i(/^Ocultar desglose$/));
-    expect(i('Mantén para hablar')).toBeGreaterThan(i('Libre: ochocientos cincuenta y seis pesos'));
+    expect(i('Toca para hablar')).toBeGreaterThan(i('Libre: ochocientos cincuenta y seis pesos'));
     // Cada fila del desglose es un solo elemento: concepto y monto juntos, sin repetir.
     expect(orden.filter((x) => x.startsWith('Colchón'))).toHaveLength(1);
     p.cerrar();

@@ -1,21 +1,38 @@
 // Orquestación del nivel nube (docs/06-NLU.md §2 y §10.1; 03 §6):
-//   proveedor principal (8 s) → si 5xx/429/red/tiempo, un intento con el alterno (8 s)
+//   proveedor principal → si 5xx/429/red/tiempo, un intento con el alterno
 //   → quitar null (variante nulable) → validar con Zod → si falla, un reintento con el error → si vuelve a fallar,
 //   aclarar/no_entendi.
+// Todos los intentos descuentan de un presupuesto total (`PRESUPUESTO_TOTAL_MS`) menor que el tiempo máximo del
+// cliente: un intento que ya no cabe no se inicia.
 // No registra nada: devuelve metadatos para que el manejador los registre (regla 9).
 import type { ContextoMinimo } from './contrato.ts';
 import { construirPrompt, mensajeCorreccion, type Prompt } from './prompt.ts';
-import { type Adaptador, FallaProveedor, type NombreProveedor, TIEMPO_MAXIMO_MS } from './proveedores.ts';
+import {
+  type Adaptador,
+  FallaProveedor,
+  type NombreProveedor,
+  PRESUPUESTO_TOTAL_MS,
+  TIEMPO_MAXIMO_MS,
+  TIEMPO_MINIMO_INTENTO_MS,
+} from './proveedores.ts';
 
 /** Validación inyectada (en el proxy, el esquema Zod generado; en la evaluación, el de `@cartera/nlu`). */
 export type Validador = (valor: unknown) => { ok: true; valor: unknown } | { ok: false; error: string };
 
-export interface OpcionesInterpretar {
+export interface OpcionesTiempo {
+  /** Tope de cada llamada a un proveedor. */
+  tiempoMaximoMs?: number;
+  /** Presupuesto total de la petición, del que descuenta cada intento. */
+  presupuestoMs?: number;
+  /** Si lo que queda del presupuesto es menor, no se inicia otro intento. */
+  tiempoMinimoIntentoMs?: number;
+  ahora: () => number;
+}
+
+export interface OpcionesInterpretar extends OpcionesTiempo {
   /** Principal primero, alterno después (se usa como mucho uno alterno). */
   adaptadores: readonly Adaptador[];
   validar: Validador;
-  tiempoMaximoMs?: number;
-  ahora: () => number;
 }
 
 export type ResultadoInterpretar =
@@ -100,13 +117,33 @@ export async function conTiempo<T>(ms: number, fn: (senal: AbortSignal) => Promi
   }
 }
 
+/**
+ * Plazos de los intentos de una petición que empezó en `inicio`: cada uno recibe `min(tope por intento, restante)`;
+ * si lo que queda no llega al mínimo devuelve `null` y no se inicia otro intento. El primero siempre se intenta y
+ * no lee el reloj (acaba de leerse para `inicio`).
+ */
+export function crearPresupuesto(opciones: OpcionesTiempo, inicio: number): () => number | null {
+  const tope = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_MS;
+  const total = opciones.presupuestoMs ?? PRESUPUESTO_TOTAL_MS;
+  const minimo = opciones.tiempoMinimoIntentoMs ?? TIEMPO_MINIMO_INTENTO_MS;
+  let primero = true;
+  return () => {
+    if (primero) {
+      primero = false;
+      return Math.min(tope, total);
+    }
+    const restante = total - (opciones.ahora() - inicio);
+    return restante < minimo ? null : Math.min(tope, restante);
+  };
+}
+
 export async function interpretar(
   texto: string,
   contexto: ContextoMinimo,
   opciones: OpcionesInterpretar,
 ): Promise<ResultadoInterpretar> {
   const inicio = opciones.ahora();
-  const tiempo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_MS;
+  const plazo = crearPresupuesto(opciones, inicio);
   const prompt: Prompt = construirPrompt(texto, contexto);
   const candidatos = opciones.adaptadores.slice(0, 2);
   let tokensEntrada = 0;
@@ -116,6 +153,9 @@ export async function interpretar(
   let ultimo: Adaptador | undefined;
 
   for (const adaptador of candidatos) {
+    // Sin presupuesto para el alterno se responde con la falla del principal (el manejador devuelve el cupo).
+    const tiempo = plazo();
+    if (tiempo === null) break;
     ultimo = adaptador;
     let respuesta;
     try {
@@ -146,17 +186,20 @@ export async function interpretar(
       };
     }
 
-    // Reintento único con el error de validación, con el mismo proveedor.
+    // Reintento único con el error de validación, con el mismo proveedor. Sin presupuesto, no_entendi.
     let segunda: ReturnType<typeof leer> = { ok: false, error: '' };
-    try {
-      llamadas += 1;
-      const reintento = { salidaAnterior: respuesta.texto, correccion: mensajeCorreccion(primera.error) };
-      const r = await conTiempo(tiempo, (senal) => adaptador.llamar({ prompt, reintento, senal }));
-      tokensEntrada += r.tokens_entrada;
-      tokensSalida += r.tokens_salida;
-      segunda = leer(r.texto, adaptador, opciones.validar);
-    } catch {
-      // Si el reintento falla, se responde no_entendi: ya hubo una respuesta del proveedor.
+    const tiempoReintento = plazo();
+    if (tiempoReintento !== null) {
+      try {
+        llamadas += 1;
+        const reintento = { salidaAnterior: respuesta.texto, correccion: mensajeCorreccion(primera.error) };
+        const r = await conTiempo(tiempoReintento, (senal) => adaptador.llamar({ prompt, reintento, senal }));
+        tokensEntrada += r.tokens_entrada;
+        tokensSalida += r.tokens_salida;
+        segunda = leer(r.texto, adaptador, opciones.validar);
+      } catch {
+        // Si el reintento falla, se responde no_entendi: ya hubo una respuesta del proveedor.
+      }
     }
     return {
       ok: true,

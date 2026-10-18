@@ -1,6 +1,7 @@
 import type * as React from 'react';
-import { fijarOcultarMontosWidget } from '../servicios';
+import { fijarEstadisticas, fijarOcultarMontosWidget } from '../servicios';
 import type { Sesion } from '../servicios/sesion';
+import { tomarEventosWidget } from '../servicios/widget';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { manejarTareaWidget } from './tarea';
 
@@ -57,12 +58,37 @@ describe('tarea del widget en segundo plano', () => {
     expect(textos(buildWidgetTree(pintado(fallida).dark))).toEqual(['Toca para ver tu día']);
   });
 
-  it('al quitarlo o tocarlo no pinta ni abre la base', async () => {
+  it('al tocarlo no pinta ni abre la base', async () => {
     const abrir = jest.fn();
     const renderWidget = jest.fn();
-    await manejarTareaWidget({ widgetAction: 'WIDGET_DELETED', renderWidget }, abrir);
     await manejarTareaWidget({ widgetAction: 'WIDGET_CLICK', renderWidget }, abrir);
     expect(abrir).not.toHaveBeenCalled();
     expect(renderWidget).not.toHaveBeenCalled();
+  });
+
+  it('pendiente 79 · agregarlo y quitarlo quedan pendientes para la analítica (con el opt-in), sin pintar al quitarlo', async () => {
+    // La misma base en las cuatro corridas: aquí cerrar no la cierra de verdad.
+    const p = conEscenario('e4-01');
+    const cerrar = jest.fn();
+    const abrir = (): Sesion => ({ ctx: p.ctx, base: { db: p.ctx.db, cerrar } }) as unknown as Sesion;
+    fijarEstadisticas(p.ctx, true);
+    const renderWidget = jest.fn();
+    await manejarTareaWidget({ widgetAction: 'WIDGET_ADDED', renderWidget }, abrir);
+    await manejarTareaWidget({ widgetAction: 'WIDGET_UPDATE', renderWidget }, abrir);
+    await manejarTareaWidget({ widgetAction: 'WIDGET_DELETED', renderWidget }, abrir);
+    expect(renderWidget).toHaveBeenCalledTimes(2);
+    expect(cerrar).toHaveBeenCalledTimes(3);
+    expect(tomarEventosWidget(p.ctx)).toEqual(['agregado', 'quitado']);
+
+    // Sin el opt-in no se anota nada; sin base, quitarlo no truena.
+    fijarEstadisticas(p.ctx, false);
+    await manejarTareaWidget({ widgetAction: 'WIDGET_DELETED', renderWidget }, abrir);
+    expect(tomarEventosWidget(p.ctx)).toEqual([]);
+    await expect(
+      manejarTareaWidget({ widgetAction: 'WIDGET_DELETED', renderWidget }, () => {
+        throw new Error('sin llave');
+      }),
+    ).resolves.toBeUndefined();
+    p.cerrar();
   });
 });

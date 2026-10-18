@@ -21,7 +21,7 @@ export function App() {
       <main>
         <h1>¿Cuántos meses sin intereses aguantas?</h1>
         <p className="entrada">
-          Antes del Buen Fin, calcula cuánto puedes sumar en mensualidades sin pasarte de lo recomendado.
+          Antes del Buen Fin, calcula cuánto puedes sumar en pagos al mes sin pasarte de lo recomendado.
         </p>
         <Calculadora />
         <ListaEspera />

@@ -1,0 +1,139 @@
+import { ErrorDominio, type PlainDate } from '@cartera/core';
+import { useState } from 'react';
+import {
+  configurarIngreso,
+  configurarIngresoVariable,
+  etiquetaFecha,
+  proximoPago,
+  type Contexto,
+} from '../../servicios';
+import { CampoMonto, CampoTexto, Tarjeta, Texto } from '../../ui';
+import { Chips } from '../onboarding/componentes';
+import {
+  conceptoIngreso,
+  leerDiaMes,
+  OPCIONES_DIA_SEMANA,
+  OPCIONES_FIN_DE_SEMANA,
+  OPCIONES_FRECUENCIA,
+  proximos14Dias,
+  reglaDeIngreso,
+} from '../onboarding/ingreso';
+import { INGRESO_EN_BLANCO, type ValoresIngreso } from './ingreso';
+
+/**
+ * Las preguntas de O3 (`02 §3`) como formulario reutilizable: Ajustes › Ingreso lo usa para cambiar el ingreso con
+ * el mismo mapeo (`reglaDeIngreso`) y los mismos servicios que el onboarding.
+ */
+export function useFormularioIngreso(
+  hoy: PlainDate,
+  inicial: ValoresIngreso | (() => ValoresIngreso) = INGRESO_EN_BLANCO,
+) {
+  const [valores, setValores] = useState(inicial);
+  const cambiar = <K extends keyof ValoresIngreso>(campo: K, valor: ValoresIngreso[K]) =>
+    setValores((v) => ({ ...v, [campo]: valor }));
+
+  const variable = valores.frecuencia === 'varia';
+  const regla = reglaDeIngreso({
+    frecuencia: valores.frecuencia,
+    finDeSemana: valores.finDeSemana,
+    diaSemana: valores.diaSemana,
+    ancla: valores.ancla,
+    diaMes: leerDiaMes(valores.diaMesTexto),
+  });
+  const proximo = regla ? proximoPago(regla, hoy) : null;
+  const monto = valores.monto;
+  const completo = variable || (regla !== null && monto !== null && monto > 0);
+
+  /** "Varía" → modo ingreso variable; si no, el ingreso principal desde hoy (reemplaza al anterior). */
+  const guardar = (ctx: Contexto) => {
+    if (variable) configurarIngresoVariable(ctx);
+    else if (regla && monto !== null && monto > 0)
+      configurarIngreso(ctx, { concepto: conceptoIngreso(valores.frecuencia), monto, regla });
+    else throw new ErrorDominio('ingreso_incompleto', 'faltan datos del ingreso');
+  };
+
+  return { hoy, valores, cambiar, variable, proximo, completo, guardar };
+}
+
+export type FormularioIngreso = ReturnType<typeof useFormularioIngreso>;
+
+/** Campos de O3. Cada `testID` lleva el `prefijo` (`<prefijo>-frecuencia-quincena`, `<prefijo>-monto`…). */
+export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioIngreso; prefijo: string }) {
+  const { hoy, valores, cambiar, variable, proximo } = formulario;
+  const fechas = proximos14Dias(hoy).map((f) => ({ valor: f, etiqueta: etiquetaFecha(f) }));
+  return (
+    <>
+      <Chips
+        testID={`${prefijo}-frecuencia`}
+        etiqueta="¿Cada cuándo te pagan?"
+        opciones={OPCIONES_FRECUENCIA}
+        valor={valores.frecuencia}
+        alCambiar={(v) => cambiar('frecuencia', v)}
+      />
+
+      {variable ? (
+        <Texto variante="cuerpo" tono="secundario">
+          Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.
+        </Texto>
+      ) : (
+        <>
+          {valores.frecuencia === 'semanal' ? (
+            <Chips
+              testID={`${prefijo}-dia-semana`}
+              etiqueta="¿Qué día te pagan?"
+              opciones={OPCIONES_DIA_SEMANA}
+              valor={valores.diaSemana}
+              alCambiar={(v) => cambiar('diaSemana', v)}
+            />
+          ) : null}
+          {valores.frecuencia === 'catorcenal' ? (
+            <Chips
+              testID={`${prefijo}-ancla`}
+              etiqueta="¿Cuándo te pagan la próxima vez?"
+              opciones={fechas}
+              valor={valores.ancla}
+              alCambiar={(v) => cambiar('ancla', v)}
+            />
+          ) : null}
+          {valores.frecuencia === 'mensual' ? (
+            <CampoTexto
+              testID={`${prefijo}-dia-mes`}
+              etiqueta="¿Qué día del mes te pagan?"
+              ejemplo="30"
+              teclado="number-pad"
+              valor={valores.diaMesTexto}
+              alCambiar={(v) => cambiar('diaMesTexto', v)}
+              error={
+                valores.diaMesTexto !== '' && leerDiaMes(valores.diaMesTexto) === null
+                  ? 'Escribe un día del 1 al 31.'
+                  : null
+              }
+            />
+          ) : null}
+          <CampoMonto
+            testID={`${prefijo}-monto`}
+            etiqueta="¿Cuánto te pagan cada vez?"
+            ayuda="Lo que te llega a la cuenta, ya con descuentos."
+            valorInicial={valores.monto}
+            alCambiar={(v) => cambiar('monto', v)}
+          />
+          <Chips
+            testID={`${prefijo}-fin-semana`}
+            etiqueta="Si cae en fin de semana te pagan:"
+            opciones={OPCIONES_FIN_DE_SEMANA}
+            valor={valores.finDeSemana}
+            alCambiar={(v) => cambiar('finDeSemana', v)}
+          />
+          {proximo ? (
+            <Tarjeta testID={`${prefijo}-proximo-pago`}>
+              <Texto variante="secundario" tono="secundario">
+                Tu próximo pago
+              </Texto>
+              <Texto variante="subtitulo">{etiquetaFecha(proximo)}</Texto>
+            </Tarjeta>
+          ) : null}
+        </>
+      )}
+    </>
+  );
+}

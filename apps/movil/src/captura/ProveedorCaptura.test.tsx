@@ -1,14 +1,17 @@
 import { render, screen, waitFor } from '@testing-library/react-native';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Text } from 'react-native';
+import { crearAnalitica, type EnvioAnalitica } from '../analitica/cliente';
 import type { FetchNube, RespuestaNube } from '../nube/http';
 import { abrirPruebaPantalla } from '../pantallas/principal/__pruebas__/base';
+import { aceptarConsentimiento } from '../privacidad/consentimiento';
+import { ProveedorAnalitica } from '../sesion/ProveedorAnalitica';
 import { ProveedorSesion } from '../sesion/ProveedorSesion';
 import type { DependenciasPlantillas } from './actualizar-plantillas';
 import { fijarPlantillasRemotas } from './catalogo';
-import { ProveedorCaptura, useCaptura } from './ProveedorCaptura';
+import { eventoPlantillasRemotas, ProveedorCaptura, useCaptura } from './ProveedorCaptura';
 import type { PuenteCaptura } from './tipos';
 
 /**
@@ -111,5 +114,108 @@ describe('plantillas remotas en la captura (CA-M10-03)', () => {
     await waitFor(() => expect(puente.fijarCatalogoRemoto).toHaveBeenCalledWith(null));
     expect(screen.getByText('version 1')).toBeTruthy();
     prueba.cerrar();
+  });
+});
+
+describe('analítica de plantillas remotas (pendiente 74, `03 §8`)', () => {
+  function montarConAnalitica(remotas: DependenciasPlantillas | null) {
+    const prueba = abrirPruebaPantalla();
+    aceptarConsentimiento(prueba.ctx, { datosFinancieros: true, estadisticas: true });
+    const enviados: EnvioAnalitica[] = [];
+    const analitica = crearAnalitica({
+      transporte: async (e) => {
+        enviados.push(e);
+      },
+      aleatorio: (n) => new Uint8Array(randomBytes(n)),
+      bancosPermitidos: new Set(),
+    });
+    render(
+      <ProveedorSesion ctx={prueba.ctx}>
+        <ProveedorAnalitica analitica={analitica}>
+          <ProveedorCaptura puente={puenteFalso()} sha256={sha256} plantillasRemotas={remotas}>
+            <VersionCatalogo />
+          </ProveedorCaptura>
+        </ProveedorAnalitica>
+      </ProveedorSesion>,
+    );
+    const propios = () =>
+      enviados.map((e) => [
+        e.evento,
+        Object.fromEntries(Object.entries(e.propiedades).filter(([k]) => !k.startsWith('$'))),
+      ]);
+    return { prueba, enviados, propios };
+  }
+
+  it('aceptada, sin red o rechazada: solo la versión activa y el código del resultado', async () => {
+    const aceptada = montarConAnalitica(deps(ARCHIVO));
+    await screen.findByText('version 2');
+    expect(aceptada.propios()).toEqual([['plantillas_remotas', { version: 2, resultado: 'aceptada' }]]);
+    // Nada del archivo: ni bancos, ni patrones, ni la firma.
+    const json = JSON.stringify(aceptada.enviados);
+    expect(json).not.toMatch(/bancos|plantillas"|patron|paquetes/);
+    expect(json).not.toContain(FIRMA.trim());
+    aceptada.prueba.cerrar();
+    fijarPlantillasRemotas(null);
+    screen.unmount();
+
+    const sinRed = montarConAnalitica(deps(null));
+    await waitFor(() => expect(sinRed.propios()).toHaveLength(1));
+    expect(sinRed.propios()).toEqual([['plantillas_remotas', { version: 1, resultado: 'sin_red' }]]);
+    sinRed.prueba.cerrar();
+    screen.unmount();
+
+    const alterado = ARCHIVO.slice();
+    alterado[10] = (alterado[10] ?? 0) ^ 0x01;
+    const rechazada = montarConAnalitica(deps(alterado));
+    await waitFor(() => expect(rechazada.propios()).toHaveLength(1));
+    expect(rechazada.propios()).toEqual([
+      ['plantillas_remotas', { version: 1, resultado: 'firma_invalida' }],
+    ]);
+    rechazada.prueba.cerrar();
+  });
+
+  it('sin llaves o sin el opt-in no sale nada', async () => {
+    const sinLlaves = montarConAnalitica(null);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(sinLlaves.enviados).toEqual([]);
+    sinLlaves.prueba.cerrar();
+    screen.unmount();
+
+    const prueba = abrirPruebaPantalla();
+    const enviados: EnvioAnalitica[] = [];
+    const analitica = crearAnalitica({
+      transporte: async (e) => {
+        enviados.push(e);
+      },
+      aleatorio: (n) => new Uint8Array(randomBytes(n)),
+      bancosPermitidos: new Set(),
+    });
+    render(
+      <ProveedorSesion ctx={prueba.ctx}>
+        <ProveedorAnalitica analitica={analitica}>
+          <ProveedorCaptura puente={puenteFalso()} sha256={sha256} plantillasRemotas={deps(ARCHIVO)}>
+            <VersionCatalogo />
+          </ProveedorCaptura>
+        </ProveedorAnalitica>
+      </ProveedorSesion>,
+    );
+    await screen.findByText('version 2');
+    expect(enviados).toEqual([]);
+    prueba.cerrar();
+  });
+});
+
+describe('eventoPlantillasRemotas', () => {
+  it('"no toca" y "sin llaves" no son revisiones; lo demás lleva la versión activa', () => {
+    expect(eventoPlantillasRemotas({ tipo: 'no_toca' }, 3)).toBeNull();
+    expect(eventoPlantillasRemotas({ tipo: 'sin_llaves' }, 3)).toBeNull();
+    expect(eventoPlantillasRemotas({ tipo: 'sin_cambios' }, 3)).toEqual({
+      nombre: 'plantillas_remotas',
+      propiedades: { version: 3, resultado: 'sin_cambios' },
+    });
+    expect(eventoPlantillasRemotas({ tipo: 'rechazada', motivo: 'app_antigua' }, 2)).toEqual({
+      nombre: 'plantillas_remotas',
+      propiedades: { version: 2, resultado: 'app_antigua' },
+    });
   });
 });

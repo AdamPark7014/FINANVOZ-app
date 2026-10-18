@@ -15,7 +15,17 @@ export const MODELO_POR_OMISION: Record<NombreProveedor, string> = {
   google: 'gemini-2.5-flash',
 };
 
+/** Tope de cada llamada a un proveedor (03 §6: 8 s); en la práctica lo acota `PRESUPUESTO_TOTAL_MS`. */
 export const TIEMPO_MAXIMO_MS = 8000;
+/**
+ * Presupuesto total de una petición al proxy: principal + alterno + reintento por validación descuentan de aquí.
+ * Debe quedar por debajo de `TIEMPO_MAXIMO_LLM_MS` del cliente (`packages/nlu/src/cliente/cliente.ts`, 10 s) con
+ * margen de red, sesión y cupo: si el teléfono se rinde antes, el resultado se pierde con el cupo ya cobrado.
+ * Mantenlas coherentes (lo verifica `interpretar.test.ts`).
+ */
+export const PRESUPUESTO_TOTAL_MS = 7000;
+/** Si lo que queda del presupuesto es menor, no se inicia otro intento. */
+export const TIEMPO_MINIMO_INTENTO_MS = 1500;
 const TOKENS_SALIDA_MAXIMOS = 2048;
 
 /**

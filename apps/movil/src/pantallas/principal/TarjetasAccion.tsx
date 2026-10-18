@@ -13,7 +13,7 @@ import {
   type TarjetaAccion,
 } from '../../servicios';
 import { TarjetaPreguntaCaptura } from '../captura/PreguntasCaptura';
-import { TarjetaArqueo, TarjetaCapturaInactiva } from '../captura/TarjetasCaptura';
+import { TarjetaArqueo, TarjetaCapturaInactiva, TarjetaReactivarCaptura } from '../captura/TarjetasCaptura';
 import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
@@ -66,6 +66,8 @@ export function TarjetasAccion({
                 alAbrirArqueo={alAbrirArqueo ?? (() => {})}
               />
             );
+          case 'reactivar_captura':
+            return <TarjetaReactivarCaptura key="reactivar_captura" testID={testID} />;
           case 'captura_inactiva':
             return <TarjetaCapturaInactiva key="captura_inactiva" testID={testID} />;
           case 'pregunta_captura':

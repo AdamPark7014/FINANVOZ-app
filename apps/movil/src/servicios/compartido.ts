@@ -164,12 +164,22 @@ function crearGrupoLocal(ctx: Contexto, grupoId: string, nombre: string, miAutor
 // ---------------------------------------------------------------------------------------------------------------
 // Libro de cada quien (E12.2, caso 31)
 
-/** ¿Algún `evento_anulado` de este teléfono apunta a `id`? */
-function anuladoLocalmente(ctx: Contexto, grupoId: string, id: string): boolean {
-  return eventosDe(ctx, grupoId).some(
-    (f) =>
-      f.tipo === 'evento_anulado' && (JSON.parse(f.cuerpo) as { id_anulado?: unknown }).id_anulado === id,
-  );
+/**
+ * Ids a los que apunta algún `evento_anulado` de este teléfono (compartido o no). Se arma una vez por lote: con
+ * miles de eventos, releer el grupo por cada uno era cuadrático.
+ */
+function idsAnuladosLocales(ctx: Contexto, grupoId: string): Set<string> {
+  const filas = ctx.db
+    .select({ cuerpo: eventoCompartido.cuerpo })
+    .from(eventoCompartido)
+    .where(and(eq(eventoCompartido.grupoId, grupoId), eq(eventoCompartido.tipo, 'evento_anulado')))
+    .all();
+  const ids = new Set<string>();
+  for (const f of filas) {
+    const id = (JSON.parse(f.cuerpo) as { id_anulado?: unknown }).id_anulado;
+    if (typeof id === 'string') ids.add(id);
+  }
+  return ids;
 }
 
 function categoriaLocal(ctx: Contexto, slug: string): string {
@@ -202,15 +212,22 @@ function anularSiHace(ctx: Contexto, transaccionId: string): string | null {
 /**
  * Lleva un evento al libro de este teléfono (idempotente por `compartido:<id>`) y guarda la transacción en
  * `evento_compartido.transaccion_id`. `cuentaLocal` es con qué pagaste o a dónde te llegó el dinero; sin ella
- * (eventos propios recuperados del servidor) se usan las cuentas puente "por asignar".
+ * (eventos propios recuperados del servidor) se usan las cuentas puente "por asignar". `anulados` sale de
+ * `idsAnuladosLocales` con todos los eventos del lote ya guardados.
  */
-function aplicarEvento(ctx: Contexto, g: FilaGrupo, e: EventoCompartido, cuentaLocal?: string): void {
+function aplicarEvento(
+  ctx: Contexto,
+  g: FilaGrupo,
+  e: EventoCompartido,
+  anulados: ReadonlySet<string>,
+  cuentaLocal?: string,
+): void {
   let propuesto: MovimientoPropuesto | null = null;
   let fecha: PlainDate;
   let descripcion: string | null = null;
   switch (e.tipo) {
     case 'gasto_compartido_creado': {
-      if (anuladoLocalmente(ctx, g.id, e.id)) return;
+      if (anulados.has(e.id)) return;
       const c = e.cuerpo;
       const r = repartoPareja(c.total, c.proporcion_a_bp);
       const [mia, suya] = g.miAutor === 'a' ? [r.parteA, r.parteB] : [r.parteB, r.parteA];
@@ -226,7 +243,7 @@ function aplicarEvento(ctx: Contexto, g: FilaGrupo, e: EventoCompartido, cuentaL
       break;
     }
     case 'pago_compartido_creado': {
-      if (anuladoLocalmente(ctx, g.id, e.id)) return;
+      if (anulados.has(e.id)) return;
       const c = e.cuerpo;
       propuesto =
         c.de === g.miAutor
@@ -306,7 +323,7 @@ function crearEventoPropio(
   });
   enTransaccion(ctx, () => {
     insertarEvento(ctx, evento, null);
-    aplicarEvento(ctx, g, evento, cuentaLocal);
+    aplicarEvento(ctx, g, evento, idsAnuladosLocales(ctx, g.id), cuentaLocal);
   });
   return evento.id;
 }
@@ -478,7 +495,7 @@ export function anularEventoCompartido(
     throw new ErrorDominio('evento_inexistente', 'no existe ese movimiento compartido');
   if (objetivo.autor !== g.miAutor)
     throw new ErrorDominio('evento_ajeno', 'solo puedes anular lo que registraste tú');
-  if (anuladoLocalmente(ctx, grupoId, eventoId))
+  if (idsAnuladosLocales(ctx, grupoId).has(eventoId))
     throw new ErrorDominio('ya_anulada', 'ese movimiento ya está anulado');
   return {
     eventoId: crearEventoPropio(ctx, deps, g, { tipo: 'evento_anulado', cuerpo: { id_anulado: eventoId } }),
@@ -547,7 +564,9 @@ function incorporar(
     nuevos.push(evento);
   }
   // Primero se guardan todos y luego se aplican: una anulación que llega junto con su gasto lo deja fuera.
-  for (const e of nuevos) aplicarEvento(ctx, g, e);
+  if (nuevos.length === 0) return;
+  const anulados = idsAnuladosLocales(ctx, g.id);
+  for (const e of nuevos) aplicarEvento(ctx, g, e, anulados);
 }
 
 /**
@@ -564,6 +583,7 @@ function cerrarLocal(ctx: Contexto, g: FilaGrupo, cerradoEn: string, por: 'yo' |
       .where(eq(grupoCompartido.id, g.id))
       .run();
     const todos = eventosDe(ctx, g.id);
+    const porId = new Map(todos.map((f) => [f.id, f]));
     for (const f of todos) {
       if (f.recibidoEn !== null) continue;
       if (f.tipo !== 'evento_anulado') {
@@ -571,7 +591,7 @@ function cerrarLocal(ctx: Contexto, g: FilaGrupo, cerradoEn: string, por: 'yo' |
         continue;
       }
       const idAnulado = (JSON.parse(f.cuerpo) as { id_anulado: string }).id_anulado;
-      const objetivo = todos.find((o) => o.id === idAnulado);
+      const objetivo = porId.get(idAnulado);
       if (!objetivo || objetivo.recibidoEn === null || !objetivo.transaccionId) continue;
       const original = ctx.libro.obtener(objetivo.transaccionId);
       if (!original || !idReversa(ctx, original.id)) continue;
@@ -879,3 +899,6 @@ export function gruposAbiertosConNombre(ctx: Contexto): { id: string; nombre: st
     .orderBy(asc(grupoCompartido.creadoEn), asc(grupoCompartido.id))
     .all();
 }
+
+/** Solo para pruebas (rendimiento de la descarga, pendiente 149). */
+export const internos = { incorporar, idsAnuladosLocales };

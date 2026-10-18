@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Finanvoz: ¿Cuántos meses sin intereses aguantas? Calculadora gratis para el Buen Fin.">
+  <!-- Fuente de og.png (1200x630). Exportar a PNG sin cambiar tamaño; el ícono es assets/marca/icono.svg. -->
+  <defs>
+    <linearGradient id="fondo-icono" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14A37F"/>
+      <stop offset="1" stop-color="#0A6B57"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#F6F8F7"/>
+  <g transform="translate(80 64) scale(0.125)">
+    <rect width="1024" height="1024" rx="224" fill="url(#fondo-icono)"/>
+    <path d="M512 212c-176 0-312 118-312 270 0 86 44 162 114 212l-26 118c-4 18 16 31 31 20l120-82c23 4 47 6 73 6 176 0 312-118 312-274S688 212 512 212z" fill="#FFFFFF"/>
+    <rect x="352" y="476" width="72" height="120" rx="36" fill="#0A6B57"/>
+    <rect x="476" y="410" width="72" height="186" rx="36" fill="#0E8A6E"/>
+    <rect x="600" y="334" width="72" height="262" rx="36" fill="#14A37F"/>
+  </g>
+  <text x="232" y="148" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="56" font-weight="700" fill="#14201C">Finanvoz</text>
+  <text font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="84" font-weight="700" fill="#14201C">
+    <tspan x="80" y="305">¿Cuántos meses sin</tspan>
+    <tspan x="80" y="400" fill="#0B7A61">intereses aguantas?</tspan>
+  </text>
+  <text font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="38" fill="#4A5A54">
+    <tspan x="80" y="472">Calcula gratis, antes del Buen Fin, cuánto</tspan>
+    <tspan x="80" y="520">puedes sumar en pagos al mes.</tspan>
+  </text>
+  <rect y="562" width="1200" height="68" fill="#0E8A6E"/>
+  <text x="80" y="607" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="32" font-weight="700" fill="#FFFFFF">finanvoz.com</text>
+</svg>

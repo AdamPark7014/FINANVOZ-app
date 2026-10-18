@@ -80,6 +80,7 @@ export interface OpcionesAnulacion {
 export type ProblemaIntegridad =
   | { readonly tipo: 'suma_distinta_de_cero'; readonly transaccionId: string }
   | { readonly tipo: 'menos_de_dos_asientos'; readonly transaccionId: string }
+  | { readonly tipo: 'monto_no_entero'; readonly transaccionId: string }
   | { readonly tipo: 'libro_descuadrado'; readonly suma: Centavos };
 
 /** Clave de la reversa de `id`: determinista, así una anulación repetida choca con `UNIQUE`. */
@@ -367,6 +368,11 @@ export function comprobarIntegridad(db: BaseDatos): ProblemaIntegridad[] {
         GROUP BY t.id HAVING COUNT(a.id) < 2`,
   );
   for (const f of cortas) problemas.push({ tipo: 'menos_de_dos_asientos', transaccionId: f.id });
+  // Un respaldo manipulado puede traer 0.5 / -0.5: suma cero, pero no son centavos.
+  const noEnteros = db.all<{ transaccion_id: string }>(
+    sql`SELECT DISTINCT transaccion_id FROM asiento WHERE typeof(monto) <> 'integer'`,
+  );
+  for (const f of noEnteros) problemas.push({ tipo: 'monto_no_entero', transaccionId: f.transaccion_id });
   const total = db.get<{ suma: number | null }>(sql`SELECT SUM(monto) AS suma FROM asiento`);
   const suma = Number(total?.suma ?? 0);
   if (suma !== 0) problemas.push({ tipo: 'libro_descuadrado', suma });

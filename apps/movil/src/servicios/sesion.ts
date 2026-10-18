@@ -8,6 +8,7 @@ import { abrirBaseApp, aleatorioExpo, almacenExpo, puertoExpo } from '../db/expo
 import { borrarTodo } from '../privacidad/borrar';
 import { dependenciasRespaldoExpo } from '../respaldo/expo';
 import { crearContexto, type Contexto, type Reloj } from './contexto';
+import { apagarCapturaTrasRestaurar } from './estado-captura';
 import { crearGeneradorUuidV7 } from './ids';
 import { relojDispositivo } from './reloj';
 import { restaurarRespaldo, type RespaldoListo } from './respaldo';
@@ -45,6 +46,12 @@ export function restaurarSesion(listo: RespaldoListo, reloj: Reloj = relojDispos
     registrarRespaldoRestaurado(ctx, listo.fecha);
   } catch {
     // No impide abrir la sesión: la fecha se corrige con el siguiente respaldo.
+  }
+  // En este teléfono no hay acceso a notificaciones ni lista blanca nativa: Hoy pide volver a activar la captura.
+  try {
+    apagarCapturaTrasRestaurar(ctx);
+  } catch {
+    // No impide abrir la sesión.
   }
   return { ctx, base };
 }

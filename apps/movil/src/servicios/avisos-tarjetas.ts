@@ -27,6 +27,10 @@ const PreferenciasAvisos = z.strictObject({
   riesgo: z.boolean().optional(),
   // M9: igual, sin la clave queda encendido ("Respaldo pendiente", `02 §13`).
   respaldo: z.boolean().optional(),
+  // M8: igual, sin la clave quedan encendidos (`02 §13`).
+  tanda: z.boolean().optional(),
+  compromiso: z.boolean().optional(),
+  ingreso: z.boolean().optional(),
 });
 
 export interface PreferenciasAvisos {
@@ -41,6 +45,12 @@ export interface PreferenciasAvisos {
   readonly riesgo: boolean;
   /** "Respaldo pendiente": 14 días sin respaldo (encendido por defecto, `02 §13`). */
   readonly respaldo: boolean;
+  /** "Aportación de tanda": el día de cada aportación (encendido por defecto, `02 §13`). */
+  readonly tanda: boolean;
+  /** "Compromiso sin cubrir": 1 día después de su fecha (encendido por defecto). */
+  readonly compromiso: boolean;
+  /** "Ingreso que no llegó": 3 días después de la fecha esperada (encendido por defecto). */
+  readonly ingreso: boolean;
 }
 
 const CLAVE = 'avisos_tarjetas';
@@ -55,6 +65,9 @@ export function obtenerPreferenciasAvisos(ctx: Contexto): PreferenciasAvisos {
         fechaLimite: g.fecha_limite,
         riesgo: g.riesgo ?? true,
         respaldo: g.respaldo ?? true,
+        tanda: g.tanda ?? true,
+        compromiso: g.compromiso ?? true,
+        ingreso: g.ingreso ?? true,
       }
     : {
         silencio: HORARIO_SILENCIOSO_POR_OMISION,
@@ -63,6 +76,9 @@ export function obtenerPreferenciasAvisos(ctx: Contexto): PreferenciasAvisos {
         fechaLimite: true,
         riesgo: true,
         respaldo: true,
+        tanda: true,
+        compromiso: true,
+        ingreso: true,
       };
 }
 
@@ -80,6 +96,9 @@ export function fijarPreferenciasAvisos(
     fecha_limite: nuevas.fechaLimite,
     riesgo: nuevas.riesgo,
     respaldo: nuevas.respaldo,
+    tanda: nuevas.tanda,
+    compromiso: nuevas.compromiso,
+    ingreso: nuevas.ingreso,
   });
   if (!r.success) throw new ErrorDominio('avisos_invalidos', 'revisa el horario de los avisos');
   escribirAjuste(ctx, CLAVE, PreferenciasAvisos, r.data);

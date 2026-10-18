@@ -6,8 +6,8 @@ import { z } from 'zod';
  * número chico acotado: no cabe un monto, un comercio, un alias, un nombre, un RFC ni un texto. Un evento con
  * una propiedad de más, un valor fuera de catálogo o un nombre desconocido se descarta completo.
  *
- * Entran solo los eventos de M2–M7; los de respaldo, plantillas remotas, suscripciones, negocio, paquete para
- * el contador y widget se agregan con su hito.
+ * Entran los eventos de M2–M7, `plantillas_remotas` y `widget` (M10); los de respaldo, suscripciones, negocio y
+ * paquete para el contador se agregan con su hito.
  */
 export const EVENTOS_PERMITIDOS = {
   app_abierta: z.strictObject({}),
@@ -41,6 +41,28 @@ export const EVENTOS_PERMITIDOS = {
       'cuota_agotada',
     ]),
   }),
+  /**
+   * Revisión diaria de plantillas remotas (`07 §3.1`): la versión activa al terminar (1 = embebidas) y el código
+   * del resultado; nunca el contenido del archivo. "No toca" y "sin llaves" no son revisiones y no se envían.
+   */
+  plantillas_remotas: z.strictObject({
+    version: z.int().min(1).max(999),
+    resultado: z.enum([
+      'aceptada',
+      'sin_cambios',
+      'sin_red',
+      'respuesta_invalida',
+      'sin_llaves',
+      'firma_invalida',
+      'json_invalido',
+      'formato_invalido',
+      'plantillas_invalidas',
+      'version_no_mayor',
+      'app_antigua',
+    ]),
+  }),
+  /** Agregar o quitar el widget "Hoy puedes" (`02 §21`); la tarea sin interfaz lo deja pendiente. */
+  widget: z.strictObject({ evento: z.enum(['agregado', 'quitado']) }),
 } as const;
 
 type Eventos = typeof EVENTOS_PERMITIDOS;

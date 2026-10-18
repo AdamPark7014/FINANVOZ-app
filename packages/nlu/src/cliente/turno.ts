@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { DefinicionHerramienta } from '../explicar/herramientas';
 import {
   CODIGOS_LIMITE,
-  TIEMPO_MAXIMO_MS,
+  TIEMPO_MAXIMO_LLM_MS,
   type CodigoErrorNube,
   type CodigoLimite,
   type MetadatosNube,
@@ -72,7 +72,7 @@ class TiempoAgotado extends Error {}
  */
 export function crearClienteTurno(opciones: OpcionesClienteTurno): ClienteTurno {
   const transporte: Transporte = opciones.transporte ?? ((url, p) => globalThis.fetch(url, p));
-  const tiempoMaximo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_MS;
+  const tiempoMaximo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_LLM_MS;
   const destino = `${opciones.url.replace(/\/+$/, '')}${RUTA_TURNO}`;
 
   async function enviar(token: string, cuerpo: string): Promise<RespuestaTransporte> {

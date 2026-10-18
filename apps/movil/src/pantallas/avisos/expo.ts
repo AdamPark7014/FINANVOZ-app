@@ -1,8 +1,9 @@
 import { Linking } from 'react-native';
 import { crearPuertoExpo } from '../../servicios';
-import type { Notificaciones, PermisoAvisos } from './notificaciones';
+import type { Notificaciones, PermisoAvisos, RespuestaAviso } from './notificaciones';
 
 type ModuloExpo = typeof import('expo-notifications');
+type RespuestaExpo = Parameters<Parameters<ModuloExpo['addNotificationResponseReceivedListener']>[0]>[0];
 
 function traducir(p: Awaited<ReturnType<ModuloExpo['getPermissionsAsync']>>): PermisoAvisos {
   if (p.granted) return 'concedido';
@@ -43,10 +44,34 @@ export function crearNotificacionesExpo(): Notificaciones | null {
         content: { title: n.content.title, body: n.content.body, data: n.content.data ?? null },
       })),
   });
+  // Solo el toque al aviso (no los botones de acción): id, ruta guardada y una clave única por toque.
+  const aRespuesta = (r: RespuestaExpo): RespuestaAviso | null => {
+    if (r.actionIdentifier !== N.DEFAULT_ACTION_IDENTIFIER) return null;
+    const { identifier, content } = r.notification.request;
+    return {
+      id: identifier,
+      ruta: content.data?.ruta ?? null,
+      clave: `${identifier}@${r.notification.date}`,
+    };
+  };
   return {
     puerto,
     permiso: async () => traducir(await N.getPermissionsAsync()),
     pedirPermiso: async () => traducir(await N.requestPermissionsAsync()),
     abrirAjustesSistema: () => void Linking.openSettings(),
+    respuestas: {
+      suscribir: (alTocar) => {
+        const s = N.addNotificationResponseReceivedListener((r) => {
+          const t = aRespuesta(r);
+          if (t) alTocar(t);
+        });
+        return () => s.remove();
+      },
+      ultima: async () => {
+        const r = N.getLastNotificationResponse();
+        return r ? aRespuesta(r) : null;
+      },
+      olvidarUltima: () => N.clearLastNotificationResponse(),
+    },
   };
 }

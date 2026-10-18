@@ -5,7 +5,7 @@
 import { z } from 'zod';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import type { Contexto } from './contexto';
-import { escribirAjuste, leerAjuste } from './preferencias';
+import { borrarAjuste, escribirAjuste, leerAjuste } from './preferencias';
 
 /** Sin eventos del servicio en 72 h con apps bancarias instaladas → aviso de captura inactiva. */
 export const HORAS_CAPTURA_INACTIVA = 72;
@@ -46,6 +46,13 @@ export interface EstadoCapturaVista {
   /** RF-CAP-07: "No he visto notificaciones de tu banco en 3 días." */
   readonly inactiva: boolean;
 }
+
+/**
+ * "Vuelve a activar la lectura de notificaciones" tras restaurar un respaldo. Ajuste aparte: el de `captura` es
+ * estricto y lo traen respaldos de versiones anteriores.
+ */
+const CLAVE_REACTIVAR = 'captura_reactivar';
+const Reactivar = z.strictObject({ desde: z.int() });
 
 function leer(ctx: Contexto): Guardado {
   return leerAjuste(ctx, CLAVE, Guardado) ?? INICIAL;
@@ -98,11 +105,31 @@ export function activarCaptura(ctx: Contexto, apps: readonly string[]): void {
     activada_en: g.activada ? (g.activada_en ?? ahora) : ahora,
     apps: [...new Set(apps)].sort(),
   });
+  borrarAjuste(ctx, CLAVE_REACTIVAR);
 }
 
+/** También descarta "Vuelve a activar la lectura de notificaciones": la persona decidió dejarla apagada. */
 export function desactivarCaptura(ctx: Contexto): void {
   exigirConsentimiento(ctx);
   escribir(ctx, { ...leer(ctx), activada: false });
+  borrarAjuste(ctx, CLAVE_REACTIVAR);
+}
+
+/**
+ * Al restaurar un respaldo (pendiente 47): el ajuste restaurado puede decir "activada", pero en el teléfono nuevo
+ * no hay acceso a notificaciones ni lista blanca nativa. La captura queda apagada, las señales del teléfono
+ * anterior se olvidan y Hoy pide volver a activarla. Sin captura activa en el respaldo no hay nada que pedir.
+ */
+export function apagarCapturaTrasRestaurar(ctx: Contexto): void {
+  const g = leer(ctx);
+  if (!g.activada) return;
+  escribir(ctx, { ...g, activada: false, permiso: 'desconocido', apps_instaladas: [] });
+  escribirAjuste(ctx, CLAVE_REACTIVAR, Reactivar, { desde: ctx.reloj.ahora() });
+}
+
+/** Tarjeta de Hoy "Vuelve a activar la lectura de notificaciones" (hasta reactivarla o descartarla). */
+export function reactivarCapturaPendiente(ctx: Contexto): boolean {
+  return leerAjuste(ctx, CLAVE_REACTIVAR, Reactivar) !== null && !leer(ctx).activada;
 }
 
 /**

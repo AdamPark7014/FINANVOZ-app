@@ -125,6 +125,10 @@ export interface ResultadoCaptura {
   readonly estado: EstadoCaptura;
   readonly transaccionId: string | null;
   readonly espera: EsperaCaptura['tipo'] | null;
+  /** Id del banco en el catálogo de plantillas (`null` si el paquete no es de ningún banco). */
+  readonly banco: string | null;
+  /** Alguna plantilla la entendió (`false` = `no_reconocida`). */
+  readonly reconocida: boolean;
 }
 
 export interface CapturaLeida {
@@ -301,6 +305,8 @@ function resultado(ctx: Contexto, id: string, nueva: boolean): ResultadoCaptura 
     estado: c.estado,
     transaccionId: c.transaccionId,
     espera: c.estado === 'interpretada' ? (c.datos.espera?.tipo ?? null) : null,
+    banco: c.datos.banco,
+    reconocida: c.datos.tipo !== 'no_reconocida',
   };
 }
 

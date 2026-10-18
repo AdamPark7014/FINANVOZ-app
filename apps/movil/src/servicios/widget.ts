@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { exigirConsentimiento, obtenerConsentimiento } from '../privacidad/consentimiento';
+import { estadisticasActivas } from '../privacidad/estadisticas';
 import { obtenerBloqueo, onboardingCompletado } from './ajustes';
 import type { Contexto } from './contexto';
 import { dias, miles } from './formato';
@@ -82,4 +83,32 @@ export function obtenerVistaWidget(ctx: Contexto): VistaWidget {
   if (ajustes.ocultarMontos) return construirVistaWidget(null, ajustes);
   if (!obtenerConsentimiento(ctx) || !onboardingCompletado(ctx)) return construirVistaWidget(null, ajustes);
   return construirVistaWidget(obtenerHoy(ctx), ajustes);
+}
+
+/** `widget {evento}` de la analítica (`03 §8`). */
+export type EventoWidget = 'agregado' | 'quitado';
+
+const CLAVE_EVENTOS = 'widget_eventos';
+const MAX_PENDIENTES = 20;
+const EventosWidget = z.strictObject({
+  pendientes: z.array(z.enum(['agregado', 'quitado'])).max(MAX_PENDIENTES),
+});
+
+/**
+ * La tarea del widget corre sin interfaz y no puede enviar analítica: deja el evento pendiente y la app lo envía
+ * al volver a primer plano (`tomarEventosWidget`). Sin el opt-in de estadísticas no guarda nada.
+ */
+export function anotarEventoWidget(ctx: Contexto, evento: EventoWidget): void {
+  if (!estadisticasActivas(ctx)) return;
+  const pendientes = leerAjuste(ctx, CLAVE_EVENTOS, EventosWidget)?.pendientes ?? [];
+  escribirAjuste(ctx, CLAVE_EVENTOS, EventosWidget, {
+    pendientes: [...pendientes, evento].slice(-MAX_PENDIENTES),
+  });
+}
+
+/** Devuelve los eventos pendientes del widget y los olvida. */
+export function tomarEventosWidget(ctx: Contexto): EventoWidget[] {
+  const pendientes = leerAjuste(ctx, CLAVE_EVENTOS, EventosWidget)?.pendientes ?? [];
+  if (pendientes.length > 0) escribirAjuste(ctx, CLAVE_EVENTOS, EventosWidget, { pendientes: [] });
+  return pendientes;
 }

@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import {
   capacidadEndeudamiento,
   PARAMETROS_CAPACIDAD,
@@ -12,10 +12,11 @@ interface CampoProps {
   ayuda?: string;
   valor: string;
   onCambio: (v: string) => void;
+  onSalir: () => void;
   error?: string | undefined;
 }
 
-function CampoPesos({ etiqueta, ayuda, valor, onCambio, error }: CampoProps) {
+function CampoPesos({ etiqueta, ayuda, valor, onCambio, onSalir, error }: CampoProps) {
   const id = useId();
   const idAyuda = `${id}-ayuda`;
   const idError = `${id}-error`;
@@ -37,6 +38,7 @@ function CampoPesos({ etiqueta, ayuda, valor, onCambio, error }: CampoProps) {
           placeholder="0"
           value={valor}
           onChange={(e) => onCambio(e.target.value)}
+          onBlur={onSalir}
           aria-invalid={error ? true : undefined}
           aria-describedby={describe}
         />
@@ -50,9 +52,11 @@ function CampoPesos({ etiqueta, ayuda, valor, onCambio, error }: CampoProps) {
   );
 }
 
+type Campo = 'ingreso' | 'deudas' | 'msi' | 'precio';
+
 type Estado =
   | { tipo: 'incompleto' }
-  | { tipo: 'error'; errores: Partial<Record<'ingreso' | 'deudas' | 'msi' | 'precio', string>> }
+  | { tipo: 'error'; errores: Partial<Record<Campo, string>> }
   | { tipo: 'listo'; resultado: ResultadoCapacidad; meses: number };
 
 const MONTO_INVALIDO = 'Escribe solo números, por ejemplo 15,000 o 1,099.50.';
@@ -91,6 +95,36 @@ function calcular(ingreso: string, deudas: string, msi: string, precio: string, 
 
 const pct = (bp: number) => `${bp / 100} %`;
 
+/** Una sola línea para el lector de pantalla; el resultado completo se lee navegando. */
+function resumir(estado: Estado): string {
+  if (estado.tipo !== 'listo') return '';
+  const r = estado.resultado;
+  if (r.compra) {
+    if (!r.compra.cabe) return `No cabe: te pasas por ${formatearPesos(-r.compra.margen)} al mes.`;
+    return r.compra.margen === 0
+      ? 'Sí cabe, pero justo: no te sobra nada al mes.'
+      : `Sí cabe: te sobran ${formatearPesos(r.compra.margen)} al mes.`;
+  }
+  if (r.capacidadMensual === 0) {
+    return r.rebasaRecomendacion
+      ? 'Ya te pasas de lo recomendado.'
+      : 'Ya estás justo en el límite recomendado.';
+  }
+  return `Puedes sumar hasta ${formatearPesos(r.capacidadMensual)} en pagos al mes.`;
+}
+
+/** Espera a que dejes de teclear para no anunciar cada tecla. */
+export const RETRASO_ANUNCIO_MS = 600;
+
+function useRetrasado<T>(valor: T, ms: number): T {
+  const [retrasado, setRetrasado] = useState(valor);
+  useEffect(() => {
+    const t = setTimeout(() => setRetrasado(valor), ms);
+    return () => clearTimeout(t);
+  }, [valor, ms]);
+  return retrasado;
+}
+
 function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; meses: number }) {
   const tope = r.limitante === 'msi' ? r.topeMsi : r.topeDeuda;
   const limitante =
@@ -99,9 +133,9 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
       : `Te limita el total de tus deudas: lo recomendado es que tus pagos no pasen de ${pct(PARAMETROS_CAPACIDAD.topeDeudaBp)} de tu ingreso (${formatearPesos(tope)} al mes).`;
 
   return (
-    <section className="resultado" aria-live="polite" aria-labelledby="titulo-resultado">
+    <section className="resultado" aria-labelledby="titulo-resultado">
       <h2 id="titulo-resultado">Tu resultado</h2>
-      <p className="etiqueta">Puedes sumar en mensualidades</p>
+      <p className="etiqueta">Puedes sumar en pagos al mes</p>
       <p className="cifra" data-prueba="capacidad">
         {formatearPesos(r.capacidadMensual)}
         <span className="unidad"> al mes</span>
@@ -109,8 +143,8 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
       {r.capacidadMensual === 0 ? (
         <p className="aviso" data-prueba="mensaje-tope">
           {r.rebasaRecomendacion
-            ? 'Tus pagos ya rebasan la recomendación. Antes de comprar a meses, conviene bajar lo que debes.'
-            : 'Ya estás justo en el tope recomendado. Una compra más a meses lo pasaría.'}
+            ? 'Con lo que ya pagas, ya te pasas de lo recomendado. Antes de comprar a meses, conviene bajar lo que debes.'
+            : 'Ya estás justo en el límite recomendado. Una compra más a meses te pasaría.'}
         </p>
       ) : (
         <p data-prueba="limitante">{limitante}</p>
@@ -120,16 +154,17 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
         <div className={`veredicto ${r.compra.cabe ? 'si' : 'no'}`} data-prueba="veredicto">
           <p className="veredicto-titulo">{r.compra.cabe ? 'Sí cabe' : 'No cabe'}</p>
           <p>
+            {`Pagarías ${formatearPesos(r.compra.cuotaMaxima)} al mes durante ${meses} meses. `}
             {r.compra.cabe
               ? r.compra.margen === 0
-                ? `La mensualidad de ${formatearPesos(r.compra.cuotaMaxima)} a ${meses} meses te deja justo en el límite (margen $0).`
-                : `La mensualidad de ${formatearPesos(r.compra.cuotaMaxima)} a ${meses} meses cabe y te deja ${formatearPesos(r.compra.margen)} de margen.`
-              : `La mensualidad de ${formatearPesos(r.compra.cuotaMaxima)} a ${meses} meses pasa tu capacidad por ${formatearPesos(-r.compra.margen)}.`}
+                ? 'Cabe justo: no te sobra nada ($0 al mes).'
+                : `Te sobran ${formatearPesos(r.compra.margen)} al mes.`
+              : `Te pasas por ${formatearPesos(-r.compra.margen)} al mes.`}
           </p>
         </div>
       )}
 
-      <h3>Precio máximo según el plazo</h3>
+      <h3>La compra más cara que te cabe, según los meses</h3>
       <table className="plazos">
         <thead>
           <tr>
@@ -156,43 +191,70 @@ export function Calculadora() {
   const [msi, setMsi] = useState('');
   const [precio, setPrecio] = useState('');
   const [meses, setMeses] = useState(12);
+  const [tocados, setTocados] = useState<ReadonlySet<Campo>>(new Set());
   const idMeses = useId();
   const estado = useMemo(
     () => calcular(ingreso, deudas, msi, precio, meses),
     [ingreso, deudas, msi, precio, meses],
   );
   const errores = estado.tipo === 'error' ? estado.errores : {};
+  const anuncio = useRetrasado(resumir(estado), RETRASO_ANUNCIO_MS);
+
+  // El error de formato se muestra al salir del campo o al enviar, nunca a media escritura.
+  const cambiar = (campo: Campo, fijar: (v: string) => void) => (v: string) => {
+    fijar(v);
+    setTocados((t) => {
+      if (!t.has(campo)) return t;
+      const sin = new Set(t);
+      sin.delete(campo);
+      return sin;
+    });
+  };
+  const salir = (campo: Campo) => () => setTocados((t) => (t.has(campo) ? t : new Set(t).add(campo)));
+  const errorVisible = (campo: Campo) => (tocados.has(campo) ? errores[campo] : undefined);
 
   return (
     <>
       <form
         className="tarjeta"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          setTocados(new Set<Campo>(['ingreso', 'deudas', 'msi', 'precio']));
+        }}
         aria-label="Calculadora de meses sin intereses"
       >
         <CampoPesos
           etiqueta="¿Cuánto te llega al mes?"
           ayuda="Lo que recibes ya con descuentos."
           valor={ingreso}
-          onCambio={setIngreso}
-          error={errores.ingreso}
+          onCambio={cambiar('ingreso', setIngreso)}
+          onSalir={salir('ingreso')}
+          error={errorVisible('ingreso')}
         />
         <CampoPesos
           etiqueta="¿Cuánto pagas al mes de deudas?"
           ayuda="Tarjetas, préstamos, crédito de auto y meses sin intereses."
           valor={deudas}
-          onCambio={setDeudas}
-          error={errores.deudas}
+          onCambio={cambiar('deudas', setDeudas)}
+          onSalir={salir('deudas')}
+          error={errorVisible('deudas')}
         />
         <CampoPesos
           etiqueta="De eso, ¿cuánto es de meses sin intereses?"
           valor={msi}
-          onCambio={setMsi}
-          error={errores.msi}
+          onCambio={cambiar('msi', setMsi)}
+          onSalir={salir('msi')}
+          error={errorVisible('msi')}
         />
         <fieldset className="compra">
           <legend>¿Quieres revisar una compra? (opcional)</legend>
-          <CampoPesos etiqueta="Precio" valor={precio} onCambio={setPrecio} error={errores.precio} />
+          <CampoPesos
+            etiqueta="Precio"
+            valor={precio}
+            onCambio={cambiar('precio', setPrecio)}
+            onSalir={salir('precio')}
+            error={errorVisible('precio')}
+          />
           <div className="campo">
             <label htmlFor={idMeses}>Meses</label>
             <select id={idMeses} value={meses} onChange={(e) => setMeses(Number(e.target.value))}>
@@ -207,6 +269,9 @@ export function Calculadora() {
         <p className="privado">Lo que escribes aquí se calcula en tu teléfono y no se envía a ningún lado.</p>
       </form>
 
+      <p className="solo-lector" role="status" aria-live="polite" aria-atomic="true" data-prueba="anuncio">
+        {anuncio}
+      </p>
       {estado.tipo === 'listo' && <Resultado resultado={estado.resultado} meses={estado.meses} />}
 
       <aside className="fuentes">

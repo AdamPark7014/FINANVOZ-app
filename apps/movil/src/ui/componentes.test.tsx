@@ -177,14 +177,14 @@ describe('Aviso con Deshacer', () => {
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 
-  it('se cierra solo a los 5 s y un aviso nuevo reinicia el tiempo', () => {
+  it('se cierra solo a los 10 s y un aviso nuevo reinicia el tiempo', () => {
     render(<Demo deshacer={() => {}} />);
     fireEvent.press(screen.getByRole('button', { name: 'Registrar' }));
-    act(() => jest.advanceTimersByTime(4000));
+    act(() => jest.advanceTimersByTime(8000));
     fireEvent.press(screen.getByRole('button', { name: 'Registrar' }));
-    act(() => jest.advanceTimersByTime(4000));
+    act(() => jest.advanceTimersByTime(8000));
     expect(screen.getByTestId('aviso')).toBeTruthy();
-    act(() => jest.advanceTimersByTime(1000));
+    act(() => jest.advanceTimersByTime(2000));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 });

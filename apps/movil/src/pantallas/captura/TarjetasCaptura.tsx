@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
-import { confirmarArqueo, posponerArqueo, type TarjetaAccion } from '../../servicios';
+import {
+  confirmarArqueo,
+  desactivarCaptura,
+  obtenerEstadoCaptura,
+  posponerArqueo,
+  type TarjetaAccion,
+} from '../../servicios';
 import { useCaptura } from '../../captura/ProveedorCaptura';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
@@ -8,6 +14,7 @@ import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
+import { ActivarCaptura } from './ActivarCaptura';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;
 
@@ -110,6 +117,61 @@ function marcaTelefono(): string | null {
   if (Platform.OS !== 'android') return null;
   const c = Platform.constants as { Brand?: string } | undefined;
   return c?.Brand ?? null;
+}
+
+/**
+ * 5. Tras restaurar un respaldo (pendiente 47) la captura quedó apagada: este teléfono todavía no da acceso a
+ * las notificaciones. "Activar" abre aquí mismo el flujo de siempre (`ActivarCaptura`, como en Ajustes); "Ahora
+ * no" la deja apagada. La tarjeta se va en cuanto la captura vuelve a estar activa.
+ */
+export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
+  const { ctx, refrescar } = useSesion();
+  const { puente } = useCaptura();
+  const mostrar = useMostrarAviso();
+  const [activando, setActivando] = useState(false);
+  // Al guardar las apps Hoy se recalcula y la tarjeta se desmonta antes del "Listo" del flujo.
+  const activandoRef = useRef(false);
+  useEffect(() => {
+    activandoRef.current = activando;
+  }, [activando]);
+  useEffect(
+    () => () => {
+      if (activandoRef.current && obtenerEstadoCaptura(ctx).activada)
+        mostrar({ mensaje: 'Listo: vuelvo a leer los avisos de tu banco.' });
+    },
+    [ctx, mostrar],
+  );
+
+  if (activando)
+    return (
+      <Tarjeta testID={testID}>
+        <ActivarCaptura testID={`${testID}-activar`} alTerminar={() => setActivando(false)} />
+      </Tarjeta>
+    );
+  return (
+    <Tarjeta testID={testID}>
+      <Texto variante="cuerpoFuerte">Vuelve a activar la lectura de notificaciones</Texto>
+      <Texto variante="secundario" tono="secundario">
+        Recuperé tus datos, pero en este teléfono todavía no puedo leer los avisos de tu banco.
+      </Texto>
+      <View style={{ gap: espacio.s }}>
+        {puente ? (
+          <Boton etiqueta="Activar" alPresionar={() => setActivando(true)} testID={`${testID}-reactivar`} />
+        ) : null}
+        <Boton
+          etiqueta="Ahora no"
+          variante="texto"
+          alPresionar={() => {
+            desactivarCaptura(ctx);
+            void puente?.fijarListaBlanca([]);
+            refrescar();
+            mostrar({ mensaje: 'Va. Puedes activarla cuando quieras en Ajustes.' });
+          }}
+          testID={`${testID}-ahora-no`}
+        />
+      </View>
+    </Tarjeta>
+  );
 }
 
 /** 5. Captura inactiva (RF-CAP-07, CA-M5-06). */

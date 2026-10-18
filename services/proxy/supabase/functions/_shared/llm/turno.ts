@@ -1,16 +1,15 @@
-// Un turno del modo explicar (06 §6, 03 §6): proveedor principal (8 s) → si 5xx/429/red/tiempo, un intento con
-// el alterno (8 s). Sin validación del texto: las cifras las valida el teléfono contra los resultados de sus
-// herramientas (regla 4). No registra nada: devuelve metadatos para el manejador (regla 9).
-import { conTiempo } from '../nlu/interpretar.ts';
-import { FallaProveedor, type NombreProveedor, TIEMPO_MAXIMO_MS } from '../nlu/proveedores.ts';
+// Un turno del modo explicar (06 §6, 03 §6): proveedor principal → si 5xx/429/red/tiempo, un intento con el
+// alterno, ambos dentro del presupuesto total de la petición (`PRESUPUESTO_TOTAL_MS`). Sin validación del texto:
+// las cifras las valida el teléfono contra los resultados de sus herramientas (regla 4). No registra nada:
+// devuelve metadatos para el manejador (regla 9).
+import { conTiempo, crearPresupuesto, type OpcionesTiempo } from '../nlu/interpretar.ts';
+import { FallaProveedor, type NombreProveedor } from '../nlu/proveedores.ts';
 import { contarResultados, LLAMADAS_MAXIMAS, type SalidaTurno, type SolicitudTurno } from './contrato.ts';
 import type { AdaptadorTurno } from './proveedores.ts';
 
-export interface OpcionesTurno {
+export interface OpcionesTurno extends OpcionesTiempo {
   /** Principal primero, alterno después (se usa como mucho uno alterno). */
   adaptadores: readonly AdaptadorTurno[];
-  tiempoMaximoMs?: number;
-  ahora: () => number;
 }
 
 interface Metadatos {
@@ -32,13 +31,16 @@ export type ResultadoTurno =
 
 export async function turno(solicitud: SolicitudTurno, opciones: OpcionesTurno): Promise<ResultadoTurno> {
   const inicio = opciones.ahora();
-  const tiempo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_MS;
+  const plazo = crearPresupuesto(opciones, inicio);
   const forzarRespuesta = contarResultados(solicitud.mensajes) >= LLAMADAS_MAXIMAS;
   let llamadas = 0;
   let ultimaFalla: FallaProveedor | undefined;
   let ultimo: AdaptadorTurno | undefined;
 
   for (const adaptador of opciones.adaptadores.slice(0, 2)) {
+    // Sin presupuesto para el alterno se responde con la falla del principal (el manejador devuelve el cupo).
+    const tiempo = plazo();
+    if (tiempo === null) break;
     ultimo = adaptador;
     try {
       llamadas += 1;

@@ -25,6 +25,7 @@ import {
   Texto,
   useTema,
 } from '../../ui';
+import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import type { MotorDictado } from '../../voz';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { CandadoPlus } from '../plan/CandadoPlus';
@@ -58,8 +59,28 @@ export function PantallaHoy({
   const vista = useVista(obtenerHoy);
   const plus = useVista(funcionesPlan);
   const [verDesglose, setVerDesglose] = useState(false);
+  // "Hablar" y "Escribir" van fijos al pie (sobre las pestañas): el aviso de "Deshacer" sube para no taparlos.
+  const [altoPie, setAltoPie] = useState(0);
+  useReservarEspacioAviso(altoPie);
   return (
-    <Pantalla testID="pantalla-hoy">
+    <Pantalla
+      testID="pantalla-hoy"
+      pie={
+        <View
+          onLayout={(e) => setAltoPie(Math.round(e.nativeEvent.layout.height) + 2 * espacio.m)}
+          testID="hoy-pie-registrar"
+        >
+          <PanelRegistrar
+            fijo
+            alMasOpciones={navegacion.alAbrirFormulario}
+            alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
+            {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
+            {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
+            {...(motor ? { motor } : {})}
+          />
+        </View>
+      }
+    >
       <Texto variante="secundario" tono="secundario" testID="hoy-fecha">
         {encabezadoFecha(etiquetaFecha(vista.hoy), etiquetaDiaMes(vista.hoy))}
       </Texto>
@@ -130,14 +151,7 @@ export function PantallaHoy({
           testID="boton-me-alcanza"
         />
       ) : null}
-      <PanelRegistrar
-        alMasOpciones={navegacion.alAbrirFormulario}
-        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
-        {...(navegacion.alAbrirArqueo ? { alArqueo: navegacion.alAbrirArqueo } : {})}
-        {...(navegacion.alAbrirMeAlcanza ? { alMeAlcanza: navegacion.alAbrirMeAlcanza } : {})}
-        {...(motor ? { motor } : {})}
-      />
-      {/* Espacio para que el aviso inferior no tape el último botón. */}
+      {/* Espacio para que el aviso inferior (encima del pie) no tape el último botón. */}
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>
   );

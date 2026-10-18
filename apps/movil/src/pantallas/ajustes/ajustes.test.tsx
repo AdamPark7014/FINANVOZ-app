@@ -1,4 +1,5 @@
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { useLocalSearchParams } from 'expo-router';
+import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
@@ -12,9 +13,11 @@ import {
   agregarEfectivo,
   completarOnboarding,
   obtenerBloqueo,
+  obtenerPreferenciasAvisos,
   type Contexto,
 } from '../../servicios';
 import { abrirSesion } from '../../servicios/sesion';
+import { notificacionesEnMemoria } from '../avisos/notificaciones';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { auditar } from '../__pruebas__/accesibilidad';
 
@@ -50,6 +53,15 @@ jest.mock('../../respaldo/expo', () => {
   return { dependenciasRespaldoExpo: r.deps, archivosRespaldoExpo: r.archivos };
 });
 
+// Avisos locales en memoria en lugar de `expo-notifications` (los toques se simulan con `tocar`/`abrirDesde`).
+let mockNotificaciones: ReturnType<typeof notificacionesEnMemoria> | null = null;
+jest.mock('../avisos/expo', () => ({ crearNotificacionesExpo: () => mockNotificaciones }));
+
+function Detalle({ testID }: { testID: string }) {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <Text testID={testID}>{String(id)}</Text>;
+}
+
 const RUTAS = {
   _layout: Raiz,
   index: Inicio,
@@ -59,6 +71,10 @@ const RUTAS = {
   'onboarding/_layout': OnboardingLayout,
   'onboarding/index': Bienvenida,
   '(tabs)/hoy': () => <Text testID="pestana-hoy">Hoy</Text>,
+  'persona/[id]': () => <Detalle testID="detalle-persona" />,
+  'tandas/[id]': () => <Detalle testID="detalle-tanda" />,
+  'tarjetas/[id]': () => <Detalle testID="detalle-tarjeta" />,
+  respaldo: () => <Text testID="pantalla-respaldo">Respaldo</Text>,
 };
 
 function conDatos(ctx: Contexto) {
@@ -75,6 +91,7 @@ function ctxInicial(): Contexto {
 
 afterEach(() => {
   for (const s of mockAbiertas.splice(0)) s.cerrar();
+  mockNotificaciones = null;
   jest.clearAllMocks();
 });
 
@@ -125,5 +142,60 @@ describe('ajustes', () => {
     expect(r.getPathname()).toBe('/ajustes');
   });
 
+  it('los avisos de tanda, compromiso sin cubrir e ingreso que no llegó se apagan desde Ajustes › Avisos', () => {
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const ctx = ctxInicial();
+    expect(obtenerPreferenciasAvisos(ctx)).toMatchObject({ tanda: true, compromiso: true, ingreso: true });
+    fireEvent.press(screen.getByTestId('ajustes-aviso-tanda'));
+    fireEvent.press(screen.getByTestId('ajustes-aviso-compromiso'));
+    fireEvent.press(screen.getByTestId('ajustes-aviso-ingreso'));
+    expect(obtenerPreferenciasAvisos(ctx)).toMatchObject({ tanda: false, compromiso: false, ingreso: false });
+  });
+
   // Exportar y borrar todo viven en el centro de privacidad (`pantallas/privacidad/privacidad.test.tsx`).
+});
+
+describe('tocar un aviso (pendiente 33)', () => {
+  it('con la app abierta o en segundo plano abre la pantalla del aviso', async () => {
+    mockPreparar = conDatos;
+    const n = notificacionesEnMemoria();
+    mockNotificaciones = n;
+    const r = renderRouter(RUTAS, { initialUrl: '/' });
+    expect(r.getPathname()).toBe('/hoy');
+
+    act(() => n.tocar('cobro:contraparte:per-1'));
+    await waitFor(() => expect(screen.getByTestId('detalle-persona')).toHaveTextContent('contraparte:per-1'));
+
+    act(() => n.tocar('tarjeta:limite:tc-1:2026-11-09', '/tarjetas/tc-1'));
+    await waitFor(() => expect(r.getPathname()).toBe('/tarjetas/tc-1'));
+
+    act(() => n.tocar('respaldo:2026-10-25'));
+    await waitFor(() => expect(r.getPathname()).toBe('/respaldo'));
+
+    // Riesgo, compromisos, ingresos y avisos desconocidos llevan a Hoy.
+    act(() => n.tocar('riesgo:2026-10-30'));
+    await waitFor(() => expect(r.getPathname()).toBe('/hoy'));
+  });
+
+  it('al abrir la app en frío desde el aviso, espera a que la raíz decida y abre su pantalla', async () => {
+    mockPreparar = conDatos;
+    const n = notificacionesEnMemoria();
+    n.abrirDesde('tanda:tan-1:2026-10-16');
+    mockNotificaciones = n;
+    const r = renderRouter(RUTAS, { initialUrl: '/' });
+    await waitFor(() => expect(r.getPathname()).toBe('/tandas/tan-1'));
+    expect(screen.getByTestId('detalle-tanda')).toHaveTextContent('tan-1');
+    // El mismo toque no se vuelve a atender.
+    expect(await n.respuestas.ultima()).toBeNull();
+  });
+
+  it('sin onboarding completo no se salta la bienvenida', async () => {
+    const n = notificacionesEnMemoria();
+    n.abrirDesde('cobro:per-1');
+    mockNotificaciones = n;
+    const r = renderRouter(RUTAS, { initialUrl: '/' });
+    await waitFor(() => expect(screen.getByTestId('onb-bienvenida')).toBeTruthy());
+    await act(async () => {});
+    expect(r.getPathname()).toBe('/onboarding');
+  });
 });

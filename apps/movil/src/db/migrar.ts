@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import { ErrorDominio } from '@cartera/core';
 import type { BaseDatos } from '@cartera/datos';
 
 /** Una migración de `packages/datos/migraciones` embebida en el bundle (`migraciones.generado.ts`). */
@@ -20,6 +21,9 @@ const TABLA = '__drizzle_migrations';
  * agnóstico del driver, así corre igual en la app (`expo-sqlite` + SQLCipher) y en Node (`better-sqlite3`).
  * Todo va en una sola transacción: si una sentencia falla, la base queda como estaba.
  *
+ * Falla cerrado (`migracion_fuera_de_orden`, sin aplicar nada) si el journal trae una migración con `cuando`
+ * menor o igual que la última aplicada que no está registrada: Drizzle la saltaría en silencio.
+ *
  * Devuelve las etiquetas aplicadas.
  */
 export function migrar(db: BaseDatos, migraciones: readonly MigracionEmbebida[]): string[] {
@@ -32,6 +36,16 @@ export function migrar(db: BaseDatos, migraciones: readonly MigracionEmbebida[])
     sql.raw(`SELECT max(created_at) AS creada FROM "${TABLA}"`),
   );
   const desde = Number(ultima?.creada ?? -1);
+  const aplicadas = new Set(
+    db
+      .all<{ creada: number }>(sql.raw(`SELECT created_at AS creada FROM "${TABLA}"`))
+      .map((f) => Number(f.creada)),
+  );
+  if (migraciones.some((m) => m.cuando <= desde && !aplicadas.has(m.cuando)))
+    throw new ErrorDominio(
+      'migracion_fuera_de_orden',
+      'hay una migración anterior a la última aplicada que no está registrada',
+    );
   const pendientes = [...migraciones].sort((a, b) => a.cuando - b.cuando).filter((m) => m.cuando > desde);
   if (pendientes.length === 0) return [];
   db.transaction((tx) => {

@@ -10,12 +10,15 @@ import {
   type ReactNode,
 } from 'react';
 import { AppState } from 'react-native';
+import type { EventoAnalitica } from '../analitica/eventos';
 import { registrarSenalesCaptura } from '../servicios';
+import { useAnalitica } from '../sesion/ProveedorAnalitica';
 import { useSesion } from '../sesion/ProveedorSesion';
 import {
   actualizarPlantillasRemotas,
   plantillasActivas,
   type DependenciasPlantillas,
+  type ResultadoActualizacion,
 } from './actualizar-plantillas';
 import { catalogoApp, fijarPlantillasRemotas } from './catalogo';
 import { procesarColaCaptura, type ResultadoCola } from './ingesta';
@@ -48,6 +51,30 @@ function valorSinCaptura(): ValorCaptura {
     leerSenales: async () => {},
   };
   return sinCaptura;
+}
+
+/** Las embebidas son la versión 1 (`07 §3.1`). */
+const VERSION_EMBEBIDA = 1;
+
+/**
+ * `plantillas_remotas {version, resultado}` (`03 §8`): solo el código del resultado y la versión activa al
+ * terminar; `null` si no hubo revisión ("no toca" o un build sin llaves).
+ */
+export function eventoPlantillasRemotas(
+  r: ResultadoActualizacion,
+  versionActiva: number,
+): EventoAnalitica | null {
+  switch (r.tipo) {
+    case 'no_toca':
+    case 'sin_llaves':
+      return null;
+    case 'aceptada':
+      return { nombre: 'plantillas_remotas', propiedades: { version: r.version, resultado: 'aceptada' } };
+    case 'rechazada':
+      return { nombre: 'plantillas_remotas', propiedades: { version: versionActiva, resultado: r.motivo } };
+    default:
+      return { nombre: 'plantillas_remotas', propiedades: { version: versionActiva, resultado: r.tipo } };
+  }
 }
 
 /** Avisa al módulo nativo sin dejar rechazos sueltos (un build anterior a M10 no tiene la función). */
@@ -84,6 +111,7 @@ export function ProveedorCaptura({
   children: ReactNode;
 }) {
   const { ctx, refrescar } = useSesion();
+  const registrarEvento = useAnalitica();
   const puente = puenteDado?.disponible() ? puenteDado : null;
   const enDepuracion = depuracion ?? puente?.esDepuracion() ?? false;
   const remotas = useMemo(
@@ -111,7 +139,12 @@ export function ProveedorCaptura({
       let r: ResultadoCola | null = null;
       do {
         pendiente.current = false;
-        r = await procesarColaCaptura(ctx, puente, { catalogo, sha256, depuracion: enDepuracion });
+        r = await procesarColaCaptura(ctx, puente, {
+          catalogo,
+          sha256,
+          depuracion: enDepuracion,
+          registrarEvento,
+        });
         if (r.leidas > 0) refrescar();
       } while (pendiente.current);
       return r;
@@ -120,7 +153,7 @@ export function ProveedorCaptura({
     } finally {
       enCurso.current = false;
     }
-  }, [ctx, puente, catalogo, sha256, enDepuracion, refrescar]);
+  }, [ctx, puente, catalogo, sha256, enDepuracion, refrescar, registrarEvento]);
 
   const leerSenales = useCallback(async () => {
     if (!puente) return;
@@ -144,14 +177,18 @@ export function ProveedorCaptura({
       return;
     }
     let vivo = true;
+    let versionActiva = VERSION_EMBEBIDA;
     const aplicar = (archivo: ArchivoRemoto | null) => {
       fijarPlantillasRemotas(archivo);
+      versionActiva = archivo?.version ?? VERSION_EMBEBIDA;
       if (vivo) setCatalogoRemoto(catalogoApp());
       catalogoANativo(puente, archivo);
     };
     const revisar = async () => {
       try {
         const r = await actualizarPlantillasRemotas(ctx, remotas);
+        const evento = eventoPlantillasRemotas(r, versionActiva);
+        if (evento) registrarEvento(evento);
         if (r.tipo === 'aceptada' && vivo) {
           aplicar(r.archivo);
           refrescar();
@@ -173,7 +210,7 @@ export function ProveedorCaptura({
       vivo = false;
       app.remove();
     };
-  }, [ctx, puente, remotas, catalogoDado, refrescar]);
+  }, [ctx, puente, remotas, catalogoDado, refrescar, registrarEvento]);
 
   useEffect(() => {
     if (!puente) return;

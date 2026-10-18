@@ -1,7 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { cargarContexto, cargarGolden } from '../eval/fixtures';
 import { Interpretacion } from '../esquema';
-import { crearClienteNube, VERSION_ESQUEMA, type PeticionTransporte, type Transporte } from './cliente';
+import {
+  crearClienteNube,
+  TIEMPO_MAXIMO_LLM_MS,
+  TIEMPO_MAXIMO_MS,
+  VERSION_ESQUEMA,
+  type PeticionTransporte,
+  type Transporte,
+} from './cliente';
 import { contextoMinimo } from './contexto-minimo';
 
 const { contexto } = cargarContexto();
@@ -116,7 +123,9 @@ describe('crearClienteNube', () => {
     expect(llamadas).toHaveLength(4);
   });
 
-  it('sin red, sin sesión y tiempo agotado (8 s)', async () => {
+  it('sin red, sin sesión y tiempo agotado (TIEMPO_MAXIMO_LLM_MS: 10 s)', async () => {
+    expect(TIEMPO_MAXIMO_LLM_MS).toBe(10_000);
+    expect(TIEMPO_MAXIMO_LLM_MS).toBeGreaterThan(TIEMPO_MAXIMO_MS);
     const sinRed = crearClienteNube({
       url: 'https://x',
       obtenerToken: token,
@@ -145,7 +154,7 @@ describe('crearClienteNube', () => {
         },
       });
       const pendiente = lento.interpretar('x', contexto);
-      await vi.advanceTimersByTimeAsync(7_999);
+      await vi.advanceTimersByTimeAsync(TIEMPO_MAXIMO_LLM_MS - 1);
       expect((senal as AbortSignal | null)?.aborted).toBe(false);
       await vi.advanceTimersByTimeAsync(1);
       expect(await pendiente).toEqual({ tipo: 'error', codigo: 'tiempo_agotado' });

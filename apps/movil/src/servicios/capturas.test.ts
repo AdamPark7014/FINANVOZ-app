@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
+import { validarEvento, type EventoAnalitica } from '../analitica/eventos';
 import { ingerirNotificaciones } from '../captura/ingesta';
 import { calcularHuella } from '../captura/huella';
 import type { ResultadoCaptura } from './capturas';
@@ -222,5 +223,37 @@ describe('huella (CA-M5-10)', () => {
     const h = await calcularHuella(n, sha256Node);
     expect(h).toBe(await sha256Node(`${n.paquete}|${n.clave}|1234|${n.titulo}|${n.texto}`));
     expect(h).toMatch(/^[0-9a-f]{64}$/);
+  });
+});
+
+describe('analítica de la ingesta (pendiente 30, RF-CAP-06)', () => {
+  it('un evento captura {banco_id, reconocida} por captura nueva; las repetidas no cuentan', async () => {
+    const p = preparar();
+    const eventos: EventoAnalitica[] = [];
+    const opciones = { ...opcionesPrueba, registrarEvento: (e: EventoAnalitica) => eventos.push(e) };
+    const cola = colaECaptura();
+    const resultados = await ingerirNotificaciones(p.ctx, cola, opciones);
+    const nuevas = resultados.filter((r) => r.nueva && r.banco !== null);
+    expect(nuevas.length).toBeGreaterThan(0);
+    expect(eventos).toHaveLength(nuevas.length);
+    const bancos = new Set(opcionesPrueba.catalogo.bancos.map((b) => b.id));
+    for (const e of eventos) {
+      expect(e.nombre).toBe('captura');
+      expect(Object.keys(e.propiedades).sort()).toEqual(['banco_id', 'reconocida']);
+      // Pasa la lista blanca tal cual: solo el id del catálogo y un booleano.
+      expect(validarEvento(e, bancos)).toEqual(e);
+    }
+    const noReconocidas = eventos.filter((e) => e.nombre === 'captura' && !e.propiedades.reconocida);
+    const esperadas = Object.values(p.esperado.no_reconocidas_por_banco).reduce((s, n) => s + n, 0);
+    expect(noReconocidas).toHaveLength(esperadas);
+
+    const json = JSON.stringify(eventos);
+    for (const n of cola) {
+      for (const t of [n.titulo, n.texto]) if (t) expect(json).not.toContain(t);
+    }
+    expect(json).not.toMatch(/\d/);
+
+    await ingerirNotificaciones(p.ctx, cola, opciones);
+    expect(eventos).toHaveLength(nuevas.length);
   });
 });

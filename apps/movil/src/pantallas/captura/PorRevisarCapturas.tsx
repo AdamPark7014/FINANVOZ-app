@@ -10,6 +10,7 @@ import {
   marcarNoReconocidaRevisada,
   type CapturaPorRevisar,
 } from '../../servicios';
+import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
@@ -52,6 +53,7 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
 
 function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: () => void }) {
   const { ctx, refrescar } = useSesion();
+  const registrarEvento = useAnalitica();
   const mostrar = useMostrarAviso();
   const avisarRegistro = useAvisoRegistro();
   const [cambiando, setCambiando] = useState(false);
@@ -156,7 +158,13 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
           opciones={categorias.map((k) => ({ valor: k.slug, etiqueta: k.nombre }))}
           valor={c.categoria}
           alCambiar={(slug) =>
-            hacer(() => confirmarCaptura(ctx, c.capturaId, slug), 'Listo. La próxima vez lo pongo así.')
+            hacer(() => {
+              confirmarCaptura(ctx, c.capturaId, slug);
+              // Corrección = cambiar la categoría que la captura ya había puesto; elegir una que faltaba no lo es.
+              if (c.categoria !== null && slug !== c.categoria) {
+                registrarEvento({ nombre: 'correccion', propiedades: { campo: 'categoria' } });
+              }
+            }, 'Listo. La próxima vez lo pongo así.')
           }
           prefijoTestID={`${testID}-categoria`}
         />

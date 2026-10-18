@@ -3,6 +3,7 @@ import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { describe, expect, it } from 'vitest';
+import { ErrorDominio } from '@cartera/core';
 import type { BaseDatos } from '@cartera/datos';
 import {
   CARPETA_MIGRACIONES,
@@ -62,6 +63,57 @@ describe('migraciones embebidas', () => {
     };
     expect(() => migrar(db, [...MIGRACIONES, rota])).toThrow();
     expect(cliente.prepare("SELECT name FROM sqlite_master WHERE name = 'nueva'").all()).toEqual([]);
+  });
+
+  it('coinciden en número y orden con el journal, y su `when` es estrictamente creciente', () => {
+    const journal = JSON.parse(readFileSync(`${CARPETA_MIGRACIONES}/meta/_journal.json`, 'utf8')) as {
+      entries: { idx: number; when: number; tag: string }[];
+    };
+    expect(MIGRACIONES.map((m) => [m.idx, m.etiqueta, m.cuando])).toEqual(
+      journal.entries.map((e) => [e.idx, e.tag, e.when]),
+    );
+    const cuandos = MIGRACIONES.map((m) => m.cuando);
+    expect(cuandos.every((c, i) => i === 0 || c > (cuandos[i - 1] ?? Infinity))).toBe(true);
+  });
+
+  it('falla cerrado si aparece una migración anterior a la última aplicada sin registrar', () => {
+    const cliente = new Database(':memory:');
+    const db = drizzle({ client: cliente }) as unknown as BaseDatos;
+    migrar(db, MIGRACIONES);
+    const marcas = () => cliente.prepare('SELECT hash, created_at FROM __drizzle_migrations').all();
+    const antes = marcas();
+    const intrusa = {
+      idx: 99,
+      etiqueta: '0001b_intrusa',
+      cuando: (MIGRACIONES[0]?.cuando ?? 0) + 1,
+      puntosDeCorte: false,
+      hash: 'y',
+      sql: 'CREATE TABLE intrusa (id TEXT);',
+    };
+    const nueva = {
+      ...intrusa,
+      etiqueta: '9999_nueva',
+      cuando: Number.MAX_SAFE_INTEGER,
+      sql: 'CREATE TABLE nueva (id TEXT);',
+    };
+    let codigo: string | undefined;
+    try {
+      migrar(db, [...MIGRACIONES, intrusa, nueva]);
+    } catch (e) {
+      codigo = e instanceof ErrorDominio ? e.codigo : undefined;
+    }
+    expect(codigo).toBe('migracion_fuera_de_orden');
+    expect(
+      cliente.prepare("SELECT name FROM sqlite_master WHERE name IN ('intrusa', 'nueva')").all(),
+    ).toEqual([]);
+    expect(marcas()).toEqual(antes);
+  });
+
+  it('una base con solo las primeras migraciones aplica las siguientes sin falsos positivos', () => {
+    const cliente = new Database(':memory:');
+    const db = drizzle({ client: cliente }) as unknown as BaseDatos;
+    migrar(db, MIGRACIONES.slice(0, 2));
+    expect(migrar(db, MIGRACIONES)).toEqual(MIGRACIONES.slice(2).map((m) => m.etiqueta));
   });
 });
 

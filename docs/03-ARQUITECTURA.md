@@ -210,6 +210,13 @@ Referencia de controles: OWASP MASVS nivel L1 (checklist en M7 y otra vez en M13
 
 `app_abierta` · `onboarding_paso {paso}` · `movimiento_registrado {origen, nivel_interprete, pregunto, latencia_bucket, espacio}` · `correccion {campo}` · `captura {banco_id, reconocida}` · `arqueo {resultado: exacto|faltante|sobrante}` · `simulacion_vista {escenarios, recomendado_tipo}` · `plan {evento}` · `respaldo {tipo: manual|auto, resultado}` · `plantillas_remotas {version, resultado}` · `suscripcion_detectada {accion}` · `negocio {evento}` · `paquete_contador {resultado}` · `widget {evento}`. Ningún monto, comercio, alias, nombre, RFC ni texto.
 
+Implementados en la lista blanca (`apps/movil/src/analitica/eventos.ts`); el resto entra con su hito:
+
+- `captura {banco_id, reconocida}`: la ingesta, una vez por captura nueva (una repetida por huella no cuenta) y solo si `banco_id` está en el catálogo de plantillas.
+- `correccion {campo}` desde las capturas: cambiar en "Por revisar" una categoría que la captura ya había puesto (`categoria`; elegir una que faltaba no cuenta), "No es mía" en una cuenta detectada (`cuenta`) y "No, es otro" en un posible duplicado (`otro`). Contestar una pregunta (¿a quién?, ¿de dónde?, ¿fue a meses?) no es corrección.
+- `plantillas_remotas {version: 1–999, resultado}`: tras cada revisión diaria; `version` es la activa al terminar (1 = embebidas) y `resultado` el código de `07 §3.1` (`aceptada`, `sin_cambios`, `sin_red`, `respuesta_invalida` o el motivo de rechazo). "No toca" y un build sin llaves no envían nada.
+- `widget {evento: agregado|quitado}`: la tarea del widget corre sin interfaz, así que solo lo anota (ajuste `widget_eventos`, máximo 20, y solo con el opt-in encendido) y la app lo envía al volver a primer plano.
+
 ## 9. Rendimiento
 
 Presupuestos en RNF-01. Medición: script de perfilado en build de producción sobre el teléfono de referencia definido en M2. Las consultas de saldo usan los índices de `asiento(cuenta_id)`; si una consulta supera 50 ms con 50 000 asientos, se agrega una tabla de caché de saldos actualizada en la misma transacción (decisión registrada en ESTADO). E14 corre en la tarea diaria, no al abrir Hoy.

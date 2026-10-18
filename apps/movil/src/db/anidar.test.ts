@@ -59,4 +59,32 @@ describe('transacciones anidadas en la raíz (expo-sqlite)', () => {
     db.transaction(() => db.run(sql`insert into t values (3)`));
     expect(valores(db)).toEqual([3]);
   });
+
+  it('si el rollback del savepoint falla, sale el error original con el del rollback como causa', () => {
+    const cruda = base();
+    const fallaRollback = new Proxy(cruda, {
+      get(objetivo, propiedad, receptor) {
+        if (propiedad !== 'run') return Reflect.get(objetivo, propiedad, receptor) as unknown;
+        return (consulta: Parameters<BaseDatos['run']>[0]) => {
+          const texto = JSON.stringify(consulta);
+          if (texto.includes('rollback to savepoint')) throw new Error('rollback roto');
+          return objetivo.run(consulta);
+        };
+      },
+    });
+    const db = conTransaccionesAnidables(fallaRollback);
+    const original = new Error('falla');
+    let atrapado: unknown;
+    db.transaction(() => {
+      try {
+        db.transaction(() => {
+          throw original;
+        });
+      } catch (e) {
+        atrapado = e;
+      }
+    });
+    expect(atrapado).toBe(original);
+    expect((atrapado as Error).cause).toEqual(new Error('rollback roto'));
+  });
 });

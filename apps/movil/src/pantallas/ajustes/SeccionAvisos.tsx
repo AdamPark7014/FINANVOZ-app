@@ -14,7 +14,7 @@ function normalizarHora(texto: string): string {
 }
 
 /**
- * Ajustes → Avisos (`02 §12`, `02 §13`): qué avisos salen (tarjetas y riesgo de no llegar), a qué hora y el horario silencioso. Cada
+ * Ajustes → Avisos (`02 §12`, `02 §13`): qué avisos salen (tarjetas, riesgo, respaldo, tandas, pagos e ingresos), a qué hora y el horario silencioso. Cada
  * cambio se guarda en servicios y la sincronización vuelve a programar los avisos del teléfono.
  */
 export function SeccionAvisos() {
@@ -115,6 +115,27 @@ export function SeccionAvisos() {
         descripcion="Si pasan 2 semanas sin respaldo, una vez por semana."
         valor={pref.respaldo}
         alCambiar={(respaldo) => guardar({ respaldo })}
+      />
+      <Interruptor
+        testID="ajustes-aviso-tanda"
+        etiqueta="Aportación de tanda"
+        descripcion="El día que te toca dar tu aportación."
+        valor={pref.tanda}
+        alCambiar={(tanda) => guardar({ tanda })}
+      />
+      <Interruptor
+        testID="ajustes-aviso-compromiso"
+        etiqueta="Compromiso sin cubrir"
+        descripcion="Un día después, si un pago fijo sigue sin registrarse."
+        valor={pref.compromiso}
+        alCambiar={(compromiso) => guardar({ compromiso })}
+      />
+      <Interruptor
+        testID="ajustes-aviso-ingreso"
+        etiqueta="Ingreso que no llegó"
+        descripcion="3 días después, si no vi llegar tu ingreso."
+        valor={pref.ingreso}
+        alCambiar={(ingreso) => guardar({ ingreso })}
       />
       <CampoTexto
         testID="ajustes-aviso-hora"

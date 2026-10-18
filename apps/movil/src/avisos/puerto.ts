@@ -1,5 +1,6 @@
 import type { PlainDate } from '@cartera/core';
 import type { AvisoPlaneado, HoraDelDia } from './planificar';
+import { rutaDeAviso } from './rutas';
 
 /**
  * Puerto de notificaciones locales. La app lo implementa con `expo-notifications` (`crearPuertoExpo`); las
@@ -104,7 +105,10 @@ function instanteLocal(fecha: PlainDate, hora: HoraDelDia): Date {
   return new Date(a, m - 1, d, hh, mm, 0, 0);
 }
 
-/** Adaptador real con `expo-notifications`. Guarda la fecha y la hora en `data` para comparar al sincronizar. */
+/**
+ * Adaptador real con `expo-notifications`. Guarda la fecha y la hora en `data` para comparar al sincronizar, y la
+ * ruta de la pantalla que abre al tocarlo (`rutas.ts`: solo ids, nada sensible).
+ */
 export function crearPuertoExpo(modulo: ModuloNotificaciones): PuertoNotificaciones {
   return {
     async programadas() {
@@ -120,7 +124,11 @@ export function crearPuertoExpo(modulo: ModuloNotificaciones): PuertoNotificacio
     async programar(n) {
       await modulo.scheduleNotificationAsync({
         identifier: n.id,
-        content: { title: n.titulo, body: n.cuerpo, data: { fecha: n.fecha, hora: n.hora } },
+        content: {
+          title: n.titulo,
+          body: n.cuerpo,
+          data: { fecha: n.fecha, hora: n.hora, ruta: rutaDeAviso(n.id) },
+        },
         trigger: { type: 'date', date: instanteLocal(n.fecha, n.hora) },
       });
     },

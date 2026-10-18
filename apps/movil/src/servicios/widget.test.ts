@@ -5,11 +5,13 @@ import { obtenerHoy } from './hoy';
 import { registrarTextoLocal } from './registrar';
 import { cargarEscenario } from './semilla';
 import {
+  anotarEventoWidget,
   construirVistaWidget,
   ENLACE_WIDGET,
   fijarOcultarMontosWidget,
   obtenerAjustesWidget,
   obtenerVistaWidget,
+  tomarEventosWidget,
   type VistaWidget,
 } from './widget';
 import { abrirPrueba, escenario } from './__pruebas__/base';
@@ -149,5 +151,28 @@ describe('widget con la base', () => {
     expect(obtenerVistaWidget(p.ctx).texto).toBe('Toca para empezar');
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     expect(obtenerVistaWidget(p.ctx).texto).toBe('Toca para empezar');
+  });
+});
+
+describe('eventos pendientes del widget (pendiente 79, `03 §8`)', () => {
+  it('sin el opt-in de estadísticas no guarda nada', () => {
+    const p = abrirPrueba();
+    anotarEventoWidget(p.ctx, 'agregado');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true, estadisticas: false });
+    anotarEventoWidget(p.ctx, 'quitado');
+    expect(tomarEventosWidget(p.ctx)).toEqual([]);
+  });
+
+  it('con el opt-in los anota en orden, tomarlos los vacía y se guardan a lo más 20', () => {
+    const p = abrirPrueba();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true, estadisticas: true });
+    anotarEventoWidget(p.ctx, 'agregado');
+    anotarEventoWidget(p.ctx, 'quitado');
+    expect(tomarEventosWidget(p.ctx)).toEqual(['agregado', 'quitado']);
+    expect(tomarEventosWidget(p.ctx)).toEqual([]);
+    for (let i = 0; i < 25; i++) anotarEventoWidget(p.ctx, i < 24 ? 'agregado' : 'quitado');
+    const pendientes = tomarEventosWidget(p.ctx);
+    expect(pendientes).toHaveLength(20);
+    expect(pendientes.at(-1)).toBe('quitado');
   });
 });

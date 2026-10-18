@@ -18,6 +18,11 @@ import { cargarVectores } from './__pruebas__/vectores';
 const e1 = cargarVectores()['E1'] as Record<string, Record<string, unknown>[]>;
 const lista = (k: string) => e1[k] ?? [];
 
+describe('E1 · vectores cargados', () => {
+  for (const k of ['con_dia_acotado', 'ajuste_fin_de_semana', 'redondear_porcentaje', 'porcentaje_mostrado'])
+    it(`${k} trae casos`, () => expect(lista(k).length).toBeGreaterThan(0));
+});
+
 describe('E1.2 fechas', () => {
   for (const v of lista('con_dia_acotado')) {
     it(`${String(v['id'])} · conDia`, () =>

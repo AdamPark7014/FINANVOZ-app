@@ -31,7 +31,7 @@ export default function Colchon() {
       testID="onb-colchon"
       paso={7}
       titulo="¿Cuánto quieres no tocar nunca?"
-      ayuda="Tu colchón no cuenta para lo que puedes gastar. Lo cambias cuando quieras en Ajustes."
+      ayuda="Tu colchón no cuenta para lo que puedes gastar. Lo cambias cuando quieras en Ajustes › Colchón."
       pie={
         <>
           <Boton testID="onb-ver-mi-dia" etiqueta="Ver mi día" alPresionar={() => terminar(monto ?? 0)} />

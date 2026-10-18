@@ -20,6 +20,7 @@ import { archivosRespaldoExpo, dependenciasRespaldoExpo } from '../src/respaldo/
 import { programarRespaldoAutomatico } from '../src/respaldo/programar';
 import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/SincronizarRespaldoAutomatico';
 import { SincronizarWidget } from '../src/widget/SincronizarWidget';
+import { programarTareaDiaria } from '../src/tareas/programar';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
@@ -192,6 +193,10 @@ function AppProtegida({
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
   useProcesarCola();
   useEvidenciaConsentimiento(evidencia);
+  // Apertura del día en segundo plano (suscripciones, ocurrencias, cortes y widget); registrarla es idempotente.
+  useEffect(() => {
+    void programarTareaDiaria(true);
+  }, []);
   return (
     // Captura automática (`07`): sin el módulo nativo (Expo Go, iPhone) el puente no está disponible y nada cambia.
     <ProveedorCaptura puente={puenteCaptura} sha256={sha256Expo}>

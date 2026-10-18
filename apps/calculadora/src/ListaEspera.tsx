@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useRef, useState, type FormEvent } from 'react';
 import { LISTA_ESPERA_URL, MARCA, RESPONSABLE, RESPONSABLE_DEFINIDO, VERSION_AVISO } from './config';
 
 /** Mismo contrato que `services/proxy/supabase/functions/_shared/lista-espera.ts`. */
@@ -55,13 +55,34 @@ export function ListaEspera() {
   const [acepta, setAcepta] = useState(false);
   const [trampa, setTrampa] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [faltan, setFaltan] = useState<readonly Clave[]>([]);
   const [envio, setEnvio] = useState<Envio>('inicial');
+  const grupos = useRef<Partial<Record<Clave, HTMLFieldSetElement | null>>>({});
+
+  function responder(clave: Clave, valor: string) {
+    setRespuestas((r) => ({ ...r, [clave]: valor }));
+    if (faltan.length && faltan.every((c) => c === clave || respuestas[c])) {
+      setFaltan([]);
+      setError(null);
+    }
+  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
+    setFaltan([]);
     if (!CORREO_VALIDO.test(correo.trim()))
       return setError('Revisa tu correo: le falta algo, como la @ o el dominio.');
-    if (PREGUNTAS.some((p) => !respuestas[p.clave])) return setError('Contesta las cuatro preguntas.');
+    const sinContestar = PREGUNTAS.filter((p) => !respuestas[p.clave]);
+    const primera = sinContestar[0];
+    if (primera) {
+      setFaltan(sinContestar.map((p) => p.clave));
+      grupos.current[primera.clave]?.querySelector('input')?.focus();
+      return setError(
+        sinContestar.length === 1
+          ? `Falta contestar: ${primera.texto}`
+          : `Faltan ${sinContestar.length} preguntas por contestar. Empieza por: ${primera.texto}`,
+      );
+    }
     if (!acepta) return setError('Para anotarte, marca que leíste y aceptas el aviso de privacidad.');
     if (!LISTA_ESPERA_URL) return setError('La lista de espera todavía no está abierta. Vuelve pronto.');
     setError(null);
@@ -112,23 +133,42 @@ export function ListaEspera() {
             onChange={(e) => setCorreo(e.target.value)}
           />
         </div>
-        {PREGUNTAS.map((p) => (
-          <fieldset key={p.clave} className="opciones">
-            <legend>{p.texto}</legend>
-            {p.opciones.map(([valor, texto]) => (
-              <label key={valor} className="opcion">
-                <input
-                  type="radio"
-                  name={`${id}-${p.clave}`}
-                  value={valor}
-                  checked={respuestas[p.clave] === valor}
-                  onChange={() => setRespuestas((r) => ({ ...r, [p.clave]: valor }))}
-                />
-                {texto}
-              </label>
-            ))}
-          </fieldset>
-        ))}
+        {PREGUNTAS.map((p) => {
+          const invalida = faltan.includes(p.clave) && !respuestas[p.clave];
+          const idError = `${id}-${p.clave}-error`;
+          return (
+            <fieldset
+              key={p.clave}
+              ref={(el) => {
+                grupos.current[p.clave] = el;
+              }}
+              className="opciones"
+              role="radiogroup"
+              aria-required="true"
+              aria-invalid={invalida || undefined}
+              aria-describedby={invalida ? idError : undefined}
+            >
+              <legend>{p.texto}</legend>
+              {p.opciones.map(([valor, texto]) => (
+                <label key={valor} className="opcion">
+                  <input
+                    type="radio"
+                    name={`${id}-${p.clave}`}
+                    value={valor}
+                    checked={respuestas[p.clave] === valor}
+                    onChange={() => responder(p.clave, valor)}
+                  />
+                  {texto}
+                </label>
+              ))}
+              {invalida && (
+                <p id={idError} className="error">
+                  Elige una respuesta.
+                </p>
+              )}
+            </fieldset>
+          );
+        })}
         <div className="trampa" aria-hidden="true">
           <label htmlFor={`${id}-sitio`}>No llenes este campo</label>
           <input

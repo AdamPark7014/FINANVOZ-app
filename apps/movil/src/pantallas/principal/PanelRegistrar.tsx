@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   contarEsperandoConexion,
@@ -30,7 +30,19 @@ import {
   tipo,
   useTema,
 } from '../../ui';
-import { MENSAJES_DICTADO, useDictado, type MotorDictado } from '../../voz';
+import {
+  ETIQUETA_ESCUCHANDO,
+  MENSAJES_DICTADO,
+  mensajeEstoOi,
+  PISTA_ESCUCHANDO,
+  PISTA_HABLAR,
+  TEXTO_HABLAR,
+  TEXTO_TE_ESCUCHO,
+  TEXTO_TERMINAR,
+  useBotonHablar,
+  useDictado,
+  type MotorDictado,
+} from '../../voz';
 import { TarjetaConfirmarCompartido } from '../compartido/TarjetaConfirmarCompartido';
 import { MENSAJE_COMPARTIDO_GUARDADO, MENSAJE_SIN_PAREJA } from '../compartido/textos';
 import { mensajeLimite } from '../plan/textos';
@@ -64,6 +76,9 @@ import {
 } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
 
+/** Con el panel fijo al pie, las respuestas ocupan como máximo esta fracción de la pantalla (y se desplazan). */
+const ALTO_MAX_RESPUESTAS = 0.35;
+
 /** Resultados que se resuelven con una tarjeta en el panel. */
 type ConTarjeta = Extract<
   ResultadoTexto,
@@ -82,10 +97,11 @@ type ConTarjeta = Extract<
 >;
 
 /**
- * Registrar hablando o escribiendo (02-UX §5): "Mantén para hablar" con transcripción en vivo y "Escribir".
- * El nivel 0 responde al instante; lo demás va a la nube (si hay red) y vuelve como registro con "Deshacer",
- * tarjeta de confirmación, elección de movimiento o pregunta. Sin red queda "por revisar" y un indicador
- * discreto dice cuántas frases esperan internet.
+ * Registrar hablando o escribiendo (02-UX §5): "Toca para hablar" (otro toque, o callarte, termina; mantener
+ * presionado y soltar también sirve) con transcripción en vivo y "Escribir". El nivel 0 responde al instante;
+ * lo demás va a la nube (si hay red) y vuelve como registro con "Deshacer", tarjeta de confirmación, elección de
+ * movimiento o pregunta. Sin red queda "por revisar" y un indicador discreto dice cuántas frases esperan
+ * internet. Lo dictado que no se entiende vuelve al campo "Escribir" para corregirlo.
  */
 export function PanelRegistrar({
   alVerMovimientos,
@@ -95,6 +111,7 @@ export function PanelRegistrar({
   motor,
   abiertoAlInicio = false,
   fraseRevision,
+  fijo = false,
 }: {
   /** "Ver movimientos" de una consulta (`06 §6`): abre Movimientos con su filtro. */
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
@@ -109,9 +126,12 @@ export function PanelRegistrar({
   abiertoAlInicio?: boolean;
   /** Id de una frase de "Por revisar" que se abre para revisarla. */
   fraseRevision?: string;
+  /** Al pie de Hoy: "Hablar" y "Escribir" siempre abajo; las respuestas encima, en un área desplazable. */
+  fijo?: boolean;
 }) {
   const { ctx, refrescar, nube } = useSesion();
   const { c } = useTema();
+  const { height: altoVentana } = useWindowDimensions();
   const avisarRegistro = useAvisoRegistro();
   const esperando = useVista(contarEsperandoConexion);
   const plan = useVista(obtenerPlan).plan;
@@ -127,6 +147,8 @@ export function PanelRegistrar({
   /** Aviso preventivo de `02 §24` tras registrar salud en efectivo (CA-M12-04); se queda hasta "Entendido". */
   const [avisoDeducible, setAvisoDeducible] = useState(false);
   const enRevision = useRef<string | null>(null);
+  /** Frase dictada que se está interpretando: si no se entiende, vuelve al campo para corregirla. */
+  const dictadoEnCurso = useRef<string | null>(null);
   const registrarEvento = useAnalitica();
   /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
   const medicion = useRef<{ inicio: number; nivel: 'reglas' | 'nube'; pregunto: boolean } | null>(null);
@@ -162,8 +184,21 @@ export function PanelRegistrar({
     }
   }, [ctx]);
 
+  /** "No te entendí": si se dictó, lo oído pasa al campo "Escribir" con "Esto oí: …" en vez de perderse. */
+  const avisarNoEntendi = useCallback((oido: string | null, porQue: string) => {
+    if (oido === null) {
+      setMensaje(porQue);
+      return;
+    }
+    setTexto(oido);
+    setEscribiendo(true);
+    setMensaje(porQue === MENSAJE_NO_ENTENDI ? mensajeEstoOi(oido) : porQue);
+  }, []);
+
   const mostrar = useCallback(
     (r: ResultadoTexto, origen: OrigenDictado) => {
+      const oido = dictadoEnCurso.current;
+      dictadoEnCurso.current = null;
       setTarjeta(null);
       setRespuesta(null);
       setExplicacion(null);
@@ -280,7 +315,7 @@ export function PanelRegistrar({
           setMensaje(r.accion === 'duplicados' ? MENSAJE_SIN_DUPLICADOS : MENSAJE_NO_ENCONTRE);
           return;
         case 'no_entendi':
-          setMensaje(MENSAJE_NO_ENTENDI);
+          avisarNoEntendi(oido, MENSAJE_NO_ENTENDI);
           return;
         case 'no_soportado':
           setMensaje(MENSAJE_NO_SOPORTADO[r.motivo]);
@@ -290,7 +325,18 @@ export function PanelRegistrar({
           return;
       }
     },
-    [alArqueo, alMeAlcanza, avisarRegistro, contarRegistro, ctx, nube, plan, refrescar, terminarRevision],
+    [
+      alArqueo,
+      alMeAlcanza,
+      avisarNoEntendi,
+      avisarRegistro,
+      contarRegistro,
+      ctx,
+      nube,
+      plan,
+      refrescar,
+      terminarRevision,
+    ],
   );
 
   const enviar = (frase: string, origen: OrigenDictado) => {
@@ -301,12 +347,15 @@ export function PanelRegistrar({
     setTarjeta(null);
     setRespuesta(null);
     setExplicacion(null);
+    const oido = origen === 'voz' ? limpio : null;
+    dictadoEnCurso.current = oido;
     medicion.current = { inicio: Date.now(), nivel: 'reglas', pregunto: false };
     let local: ResultadoTexto | null;
     try {
       local = registrarTextoLocal(ctx, limpio, origen);
     } catch (e) {
-      setMensaje(mensajeError(e, MENSAJE_NO_ENTENDI));
+      dictadoEnCurso.current = null;
+      avisarNoEntendi(oido, mensajeError(e, MENSAJE_NO_ENTENDI));
       return;
     }
     if (local) {
@@ -317,7 +366,10 @@ export function PanelRegistrar({
     setInterpretando(true);
     registrarTexto(ctx, limpio, origen, { nube })
       .then((r) => mostrar(r, origen))
-      .catch((e: unknown) => setMensaje(mensajeError(e, MENSAJE_NO_ENTENDI)))
+      .catch((e: unknown) => {
+        dictadoEnCurso.current = null;
+        avisarNoEntendi(oido, mensajeError(e, MENSAJE_NO_ENTENDI));
+      })
       .finally(() => setInterpretando(false));
   };
 
@@ -346,6 +398,7 @@ export function PanelRegistrar({
     alTerminar: (t) => enviar(t, 'voz'),
   });
   const escuchando = dictado.estado === 'escuchando' || dictado.estado === 'procesando';
+  const boton = useBotonHablar({ escuchando, iniciar: dictado.iniciar, detener: dictado.detener });
   const errorVoz =
     dictado.estado === 'sin_permiso'
       ? MENSAJES_DICTADO.sin_permiso
@@ -353,8 +406,8 @@ export function PanelRegistrar({
         ? MENSAJES_DICTADO[dictado.error]
         : null;
 
-  return (
-    <View style={{ gap: espacio.m }} testID="panel-registrar">
+  const respuestas = (
+    <>
       {avisoDeducible ? (
         <Tarjeta testID="aviso-deducible">
           <Texto variante="cuerpo" accessibilityLiveRegion="polite">
@@ -494,7 +547,7 @@ export function PanelRegistrar({
 
       {escuchando ? (
         <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="transcripcion-en-vivo">
-          {dictado.parcial === '' ? 'Te escucho…' : dictado.parcial}
+          {dictado.parcial === '' ? TEXTO_TE_ESCUCHO : dictado.parcial}
         </Texto>
       ) : null}
       {errorVoz ? (
@@ -548,48 +601,56 @@ export function PanelRegistrar({
           />
         </View>
       ) : null}
+    </>
+  );
 
-      <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'center' }}>
-        <Pressable
-          testID="boton-hablar"
-          onPressIn={() => void dictado.iniciar()}
-          onPressOut={dictado.detener}
-          accessibilityRole="button"
-          accessibilityLabel="Mantén para hablar"
-          accessibilityHint="Mantén presionado, di tu gasto y suelta"
-          accessibilityState={{ busy: escuchando }}
-          style={({ pressed }) => ({
-            flex: 1,
-            minHeight: OBJETIVO_TACTIL_MIN + espacio.s,
-            borderRadius: radio.pastilla,
-            backgroundColor: c.acento,
-            opacity: pressed ? 0.85 : 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: espacio.s,
-            paddingHorizontal: espacio.l,
-          })}
-        >
-          <Microfono color={c.sobreAcento} />
-          <Texto style={[tipo.etiqueta, { fontSize: 16, color: c.sobreAcento }]}>
-            {escuchando ? 'Suelta para registrar' : 'Mantén para hablar'}
-          </Texto>
-        </Pressable>
-        <Boton
-          etiqueta="Escribir"
-          variante="secundario"
-          ancho="contenido"
-          alPresionar={() => setEscribiendo((v) => !v)}
-          testID="boton-escribir"
-        />
-      </View>
+  const controles = (
+    <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'center' }}>
+      <Pressable
+        testID="boton-hablar"
+        onPressIn={boton.alPresionarDentro}
+        onPressOut={boton.alSoltar}
+        accessibilityActions={boton.accionesAccesibles}
+        onAccessibilityAction={boton.alAccionAccesible}
+        accessibilityRole="button"
+        accessibilityLabel={escuchando ? ETIQUETA_ESCUCHANDO : TEXTO_HABLAR}
+        accessibilityHint={escuchando ? PISTA_ESCUCHANDO : PISTA_HABLAR}
+        style={({ pressed }) => ({
+          flex: 1,
+          minHeight: OBJETIVO_TACTIL_MIN + espacio.s,
+          borderRadius: radio.pastilla,
+          backgroundColor: c.acento,
+          opacity: pressed ? 0.85 : 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: espacio.s,
+          paddingHorizontal: espacio.l,
+        })}
+      >
+        <Microfono color={c.sobreAcento} />
+        <Texto style={[tipo.etiqueta, { fontSize: 16, color: c.sobreAcento }]}>
+          {escuchando ? TEXTO_TERMINAR : TEXTO_HABLAR}
+        </Texto>
+      </Pressable>
+      <Boton
+        etiqueta="Escribir"
+        variante="secundario"
+        ancho="contenido"
+        alPresionar={() => setEscribiendo((v) => !v)}
+        testID="boton-escribir"
+      />
+    </View>
+  );
+
+  const extras = (
+    <>
       {esperando > 0 ? (
         <Texto variante="secundario" tono="secundario" testID="indicador-esperando-conexion">
           {mensajeEsperandoConexion(esperando)}
         </Texto>
       ) : null}
-      {alMasOpciones ? (
+      {alMasOpciones && (!fijo || escribiendo) ? (
         <Boton
           etiqueta="Registrar con formulario"
           variante="texto"
@@ -598,6 +659,45 @@ export function PanelRegistrar({
           testID="boton-formulario"
         />
       ) : null}
+    </>
+  );
+
+  if (fijo) {
+    const hayRespuestas =
+      avisoDeducible ||
+      respuesta !== null ||
+      explicacion !== null ||
+      tarjeta !== null ||
+      escuchando ||
+      errorVoz !== null ||
+      interpretando ||
+      explicando ||
+      mensaje !== null ||
+      escribiendo ||
+      esperando > 0;
+    return (
+      <View style={{ gap: espacio.s }} testID="panel-registrar">
+        {hayRespuestas ? (
+          <ScrollView
+            style={{ maxHeight: altoVentana * ALTO_MAX_RESPUESTAS }}
+            contentContainerStyle={{ gap: espacio.m }}
+            keyboardShouldPersistTaps="handled"
+            testID="panel-registrar-respuestas"
+          >
+            {respuestas}
+            {extras}
+          </ScrollView>
+        ) : null}
+        {controles}
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ gap: espacio.m }} testID="panel-registrar">
+      {respuestas}
+      {controles}
+      {extras}
     </View>
   );
 }

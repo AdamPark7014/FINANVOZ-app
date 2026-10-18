@@ -433,17 +433,15 @@ describe('cola "por interpretar"', () => {
       procesarPorInterpretar(p.ctx, p.nube),
       procesarPorInterpretar(p.ctx, p.nube),
     ]);
-    expect(a).toEqual({ aplicadas: 3, porRevisar: 0, pendientes: 0 });
+    // La corrección no se aplica sola: queda "por revisar" para que la persona vea el cambio.
+    expect(a).toEqual({ aplicadas: 2, porRevisar: 1, pendientes: 0 });
     expect(b).toEqual(a); // la misma corrida: nadie interpreta dos veces
     expect(p.recibidas.map((r) => r.texto)).toEqual(frases);
     expect(p.recibidas.map((r) => r.contexto.fecha_referencia)).toEqual([HOY, HOY, HOY]);
-
-    // En orden: la corrección encontró los tacos que se registraron antes.
-    expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000);
-    expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 2_500 - 8_000);
+    expect(p.ctx.libro.saldo(p.nu)).toBe(-208_000);
     expect(programadosActivos(p.ctx)).toHaveLength(1);
-    expect(listarPorInterpretar(p.ctx)).toEqual([]);
-    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
+    const [correccion] = listarPorInterpretar(p.ctx);
+    expect(correccion).toMatchObject({ texto: TACOS_EN_EFECTIVO, estado: 'revisar' });
 
     // Idempotente: otra corrida no hace nada.
     expect(await procesarPorInterpretar(p.ctx, p.nube)).toEqual({
@@ -452,6 +450,16 @@ describe('cola "por interpretar"', () => {
       pendientes: 0,
     });
     expect(p.recibidas).toHaveLength(3);
+
+    // Al revisarla, la corrección encuentra los tacos que se registraron antes, con la fecha en que se dijo.
+    expect(await revisarPorInterpretar(p.ctx, correccion?.id as string, p.nube)).toMatchObject({
+      resultado: 'corregido',
+    });
+    expect(p.recibidas[3]?.contexto.fecha_referencia).toBe(HOY);
+    expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000);
+    expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 2_500 - 8_000);
+    expect(listarPorInterpretar(p.ctx)).toEqual([]);
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
   it('se detiene en el primer fallo de red sin saltarse el orden y sigue al reconectar', async () => {
@@ -468,11 +476,11 @@ describe('cola "por interpretar"', () => {
     });
     p.fallar(null);
     expect(await procesarPorInterpretar(p.ctx, p.nube)).toEqual({
-      aplicadas: 2,
-      porRevisar: 0,
+      aplicadas: 1,
+      porRevisar: 1, // la corrección espera a la persona
       pendientes: 0,
     });
-    expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 2_500 - 8_000);
+    expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 2_500);
   });
 
   it('lo que necesita a la persona queda "por revisar" y se revisa después', async () => {

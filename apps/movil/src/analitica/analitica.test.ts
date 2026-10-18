@@ -69,6 +69,8 @@ const VALIDOS: EventoAnalitica[] = [
   { nombre: 'arqueo', propiedades: { resultado: 'faltante' } },
   { nombre: 'simulacion_vista', propiedades: { escenarios: 4, recomendado_tipo: 'msi' } },
   { nombre: 'plan', propiedades: { evento: 'paywall_visto' } },
+  { nombre: 'plantillas_remotas', propiedades: { version: 2, resultado: 'aceptada' } },
+  { nombre: 'widget', propiedades: { evento: 'agregado' } },
 ];
 
 describe('analítica con opt-in (03 §8, RNF-05)', () => {
@@ -140,6 +142,15 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       { nombre: 'captura', propiedades: { banco_id: 'bbva', reconocida: true, texto: 'Compra $25' } },
       { nombre: 'simulacion_vista', propiedades: { escenarios: 109990, recomendado_tipo: 'msi' } },
       { nombre: 'correccion', propiedades: { campo: 'la jefa' } },
+      {
+        nombre: 'plantillas_remotas',
+        propiedades: { version: 2, resultado: 'aceptada', contenido: '{"bancos":[]}' },
+      },
+      { nombre: 'plantillas_remotas', propiedades: { version: 150000, resultado: 'aceptada' } },
+      { nombre: 'plantillas_remotas', propiedades: { version: 2, resultado: 'BBVA: Compra por $1,099.90' } },
+      { nombre: 'plantillas_remotas', propiedades: { version: 0, resultado: 'sin_red' } },
+      { nombre: 'widget', propiedades: { evento: 'Hoy puedes $214' } },
+      { nombre: 'widget', propiedades: { evento: 'agregado', cifra: '$214' } },
       { nombre: 'app_abierta' },
       'app_abierta',
       null,
@@ -167,7 +178,21 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       fc.integer(),
       fc.double(),
       fc.boolean(),
-      fc.constantFrom('voz', 'texto', 'personal', 'faltante', 'bbva', 'msi', 'reglas', '<1s', 3),
+      fc.constantFrom(
+        'voz',
+        'texto',
+        'personal',
+        'faltante',
+        'bbva',
+        'msi',
+        'reglas',
+        '<1s',
+        3,
+        'aceptada',
+        'sin_red',
+        'agregado',
+        'quitado',
+      ),
     );
     fc.assert(
       fc.property(
@@ -183,9 +208,9 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
             for (const k of Object.keys(enviado.propiedades)) expect(permitidas).toContain(k);
             const json = JSON.stringify(enviado).toLowerCase();
             for (const s of SENSIBLES) expect(json).not.toContain(s.toLowerCase());
-            // Ningún número con forma de monto: solo pasos y conteos chicos.
-            for (const v of Object.values(enviado.propiedades)) {
-              if (typeof v === 'number') expect(Math.abs(v)).toBeLessThanOrEqual(40);
+            // Ningún número con forma de monto: solo pasos y conteos chicos (la versión de plantillas, ≤ 999).
+            for (const [k, v] of Object.entries(enviado.propiedades)) {
+              if (typeof v === 'number') expect(Math.abs(v)).toBeLessThanOrEqual(k === 'version' ? 999 : 40);
               if (typeof v === 'string') expect(v).not.toMatch(/\d{3,}|\$/);
             }
           }

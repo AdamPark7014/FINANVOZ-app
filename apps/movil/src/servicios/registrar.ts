@@ -12,6 +12,7 @@ import {
   type Interpretacion,
   type Movimiento,
   type RefCuenta,
+  type ResultadoNube,
   type ResultadoResolutor,
 } from '@cartera/nlu';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
@@ -273,7 +274,8 @@ export type ResultadoTexto =
       /** La frase original, para volver a mandarla con la opción elegida. */
       readonly texto: string;
     }
-  | { readonly resultado: 'no_entendi' }
+  /** `texto_largo`: la frase pasa de 500 caracteres y no viaja a la nube ("Dilo más corto"). */
+  | { readonly resultado: 'no_entendi'; readonly motivo?: 'texto_largo' }
   | { readonly resultado: 'no_soportado'; readonly motivo: MotivoNoSoportado }
   | {
       readonly resultado: 'fuera_de_alcance';
@@ -295,6 +297,12 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'me_alcanza',
   'explicar',
 ]);
+
+/** La cola no las aplica sola: cambian lo ya registrado y la persona tiene que verlo, con Deshacer (`06 §7`). */
+const SOLO_CON_LA_PERSONA = new Set<Interpretacion['intencion']>(['anular', 'corregir']);
+
+/** Texto máximo de `POST /nlu/interpretar` (`TEXTO_MAXIMO_NUBE` de `@cartera/nlu`): más largo es un 400. */
+const TEXTO_MAXIMO_NUBE = 500;
 
 function tipoResolutor(c: CuentaPropia): CuentaResolutor['tipo'] | null {
   switch (c.subtipo) {
@@ -1007,7 +1015,7 @@ export async function registrarTexto(
   if (local) return local;
   const r = await interpretarEnNube(ctx, frase, opciones.nube ?? null);
   if (r.tipo !== 'ok') {
-    if (r.tipo === 'invalida') return { resultado: 'no_entendi' };
+    if (r.tipo === 'invalida') return noEntendi(r);
     return {
       resultado: 'por_interpretar',
       id: guardarPorInterpretar(ctx, frase),
@@ -1018,17 +1026,32 @@ export async function registrarTexto(
   return aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase);
 }
 
+/** `invalida`: la nube no puede con esta frase (respuesta inválida, texto largo o rechazo definitivo del proxy). */
 type RespuestaNube =
   | { tipo: 'ok'; interpretacion: Interpretacion }
-  | { tipo: 'invalida' }
+  | { tipo: 'invalida'; motivo?: 'texto_largo' }
   | { tipo: 'limite'; codigo: CodigoLimite }
   | { tipo: Exclude<MotivoPorInterpretar, 'limite'> };
+
+function noEntendi(r: Extract<RespuestaNube, { tipo: 'invalida' }>): ResultadoTexto {
+  return { resultado: 'no_entendi', ...(r.motivo ? { motivo: r.motivo } : {}) };
+}
+
+/**
+ * El proxy rechazó esta frase en particular (400 por el contrato, 413 o 422): reintentarla no sirve. Un 401,
+ * 408, 429 o 5xx es pasajero y deja la frase esperando.
+ */
+function rechazoDefinitivo(r: Extract<ResultadoNube, { tipo: 'error' }>): boolean {
+  return r.codigo === 'peticion_invalida' || r.status === 413 || r.status === 422;
+}
 
 async function interpretarEnNube(
   ctx: Contexto,
   frase: Frase,
   nube: NivelNube | null,
 ): Promise<RespuestaNube> {
+  if (frase.texto.trim() === '') return { tipo: 'invalida' };
+  if (frase.texto.length > TEXTO_MAXIMO_NUBE) return { tipo: 'invalida', motivo: 'texto_largo' };
   if (!nube) return { tipo: 'sin_nube' };
   try {
     if (!(await nube.conectividad.enLinea())) return { tipo: 'sin_red' };
@@ -1044,7 +1067,9 @@ async function interpretarEnNube(
     case 'limite':
       return { tipo: 'limite', codigo: r.codigo };
     case 'error':
-      return r.codigo === 'respuesta_invalida' ? { tipo: 'invalida' } : { tipo: 'error' };
+      return r.codigo === 'respuesta_invalida' || rechazoDefinitivo(r)
+        ? { tipo: 'invalida' }
+        : { tipo: 'error' };
   }
 }
 
@@ -1165,7 +1190,7 @@ export async function revisarPorInterpretar(
   let r = nivelCero(ctx, cuentasResolutor(ctx), frase);
   if (!r) {
     const n = await interpretarEnNube(ctx, frase, nube);
-    if (n.tipo === 'invalida') r = { resultado: 'no_entendi' };
+    if (n.tipo === 'invalida') r = noEntendi(n);
     else if (n.tipo === 'ok') r = aplicarInterpretacion(ctx, n.interpretacion, cuentasResolutor(ctx), frase);
     else
       return {
@@ -1194,7 +1219,9 @@ export interface ResultadoCola {
  * CA-M3-05: al reconectar interpreta las frases guardadas **en orden**, una por una, con la fecha en que se
  * dijeron. Idempotente: cada frase se aplica y se borra de la cola en la misma transacción SQLite (y sus
  * movimientos llevan clave `frase:<id>:<i>`), y dos llamadas simultáneas comparten la misma corrida. Se detiene
- * en el primer fallo de red para no saltarse el orden.
+ * en el primer fallo pasajero (red, límite, 5xx, tiempo) para no saltarse el orden; una frase que la nube no puede
+ * interpretar (rechazo definitivo, texto largo, respuesta inválida) va a "Por revisar" y la cola sigue. Anular y
+ * corregir nunca se aplican desde aquí: van a "Por revisar" para que la persona vea el cambio.
  */
 export function procesarPorInterpretar(ctx: Contexto, nube: NivelNube | null): Promise<ResultadoCola> {
   const enCurso = procesando.get(ctx);
@@ -1224,6 +1251,7 @@ export function procesarPorInterpretar(ctx: Contexto, nube: NivelNube | null): P
       try {
         final = enTransaccion(ctx, () => {
           if (!leerAjuste(ctx, clave, PorInterpretar)) return 'ya' as const; // otra corrida ya la aplicó
+          if (r.tipo === 'ok' && SOLO_CON_LA_PERSONA.has(r.interpretacion.intencion)) return marcarRevisar();
           const res =
             r.tipo === 'ok'
               ? aplicarInterpretacion(ctx, r.interpretacion, cuentasResolutor(ctx), frase)

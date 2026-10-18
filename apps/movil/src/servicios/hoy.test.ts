@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { DesgloseReservado, PlainDate, Regla } from '@cartera/core';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { fijarColchon } from './ajustes';
+import { activarCaptura, apagarCapturaTrasRestaurar, desactivarCaptura } from './estado-captura';
 import { deshacer } from './formulario';
 import { obtenerHoy, type TarjetaAccion } from './hoy';
 import {
@@ -250,5 +251,23 @@ describe('Hoy', () => {
     expect(hoy.estado).toBe('libre_negativo');
     expect(hoy.hoyPuedesCentavos).toBe(0);
     expect(hoy.faltante).toBe(-hoy.libre);
+  });
+
+  it('tras restaurar con la captura activa pide reactivarla hasta que la reactive o la descarte (pendiente 47)', () => {
+    const p = abrirPrueba();
+    const e = cargarEscenario(p.ctx, escenario('e4-01'));
+    p.reloj.fijar(e.hoy);
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    apagarCapturaTrasRestaurar(p.ctx);
+    const tipos = () => obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo);
+    expect(tipos()).toEqual(['reactivar_captura']);
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    expect(tipos()).toEqual([]);
+
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    apagarCapturaTrasRestaurar(p.ctx);
+    expect(tipos()).toEqual(['reactivar_captura']);
+    desactivarCaptura(p.ctx);
+    expect(tipos()).toEqual([]);
   });
 });

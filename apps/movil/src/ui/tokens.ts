@@ -124,8 +124,11 @@ export const radio = {
 /** Objetivo táctil mínimo (02-UX §15, RNF-08). */
 export const OBJETIVO_TACTIL_MIN = 48;
 
-/** Duración del aviso con "Deshacer" (02-UX §1.3, RF-REG-04). */
-export const DURACION_AVISO_MS = 5000;
+/**
+ * Duración mínima del aviso con "Deshacer" (02-UX §1.3, RF-REG-04). Android puede pedir más (ajuste "Tiempo
+ * para actuar" de accesibilidad) y con lector de pantalla no se cierra solo.
+ */
+export const DURACION_AVISO_MS = 10_000;
 
 /**
  * Escala tipográfica. Tamaños en sp: escalan con la preferencia del sistema (texto al 200 %);

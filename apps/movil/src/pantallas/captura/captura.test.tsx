@@ -24,7 +24,8 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { abrirPruebaPantalla, conEscenario, escenario, vector } from '../principal/__pruebas__/base';
 import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
-import { ActivarCaptura } from './ActivarCaptura';
+import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
+import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
 
 const FIXTURES = join(__dirname, '../../../../../fixtures');
 const MINUTO = 60_000;
@@ -315,6 +316,45 @@ describe('O6 · activar la captura', () => {
     expect(obtenerEstadoCaptura(p.ctx)).toMatchObject({ activada: true, apps: ['mx.ejemplo.bancoa'] });
     fireEvent.press(screen.getByTestId('o6-continuar'));
     expect(alTerminar).toHaveBeenCalledWith(true);
+    p.cerrar();
+  });
+
+  it('tras restaurar, Hoy pide reactivarla y "Activar" recorre el mismo flujo hasta la lista blanca (pendiente 47)', async () => {
+    const p = eCaptura();
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    apagarCapturaTrasRestaurar(p.ctx);
+    expect(obtenerHoy(p.ctx).tarjetasAccion.map((t) => t.tipo)).toContain('reactivar_captura');
+    const puente = puenteFalso();
+    conCaptura(p.ctx, puente, <PantallaHoy navegacion={navegacionFalsa()} />);
+    expect(screen.getByText('Vuelve a activar la lectura de notificaciones')).toBeTruthy();
+    fireEvent.press(screen.getByTestId(/-reactivar$/));
+    // La divulgación destacada se vuelve a mostrar antes de abrir el ajuste del sistema.
+    expect(screen.getByText(DIVULGACION_CAPTURA.parrafos[1])).toBeTruthy();
+    await act(async () => fireEvent.press(screen.getByTestId(/-activar-activar$/)));
+    expect(puente.abrirAjustesPermiso).toHaveBeenCalled();
+    await act(async () => fireEvent.press(screen.getByTestId(/-activar-ya$/)));
+    fireEvent.press(screen.getByTestId(/-activar-app-banco_a$/));
+    await act(async () => fireEvent.press(screen.getByTestId(/-activar-guardar-apps$/)));
+    expect(puente.fijarListaBlanca).toHaveBeenCalledWith(['mx.ejemplo.bancoa']);
+    expect(obtenerEstadoCaptura(p.ctx).activada).toBe(true);
+    expect(reactivarCapturaPendiente(p.ctx)).toBe(false);
+    expect(screen.queryByText('Vuelve a activar la lectura de notificaciones')).toBeNull();
+    expect(screen.getByText('Listo: vuelvo a leer los avisos de tu banco.')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('tras restaurar, "Ahora no" deja la captura apagada y quita la tarjeta', async () => {
+    const p = eCaptura();
+    activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
+    apagarCapturaTrasRestaurar(p.ctx);
+    const puente = puenteFalso();
+    conCaptura(p.ctx, puente, <PantallaHoy navegacion={navegacionFalsa()} />);
+    await act(async () => fireEvent.press(screen.getByTestId(/-ahora-no$/)));
+    expect(puente.fijarListaBlanca).toHaveBeenCalledWith([]);
+    expect(obtenerEstadoCaptura(p.ctx).activada).toBe(false);
+    expect(reactivarCapturaPendiente(p.ctx)).toBe(false);
+    expect(screen.queryByText('Vuelve a activar la lectura de notificaciones')).toBeNull();
+    expect(screen.getByText('Va. Puedes activarla cuando quieras en Ajustes.')).toBeTruthy();
     p.cerrar();
   });
 

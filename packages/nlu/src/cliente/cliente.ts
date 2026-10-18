@@ -5,8 +5,16 @@ import { Interpretacion } from '../esquema';
 /** Versión del esquema `Interpretacion` que la app espera (`03 §6`). Sube con cada cambio incompatible. */
 export const VERSION_ESQUEMA = 1;
 
-/** Tiempo máximo de una interpretación (`03 §6`: 8 s). */
+/** Tiempo máximo de las peticiones cortas a la nube (sesión, respaldo, evidencia; `03 §6`: 8 s). */
 export const TIEMPO_MAXIMO_MS = 8_000;
+
+/**
+ * Tiempo máximo de una petición al intérprete o al modo explicar. Debe ser mayor que `PRESUPUESTO_TOTAL_MS` del
+ * proxy (`services/proxy/supabase/functions/_shared/nlu/proveedores.ts`, 7 s) más margen de red, sesión y cupo:
+ * si el teléfono se rinde antes, el alterno o el reintento nunca llegan, el cupo ya se cobró y al reintentar la
+ * frase se cobra otra vez. Mantenlas coherentes (lo verifica `interpretar.test.ts` del proxy).
+ */
+export const TIEMPO_MAXIMO_LLM_MS = 10_000;
 
 /** Ruta de la Edge Function bajo la URL del proyecto de Supabase. */
 export const RUTA_INTERPRETAR = '/functions/v1/nlu-interpretar';
@@ -95,7 +103,7 @@ const transportePorOmision: Transporte = (url, peticion) => globalThis.fetch(url
  */
 export function crearClienteNube(opciones: OpcionesClienteNube): ClienteNube {
   const transporte = opciones.transporte ?? transportePorOmision;
-  const tiempoMaximo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_MS;
+  const tiempoMaximo = opciones.tiempoMaximoMs ?? TIEMPO_MAXIMO_LLM_MS;
   const destino = `${opciones.url.replace(/\/+$/, '')}${RUTA_INTERPRETAR}`;
 
   async function enviar(token: string, cuerpo: string): Promise<RespuestaTransporte> {
