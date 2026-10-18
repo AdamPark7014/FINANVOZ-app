@@ -6,6 +6,8 @@ import { formatearCentavos } from '../../ui';
 
 /** Lista (`Cuentas → Tandas`). */
 export const TITULO_TANDAS = 'Tandas';
+/** Entrada desde Cuentas (`02 §18`). */
+export const BTN_TANDAS_CUENTAS = 'Ver mis tandas';
 export const ETIQUETA_NUEVA_TANDA = 'Nueva tanda';
 export const ETIQUETA_VER_CALENDARIO = 'Ver calendario';
 
