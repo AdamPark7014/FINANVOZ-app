@@ -102,6 +102,7 @@ export function PantallaAyuda({
             tono="faltante"
             accessibilityRole="alert"
             accessibilityLiveRegion="polite"
+            accessibilityLabel={etiquetaAccesibleSinAppCorreo(CORREO_AYUDA)}
             testID="ayuda-sin-correo"
           >
             {mensajeSinAppCorreo(CORREO_AYUDA)}
@@ -144,15 +145,13 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         </Texto>
       </Pressable>
       {abierta ? (
-        <View
-          style={{ gap: espacio.s }}
-          testID={`ayuda-respuesta-${p.id}`}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={ETIQUETA_RESPUESTA}
-        >
-          {p.respuesta.map((parrafo) => (
-            <Texto key={parrafo} variante="cuerpo">
+        <View style={{ gap: espacio.s }} testID={`ayuda-respuesta-${p.id}`} accessibilityLiveRegion="polite">
+          {p.respuesta.map((parrafo, i) => (
+            <Texto
+              key={parrafo}
+              variante="cuerpo"
+              accessibilityLabel={etiquetaAccesibleParrafoRespuesta(parrafo, i === 0)}
+            >
               {parrafo}
             </Texto>
           ))}

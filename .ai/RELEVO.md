@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Respaldo · TalkBack exportar:** `PISTA_EXPORTAR_ARCHIVO` en `TarjetaRespaldo`; test en `respaldo-ui.test.tsx`.
+- **Ajustes › Widget · TalkBack:** `PISTA_OCULTAR_MONTOS` en el interruptor «Ocultar montos» (prop `pista` opcional en `Interruptor`); tests en `widget.test.tsx` y `componentes.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Personas, suscripciones, me-alcanza, tandas, arqueo. Ver `git log`.
+- PreviaWidget (etiqueta «Vista previa», liveRegion, pista), error alert, respaldo, captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo (widget, onboarding, me-alcanza, personas) — no mezclar en commits ajenos.
+- WIP paralelo (onboarding, me-alcanza, personas) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Más `PISTA` en respaldo (confirmar borrar cuenta, restaurar) o CTA Tandas (`boton-tandas`).
+2. Más `PISTA` en respaldo o CTA Tandas (`boton-tandas`).
 
 ## No tocar
 
