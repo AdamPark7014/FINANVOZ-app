@@ -6,24 +6,24 @@
 
 ## Hecho en este turno
 
-- **Fiscal (`02 §24`, M12):** copy pulido en `deducciones/textos.ts`, `MENSAJE_SIN_PARAMETROS`, FAQ en `ayuda/textos.ts`, `BTN_DEDUCCIONES_CUENTAS` en Cuentas; pruebas anclan título/descripción Plus y CTA desde Cuentas.
-- **Negocio (M11):** sin pantallas en app; nada que pulir en UI.
+- **PantallaCuentas:** vacíos con `etiquetaVacioCuentas*` + `EstadoVacio.etiquetaAccesible`; `cuentas-titulo` y `seccion-*-titulo` header; botones Cobrar/Ver/Contar con etiqueta TalkBack contextual (ya en `e605751` / batch previo).
+- **principal.test:** aserción de saldo BBVA usa el nombre real de la cuenta en e4-01 (no asumir «BBVA» corto).
 
 ## Hecho (acumulado reciente)
 
-- TalkBack headers (arqueo, deducciones, plan, persona); tabs/hoy/suscripciones; onboarding/widget. Ver `git log`.
+- Deducciones, tabs, onboarding/captura, Chip. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP en disco (personas, onboarding, widget) — no mezclar sin leer diff.
+- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio + paquete contador cuando toque el hito.
-3. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
