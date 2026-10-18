@@ -6,24 +6,22 @@
 
 ## Hecho en este turno
 
-- **Hoy / principal:** TalkBack en héroe (OCULTAR etiquetas duplicadas), tarjeta del día (`etiquetaTarjetaDelDia`), probabilidad calculando y aviso de riesgo.
+- **Suscripciones:** prueba «Cuentas abre Suscripciones» usa `accessibilityLabel` del botón (texto oculto en árbol a11y), no `getByText`.
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget testIDs y a11y ocultar montos; Cuentas/personas TalkBack. Ver `git log`.
+- Movimientos testID por día, cuentas atajos, onboarding/tabs TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP sin commitear en disco: `onboarding/textos.ts`, `principal/principal.test.tsx`, `PantallaTandas.tsx` (turno anterior).
+- WIP ajeno en disco (arqueo, personas, tarjetas) — no mezclar sin `git status`.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP onboarding/tandas/principal.test del turno previo.
-3. M11 negocio cuando toque el hito.
+2. Misma aserción en deducciones/compartidos si `getByText` falla igual.
 
 ## No tocar
 
