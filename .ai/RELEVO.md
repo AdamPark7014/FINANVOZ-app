@@ -6,30 +6,27 @@
 
 ## Hecho en este turno
 
-- **docs semilla:** `apps/movil/scripts/README.md` — tip PowerShell `pnpm --filter movil semilla <id>`, git/hash skip (`.db` en `.gitignore`), validación por JSON vs `esperado`, typecheck skip del CLI (`tsx` / `scripts/` fuera de `tsconfig`). Enlazado desde `fixtures/README.md` (§ Semilla en PowerShell, ya en main).
+- **movil/ajustes/widget:** `SeccionWidget` con copy en `widget-textos.ts`, `PreviaWidget` reactiva al interruptor, testIDs (`ajustes-widget-previa`, instrucciones, error); indentación del handler.
 
 ## Hecho (acumulado reciente)
 
-Ver `docs/ESTADO.md` y `git log` (respaldo textos, compartido, plan, etc.).
+- Copy Ajustes (captura, colchón, avisos, ingreso), widget Android, suscripciones. Ver `git log` y `docs/ESTADO.md`.
 
 ## A medias — CUIDADO
 
-- CI: `publicar-ejemplos.test.ts` y `rendimiento.test.ts` (RNF-01) pueden fallar en Windows.
-- WIP local en pantallas movil / UI — no mezclar sin `relevo.ps1 salvar`.
-- M0 / Expo / teléfono / legal / fiscal: Adam.
-- `src/servicios/semilla.ts` / `semilla.test.ts`: typecheck preexistentes (lógica no tocada).
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP local sin commitear (privacidad, onboarding, calculadora, etc.) — no mezclar.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
-1. Adam — M0 y EAS.
-2. Teléfono — escenarios semilla y respaldo.
-3. Estabilizar CI sin tocar umbral RNF-01 salvo acuerdo.
+1. Adam — M0 / EAS.
+2. Limpiar WIP ajeno en commits pequeños si Adam lo pide.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `packages/core` E*, `eas.json`, `app.config`, vectores a mano.
-- Lógica de `semilla.ts` / arreglo typecheck servicio semilla (fuera de alcance).
+- `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
 
