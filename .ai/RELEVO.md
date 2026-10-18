@@ -6,20 +6,21 @@
 
 ## Hecho en este turno
 
-- **Suscripciones TalkBack:** `etiquetaAccesibleAyudaSuscripciones` en la pista bajo el título (filas activas) + tests.
+- **Compartidos TalkBack:** pistas `PISTA_CREAR_CON_ALGUIEN` y `PISTA_ESCANEAR_CODIGO` en lista vacía; vacío con `etiquetaVacioCompartidos` + pruebas Cuentas/Volver (acumulado en commits recientes).
 
 ## Hecho (acumulado reciente)
 
-- Tarjetas movimientos en palabras, inactivas suscripciones, UI kit. Ver `git log`.
+- Suscripciones inactivas/vacío, captura, widget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco — `git status` antes de editar.
-- CI Windows, M0: Adam.
+- WIP ajeno en disco (`git status`): ajustes/widget — no mezclar.
+- CI Windows; M0 Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. Pistas TalkBack en flujos crear/unirse de compartidos (QR, cámara) si sigue la tanda a11y.
 
 ## No tocar
 

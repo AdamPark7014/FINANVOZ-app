@@ -15,6 +15,7 @@ export interface PreguntaFrecuente {
  */
 
 export const ETIQUETA_VOLVER = 'Volver';
+/** TalkBack: nombre del botón volver (etiqueta accesible). */
 export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
 /** TalkBack: acción del botón volver (desde Ajustes). */
 export const PISTA_VOLVER = 'Regresa a Ajustes';
@@ -48,6 +49,7 @@ export const BTN_AYUDA = BTN_ABRIR_DESDE_AJUSTES;
 export const CONTACTO_TITULO = '¿No encontraste tu respuesta?';
 export const BTN_ESCRIBIR_CORREO = 'Escribir un correo';
 export const PISTA_ESCRIBIR_CORREO = 'Abre tu app de correo; el asunto ya viene listo';
+/** TalkBack: nombre del botón de contacto por correo. */
 export const ACCESIBILIDAD_ESCRIBIR_CORREO = 'Escribir un correo de ayuda';
 
 /** Asunto fijo del correo. No lleva datos de la persona ni de su libro. */
