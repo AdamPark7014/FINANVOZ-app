@@ -6,27 +6,25 @@
 
 ## Hecho en este turno
 
-- **Captura:** `captura/textos.test.ts` verifica que `etiquetaPermisoCaptura` incluye la ayuda Android en permiso concedido y denegado.
+- **TalkBack tandas/ajustes/captura:** ya en `main` (estado captura con `etiquetaCapturaActiva`, título `ajustes-captura-titulo`, por-revisar, tandas vacío/pistas). Push al remoto verificado.
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones/O5 TalkBack, tandas, principal/captura copy. Ver `git log`.
+- `fc59f44` test header Por revisar; `b6d720a` TalkBack captura activa Ajustes; tandas PISTA_* / EstadoVacio. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP ayuda/compartido en working tree — no commitear sin revisar diff.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio cuando toque el hito.
+2. Cerrar WIP ayuda/compartido en commit aparte.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

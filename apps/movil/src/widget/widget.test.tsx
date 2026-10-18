@@ -100,7 +100,7 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
 
   it('con cifra pasa auditoría: una sola etiqueta hablada, sin cifras sueltas en el árbol', () => {
     render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
-    expect(auditar(screen.toJSON())).toEqual([]);
+    expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
     const previa = screen.getByTestId('previa-widget');
     expect(
       within(previa).getByTestId('previa-widget-cifra', { includeHiddenElements: true }).props
@@ -245,6 +245,7 @@ describe('Ajustes → Widget', () => {
       </ProveedorSesion>,
     );
     await act(async () => {});
+    expect(screen.getByTestId('ajustes-widget-titulo')).toHaveProp('accessibilityRole', 'header');
     const interruptor = screen.getByTestId('ajustes-widget-ocultar');
     expect(interruptor.props.accessibilityState).toMatchObject({ checked: false });
 

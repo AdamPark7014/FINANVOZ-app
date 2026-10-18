@@ -48,7 +48,13 @@ export function SeccionCaptura() {
           >
             {textoCapturaActiva(estado.apps.length)}
           </Texto>
-          <Texto variante="etiqueta">{ETIQUETA_AVISO_AL_CAPTURAR}</Texto>
+          <Texto
+            variante="etiqueta"
+            testID="ajustes-captura-aviso-titulo"
+            accessibilityRole="header"
+          >
+            {ETIQUETA_AVISO_AL_CAPTURAR}
+          </Texto>
           <Texto variante="secundario" tono="secundario">
             {DESC_AVISO_AL_CAPTURAR}
           </Texto>

@@ -5,7 +5,7 @@ import {
   type ResultadoTexto,
   type TarjetaEditada,
 } from '../../servicios';
-import { formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui';
 
 /** Redacción de Tarjetas (`02 §8`, `02 §14`): solo presenta lo que ya calculó `servicios/`. */
 
@@ -274,9 +274,10 @@ export function etiquetaAccesibleDato(etiqueta: string, valor: string): string {
 export function etiquetaAccesibleMovimientoTarjeta(
   titulo: string,
   fecha: string,
-  monto: string,
+  centavos: Centavos,
   esSalida: boolean,
 ): string {
+  const monto = cifraEnPalabras(centavos, 'centavos');
   return `${titulo}, ${fecha}, ${esSalida ? 'gasto' : 'abono'} ${monto}`;
 }
 

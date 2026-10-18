@@ -162,3 +162,13 @@ describe('etiquetaHablada (02-UX §15: cada cifra dentro de una frase se lee en 
     );
   });
 });
+
+describe('etiquetaEstadoVacio (TalkBack de listas vacías)', () => {
+  it('«Todavía» al inicio se oye «Aún»; el resto y las cifras igual que etiquetaHablada', () => {
+    expect(etiquetaEstadoVacio('Todavía no hay movimientos.')).toBe('Aún no hay movimientos.');
+    expect(etiquetaEstadoVacio('Faltan $315 en el arqueo.')).toBe(
+      'Faltan trescientos quince pesos en el arqueo.',
+    );
+    expect(etiquetaEstadoVacio('No debes nada.')).toBe('No debes nada.');
+  });
+});

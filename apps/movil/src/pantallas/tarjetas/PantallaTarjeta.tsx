@@ -192,13 +192,12 @@ function Detalle({
           const titulo =
             m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_TITULO;
           const fecha = etiquetaDiaMes(m.fecha);
-          const monto = formatearCentavos(m.monto);
           const esSalida = m.sentido === 'salida';
           return (
             <View
               key={m.id}
               accessible
-              accessibilityLabel={etiquetaAccesibleMovimientoTarjeta(titulo, fecha, monto, esSalida)}
+              accessibilityLabel={etiquetaAccesibleMovimientoTarjeta(titulo, fecha, m.monto, esSalida)}
               style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
             >
               <Texto variante="secundario" style={{ flex: 1 }} importantForAccessibility="no">
