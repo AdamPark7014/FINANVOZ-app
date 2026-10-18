@@ -19,7 +19,7 @@ export function App() {
         <span className="marca">{MARCA}</span>
       </header>
       <main>
-        <h1>¿Cuántos meses sin intereses aguantas?</h1>
+        <h1>¿Cuántos MSI aguantas?</h1>
         <p className="entrada">
           Antes del Buen Fin, calcula cuánto puedes sumar en pagos al mes sin pasarte de lo recomendado.
         </p>
