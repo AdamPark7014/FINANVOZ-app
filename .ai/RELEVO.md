@@ -6,28 +6,25 @@
 
 ## Hecho en este turno
 
-- **PreviaWidget:** `testID="previa-widget-solo-texto"` en rama sin cifra; prueba TalkBack simétrica con la fila con montos.
+- **Cuentas:** botón Suscripciones usa `BTN_SUSCRIPCIONES_CUENTAS` en `suscripciones/textos.ts` (simétrico a deducciones).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding/tabs/captura/widget TalkBack y copy (commits `3e3ef97`, `64608c7`, etc.). Ver `git log`.
+- Pestañas TalkBack, deducciones `BTN_DEDUCCIONES_CUENTAS`, onboarding copy en `textos.ts`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal params: Adam.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
-3. M11 negocio cuando toque el hito.
+2. Centralizar copy O3–O7 restante en `textos.ts` por pantalla si queda inline.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
