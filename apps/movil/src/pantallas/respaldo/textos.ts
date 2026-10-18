@@ -61,6 +61,9 @@ export const SUBTITULO_ARCHIVO = 'Respaldo cifrado';
 export const DESCRIPCION_ARCHIVO =
   'Un archivo con todos tus datos, cifrado con una contraseña que solo tú conoces. Guárdalo donde quieras y úsalo para pasar tus datos a otro teléfono.';
 export const BTN_EXPORTAR_ARCHIVO = 'Exportar respaldo (.cartera)';
+/** TalkBack cuando ya hay contraseña (`02 §19`). */
+export const PISTA_EXPORTAR_ARCHIVO =
+  'Genera un archivo cifrado para guardarlo o pasarlo a otro teléfono';
 export const BTN_CAMBIAR_CONTRASENA = 'Cambiar contraseña';
 export const BTN_CREAR_CONTRASENA = 'Crear contraseña de respaldo';
 export const BTN_RESTAURAR_RESPALDO = 'Restaurar un respaldo';

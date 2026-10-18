@@ -74,6 +74,7 @@ export function SeccionWidget() {
           variante="secundario"
           tono="faltante"
           testID="ajustes-widget-error"
+          accessibilityRole="alert"
           accessibilityLiveRegion="polite"
         >
           {MENSAJE_NO_GUARDAR}

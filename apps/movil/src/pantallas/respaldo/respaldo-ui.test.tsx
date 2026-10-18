@@ -5,6 +5,7 @@ import { ProveedorControlApp, type ControlApp } from '../../sesion/ControlApp';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
+import { fijarContrasenaRespaldo } from '../../servicios';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { PantallaRespaldo } from './PantallaRespaldo';
 import { Restaurar } from './Restaurar';

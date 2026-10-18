@@ -35,9 +35,14 @@ import {
   MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
+  PISTA_ABRIR_ESCANER,
+  PISTA_CANCELAR_ESCANER,
+  PISTA_CREAR_CODIGO,
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
+  PISTA_PERMISO_CAMARA,
   PISTA_VOLVER_CUENTAS,
+  PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
   etiquetaVacioGrupoMovimientos,
   TEXTO_COMPARTIDOS_VACIO,
@@ -47,10 +52,11 @@ import {
 
 // La cámara falsa "lee" el QR que la prueba deja en `mockQr` al tocarla.
 let mockQr = '';
+let mockCamaraConcedida = true;
 jest.mock('expo-camera', () => {
   const { Pressable, Text } = jest.requireActual('react-native');
   return {
-    useCameraPermissions: () => [{ granted: true }, jest.fn()],
+    useCameraPermissions: () => [{ granted: mockCamaraConcedida }, jest.fn()],
     CameraView: ({ onBarcodeScanned }: { onBarcodeScanned: (r: { data: string }) => void }) => (
       <Pressable
         testID="camara-falsa"
@@ -149,6 +155,37 @@ describe('02 §27 · Gastos con tu pareja', () => {
     expect(screen.getByTestId('compartidos-vacio').props.accessibilityLabel).toBe(etiquetaVacioCompartidos());
     expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
     A.cerrar();
+  });
+
+  it('TalkBack en flujos crear y escanear (`02 §19`)', () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('compartidos-crear'));
+    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
+    expect(screen.getByTestId('compartidos-crear-codigo')).toHaveProp('accessibilityHint', PISTA_CREAR_CODIGO);
+    fireEvent.press(screen.getByTestId('compartidos-volver'));
+    fireEvent.press(screen.getByTestId('compartidos-escanear'));
+    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
+    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp('accessibilityHint', PISTA_ABRIR_ESCANER);
+    fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Ana');
+    fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
+    expect(screen.getByTestId('escaner-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ESCANER);
+    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
+    A.cerrar();
+  });
+
+  it('escáner sin permiso: pista TalkBack en Permitir la cámara', () => {
+    jest.doMock('expo-camera', () => {
+      const { Pressable, Text } = jest.requireActual('react-native');
+      return {
+        useCameraPermissions: () => [{ granted: false }, jest.fn()],
+        CameraView: () => null,
+      };
+    });
+    const { EscanerQr: EscanerSinPermiso } = jest.requireActual('./EscanerQr');
+    render(<EscanerSinPermiso alLeer={jest.fn()} alCancelar={jest.fn()} />);
+    expect(screen.getByTestId('escaner-permiso')).toHaveProp('accessibilityHint', PISTA_PERMISO_CAMARA);
   });
 
   it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {

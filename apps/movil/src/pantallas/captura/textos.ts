@@ -27,6 +27,20 @@ export const PISTA_CONFIRMAR_CAPTURA = 'Confirma que la captura está correcta';
 export const PISTA_CAPTURA_DE_CONTADO = 'Indica que no fue a meses sin intereses';
 export const PISTA_CAMBIAR_CATEGORIA_CAPTURA = 'Elige otra categoría para esta captura';
 
+/** TalkBack: tarjeta de Hoy tras restaurar (`TarjetaReactivarCaptura`). */
+export const PISTA_DESCARTAR_REACTIVAR_CAPTURA = 'Deja la captura apagada y quita esta tarjeta';
+/** TalkBack: tarjeta captura inactiva (RF-CAP-07). */
+export const PISTA_REVISAR_ACCESO_CAPTURA =
+  'Abre ajustes del teléfono para revisar el acceso a notificaciones';
+
+export const TITULO_CAPTURA_INACTIVA =
+  'No he visto notificaciones de tu banco en 3 días. Revisa que la captura siga activa.';
+
+/** TalkBack: aviso + guía por marca del teléfono (`TarjetaCapturaInactiva`). */
+export function etiquetaGuiaCapturaInactiva(guia: string): string {
+  return `${TITULO_CAPTURA_INACTIVA} ${guia}`;
+}
+
 export const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
 export const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
 export const AVISO_SIN_TEXTO =

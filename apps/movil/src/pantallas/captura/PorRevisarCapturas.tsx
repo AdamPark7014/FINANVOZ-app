@@ -24,6 +24,7 @@ import {
   ETIQUETA_SIN_CATEGORIA,
   INTRO_CAPTURAS_POR_REVISAR,
   etiquetaMesesChip,
+  etiquetaIntroCapturasPorRevisar,
   etiquetaVacioCapturasPorRevisar,
   MESES_CAPTURA,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
@@ -78,7 +79,12 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
       <Texto variante="subtitulo" testID="capturas-por-revisar-titulo" accessibilityRole="header">
         {TITULO_CAPTURAS_POR_REVISAR}
       </Texto>
-      <Texto variante="secundario" tono="secundario" testID="capturas-por-revisar-intro">
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID="capturas-por-revisar-intro"
+        accessibilityLabel={etiquetaIntroCapturasPorRevisar()}
+      >
         {INTRO_CAPTURAS_POR_REVISAR}
       </Texto>
       {lista.map((c) => (

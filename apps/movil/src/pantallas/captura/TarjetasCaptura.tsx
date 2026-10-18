@@ -26,7 +26,14 @@ import {
   TITULO,
   textoDeberiasTraer,
 } from '../arqueo/textos';
+import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { ActivarCaptura } from './ActivarCaptura';
+import {
+  etiquetaGuiaCapturaInactiva,
+  PISTA_DESCARTAR_REACTIVAR_CAPTURA,
+  PISTA_REVISAR_ACCESO_CAPTURA,
+  TITULO_CAPTURA_INACTIVA,
+} from './textos';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;
 
@@ -104,7 +111,7 @@ export function TarjetaArqueo({
         />
       )}
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}
@@ -186,6 +193,7 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
             alPresionar={() => setActivando(true)}
             testID={`${testID}-reactivar`}
             etiquetaAccesible="Activar lectura de notificaciones del banco"
+            pista={PISTA_ACTIVAR_CAPTURA}
           />
         ) : null}
         <Boton
@@ -198,6 +206,7 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
             mostrar({ mensaje: 'Va. Puedes activarla cuando quieras en Ajustes.' });
           }}
           testID={`${testID}-ahora-no`}
+          pista={PISTA_DESCARTAR_REACTIVAR_CAPTURA}
         />
       </View>
     </Tarjeta>
