@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mensajePagoPlaneadoApartado, tituloCompraMsiMeses, TITULO_CONFIRMAR_MSI } from './textos';
+import { tituloCompraMsiMeses, TITULO_CONFIRMAR_MSI } from './textos';
 
 describe('tarjetas/textos · confirmar MSI', () => {
   it('título de compra incluye meses', () => {

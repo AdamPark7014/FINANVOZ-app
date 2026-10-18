@@ -165,7 +165,7 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar cambios" alPresionar={guardar} testID="editar-guardar" />
+      <Boton etiqueta={BTN_GUARDAR_CAMBIOS} alPresionar={guardar} testID="editar-guardar" />
       <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} testID="editar-cancelar" />
     </View>
   );
@@ -192,23 +192,23 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
       <Chips
         testID="corregir-sentido"
         opciones={[
-          { valor: 'debo', etiqueta: 'Debo' },
-          { valor: 'a_favor', etiqueta: 'Tengo saldo a favor' },
+          { valor: 'debo', etiqueta: ETIQUETA_SENTIDO_DEBO },
+          { valor: 'a_favor', etiqueta: ETIQUETA_SENTIDO_A_FAVOR },
         ]}
         valor={sentido}
         alCambiar={setSentido}
       />
-      <CampoMonto testID="corregir-monto" etiqueta="Saldo según tu banco" alCambiar={setMonto} />
+      <CampoMonto testID="corregir-monto" etiqueta={ETIQUETA_SALDO_SEGUN_BANCO} alCambiar={setMonto} />
       {error ? (
         <Texto variante="secundario" tono="faltante">
           {error}
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Corregir saldo"
+        etiqueta={BTN_CORREGIR_SALDO}
         testID="corregir-guardar"
         alPresionar={() => {
-          if (monto === null) return setError('Escribe el saldo que dice tu banco.');
+          if (monto === null) return setError(ERROR_SALDO_SEGUN_BANCO);
           try {
             const r = corregirSaldoTarjeta(ctx, d.id, sentido === 'debo' ? monto : -monto);
             if (r.transaccionId) {
@@ -220,7 +220,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
             }
             alTerminar();
           } catch {
-            setError('No pude corregir el saldo. Intenta de nuevo.');
+            setError(ERROR_CORREGIR_SALDO);
           }
         }}
       />
