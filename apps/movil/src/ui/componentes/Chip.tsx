@@ -109,11 +109,19 @@ export function GrupoChips<T extends string>({
   /** Pregunta del grupo (TalkBack en el radiogroup), p. ej. «¿Con qué pagaste?». */
   etiqueta?: string;
 }) {
+  const seleccionada = valor !== null ? opciones.find((o) => o.valor === valor) : undefined;
+  const pistaGrupo =
+    seleccionada !== undefined
+      ? `Seleccionado: ${etiquetaChipHablada(seleccionada.etiqueta, seleccionada.etiquetaAccesible)}`
+      : etiqueta !== undefined
+        ? 'Elige una opción'
+        : undefined;
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={etiqueta ? etiquetaHablada(etiqueta) : undefined}
-      style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}
+      {...(pistaGrupo === undefined ? {} : { accessibilityHint: pistaGrupo })}
+      style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s, alignItems: 'center' }}
     >
       {opciones.map((o) => (
         <Chip

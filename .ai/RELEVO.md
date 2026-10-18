@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **GrupoChips TalkBack:** `accessibilityHint` en el radiogroup («Elige una opción» / «Seleccionado: …»); fila con `alignItems: 'center'`.
+- **EscanerQr TalkBack:** instrucción visual fuera del árbol; botón «Permitir la cámara» con `etiquetaAccesible` completa + pista; test en `compartido.test.tsx`.
+- **FormularioGastoCompartido (turno previo/rescate):** `PISTA_GUARDAR_GASTO_COMPARTIDO`, live region resumen con `importantForAccessibility="yes"`.
 
 ## Hecho (acumulado reciente)
 
-- Chip/Boton hints, PreviaWidget, suscripciones. Ver `git log`.
+- PreviaWidget, captura, Cuentas TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP pantallas (`ayuda/`, `me-alcanza/`, `tarjetas/`, etc.) — turno anterior, no mezclar.
+- WIP paralelo fuera de `compartido/` (onboarding, ajustes, Chip, etc.) — no mezclar en commits de compartido.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack aviso retiro tarjeta en formulario movimiento o `CampoMonto` deshabilitado.
+2. TalkBack botones grupo (Saldar, Anular) o `TarjetaConfirmarCompartido` cancelar.
 
 ## No tocar
 

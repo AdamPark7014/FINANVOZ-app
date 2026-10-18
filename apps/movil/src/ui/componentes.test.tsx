@@ -7,6 +7,7 @@ import {
   Barra,
   Boton,
   Chip,
+  GrupoChips,
   CampoMonto,
   CampoTexto,
   EstadoVacio,
@@ -93,6 +94,24 @@ describe('Boton', () => {
   });
 });
 
+
+describe('GrupoChips', () => {
+  const opciones = [
+    { valor: 'efectivo' as const, etiqueta: 'Efectivo' },
+    { valor: 'debito' as const, etiqueta: 'Débito' },
+  ];
+
+  it('radiogroup anuncia selección o invita a elegir', () => {
+    const { rerender } = render(
+      <GrupoChips opciones={opciones} valor="efectivo" alCambiar={() => {}} etiqueta="¿Con qué pagaste?" />,
+    );
+    expect(screen.getByLabelText('¿Con qué pagaste?').props.accessibilityHint).toBe('Seleccionado: Efectivo');
+    rerender(
+      <GrupoChips opciones={opciones} valor={null} alCambiar={() => {}} etiqueta="¿Con qué pagaste?" />,
+    );
+    expect(screen.getByLabelText('¿Con qué pagaste?').props.accessibilityHint).toBe('Elige una opción');
+  });
+});
 
 describe('Chip', () => {
   it('hitSlop táctil y deshabilitado en TalkBack', () => {
