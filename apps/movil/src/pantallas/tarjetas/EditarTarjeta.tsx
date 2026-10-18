@@ -92,21 +92,21 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
       />
       <CampoTexto
         testID="editar-corte"
-        etiqueta="Día de corte"
+        etiqueta={ETIQUETA_DIA_CORTE}
         teclado="number-pad"
         valor={corte}
         alCambiar={setCorte}
       />
       <Chips
         testID="editar-modo-limite"
-        etiqueta="¿Cómo sabes cuándo pagar?"
+        etiqueta={PREGUNTA_MODO_LIMITE}
         opciones={OPCIONES_LIMITE}
         valor={modoLimite}
         alCambiar={setModoLimite}
       />
       <CampoTexto
         testID="editar-limite-pago"
-        etiqueta={modoLimite === 'dia' ? 'Día límite de pago' : 'Días para pagar después del corte'}
+        etiqueta={modoLimite === 'dia' ? ETIQUETA_DIA_LIMITE_PAGO : ETIQUETA_DIAS_PARA_PAGAR}
         teclado="number-pad"
         valor={limitePago}
         alCambiar={setLimitePago}

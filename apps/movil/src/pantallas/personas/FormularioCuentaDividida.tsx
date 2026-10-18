@@ -22,12 +22,11 @@ import {
   ERROR_DIVISION_ORIGEN,
   ERROR_DIVISION_REPARTO,
   ERROR_DIVISION_TOTAL,
+  ETIQUETA_CATEGORIA_PARTE,
+  ETIQUETA_ORIGEN_DIVISION,
   TEXTO_CONTACTOS_VACIO,
   textoFaltanPersonas,
 } from './textos';
-
-const PREGUNTA_CATEGORIA_PARTE = 'Categoría de tu parte';
-const PREGUNTA_ORIGEN_DIVISION = '¿Con qué pagaste?';
 
 export type RegistradoDivision = Extract<ResultadoTexto, { resultado: 'registrado_division' }>;
 
@@ -270,19 +269,19 @@ export function FormularioCuentaDividida({
       </View>
       <View style={{ gap: espacio.xs }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
-          {PREGUNTA_CATEGORIA_PARTE}
+          {ETIQUETA_CATEGORIA_PARTE}
         </Texto>
         <GrupoChips
           opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
           valor={categoria}
           alCambiar={setCategoria}
           prefijoTestID="division-categoria"
-          etiqueta={PREGUNTA_CATEGORIA_PARTE}
+          etiqueta={ETIQUETA_CATEGORIA_PARTE}
         />
       </View>
       <View style={{ gap: espacio.xs }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
-          {PREGUNTA_ORIGEN_DIVISION}
+          {ETIQUETA_ORIGEN_DIVISION}
         </Texto>
         {prellenado?.faltaOrigen?.motivo === 'no_encontrada' && prellenado.faltaOrigen.alias ? (
           <Texto variante="secundario" tono="secundario">
@@ -294,7 +293,7 @@ export function FormularioCuentaDividida({
           valor={origenId}
           alCambiar={setOrigenId}
           prefijoTestID="division-origen"
-          etiqueta={PREGUNTA_ORIGEN_DIVISION}
+          etiqueta={ETIQUETA_ORIGEN_DIVISION}
         />
       </View>
       {intentado && pendiente ? (

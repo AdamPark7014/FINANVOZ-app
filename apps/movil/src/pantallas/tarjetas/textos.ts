@@ -78,6 +78,35 @@ export const BTN_EDITAR_TARJETA = 'Editar tarjeta';
 export const BTN_CORREGIR_SALDO = 'Corregir saldo';
 export const MENSAJE_SALDO_SIN_CAMBIO = 'Ese ya era el saldo. No cambié nada.';
 
+/** Editar tarjeta y corregir saldo (`02 §8`). */
+export const BTN_GUARDAR_CAMBIOS = 'Guardar cambios';
+export const ETIQUETA_NOMBRE_TARJETA = 'Nombre';
+export const ETIQUETA_ULTIMOS4 = 'Últimos 4 números (opcional)';
+export const ETIQUETA_DIA_CORTE = 'Día de corte';
+export const PREGUNTA_MODO_LIMITE = '¿Cómo sabes cuándo pagar?';
+export const OPCION_LIMITE_DIA_MES = 'Un día del mes';
+export const OPCION_LIMITE_DIAS_DESPUES = 'Días después del corte';
+export const ETIQUETA_DIA_LIMITE_PAGO = 'Día límite de pago';
+export const ETIQUETA_DIAS_PARA_PAGAR = 'Días para pagar después del corte';
+export const ETIQUETA_LIMITE_CREDITO = 'Límite de crédito';
+export const PREGUNTA_MODO_PAGO = '¿Cómo la pagas?';
+export const ETIQUETA_TASA_ANUAL = 'Tasa anual (opcional)';
+export const AYUDA_TASA_ANUAL = 'Solo la uso para decirte qué tarjeta conviene pagar primero.';
+export const EJEMPLO_TASA_ANUAL = '45.5';
+export const ERROR_NOMBRE_TARJETA = 'Escribe el nombre de la tarjeta.';
+export const ERROR_ULTIMOS4_TARJETA = 'Los últimos 4 son cuatro números, o déjalo vacío.';
+export const ERROR_DIA_CORTE = 'Escribe el día de corte, del 1 al 31.';
+export const ERROR_DIA_LIMITE_PAGO = 'Escribe el día límite de pago, del 1 al 31.';
+export const ERROR_DIAS_PARA_PAGAR = 'Escribe cuántos días tienes para pagar después del corte.';
+export const ERROR_LIMITE_CREDITO = 'Escribe tu límite de crédito.';
+export const ERROR_TASA_ANUAL = 'Escribe la tasa así: 45.5';
+export const ERROR_GUARDAR_TARJETA = 'No pude guardar la tarjeta. Revisa el día de corte y el día límite.';
+export const ETIQUETA_SENTIDO_DEBO = 'Debo';
+export const ETIQUETA_SENTIDO_A_FAVOR = 'Tengo saldo a favor';
+export const ETIQUETA_SALDO_SEGUN_BANCO = 'Saldo según tu banco';
+export const ERROR_SALDO_SEGUN_BANCO = 'Escribe el saldo que dice tu banco.';
+export const ERROR_CORREGIR_SALDO = 'No pude corregir el saldo. Intenta de nuevo.';
+
 export function textoPrimerCorteEnApp(etiquetaProximoCorte: string): string {
   return `Tu primer corte con la app es el ${etiquetaProximoCorte}.`;
 }

@@ -10,6 +10,7 @@ export {
   BTN_RECONSENT_SOLO_LECTURA,
   CASILLA_ESTADISTICAS_OPCIONAL,
   CASILLA_RECONSENT_DATOS,
+  ACCESIBILIDAD_VOLVER,
   ETIQUETA_VOLVER,
   etiquetaAccesibilidadVersionTerminos,
   etiquetaConfirmarBorrar,

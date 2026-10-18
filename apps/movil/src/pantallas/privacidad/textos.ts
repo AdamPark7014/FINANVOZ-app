@@ -42,6 +42,7 @@ export function lineaVersionAviso(version: string): string {
 }
 
 export const ETIQUETA_VOLVER = 'Volver';
+export const ACCESIBILIDAD_VOLVER = 'Volver a ajustes';
 export const TITULO_PRIVACIDAD = 'Tu privacidad';
 export const INTRO_PRIVACIDAD =
   'Tus datos viven cifrados en este teléfono. Aquí ves qué se guarda, qué sale y a quién, y decides.';

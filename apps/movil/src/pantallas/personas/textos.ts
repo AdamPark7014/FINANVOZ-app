@@ -86,4 +86,6 @@ export const TEXTO_CONTACTOS_VACIO =
 export const ERROR_DIVISION_TOTAL = 'Escribe cuánto fue en total.';
 export const ERROR_DIVISION_REPARTO = 'El total no alcanza para repartirlo entre todos.';
 export const ERROR_DIVISION_CATEGORIA = 'Elige una categoría.';
-export const ERROR_DIVISION_ORIGEN = '¿Con qué pagaste?';
+export const ETIQUETA_CATEGORIA_PARTE = 'Categoría de tu parte';
+export const ETIQUETA_ORIGEN_DIVISION = '¿Con qué pagaste?';
+export const ERROR_DIVISION_ORIGEN = ETIQUETA_ORIGEN_DIVISION;

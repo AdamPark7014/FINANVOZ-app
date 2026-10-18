@@ -40,6 +40,11 @@ import {
   TITULO_MESES_SIN_INTERESES,
   TITULO_PAGOS_PLANEADOS,
   BTN_CANCELAR,
+  BTN_GUARDAR_PAGO_PLANEADO,
+  BTN_LIQUIDAR_MESES,
+  BTN_SI_LIQUIDAR,
+  ERROR_DIA_PAGO_PLANEADO,
+  ERROR_MONTO_PAGO_PLANEADO,
   textoConfirmarLiquidar,
   VACIO_MSI_TARJETA,
 } from './textos';
@@ -86,7 +91,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
             {textoConfirmarLiquidar(p.descripcion, formatearCentavos(p.restante))}
           </Texto>
           <Boton
-            etiqueta="Sí, liquidar"
+            etiqueta={BTN_SI_LIQUIDAR}
             testID={`plan-${p.id}-confirmar-liquidar`}
             alPresionar={() => {
               try {
@@ -105,7 +110,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
       ) : null}
       {activo && !confirmando ? (
         <Boton
-          etiqueta="Liquidar meses"
+          etiqueta={BTN_LIQUIDAR_MESES}
           variante="secundario"
           ancho="contenido"
           testID={`plan-${p.id}-liquidar`}
@@ -252,11 +257,11 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
   const [error, setError] = useState<string | null>(null);
 
   const guardar = () => {
-    if (monto === null || monto <= 0) return setError('Escribe cuánto vas a pagar cada vez.');
+    if (monto === null || monto <= 0) return setError(ERROR_MONTO_PAGO_PLANEADO);
     let regla: Regla = { tipo: 'quincenal_15_ultimo' };
     if (frecuencia === 'mensual') {
       const d = leerDiaMes(dia);
-      if (d === null) return setError('Escribe el día del mes, del 1 al 31.');
+      if (d === null) return setError(ERROR_DIA_PAGO_PLANEADO);
       regla = { tipo: 'mensual', dia: d };
     }
     try {
@@ -304,7 +309,11 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar pago planeado" alPresionar={guardar} testID="pago-planeado-guardar" />
+      <Boton
+        etiqueta={BTN_GUARDAR_PAGO_PLANEADO}
+        alPresionar={guardar}
+        testID="pago-planeado-guardar"
+      />
       <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
     </View>
   );

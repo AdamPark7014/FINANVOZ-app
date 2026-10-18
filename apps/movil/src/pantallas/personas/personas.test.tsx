@@ -19,6 +19,9 @@ import { PantallaRegistrar } from '../principal/PantallaRegistrar';
 import { FormularioCuentaDividida } from './FormularioCuentaDividida';
 import { PantallaPersona } from './PantallaPersona';
 import {
+  ERROR_DIVISION_ORIGEN,
+  ETIQUETA_CATEGORIA_PARTE,
+  ETIQUETA_ORIGEN_DIVISION,
   MENSAJE_PERMISO_AVISOS,
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
@@ -35,6 +38,14 @@ const textoDe = (testID: string) => {
   const hijos = screen.getByTestId(testID).props.children as unknown;
   return Array.isArray(hijos) ? hijos.join('') : String(hijos);
 };
+
+describe('textos · cuenta dividida', () => {
+  it('etiquetas de chips y validación comparten origen', () => {
+    expect(ETIQUETA_ORIGEN_DIVISION).toBe('¿Con qué pagaste?');
+    expect(ERROR_DIVISION_ORIGEN).toBe(ETIQUETA_ORIGEN_DIVISION);
+    expect(ETIQUETA_CATEGORIA_PARTE).toContain('Categoría');
+  });
+});
 
 function conAmigos() {
   const p = conEscenario('e4-01');

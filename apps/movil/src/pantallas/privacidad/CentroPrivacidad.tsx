@@ -21,6 +21,7 @@ import {
   BTN_PERMISOS_TELEFONO,
   DESC_ESTADISTICAS,
   ETIQUETA_ESTADISTICAS,
+  ACCESIBILIDAD_VOLVER,
   ETIQUETA_VOLVER,
   guardadoVacio,
   INTRO_PRIVACIDAD,
@@ -32,6 +33,7 @@ import {
   PALABRA_BORRAR,
   PERMISOS,
   PISTA_PERMISOS_TELEFONO,
+  PISTA_VOLVER,
   SALE_DEL_TELEFONO,
   SECCION_BORRAR,
   SECCION_DATOS,
@@ -124,6 +126,8 @@ export function CentroPrivacidad({
         variante="texto"
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
+        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={alVolver}
       />
       <Texto testID="privacidad-titulo" variante="titulo" accessibilityRole="header">
