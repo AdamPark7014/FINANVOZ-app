@@ -52,7 +52,6 @@ import {
   BTN_COMO_LO_CALCULE,
   BTN_DESHACER,
   BTN_HACER_OTRA_CUENTA,
-  BTN_LISTO,
   BTN_LO_COMPRE,
   ERROR_CALCULO,
   ERROR_PRECIO,
@@ -614,8 +613,8 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
     expect(screen.queryByTestId('boton-extraordinario')).toBeNull();
     fireEvent.press(screen.getByTestId('boton-volver-a-contar'));
     expect(
-      within(screen.getByTestId('aviso')).getByText(
-        'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+      within(screen.getByTestId('aviso')).getByLabelText(
+        etiquetaHablada('Listo: vuelvo a contarlo para estimar tus gastos de cada día.'),
       ),
     ).toBeTruthy();
     expect(screen.queryByTestId('nota-extraordinario')).toBeNull();
