@@ -62,7 +62,11 @@ export function PreviaWidget({
           >
             {vista.cifra}
           </Text>
-          <Text importantForAccessibility="no" style={[estilos.detalle, { color: c.textoSecundario }]}>
+          <Text
+            testID="previa-widget-detalle"
+            importantForAccessibility="no"
+            style={[estilos.detalle, { color: c.textoSecundario }]}
+          >
             {detalleConSeparador(vista.detalle)}
           </Text>
         </View>

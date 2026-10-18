@@ -10,7 +10,7 @@
 
 ## Hecho (acumulado reciente)
 
-- Onboarding textos O3/O4, ayuda/tandas/captura a11y, Chip en ui. Ver `git log`.
+- Cuentas `BTN_AGREGAR_TARJETA_CREDITO` (`9845457`); onboarding O3/O4, tandas/captura a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 

@@ -37,11 +37,17 @@ export const ALTERNATIVA_NO_DISPONIBLE = 'Por ahora, dicta o escribe tus gastos:
 
 export const TITULO_PERMISO_NOTIFICACIONES = 'Acceso a notificaciones';
 export const PERMISO_INSTRUCCION =
-  'En ajustes del teléfono, busca Finanvoz y activa «Permitir acceso a notificaciones». Luego regresa aquí.';
+  'En Ajustes del teléfono, busca Finanvoz y activa «Permitir acceso a notificaciones». Luego regresa aquí.';
 export const PERMISO_DENEGADO =
-  'Todavía no tengo permiso para leer tus notificaciones. Revísalo en ajustes y vuelve a intentar.';
+  'Todavía no tengo acceso a tus notificaciones. Revísalo en Ajustes del teléfono y vuelve a intentar.';
 export const PERMISO_AYUDA_ANDROID =
   'Si Android no te deja activarlo, abre la información de la app, toca el menú ⋮ y elige «Permitir ajustes restringidos».';
+
+/** TalkBack: título + instrucción o aviso de denegado + ayuda Android (`02 §15`). */
+export function etiquetaPermisoCaptura(denegado: boolean): string {
+  const cuerpo = denegado ? PERMISO_DENEGADO : PERMISO_INSTRUCCION;
+  return `${TITULO_PERMISO_NOTIFICACIONES}. ${cuerpo} ${PERMISO_AYUDA_ANDROID}`;
+}
 
 export const TEXTO_SIN_APPS_BANCO =
   'No encontré apps de banco que reconozca en tu teléfono. Cuando instales una, actívala en Ajustes.';

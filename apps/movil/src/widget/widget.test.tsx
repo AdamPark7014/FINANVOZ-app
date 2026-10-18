@@ -230,6 +230,10 @@ describe('Ajustes → Widget', () => {
     fireEvent.press(interruptor);
     await act(async () => {});
     expect(obtenerAjustesWidget(p.ctx)).toEqual({ ocultarMontos: true });
+    expect(
+      within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget').props.accessibilityLabel,
+    ).not.toMatch(/\$|\d/);
+    expect(auditar(screen.toJSON())).toEqual([]);
     expect(screen.getByTestId('ajustes-widget-ocultar').props.accessibilityState).toMatchObject({
       checked: true,
     });

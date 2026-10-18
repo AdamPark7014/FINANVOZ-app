@@ -200,9 +200,14 @@ export function ActivarCaptura({
       {paso.tipo === 'apps' ? (
         paso.apps.length === 0 ? (
           <>
-            <Texto variante="cuerpo" tono="secundario" testID={`${testID}-sin-apps`}>
-              {TEXTO_SIN_APPS_BANCO}
+            <Texto variante="subtitulo" accessibilityRole="header">
+              {TITULO_ELEGIR_APPS}
             </Texto>
+            <EstadoVacio
+              texto={TEXTO_SIN_APPS_BANCO}
+              testID={`${testID}-sin-apps`}
+              etiquetaAccesible={etiquetaSinAppsBanco()}
+            />
             {continuar(false)}
           </>
         ) : (

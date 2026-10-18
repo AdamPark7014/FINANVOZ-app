@@ -334,6 +334,9 @@ describe('O6 · activar la captura', () => {
     await act(async () => fireEvent.press(screen.getByTestId('o6-ya')));
     expect(screen.getByTestId('o6-permiso-denegado')).toBeTruthy();
     expect(screen.getByText(PERMISO_DENEGADO)).toBeTruthy();
+    expect(screen.getByTestId('o6-permiso-denegado-texto').props.accessibilityLabel).toBe(
+      etiquetaPermisoCaptura(true),
+    );
     permiso = 'concedido';
     await act(async () => fireEvent.press(screen.getByTestId('o6-ya')));
     expect(screen.getByText('¿Qué apps de banco leo?')).toBeTruthy();

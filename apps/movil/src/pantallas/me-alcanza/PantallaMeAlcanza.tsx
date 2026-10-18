@@ -296,6 +296,7 @@ export function PantallaMeAlcanza({
             etiqueta={BTN_CANCELAR}
             variante="secundario"
             alPresionar={cancelar}
+            pista={PISTA_CANCELAR}
             testID="boton-cancelar-me-alcanza"
           />
         </View>

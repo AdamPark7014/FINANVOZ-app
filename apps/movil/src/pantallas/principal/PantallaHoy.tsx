@@ -355,6 +355,7 @@ function AvisosUnaVez({ avisos }: { avisos: readonly Aviso[] }) {
             variante="texto"
             ancho="contenido"
             alPresionar={() => setCerrados((x) => [...x, a.id])}
+            pista={PISTA_AVISO_ENTENDIDO}
             testID="boton-aviso-entendido"
           />
         </Tarjeta>
