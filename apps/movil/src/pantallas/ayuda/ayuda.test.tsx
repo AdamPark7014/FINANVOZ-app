@@ -159,6 +159,8 @@ describe('pantalla de ayuda', () => {
     expect(screen.getByTestId('ayuda-titulo')).toHaveTextContent(TITULO);
     expect(screen.getByTestId('ayuda-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ayuda-intro')).toHaveTextContent(INTRO);
+    expect(screen.getByTestId('ayuda-preguntas-titulo')).toHaveTextContent(PREGUNTAS_TITULO);
+    expect(screen.getByTestId('ayuda-preguntas-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveTextContent(CONTACTO_TITULO);
     expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveProp('accessibilityRole', 'header');
   });

@@ -83,6 +83,23 @@ describe('SeccionCaptura (TalkBack)', () => {
     p.cerrar();
   });
 
+  it('sin puente nativo: no disponible y sin activar', () => {
+    const p = conEscenario('e4-01');
+    render(
+      <ProveedorSesion ctx={p.ctx}>
+        <ProveedorCaptura puente={null} sha256={sha256} plantillasRemotas={null}>
+          <SeccionCaptura />
+        </ProveedorCaptura>
+      </ProveedorSesion>,
+    );
+    expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_CAPTURA_NO_DISPONIBLE,
+    );
+    expect(screen.queryByTestId('ajustes-captura-activar')).toBeNull();
+    p.cerrar();
+  });
+
   it('con captura activa: estado, aviso y modo aviso para TalkBack', () => {
     const p = renderSeccionCaptura(['mx.ejemplo.bancoa']);
     expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
