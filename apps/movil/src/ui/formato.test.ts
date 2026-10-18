@@ -20,6 +20,7 @@ describe('formatearCentavos', () => {
     [5, 'auto', '$0.05'],
     [-37400, 'auto', '−$374'],
     [-350, 'pesos', '−$4'],
+    [99, 'pesos', '$0'],
     [123456789012, 'centavos', '$1,234,567,890.12'],
   ] as const)('%i en modo %s → %s', (c, modo, esperado) => {
     expect(formatearCentavos(c, modo)).toBe(esperado);
