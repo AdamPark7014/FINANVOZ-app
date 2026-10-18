@@ -14,4 +14,4 @@ Componentes y tokens de FinanVoz (`docs/02-UX` §15–§16). Las pantallas impor
 
 Contraste WCAG: pares en `tokens.test.ts`. Marca en `assets/marca/README.md`.
 
-**Accesibilidad:** los controles llevan `accessibilityLabel` (cifras en palabras vía `etiquetaHablada` / `Cifra`); el texto visible duplicado va oculto al lector con `accessibilityElementsHidden`. Campos con error usan `accessibilityState.invalid`; barras de progreso, `accessibilityValue`.
+**Accesibilidad:** los controles llevan `accessibilityLabel` (cifras en palabras vía `etiquetaHablada` / `Cifra`); el texto visible duplicado va oculto al lector con `accessibilityElementsHidden`. Campos con error usan `accessibilityState.invalid`; la ayuda del campo va solo en `accessibilityHint`; `EstadoVacio` usa live region; barras de progreso, `accessibilityValue`; botones en carga, `busy` y pista por defecto.

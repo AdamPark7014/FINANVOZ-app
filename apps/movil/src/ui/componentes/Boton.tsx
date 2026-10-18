@@ -49,7 +49,7 @@ export function Boton({
       disabled={inactivo}
       accessibilityRole="button"
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
-      accessibilityHint={pista}
+      accessibilityHint={pista ?? (cargando ? 'Espera, termina de cargar' : undefined)}
       accessibilityState={{ disabled: inactivo, busy: cargando }}
       hitSlop={variante === 'texto' ? espacio.s : undefined}
       style={({ pressed }) => [

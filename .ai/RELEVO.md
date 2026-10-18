@@ -6,23 +6,23 @@
 
 ## Hecho en este turno
 
-- **Chip:** TalkBack (`×2`, `etiquetaAccesible`, radio sin `checked` duplicado) + pruebas `Chip.test.tsx`.
-- **ajustes:** título con `accessibilityRole="header"` y `testID`; aserción en `ajustes.test.tsx`.
+- **Chip / GrupoChips:** TalkBack — radio solo `selected`; «×N» → «, N veces»; `OpcionChip.etiquetaAccesible`; pruebas `Chip.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- EstadoVacio/Boton/Campo, facturas compartidas live region, TarjetaRespaldo. Ver `git log`.
+- ajustes header, EstadoVacio/Boton/Campo, suscripciones live region. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: `PantallaTanda.tsx` (`PISTA_VOLVER_DETALLE` sin commitear).
+- WIP local sin commitear: `PantallaTanda`, `EstadoVacio`, `Boton`, `CampoTexto`, `componentes.test.tsx`, etc. (turno anterior).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar copy O3–O7 en `textos.ts` (ingreso, cuentas, pagos-fijos, colchon, tarjeta).
+2. Commitear o descartar WIP ajustes/onboarding/tanda.
+3. Centralizar copy O3–O7 en `textos.ts`.
 
 ## No tocar
 

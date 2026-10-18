@@ -84,6 +84,7 @@ describe('Boton', () => {
     render(<Boton etiqueta="Guardar" alPresionar={() => {}} cargando />);
     const boton = screen.getByRole('button', { name: 'Guardar' });
     expect(boton.props.accessibilityState).toEqual({ disabled: true, busy: true });
+    expect(boton.props.accessibilityHint).toBe('Espera, termina de cargar');
     expect(boton).toBeDisabled();
   });
 });
