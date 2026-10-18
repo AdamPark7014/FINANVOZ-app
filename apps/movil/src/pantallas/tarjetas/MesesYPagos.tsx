@@ -39,12 +39,14 @@ import {
   TITULO_COMPROMISO_MSI,
   TITULO_MESES_SIN_INTERESES,
   TITULO_PAGOS_PLANEADOS,
+  BTN_AGREGAR_PAGO_PLANEADO,
   BTN_CANCELAR,
   BTN_GUARDAR_PAGO_PLANEADO,
   BTN_LIQUIDAR_MESES,
   BTN_SI_LIQUIDAR,
   ERROR_DIA_PAGO_PLANEADO,
   ERROR_MONTO_PAGO_PLANEADO,
+  mensajePagoPlaneadoApartado,
   textoConfirmarLiquidar,
   VACIO_MSI_TARJETA,
 } from './textos';
@@ -229,7 +231,7 @@ function FilaPagoPlaneado({ p }: { p: PagoPlaneadoVista }) {
         </Texto>
       ) : null}
       <Boton
-        etiqueta="Quitar"
+        etiqueta={BTN_QUITAR_PAGO_PLANEADO}
         variante="texto"
         ancho="contenido"
         testID={`pago-planeado-${p.programadoId}-quitar`}
@@ -267,7 +269,7 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
     try {
       agregarPagoPlaneado(ctx, { tarjetaId, monto, regla, cuentaId: cuenta });
       refrescar();
-      mostrar({ mensaje: `Listo: aparto ${formatearCentavos(monto)} para cada pago planeado.` });
+      mostrar({ mensaje: mensajePagoPlaneadoApartado(monto) });
       alTerminar();
     } catch (e) {
       setError(mensajeError(e));
@@ -348,7 +350,7 @@ export function PagosPlaneados({ d }: { d: DetalleTarjeta }) {
         <AgregarPagoPlaneado tarjetaId={d.id} alTerminar={() => setAgregando(false)} />
       ) : (
         <Boton
-          etiqueta="Agregar pago planeado"
+          etiqueta={BTN_AGREGAR_PAGO_PLANEADO}
           variante="secundario"
           testID="pago-planeado-agregar"
           alPresionar={() => setAgregando(true)}
