@@ -32,6 +32,7 @@ import {
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
   etiquetaFiltroMovimientosActivo,
+  etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
   TEXTO_MOVIMIENTOS_FILTRO_ACTIVO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
@@ -553,6 +554,10 @@ describe('Movimientos', () => {
     expect(frase).toBeTruthy();
     expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveTextContent(TEXTO_POR_REVISAR);
+    expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaIntroPorRevisar(),
+    );
     expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
       'accessibilityHint',
       PISTA_DESCARTAR_FRASE,
@@ -570,6 +575,8 @@ describe('Movimientos', () => {
     const dia = listarMovimientos(p.ctx)[0]?.fecha;
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
+    expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('accessibilityRole', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`).props.accessibilityLabel).toMatch(/veinticinco pesos/);
     p.cerrar();
   });
