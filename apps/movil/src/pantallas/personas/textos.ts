@@ -82,3 +82,8 @@ export const TEXTO_MOVIMIENTOS_PERSONA_VACIO = 'Todavía no hay movimientos con 
 /** Cuenta dividida: aún no hay contactos guardados. */
 export const TEXTO_CONTACTOS_VACIO =
   'Todavía no tienes contactos. Escribe abajo a quien te debe y elige a cada uno.';
+
+export const ERROR_DIVISION_TOTAL = 'Escribe cuánto fue en total.';
+export const ERROR_DIVISION_REPARTO = 'El total no alcanza para repartirlo entre todos.';
+export const ERROR_DIVISION_CATEGORIA = 'Elige una categoría.';
+export const ERROR_DIVISION_ORIGEN = '¿Con qué pagaste?';

@@ -1,7 +1,85 @@
+import type { Centavos } from '@cartera/core';
 import type { FrecuenciaTanda, MovimientoTanda, RondaTandaVista, TandaYaEmpezada } from '../../servicios';
 import { formatearCentavos } from '../../ui';
 
 /** Copy de tandas (`02 §18`, tuteo). */
+
+/** Lista (`Cuentas → Tandas`). */
+export const TITULO_TANDAS = 'Tandas';
+export const ETIQUETA_NUEVA_TANDA = 'Nueva tanda';
+export const ETIQUETA_VER_CALENDARIO = 'Ver calendario';
+
+/** Tarjetas de Hoy (debe coincidir con `servicios/tandas.ts`). */
+export const PREGUNTA_YA_DISTE = '¿Ya diste tu tanda?';
+export const PREGUNTA_HOY_COBRO = 'Hoy te toca cobrar tu tanda.';
+export const ETIQUETA_TODAVIA_NO = 'Todavía no';
+export const MENSAJE_TODAVIA_NO_APORTACION = 'La sigo apartando. Te pregunto mañana.';
+export const MENSAJE_TODAVIA_NO_COBRO = 'Va. Te pregunto mañana.';
+
+export const PREGUNTA_CUENTA_SALIO = '¿De qué cuenta salió?';
+export const PREGUNTA_CUENTA_LLEGO = '¿A qué cuenta llegó?';
+
+/** Formulario nueva tanda. */
+export const ETIQUETA_NOMBRE_OPCIONAL = 'Nombre (opcional)';
+export const EJEMPLO_NOMBRE_TANDA = 'Tanda de la oficina';
+export const ETIQUETA_APORTACION = '¿Cuánto das en cada ronda?';
+export const ETIQUETA_FRECUENCIA = '¿Cada cuándo?';
+export const ETIQUETA_PARTICIPANTES = '¿Cuántos son?';
+export const ETIQUETA_TURNO = '¿Qué número te toca?';
+export const ETIQUETA_PRIMERA_FECHA = 'Primera fecha';
+export const EJEMPLO_FECHA = '16/10/2026';
+export const ETIQUETA_CUENTA_APORTACION_OPCIONAL = '¿De dónde sale tu aportación? (opcional)';
+export const TITULO_YA_EMPEZO = 'Esta tanda ya empezó.';
+export const ETIQUETA_APORTACIONES_HECHAS = '¿Cuántas aportaciones llevas?';
+export const ETIQUETA_YA_TE_TOCO = '¿Ya te tocó?';
+export const SUFIJO_RONDAS_NO_APARTO = 'Esas rondas no las vuelvo a apartar.';
+export const ETIQUETA_GUARDAR_TANDA = 'Guardar tanda';
+
+export const OPCIONES_SI_NO = [
+  { valor: 'si' as const, etiqueta: 'Sí' },
+  { valor: 'no' as const, etiqueta: 'No' },
+];
+
+export const ERROR_APORTACION = 'Escribe cuánto das en cada ronda.';
+export const ERROR_FRECUENCIA = 'Dime cada cuándo das tu tanda.';
+export const ERROR_PARTICIPANTES = 'Escribe cuántos son en la tanda (de 2 a 50).';
+export const errorTurno = (max: number) => `Escribe tu turno, del 1 al ${max}.`;
+export const ERROR_FECHA_INICIO = 'Escribe la primera fecha así: 16/10/2026.';
+export const ERROR_APORTACIONES_HECHAS =
+  'Escribe cuántas aportaciones llevas, o déjalo como te lo propuse.';
+export const ERROR_GUARDAR_TANDA = 'No pude guardar la tanda. Revisa los datos.';
+
+export const TEXTO_COMPROMISO_APORTACION =
+  'Cada aportación es un compromiso: la aparto de tu dinero libre el día que toca.';
+
+export function textoResumenCobro(
+  cobro: Centavos,
+  etiquetaCobro: string,
+  turno: number,
+  participantes: number,
+): string {
+  return `Cobras ${formatearCentavos(cobro)} el ${etiquetaCobro} (ronda ${turno} de ${participantes}).`;
+}
+
+export function textoYaEmpezoCompleto(y: TandaYaEmpezada): string {
+  return `${textoYaEmpezo(y)}. ${SUFIJO_RONDAS_NO_APARTO}`;
+}
+
+export function textoSubtituloListaConProxima(
+  aportacion: Centavos,
+  etiquetaProxima: string,
+  etiquetaCobro: string,
+): string {
+  return `${formatearCentavos(aportacion)} el ${etiquetaProxima} · cobras el ${etiquetaCobro}`;
+}
+
+export function textoSubtituloListaSinProxima(etiquetaCobro: string): string {
+  return `Ya diste todas tus aportaciones · cobras el ${etiquetaCobro}`;
+}
+
+/** Aviso al guardar desde voz o formulario. */
+export const MENSAJE_TANDA_GUARDADA =
+  'Listo: guardé tu tanda. Aparto cada aportación el día que toca.';
 
 /** Detalle (`tandas/[id]`). */
 export const ETIQUETA_VOLVER = 'Volver';

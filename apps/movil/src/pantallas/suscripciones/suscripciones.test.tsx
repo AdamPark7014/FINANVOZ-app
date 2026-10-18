@@ -71,7 +71,7 @@ describe('Suscripciones (02 §20)', () => {
     const antes = obtenerHoy(ctx).reservado;
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
-    expect(textoDe('suscripciones-mensaje')).toBe('Listo: Hoy aparta tu Netflix antes de cada cargo.');
+    expect(textoDe('suscripciones-mensaje')).toBe(mensajeAccionSuscripcion('compromiso', 'Netflix'));
     expect(screen.getByTestId('suscripcion-netflix-apartada')).toBeTruthy();
     expect(screen.queryByTestId('suscripcion-netflix-compromiso')).toBeNull();
     expect(obtenerHoy(ctx).reservado - antes).toBe(21_900);
@@ -92,9 +92,7 @@ describe('Suscripciones (02 §20)', () => {
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('suscripcion-smart-fit-cancelada'));
     expect(screen.queryByTestId('suscripcion-smart-fit')).toBeNull();
-    expect(textoDe('suscripciones-mensaje')).toBe(
-      'Ya no te muestro Smart Fit. Si vuelve a cobrarse, te aviso aquí.',
-    );
+    expect(textoDe('suscripciones-mensaje')).toBe(mensajeAccionSuscripcion('cancelada', 'Smart Fit'));
     fireEvent.press(screen.getByTestId('suscripcion-dominio-web-no-es'));
     expect(screen.queryByTestId('suscripcion-dominio-web')).toBeNull();
     expect(textoDe('suscripciones-resumen')).toBe(

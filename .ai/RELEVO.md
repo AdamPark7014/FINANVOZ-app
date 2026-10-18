@@ -6,16 +6,16 @@
 
 ## Hecho en este turno
 
-- **movil/ajustes/ingreso:** `8088eb3` — `SeccionIngreso` y `FormularioIngreso` usan `ingreso-textos.ts`; arreglado botón `Decir cada cuándo me pagan` (UTF-8).
+- **docs(core):** `packages/core/README.md` — tip motores puros (`hoy` / `semilla`, sin reloj ni `Math.random()`).
 
 ## Hecho (acumulado reciente)
 
-- Copy general Ajustes en `textos.ts` / `app/ajustes.tsx`. Ver `git log` y `docs/ESTADO.md`.
+- **movil/ajustes/ingreso:** `8088eb3` — ingreso-textos; copy Ajustes en `textos.ts`. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP local sin commitear (privacidad, compartido, calculadora, UI) — turno anterior; no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
-- WIP local ajeno (`ayuda/index.ts`, `me-alcanza.test.tsx`, stashes) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
@@ -26,7 +26,7 @@
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `packages/core` E*, vectores a mano.
+- `packages/core` E*, vectores a mano (README sí).
 
 ## Estimación rápida
 

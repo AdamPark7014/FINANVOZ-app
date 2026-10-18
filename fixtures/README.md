@@ -71,4 +71,4 @@ Nunca se suben estados de cuenta reales. Para cambiar un PDF sintético se cambi
 3. Regenera: `node scripts/oraculo.mjs --escribir` (o `python3 fixtures/motores/oraculo.py --escribir`; en Windows `py -3`).
 4. Registra la decisión en `docs/ESTADO.md`.
 
-Nunca edites `vectores.json` a mano. `--verificar` compara como JSON, así que funciona igual en Windows, macOS y Linux.
+Nunca edites `vectores.json` a mano. Prefiere siempre el wrapper `node scripts/oraculo.mjs` (§ Oráculo en PowerShell); `--verificar` compara como JSON en Windows, macOS y Linux.

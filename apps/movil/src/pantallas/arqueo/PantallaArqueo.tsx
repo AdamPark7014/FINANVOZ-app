@@ -28,9 +28,10 @@ import {
   mensajeEfectivoQuedo,
   mensajeSumaPropuesta,
   OPCIONES_SOBRANTE,
+  ETIQUETA_GASTO_SIN_DESCRIPCION,
   PASO_MARCAR_AYUDA,
   PASO_MARCAR_TITULO,
-  SIN_CUENTA_EFECTIVO,
+  TEXTO_SIN_CUENTA_EFECTIVO,
   TITULO,
   textoDeberiasTraer,
   textoFaltante,
@@ -89,7 +90,7 @@ export function PantallaArqueo({
         />
       ) : (
         <Texto variante="cuerpo" tono="secundario" testID="arqueo-sin-efectivo">
-          {SIN_CUENTA_EFECTIVO}
+          {TEXTO_SIN_CUENTA_EFECTIVO}
         </Texto>
       )}
     </Pantalla>
@@ -179,7 +180,7 @@ function Arqueo({
           {inicial.porAsignar.map((g) => (
             <Casilla
               key={g.transaccionId}
-              etiqueta={`${g.descripcion ?? 'Gasto'} ${formatearCentavos(g.monto)} · ${g.etiqueta}`}
+              etiqueta={`${g.descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION} ${formatearCentavos(g.monto)} · ${g.etiqueta}`}
               valor={marcados.includes(g.transaccionId)}
               alCambiar={(v) =>
                 setMarcados((m) => (v ? [...m, g.transaccionId] : m.filter((id) => id !== g.transaccionId)))

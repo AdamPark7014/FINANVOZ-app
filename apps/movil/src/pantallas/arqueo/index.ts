@@ -6,6 +6,7 @@ export {
   ETIQUETA_OTRA_CANTIDAD,
   ETIQUETA_QUIEN_TE_PAGO,
   mensajeCuadra,
+  TEXTO_SIN_CUENTA_EFECTIVO,
   TITULO as TITULO_ARQUEO,
   textoDeberiasTraer,
 } from './textos';

@@ -163,15 +163,24 @@ export function ActivarCaptura({
 
       {paso.tipo === 'permiso' ? (
         <>
-          <Tarjeta testID={`${testID}-permiso`}>
-            <Texto variante="cuerpo">
-              {paso.denegado
-                ? 'Todavía no veo el acceso activado.'
-                : 'Busca Finanvoz en la lista de acceso a notificaciones y actívala. Luego regresa aquí.'}
+          <Texto variante="subtitulo" accessibilityRole="header">
+            {TITULO_PERMISO_NOTIFICACIONES}
+          </Texto>
+          <Tarjeta
+            testID={paso.denegado ? `${testID}-permiso-denegado` : `${testID}-permiso`}
+            accessibilityRole="summary"
+            accessibilityLabel={
+              paso.denegado ? PERMISO_DENEGADO : `${PERMISO_INSTRUCCION} ${PERMISO_AYUDA_ANDROID}`
+            }
+          >
+            <Texto
+              variante="cuerpo"
+              testID={paso.denegado ? `${testID}-permiso-denegado-texto` : `${testID}-permiso-texto`}
+            >
+              {paso.denegado ? PERMISO_DENEGADO : PERMISO_INSTRUCCION}
             </Texto>
             <Texto variante="secundario" tono="secundario">
-              Si Android no te deja activarlo, abre la información de la app, toca el menú ⋮ y elige «Permitir
-              ajustes restringidos».
+              {PERMISO_AYUDA_ANDROID}
             </Texto>
           </Tarjeta>
           <Boton etiqueta="Ya lo activé" alPresionar={() => void revisarPermiso()} testID={`${testID}-ya`} />
@@ -194,17 +203,18 @@ export function ActivarCaptura({
       {paso.tipo === 'apps' ? (
         paso.apps.length === 0 ? (
           <>
-            <Texto variante="cuerpo" testID={`${testID}-sin-apps`}>
-              No encontré apps de banco que reconozca en tu teléfono. Cuando instales una, actívala en
-              Ajustes.
+            <Texto variante="cuerpo" tono="secundario" testID={`${testID}-sin-apps`}>
+              {TEXTO_SIN_APPS_BANCO}
             </Texto>
             {continuar(false)}
           </>
         ) : (
           <>
-            <Texto variante="subtitulo">¿Qué apps de banco leo?</Texto>
+            <Texto variante="subtitulo" accessibilityRole="header">
+              {TITULO_ELEGIR_APPS}
+            </Texto>
             <Texto variante="secundario" tono="secundario">
-              Solo leo las que marques.
+              {INTRO_ELEGIR_APPS}
             </Texto>
             {paso.apps.map((a) => (
               <Casilla

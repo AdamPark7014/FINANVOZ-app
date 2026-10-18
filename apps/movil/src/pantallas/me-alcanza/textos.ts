@@ -1,8 +1,29 @@
-/** Copy de vacío y error en «¿Me alcanza?» (`02 §9`, `02 §14`: qué pasó + qué hacer). */
+/** Copy de «¿Me alcanza?» (`02 §9`, `02 §14`: tuteo, qué pasó + qué hacer). */
 
 export { MENSAJE_DATOS_INSUFICIENTES } from '../../servicios/probabilidad';
 
-/** Pie cuando aún no hay bastante historial de gastos. */
+export const TITULO = '¿Me alcanza?';
+
+export const ETIQUETA_PRECIO = '¿Cuánto cuesta?';
+export const ETIQUETA_DESCRIPCION = '¿Qué es? (opcional)';
+export const EJEMPLO_DESCRIPCION = 'unos tenis';
+export const PREGUNTA_MSI = '¿Lo quieres a meses sin intereses?';
+export const ETIQUETA_MSI_TU_DIME = 'Tú dime';
+export const ETIQUETA_MSI_OTRO = 'Otro';
+export const ETIQUETA_MESES_MANUAL = '¿A cuántos meses?';
+
+export function etiquetaChipMeses(meses: string): string {
+  return `${meses} meses`;
+}
+
+export const TEXTO_CALCULANDO = 'Estoy revisando tus opciones…';
+export const ETIQUETA_PROGRESO = 'Avance del cálculo';
+
+export const ETIQUETA_OPCION_RECOMENDADA = 'Lo más seguro';
+export const SUFIJO_ACCESIBILIDAD_RECOMENDADA = ', lo más seguro';
+export const TEXTO_PARCIAL_HORIZONTE = 'Algunos pagos caen después de 2 años: no los revisé.';
+
+/** Pie cuando aún no hay bastante historial de gastos (vacío / datos insuficientes). */
 export const AYUDA_DATOS_INSUFICIENTES =
   'Sigue registrando tus gastos un par de semanas y vuelve a calcular.';
 

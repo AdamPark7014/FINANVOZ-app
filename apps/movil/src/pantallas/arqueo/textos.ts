@@ -10,8 +10,12 @@ export const CONTINUAR = 'Continuar';
 export const CONFIRMAR = 'Confirmar';
 export const TOTAL = 'Total';
 
-export const SIN_CUENTA_EFECTIVO =
+/** Sin cuenta de efectivo (`02 §7`). */
+export const TEXTO_SIN_CUENTA_EFECTIVO =
   'No llevas una cuenta de efectivo. Agrégala en Cuentas para poder contarla.';
+
+/** Gasto por asignar sin descripción en el paso 1. */
+export const ETIQUETA_GASTO_SIN_DESCRIPCION = 'Gasto';
 
 export const PASO_MARCAR_TITULO = 'Antes: ¿pagaste alguno de estos en efectivo?';
 export const PASO_MARCAR_AYUDA =

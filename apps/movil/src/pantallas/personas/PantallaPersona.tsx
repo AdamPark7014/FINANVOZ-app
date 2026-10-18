@@ -21,10 +21,30 @@ import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
 import {
+  AYUDA_PEDIR_DATOS_COBRO,
+  ERROR_MONTO_MAYOR_CERO,
+  ETIQUETA_A_DONDE_LLEGO,
+  ETIQUETA_COBRAR,
+  ETIQUETA_GUARDAR,
+  ETIQUETA_GUARDAR_Y_COBRAR,
+  ETIQUETA_MONTO,
+  ETIQUETA_QUITAR_RECORDATORIO,
+  ETIQUETA_VOLVER,
+  ETIQUETA_YA_ME_PAGO,
   etiquetaSaldoPersona,
   MENSAJE_COMPARTIR_NO_DISPONIBLE,
+  MENSAJE_ERROR_RECORDATORIO,
+  MENSAJE_PERMISO_AVISOS,
+  MENSAJE_SIN_AVISOS,
+  mensajeRecordatorioCobro,
+  mensajeRegistroCobro,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
+  TIP_SALDO_TE_DEBEN,
+  TITULO_MOVIMIENTOS,
+  TITULO_PEDIR_DATOS_COBRO,
+  TITULO_RECORDATORIO_COBRO,
+  TITULO_YA_ME_PAGO,
 } from './textos';
 
 /** Abre la hoja de compartir del sistema con el mensaje (WhatsApp, SMS, lo que elijas). */
@@ -33,9 +53,6 @@ export type Compartir = (mensaje: string) => Promise<void>;
 const compartirSistema: Compartir = async (mensaje) => {
   await Share.share({ message: mensaje });
 };
-
-const MENSAJE_SIN_AVISOS = 'No puedo programar avisos en este teléfono.';
-const MENSAJE_PERMISO_AVISOS = 'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.';
 
 type Panel = 'datos' | 'pago' | null;
 
@@ -57,7 +74,7 @@ export function PantallaPersona({
   if (!existe) {
     return (
       <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
-        <Boton etiqueta="Volver" variante="texto" ancho="contenido" alPresionar={alVolver} />
+        <Boton etiqueta={ETIQUETA_VOLVER} variante="texto" ancho="contenido" alPresionar={alVolver} />
         <Texto variante="cuerpo" tono="secundario" testID="persona-no-encontrada">
           {TEXTO_PERSONA_NO_ENCONTRADA}
         </Texto>
@@ -99,7 +116,7 @@ function Detalle({
     <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="persona-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
@@ -120,16 +137,16 @@ function Detalle({
         </View>
         {d.saldo > 0 ? (
           <Texto variante="secundario" tono="secundario">
-            Lo que te deben no cuenta como dinero libre hasta que te paguen.
+            {TIP_SALDO_TE_DEBEN}
           </Texto>
         ) : null}
       </Tarjeta>
 
       {d.saldo > 0 ? (
         <View style={{ gap: espacio.s }}>
-          <Boton etiqueta="Cobrar" alPresionar={() => void cobrar()} testID="boton-cobrar" />
+          <Boton etiqueta={ETIQUETA_COBRAR} alPresionar={() => void cobrar()} testID="boton-cobrar" />
           <Boton
-            etiqueta="Ya me pagó"
+            etiqueta={ETIQUETA_YA_ME_PAGO}
             variante="secundario"
             alPresionar={() => setPanel(panel === 'pago' ? null : 'pago')}
             testID="boton-ya-me-pago"
@@ -145,12 +162,12 @@ function Detalle({
 
       {panel === 'datos' ? (
         <Tarjeta testID="persona-pedir-datos">
-          <Texto variante="subtitulo">¿A dónde te pagan?</Texto>
+          <Texto variante="subtitulo">{TITULO_PEDIR_DATOS_COBRO}</Texto>
           <Texto variante="secundario" tono="secundario">
-            Para cobrar, primero dime tus datos. Solo te los pido una vez.
+            {AYUDA_PEDIR_DATOS_COBRO}
           </Texto>
           <FormularioDatosCobro
-            etiquetaGuardar="Guardar y cobrar"
+            etiquetaGuardar={ETIQUETA_GUARDAR_Y_COBRAR}
             alGuardar={() => void cobrar()}
             alCancelar={() => setPanel(null)}
           />
@@ -293,7 +310,7 @@ function Recordatorio({
             {mensajeRecordatorioCobro(fecha.etiqueta)}
           </Texto>
           <Boton
-            etiqueta="Quitar recordatorio"
+            etiqueta={ETIQUETA_QUITAR_RECORDATORIO}
             variante="texto"
             ancho="contenido"
             alPresionar={() => void fijar(null)}

@@ -114,19 +114,19 @@ export function resumenPlan(v: VistaPlan): { titulo: string; detalle: string | n
   }
   if (v.terminoPlus === 'prueba') {
     return {
-      titulo: 'Plan Gratis',
+      titulo: TITULO_PLAN_GRATIS,
       detalle:
         'Tu prueba de Plus terminó. Todo sigue aquí: tus datos siguen visibles, editables y puedes descargarlos.',
     };
   }
   if (v.terminoPlus === 'suscripcion') {
     return {
-      titulo: 'Plan Gratis',
+      titulo: TITULO_PLAN_GRATIS,
       detalle:
         'Tu suscripción a Plus terminó. Todo sigue aquí: tus datos siguen visibles, editables y puedes descargarlos.',
     };
   }
-  return { titulo: 'Plan Gratis', detalle: null };
+  return { titulo: TITULO_PLAN_GRATIS, detalle: null };
 }
 
 /** "Probar 14 días gratis" / "Mensual · $69.00 al mes". */

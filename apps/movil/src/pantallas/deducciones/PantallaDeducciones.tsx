@@ -124,12 +124,14 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
     <Pantalla testID="pantalla-deducciones" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="deducciones-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
       />
-      <Texto variante="titulo">{`Deducciones ${v.ejercicio}`}</Texto>
+      <Texto variante="titulo" testID="deducciones-titulo-pantalla">
+        {tituloPantallaDeducciones(v.ejercicio)}
+      </Texto>
       {v.ejercicios.length > 1 ? (
         <Chips
           opciones={v.ejercicios.map((a) => ({ valor: a, etiqueta: String(a) }))}
@@ -162,7 +164,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
 
       <Boton
         testID="deducciones-importar"
-        etiqueta="Importar facturas (XML o ZIP)"
+        etiqueta={BTN_IMPORTAR_FACTURAS}
         variante="secundario"
         cargando={importando}
         alPresionar={importar}
@@ -170,7 +172,9 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
       <MensajeError texto={error} />
       {resultado ? <ResultadoImportacionTarjeta r={resultado} alCerrar={() => setResultado(null)} /> : null}
 
-      <Texto variante="subtitulo">Tus facturas</Texto>
+      <Texto variante="subtitulo" testID="deducciones-tus-facturas">
+        {TITULO_TUS_FACTURAS}
+      </Texto>
       {v.facturas.length === 0 ? (
         <Texto variante="cuerpo" tono="secundario" testID="deducciones-sin-facturas">
           {TEXTO_FACTURAS_VACIO}
