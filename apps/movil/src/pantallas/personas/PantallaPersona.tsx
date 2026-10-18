@@ -164,6 +164,7 @@ function Detalle({
             etiqueta={ETIQUETA_YA_ME_PAGO}
             variante="secundario"
             alPresionar={() => setPanel(panel === 'pago' ? null : 'pago')}
+            pista={PISTA_YA_ME_PAGO}
             testID="boton-ya-me-pago"
           />
         </View>
