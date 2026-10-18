@@ -1,18 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import {
   AYUDA_BIENVENIDA,
+  AYUDA_COLCHON_ONB,
+  AYUDA_PAGOS_FIJOS,
   BTN_ACEPTAR_CONTINUAR,
+  BTN_SIN_COLCHON_POR_AHORA,
   CASILLA_DATOS_FINANCIEROS,
   CASILLA_ESTADISTICAS_OPCIONAL,
   CUERPO_BIENVENIDA,
   ERROR_GUARDAR,
+  ERROR_PAGO_FIJO_INCOMPLETO,
   etiquetaProgresoOnboarding,
   PASOS_ONBOARDING,
   PISTA_MARCAR_CASILLA_DATOS,
   TITULO_BIENVENIDA,
+  TITULO_COLCHON,
   TITULO_CONSENTIMIENTO,
   TITULO_INGRESO,
+  TITULO_PAGOS_FIJOS,
   textoProgresoOnboarding,
+  ayudaSugerenciaColchonOnboarding,
 } from './textos';
 
 describe('textos de onboarding', () => {
@@ -28,6 +35,12 @@ describe('textos de onboarding', () => {
       CASILLA_ESTADISTICAS_OPCIONAL,
       PISTA_MARCAR_CASILLA_DATOS,
       TITULO_INGRESO,
+      TITULO_PAGOS_FIJOS,
+      AYUDA_PAGOS_FIJOS,
+      ERROR_PAGO_FIJO_INCOMPLETO,
+      TITULO_COLCHON,
+      AYUDA_COLCHON_ONB,
+      BTN_SIN_COLCHON_POR_AHORA,
     ]) {
       expect(texto).not.toMatch(/!/);
       expect(texto).not.toMatch(/por favor/i);

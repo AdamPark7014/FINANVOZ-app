@@ -32,6 +32,9 @@ import {
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,
+  etiquetaVacioCuentasCompromisos,
+  etiquetaVacioCuentasDebes,
+  etiquetaVacioCuentasTienes,
 } from './textos';
 
 const NOMBRE_SUBTIPO: Record<string, string> = {
@@ -84,7 +87,9 @@ export function PantallaCuentas({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">Cuentas</Texto>
+        <Texto variante="titulo" testID="cuentas-titulo">
+          Cuentas
+        </Texto>
         <Boton
           etiqueta="⚙ Ajustes"
           etiquetaAccesible="Ajustes"
@@ -97,7 +102,11 @@ export function PantallaCuentas({
 
       <Seccion titulo="Tienes" testID="seccion-tienes">
         {v.tienes.length === 0 ? (
-          <EstadoVacio texto={TEXTO_CUENTAS_TIENES_VACIO} testID="cuentas-tienes-vacio" />
+          <EstadoVacio
+            texto={TEXTO_CUENTAS_TIENES_VACIO}
+            testID="cuentas-tienes-vacio"
+            etiquetaAccesible={etiquetaVacioCuentasTienes()}
+          />
         ) : null}
         {v.tienes.map((c) => (
           <Fila
@@ -121,7 +130,11 @@ export function PantallaCuentas({
 
       <Seccion titulo="Debes" testID="seccion-debes">
         {v.debes.length === 0 ? (
-          <EstadoVacio texto={TEXTO_CUENTAS_DEBES_VACIO} testID="cuentas-debes-vacio" />
+          <EstadoVacio
+            texto={TEXTO_CUENTAS_DEBES_VACIO}
+            testID="cuentas-debes-vacio"
+            etiquetaAccesible={etiquetaVacioCuentasDebes()}
+          />
         ) : null}
         {v.debes.map((d) =>
           d.tipo === 'tarjeta' ? (
@@ -170,7 +183,11 @@ export function PantallaCuentas({
 
       <Seccion titulo="Compromisos" subtitulo={SUBTITULO_CUENTAS_COMPROMISOS} testID="seccion-compromisos">
         {v.compromisos.length === 0 ? (
-          <EstadoVacio texto={TEXTO_CUENTAS_COMPROMISOS_VACIO} testID="cuentas-compromisos-vacio" />
+          <EstadoVacio
+            texto={TEXTO_CUENTAS_COMPROMISOS_VACIO}
+            testID="cuentas-compromisos-vacio"
+            etiquetaAccesible={etiquetaVacioCuentasCompromisos()}
+          />
         ) : null}
         {v.compromisos.map((c) => (
           <Fila
@@ -243,10 +260,12 @@ function Seccion({
   testID: string;
 }) {
   return (
-    <View style={{ gap: espacio.s }} testID={testID}>
-      <Texto variante="subtitulo">{titulo}</Texto>
+    <View style={{ gap: espacio.s }} testID={testID} accessibilityLabel={titulo} accessible>
+      <Texto variante="subtitulo" testID={`${testID}-titulo`}>
+        {titulo}
+      </Texto>
       {subtitulo ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" testID={`${testID}-subtitulo`}>
           {subtitulo}
         </Texto>
       ) : null}

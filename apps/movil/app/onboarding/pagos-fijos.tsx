@@ -9,6 +9,18 @@ import {
   PasoOnboarding,
 } from '../../src/pantallas/onboarding/componentes';
 import { TIP_PAGOS_SALTAR } from '../../src/pantallas/onboarding/tips';
+import {
+  AYUDA_PAGO_VARIABLE,
+  AYUDA_PAGOS_FIJOS,
+  BTN_ONB_CONTINUAR,
+  BTN_ONB_SALTAR,
+  ERROR_PAGO_FIJO_INCOMPLETO,
+  ETIQUETA_PAGO_DIA_MES,
+  ETIQUETA_PAGO_MONTO_FIJO,
+  ETIQUETA_PAGO_MONTO_VARIABLE,
+  etiquetaAgregarPago,
+  TITULO_PAGOS_FIJOS,
+} from '../../src/pantallas/onboarding/textos';
 import { leerDiaMes } from '../../src/pantallas/onboarding/ingreso';
 import { agregarPagoFijo, PAGOS_FIJOS_SUGERIDOS } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
@@ -43,7 +55,7 @@ export default function PagosFijos() {
     if (!sugerido) return;
     const diaMes = leerDiaMes(dia);
     if (monto === null || monto <= 0 || diaMes === null) {
-      setError('Escribe cuánto pagas y qué día del mes (1 a 31).');
+      setError(ERROR_PAGO_FIJO_INCOMPLETO);
       return;
     }
     let id: string;
@@ -74,8 +86,8 @@ export default function PagosFijos() {
     <PasoOnboarding
       testID="onb-pagos-fijos"
       paso={5}
-      titulo="¿Qué pagos tienes cada mes?"
-      ayuda="Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar."
+      titulo={TITULO_PAGOS_FIJOS}
+      ayuda={AYUDA_PAGOS_FIJOS}
       tip={TIP_PAGOS_SALTAR}
       pie={
         <Boton
