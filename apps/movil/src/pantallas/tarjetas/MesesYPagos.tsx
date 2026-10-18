@@ -65,30 +65,30 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
   const activo = p.estado === 'activo' && p.restante > 0;
   const cuota = formatearCentavos(p.cuota);
   return (
-    <Tarjeta
-      testID={`plan-${p.id}`}
-      {...(activo
-        ? {
-            etiquetaAccesible: etiquetaAccesiblePlanMsi(
-              p.descripcion,
-              cuota,
-              p.cuotasRestantes,
-              p.meses,
-            ),
-          }
-        : {})}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <Texto variante="cuerpoFuerte" style={{ flex: 1 }}>
-          {p.descripcion}
-        </Texto>
-        <Cifra centavos={p.monto} contexto={p.descripcion} />
+    <Tarjeta testID={`plan-${p.id}`}>
+      <View
+        accessible={activo}
+        accessibilityLabel={
+          activo
+            ? etiquetaAccesiblePlanMsi(p.descripcion, cuota, p.cuotasRestantes, p.meses)
+            : undefined
+        }
+        style={{ gap: espacio.xxs }}
+      >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+          <Texto variante="cuerpoFuerte" style={{ flex: 1 }} importantForAccessibility="no">
+            {p.descripcion}
+          </Texto>
+          <Cifra centavos={p.monto} contexto={p.descripcion} />
+        </View>
+        {activo ? (
+          <Texto variante="secundario" testID={`plan-${p.id}-cuotas`} importantForAccessibility="no">
+            {`${cuota} al mes · faltan ${p.cuotasRestantes} de ${p.meses}`}
+          </Texto>
+        ) : null}
       </View>
       {activo ? (
         <>
-          <Texto variante="secundario" testID={`plan-${p.id}-cuotas`}>
-            {`${cuota} al mes · faltan ${p.cuotasRestantes} de ${p.meses}`}
-          </Texto>
           {p.terminaEn ? (
             <Texto variante="secundario" tono="secundario">
               {`Terminas en ${etiquetaMes(p.terminaEn)}`}

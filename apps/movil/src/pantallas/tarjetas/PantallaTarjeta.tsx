@@ -19,6 +19,7 @@ import { Dato, FormularioPago, PreguntaLiquidarMeses, Seccion } from './componen
 import { CorregirSaldo, EditarTarjeta } from './EditarTarjeta';
 import { CompromisoMeses, PagosPlaneados, SeccionMeses } from './MesesYPagos';
 import {
+  ACCESIBILIDAD_TARJETA_NO_ENCONTRADA,
   AYUDA_SALDO_A_FAVOR,
   BTN_CORREGIR_SALDO,
   BTN_EDITAR_TARJETA,
@@ -34,7 +35,9 @@ import {
   ETIQUETA_PNGI,
   ETIQUETA_PROXIMO_CORTE,
   ETIQUETA_SALDO_A_FAVOR,
+  etiquetaAccesibleMovimientoTarjeta,
   etiquetaAccesibleUsoTarjeta,
+  etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   etiquetaSaldoAlCorte,
   MOVIMIENTO_SIN_TITULO,

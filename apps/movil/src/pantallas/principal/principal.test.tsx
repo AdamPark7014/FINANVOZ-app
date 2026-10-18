@@ -395,6 +395,7 @@ describe('Registrar', () => {
         <PantallaCuentas alAbrirAjustes={jest.fn()} />
       </>,
     );
+    expect(screen.getByTestId('registrar-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('tipo-prestamo_recibido'));
     fireEvent.changeText(screen.getByTestId('campo-monto'), '2,000');
     fireEvent.press(screen.getByTestId('boton-guardar-movimiento'));

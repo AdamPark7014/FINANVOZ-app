@@ -16,6 +16,9 @@ import {
   ETIQUETA_VOLVER,
   INTRO,
   mensajeSinAppCorreo,
+  PISTA_ESCRIBIR_CORREO,
+  PISTA_VOLVER,
+  PREGUNTAS_TITULO,
   TITULO,
 } from './textos';
 

@@ -41,7 +41,9 @@ export function PantallaRegistrar({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo">Registrar</Texto>
+        <Texto variante="titulo" testID="registrar-titulo" accessibilityRole="header">
+          Registrar
+        </Texto>
         <Boton
           etiqueta="Cerrar"
           variante="texto"

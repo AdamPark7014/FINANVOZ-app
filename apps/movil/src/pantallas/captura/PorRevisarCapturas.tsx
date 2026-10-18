@@ -55,7 +55,7 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
     if (!capturaActiva) return null;
     return (
       <View style={{ gap: espacio.s }} testID="capturas-por-revisar">
-        <Texto variante="subtitulo" accessibilityRole="header">
+        <Texto variant="subtitulo" testID="capturas-por-revisar-titulo" accessibilityRole="header">
           {TITULO_CAPTURAS_POR_REVISAR}
         </Texto>
         <EstadoVacio

@@ -9,7 +9,6 @@ import {
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
   ETIQUETA_VOLVER,
-  ETIQUETA_RESPUESTA,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
   INTRO,
@@ -64,7 +63,7 @@ export function PantallaAyuda({
         {PREGUNTAS_TITULO}
       </Texto>
 
-      <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityLabel={PREGUNTAS_TITULO}>
+      <View style={{ gap: espacio.s }} testID="ayuda-preguntas">
         {PREGUNTAS_FRECUENTES.map((p) => (
           <Pregunta
             key={p.id}

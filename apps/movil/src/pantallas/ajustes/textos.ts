@@ -21,6 +21,7 @@ export const BTN_PRIVACIDAD = 'Abrir el centro de privacidad';
 
 export {
   BTN_ABRIR_DESDE_AJUSTES as BTN_AYUDA,
+  PISTA_ABRIR_DESDE_AJUSTES as PISTA_AYUDA,
   SECCION_AJUSTES as SECCION_AYUDA,
   TEXTO_CARD_AJUSTES as TEXTO_AYUDA,
 } from '../ayuda/textos';

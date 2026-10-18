@@ -10,7 +10,7 @@ import {
   type SuscripcionVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { mensajeError } from '../principal/textos';
 import {

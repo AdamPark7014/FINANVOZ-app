@@ -196,7 +196,7 @@ describe('CampoMonto', () => {
   it('convierte pesos escritos a centavos enteros', () => {
     const alCambiar = jest.fn();
     render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
-    const campo = screen.getByLabelText('Monto');
+    const campo = screen.getByLabelText('Monto en pesos');
     fireEvent.changeText(campo, '1,099.9');
     expect(alCambiar).toHaveBeenLastCalledWith(109990);
     fireEvent.changeText(campo, '');

@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **Movimientos TalkBack:** `movimientos-titulo`, encabezados por día, filtro con `etiquetaFiltroMovimientosActivo`, filas con `cifraEnPalabras`; pruebas en `principal.test.tsx`.
-- **Fix menor:** duplicado `etiquetaVacioSuscripciones` en `suscripciones/textos.ts`.
+- **Onboarding O6:** `TIP_CAPTURA_AHORA_NO` reexportado desde `textos.ts` (mismo patrón que O3–O7).
 
 ## Hecho (acumulado reciente)
 
-- Cuentas/personas/captura headers, onboarding tips, deducciones importar. Ver `git log`.
+- Tips O3–O7 en `tips.ts` sin ciclo; suscripciones/tandas WIP. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP: `PantallaSuscripciones`, `tandas/textos` PISTA_* (no mezclar).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes en repo — no mezclar en commits a11y.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Headers TalkBack en pantallas restantes si hace falta.
+2. Cablear PISTA_* en pantallas Tandas.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar

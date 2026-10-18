@@ -18,6 +18,13 @@ import { useNotificaciones } from '../avisos/notificaciones';
 export const TEXTO_RIESGO =
   'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
 
+export const TEXTO_CALCULANDO_PROBABILIDAD = 'Calculando si llegas…';
+
+/** TalkBack: la barra lleva el dato; el texto visible debajo no se repite (`ui/README.md`). */
+export function etiquetaAccesibleProbabilidad(texto: string, etiqueta: string | null): string {
+  return etiqueta ? `${texto}. ${etiqueta}` : texto;
+}
+
 /**
  * Probabilidad de llegar sin tocar el colchón (RF-HOY-02, `02 §4`) debajo de la cifra de Hoy. Si ya está
  * calculada para este libro se pinta al instante (`leerProbabilidadHoy`); si no, se calcula por bloques en
@@ -83,7 +90,7 @@ export function ProbabilidadHoy({
         style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}
       >
         <ActivityIndicator size="small" color={c.textoSecundario} importantForAccessibility="no" />
-        <Texto variante="secundario" tono="secundario" {...{ accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }}>
+        <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_PROBABILIDAD_CALCULANDO}
         </Texto>
       </View>

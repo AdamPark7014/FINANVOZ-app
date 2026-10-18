@@ -32,6 +32,7 @@ import {
   PISTA_VER_CALENDARIO,
   PISTA_VOLVER,
   PISTA_VOLVER_DETALLE,
+  etiquetaVacioTandas,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
   mensajeAportacion,
@@ -113,6 +114,7 @@ describe('Tandas (02 §18)', () => {
     const p = preparar('2026-10-16');
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
     expect(screen.getByTestId('tandas-vacio')).toHaveTextContent(TEXTO_TANDAS_VACIO);
+    expect(screen.getByTestId('tandas-vacio').props.accessibilityLabel).toBe(etiquetaVacioTandas());
     expect(screen.getByTestId('tandas-nueva')).toBeTruthy();
     expect(screen.queryByTestId(/^tanda-/)).toBeNull();
   });
