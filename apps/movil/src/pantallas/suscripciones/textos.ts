@@ -38,14 +38,34 @@ export const TITULO_INACTIVAS = 'Ya no se cobran';
 export const ICONO_INACTIVAS_CERRADA = '+';
 export const ICONO_INACTIVAS_ABIERTA = '−';
 
-/** TalkBack: pie de lista con suscripciones ya canceladas (`02 §15`). */
-export function etiquetaInactivasSuscripciones(texto: string): string {
-  return `Suscripciones que ya no se cobran. ${texto}`;
+/** Encabezado hablado del acordeón de inactivas (`02 §15`). */
+export function etiquetaAccesibleInactivasEncabezado(cantidad: number): string {
+  return cantidad === 1
+    ? `${TITULO_INACTIVAS}, 1 suscripción`
+    : `${TITULO_INACTIVAS}, ${cantidad} suscripciones`;
+}
+
+/** TalkBack: botón del acordeón; si está plegado incluye el detalle (`02 §15`). */
+export function etiquetaAccesibleInactivasBoton(cantidad: number, texto: string, abierta: boolean): string {
+  const encabezado = etiquetaAccesibleInactivasEncabezado(cantidad);
+  if (abierta) return encabezado;
+  return `${encabezado}. ${etiquetaHablada(texto)}`;
+}
+
+/** Detalle visible cuando el acordeón está abierto (`02 §15`). */
+export function etiquetaAccesibleInactivasDetalle(texto: string): string {
+  return etiquetaHablada(texto);
 }
 
 /** Pista TalkBack al expandir o cerrar la lista de inactivas (`02 §15`). */
 export function pistaInactivasSuscripciones(abierta: boolean): string {
   return abierta ? 'Pliega el detalle' : 'Despliega el detalle';
+}
+
+/** TalkBack: monto de la fila, con aumento de precio si aplica (`02 §15`). */
+export function etiquetaAccesibleMontoSuscripcion(textoMonto: string, textoAntes?: string | null): string {
+  const visible = textoAntes ? `${textoMonto} (${textoAntes})` : textoMonto;
+  return `Monto. ${etiquetaHablada(visible)}`;
 }
 
 /** TalkBack: cuándo viene el siguiente cargo en la fila (`02 §15`). */

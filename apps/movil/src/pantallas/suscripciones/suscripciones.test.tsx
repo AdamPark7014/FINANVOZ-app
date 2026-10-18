@@ -16,7 +16,9 @@ import {
   etiquetaAccesibleHoyApartaSuscripcion,
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
-  etiquetaInactivasSuscripciones,
+  etiquetaAccesibleInactivasBoton,
+  etiquetaAccesibleInactivasDetalle,
+  etiquetaAccesibleMontoSuscripcion,
   etiquetaVacioSuscripciones,
   pistaInactivasSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
@@ -78,8 +80,12 @@ describe('Suscripciones (02 §20)', () => {
         'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
       ),
     );
-    expect(screen.getByTestId('suscripcion-netflix-monto').props.accessibilityLabel).toMatch(/pesos/);
+    expect(screen.getByTestId('suscripcion-netflix-monto')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleMontoSuscripcion('$219 al mes', null),
+    );
     expect(screen.getByTestId('suscripcion-netflix-nombre')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('suscripciones-activas')).toHaveProp('accessibilityRole', 'list');
     expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
   });
 
@@ -109,9 +115,13 @@ describe('Suscripciones (02 §20)', () => {
     const inactivas = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';
     expect(textoDe('suscripciones-inactivas')).toBe(inactivas);
     const desplegar = screen.getByTestId('suscripciones-inactivas-desplegar');
-    expect(desplegar).toHaveProp('accessibilityLabel', etiquetaInactivasSuscripciones(inactivas));
+    expect(desplegar).toHaveProp('accessibilityLabel', etiquetaAccesibleInactivasBoton(1, inactivas, true));
     expect(desplegar).toHaveProp('accessibilityHint', pistaInactivasSuscripciones(true));
     expect(desplegar).toHaveProp('accessibilityState', { expanded: true });
+    expect(screen.getByTestId('suscripciones-inactivas')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleInactivasDetalle(inactivas),
+    );
   });
 
   it('Editar nombre: guarda "Dominio web" en la fila', () => {

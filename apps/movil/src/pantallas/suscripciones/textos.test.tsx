@@ -4,7 +4,10 @@ import {
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
   TEXTO_HOY_APARTA,
-  etiquetaInactivasSuscripciones,
+  etiquetaAccesibleInactivasBoton,
+  etiquetaAccesibleInactivasEncabezado,
+  etiquetaAccesibleInactivasDetalle,
+  etiquetaAccesibleMontoSuscripcion,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
@@ -23,10 +26,21 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaVacioSuscripciones()).toBe(`${TITULO_PANTALLA}. ${TEXTO_SUSCRIPCIONES_VACIO}`);
   });
 
-  it('inactivas incluyen contexto para TalkBack', () => {
-    expect(etiquetaInactivasSuscripciones('Ya no se cobran: Disney Plus')).toMatch(
-      /^Suscripciones que ya no se cobran\./,
+  it('inactivas: encabezado, botón plegado y detalle', () => {
+    expect(etiquetaAccesibleInactivasEncabezado(1)).toBe('Ya no se cobran, 1 suscripción');
+    expect(etiquetaAccesibleInactivasEncabezado(3)).toBe('Ya no se cobran, 3 suscripciones');
+    const detalle = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';
+    expect(etiquetaAccesibleInactivasBoton(1, detalle, false)).toContain('Disney Plus');
+    expect(etiquetaAccesibleInactivasBoton(1, detalle, true)).toBe(
+      etiquetaAccesibleInactivasEncabezado(1),
     );
+    expect(etiquetaAccesibleInactivasDetalle(detalle)).toBe(detalle);
+  });
+
+  it('monto de fila con aumento en palabras', () => {
+    expect(etiquetaAccesibleMontoSuscripcion('$129 al mes', 'antes $115')).toMatch(/^Monto\./);
+    expect(etiquetaAccesibleMontoSuscripcion('$129 al mes', 'antes $115')).toMatch(/pesos/);
+    expect(etiquetaAccesibleMontoSuscripcion('$129 al mes', 'antes $115')).not.toMatch(/\$/);
   });
 
   it('acordeón inactivas: pista Despliega o Pliega', () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, type ViewProps } from 'react-native';
 import {
   convertirEnCompromiso,
   fijarNombreSuscripcion,
@@ -23,10 +23,13 @@ import {
   ETIQUETA_VOLVER,
   etiquetaAccesibleAyudaSuscripciones,
   etiquetaAccesibleHoyApartaSuscripcion,
+  etiquetaAccesibleInactivasBoton,
+  etiquetaAccesibleInactivasDetalle,
+  etiquetaAccesibleMontoSuscripcion,
   etiquetaAccesibleProximoSuscripcion,
   etiquetaAccesibleResumenSuscripciones,
-  etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
+  TITULO_PANTALLA,
   ICONO_INACTIVAS_ABIERTA,
   ICONO_INACTIVAS_CERRADA,
   pistaInactivasSuscripciones,
@@ -42,7 +45,6 @@ import {
   PISTA_VOLVER,
   TEXTO_HOY_APARTA,
   TEXTO_SUSCRIPCIONES_VACIO,
-  TITULO_PANTALLA,
   type AccionSuscripcion,
 } from './textos';
 
@@ -80,7 +82,12 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto testID="suscripciones-titulo" variante="titulo" accessibilityRole="header">
+      <Texto
+        testID="suscripciones-titulo"
+        variante="titulo"
+        accessibilityRole="header"
+        accessibilityLabel={TITULO_PANTALLA}
+      >
         {TITULO_PANTALLA}
       </Texto>
       {v.activas.length > 0 ? (
@@ -115,27 +122,34 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
           accessibilityRole={mensaje.error ? 'alert' : 'text'}
           accessibilityLiveRegion="polite"
           importantForAccessibility="yes"
+          accessibilityLabel={mensaje.texto}
           testID="suscripciones-mensaje"
         >
           {mensaje.texto}
         </Texto>
       ) : null}
-      {v.activas.map((s) => (
-        <Fila
-          key={`${s.comercio}-${s.nombre}`}
-          s={s}
-          alHacer={(a) => hacer(a, s)}
-          alRenombrar={(nombre) => {
-            try {
-              fijarNombreSuscripcion(ctx, s.comercio, nombre);
-              setMensaje({ texto: mensajeNombreGuardado(nombre), error: false });
-            } catch (e) {
-              setMensaje({ texto: mensajeError(e), error: true });
-            }
-            refrescar();
-          }}
-        />
-      ))}
+      <View
+        style={{ gap: espacio.s }}
+        testID="suscripciones-activas"
+        {...({ accessibilityRole: 'list' } as ViewProps)}
+      >
+        {v.activas.map((s) => (
+          <Fila
+            key={`${s.comercio}-${s.nombre}`}
+            s={s}
+            alHacer={(a) => hacer(a, s)}
+            alRenombrar={(nombre) => {
+              try {
+                fijarNombreSuscripcion(ctx, s.comercio, nombre);
+                setMensaje({ texto: mensajeNombreGuardado(nombre), error: false });
+              } catch (e) {
+                setMensaje({ texto: mensajeError(e), error: true });
+              }
+              refrescar();
+            }}
+          />
+        ))}
+      </View>
       {v.textoInactivas ? (
         <SeccionInactivas textoInactivas={v.textoInactivas} cantidad={v.inactivas.length} />
       ) : null}
@@ -154,7 +168,7 @@ function SeccionInactivas({ textoInactivas, cantidad }: { textoInactivas: string
         testID="suscripciones-inactivas-desplegar"
         onPress={() => setAbierta((a) => !a)}
         accessibilityRole="button"
-        accessibilityLabel={etiquetaInactivasSuscripciones(textoInactivas)}
+        accessibilityLabel={etiquetaAccesibleInactivasBoton(cantidad, textoInactivas, abierta)}
         accessibilityHint={pistaInactivasSuscripciones(abierta)}
         accessibilityState={{ expanded: abierta }}
         style={({ pressed }) => ({
@@ -180,14 +194,19 @@ function SeccionInactivas({ textoInactivas, cantidad }: { textoInactivas: string
         </Texto>
       </Pressable>
       {abierta ? (
-        <Texto
-          variante="secundario"
-          tono="secundario"
-          testID="suscripciones-inactivas"
-          importantForAccessibility="no"
+        <View
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
         >
-          {textoInactivas}
-        </Texto>
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="suscripciones-inactivas"
+            accessibilityLabel={etiquetaAccesibleInactivasDetalle(textoInactivas)}
+          >
+            {textoInactivas}
+          </Texto>
+        </View>
       ) : null}
     </Tarjeta>
   );
@@ -216,7 +235,8 @@ function Fila({
     setEditandoNombre(false);
   };
   return (
-    <Tarjeta testID={id}>
+    <View testID={id} {...({ accessibilityRole: 'listitem' } as ViewProps)}>
+    <Tarjeta>
       <View style={{ gap: espacio.xxs }}>
         {editandoNombre ? (
           <CampoTexto
@@ -250,7 +270,11 @@ function Fila({
             pista={PISTA_GUARDAR_NOMBRE}
           />
         )}
-        <Texto variante="cuerpo" testID={`${id}-monto`}>
+        <Texto
+          variante="cuerpo"
+          testID={`${id}-monto`}
+          accessibilityLabel={etiquetaAccesibleMontoSuscripcion(s.textoMonto, s.textoAntes)}
+        >
           {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
         </Texto>
         {s.textoProximo ? (
@@ -311,5 +335,6 @@ function Fila({
         </View>
       )}
     </Tarjeta>
+    </View>
   );
 }
