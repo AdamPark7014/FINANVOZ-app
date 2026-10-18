@@ -1,6 +1,7 @@
 import type { Centavos } from '@cartera/core';
 
 export { PantallaArqueo } from './PantallaArqueo';
+export { mensajeCuadra, TITULO as TITULO_ARQUEO, textoDeberiasTraer } from './textos';
 
 /**
  * La cantidad de "traigo 300" viaja en memoria, no en la ruta: las rutas pueden terminar en breadcrumbs de
