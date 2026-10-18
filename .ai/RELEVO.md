@@ -6,26 +6,27 @@
 
 ## Hecho en este turno
 
-- **Tarjetas / onboarding TalkBack:** pruebas de `preguntaTarjetaConfirmarMsi`, `etiquetaSiLiquidar`; tip O2 en `etiquetaTipOnboarding`. Acumulado: helpers vacíos/filas MSI, pistas O1, jest `tarjetas.test.tsx`.
+- **TalkBack micro tests:** `tandas.test.tsx` ancla `PISTA_VER_CALENDARIO`, `PISTA_YA_LA_DI`; `arqueo.test.tsx` ancla `accessibilityLiveRegion` en `arqueo-mensaje-hecho`.
 
 ## Hecho (acumulado reciente)
 
-- Chip/Movimientos, arqueo, suscripciones, CampoMonto. Ver `git log`.
+- Tandas/arqueo copy y pistas en pantallas; Me alcanza, suscripciones, Hoy CTAs. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`ayuda`, `principal`) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP ajeno en working tree (captura/compartido/formato) — no mezclar sin revisar `git status`.
+- CA-M6-05 probabilidad: intermitente en local.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP paralelo.
+2. Cerrar WIP paralelo en commits pequeños.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
