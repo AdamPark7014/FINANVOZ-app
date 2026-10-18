@@ -10,6 +10,7 @@ describe('Chip (TalkBack)', () => {
     const chip = screen.getByTestId('c');
     expect(chip.props.accessibilityRole).toBe('radio');
     expect(chip.props.accessibilityLabel).toBe('Efectivo');
+    expect(chip.props.accessibilityHint).toBe('Selecciona esta opción');
     expect(chip.props.accessibilityState).toMatchObject({ selected: true });
     const texto = screen.getByText('✓ Efectivo', { includeHiddenElements: true });
     expect(texto.props.accessibilityElementsHidden).toBe(true);
@@ -22,6 +23,7 @@ describe('Chip (TalkBack)', () => {
     );
     expect(screen.getByTestId('c').props.accessibilityState).toMatchObject({ checked: true });
     expect(screen.getByTestId('c').props.accessibilityRole).toBe('checkbox');
+    expect(screen.getByTestId('c').props.accessibilityHint).toBe('Marca o desmarca esta opción');
   });
 
   it('«Nombre ×2» se lee como «Nombre, 2 veces»', () => {

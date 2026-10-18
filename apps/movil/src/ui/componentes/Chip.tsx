@@ -38,6 +38,7 @@ export function Chip({
   multiple = false,
   deshabilitado = false,
   etiquetaAccesible,
+  pista,
   testID,
 }: {
   etiqueta: string;
@@ -48,9 +49,16 @@ export function Chip({
   deshabilitado?: boolean;
   /** TalkBack si el texto visible no basta (p. ej. «Caro ×2»). */
   etiquetaAccesible?: string;
+  /** Qué pasa al tocarlo, leído por TalkBack después de la etiqueta. */
+  pista?: string;
   testID?: string;
 }) {
   const { c } = useTema();
+  const pistaPorOmision = deshabilitado
+    ? 'No disponible'
+    : multiple
+      ? 'Marca o desmarca esta opción'
+      : 'Selecciona esta opción';
   return (
     <Pressable
       testID={testID}
@@ -58,6 +66,7 @@ export function Chip({
       disabled={deshabilitado}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityLabel={etiquetaChipHablada(etiqueta, etiquetaAccesible)}
+      accessibilityHint={pista ?? pistaPorOmision}
       accessibilityState={multiple ? { checked: seleccionado, disabled: deshabilitado } : { selected: seleccionado, disabled: deshabilitado }}
       hitSlop={hitSlopTactil}
       style={({ pressed }) => ({

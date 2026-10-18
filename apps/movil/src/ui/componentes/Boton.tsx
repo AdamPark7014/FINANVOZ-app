@@ -49,7 +49,9 @@ export function Boton({
       disabled={inactivo}
       accessibilityRole="button"
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
-      accessibilityHint={pista ?? (cargando ? 'Espera, termina de cargar' : undefined)}
+      accessibilityHint={
+        pista ?? (cargando ? 'Espera, termina de cargar' : deshabilitado ? 'No disponible' : undefined)
+      }
       accessibilityState={{ disabled: inactivo, busy: cargando }}
       hitSlop={variante === 'texto' || ancho === 'contenido' ? hitSlopTactil : undefined}
       style={({ pressed }) => [
