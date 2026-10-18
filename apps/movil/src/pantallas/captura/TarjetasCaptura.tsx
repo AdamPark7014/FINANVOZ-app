@@ -21,6 +21,8 @@ import {
   ETIQUETA_OTRA_CANTIDAD,
   mensajeCuadra,
   MENSAJE_POSPONER,
+  PISTA_ABRIR_DESDE_TARJETA,
+  PISTA_POSPONER,
   TITULO,
   textoDeberiasTraer,
 } from '../arqueo/textos';
@@ -76,12 +78,14 @@ export function TarjetaArqueo({
           <Boton
             etiqueta={TITULO}
             etiquetaAccesible={ACCESIBILIDAD_ABRIR}
+            pista={PISTA_ABRIR_DESDE_TARJETA}
             alPresionar={alAbrirArqueo}
             testID={`${testID}-abrir`}
           />
           <Boton
             etiqueta={AHORA_NO}
             variante="texto"
+            pista={PISTA_POSPONER}
             alPresionar={() => elegir('ahora_no')}
             testID={`${testID}-ahora_no`}
           />

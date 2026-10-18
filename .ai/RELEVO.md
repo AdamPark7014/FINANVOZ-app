@@ -6,21 +6,21 @@
 
 ## Hecho en este turno
 
-- **Tandas TalkBack Cancelar:** `PISTA_CANCELAR_*` en formulario, edición, archivar y flujo «Me tocó»; tests en `tandas.test.tsx`.
+- **Capturas por revisar TalkBack:** `PISTA_*` en CTAs de `PorRevisarCapturas`; `testID` intro frases por interpretar en `PantallaMovimientos`; tests en `captura.test` y `principal.test`.
 
 ## Hecho (acumulado reciente)
 
-- Ayuda Volver, PantallaTanda no encontrada, Movimientos/me-alcanza, widget. Ver `git log`.
+- Movimientos/me-alcanza, compartidos, widget, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local `personas.test.tsx` (turno anterior) — no mezclar sin salvar.
-- M0 / EAS: Adam.
+- WIP paralelo (tandas, ajustes, tests) — `git status` antes de editar; no mezclar en commits ajenos.
+- CI Windows, M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack CTAs restantes (p. ej. `boton-tandas` en Cuentas).
+2. Typecheck rojo ajeno (tarjetas/semilla) si toca CI.
 
 ## No tocar
 

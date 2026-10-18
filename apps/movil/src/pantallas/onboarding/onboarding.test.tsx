@@ -197,7 +197,7 @@ describe('onboarding', () => {
     escribir('onb-ingreso-monto', '13,000');
     expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/jue 15/);
     expect(screen.getByTestId('onb-proximo-pago').props.accessibilityLabel).toBe(
-      etiquetaHablada(etiquetaProximoPagoOnboarding('jue 15 oct 2026')),
+      etiquetaHablada(etiquetaProximoPagoOnboarding('jue 15')),
     );
     tocar('onb-ingreso-continuar');
     expect(r.getPathname()).toBe('/onboarding/cuentas');

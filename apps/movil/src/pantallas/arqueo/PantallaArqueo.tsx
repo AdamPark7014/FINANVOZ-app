@@ -212,7 +212,12 @@ function Arqueo({
               testID={`arqueo-marcar-${g.transaccionId}`}
             />
           ))}
-          <Boton etiqueta={CONTINUAR} alPresionar={() => setPaso('cantidad')} testID="arqueo-continuar" />
+          <Boton
+            etiqueta={CONTINUAR}
+            pista={PISTA_CONTINUAR}
+            alPresionar={() => setPaso('cantidad')}
+            testID="arqueo-continuar"
+          />
         </View>
       ) : null}
 
@@ -242,6 +247,7 @@ function Arqueo({
               />
               <Boton
                 etiqueta={CONTINUAR}
+                pista={PISTA_CALCULAR}
                 deshabilitado={real === null}
                 alPresionar={() => real !== null && calcular(real)}
                 testID="arqueo-calcular"
@@ -276,7 +282,13 @@ function Arqueo({
       ) : null}
 
       {error ? (
-        <Texto variante="secundario" tono="faltante" testID="arqueo-error">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="arqueo-error"
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
           {error}
         </Texto>
       ) : null}
@@ -316,12 +328,19 @@ function Faltante({
         </View>
       </Tarjeta>
       {error ? (
-        <Texto variante="secundario" tono="faltante" testID="arqueo-error-propuesta">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="arqueo-error-propuesta"
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
           {error}
         </Texto>
       ) : null}
       <Boton
         etiqueta={CONFIRMAR}
+        pista={PISTA_CONFIRMAR}
         alPresionar={() => {
           if (suma !== calculo.hueco) {
             setError(mensajeSumaPropuesta(calculo.hueco, suma));
