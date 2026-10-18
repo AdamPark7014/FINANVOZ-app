@@ -567,7 +567,12 @@ function FormularioCuentaCaptura({
       />
       <Fallo texto={error} />
       <Boton etiqueta={BTN_GUARDAR_CUENTA} alPresionar={guardar} testID={`${testID}-guardar`} />
-      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alCancelar}
+        testID={`${testID}-cancelar`}
+      />
     </View>
   );
 }
