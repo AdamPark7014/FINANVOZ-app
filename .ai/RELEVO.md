@@ -6,20 +6,21 @@
 
 ## Hecho en este turno
 
-- **Arqueo TalkBack:** `arqueo.test.tsx` — vacío BBVA con `etiquetaVacioSinEfectivo()`; flujo Listo (`ACCESIBILIDAD_LISTO`, `accessibilityLiveRegion` en mensaje) tolera cuadre directo o chip sobrante.
+- **Ajustes › Captura TalkBack (micro):** título con `header`; etiquetas habladas apagada / no disponible; lista vacía (0 apps); tests `captura-textos` + aserción en `ingreso-colchon.test`.
 
 ## Hecho (acumulado reciente)
 
-- Principal sin ingreso, me-alcanza datos insuficientes, suscripciones/O5, Cuentas. Ver `git log`.
+- TalkBack Hoy/Movimientos/Cuentas, onboarding, captura activa en palabras. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en disco — no mezclar sin `git status`.
-- CI Windows, M0: Adam.
+- CI Windows; M0 Adam.
+- WIP ajeno: no mezclar en commits de captura.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
+2. TalkBack captura activa con puente mockeado (Activar/Desactivar hints en test de integración).
 
 ## No tocar
 
