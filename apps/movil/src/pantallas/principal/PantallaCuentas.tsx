@@ -27,6 +27,8 @@ import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { EstadoVacio } from './EstadoVacio';
 import {
+  BTN_AJUSTES_CUENTAS,
+  BTN_AJUSTES_CUENTAS_ACCESIBLE,
   contextoSaldoCompromiso,
   contextoSaldoLeDebes,
   contextoSaldoTarjeta,
@@ -95,8 +97,8 @@ export function PantallaCuentas({
           Cuentas
         </Texto>
         <Boton
-          etiqueta="⚙ Ajustes"
-          etiquetaAccesible="Ajustes"
+          etiqueta={BTN_AJUSTES_CUENTAS}
+          etiquetaAccesible={BTN_AJUSTES_CUENTAS_ACCESIBLE}
           variante="texto"
           ancho="contenido"
           alPresionar={alAbrirAjustes}

@@ -13,7 +13,7 @@ import {
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
+import { Boton, Cifra, espacio, EstadoVacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';

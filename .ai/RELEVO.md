@@ -6,29 +6,27 @@
 
 ## Hecho en este turno
 
-- **Fiscal M12 (`02 §24`):** copy pulido deducciones/ayuda/`MENSAJE_SIN_PARAMETROS`, CTA Cuentas, pruebas Plus (en main: `cdc4119`, `12d3abf`, `d0eabaf`).
-- **Negocio M11:** sin UI en app.
+- **Cuentas:** copy del engrane Ajustes centralizado en `principal/textos.ts` (`BTN_AJUSTES_CUENTAS` + accesible).
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips en `tips.ts`; headers TalkBack varias pantallas. Ver `git log`.
+- Personas TalkBack movimientos; tandas BTN; onboarding O5/O7. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local (ayuda PISTA_VOLVER, tandas, onboarding) — `git status` antes de editar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / fiscal params: Adam.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. M11 negocio + paquete contador.
-3. PISTA volver en ayuda/compartidos si falta.
+2. Centralizar inline restante en `PantallaCuentas` (`Cuentas` título, tarjetas) si conviene.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida

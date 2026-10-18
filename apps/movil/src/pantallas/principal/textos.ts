@@ -73,6 +73,10 @@ export const EJEMPLO_CAMPO_REGISTRAR = 'tacos 80 en efectivo';
 
 /** CTAs en tarjetas de consulta y explicar (`06 §6`, RF-CON-01 / RF-CON-02). */
 export const BTN_VER_PLUS = 'Ver Plus';
+/** Engrane en la cabecera de Cuentas (`02 §11`). */
+export const BTN_AJUSTES_CUENTAS = '⚙ Ajustes';
+/** TalkBack: sin emoji del engrane. */
+export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
 export const BTN_VER_MOVIMIENTOS_CHEVRON = 'Ver movimientos ›';
 export const BTN_LISTO = 'Listo';
