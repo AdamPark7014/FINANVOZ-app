@@ -36,6 +36,11 @@ export const TEXTO_INGRESO_VARIABLE =
   'Sin problema: calcularé cuánto puedes gastar con los próximos 30 días.';
 export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
+/** TalkBack Ajustes › Ingreso: la fecha calculada no depende solo del subtítulo visual. */
+export function etiquetaProximoPagoIngreso(fechaLegible: string): string {
+  return `${ETIQUETA_PROXIMO_PAGO}: ${fechaLegible}`;
+}
+
 export const RESUMEN_SIN_INGRESO = 'Aún no me dices cada cuándo te pagan.';
 export const RESUMEN_INGRESO_VARIABLE = 'Tu ingreso varía: reparto tu dinero libre en 30 días.';
 

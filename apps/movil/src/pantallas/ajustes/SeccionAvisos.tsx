@@ -17,9 +17,9 @@ import {
   BTN_GUARDAR_HORARIO,
   BTN_PERMITIR_AVISOS,
   CONFIRMACION_HORARIO,
+  DESC_HORARIO_SILENCIOSO,
   DESC_COMPROMISO,
   DESC_CORTE,
-  DESC_HORARIO_SILENCIOSO,
   DESC_INGRESO,
   DESC_LIMITE,
   DESC_RESPALDO,
@@ -29,6 +29,8 @@ import {
   EJEMPLO_SILENCIO_DESDE,
   EJEMPLO_SILENCIO_HASTA,
   ERROR_FORMATO_HORA,
+  ETIQUETA_AVISOS_APAGADOS_TELEFONO,
+  ETIQUETA_BLOQUE_HORARIO_SILENCIOSO,
   ETIQUETA_HORA_AVISOS,
   ETIQUETA_HORARIO_SILENCIOSO,
   ETIQUETA_SILENCIO_DESDE,
@@ -106,6 +108,7 @@ export function SeccionAvisos() {
             tono="secundario"
             testID="ajustes-avisos-sin-permiso"
             accessibilityRole="alert"
+            accessibilityLabel={ETIQUETA_AVISOS_APAGADOS_TELEFONO}
           >
             {AVISOS_APAGADOS_EN_TELEFONO}
           </Texto>
@@ -191,10 +194,17 @@ export function SeccionAvisos() {
         variante="etiqueta"
         testID="ajustes-avisos-horario-titulo"
         accessibilityRole="header"
+        accessibilityLabel={ETIQUETA_BLOQUE_HORARIO_SILENCIOSO}
       >
         {ETIQUETA_HORARIO_SILENCIOSO}
       </Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID="ajustes-avisos-horario-desc"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         {DESC_HORARIO_SILENCIOSO}
       </Texto>
       <View style={{ flexDirection: 'row', gap: espacio.s }}>

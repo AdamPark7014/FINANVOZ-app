@@ -12,6 +12,7 @@ import {
   BTN_GUARDAR,
   PISTA_APARTAR_COLCHON,
   PISTA_CAMBIAR_COLCHON,
+  PISTA_GUARDAR_COLCHON,
   confirmacionColchon,
   CONFIRMACION_SIN_COLCHON,
   ETIQUETA_MONTO_COLCHON,
@@ -74,6 +75,7 @@ export function SeccionColchon() {
           <Boton
             testID="ajustes-colchon-guardar"
             etiqueta={BTN_GUARDAR}
+            pista={PISTA_GUARDAR_COLCHON}
             deshabilitado={monto === null}
             alPresionar={guardar}
           />

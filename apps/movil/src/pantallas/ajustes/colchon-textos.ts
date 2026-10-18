@@ -7,6 +7,8 @@ export const SECCION_COLCHON = 'Colchón';
 
 export const ETIQUETA_MONTO_COLCHON = 'Tu colchón';
 export const BTN_GUARDAR = 'Guardar';
+/** TalkBack al guardar el colchón en Ajustes (`02 §12`). */
+export const PISTA_GUARDAR_COLCHON = 'Guarda cuánto apartas que no cuenta para lo que puedes gastar';
 export const BTN_CANCELAR = 'Cancelar';
 
 export const BTN_CAMBIAR_COLCHON = 'Cambiar mi colchón';

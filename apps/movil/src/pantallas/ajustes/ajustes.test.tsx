@@ -109,7 +109,7 @@ describe('raíz', () => {
     });
     renderRouter(RUTAS, { initialUrl: '/' });
     expect(screen.getByText('No pude abrir tus datos')).toBeTruthy();
-    fireEvent.press(screen.getByText('Intentar de nuevo'));
+    fireEvent.press(screen.getByLabelText('Intentar de nuevo'));
     expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
   });
 });

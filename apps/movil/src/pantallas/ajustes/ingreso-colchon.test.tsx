@@ -17,12 +17,13 @@ import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { ETIQUETA_CAPTURA_NO_DISPONIBLE } from './captura-textos';
-import { etiquetaCampoMonto } from '../../ui/formato';
-import { ayudaColchon, ETIQUETA_MONTO_COLCHON } from './colchon-textos';
+import { etiquetaCampoMonto, pistaCampoMonto } from '../../ui/formato';
+import { ayudaColchon, ETIQUETA_MONTO_COLCHON, PISTA_GUARDAR_COLCHON } from './colchon-textos';
 import {
   CONFIRMACION_INGRESO_VARIABLE,
   ETIQUETA_CAMBIAR_INGRESO,
   ETIQUETA_CONFIGURAR_INGRESO,
+  etiquetaProximoPagoIngreso,
   fraseCuandoTePagan,
   lineaResumenIngreso,
   mensajeIngresoGuardado,
@@ -180,6 +181,10 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       'accessibilityLabel',
       etiquetaCampoMonto(PREGUNTA_MONTO, '13,000'),
     );
+    expect(screen.getByTestId('editar-ingreso-proximo-pago-fecha')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaProximoPagoIngreso('jue 15'),
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
 
     // Cada viernes: sin el día no se puede guardar.
@@ -249,7 +254,11 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     );
     expect(screen.getByTestId('ajustes-colchon-monto')).toHaveProp(
       'accessibilityHint',
-      ayudaColchon(130_000),
+      pistaCampoMonto(ayudaColchon(130_000)),
+    );
+    expect(screen.getByTestId('ajustes-colchon-guardar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_COLCHON,
     );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
 

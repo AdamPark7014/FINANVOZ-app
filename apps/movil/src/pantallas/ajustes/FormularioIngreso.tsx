@@ -23,6 +23,7 @@ import {
   EJEMPLO_DIA_MES,
   ERROR_DIA_MES,
   ETIQUETA_PROXIMO_PAGO,
+  etiquetaProximoPagoIngreso,
   PREGUNTA_DIA_MES,
   PREGUNTA_DIA_SEMANA,
   PREGUNTA_FIN_SEMANA,
@@ -139,10 +140,22 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
           />
           {proximo ? (
             <Tarjeta testID={`${prefijo}-proximo-pago`}>
-              <Texto variante="secundario" tono="secundario">
+              <Texto
+                variante="secundario"
+                tono="secundario"
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
                 {ETIQUETA_PROXIMO_PAGO}
               </Texto>
-              <Texto variante="subtitulo">{etiquetaFecha(proximo)}</Texto>
+              <Texto
+                variante="subtitulo"
+                testID={`${prefijo}-proximo-pago-fecha`}
+                accessibilityRole="text"
+                accessibilityLabel={etiquetaProximoPagoIngreso(etiquetaFecha(proximo))}
+              >
+                {etiquetaFecha(proximo)}
+              </Texto>
             </Tarjeta>
           ) : null}
         </>

@@ -35,6 +35,11 @@ export const EJEMPLO_HORA_AVISOS = '09:00';
 export const ETIQUETA_HORARIO_SILENCIOSO = 'Horario silencioso';
 export const DESC_HORARIO_SILENCIOSO =
   'En este horario no te aviso nada; lo que caiga ahí sale cuando termina.';
+/** TalkBack: título y explicación en un solo foco (visible: título + {@link DESC_HORARIO_SILENCIOSO}). */
+export const ETIQUETA_BLOQUE_HORARIO_SILENCIOSO = `${ETIQUETA_HORARIO_SILENCIOSO}. ${DESC_HORARIO_SILENCIOSO}`;
+
+/** TalkBack cuando el teléfono bloquea avisos (visible: {@link AVISOS_APAGADOS_EN_TELEFONO}). */
+export const ETIQUETA_AVISOS_APAGADOS_TELEFONO = `Aviso. ${AVISOS_APAGADOS_EN_TELEFONO}`;
 
 export const ETIQUETA_SILENCIO_DESDE = 'Desde';
 export const ETIQUETA_SILENCIO_HASTA = 'Hasta';
