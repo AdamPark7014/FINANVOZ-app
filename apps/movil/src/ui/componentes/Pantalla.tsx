@@ -29,7 +29,7 @@ export function Pantalla({
   return (
     <SafeAreaView testID={testID} edges={bordes} style={{ flex: 1, backgroundColor: c.fondo }}>
       {desplazable ? (
-        <ScrollView contentContainerStyle={[contenido, contenidoStyle]} keyboardShouldPersistTaps="handled">
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={[contenido, contenidoStyle]} keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
       ) : (
