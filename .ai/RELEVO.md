@@ -6,28 +6,26 @@
 
 ## Hecho en este turno
 
-- **Tandas:** copy y pistas TalkBack en lista/detalle (volver, nueva, calendario, ya la di, me tocó); vacío con `EstadoVacio`; test aserta `PISTA_ME_TOCO`.
+- **Suscripciones / O5 pagos fijos (TalkBack):** fila con encabezado, mensaje `alert` si error, vacío `EstadoVacio`, auditoría estricta E14; O5 pistas continuar/saltar y fila agregada en palabras (`onboarding.test.tsx`).
+- **UI kit:** `EstadoVacio` / `CampoMonto` TalkBack; tests `componentes.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips, ayuda/captura/suscripciones a11y. Ver `git log`.
+- Cuentas CTAs, captura, me-alcanza. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Muchos archivos WIP en `git status` (otros turnos) — no commitear sin revisar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP paralelo (`PreviaWidget`, etc.) — no mezclar sin `git status`.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Salvar o commitear WIP suelto en tests/UI.
-3. M11 negocio cuando toque el hito.
+2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
