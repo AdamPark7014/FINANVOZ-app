@@ -6,27 +6,26 @@
 
 ## Hecho en este turno
 
-- **Arqueo efectivo TalkBack/copy:** `arqueo/textos.ts` (`AYUDA_POR_ASIGNAR`, `ACCESIBILIDAD_ABRIR`/`LISTO`, `etiquetaContarEnCuenta`); `TarjetasCaptura`, `PantallaArqueo`, `PantallaHoy`, `PantallaCuentas`; tests `accesibilidad.test.tsx` + `arqueo.test.tsx` (`682a231`, `4ef5253`, `4d5d5d9`, `f744751`).
+- **Chip / Movimientos / principal (TalkBack):** pruebas de `Chip.test` alineadas con `accessibilityState` y `hitSlop`; `principal.test` cubre título, días, filtro activo, vacíos con `liveRegion` y filas habladas.
 
 ## Hecho (acumulado reciente)
 
-- Me alcanza, tandas, suscripciones, Hoy CTAs. Ver `git log` (`a36fc17`).
+- Captura, suscripciones, widget, Hoy/Cuentas a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en working tree — no mezclar sin revisar `git status`.
-- CA-M6-05 probabilidad: intermitente en local.
-- M0 / EAS: Adam.
+- WIP ajeno en móvil (`git status`) — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Cerrar WIP paralelo en commits pequeños.
+2. Video flujo divulgación → captura para Play (`08 §3.1`).
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
