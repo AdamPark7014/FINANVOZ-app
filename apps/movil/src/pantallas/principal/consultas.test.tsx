@@ -110,8 +110,8 @@ describe('Movimientos con el filtro de una consulta', () => {
       f.nube,
     );
     expect(screen.getByTestId('movimientos-filtro')).toBeTruthy();
-    expect(screen.getByTestId('movimientos-lista')).toHaveTextContent(/tacos/i);
-    expect(screen.getByTestId('movimientos-lista')).not.toHaveTextContent(/uber/i);
+    expect(screen.getByText(/tacos/i, { hidden: true })).toBeTruthy();
+    expect(screen.queryByText(/uber/i, { hidden: true })).toBeNull();
     fireEvent.press(screen.getByTestId('boton-quitar-filtro'));
     expect(alQuitarFiltro).toHaveBeenCalled();
     expect(filtroDeParams({})).toBeNull();

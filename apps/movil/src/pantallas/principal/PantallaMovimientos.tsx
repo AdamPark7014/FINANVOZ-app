@@ -43,6 +43,7 @@ import {
   TEXTO_MOVIMIENTOS_VACIO,
   TEXTO_POR_REVISAR,
   TITULO_POR_REVISAR,
+  MENSAJE_ANULADO_MOVIMIENTO,
 } from './textos';
 
 const INSIGNIA: Record<MovimientoVista['insignias'][number], string> = {
@@ -200,7 +201,7 @@ export function PantallaMovimientos({
                   anularMovimiento(ctx, m.id);
                   setAbierto(null);
                   refrescar();
-                  mostrar({ mensaje: 'Anulé el movimiento.' });
+                  mostrar({ mensaje: MENSAJE_ANULADO_MOVIMIENTO });
                 } catch (e) {
                   mostrar({ mensaje: mensajeError(e) });
                 }

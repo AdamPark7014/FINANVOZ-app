@@ -265,6 +265,7 @@ export const TEXTO_MOVIMIENTOS_FILTRO_ACTIVO = 'Solo los movimientos de tu pregu
 
 export const PREGUNTA_PASAR_A_MESES = '¿A cuántos meses sin intereses fue?';
 export const PISTA_ELEGIR_CUENTA_CONFIRMACION = 'Elige una cuenta en los chips de arriba.';
+export const MENSAJE_ANULADO_MOVIMIENTO = 'Anulé el movimiento.';
 
 // ——— Cuentas (`02 §11`) ———
 

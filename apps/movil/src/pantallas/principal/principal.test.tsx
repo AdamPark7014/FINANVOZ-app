@@ -23,6 +23,7 @@ import {
   TEXTO_CUENTAS_TIENES_VACIO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
+  MENSAJE_ANULADO_MOVIMIENTO,
   SUBTITULO_SIN_INGRESO,
   TITULO_SIN_INGRESO,
   contextoSaldoCompromiso,
@@ -505,7 +506,7 @@ describe('Movimientos', () => {
     expect(within(detalle).getByText('Registrado escribiendo · 11 oct')).toBeTruthy();
     fireEvent.press(within(detalle).getByTestId('boton-anular'));
     fireEvent.press(screen.getByTestId('boton-confirmar-anular'));
-    expect(screen.getByText('Anulé el movimiento.')).toBeTruthy();
+    expect(screen.getByText(MENSAJE_ANULADO_MOVIMIENTO)).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
     expect(listarMovimientos(p.ctx)).toEqual([]);
   });

@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **test(movil): tandas** — conflictos resueltos en `tandas.test.tsx`; aserciones de aviso en Hoy (aportación/cobro) con `within(aviso).getByText(..., { hidden: true })` porque el snack incluye «Deshacer».
+- **test(movil):** pruebas alineadas a UI con texto oculto al lector — avisos de tanda (`toHaveTextContent` + `saldoInicial` en E11-03); filtro de consulta en Movimientos (`hidden: true`). Resuelto conflicto stash en `tandas.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Principal interpretación copy, tarjetas, Hoy, deducciones. Ver `git log`.
+- Estados de cuenta: copy/a11y en `LeerEstadoCuenta`, barrel `index.ts` (`b3a74f1`). Consulta/respaldo: `BTN_LISTO`, `boton-cerrar-consulta`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (arqueo, captura, estados-cuenta, me-alcanza, etc.) — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
+- WIP ajeno (tabs, arqueo, PanelRegistrar) — no mezclar.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Pantallas con strings sueltos (Movimientos, chips, etc.).
+2. Push `main` si hace falta.
 
 ## No tocar
 
