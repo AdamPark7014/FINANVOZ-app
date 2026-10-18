@@ -252,12 +252,15 @@ function YaMePago({
     <Tarjeta testID="persona-ya-me-pago">
       <Texto variante="subtitulo">{TITULO_YA_ME_PAGO}</Texto>
       <CampoMonto etiqueta={ETIQUETA_MONTO} valorInicial={saldo} alCambiar={setMonto} testID="pago-persona-monto" />
-      <Texto variante="etiqueta">{ETIQUETA_A_DONDE_LLEGO}</Texto>
+      <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {ETIQUETA_A_DONDE_LLEGO}
+      </Texto>
       <GrupoChips
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={destinoId}
         alCambiar={setDestinoId}
         prefijoTestID="pago-persona-destino"
+        etiqueta={ETIQUETA_A_DONDE_LLEGO}
       />
       {intentado && faltante ? (
         <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
@@ -325,12 +328,15 @@ function Recordatorio({
         </>
       ) : (
         <>
-          <Texto variante="subtitulo">{TITULO_RECORDATORIO_COBRO}</Texto>
+          <Texto variante="subtitulo" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {TITULO_RECORDATORIO_COBRO}
+          </Texto>
           <GrupoChips
             opciones={opciones.map((o) => ({ valor: o.fecha, etiqueta: o.etiqueta }))}
             valor={null}
             alCambiar={(f) => void fijar(f)}
             prefijoTestID="recordatorio-cobro"
+            etiqueta={TITULO_RECORDATORIO_COBRO}
           />
         </>
       )}

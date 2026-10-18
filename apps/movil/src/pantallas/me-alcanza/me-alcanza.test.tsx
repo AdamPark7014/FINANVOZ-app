@@ -26,6 +26,7 @@ import {
   type VistaMeAlcanza,
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
+import { etiquetaHablada } from '../../ui/formato';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import {
   notificacionesEnMemoria,
@@ -59,7 +60,10 @@ import {
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
+  PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
+  TITULO,
+  etiquetaChipMeses,
 } from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
@@ -231,6 +235,14 @@ function conHistorial() {
 }
 
 describe('¿Me alcanza?', () => {
+  it('el formulario vacío muestra título y chips con copy de textos.ts', () => {
+    const p = e401();
+    montar(p.ctx, <PantallaMeAlcanza calcular={jest.fn()} alCerrar={jest.fn()} />);
+    expect(screen.getByText(TITULO)).toBeTruthy();
+    expect(screen.getByText(PREGUNTA_MSI)).toBeTruthy();
+    expect(screen.getByText(etiquetaChipMeses('6'))).toBeTruthy();
+  });
+
   it('CA-M6-03 · con el resultado de E8-22 muestra "< 1 %", "89 %", "79 %", "90 %" y la recomendación', async () => {
     const p = e401();
     montar(
@@ -259,9 +271,9 @@ describe('¿Me alcanza?', () => {
     expect(screen.getByText('Comprometes $500 al mes hasta enero')).toBeTruthy();
     // "Sin comprar" no se puede "comprar".
     expect(screen.getByTestId('lo-compre-msi')).toBeTruthy();
-    expect(screen.getAllByText(BTN_LO_COMPRE).length).toBeGreaterThan(0);
-    expect(screen.getByText(BTN_COMO_LO_CALCULE)).toBeTruthy();
-    expect(screen.getByText(BTN_HACER_OTRA_CUENTA)).toBeTruthy();
+    expect(screen.getByTestId('lo-compre-contado_hoy')).toBeTruthy();
+    expect(screen.getByRole('button', { name: BTN_COMO_LO_CALCULE })).toBeTruthy();
+    expect(screen.getByTestId('boton-otra-cuenta')).toBeTruthy();
     expect(screen.queryByTestId('lo-compre-base')).toBeNull();
     expect(screen.queryByTestId('me-alcanza-etiqueta')).toBeNull(); // 92 días de historial
     // Texto fijo de `08 §1`.

@@ -25,6 +25,7 @@ import {
   ETIQUETA_VOLVER,
   INTRO_RESTAURAR_ARCHIVO,
   INTRO_RESTAURAR_NUBE,
+  PISTA_VOLVER_RESTAURAR,
   mensajeErrorNube,
   mensajeErrorRespaldo,
   RESTAURAR_NO_DISPONIBLE,
@@ -119,6 +120,8 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
         variante="texto"
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
+        etiquetaAccesible={ACCESIBILIDAD_VOLVER_RESTAURAR}
+        pista={PISTA_VOLVER_RESTAURAR}
         deshabilitado={trabajando}
         alPresionar={alVolver}
       />

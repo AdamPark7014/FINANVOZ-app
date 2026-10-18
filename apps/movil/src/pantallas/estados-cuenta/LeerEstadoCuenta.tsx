@@ -384,7 +384,7 @@ function Revisar({
           {a.nuevos.map((n) => (
             <Casilla
               key={n.indice}
-              etiqueta={etiquetaRenglon(n)}
+              etiqueta={etiquetaRenglonEstado(n)}
               valor={!quitados.has(n.indice)}
               alCambiar={(v) =>
                 setQuitados((q) => {
@@ -448,7 +448,7 @@ function Dudoso({
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
       <Texto variante="secundario" tono="secundario">
-        {preguntaEsMismoMovimiento(d)}
+        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
       </Texto>
       <Chips
         etiqueta={etiquetaChipsDudoso(d.descripcion)}

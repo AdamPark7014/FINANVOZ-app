@@ -12,12 +12,14 @@ import { TarjetaRespaldo } from './TarjetaRespaldo';
 import { crearRespaldoPrueba } from './__pruebas__/respaldo';
 import {
   ACCESIBILIDAD_VOLVER,
+  ACCESIBILIDAD_VOLVER_RESTAURAR,
   AVISO_CONTRASENA,
   BTN_CREAR_CONTRASENA,
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
   PISTA_BORRAR_CUENTA,
   PISTA_VOLVER,
+  PISTA_VOLVER_RESTAURAR,
   SUBTITULO_ARCHIVO,
   TITULO_RESPALDO,
 } from './textos';
@@ -81,6 +83,23 @@ describe('accesibilidad en pantalla respaldo', () => {
     );
     expect(screen.getByText(SUBTITULO_ARCHIVO)).toBeTruthy();
     expect(screen.getByText(DESCRIPCION_ARCHIVO)).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('Restaurar: volver tiene rol, etiqueta y pista', () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    montar(
+      p.ctx,
+      <Restaurar alVolver={jest.fn()} />,
+      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
+    );
+    expect(screen.getByTestId('restaurar-volver')).toHaveProp('accessibilityRole', 'button');
+    expect(screen.getByTestId('restaurar-volver')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_VOLVER_RESTAURAR,
+    );
+    expect(screen.getByTestId('restaurar-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_RESTAURAR);
     p.cerrar();
   });
 });

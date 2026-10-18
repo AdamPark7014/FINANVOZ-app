@@ -240,7 +240,9 @@ export function PantallaMeAlcanza({
             ejemplo={EJEMPLO_DESCRIPCION}
             testID="me-alcanza-descripcion"
           />
-          <Texto variante="cuerpo">{PREGUNTA_MSI}</Texto>
+          <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {PREGUNTA_MSI}
+          </Texto>
           <GrupoChips<OpcionMeses>
             opciones={[
               { valor: 'sin', etiqueta: ETIQUETA_MSI_TU_DIME },
@@ -250,6 +252,7 @@ export function PantallaMeAlcanza({
             valor={meses}
             alCambiar={setMeses}
             prefijoTestID="me-alcanza-meses"
+            etiqueta={PREGUNTA_MSI}
           />
           {meses === 'otro' ? (
             <CampoTexto

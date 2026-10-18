@@ -27,12 +27,15 @@ export function ElegirCuentaTanda({
   const cuentas = useVista((ctx) => listarCuentas(ctx).tienes.filter((c) => c.subtipo !== 'ahorro'));
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="secundario">{pregunta}</Texto>
+      <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {pregunta}
+      </Texto>
       <GrupoChips
         opciones={cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
         valor={null}
         alCambiar={alElegir}
         prefijoTestID={prefijoTestID}
+        etiqueta={pregunta}
       />
     </View>
   );

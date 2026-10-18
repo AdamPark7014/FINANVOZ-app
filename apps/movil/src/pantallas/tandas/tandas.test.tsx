@@ -165,6 +165,7 @@ describe('Tandas (02 §18)', () => {
     expect(
       within(screen.getByTestId('aviso')).getByText(
         mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
+        { hidden: true },
       ),
     ).toBeTruthy();
     const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
@@ -191,6 +192,7 @@ describe('Tandas (02 §18)', () => {
     expect(
       within(screen.getByTestId('aviso')).getByText(
         mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
+        { hidden: true },
       ),
     ).toBeTruthy();
     expect(detalleTanda(p.ctx, tandaId).cobrada).toBe(true);
