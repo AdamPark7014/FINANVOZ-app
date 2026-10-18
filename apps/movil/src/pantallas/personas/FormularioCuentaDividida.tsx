@@ -212,7 +212,12 @@ export function FormularioCuentaDividida({
               testID="division-te-deben"
             />
           </View>
-          <Texto variante="secundario" tono="secundario">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="division-reparto-detalle"
+            accessibilityLiveRegion="polite"
+          >
             {reparto.partesOtros.every((x) => x === reparto.partesOtros[0])
               ? `Cada quien te debe ${formatearCentavos(reparto.partesOtros[0] ?? 0)}. No cuenta como ingreso.`
               : `Cada quien te debe ${reparto.partesOtros.map((x) => formatearCentavos(x)).join(', ')}, en el orden en que los eliges. No cuenta como ingreso.`}

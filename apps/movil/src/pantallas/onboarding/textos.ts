@@ -99,6 +99,22 @@ export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
 export const PISTA_PAGOS_SALTAR = 'Pasa al siguiente paso sin registrar pagos fijos';
 export const PISTA_PAGOS_CONTINUAR = 'Pasa a activar la captura automática';
 
+/** TalkBack O6 · «Ahora no» en ActivarCaptura (complementa el consejo `TIP_CAPTURA_AHORA_NO`). */
+export const PISTA_CAPTURA_AHORA_NO = 'Pasa al colchón sin activar la captura automática';
+
+/** TalkBack O4 · tarjeta de crédito opcional en el recorrido. */
+export const PISTA_AGREGAR_TARJETA_ONB = 'Abre el formulario de tarjeta de crédito';
+export const PISTA_TARJETA_GUARDAR_ONB = 'Guarda la tarjeta con los datos que pusiste';
+export const PISTA_TARJETA_DESPUES_ONB = 'Regresa a cuentas sin guardar esta tarjeta';
+
+/** TalkBack O4 · aviso al elegir «No sé» en meses incluidos en el saldo (`02 §3.1`). */
+export const AVISO_NO_SE_TARJETA_ONB =
+  'No lo resto: puede que cuente de más lo que debes, nunca de menos. Compáralo con tu próximo estado de cuenta.';
+
+export function etiquetaAvisoNoSeTarjetaOnb(): string {
+  return `Aviso: ${AVISO_NO_SE_TARJETA_ONB}`;
+}
+
 export function etiquetaAgregarPago(concepto: string): string {
   return `Agregar ${concepto}`;
 }

@@ -45,6 +45,7 @@ import {
   MENSAJE_SIN_AVISOS,
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
+  etiquetaPersonaNoEncontrada,
   etiquetaVacioMovimientosPersona,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
@@ -90,7 +91,11 @@ export function PantallaPersona({
           alPresionar={alVolver}
           pista={PISTA_VOLVER}
         />
-        <EstadoVacio texto={TEXTO_PERSONA_NO_ENCONTRADA} testID="persona-no-encontrada" />
+        <EstadoVacio
+          texto={TEXTO_PERSONA_NO_ENCONTRADA}
+          testID="persona-no-encontrada"
+          etiquetaAccesible={etiquetaPersonaNoEncontrada()}
+        />
       </Pantalla>
     );
   }

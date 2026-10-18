@@ -17,15 +17,12 @@ import {
 } from '../ajustes/avisos-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
-import {
-  etiquetaAccesibleProbabilidad,
-  ProbabilidadHoy,
-  TEXTO_RIESGO,
-} from './ProbabilidadHoy';
+import { etiquetaAccesibleProbabilidad, ProbabilidadHoy } from './ProbabilidadHoy';
 import {
   ETIQUETA_PROBABILIDAD_CALCULANDO,
   etiquetaAvisoRiesgo,
   FRASE_MARCA_PROBABILIDAD,
+  TEXTO_RIESGO,
 } from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
@@ -113,6 +110,7 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     expect(screen.getByTestId('aviso-riesgo')).toHaveTextContent(TEXTO_RIESGO);
     expect(screen.getByTestId('aviso-riesgo-texto')).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId('aviso-riesgo-texto')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('aviso-riesgo-texto')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('aviso-riesgo-texto').props.accessibilityLabel).toBe(
       etiquetaAvisoRiesgo(TEXTO_RIESGO),
     );

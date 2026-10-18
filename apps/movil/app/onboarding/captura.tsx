@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from '../../src/pantallas/captura/ActivarCaptura';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
-import { TIP_CAPTURA_AHORA_NO } from '../../src/pantallas/onboarding/textos';
+import { PISTA_CAPTURA_AHORA_NO, TIP_CAPTURA_AHORA_NO } from '../../src/pantallas/onboarding/textos';
 
 /**
  * O6 · Captura automática (`02 §3`): la divulgación destacada de `08 §3.1` antes de abrir el ajuste del sistema.
@@ -16,7 +16,11 @@ export default function Captura() {
       titulo={DIVULGACION_CAPTURA.titulo}
       tip={TIP_CAPTURA_AHORA_NO}
     >
-      <ActivarCaptura testID="onb-captura" alTerminar={() => router.push('/onboarding/colchon')} />
+      <ActivarCaptura
+        testID="onb-captura"
+        pistaAhoraNo={PISTA_CAPTURA_AHORA_NO}
+        alTerminar={() => router.push('/onboarding/colchon')}
+      />
     </PasoOnboarding>
   );
 }

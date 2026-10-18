@@ -6,22 +6,21 @@
 
 ## Hecho en este turno
 
-- **EscanerQr TalkBack:** instrucción visual fuera del árbol; botón «Permitir la cámara» con `etiquetaAccesible` completa + pista; test en `compartido.test.tsx`.
-- **FormularioGastoCompartido (turno previo/rescate):** `PISTA_GUARDAR_GASTO_COMPARTIDO`, live region resumen con `importantForAccessibility="yes"`.
+- **ProbabilidadHoy / riesgo:** copy centralizado en `textos.ts` (`TEXTO_AVISO_RIESGO_HOY`); aviso con `tono="faltante"` y `importantForAccessibility="yes"` para TalkBack al aparecer bajo P < 50 %.
 
 ## Hecho (acumulado reciente)
 
-- PreviaWidget, captura, Cuentas TalkBack. Ver `git log`.
+- Marca 50 % en barra, `FRASE_MARCA_PROBABILIDAD`, PreviaWidget, Chip hints. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo fuera de `compartido/` (onboarding, ajustes, Chip, etc.) — no mezclar en commits de compartido.
+- WIP paralelo (onboarding, captura, suscripciones, movimientos, etc.) — no mezclar en commits ajenos.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack botones grupo (Saldar, Anular) o `TarjetaConfirmarCompartido` cancelar.
+2. TalkBack aviso retiro tarjeta en formulario movimiento o `CampoMonto` deshabilitado.
 
 ## No tocar
 

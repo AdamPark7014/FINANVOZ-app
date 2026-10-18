@@ -16,12 +16,11 @@ import {
   ETIQUETA_PROBABILIDAD_CALCULANDO,
   etiquetaAvisoRiesgo,
   FRASE_MARCA_PROBABILIDAD,
+  TEXTO_AVISO_RIESGO_HOY,
 } from './textos';
 import { useNotificaciones } from '../avisos/notificaciones';
 
-/** Aviso de riesgo en Hoy (P < 50 %, `02 §13`): sin cifras nuevas, solo qué significa la probabilidad. */
-export const TEXTO_RIESGO =
-  'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
+export { TEXTO_RIESGO } from './textos';
 
 /** TalkBack: la barra lleva el dato, la marca del 50 % y la etiqueta; el pie visible queda oculto. */
 export function etiquetaAccesibleProbabilidad(texto: string, etiqueta: string | null): string {
@@ -139,12 +138,14 @@ export function ProbabilidadHoy({
         <Tarjeta testID="aviso-riesgo">
           <Texto
             variante="secundario"
+            tono="faltante"
             testID="aviso-riesgo-texto"
             accessibilityRole="alert"
             accessibilityLiveRegion="polite"
-            accessibilityLabel={etiquetaAvisoRiesgo(TEXTO_RIESGO)}
+            importantForAccessibility="yes"
+            accessibilityLabel={etiquetaAvisoRiesgo()}
           >
-            {TEXTO_RIESGO}
+            {TEXTO_AVISO_RIESGO_HOY}
           </Texto>
         </Tarjeta>
       ) : null}

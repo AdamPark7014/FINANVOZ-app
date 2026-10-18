@@ -9,6 +9,8 @@ export const SECCION_CAPTURA = 'Captura automática';
 export const ETIQUETA_AVISO_AL_CAPTURAR = 'Aviso al capturar';
 export const DESC_AVISO_AL_CAPTURAR =
   'Te aviso en segundo plano cuando anoto un movimiento. Nunca lleva montos ni comercios.';
+/** TalkBack: título y explicación en un solo foco (visible: título + {@link DESC_AVISO_AL_CAPTURAR}). */
+export const ETIQUETA_BLOQUE_AVISO_CAPTURAR = `${ETIQUETA_AVISO_AL_CAPTURAR}. ${DESC_AVISO_AL_CAPTURAR}`;
 export const PREGUNTA_MODO_AVISO = '¿Cómo quieres el aviso al capturar?';
 
 export const OPCIONES_MODO_AVISO: readonly OpcionChip<ModoAvisoCaptura>[] = [

@@ -27,6 +27,7 @@ import {
   ETIQUETA_SALDO_CUENTA_ONB,
   ETIQUETA_TARJETA_DEBES,
   ETIQUETAS_SUBTIPO_CUENTA,
+  PISTA_AGREGAR_TARJETA_ONB,
   PISTA_CUENTAS_CONTINUAR,
   SUFIJO_TIENES,
   TIP_CUENTAS_MINIMO,
@@ -176,6 +177,7 @@ export default function Cuentas() {
         testID="onb-agregar-tarjeta"
         variante="secundario"
         etiqueta={BTN_AGREGAR_TARJETA_CREDITO}
+        pista={PISTA_AGREGAR_TARJETA_ONB}
         alPresionar={() => router.push('/onboarding/tarjeta')}
       />
       <MensajeError texto={error} />

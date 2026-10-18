@@ -35,6 +35,8 @@ import { etiquetaHablada } from '../../ui';
 import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
+  PISTA_AGREGAR_TARJETA_ONB,
+  PISTA_CAPTURA_AHORA_NO,
   PISTA_COMPLETAR_INGRESO,
   PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
@@ -42,8 +44,15 @@ import {
   PISTA_ONB_EMPEZAR,
   PISTA_PAGOS_CONTINUAR,
   PISTA_PAGOS_SALTAR,
+  PISTA_TARJETA_DESPUES_ONB,
+  PISTA_TARJETA_GUARDAR_ONB,
   TITULO_BIENVENIDA,
 } from './textos';
+import {
+  AVISO_SIMPLIFICADO,
+  etiquetaAvisoSimplificadoOnboarding,
+} from './aviso';
+import { TITULO_AVISO_SIMPLIFICADO } from './textos';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
 const RUTAS = {
@@ -105,6 +114,10 @@ describe('onboarding', () => {
       'accessibilityLabel',
       `Consejo: ${TIP_CONSENTIMIENTO}`,
     );
+    expect(screen.getByTestId('onb-aviso-simplificado')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_SIMPLIFICADO, AVISO_SIMPLIFICADO),
+    );
 
     // La casilla obligatoria viene sin marcar y el botón no hace nada hasta marcarla.
     expect(screen.getByTestId('onb-casilla-datos')).toHaveProp('accessibilityState', { checked: false });
@@ -163,8 +176,20 @@ describe('onboarding', () => {
     it('CA-M2-12 · con meses que ya tenía y "No sé": no resta los meses del saldo y Hoy avisa', () => {
       const r = abrir('/onboarding/cuentas');
       expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CUENTAS_MINIMO);
+      expect(screen.getByTestId('onb-agregar-tarjeta')).toHaveProp(
+        'accessibilityHint',
+        PISTA_AGREGAR_TARJETA_ONB,
+      );
       tocar('onb-agregar-tarjeta');
       expect(r.getPathname()).toBe('/onboarding/tarjeta');
+      expect(screen.getByTestId('tarjeta-guardar')).toHaveProp(
+        'accessibilityHint',
+        PISTA_TARJETA_GUARDAR_ONB,
+      );
+      expect(screen.getByTestId('tarjeta-despues')).toHaveProp(
+        'accessibilityHint',
+        PISTA_TARJETA_DESPUES_ONB,
+      );
       llenarTarjeta();
       escribir('tarjeta-saldo', '8,000');
       tocar('tarjeta-msi-si');
@@ -174,6 +199,8 @@ describe('onboarding', () => {
       // Sin responder "¿El saldo ya los incluye?" no se guarda.
       tocar('tarjeta-guardar');
       expect(screen.getByTestId('error-formulario')).toHaveTextContent(/ya incluye esos meses/);
+    expect(screen.getByTestId('error-formulario')).toHaveProp('accessibilityLabel', expect.stringMatching(/ya incluye esos meses/));
+    expect(screen.getByTestId('error-formulario')).toHaveProp('importantForAccessibility', 'yes');
       expect(listarCuentas(s.ctx).debes).toHaveLength(0);
 
       tocar('tarjeta-incluye-no_se');
@@ -192,6 +219,14 @@ describe('onboarding', () => {
     it('sin saldo no se crea la tarjeta; "Agregar después" no guarda nada', () => {
       const r = abrir('/onboarding/cuentas');
       tocar('onb-agregar-tarjeta');
+      expect(screen.getByTestId('tarjeta-guardar')).toHaveProp(
+        'accessibilityHint',
+        PISTA_TARJETA_GUARDAR_ONB,
+      );
+      expect(screen.getByTestId('tarjeta-despues')).toHaveProp(
+        'accessibilityHint',
+        PISTA_TARJETA_DESPUES_ONB,
+      );
       llenarTarjeta();
       tocar('tarjeta-guardar');
       expect(screen.getByTestId('error-formulario')).toHaveTextContent(/cuánto debes hoy/);

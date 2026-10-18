@@ -43,6 +43,7 @@ import {
   PISTA_CREAR_CON_ALGUIEN,
   PISTA_ESCANEAR_CODIGO,
   PISTA_ESCRIBIR_NOMBRE_PAREJA,
+  INSTRUCCION_PERMISO_CAMARA,
   PISTA_GUARDAR_GASTO_COMPARTIDO,
   PISTA_PERMISO_CAMARA,
   PISTA_VISTA_CAMARA,
@@ -195,6 +196,10 @@ describe('02 §27 · Gastos con tu pareja', () => {
   it('escáner sin permiso: pista TalkBack en Permitir la cámara', () => {
     mockCamaraConcedida = false;
     render(<EscanerQr alLeer={jest.fn()} alCancelar={jest.fn()} />);
+    expect(screen.getByTestId('escaner-permiso')).toHaveProp(
+      'accessibilityLabel',
+      INSTRUCCION_PERMISO_CAMARA,
+    );
     expect(screen.getByTestId('escaner-permiso')).toHaveProp('accessibilityHint', PISTA_PERMISO_CAMARA);
     mockCamaraConcedida = true;
   });

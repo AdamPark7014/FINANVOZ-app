@@ -147,7 +147,9 @@ export function PasoOnboarding({
       >
         {textoProgresoOnboarding(paso)}
       </Texto>
-      <Texto variante="titulo">{titulo}</Texto>
+      <Texto variante="titulo" accessibilityRole="header">
+        {titulo}
+      </Texto>
       {ayuda ? (
         <Texto variante="cuerpo" tono="secundario">
           {ayuda}
@@ -178,6 +180,8 @@ export function MensajeError({ texto }: { texto: string | null }) {
       tono="faltante"
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
+      importantForAccessibility="yes"
+      accessibilityLabel={texto}
       testID="error-formulario"
     >
       {texto}

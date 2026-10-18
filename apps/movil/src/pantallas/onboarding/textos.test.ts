@@ -18,8 +18,10 @@ import {
   PISTA_COMPLETAR_INGRESO,
   PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
+  PISTA_CAPTURA_AHORA_NO,
   PISTA_ONB_CONTINUAR,
   PISTA_ONB_EMPEZAR,
+  PISTA_TARJETA_DESPUES_ONB,
   TITULO_BIENVENIDA,
   TITULO_COLCHON,
   TITULO_CONSENTIMIENTO,
@@ -117,5 +119,14 @@ describe('textos de onboarding', () => {
     expect(TIP_CONSENTIMIENTO).toMatch(/«Aceptar y continuar»/);
     expect(TIP_CAPTURA_AHORA_NO).toMatch(/«Ahora no»/);
     expect(TIP_CAPTURA_AHORA_NO).toMatch(/Ajustes › Captura/);
+  });
+
+  it('PISTA_CAPTURA_AHORA_NO describe el siguiente paso del recorrido', () => {
+    expect(PISTA_CAPTURA_AHORA_NO).toMatch(/colchón/i);
+    expect(PISTA_CAPTURA_AHORA_NO).not.toMatch(/!/);
+  });
+
+  it('pistas TalkBack de tarjeta en onboarding', () => {
+    expect(PISTA_TARJETA_DESPUES_ONB).toMatch(/sin guardar/i);
   });
 });

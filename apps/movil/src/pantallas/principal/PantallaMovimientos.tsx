@@ -386,7 +386,7 @@ function FilaMovimiento({
       accionesAnidadas={abierto}
       expandida={abierto}
       etiquetaAccesible={etiquetaAccesible}
-      pista={abierto ? 'Oculta el detalle' : 'Muestra el detalle'}
+      pista={abierto ? PISTA_OCULTAR_DETALLE_MOVIMIENTO : PISTA_MOSTRAR_DETALLE_MOVIMIENTO}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <View style={{ flex: 1, gap: espacio.xxs }}>
@@ -463,9 +463,22 @@ function FilaMovimiento({
             )
           ) : null}
           {pasando ? null : confirmando ? (
-            <View style={{ gap: espacio.s }}>
-              <Texto variante="cuerpo">¿Anular este movimiento? Sus montos vuelven a tus cuentas.</Texto>
-              <Boton etiqueta="Sí, anular" alPresionar={alAnular} testID="boton-confirmar-anular" />
+            <View style={{ gap: espacio.s }} testID={`confirmar-anular-${m.id}`}>
+              <Texto
+                variante="cuerpo"
+                testID={`texto-confirmar-anular-${m.id}`}
+                accessibilityRole="alert"
+                accessibilityLiveRegion="polite"
+                accessibilityLabel={etiquetaConfirmarAnularMovimiento()}
+              >
+                {TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO}
+              </Texto>
+              <Boton
+                etiqueta="Sí, anular"
+                alPresionar={alAnular}
+                pista={PISTA_CONFIRMAR_ANULAR_MOVIMIENTO}
+                testID="boton-confirmar-anular"
+              />
               <Boton etiqueta="Cancelar" variante="texto" alPresionar={() => setConfirmando(false)} />
             </View>
           ) : (
@@ -474,6 +487,7 @@ function FilaMovimiento({
               variante="secundario"
               ancho="contenido"
               alPresionar={() => setConfirmando(true)}
+              pista={PISTA_ANULAR_MOVIMIENTO}
               testID="boton-anular"
             />
           )}

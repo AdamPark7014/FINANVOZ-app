@@ -45,10 +45,14 @@ import {
   PISTA_CONFIGURAR_INGRESO_HOY,
   PISTA_ME_ALCANZA_HOY,
   PISTA_OCULTAR_DESGLOSE,
+  PISTA_ANULAR_MOVIMIENTO,
+  PISTA_CONFIRMAR_ANULAR_MOVIMIENTO,
   PISTA_DESCARTAR_FRASE,
+  PISTA_MOSTRAR_DETALLE_MOVIMIENTO,
   PISTA_REGISTRAR_MOVIMIENTO,
   PISTA_VER_DESGLOSE,
   PISTA_VER_TODOS_MOVIMIENTOS,
+  etiquetaConfirmarAnularMovimiento,
   PISTA_AGREGAR_TARJETA_CREDITO,
   PISTA_COBRAR_DESDE_CUENTAS,
   PISTA_CONTAR_EFECTIVO,
@@ -624,6 +628,10 @@ describe('Movimientos', () => {
     );
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('accessibilityRole', 'listitem');
+    expect(screen.getByTestId(`movimiento-${id}`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_MOSTRAR_DETALLE_MOVIMIENTO,
+    );
     expect(screen.getByTestId(`movimiento-${id}`).props.accessibilityLabel).toMatch(/veinticinco pesos/);
     p.cerrar();
   });
@@ -731,7 +739,19 @@ describe('Movimientos', () => {
     const detalle = screen.getByTestId(`detalle-${id}`);
     expect(within(detalle).getByText('Salió de: Cartera')).toBeTruthy();
     expect(within(detalle).getByText('Registrado escribiendo · 11 oct')).toBeTruthy();
+    expect(within(detalle).getByTestId('boton-anular')).toHaveProp(
+      'accessibilityHint',
+      PISTA_ANULAR_MOVIMIENTO,
+    );
     fireEvent.press(within(detalle).getByTestId('boton-anular'));
+    const confirmacion = screen.getByTestId(`texto-confirmar-anular-${id}`);
+    expect(confirmacion).toHaveProp('accessibilityRole', 'alert');
+    expect(confirmacion).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(confirmacion.props.accessibilityLabel).toBe(etiquetaConfirmarAnularMovimiento());
+    expect(screen.getByTestId('boton-confirmar-anular')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CONFIRMAR_ANULAR_MOVIMIENTO,
+    );
     fireEvent.press(screen.getByTestId('boton-confirmar-anular'));
     expect(screen.getByLabelText(MENSAJE_ANULADO_MOVIMIENTO)).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');

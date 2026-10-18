@@ -385,6 +385,10 @@ describe('O6 · activar la captura', () => {
     const puente = puenteFalso();
     const alTerminar = jest.fn();
     conCaptura(p.ctx, puente, <ActivarCaptura testID="o6" alTerminar={alTerminar} />);
+    expect(screen.getByTestId('o6-ahora-no')).toHaveProp(
+      'accessibilityHint',
+      PISTA_AHORA_NO_ACTIVAR_CAPTURA,
+    );
     expect(
       screen.getByText(
         'Solo leemos las apps que marques. Las demás notificaciones se ignoran en tu teléfono y no se guardan.',

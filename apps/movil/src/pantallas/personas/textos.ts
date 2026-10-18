@@ -94,6 +94,11 @@ export const MENSAJE_COMPARTIR_NO_DISPONIBLE = 'No pude abrir la hoja de compart
 /** Detalle: id que ya no existe en el libro (`02 §17`). */
 export const TEXTO_PERSONA_NO_ENCONTRADA = 'No encontré a esa persona.';
 
+/** Vacío persona inexistente: sección + copy para TalkBack (`02 §15`). */
+export function etiquetaPersonaNoEncontrada(): string {
+  return `Persona. ${TEXTO_PERSONA_NO_ENCONTRADA}`;
+}
+
 /** Detalle: aún no hay préstamos ni cuentas divididas con ella. */
 export const TEXTO_MOVIMIENTOS_PERSONA_VACIO = 'Todavía no hay movimientos con esta persona.';
 

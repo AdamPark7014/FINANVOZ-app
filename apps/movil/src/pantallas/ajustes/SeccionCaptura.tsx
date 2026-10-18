@@ -10,6 +10,7 @@ import {
   BTN_DESACTIVAR_CAPTURA,
   DESC_AVISO_AL_CAPTURAR,
   ETIQUETA_AVISO_AL_CAPTURAR,
+  ETIQUETA_BLOQUE_AVISO_CAPTURAR,
   ETIQUETA_CAPTURA_APAGADA,
   ETIQUETA_CAPTURA_NO_DISPONIBLE,
   ESTADO_APAGADA,
@@ -52,10 +53,16 @@ export function SeccionCaptura() {
             variante="etiqueta"
             testID="ajustes-captura-aviso-titulo"
             accessibilityRole="header"
+            accessibilityLabel={ETIQUETA_BLOQUE_AVISO_CAPTURAR}
           >
             {ETIQUETA_AVISO_AL_CAPTURAR}
           </Texto>
-          <Texto variante="secundario" tono="secundario">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="ajustes-captura-aviso-desc"
+            {...OCULTAR_ETIQUETA_VISIBLE}
+          >
             {DESC_AVISO_AL_CAPTURAR}
           </Texto>
           <Texto variante="secundario" testID="ajustes-captura-aviso-pregunta" {...OCULTAR_ETIQUETA_VISIBLE}>

@@ -11,6 +11,11 @@ export const RESPONSABLE = {
 } as const;
 
 /** Puntos del aviso simplificado (O2). */
+/** TalkBack O2: el aviso simplificado no depende solo de la lista visual con viñetas. */
+export function etiquetaAvisoSimplificadoOnboarding(titulo: string, puntos: readonly string[]): string {
+  return `${titulo}. ${puntos.join(' ')}`;
+}
+
 export const AVISO_SIMPLIFICADO: readonly string[] = [
   `${RESPONSABLE.nombre} es responsable de tus datos.`,
   'Lo que anotas sobre tu dinero (cuentas, saldos, tarjetas, pagos y movimientos) se guarda cifrado solo en tu teléfono.',

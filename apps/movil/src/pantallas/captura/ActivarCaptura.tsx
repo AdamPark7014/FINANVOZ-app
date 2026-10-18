@@ -267,7 +267,12 @@ export function ActivarCaptura({
       ) : null}
 
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID={`${testID}-error`}
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Texto>
       ) : null}

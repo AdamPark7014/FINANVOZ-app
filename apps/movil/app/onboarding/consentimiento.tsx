@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { AVISO_SIMPLIFICADO } from '../../src/pantallas/onboarding/aviso';
+import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from '../../src/pantallas/onboarding/aviso';
 import {
   Casilla,
   ERROR_GUARDAR,
@@ -62,24 +62,33 @@ export default function Consentimiento() {
         />
       }
     >
-      <Tarjeta>
-        <Texto variante="subtitulo">{TITULO_AVISO_SIMPLIFICADO}</Texto>
-        <View style={{ gap: espacio.s }}>
-          {AVISO_SIMPLIFICADO.map((punto) => (
-            <Texto key={punto} variante="secundario">
-              {`• ${punto}`}
-            </Texto>
-          ))}
-        </View>
-        <Boton
-          testID="onb-aviso-completo"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_LEER_AVISO_COMPLETO}
-          pista={PISTA_LEER_AVISO_COMPLETO}
-          alPresionar={() => router.push('/aviso-privacidad')}
-        />
-      </Tarjeta>
+      <View
+        testID="onb-aviso-simplificado"
+        accessible
+        accessibilityRole="summary"
+        accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_SIMPLIFICADO, AVISO_SIMPLIFICADO)}
+      >
+        <Tarjeta>
+          <Texto variante="subtitulo" accessibilityElementsHidden>
+            {TITULO_AVISO_SIMPLIFICADO}
+          </Texto>
+          <View style={{ gap: espacio.s }} importantForAccessibility="no-hide-descendants">
+            {AVISO_SIMPLIFICADO.map((punto) => (
+              <Texto key={punto} variante="secundario" accessibilityElementsHidden>
+                {`• ${punto}`}
+              </Texto>
+            ))}
+          </View>
+          <Boton
+            testID="onb-aviso-completo"
+            variante="texto"
+            ancho="contenido"
+            etiqueta={BTN_LEER_AVISO_COMPLETO}
+            pista={PISTA_LEER_AVISO_COMPLETO}
+            alPresionar={() => router.push('/aviso-privacidad')}
+          />
+        </Tarjeta>
+      </View>
       <Casilla
         testID="onb-casilla-datos"
         etiqueta={CASILLA_DATOS_FINANCIEROS}

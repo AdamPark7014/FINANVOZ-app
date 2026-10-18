@@ -7,6 +7,7 @@ import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { conEscenario } from '../principal/__pruebas__/base';
 import {
   ETIQUETA_AVISO_AL_CAPTURAR,
+  ETIQUETA_BLOQUE_AVISO_CAPTURAR,
   ETIQUETA_CAPTURA_APAGADA,
   ETIQUETA_CAPTURA_NO_DISPONIBLE,
   etiquetaCapturaActiva,
@@ -107,7 +108,13 @@ describe('SeccionCaptura (TalkBack)', () => {
       etiquetaCapturaActiva(1),
     );
     expect(screen.getByTestId('ajustes-captura-aviso-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-captura-aviso-titulo')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_BLOQUE_AVISO_CAPTURAR,
+    );
     expect(screen.getByText(ETIQUETA_AVISO_AL_CAPTURAR)).toBeTruthy();
+    const desc = screen.getByTestId('ajustes-captura-aviso-desc', { includeHiddenElements: true });
+    expect(desc.props.accessibilityElementsHidden).toBe(true);
     const pregunta = screen.getByTestId('ajustes-captura-aviso-pregunta', { includeHiddenElements: true });
     expect(pregunta.props.accessibilityElementsHidden).toBe(true);
     expect(pregunta.props.importantForAccessibility).toBe('no-hide-descendants');

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { VERSION_CONSENTIMIENTO, compararVersionAviso, versionAvisoDesactualizada } from '../../privacidad/consentimiento';
 import { VERSION_TERMINOS } from '../privacidad/legales';
-import { AVISO_COMPLETO, AVISO_SIMPLIFICADO } from './aviso';
+import { AVISO_COMPLETO, AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from './aviso';
+import { TITULO_AVISO_SIMPLIFICADO } from './textos';
 
 describe('aviso de privacidad (pendiente 84 · modo explicar)', () => {
   it('VERSION_CONSENTIMIENTO es posterior a 2026-10-m7 y desactualiza la versión anterior', () => {
@@ -9,6 +10,14 @@ describe('aviso de privacidad (pendiente 84 · modo explicar)', () => {
     expect(compararVersionAviso('2026-10-m7', VERSION_CONSENTIMIENTO)).toBeLessThan(0);
     expect(versionAvisoDesactualizada('2026-10-m7')).toBe(true);
     expect(versionAvisoDesactualizada(VERSION_CONSENTIMIENTO)).toBe(false);
+  });
+
+  it('TalkBack del aviso simplificado incluye título y todos los puntos', () => {
+    const hablado = etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_SIMPLIFICADO, AVISO_SIMPLIFICADO);
+    expect(hablado.startsWith(TITULO_AVISO_SIMPLIFICADO)).toBe(true);
+    for (const punto of AVISO_SIMPLIFICADO) {
+      expect(hablado).toContain(punto);
+    }
   });
 
   it('el aviso simplificado menciona preguntas abiertas, datos agregados y el proveedor de IA', () => {

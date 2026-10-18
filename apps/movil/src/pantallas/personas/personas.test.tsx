@@ -46,6 +46,7 @@ import {
   TITULO_PEDIR_DATOS_COBRO,
   TITULO_YA_ME_PAGO,
   TEXTO_CONTACTOS_VACIO,
+  etiquetaPersonaNoEncontrada,
   etiquetaVacioContactosDivision,
   etiquetaVacioMovimientosPersona,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
@@ -113,6 +114,7 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     expect(textoDe('division-partes')).toBe('Entre 4');
     expect(textoDe('division-tu-parte')).toBe('$300');
     expect(textoDe('division-te-deben')).toBe('$900');
+    expect(screen.getByTestId('division-reparto-detalle')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(textoDe('division-faltan')).toBe('Elige 3 personas (llevas 0).');
     expect(screen.getByTestId('division-faltan')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('division-partes')).toHaveProp('accessibilityLiveRegion', 'polite');
@@ -375,6 +377,9 @@ describe('estados vacíos (es-MX)', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
     expect(textoDe('persona-no-encontrada')).toBe(TEXTO_PERSONA_NO_ENCONTRADA);
+    expect(screen.getByTestId('persona-no-encontrada').props.accessibilityLabel).toBe(
+      etiquetaPersonaNoEncontrada(),
+    );
     expect(screen.getByTestId('persona-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
   });
 

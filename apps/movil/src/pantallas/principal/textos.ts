@@ -269,10 +269,17 @@ export const ETIQUETA_PROBABILIDAD_CALCULANDO = 'Calculando si llegas…';
 /** TalkBack en la barra de probabilidad: la marca vertical es P = 50 % (`02 §13`). */
 export const FRASE_MARCA_PROBABILIDAD = 'La marca es el 50 %.';
 
+/** Aviso bajo la probabilidad cuando P < 50 % (`02 §13`): sin cifras nuevas. */
+export const TEXTO_AVISO_RIESGO_HOY =
+  'Con lo que sueles gastar, es probable que tengas que tocar tu colchón antes de tu próximo ingreso. Revisa qué viene.';
+
+/** Alias usado en pruebas de pantalla y servicios de aviso. */
+export const TEXTO_RIESGO = TEXTO_AVISO_RIESGO_HOY;
+
 /** Prefijo TalkBack del aviso bajo la probabilidad cuando P < 50 % (`02 §13`, `02 §15`). */
 export const ETIQUETA_AVISO_RIESGO = 'Aviso de riesgo';
 
-export function etiquetaAvisoRiesgo(cuerpo: string): string {
+export function etiquetaAvisoRiesgo(cuerpo: string = TEXTO_AVISO_RIESGO_HOY): string {
   return `${ETIQUETA_AVISO_RIESGO}. ${cuerpo}`;
 }
 
