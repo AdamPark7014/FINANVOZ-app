@@ -11,7 +11,7 @@ export default function ReconsentimientoRuta() {
         options={{
           headerShown: false,
           gestureEnabled: false,
-          title: 'Actualizamos el aviso de privacidad',
+          title: TITULO_RECONSENTIMIENTO,
         }}
       />
       <Reconsentimiento alBorrarTodo={() => control.borrarTodo()} />

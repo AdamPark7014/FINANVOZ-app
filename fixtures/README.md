@@ -25,7 +25,7 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 
 ## Oráculo en PowerShell (Windows)
 
-Desde la **raíz del repo** (donde está `package.json`):
+Usa PowerShell 7+ (`pwsh`) o la consola integrada; el comando es el mismo. Desde la **raíz del repo** (donde está `package.json`):
 
 ```powershell
 node scripts/oraculo.mjs --verificar   # CI y /verificar
