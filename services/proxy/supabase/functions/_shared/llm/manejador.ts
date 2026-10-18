@@ -4,6 +4,7 @@
 import type { ResultadoCupo } from '../nlu/limites.ts';
 import type { EventoRegistro, Registrador } from '../nlu/registro.ts';
 import {
+  contarResultados,
   type CodigoError,
   CUERPO_MAXIMO_BYTES,
   ESTADO_POR_ERROR,
@@ -72,9 +73,10 @@ export function crearManejadorTurno(deps: DependenciasManejadorTurno): (req: Req
       }
       const solicitud = validarSolicitud(cuerpo);
       if (solicitud === null) return error('solicitud_invalida');
+      const resultadosHerramienta = contarResultados(solicitud.mensajes);
 
       const cupo = await deps.consumirCupo(usuarioId);
-      if (cupo !== 'ok') return error(cupo);
+      if (cupo !== 'ok') return error(cupo, { resultados_herramienta: resultadosHerramienta });
 
       const r = await deps.turno(solicitud);
       const metadatos = {
@@ -84,6 +86,7 @@ export function crearManejadorTurno(deps: DependenciasManejadorTurno): (req: Req
         tokens_salida: r.tokens_salida,
         latencia_ms: r.latencia_ms,
         llamadas: r.llamadas,
+        resultados_herramienta: resultadosHerramienta,
       };
       if (!r.ok) {
         await deps.devolverCupo(usuarioId).catch(() => undefined);

@@ -12,6 +12,8 @@ export interface EventoRegistro {
   tokens_salida?: number | undefined;
   latencia_ms?: number | undefined;
   llamadas?: number | undefined;
+  /** Resultados de herramientas ya en la conversación (`/llm/turno`, 0–3); ayuda a medir vueltas sin PII. */
+  resultados_herramienta?: number | undefined;
   /** Estado HTTP del proveedor cuando falló (sin su cuerpo). */
   estado_proveedor?: number | undefined;
 }
@@ -23,6 +25,7 @@ const CAMPOS_NUMERO = [
   'tokens_salida',
   'latencia_ms',
   'llamadas',
+  'resultados_herramienta',
   'estado_proveedor',
 ] as const;
 /** Los textos permitidos son identificadores cortos (códigos, nombres de modelo, hashes hex). */

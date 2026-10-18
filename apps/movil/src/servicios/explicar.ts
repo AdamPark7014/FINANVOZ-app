@@ -1,6 +1,7 @@
 import {
   consultaDeHerramienta,
   HERRAMIENTAS_EXPLICAR,
+  LLAMADAS_HERRAMIENTA_MAX,
   validarCifras,
   type CodigoLimite,
   type ConsultaHerramienta,
@@ -24,8 +25,8 @@ import { funcionesPlan } from './plan';
  * libro.
  */
 
-/** Llamadas a herramientas por pregunta (`06 §6`). */
-export const LLAMADAS_MAXIMAS_EXPLICAR = 3;
+/** Llamadas a herramientas por pregunta (`06 §6`); fuente: `@cartera/nlu` · `explicar/cupo.ts`. */
+export const LLAMADAS_MAXIMAS_EXPLICAR = LLAMADAS_HERRAMIENTA_MAX;
 /** Pie fijo de la respuesta (`02 §22`). */
 export const PIE_EXPLICAR = 'Responde con tus datos; no es asesoría financiera.';
 /** Aviso cuando la respuesta del modelo no pasó la validación de cifras (`02 §22`). */

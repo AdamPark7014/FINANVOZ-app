@@ -211,6 +211,20 @@ Modo explicar (`docs/06-NLU.md §6`, `02 §22`): un turno **sin estado** de un b
 | `_shared/llm/turno.ts` | 8 s por llamada; ante 5xx, 429, red o tiempo, un intento con el alterno |
 | `_shared/llm/manejador.ts` | JWT → cuerpo → cupo (`consumir_turno_llm`) → turno → respuesta; registra solo metadatos (código `herramientas` o `respuesta`) |
 | `migrations/20261110000000_llm_turno.sql` | `consumir_turno_llm`: solo Plus o Negocio vigente (`solo_plus` en Gratis, sin consumir); cada turno cuenta una interpretación del mismo cupo que `/nlu/interpretar` |
+| `_shared/llm/cupo-explicar.ts` | Constantes del cupo por pregunta (2–4 interpretaciones estimadas; 1–4 reales); alineadas con `packages/nlu/src/explicar/cupo.ts` |
+
+### Cupo por pregunta (pendiente 88)
+
+Cada **`POST /llm/turno`** consume **una** interpretación del contador compartido con `/nlu/interpretar` (Plus: **60/día**, **300/mes** — ver `_shared/nlu/limites.ts`). El teléfono encadena varias vueltas HTTP por pregunta (`apps/movil/src/servicios/explicar.ts`):
+
+| Constante | Valor | Significado |
+|---|---|---|
+| `LLAMADAS_HERRAMIENTA_MAX` | 3 | Herramientas de solo lectura por pregunta (`06 §6`) |
+| `VUELTAS_HTTP_MAX_POR_PREGUNTA` | 4 | Máximo de llamadas al proxy por pregunta (bucle + cierre) |
+| `INTERPRETACIONES_POR_PREGUNTA` | 1–4 | Rango real de interpretaciones consumidas |
+| `INTERPRETACIONES_POR_PREGUNTA_ESTIMADO` | 2–4 | Estimación conservadora para capacidad Plus (~15–30 preguntas/día) |
+
+Con **502** o **504** el turno se devuelve al cupo (`devolver_interpretacion`). Para medir vueltas sin PII, los registros de `/llm/turno` incluyen `resultados_herramienta` (0–3: cuántos resultados ya venían en la petición).
 
 ### Contrato
 
@@ -238,7 +252,7 @@ Errores `{ "error": "<código>" }`: los de `/nlu/interpretar` más **403 `solo_p
 3. `supabase functions deploy llm-turno` (con la verificación de JWT del gateway activa).
 4. Prueba de humo: con la sesión anónima de un usuario Gratis, `curl -X POST https://<ref>.supabase.co/functions/v1/llm-turno -H "Authorization: Bearer <token>" -H 'content-type: application/json' -d '{"mensajes":[{"rol":"usuario","texto":"¿en qué gasto más?"}],"herramientas":[{"nombre":"mayores_gastos","descripcion":"Top de gastos","parametros":{"type":"object","properties":{}}}]}'` responde 403 `solo_plus`; con un usuario en `derechos` como `plus`, 200 con `salida.tipo = "herramientas"`.
 
-Registros: `{"endpoint":"/llm/turno","codigo":"herramientas"|"respuesta"|<error>, …}` con hash de usuario, proveedor, modelo, tokens, latencia y llamadas; nunca la pregunta, argumentos, resultados ni el texto del modelo.
+Registros: `{"endpoint":"/llm/turno","codigo":"herramientas"|"respuesta"|<error>, …}` con hash de usuario, proveedor, modelo, tokens, latencia, llamadas al proveedor y `resultados_herramienta` (0–3); nunca la pregunta, argumentos, resultados ni el texto del modelo.
 ## M10 · Plantillas remotas firmadas (bucket público `plantillas`)
 
 Sin Edge Function (`docs/07-CAPTURA.md §3.1`): la app baja `https://<ref>.supabase.co/storage/v1/object/public/plantillas/plantillas.json` (con `If-None-Match`) y `plantillas.json.sig`, y verifica la firma Ed25519 con las llaves públicas del build (`EXPO_PUBLIC_PLANTILLAS_LLAVES`). El bucket no necesita ser confiable, solo estar disponible.
