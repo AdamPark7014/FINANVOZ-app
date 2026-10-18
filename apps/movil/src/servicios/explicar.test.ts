@@ -2,7 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { extraerCifras, validarCifras } from '@cartera/nlu';
 import { listarCuentas } from './cuentas';
 import type { EventoAnalitica } from '../analitica/eventos';
-import { AVISO_SIN_EXPLICACION, explicar, LLAMADAS_MAXIMAS_EXPLICAR } from './explicar';
+import {
+  AVISO_SIN_EXPLICACION,
+  explicar,
+  LLAMADAS_MAXIMAS_EXPLICAR,
+  MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
+  MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+  mensajeLimiteExplicar,
+} from './explicar';
 import { registrarMovimiento } from './formulario';
 import { listarMovimientos } from './movimientos';
 import type { NivelNube } from './nube';
@@ -279,7 +286,25 @@ describe('modo explicar: límites y fallas', () => {
     });
     expect(
       await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'limite', codigo: 'limite_mensual' }]).nube }),
-    ).toEqual({ tipo: 'limite', codigo: 'limite_mensual' });
+    ).toEqual({
+      tipo: 'limite',
+      codigo: 'limite_mensual',
+      mensaje: MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+    });
+  });
+
+  it('cupo agotado: mensaje en tuteo es-MX para explicar, sin Por revisar', () => {
+    for (const plan of ['gratis', 'plus'] as const) {
+      const m = mensajeLimiteExplicar('limite_mensual', plan);
+      expect(m).toMatch(/Pregúntame|responderte|tus /i);
+      expect(m).not.toMatch(/Por revisar|La guardé/i);
+      expect(m).toBe(
+        plan === 'plus' ? MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS : MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
+      );
+    }
+    const diario = mensajeLimiteExplicar('limite_diario', 'plus');
+    expect(diario).toContain('Pregúntame de nuevo mañana');
+    expect(diario).not.toMatch(/Por revisar/i);
   });
 
   it('falla a media pregunta: muestra en plantilla lo ya consultado; al inicio, error', async () => {

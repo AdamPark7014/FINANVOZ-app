@@ -1,13 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
-import {
-  AVISO_DEDUCIBLE_EFECTIVO,
-  MENSAJE_SIN_PARAMETROS,
-  TEXTO_RECHAZO,
-  type ArchivoCfdi,
-  type Contexto,
-} from '../../servicios';
+import { TEXTO_RECHAZO, type ArchivoCfdi, type Contexto } from '../../servicios';
 import {
   armarZip,
   configFiscalPrueba,
@@ -25,6 +19,7 @@ import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import type { ArchivosFacturas } from './archivos';
 import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones';
+import { AVISO_DEDUCIBLE_EFECTIVO, LEYENDA_ESTIMACION, MENSAJE_SIN_PARAMETROS } from './textos';
 
 const CARPETA_CFDI = join(__dirname, '../../../../../fixtures/cfdi');
 
@@ -145,9 +140,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
       'HOSPITAL FICTICIO · $5,000: factura en pagos sin confirmar',
     );
     expect(textoDe('deducciones-ahorro')).toMatch(/agrega tu base gravable/);
-    expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(
-      'Estimación para apartar dinero y preparar tu declaración. No sustituye a tu contador ni presenta declaraciones ante el SAT.',
-    );
+    expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(LEYENDA_ESTIMACION);
 
     fireEvent.press(screen.getByTestId(`factura-${hospital}-ya-la-pague`));
     for (const forma of ['Transferencia', 'Tarjeta', 'Efectivo', 'Cheque'])
@@ -178,6 +171,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     expect(screen.queryByTestId('deducciones-titulo')).toBeNull();
     expect(screen.queryByText(/deducibles/)).toBeNull();
     expect(screen.getByTestId(`factura-${uuidDe('c01_dentista_debito.xml')}`)).toBeTruthy();
+    expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(LEYENDA_ESTIMACION);
   });
 
   it('en Gratis explica que es de Plus', () => {

@@ -26,6 +26,7 @@ import { Chips, MensajeError } from '../onboarding/componentes';
 import { PuertaPlus } from '../plan/CandadoPlus';
 import { mensajeError } from '../principal/textos';
 import type { ArchivosFacturas } from './archivos';
+import { LEYENDA_ESTIMACION } from './textos';
 
 export const PEDIR_PERFIL =
   'Para estimar, necesito tu RFC, tus ingresos brutos del año (los de tu constancia de sueldos, incluidos los exentos) y, si la tienes, tu base gravable.';
@@ -169,12 +170,23 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
           alPresionar={() => setEditando(true)}
         />
       ) : null}
-      {v.estado === 'listo' ? (
-        <Texto variante="pequeno" tono="secundario" testID="deducciones-leyenda">
-          {v.leyenda}
-        </Texto>
-      ) : null}
+      {v.estado === 'listo' || v.estado === 'sin_parametros' ? <AvisoFiscalEstimacion /> : null}
     </Pantalla>
+  );
+}
+
+/** `08 §1`: estimación, no dictamen ni declaración ante el SAT. */
+function AvisoFiscalEstimacion() {
+  return (
+    <Texto
+      variante="pequeno"
+      tono="secundario"
+      testID="deducciones-leyenda"
+      accessibilityRole="text"
+      accessibilityLabel="Aviso sobre estimaciones fiscales"
+    >
+      {LEYENDA_ESTIMACION}
+    </Texto>
   );
 }
 
@@ -371,7 +383,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
         <View style={{ gap: espacio.xs }}>
           <Interruptor
             etiqueta="Son lentes ópticos"
-            descripcion="Los lentes tienen su propio tope en el año."
+            descripcion="En el año, los lentes tienen tope aparte del resto de salud."
             valor={f.lentes}
             alCambiar={(valor) => hacer(() => marcarLentes(ctx, f.uuid, valor))}
             testID={`${id}-lentes`}
@@ -506,11 +518,14 @@ export function ImportarCompartidas({
         </Texto>
       ) : null}
       {estado.tipo !== 'leyendo' ? (
-        <Boton
-          etiqueta="Ver mis deducciones"
-          alPresionar={alVerDeducciones}
-          testID="importar-ver-deducciones"
-        />
+        <>
+          <Boton
+            etiqueta="Ver mis deducciones"
+            alPresionar={alVerDeducciones}
+            testID="importar-ver-deducciones"
+          />
+          <AvisoFiscalEstimacion />
+        </>
       ) : null}
     </Pantalla>
   );

@@ -13,7 +13,7 @@ import type { EventoAnalitica } from '../analitica/eventos';
 import type { Contexto } from './contexto';
 import type { FiltroMovimientos } from './movimientos';
 import type { NivelNube } from './nube';
-import { funcionesPlan } from './plan';
+import { funcionesPlan, INTERPRETACIONES_NUBE_MES, obtenerPlan, type Plan } from './plan';
 
 /**
  * Modo explicar (`06 §6`, `02 §22`, RF-CON-02, Plus): preguntas abiertas ("¿por qué no me alcanzó la quincena
@@ -31,6 +31,22 @@ export const LLAMADAS_MAXIMAS_EXPLICAR = LLAMADAS_HERRAMIENTA_MAX;
 export const PIE_EXPLICAR = 'Responde con tus datos; no es asesoría financiera.';
 /** Aviso cuando la respuesta del modelo no pasó la validación de cifras (`02 §22`). */
 export const AVISO_SIN_EXPLICACION = 'No pude explicarlo mejor';
+
+/** Cupo de interpretaciones agotado en modo explicar (`02 §22`, M7): tuteo es-MX, sin «Por revisar». */
+export const MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS = `Ya usaste las ${INTERPRETACIONES_NUBE_MES.gratis} frases que interpreto en internet este mes. No pude responderte esta pregunta. Las frases sencillas («tacos 80 en efectivo») siguen funcionando, y con Plus tienes ${INTERPRETACIONES_NUBE_MES.plus} al mes.`;
+export const MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS = `Ya usaste las ${INTERPRETACIONES_NUBE_MES.plus} frases que interpreto en internet este mes. No pude responderte esta pregunta. Las frases sencillas («tacos 80 en efectivo») siguen funcionando.`;
+export const MENSAJE_LIMITE_EXPLICAR_DIARIO =
+  'Ya usaste las frases que interpreto en internet por hoy. No pude responderte esta pregunta. Pregúntame de nuevo mañana. Las frases sencillas («tacos 80 en efectivo») siguen funcionando.';
+export const MENSAJE_LIMITE_EXPLICAR_TOPE =
+  'Por ahora no pude responderte esta pregunta en internet. Pregúntame de nuevo más tarde.';
+
+/** Mensaje al agotar el cupo durante el bucle explicar; siempre texto listo para la UI. */
+export function mensajeLimiteExplicar(codigo: CodigoLimite, plan: Plan): string {
+  if (codigo === 'limite_mensual')
+    return plan === 'plus' ? MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS : MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS;
+  if (codigo === 'limite_diario') return MENSAJE_LIMITE_EXPLICAR_DIARIO;
+  return MENSAJE_LIMITE_EXPLICAR_TOPE;
+}
 
 const PREGUNTA_MAXIMA = 500;
 const NOMBRES: ReadonlySet<string> = new Set(HERRAMIENTAS_EXPLICAR.map((h) => h.nombre));
@@ -61,7 +77,7 @@ export type RespuestaExplicar =
   /** En Gratis (o el servidor dice que Plus ya no está vigente): no se pregunta nada. */
   | { readonly tipo: 'solo_plus' }
   | { readonly tipo: 'sin_red' }
-  | { readonly tipo: 'limite'; readonly codigo: CodigoLimite }
+  | { readonly tipo: 'limite'; readonly codigo: CodigoLimite; readonly mensaje: string }
   | { readonly tipo: 'error' };
 
 export interface OpcionesExplicar {
@@ -151,7 +167,10 @@ export async function explicar(
     vueltas += 1;
     const r = await cliente.turno(mensajes, HERRAMIENTAS_EXPLICAR);
     if (r.tipo === 'solo_plus') return { tipo: 'solo_plus' };
-    if (r.tipo === 'limite') return { tipo: 'limite', codigo: r.codigo };
+    if (r.tipo === 'limite') {
+      const plan = obtenerPlan(ctx).plan;
+      return { tipo: 'limite', codigo: r.codigo, mensaje: mensajeLimiteExplicar(r.codigo, plan) };
+    }
     if (r.tipo !== 'ok') {
       // A media pregunta, lo ya consultado se muestra en plantilla.
       if (respuestas.length > 0) return plantilla(ctx, respuestas, vueltas, opciones);
