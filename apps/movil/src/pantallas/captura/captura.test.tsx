@@ -35,6 +35,7 @@ import {
   etiquetaGuiaCapturaInactiva,
   etiquetaIntroCapturasPorRevisar,
   etiquetaPermisoCaptura,
+  etiquetaResumenCapturaActiva,
   etiquetaVacioCapturasPorRevisar,
   INTRO_CAPTURAS_POR_REVISAR,
   PERMISO_DENEGADO,
@@ -98,6 +99,10 @@ describe('preguntas de captura en Hoy', () => {
 
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText(tituloSalidaSinPareja(420_000), { hidden: true })).toBeTruthy();
+    expect(screen.getByTestId('tarjeta-accion-0-detalle')).toHaveProp(
+      'accessibilityLabel',
+      expect.stringMatching(/no vi a dónde llegó/),
+    );
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-cuenta'));
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-destino-externa'));
     expect(p.ctx.libro.saldo(CUENTAS_SISTEMA.transito)).toBe(0);
@@ -189,9 +194,18 @@ describe('Movimientos → capturas por revisar', () => {
       'accessibilityHint',
       PISTA_YA_REGISTRE_AVISO,
     );
-    expect(
-      within(screen.getByTestId(`captura-${noReconocida?.capturaId}`)).getByRole('header'),
-    ).toBeTruthy();
+    const filaNoReconocida = screen.getByTestId(`captura-${noReconocida?.capturaId}`);
+    expect(within(filaNoReconocida).getByRole('header')).toHaveProp(
+      'accessibilityLabel',
+      expect.stringMatching(/no entendí/),
+    );
+    const conMonto = antes.find((c) => c.motivos[0] !== 'no_reconocida' && c.monto !== null);
+    if (conMonto) {
+      const titulo = conMonto.comercio ?? conMonto.banco ?? 'Movimiento de tu banco';
+      expect(
+        within(screen.getByTestId(`captura-${conMonto.capturaId}`)).getByRole('header'),
+      ).toHaveProp('accessibilityLabel', expect.stringContaining(titulo));
+    }
     expect(screen.getByText(/Consulta tu estado de cuenta en la app/)).toBeTruthy();
     fireEvent.press(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`));
     expect(screen.queryByText(/Consulta tu estado de cuenta en la app/)).toBeNull();
@@ -406,6 +420,7 @@ describe('O6 · activar la captura', () => {
         'Solo leemos las apps que marques. Las demás notificaciones se ignoran en tu teléfono y no se guardan.',
       ),
     ).toBeTruthy();
+    expect(screen.getByTestId('o6-activar')).toHaveProp('accessibilityHint', PISTA_ACTIVAR_CAPTURA);
     await act(async () => fireEvent.press(screen.getByTestId('o6-activar')));
     expect(puente.abrirAjustesPermiso).toHaveBeenCalled();
     expect(obtenerEstadoCaptura(p.ctx).divulgacionAceptada).toBe(true);
@@ -416,6 +431,10 @@ describe('O6 · activar la captura', () => {
     await act(async () => fireEvent.press(screen.getByTestId('o6-guardar-apps')));
     expect(puente.fijarListaBlanca).toHaveBeenCalledWith(['mx.ejemplo.bancoa']);
     expect(obtenerEstadoCaptura(p.ctx)).toMatchObject({ activada: true, apps: ['mx.ejemplo.bancoa'] });
+    expect(screen.getByTestId('o6-lista-resumen')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaResumenCapturaActiva(['Banco A']),
+    );
     fireEvent.press(screen.getByTestId('o6-continuar'));
     expect(alTerminar).toHaveBeenCalledWith(true);
     p.cerrar();

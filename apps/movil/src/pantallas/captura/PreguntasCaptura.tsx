@@ -21,7 +21,7 @@ import {
 } from '../../servicios';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, CampoTexto, espacio, etiquetaHablada, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
@@ -60,6 +60,7 @@ import {
   detallePagoSinOrigen,
   detalleSalidaSinPareja,
   descripcionDuplicado,
+  etiquetaDetallePreguntaCaptura,
   EJEMPLO_NOMBRE_PERSONA,
   ERROR_GUARDAR_CUENTA,
   ERROR_NOMBRE_CUENTA,
@@ -87,6 +88,11 @@ import {
   PREGUNTA_A_QUIEN_PRESTASTE,
   PREGUNTA_QUE_PAGASTE,
   PREGUNTA_SE_LO_DEBES,
+  PISTA_GUARDAR_PERSONA_NUEVA,
+  PISTA_NO_ES_MIA_CUENTA,
+  PISTA_NO_OTRO_DUPLICADO,
+  PISTA_SI_AGREGAR_CUENTA_CAPTURA,
+  PISTA_SI_MISMO_DUPLICADO,
   tituloCuentaNuevaDetectada,
   tituloCuentaNuevaSinUltimos4,
   tituloDuplicado,
@@ -134,7 +140,7 @@ function useResponder() {
 function Fallo({ texto }: { texto: string | null }) {
   if (!texto) return null;
   return (
-    <Texto variante="secundario" tono="faltante">
+    <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
       {texto}
     </Texto>
   );
@@ -146,19 +152,27 @@ function Marco({
   detalle,
   error,
   children,
+  etiquetaDetalle,
 }: {
   testID: string;
   titulo: string;
   detalle: string;
   error: string | null;
   children: ReactNode;
+  /** TalkBack del detalle; por omisión solo el detalle en palabras. */
+  etiquetaDetalle?: string;
 }) {
   return (
     <Tarjeta testID={testID}>
       <Texto variante="cuerpoFuerte" {...OCULTAR_ETIQUETA_VISIBLE}>
         {titulo}
       </Texto>
-      <Texto variante="secundario" tono="secundario">
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID={`${testID}-detalle`}
+        accessibilityLabel={etiquetaDetalle ?? etiquetaHablada(detalle)}
+      >
         {detalle}
       </Texto>
       <View style={{ gap: espacio.s }}>{children}</View>
@@ -228,6 +242,7 @@ function ElegirPersona({
           alElegir(personaId);
         }}
         testID={`${testID}-guardar-persona`}
+        pista={PISTA_GUARDAR_PERSONA_NUEVA}
       />
     </View>
   );
@@ -440,6 +455,10 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
       titulo={titulo}
       detalle={detalleCuentaNueva(p.monto, etiquetaFecha(p.fecha))}
       error={error}
+      etiquetaDetalle={etiquetaDetallePreguntaCaptura(
+        titulo,
+        detalleCuentaNueva(p.monto, etiquetaFecha(p.fecha)),
+      )}
     >
       {agregando ? (
         p.sugerencia === 'tarjeta_credito' ? (
@@ -477,6 +496,7 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
             etiqueta={p.ultimos4 ? BTN_SI_AGREGALA : BTN_AGREGAR_CUENTA}
             alPresionar={() => setAgregando(true)}
             testID={`${testID}-agregar`}
+            pista={PISTA_SI_AGREGAR_CUENTA_CAPTURA}
           />
           <Boton
             etiqueta={BTN_NO_ES_MIA}
@@ -489,6 +509,7 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
               }, AVISO_CUENTA_NO_MIA)
             }
             testID={`${testID}-no-es-mia`}
+            pista={PISTA_NO_ES_MIA_CUENTA}
           />
         </>
       )}
@@ -583,12 +604,15 @@ function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) 
   const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
   const que = descripcionDuplicado(p.dictado.descripcion);
+  const titulo = tituloDuplicado(que, etiquetaFecha(p.dictado.fecha));
+  const detalle = detalleDuplicado(p.monto, etiquetaFecha(p.fecha), p.dictado.monto);
   return (
     <Marco
       testID={testID}
-      titulo={tituloDuplicado(que, etiquetaFecha(p.dictado.fecha))}
-      detalle={detalleDuplicado(p.monto, etiquetaFecha(p.fecha), p.dictado.monto)}
+      titulo={titulo}
+      detalle={detalle}
       error={error}
+      etiquetaDetalle={etiquetaDetallePreguntaCaptura(titulo, detalle)}
     >
       <Boton
         etiqueta={BTN_SI_ES_MISMO}
@@ -596,6 +620,7 @@ function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) 
           responder(() => responderDuplicado(ctx, p.capturaId, 'mismo'), AVISO_DUPLICADO_MISMO)
         }
         testID={`${testID}-mismo`}
+        pista={PISTA_SI_MISMO_DUPLICADO}
       />
       <Boton
         etiqueta={BTN_NO_ES_OTRO}
@@ -608,6 +633,7 @@ function Duplicado({ p, testID }: { p: Pregunta<'duplicado'>; testID: string }) 
           }, AVISO_DUPLICADO_OTRO)
         }
         testID={`${testID}-otro`}
+        pista={PISTA_NO_OTRO_DUPLICADO}
       />
     </Marco>
   );

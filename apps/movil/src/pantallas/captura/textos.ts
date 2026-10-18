@@ -1,7 +1,7 @@
 /** Copy de captura automática y por revisar (`02 §6`, `02 §14`, tuteo). */
 
 import type { Centavos } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { etiquetaHablada, formatearCentavos } from '../../ui';
 
 export const TITULO_CAPTURAS_POR_REVISAR = 'Capturas por revisar';
 export const INTRO_CAPTURAS_POR_REVISAR =
@@ -26,6 +26,20 @@ export const PISTA_DESCARTAR_AVISO = 'Quita este aviso sin registrarlo';
 export const PISTA_CONFIRMAR_CAPTURA = 'Confirma que la captura está correcta';
 export const PISTA_CAPTURA_DE_CONTADO = 'Indica que no fue a meses sin intereses';
 export const PISTA_CAMBIAR_CATEGORIA_CAPTURA = 'Elige otra categoría para esta captura';
+
+/** Permiso de notificaciones en `ActivarCaptura`. */
+export const PISTA_YA_ACTIVE_PERMISO =
+  'Confirma que ya activaste el permiso en Ajustes del teléfono';
+export const PISTA_ABRIR_AJUSTE_PERMISO = 'Abre otra vez el ajuste de notificaciones';
+export const PISTA_ABRIR_INFO_APP_CAPTURA =
+  'Abre la información de Finanvoz para permitir ajustes restringidos';
+
+/** Preguntas de captura en Hoy (`PreguntasCaptura.tsx`). */
+export const PISTA_SI_MISMO_DUPLICADO = 'Indica que es el mismo movimiento que ya anotaste';
+export const PISTA_NO_OTRO_DUPLICADO = 'Regístralo como un movimiento aparte';
+export const PISTA_SI_AGREGAR_CUENTA_CAPTURA = 'Agrega esta cuenta o tarjeta a tu cartera';
+export const PISTA_NO_ES_MIA_CUENTA = 'Descarta el aviso; no es una cuenta tuya';
+export const PISTA_GUARDAR_PERSONA_NUEVA = 'Guarda el nombre y continúa';
 
 /** Tarjeta de Hoy tras restaurar un respaldo (`TarjetaReactivarCaptura`). */
 export const TITULO_REACTIVAR_CAPTURA = 'Vuelve a activar la lectura de notificaciones';
@@ -104,6 +118,32 @@ export const LISTA_CAPTURA_APPS = (nombres: readonly string[]) =>
   `Listo: anotaré lo que avisen ${nombres.join(', ')}.`;
 export const LISTA_CAPTURA_POR_REVISAR =
   'Lo que no entienda queda en Movimientos → Por revisar.';
+
+/** TalkBack: tarjeta «no disponible» en `ActivarCaptura`. */
+export function etiquetaTarjetaNoDisponibleCaptura(): string {
+  return `${ETIQUETA_NO_DISPONIBLE}. ${CUERPO_NO_DISPONIBLE}`;
+}
+
+/** TalkBack: resumen al terminar de activar la captura. */
+export function etiquetaResumenCapturaActiva(nombres: readonly string[]): string {
+  const linea = nombres.length > 0 ? LISTA_CAPTURA_APPS(nombres) : LISTA_CAPTURA_ACTIVA;
+  return `${etiquetaHablada(linea)}. ${LISTA_CAPTURA_POR_REVISAR}`;
+}
+
+/** TalkBack: título + detalle de una pregunta de captura (sin repetir en el radiogroup). */
+export function etiquetaDetallePreguntaCaptura(titulo: string, detalle: string): string {
+  return `${etiquetaHablada(titulo)}. ${etiquetaHablada(detalle)}`;
+}
+
+/** TalkBack: encabezado de una fila en Por revisar (comercio o banco + contexto). */
+export function etiquetaEncabezadoFilaCaptura(titulo: string, subtitulo: string): string {
+  return `${etiquetaHablada(titulo)}. ${etiquetaHablada(subtitulo)}`;
+}
+
+/** TalkBack: encabezado de aviso no reconocido en Por revisar. */
+export function etiquetaAvisoNoReconocido(banco: string, fechaEtiqueta: string): string {
+  return `${banco} mandó un aviso que no entendí. ${fechaEtiqueta}. Si fue un movimiento, regístralo tú.`;
+}
 
 /** Preguntas de captura en Hoy (`02 §6`, `PreguntasCaptura.tsx`). */
 

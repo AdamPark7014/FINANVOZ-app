@@ -11,6 +11,10 @@ import {
   etiquetaVacioCapturasPorRevisar,
   PISTA_AHORA_NO_ACTIVAR_CAPTURA,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
+  PISTA_NO_OTRO_DUPLICADO,
+  PISTA_SI_MISMO_DUPLICADO,
+  etiquetaDetallePreguntaCaptura,
+  etiquetaResumenCapturaActiva,
 } from './textos';
 
 describe('captura/textos', () => {
@@ -22,9 +26,18 @@ describe('captura/textos', () => {
       PISTA_YA_REGISTRE_AVISO,
       PISTA_AHORA_NO_ACTIVAR_CAPTURA,
       PISTA_DESCARTAR_REACTIVAR_CAPTURA,
+      PISTA_SI_MISMO_DUPLICADO,
+      PISTA_NO_OTRO_DUPLICADO,
     ]) {
       expect(copy).not.toMatch(/!/);
     }
+  });
+
+  it('etiquetas TalkBack de preguntas dictan cifras en palabras', () => {
+    const titulo = '¿De dónde salió el pago de $4,200 a tu Oro?';
+    const detalle = 'Llegó el vie 9 y no vi de qué cuenta salió.';
+    expect(etiquetaDetallePreguntaCaptura(titulo, detalle)).toMatch(/cuatro mil doscientos pesos/);
+    expect(etiquetaResumenCapturaActiva(['Banco A'])).toMatch(/Por revisar/);
   });
 
   it('permiso de notificaciones nombra Ajustes del teléfono y Finanvoz', () => {

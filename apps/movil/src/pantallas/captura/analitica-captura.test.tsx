@@ -23,7 +23,12 @@ import { conEscenario } from '../principal/__pruebas__/base';
 import { etiquetaCampoMonto } from '../../ui/formato';
 import { PorRevisarCapturas } from './PorRevisarCapturas';
 import { TarjetaPreguntaCaptura } from './PreguntasCaptura';
-import { AYUDA_SALDO_HOY, ETIQUETA_SALDO_HOY } from './textos';
+import {
+  AYUDA_SALDO_HOY,
+  ETIQUETA_SALDO_HOY,
+  PISTA_NO_ES_MIA_CUENTA,
+  PISTA_NO_OTRO_DUPLICADO,
+} from './textos';
 
 /**
  * Pendiente 30 (parte captura): `correccion {campo}` desde las capturas. Solo el campo, nunca el monto, el
@@ -150,6 +155,10 @@ describe('analítica de las correcciones de captura (03 §8, pendiente 30)', () 
     if (!q) throw new Error('falta la pregunta de cuenta nueva');
 
     const enviados = conAnalitica(p.ctx, <TarjetaPreguntaCaptura pregunta={q} testID="pregunta" />);
+    expect(screen.getByTestId('pregunta-no-es-mia')).toHaveProp(
+      'accessibilityHint',
+      PISTA_NO_ES_MIA_CUENTA,
+    );
     fireEvent.press(screen.getByTestId('pregunta-no-es-mia'));
     expect(propios(enviados)).toEqual([['correccion', { campo: 'cuenta' }]]);
     const json = JSON.stringify(enviados).toLowerCase();
@@ -205,6 +214,12 @@ describe('analítica de las correcciones de captura (03 §8, pendiente 30)', () 
       if (!q) throw new Error('falta la pregunta de duplicado');
 
       const enviados = conAnalitica(p.ctx, <TarjetaPreguntaCaptura pregunta={q} testID="pregunta" />);
+      if (boton === 'otro') {
+        expect(screen.getByTestId('pregunta-otro')).toHaveProp(
+          'accessibilityHint',
+          PISTA_NO_OTRO_DUPLICADO,
+        );
+      }
       fireEvent.press(screen.getByTestId(`pregunta-${boton}`));
       expect(propios(enviados)).toEqual(esperado);
       expect(JSON.stringify(enviados).toLowerCase()).not.toMatch(/coca|oxxo|2500|25\.00|4410/);

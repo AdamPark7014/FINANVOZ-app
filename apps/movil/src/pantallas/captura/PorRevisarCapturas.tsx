@@ -23,6 +23,8 @@ import {
   AVISO_SIN_TEXTO,
   ETIQUETA_SIN_CATEGORIA,
   INTRO_CAPTURAS_POR_REVISAR,
+  etiquetaAvisoNoReconocido,
+  etiquetaEncabezadoFilaCaptura,
   etiquetaMesesChip,
   etiquetaIntroCapturasPorRevisar,
   etiquetaVacioCapturasPorRevisar,
@@ -121,7 +123,11 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
     const texto = [c.texto?.titulo, c.texto?.texto].filter((t) => t).join(' · ');
     return (
       <Tarjeta testID={testID}>
-        <Texto variante="cuerpoFuerte" accessibilityRole="header">
+        <Texto
+          variante="cuerpoFuerte"
+          accessibilityRole="header"
+          accessibilityLabel={etiquetaAvisoNoReconocido(c.banco, etiquetaDiaMes(c.fecha))}
+        >
           {`${c.banco} mandó un aviso que no entendí`}
         </Texto>
         {texto ? (
@@ -179,7 +185,11 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
     <Tarjeta testID={testID}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <View style={{ flex: 1, gap: espacio.xxs }}>
-          <Texto variante="cuerpoFuerte" accessibilityRole="header">
+          <Texto
+            variante="cuerpoFuerte"
+            accessibilityRole="header"
+            accessibilityLabel={etiquetaEncabezadoFilaCaptura(titulo, subtitulo)}
+          >
             {titulo}
           </Texto>
           <Texto variante="secundario" tono="secundario">
@@ -255,7 +265,12 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
         ) : null}
       </View>
       {error ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID={`${testID}-error`}
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Texto>
       ) : null}

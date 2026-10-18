@@ -11,6 +11,7 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, EstadoVacio, Tarjeta, Texto } from '../../ui';
 import { Casilla } from '../onboarding/componentes';
+import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import {
   ALTERNATIVA_NO_DISPONIBLE,
   CUERPO_NO_DISPONIBLE,
@@ -24,8 +25,13 @@ import {
   PERMISO_DENEGADO,
   PERMISO_INSTRUCCION,
   etiquetaPermisoCaptura,
+  etiquetaResumenCapturaActiva,
   etiquetaSinAppsBanco,
+  etiquetaTarjetaNoDisponibleCaptura,
+  PISTA_ABRIR_AJUSTE_PERMISO,
+  PISTA_ABRIR_INFO_APP_CAPTURA,
   PISTA_AHORA_NO_ACTIVAR_CAPTURA,
+  PISTA_YA_ACTIVE_PERMISO,
   TEXTO_SIN_APPS_BANCO,
   TITULO_ELEGIR_APPS,
   TITULO_PERMISO_NOTIFICACIONES,
@@ -142,10 +148,17 @@ export function ActivarCaptura({
       {paso.tipo === 'no_disponible' ? (
         <>
           <Tarjeta testID={`${testID}-pronto`}>
-            <Texto variante="etiqueta" tono="acento">
+            <Texto
+              variante="etiqueta"
+              tono="acento"
+              accessibilityRole="alert"
+              accessibilityLabel={etiquetaTarjetaNoDisponibleCaptura()}
+            >
               {ETIQUETA_NO_DISPONIBLE}
             </Texto>
-            <Texto variante="cuerpo">{CUERPO_NO_DISPONIBLE}</Texto>
+            <Texto variante="cuerpo" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+              {CUERPO_NO_DISPONIBLE}
+            </Texto>
           </Tarjeta>
           <Texto variante="cuerpo" tono="secundario">
             {ALTERNATIVA_NO_DISPONIBLE}
@@ -167,7 +180,12 @@ export function ActivarCaptura({
             ))}
           </Tarjeta>
           <View style={{ gap: espacio.s }}>
-            <Boton etiqueta="Activar" alPresionar={() => void activar()} testID={`${testID}-activar`} />
+            <Boton
+              etiqueta="Activar"
+              alPresionar={() => void activar()}
+              testID={`${testID}-activar`}
+              pista={PISTA_ACTIVAR_CAPTURA}
+            />
             {ahoraNo}
           </View>
         </>
@@ -191,18 +209,25 @@ export function ActivarCaptura({
             </Texto>
           </Tarjeta>
           <View style={{ gap: espacio.s }}>
-            <Boton etiqueta="Ya lo activé" alPresionar={() => void revisarPermiso()} testID={`${testID}-ya`} />
+            <Boton
+              etiqueta="Ya lo activé"
+              alPresionar={() => void revisarPermiso()}
+              testID={`${testID}-ya`}
+              pista={PISTA_YA_ACTIVE_PERMISO}
+            />
             <Boton
               etiqueta="Abrir el ajuste otra vez"
               variante="secundario"
               alPresionar={() => void puente?.abrirAjustesPermiso()}
               testID={`${testID}-abrir-ajuste`}
+              pista={PISTA_ABRIR_AJUSTE_PERMISO}
             />
             <Boton
               etiqueta="Abrir información de la app"
               variante="texto"
               alPresionar={() => void puente?.abrirInfoApp()}
               testID={`${testID}-info-app`}
+              pista={PISTA_ABRIR_INFO_APP_CAPTURA}
             />
             {ahoraNo}
           </View>
@@ -258,10 +283,21 @@ export function ActivarCaptura({
       {paso.tipo === 'lista' ? (
         <>
           <Tarjeta testID={`${testID}-lista`}>
-            <Texto variante="cuerpo">
+            <Texto
+              variante="cuerpo"
+              testID={`${testID}-lista-resumen`}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              accessibilityLabel={etiquetaResumenCapturaActiva(paso.nombres)}
+            >
               {paso.nombres.length > 0 ? LISTA_CAPTURA_APPS(paso.nombres) : LISTA_CAPTURA_ACTIVA}
             </Texto>
-            <Texto variante="secundario" tono="secundario">
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
               {LISTA_CAPTURA_POR_REVISAR}
             </Texto>
           </Tarjeta>
