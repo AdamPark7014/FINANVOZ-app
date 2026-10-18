@@ -205,7 +205,9 @@ export function PantallaCompartidos({
 
       {modo.tipo === 'qr' ? (
         <>
-          <Texto variante="cuerpo">{instruccionQrTrasCrear(modo.nombre)}</Texto>
+          <Texto variante="cuerpo" testID="compartidos-instruccion-qr" importantForAccessibility="yes">
+            {instruccionQrTrasCrear(modo.nombre)}
+          </Texto>
           <CodigoQr texto={modo.qr} testID="compartidos-qr" />
           <Boton
             testID="compartidos-listo"

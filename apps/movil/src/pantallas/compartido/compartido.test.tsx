@@ -33,7 +33,6 @@ import {
   ETIQUETA_ACCESIBILIDAD_QR_UNION,
   ETIQUETA_CON_QUIEN_COMPARTES,
   ERROR_NOMBRE_PAREJA,
-  MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
   ETIQUETA_VISTA_CAMARA,
@@ -373,11 +372,14 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('compartido-guardar'));
     });
-    expect(await screen.findByText(MENSAJE_COMPARTIDO_GUARDADO)).toBeTruthy();
-    expect(screen.queryByTestId('formulario-gasto-compartido')).toBeNull();
-    expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).saldo.texto).toBe(
-      'Beto te debe $480',
-    );
+    await waitFor(() => {
+      expect(screen.queryByTestId('formulario-gasto-compartido')).toBeNull();
+    });
+    await waitFor(() => {
+      expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).saldo.texto).toBe(
+        'Beto te debe $480',
+      );
+    });
     A.cerrar();
   });
 

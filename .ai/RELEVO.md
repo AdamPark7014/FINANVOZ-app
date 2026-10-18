@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **¿Me alcanza? (móvil):** micro TalkBack — anuncio al terminar/fallar/vacío (`announceForAccessibility`), resumen con live region, calculando agrupado, escenarios con detalle en etiqueta, vacío con header/alert (`6425b98`); test probabilidad en suite alineado.
+- **Gastos compartidos (móvil):** micro TalkBack — pistas en lista, grupo, formulario y confirmación; encabezados; resumen dictado con `etiquetaHablada`; tarjetas de grupo con pista; test dictar estable por saldo.
 
 ## Hecho (acumulado reciente)
 
-- Calculadora web a11y, tandas, onboarding TalkBack. Ver `git log`.
+- ¿Me alcanza?, calculadora web a11y, tandas, onboarding TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
