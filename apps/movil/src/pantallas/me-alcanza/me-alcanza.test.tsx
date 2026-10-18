@@ -458,6 +458,7 @@ describe('¿Me alcanza?', () => {
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(1);
     expect(listarPlanesMsi(p.ctx, p.nu)[0]).toMatchObject({ monto: 150_000, meses: 3 });
     expect(screen.getByTestId('comprado-msi')).toBeTruthy();
+    expect(screen.getByTestId('comprado-msi')).toHaveProp('accessibilityLiveRegion', 'polite');
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
@@ -564,6 +565,11 @@ describe('¿Me alcanza?', () => {
       <PantallaMeAlcanza consultaInicial={{ precio: 150_000 }} bloques={sinEspera} alCerrar={jest.fn()} />,
     );
     await screen.findByTestId('me-alcanza-datos-insuficientes');
+    expect(screen.getByTestId('me-alcanza-titulo-vacio')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('me-alcanza-mensaje')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('me-alcanza-anuncio-vacio').props.accessibilityLabel).toBe(
+      anuncioDatosInsuficientes('Una compra de $1,500', MENSAJE_DATOS_INSUFICIENTES),
+    );
     expect(textoDe('me-alcanza-mensaje')).toBe(MENSAJE_DATOS_INSUFICIENTES);
     expect(textoDe('me-alcanza-datos-ayuda')).toBe(AYUDA_DATOS_INSUFICIENTES);
     expect(screen.getByTestId('me-alcanza-datos-ayuda').props.accessibilityLabel).toBe(
