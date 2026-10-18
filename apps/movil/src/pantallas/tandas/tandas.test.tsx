@@ -28,12 +28,17 @@ import {
   PREGUNTA_YA_DISTE,
   TEXTO_NO_ES_INGRESO,
   TEXTO_TANDA_NO_ENCONTRADA,
+  PISTA_ARCHIVAR_TANDA,
+  PISTA_CONFIRMAR_ARCHIVAR,
+  PISTA_EDITAR_NOMBRE_CUENTA,
+  PISTA_GUARDAR_CAMBIOS,
   PISTA_ME_TOCO,
   PISTA_NUEVA_TANDA,
   PISTA_VER_CALENDARIO,
   PISTA_VOLVER,
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
+  TITULO_CALENDARIO,
   etiquetaVacioTandas,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,
@@ -112,6 +117,12 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId('tanda-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('tanda-me-toco')).toHaveProp('accessibilityHint', PISTA_ME_TOCO);
     expect(screen.getByTestId('tanda-ya-la-di')).toHaveProp('accessibilityHint', PISTA_YA_LA_DI);
+    expect(within(screen.getByTestId('tanda-calendario')).getByText(TITULO_CALENDARIO)).toHaveProp(
+      'accessibilityRole',
+      'header',
+    );
+    expect(screen.getByTestId('tanda-editar-abrir')).toHaveProp('accessibilityHint', PISTA_EDITAR_NOMBRE_CUENTA);
+    expect(screen.getByTestId('tanda-archivar-abrir')).toHaveProp('accessibilityHint', PISTA_ARCHIVAR_TANDA);
   });
 
   it('Ver calendario en la lista tiene pista TalkBack', () => {
@@ -294,6 +305,7 @@ describe('Tandas (02 §18)', () => {
     const vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={alVolver} />);
 
     fireEvent.press(screen.getByTestId('tanda-editar-abrir'));
+    expect(screen.getByTestId('tanda-editar-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_CAMBIOS);
     fireEvent.changeText(screen.getByTestId('tanda-editar-nombre'), 'Tanda vecinos');
     fireEvent.press(screen.getByTestId(`tanda-editar-cuenta-${p.efectivo}`));
     fireEvent.press(screen.getByTestId('tanda-editar-guardar'));
@@ -342,11 +354,5 @@ describe('copy centralizado (textos.ts)', () => {
     expect(MENSAJE_TODAVIA_NO_APORTACION).toBe('La sigo apartando. Te pregunto mañana.');
     expect(MENSAJE_TODAVIA_NO_COBRO).toBe('Va. Te pregunto mañana.');
     expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
-  });
-
-  it('pistas TalkBack de lista, detalle y Hoy', () => {
-    expect(PISTA_VER_CALENDARIO).toMatch(/calendario/i);
-    expect(PISTA_YA_LA_DI).toContain('aportación');
-    expect(PISTA_ME_TOCO).toMatch(/cobr/i);
   });
 });

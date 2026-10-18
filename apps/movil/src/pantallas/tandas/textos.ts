@@ -102,8 +102,16 @@ export const PISTA_ME_TOCO = 'Registra el cobro; no cuenta como ingreso';
 export const TITULO_CALENDARIO = 'Calendario';
 export const SUFIJO_TU_TURNO = ' · tu turno';
 export const ETIQUETA_EDITAR_NOMBRE_CUENTA = 'Editar nombre o cuenta';
+/** TalkBack al abrir edición de nombre o cuenta (`02 §18`). */
+export const PISTA_EDITAR_NOMBRE_CUENTA = 'Cambia el nombre o la cuenta de aportación';
 export const ETIQUETA_ARCHIVAR_TANDA = 'Archivar tanda';
+/** TalkBack al iniciar archivar (`02 §18`). */
+export const PISTA_ARCHIVAR_TANDA = 'Quita la tanda de la lista y cancela aportaciones futuras';
+/** TalkBack al confirmar archivar. */
+export const PISTA_CONFIRMAR_ARCHIVAR = 'Confirma archivar; lo ya registrado se queda';
 export const ETIQUETA_GUARDAR_CAMBIOS = 'Guardar cambios';
+/** TalkBack al guardar edición de nombre o cuenta. */
+export const PISTA_GUARDAR_CAMBIOS = 'Guarda el nombre y la cuenta que elegiste';
 export const ETIQUETA_CANCELAR = 'Cancelar';
 export const ETIQUETA_NOMBRE = 'Nombre';
 export const ETIQUETA_CUENTA_APORTACION = '¿De qué cuenta sale la aportación?';

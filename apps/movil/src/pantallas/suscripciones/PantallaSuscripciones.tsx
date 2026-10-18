@@ -21,6 +21,7 @@ import {
   ETIQUETA_NOMBRE,
   ETIQUETA_NO_ES,
   ETIQUETA_VOLVER,
+  etiquetaAccesibleAyudaSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
@@ -76,7 +77,12 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         {TITULO_PANTALLA}
       </Texto>
       {v.activas.length > 0 ? (
-        <Texto variante="secundario" tono="secundario" testID="suscripciones-ayuda">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="suscripciones-ayuda"
+          accessibilityLabel={etiquetaAccesibleAyudaSuscripciones()}
+        >
           {PISTA_AYUDA}
         </Texto>
       ) : null}

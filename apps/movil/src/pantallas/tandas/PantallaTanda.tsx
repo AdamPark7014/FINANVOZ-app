@@ -23,6 +23,10 @@ import {
   ETIQUETA_ME_TOCO,
   ETIQUETA_NOMBRE,
   ETIQUETA_VOLVER,
+  PISTA_ARCHIVAR_TANDA,
+  PISTA_CONFIRMAR_ARCHIVAR,
+  PISTA_EDITAR_NOMBRE_CUENTA,
+  PISTA_GUARDAR_CAMBIOS,
   PISTA_ME_TOCO,
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
@@ -233,7 +237,12 @@ function Ajustes({
     return (
       <Tarjeta testID="tanda-archivar">
         <Texto variante="cuerpo">{TEXTO_CONFIRMAR_ARCHIVAR}</Texto>
-        <Boton testID="tanda-archivar-confirmar" etiqueta={ETIQUETA_ARCHIVAR_TANDA} alPresionar={archivar} />
+        <Boton
+          testID="tanda-archivar-confirmar"
+          etiqueta={ETIQUETA_ARCHIVAR_TANDA}
+          alPresionar={archivar}
+          pista={PISTA_CONFIRMAR_ARCHIVAR}
+        />
         <Boton
           testID="tanda-archivar-cancelar"
           etiqueta={ETIQUETA_CANCELAR}
@@ -272,7 +281,12 @@ function Ajustes({
             prefijoTestID="tanda-editar-cuenta"
           />
         )}
-        <Boton testID="tanda-editar-guardar" etiqueta={ETIQUETA_GUARDAR_CAMBIOS} alPresionar={guardar} />
+        <Boton
+          testID="tanda-editar-guardar"
+          etiqueta={ETIQUETA_GUARDAR_CAMBIOS}
+          alPresionar={guardar}
+          pista={PISTA_GUARDAR_CAMBIOS}
+        />
         <Boton
           testID="tanda-editar-cancelar"
           etiqueta={ETIQUETA_CANCELAR}

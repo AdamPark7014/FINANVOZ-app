@@ -195,7 +195,11 @@ describe('Registrar con la nube', () => {
       p.reconectar();
     });
     const [frase] = listarPorInterpretar(p.ctx);
-    fireEvent.press(await screen.findByTestId(`revisar-${frase?.id}`));
+    expect(await screen.findByTestId(`revisar-${frase?.id}`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_REVISAR_FRASE,
+    );
+    fireEvent.press(screen.getByTestId(`revisar-${frase?.id}`));
     expect(p.alRevisar).toHaveBeenCalledWith(frase?.id);
 
     // Registrar abierto con esa frase.

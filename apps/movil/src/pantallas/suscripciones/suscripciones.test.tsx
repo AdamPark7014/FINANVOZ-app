@@ -12,6 +12,7 @@ import {
   mensajeNombreGuardado,
   PISTA_AYUDA,
   PISTA_VOLVER,
+  etiquetaAccesibleAyudaSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
@@ -63,6 +64,10 @@ describe('Suscripciones (02 §20)', () => {
   it('TalkBack: resumen y montos en palabras; auditoría estricta sin hallazgos', () => {
     const { ctx } = preparar();
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    expect(screen.getByTestId('suscripciones-ayuda')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleAyudaSuscripciones(),
+    );
     expect(screen.getByTestId('suscripciones-resumen').props.accessibilityLabel).toMatch(/pesos/);
     expect(screen.getByTestId('suscripcion-netflix-monto').props.accessibilityLabel).toMatch(/pesos/);
     expect(screen.getByTestId('suscripcion-netflix-nombre')).toHaveProp('accessibilityRole', 'header');

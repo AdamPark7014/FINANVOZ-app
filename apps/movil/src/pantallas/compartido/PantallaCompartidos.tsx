@@ -26,6 +26,8 @@ import {
   ETIQUETA_NOMBRE_PAREJA,
   ETIQUETA_VOLVER,
   instruccionQrTrasCrear,
+  PISTA_CREAR_CON_ALGUIEN,
+  PISTA_ESCANEAR_CODIGO,
   PISTA_VOLVER_CUENTAS,
   etiquetaVacioCompartidos,
   TEXTO_COMPARTIDOS_VACIO,
@@ -161,12 +163,14 @@ export function PantallaCompartidos({
           <Boton
             testID="compartidos-crear"
             etiqueta={BTN_CREAR_CON_ALGUIEN}
+            pista={PISTA_CREAR_CON_ALGUIEN}
             alPresionar={() => setModo({ tipo: 'crear' })}
           />
           <Boton
             testID="compartidos-escanear"
             etiqueta={BTN_ESCANEAR_CODIGO}
             variante="secundario"
+            pista={PISTA_ESCANEAR_CODIGO}
             alPresionar={() => setModo({ tipo: 'unirse', escaneando: false })}
           />
         </>

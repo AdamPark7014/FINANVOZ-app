@@ -35,6 +35,8 @@ import {
   MENSAJE_COMPARTIDO_GUARDADO,
   MENSAJE_SIN_PAREJA,
   parsearProporcionReparto,
+  PISTA_CREAR_CON_ALGUIEN,
+  PISTA_ESCANEAR_CODIGO,
   PISTA_VOLVER_CUENTAS,
   etiquetaVacioCompartidos,
   etiquetaVacioGrupoMovimientos,
@@ -139,6 +141,8 @@ describe('02 §27 · Gastos con tu pareja', () => {
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
     expect(screen.getByTestId('compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_CUENTAS);
+    expect(screen.getByTestId('compartidos-crear')).toHaveProp('accessibilityHint', PISTA_CREAR_CON_ALGUIEN);
+    expect(screen.getByTestId('compartidos-escanear')).toHaveProp('accessibilityHint', PISTA_ESCANEAR_CODIGO);
     expect(screen.getByTestId('compartidos-vacio')).toHaveTextContent(TEXTO_COMPARTIDOS_VACIO);
     expect(screen.getByTestId('compartidos-vacio').props.accessibilityLabel).toBe(etiquetaVacioCompartidos());
     expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);

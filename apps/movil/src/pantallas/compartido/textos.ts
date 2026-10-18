@@ -22,7 +22,12 @@ export function etiquetaVacioCompartidos(): string {
 }
 export const AVISO_REVINCULAR_LISTA = 'Vuelve a vincular este teléfono';
 export const BTN_CREAR_CON_ALGUIEN = 'Crear con alguien';
+/** Lista de grupos: abre el flujo para generar un código QR (`02 §15`). */
+export const PISTA_CREAR_CON_ALGUIEN =
+  'Escribe cómo se llama tu pareja y te muestro el código para vincularlos';
 export const BTN_ESCANEAR_CODIGO = 'Escanear código';
+/** Lista de grupos: une tu teléfono al grupo de tu pareja (`02 §15`). */
+export const PISTA_ESCANEAR_CODIGO = 'Lee el código QR que aparece en el teléfono de tu pareja';
 export const BTN_ESCANEAR_SU_CODIGO = 'Escanear su código';
 export const BTN_CREAR_CODIGO = 'Crear código';
 export const BTN_LISTO = 'Listo';

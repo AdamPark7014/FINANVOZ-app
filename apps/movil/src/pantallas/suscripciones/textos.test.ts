@@ -1,4 +1,5 @@
 import {
+  etiquetaAccesibleAyudaSuscripciones,
   etiquetaInactivasSuscripciones,
   etiquetaVacioSuscripciones,
   mensajeAccionSuscripcion,
@@ -25,6 +26,7 @@ describe('textos de suscripciones (02 §20)', () => {
 
   it('ayuda en plural para varias filas', () => {
     expect(PISTA_AYUDA).toContain('Conviértelas');
+    expect(etiquetaAccesibleAyudaSuscripciones()).toContain(PISTA_AYUDA);
   });
 
   it('mensajes de acción con nombre del comercio', () => {

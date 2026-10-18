@@ -11,6 +11,11 @@ export const BTN_SUSCRIPCIONES_CUENTAS = 'Ver mis suscripciones';
 export const PISTA_AYUDA =
   'Conviértelas en compromiso y Hoy las aparta; o avisa si ya no las pagas o no son suscripción.';
 
+/** TalkBack: la ayuda bajo el título cuando hay filas activas (`02 §15`). */
+export function etiquetaAccesibleAyudaSuscripciones(): string {
+  return `Opciones por suscripción. ${PISTA_AYUDA}`;
+}
+
 /** Sin cargos recurrentes detectados (E14). */
 export const TEXTO_SUSCRIPCIONES_VACIO =
   'Todavía no veo cargos que se repitan. Cuando un cobro llegue cada mes, cada semana o cada año, aparece aquí.';

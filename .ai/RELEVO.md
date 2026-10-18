@@ -6,25 +6,26 @@
 
 ## Hecho en este turno
 
-- **Compartidos TalkBack:** pistas `PISTA_CREAR_CON_ALGUIEN` y `PISTA_ESCANEAR_CODIGO` en lista vacía; vacío con `etiquetaVacioCompartidos` + pruebas Cuentas/Volver (acumulado en commits recientes).
+- **Ayuda TalkBack:** `922e4b6` — hints FAQ abierta/cerrada y correo en `ayuda.test.tsx`; comentarios TalkBack en `ACCESIBILIDAD_*` (`textos.ts`). Base FAQ: `3ce83b9` (`ETIQUETA_RESPUESTA`, Despliega/Pliega).
 
 ## Hecho (acumulado reciente)
 
-- Suscripciones inactivas/vacío, captura, widget. Ver `git log`.
+- Widget/SeccionWidget, principal Chip, tandas, captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`git status`): ajustes/widget — no mezclar.
-- CI Windows; M0 Adam.
+- WIP ajeno sin commitear (`SeccionWidget`, `widget.test`) — no mezclar; salvar si hace falta.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Pistas TalkBack en flujos crear/unirse de compartidos (QR, cámara) si sigue la tanda a11y.
+2. Cerrar leftover widget si sigue la tanda a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
