@@ -416,7 +416,7 @@ describe('¿Me alcanza?', () => {
     const calcular = jest.fn<ReturnType<CalcularMeAlcanza>, Parameters<CalcularMeAlcanza>>(async () => vista);
     montar(p.ctx, <PantallaMeAlcanza calcular={calcular} alCerrar={jest.fn()} />);
     fireEvent.press(screen.getByTestId('boton-calcular-me-alcanza'));
-    expect(textoDe('me-alcanza-error')).toBe('Escribe un precio mayor a $0.');
+    expect(textoDe('error-formulario')).toBe(ERROR_PRECIO);
     expect(calcular).not.toHaveBeenCalled();
 
     fireEvent.changeText(screen.getByTestId('me-alcanza-precio'), '1,500');
@@ -435,6 +435,7 @@ describe('¿Me alcanza?', () => {
     );
     await screen.findByTestId('me-alcanza-datos-insuficientes');
     expect(textoDe('me-alcanza-mensaje')).toBe(MENSAJE_DATOS_INSUFICIENTES);
+    expect(textoDe('me-alcanza-datos-ayuda')).toBe(AYUDA_DATOS_INSUFICIENTES);
     expect(screen.getByText('Una compra de $1,500')).toBeTruthy();
   });
 

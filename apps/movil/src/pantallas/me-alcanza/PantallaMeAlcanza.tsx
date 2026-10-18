@@ -16,12 +16,23 @@ import { TEXTO_NO_ASESORIA } from '../privacidad/legales';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, CampoMonto, CampoTexto, espacio, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
 import { useNotificaciones } from '../avisos/notificaciones';
+import { MensajeError } from '../onboarding/componentes';
 import { leerEntero } from '../onboarding/ingreso';
 import { GrupoChips } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { avisoRecordatorio } from './recordatorio';
+import {
+  AYUDA_DATOS_INSUFICIENTES,
+  ERROR_CALCULO,
+  ERROR_MESES,
+  ERROR_PRECIO,
+  ERROR_RECORDATORIO,
+  MENSAJE_CANCELADO,
+  MENSAJE_PERMISO_AVISOS,
+  MENSAJE_SIN_AVISOS,
+} from './textos';
 
 /** El cálculo (por omisión `meAlcanza` de servicios); inyectable para pruebas con el resultado de un vector. */
 export type CalcularMeAlcanza = (
@@ -38,10 +49,6 @@ type Estado =
 
 const MESES = ['3', '6', '9', '12', '18', '24'] as const;
 type OpcionMeses = 'sin' | (typeof MESES)[number] | 'otro';
-
-export const MENSAJE_CANCELADO = 'Cancelé el cálculo. Puedes cambiar los datos y volver a calcular.';
-const MENSAJE_SIN_AVISOS = 'No puedo programar avisos en este teléfono.';
-const MENSAJE_PERMISO_AVISOS = 'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.';
 
 /**
  * "¿Me alcanza?" (RF-SIM-01, `02 §9`): formulario (precio, qué es y meses), cálculo por bloques con progreso y
@@ -154,7 +161,7 @@ export function PantallaMeAlcanza({
   const enviar = () => {
     setError(null);
     const n = meses === 'sin' ? undefined : meses === 'otro' ? leerEntero(mesesOtro, 2, 48) : Number(meses);
-    if (n === null) return setError('Elige los meses, de 2 a 48.');
+    if (n === null) return setError(ERROR_MESES);
     const r = ConsultaMeAlcanza.safeParse({
       precio: precio ?? 0,
       ...(descripcion.trim() !== '' ? { descripcion: descripcion.trim() } : {}),
