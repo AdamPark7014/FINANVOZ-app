@@ -125,14 +125,14 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
           ) : null}
           <CampoMonto
             testID={`${prefijo}-monto`}
-            etiqueta="¿Cuánto te pagan cada vez?"
-            ayuda="Lo que te llega a la cuenta, ya con descuentos."
+            etiqueta={PREGUNTA_MONTO}
+            ayuda={AYUDA_MONTO}
             valorInicial={valores.monto}
             alCambiar={(v) => cambiar('monto', v)}
           />
           <Chips
             testID={`${prefijo}-fin-semana`}
-            etiqueta="Si cae en fin de semana te pagan:"
+            etiqueta={PREGUNTA_FIN_SEMANA}
             opciones={OPCIONES_FIN_DE_SEMANA}
             valor={valores.finDeSemana}
             alCambiar={(v) => cambiar('finDeSemana', v)}

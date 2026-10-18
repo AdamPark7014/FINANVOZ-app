@@ -198,7 +198,7 @@ export function PantallaMeAlcanza({
       >
         <Texto variante="titulo">¿Me alcanza?</Texto>
         <Boton
-          etiqueta="Cerrar"
+          etiqueta={BTN_CERRAR}
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
@@ -247,7 +247,7 @@ export function PantallaMeAlcanza({
             />
           ) : null}
           <MensajeError texto={error} />
-          <Boton etiqueta="Calcular" alPresionar={enviar} testID="boton-calcular-me-alcanza" />
+          <Boton etiqueta={BTN_CALCULAR} alPresionar={enviar} testID="boton-calcular-me-alcanza" />
         </View>
       ) : null}
 
@@ -260,7 +260,7 @@ export function PantallaMeAlcanza({
             testID="me-alcanza-progreso"
           />
           <Boton
-            etiqueta="Cancelar"
+            etiqueta={BTN_CANCELAR}
             variante="secundario"
             alPresionar={cancelar}
             testID="boton-cancelar-me-alcanza"
@@ -273,11 +273,16 @@ export function PantallaMeAlcanza({
           <Texto variante="cuerpo" testID="me-alcanza-error-calculo">
             {ERROR_CALCULO}
           </Texto>
-          <Boton etiqueta="Intentar de nuevo" alPresionar={() => iniciar(estado.consulta)} />
           <Boton
-            etiqueta="Cambiar los datos"
+            etiqueta={BTN_INTENTAR_DE_NUEVO}
+            alPresionar={() => iniciar(estado.consulta)}
+            testID="boton-reintentar-me-alcanza"
+          />
+          <Boton
+            etiqueta={BTN_CAMBIAR_DATOS}
             variante="texto"
             alPresionar={() => setEstado({ tipo: 'formulario', aviso: null })}
+            testID="boton-cambiar-datos-me-alcanza"
           />
         </View>
       ) : null}
@@ -291,7 +296,12 @@ export function PantallaMeAlcanza({
           <Texto variante="secundario" tono="secundario" testID="me-alcanza-datos-ayuda">
             {AYUDA_DATOS_INSUFICIENTES}
           </Texto>
-          <Boton etiqueta="Listo" variante="secundario" alPresionar={alCerrar} />
+          <Boton
+            etiqueta={BTN_LISTO}
+            variante="secundario"
+            alPresionar={alCerrar}
+            testID="boton-listo-datos-insuficientes"
+          />
         </View>
       ) : null}
 
@@ -336,7 +346,7 @@ function Resultado({
       mostrar({
         mensaje: r.tipo === 'msi' ? mensajeCompraMsi(r.compra) : `Registré: ${vista.titulo} · por asignar`,
         accion: {
-          etiqueta: 'Deshacer',
+          etiqueta: BTN_DESHACER,
           alPresionar: () => {
             deshacer(ctx, r.deshacer);
             setComprado(null);
@@ -362,7 +372,7 @@ function Resultado({
         avisoRecordatorio(rec.fecha, vista.consulta.descripcion, obtenerPreferenciasAvisos(ctx)),
       );
       setRecordado(true);
-      mostrar({ mensaje: 'Listo: te lo recuerdo ese día.' });
+      mostrar({ mensaje: MENSAJE_AVISO_RECORDATORIO });
     } catch {
       setMensajeRecordatorio(ERROR_RECORDATORIO);
     }

@@ -165,7 +165,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               ) : null}
               <Boton
                 variante="texto"
-                etiqueta="Volver a elegir"
+                etiqueta={BTN_VOLVER_A_ELEGIR}
                 deshabilitado={trabajando}
                 alPresionar={() => {
                   setError(null);
@@ -177,12 +177,12 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
             <>
               {paso.deLaNube ? (
                 <Texto variante="cuerpo" testID="restaurar-encontre">
-                  Encontré tu respaldo más reciente. Escribe su contraseña.
+                  {TEXTO_RESPALDO_RECIENTE}
                 </Texto>
               ) : null}
               <CampoTexto
                 testID="restaurar-contrasena"
-                etiqueta="Contraseña del respaldo"
+                etiqueta={ETIQUETA_CONTRASENA}
                 valor={contrasena}
                 alCambiar={setContrasena}
                 autoFocus
@@ -191,14 +191,14 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               />
               <Boton
                 testID="restaurar-abrir"
-                etiqueta="Abrir respaldo"
+                etiqueta={BTN_ABRIR_RESPALDO}
                 cargando={trabajando}
                 deshabilitado={trabajando || contrasena === ''}
                 alPresionar={() => void abrir(paso.archivo)}
               />
               <Boton
                 variante="texto"
-                etiqueta={paso.deLaNube ? 'Volver a elegir' : 'Elegir otro archivo'}
+                etiqueta={paso.deLaNube ? BTN_VOLVER_A_ELEGIR : BTN_ELEGIR_OTRO_ARCHIVO}
                 deshabilitado={trabajando}
                 alPresionar={() => {
                   setError(null);
@@ -214,20 +214,19 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
               </Texto>
               {tieneDatos ? (
                 <Texto variante="cuerpo" tono="faltante" testID="restaurar-reemplaza">
-                  Se reemplaza todo lo que hay ahora en este teléfono. Si quieres conservarlo, primero exporta
-                  un respaldo.
+                  {AVISO_REEMPLAZA_DATOS}
                 </Texto>
               ) : null}
               <Boton
                 testID="restaurar-confirmar"
-                etiqueta="Restaurar"
+                etiqueta={BTN_RESTAURAR}
                 cargando={trabajando}
                 deshabilitado={trabajando}
                 alPresionar={() => void restaurar(paso.listo)}
               />
               <Boton
                 variante="texto"
-                etiqueta="Cancelar"
+                etiqueta={BTN_CANCELAR}
                 deshabilitado={trabajando}
                 alPresionar={() => setPaso({ tipo: 'elegir' })}
               />
