@@ -38,6 +38,8 @@ export const ETIQUETA_APORTACIONES_HECHAS = '¿Cuántas aportaciones llevas?';
 export const ETIQUETA_YA_TE_TOCO = '¿Ya te tocó?';
 export const SUFIJO_RONDAS_NO_APARTO = 'Esas rondas no las vuelvo a apartar.';
 export const ETIQUETA_GUARDAR_TANDA = 'Guardar tanda';
+/** TalkBack al guardar una tanda nueva (`02 §18`). */
+export const PISTA_GUARDAR_TANDA = 'Guarda la tanda con los datos que escribiste';
 
 export const OPCIONES_SI_NO = [
   { valor: 'si' as const, etiqueta: 'Sí' },
