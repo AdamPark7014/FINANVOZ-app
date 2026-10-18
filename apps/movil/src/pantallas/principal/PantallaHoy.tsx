@@ -341,7 +341,9 @@ function AvisosUnaVez({ avisos }: { avisos: readonly Aviso[] }) {
     <View style={{ gap: espacio.m }}>
       {visibles.map((a) => (
         <Tarjeta key={a.id} testID="aviso-una-vez" style={{ borderColor: c.acentoTexto }}>
-          <Texto variante="cuerpo">{a.texto}</Texto>
+          <Texto variante="cuerpo" accessibilityRole="alert" accessibilityLiveRegion="polite">
+            {a.texto}
+          </Texto>
           <Boton
             etiqueta="Entendido"
             variante="texto"

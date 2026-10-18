@@ -235,7 +235,9 @@ describe('Hoy', () => {
       p.ctx,
       <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
     );
-    expect(screen.getByText(texto)).toBeTruthy();
+    const aviso = screen.getByText(texto);
+    expect(aviso.props.accessibilityRole).toBe('alert');
+    expect(aviso.props.accessibilityLiveRegion).toBe('polite');
     expect(obtenerHoy(p.ctx).avisos).toEqual([]);
     fireEvent.press(screen.getByTestId('boton-aviso-entendido'));
     expect(screen.queryByText(texto)).toBeNull();
