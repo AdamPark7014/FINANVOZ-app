@@ -6,5 +6,7 @@ export {
   lineaCuotas,
   mensajeCompraMsi,
   mensajeTarjetaConfigurada,
+  TEXTO_TARJETA_NO_ENCONTRADA,
   VACIO_MSI_TARJETA,
+  VACIO_MOVIMIENTOS_TARJETA,
 } from './textos';

@@ -6,29 +6,26 @@
 
 ## Hecho en este turno
 
-- **movil:** copy de Ajustes en `src/pantallas/ajustes/textos.ts` + barrel `index.ts`; `app/ajustes.tsx` consume esas constantes (973d50c / 33dd907 / 0855720).
+- **movil/ajustes/ingreso:** `SeccionIngreso` y `FormularioIngreso` consumen `ingreso-textos.ts` (labels es-MX); corregido `cuándo` roto en el botón de configurar ingreso.
 
 ## Hecho (acumulado reciente)
 
-Ver `docs/ESTADO.md` y `git log` (M16 compartido copy, ¿Me alcanza?, oleadas W/V, etc.).
+- `ingreso-textos.ts`, `EditarIngreso`, `ingreso.ts` ya centralizaban copy; ver `git log` en `apps/movil/src/pantallas/ajustes/`.
 
 ## A medias — CUIDADO
 
-- CI: `publicar-ejemplos.test.ts` y `rendimiento.test.ts` (RNF-01) pueden fallar en Windows.
-- M0 / Expo / teléfono / legal / fiscal: sin cambio (Adam).
-- `semilla.ts` / `semilla.test.ts`: typecheck preexistentes en movil (no tocados).
-- WIP local de otros agentes (stashes `wip paralelo*`) — no mezclar sin leer.
+- WIP local ajeno (no commitear mezclado): `principal.test.tsx`, `PantallaTarjeta.tsx`, respaldo, calculadora, etc.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 
 ## Siguiente paso
 
-1. Adam — M0 y EAS (LANZAMIENTO sentadas 1–2).
-2. Teléfono — validar flujo compartido con cámara (140–141).
-3. Centralizar copy de subsecciones Ajustes (ingreso ya tiene `ingreso-textos.ts`).
+1. Adam — M0 / EAS.
+2. Teléfono — flujos compartido e ingreso.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `packages/core` E*, `eas.json`, `app.config`, vectores a mano.
+- `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
 

@@ -34,6 +34,11 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { PantallaTarjeta } from './PantallaTarjeta';
+import {
+  AYUDA_SALDO_A_FAVOR,
+  TEXTO_TARJETA_NO_ENCONTRADA,
+  VACIO_MOVIMIENTOS_TARJETA,
+} from './textos';
 
 const textoDe = (testID: string) => {
   const hijos = screen.getByTestId(testID).props.children as unknown;
