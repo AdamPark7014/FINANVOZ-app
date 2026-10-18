@@ -6,22 +6,20 @@
 
 ## Hecho en este turno
 
-- **UI kit TalkBack:** `EstadoVacio` (`etiquetaHablada` por defecto), `CampoMonto` vía `etiquetaCampoMonto`; micro tests `componentes.test.tsx` + `formato.test.ts`.
-- **Suscripciones:** `textos.test.ts` (vacío/inactivas).
+- **Tandas:** prueba detalle aserta `PISTA_ME_TOCO` en `tanda-me-toco` (TalkBack al registrar cobro).
 
 ## Hecho (acumulado reciente)
 
-- Captura, Cuentas CTAs, me-alcanza pistas. Ver `git log`.
+- Suscripciones/compartidos leftovers, Ajustes captura activa, Cuentas CTAs. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP paralelo en otras pantallas — no mezclar sin revisar disco.
-- CI Windows, M0: Adam.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas.
 
 ## No tocar
 
