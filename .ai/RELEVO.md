@@ -6,27 +6,27 @@
 
 ## Hecho en este turno
 
-- **Me alcanza / tandas / suscripciones:** copy y TalkBack (cerrar, cancelar, vacíos con `EstadoVacio`, pistas en lista de tandas); prueba de `etiquetaVacioSuscripciones` en `textos.test.ts`.
+- **Ajustes › Captura:** estado activo con `accessibilityLabel={etiquetaCapturaActiva(...)}` (`b6d720a`).
 
 ## Hecho (acumulado reciente)
 
-- Headers TalkBack, Cuentas, Hoy, deducciones, widget. Ver `git log`.
+- Arqueo/Hoy copy TalkBack, onboarding tips, CTAs Cuentas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`git status`): no reescribir sin `git diff`.
-- CA-M6-05 probabilidad: prueba intermitente en CI local.
-- M0 / EAS: Adam.
+- WIP paralelo en disco — `git status` antes de editar.
+- CI Windows: `publicar-ejemplos`, RNF-01.
+- M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Estabilizar CA-M6-05 si falla en CI.
+2. Paridad `accessibilityLabel` en CTAs compartidos/tandas desde Cuentas.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) literal.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
