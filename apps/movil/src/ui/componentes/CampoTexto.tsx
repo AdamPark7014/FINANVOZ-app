@@ -40,7 +40,13 @@ export function CampoTexto({
   const conError = Boolean(error);
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="etiqueta">{etiqueta}</Texto>
+      <Texto
+        variante="etiqueta"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
+        {etiqueta}
+      </Texto>
       <TextInput
         testID={testID}
         value={valor}

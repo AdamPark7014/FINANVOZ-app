@@ -2,6 +2,7 @@ import type { Centavos } from '@cartera/core';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
+import { TIP_COLCHON_SIN_POR_AHORA } from '../../src/pantallas/onboarding/tips';
 import { colchonSugerido, completarOnboarding, fijarColchon } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, CampoMonto, formatearCentavos } from '../../src/ui';
@@ -32,6 +33,7 @@ export default function Colchon() {
       paso={7}
       titulo="¿Cuánto quieres no tocar nunca?"
       ayuda="Tu colchón no cuenta para lo que puedes gastar. Lo cambias cuando quieras en Ajustes › Colchón."
+      tip={TIP_COLCHON_SIN_POR_AHORA}
       pie={
         <>
           <Boton testID="onb-ver-mi-dia" etiqueta="Ver mi día" alPresionar={() => terminar(monto ?? 0)} />
