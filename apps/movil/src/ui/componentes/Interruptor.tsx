@@ -8,6 +8,8 @@ export interface InterruptorProps {
   etiqueta: string;
   /** Explica el efecto: "Lo que le debes no cuenta como libre". */
   descripcion?: string;
+  /** TalkBack cuando conviene no repetir la descripción visible (`02 §15`). */
+  pista?: string;
   valor: boolean;
   alCambiar: (valor: boolean) => void;
   deshabilitado?: boolean;
@@ -18,6 +20,7 @@ export interface InterruptorProps {
 export function Interruptor({
   etiqueta,
   descripcion,
+  pista,
   valor,
   alCambiar,
   deshabilitado = false,
@@ -31,7 +34,7 @@ export function Interruptor({
       disabled={deshabilitado}
       accessibilityRole="switch"
       accessibilityLabel={etiquetaHablada(etiqueta)}
-      accessibilityHint={descripcion}
+      accessibilityHint={pista ?? descripcion}
       accessibilityState={{ checked: valor, disabled: deshabilitado }}
       style={{
         minHeight: OBJETIVO_TACTIL_MIN,

@@ -14,3 +14,7 @@ export const ETIQUETA_OCULTAR = 'Ocultar montos';
 
 export const DESC_OCULTAR =
   'En el widget verás “Toca para ver tu día” en lugar del monto.';
+
+/** TalkBack en «Ocultar montos»: acción inmediata, sin repetir la descripción visible. */
+export const PISTA_OCULTAR_MONTOS =
+  'Actualiza la vista previa y el widget del inicio al instante.';

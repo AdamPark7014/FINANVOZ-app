@@ -9,6 +9,7 @@ import {
   DESC_OCULTAR,
   ETIQUETA_OCULTAR,
   ETIQUETA_PREVIA,
+  PISTA_OCULTAR_MONTOS,
   PISTA_PREVIA,
   SECCION_WIDGET,
   TEXTO_INSTRUCCION,
@@ -57,6 +58,7 @@ export function SeccionWidget() {
           testID="ajustes-widget-ocultar"
           etiqueta={ETIQUETA_OCULTAR}
           descripcion={DESC_OCULTAR}
+          pista={PISTA_OCULTAR_MONTOS}
           valor={ocultarMontos}
           alCambiar={(valor) => {
             try {
