@@ -1,5 +1,5 @@
 import { ErrorDominio } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { etiquetaHablada, formatearCentavos } from '../../ui';
 import {
   MENSAJE_LIMITE_DIARIO,
   MENSAJE_LIMITE_MENSUAL_GRATIS,
@@ -79,6 +79,10 @@ export const BTN_AJUSTES_CUENTAS = '⚙ Ajustes';
 export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
 /** Sección Debes en Cuentas (`02 §11`). */
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
+/** TalkBack en Debes (`02 §11`, `02 §15`). */
+export const PISTA_AGREGAR_TARJETA_CREDITO = 'Abre el formulario para registrar una tarjeta de crédito';
+/** Te deben en Cuentas: abre la ficha (`02 §17`, `02 §15`). */
+export const PISTA_COBRAR_DESDE_CUENTAS = 'Abre su ficha para cobrarle';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
 export const BTN_VER_MOVIMIENTOS_CHEVRON = 'Ver movimientos ›';
 export const BTN_LISTO = 'Listo';
@@ -338,6 +342,11 @@ export function etiquetaFiltroMovimientosActivo(): string {
   return `Movimientos. ${TEXTO_MOVIMIENTOS_FILTRO_ACTIVO}`;
 }
 
+/** Encabezado de día en la lista de movimientos (`02 §10`, TalkBack). */
+export function etiquetaEncabezadoDiaMovimientos(etiquetaVisible: string): string {
+  return etiquetaHablada(`Movimientos del ${etiquetaVisible}`);
+}
+
 /** Lista vacía en Movimientos: pestaña + copy para TalkBack (`02 §15`). */
 export function etiquetaVacioMovimientos(conFiltro: boolean): string {
   const copy = conFiltro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO;
@@ -372,7 +381,7 @@ export function etiquetaVacioCuentasDebes(): string {
 }
 
 export function etiquetaVacioCuentasCompromisos(): string {
-  return `Compromisos. ${TEXTO_CUENTAS_COMPROMISOS_VACIO}`;
+  return `Compromisos, ${SUBTITULO_CUENTAS_COMPROMISOS.toLowerCase()}. ${TEXTO_CUENTAS_COMPROMISOS_VACIO}`;
 }
 
 /** Contexto TalkBack de cada saldo en Cuentas (`02 §15`). */

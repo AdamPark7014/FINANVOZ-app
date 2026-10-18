@@ -31,6 +31,7 @@ import {
   etiquetaVacioCuentasCompromisos,
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
+  etiquetaEncabezadoDiaMovimientos,
   etiquetaFiltroMovimientosActivo,
   etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
@@ -575,6 +576,10 @@ describe('Movimientos', () => {
     const dia = listarMovimientos(p.ctx)[0]?.fecha;
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaEncabezadoDiaMovimientos(listarMovimientos(p.ctx)[0]?.etiqueta ?? ''),
+    );
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('accessibilityRole', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`).props.accessibilityLabel).toMatch(/veinticinco pesos/);

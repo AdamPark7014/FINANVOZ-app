@@ -38,6 +38,7 @@ import {
   NOMBRE_TIPO_LIBRO,
   resumenMovimiento,
   PREGUNTA_PASAR_A_MESES,
+  etiquetaEncabezadoDiaMovimientos,
   etiquetaFiltroMovimientosActivo,
   etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
@@ -216,6 +217,7 @@ export function PantallaMovimientos({
             variante="etiqueta"
             tono="secundario"
             accessibilityRole="header"
+            accessibilityLabel={etiquetaEncabezadoDiaMovimientos(d.etiqueta)}
             testID={`movimientos-dia-${d.fecha}`}
           >
             {d.etiqueta}

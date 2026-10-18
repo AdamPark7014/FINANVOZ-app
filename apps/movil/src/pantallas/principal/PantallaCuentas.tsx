@@ -28,6 +28,9 @@ import {
   BTN_AGREGAR_TARJETA_CREDITO,
   BTN_AJUSTES_CUENTAS,
   BTN_AJUSTES_CUENTAS_ACCESIBLE,
+  PISTA_AGREGAR_TARJETA_CREDITO,
+  PISTA_COBRAR_DESDE_CUENTAS,
+  PISTA_CONTAR_EFECTIVO,
   contextoSaldoCompromiso,
   contextoSaldoLeDebes,
   contextoSaldoTeDebe,
@@ -127,6 +130,7 @@ export function PantallaCuentas({
                       accion: {
                         etiqueta: TITULO_CONTAR_EFECTIVO,
                         etiquetaAccesible: etiquetaContarEnCuenta(c.nombre),
+                        pista: PISTA_CONTAR_EFECTIVO,
                         alPresionar: () => alContarEfectivo(c.id),
                       },
                     }
@@ -167,6 +171,7 @@ export function PantallaCuentas({
         {alAgregarTarjeta ? (
           <Boton
             etiqueta={BTN_AGREGAR_TARJETA_CREDITO}
+            pista={PISTA_AGREGAR_TARJETA_CREDITO}
             variante="texto"
             ancho="contenido"
             alPresionar={alAgregarTarjeta}
