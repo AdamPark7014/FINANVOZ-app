@@ -18,6 +18,7 @@ import {
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
   PISTA_BORRAR_CUENTA,
+  PISTA_RESPALDAR_AHORA,
   PISTA_VOLVER,
   PISTA_VOLVER_RESTAURAR,
   SUBTITULO_ARCHIVO,
@@ -48,6 +49,7 @@ describe('textos de respaldo (`02 §14`, §19)', () => {
       BTN_RESTAURAR_RESPALDO,
       PISTA_VOLVER,
       PISTA_BORRAR_CUENTA,
+      PISTA_RESPALDAR_AHORA,
     ].join('\n');
     expect(ui).not.toMatch(/[!¡]/);
   });
