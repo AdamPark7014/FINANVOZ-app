@@ -88,7 +88,12 @@ describe('Suscripciones (02 §20)', () => {
       expect(textoDe(`suscripcion-${id}-proximo`)).toBe(proximo);
     }
     expect(screen.queryByTestId('suscripcion-disney-plus')).toBeNull();
-    expect(textoDe('suscripciones-inactivas')).toBe('Ya no se cobran: Disney Plus (último cargo 20 jul)');
+    const inactivas = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';
+    expect(textoDe('suscripciones-inactivas')).toBe(inactivas);
+    expect(screen.getByTestId('suscripciones-inactivas')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaInactivasSuscripciones(inactivas),
+    );
   });
 
   it('Editar nombre: guarda "Dominio web" en la fila', () => {

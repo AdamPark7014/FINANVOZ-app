@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { View } from 'react-native';
 import {
   ETIQUETA_VOLVER,
+  PISTA_VOLVER,
   etiquetaAccesibilidadVersionTerminos,
   lineaVersionTerminos,
   TERMINOS_CORTO,
@@ -20,6 +21,7 @@ export default function Terminos() {
         variante="texto"
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
+        pista={PISTA_VOLVER}
         alPresionar={() => router.back()}
       />
       <Texto testID="terminos-titulo" variante="titulo" accessibilityRole="header">

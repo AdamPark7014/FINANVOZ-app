@@ -119,7 +119,12 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
         />
       ))}
       {v.textoInactivas ? (
-        <Texto variante="secundario" tono="secundario" testID="suscripciones-inactivas">
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID="suscripciones-inactivas"
+          accessibilityLabel={etiquetaInactivasSuscripciones(v.textoInactivas)}
+        >
           {v.textoInactivas}
         </Texto>
       ) : null}

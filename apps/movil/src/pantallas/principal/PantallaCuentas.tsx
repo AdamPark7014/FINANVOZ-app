@@ -129,8 +129,8 @@ export function PantallaCuentas({
                 {...(c.subtipo === 'efectivo' && alContarEfectivo
                   ? {
                       accion: {
-                        etiqueta: 'Contar mi efectivo',
-                        etiquetaAccesible: `Contar mi efectivo en ${c.nombre}`,
+                        etiqueta: TITULO_CONTAR_EFECTIVO,
+                        etiquetaAccesible: etiquetaContarEnCuenta(c.nombre),
                         alPresionar: () => alContarEfectivo(c.id),
                       },
                     }

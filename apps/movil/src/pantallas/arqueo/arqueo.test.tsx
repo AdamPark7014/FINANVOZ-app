@@ -34,6 +34,7 @@ const textoDe = (testID: string) => {
 describe('copy del arqueo (es-MX)', () => {
   it('título y preguntas de formulario en tuteo', () => {
     expect(TITULO).toBe('Contar mi efectivo');
+    expect(etiquetaContarEnCuenta('Cartera')).toBe('Contar mi efectivo en Cartera');
     expect(PASO_MARCAR_TITULO).toMatch(/\?$/);
     expect(ETIQUETA_MONTO_TRAES).toBe('¿Cuánto traes?');
     expect(ETIQUETA_QUIEN_TE_PAGO).toBe('¿Quién te pagó?');

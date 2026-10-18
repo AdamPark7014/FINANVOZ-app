@@ -17,4 +17,10 @@ describe('principal/textos · interpretación', () => {
     expect(etiquetaBotonElegirMovimiento('anular')).toBe('Borrar');
     expect(etiquetaBotonElegirMovimiento('corregir')).toBe('Guardar');
   });
+
+  it('tarjeta del día agrupa título y tip para TalkBack', () => {
+    expect(etiquetaTarjetaDelDia('Paga la luz antes del viernes')).toBe(
+      `${TITULO_TARJETA_DEL_DIA}. Paga la luz antes del viernes`,
+    );
+  });
 });
