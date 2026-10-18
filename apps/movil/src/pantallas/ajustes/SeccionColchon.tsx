@@ -17,6 +17,7 @@ import {
   RESUMEN_SIN_COLCHON,
   SECCION_COLCHON,
 } from './colchon-textos';
+import { MENSAJE_NO_GUARDAR } from './textos';
 
 /**
  * Ajustes › Colchón (`02 §12`, RF-CFG-02): lo que no cuenta para lo que puedes gastar. Se guarda con el mismo
@@ -43,7 +44,7 @@ export function SeccionColchon() {
     try {
       fijarColchon(ctx, monto);
     } catch {
-      setMensaje({ texto: ERROR_GUARDAR, error: true });
+      setMensaje({ texto: MENSAJE_NO_GUARDAR, error: true });
       return;
     }
     refrescar();

@@ -19,22 +19,22 @@ export default function Registrar() {
       testID={TEST_ID_PANTALLA_REGISTRAR}
       accessibilityLabel={ETIQUETA_ACCESIBILIDAD_REGISTRAR}
     >
-    <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
-      <PantallaRegistrar
-        // `key`: revisar otra frase vuelve a montar el panel.
-        key={frase ?? 'nueva'}
-        alCerrar={cerrar}
-        alVerMovimientos={(filtro) =>
-          router.navigate({ pathname: '/movimientos', params: paramsDeFiltro(filtro) })
-        }
-        alVerMovimiento={(transaccionId) =>
-          router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) })
-        }
-        alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
-        alMeAlcanza={(consulta) => abrirMeAlcanza(router, consulta)}
-        {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}
-      />
-    </ProveedorCompartido>
+      <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
+        <PantallaRegistrar
+          // `key`: revisar otra frase vuelve a montar el panel.
+          key={frase ?? 'nueva'}
+          alCerrar={cerrar}
+          alVerMovimientos={(filtro) =>
+            router.navigate({ pathname: '/movimientos', params: paramsDeFiltro(filtro) })
+          }
+          alVerMovimiento={(transaccionId) =>
+            router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) })
+          }
+          alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
+          alMeAlcanza={(consulta) => abrirMeAlcanza(router, consulta)}
+          {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}
+        />
+      </ProveedorCompartido>
     </View>
   );
 }

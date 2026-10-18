@@ -283,6 +283,14 @@ describe('Tarjetas', () => {
     montar(p.ctx, <PantallaTarjeta tarjetaId={nu} alVolver={jest.fn()} />);
     expect(screen.getByTestId('tarjeta-meses-vacio')).toHaveTextContent(VACIO_MSI_TARJETA);
     expect(screen.getByTestId('tarjeta-movimientos-vacio')).toHaveTextContent(VACIO_MOVIMIENTOS_TARJETA);
+    expect(screen.getByTestId('tarjeta-nombre')).toHaveProp('accessibilityRole', 'header');
+  });
+
+  it('resumen expone filas Dato con etiqueta accesible', () => {
+    const p = e510();
+    const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    expect(screen.getByLabelText(`Fecha límite: ${t?.etiquetaFechaLimite}`)).toBeTruthy();
   });
 
   it('Cuentas lleva al detalle y muestra uso, fecha límite y próximo corte', () => {
@@ -303,8 +311,6 @@ describe('Tarjetas', () => {
     expect(textoDe('tarjeta-disponible')).toBe('$28,800');
     expect(textoDe('tarjeta-uso')).toBe('Usas 4 % de tu límite de $30,000. La marca es el 30 %.');
     expect(screen.getByTestId('tarjeta-sin-corte')).toBeTruthy();
-    expect(screen.getByLabelText(`Fecha límite: ${t?.etiquetaFechaLimite}`)).toBeTruthy();
-    expect(screen.getByTestId('tarjeta-nombre')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('Pagar desde el detalle (cuenta de origen) y Deshacer devuelve la deuda', () => {

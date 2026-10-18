@@ -2,6 +2,7 @@ import { renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import { barraPestanas } from '../../src/ui';
 import LayoutPestanas, { ETIQUETA_ACCESIBILIDAD_PESTANA } from './_layout';
+import { TEST_ID_PANTALLA_REGISTRAR, testIdBotonPestana } from './pestanas-textos';
 
 const RUTAS = {
   '(tabs)/_layout': LayoutPestanas,

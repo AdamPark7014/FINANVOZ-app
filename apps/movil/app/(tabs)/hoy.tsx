@@ -22,18 +22,18 @@ export default function Hoy() {
     >
       <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
         <PantallaHoy
-        navegacion={{
-          alVerMovimientos: (filtro) =>
-            router.navigate({ pathname: '/movimientos', params: filtro ? paramsDeFiltro(filtro) : {} }),
-          alVerMovimiento: (transaccionId) =>
-            router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) }),
-          // Directo a Ajustes › Ingreso (02-UX §12); al guardar regresa aquí.
-          alConfigurarIngreso: () => router.push('/ajustes/ingreso'),
-          alAbrirFormulario: () => router.navigate('/registrar'),
-          alAbrirArqueo: (efectivoReal) =>
-            abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
-          alAbrirMeAlcanza: (consulta) => abrirMeAlcanza(router, consulta),
-        }}
+          navegacion={{
+            alVerMovimientos: (filtro) =>
+              router.navigate({ pathname: '/movimientos', params: filtro ? paramsDeFiltro(filtro) : {} }),
+            alVerMovimiento: (transaccionId) =>
+              router.navigate({ pathname: '/movimientos', params: paramsDeDetalle(transaccionId) }),
+            // Directo a Ajustes › Ingreso (02-UX §12); al guardar regresa aquí.
+            alConfigurarIngreso: () => router.push('/ajustes/ingreso'),
+            alAbrirFormulario: () => router.navigate('/registrar'),
+            alAbrirArqueo: (efectivoReal) =>
+              abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
+            alAbrirMeAlcanza: (consulta) => abrirMeAlcanza(router, consulta),
+          }}
         />
       </ProveedorCompartido>
     </View>

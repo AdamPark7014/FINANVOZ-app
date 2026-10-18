@@ -121,6 +121,7 @@ function Arqueo({
   const esperado =
     inicial.saldo -
     inicial.porAsignar.filter((g) => marcados.includes(g.transaccionId)).reduce((s, g) => s + g.monto, 0);
+  const preguntaCantidad = textoDeberiasTraer(esperado);
 
   const entrada = (efectivoReal: Centavos) => ({
     cuentaId: inicial.cuentaId,
@@ -194,11 +195,7 @@ function Arqueo({
 
       {paso === 'cantidad' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-cantidad">
-          {(() => {
-            const preguntaCantidad = textoDeberiasTraer(esperado);
-            return (
-              <>
-          <Texto variant="subtitulo" testID="arqueo-esperado" {...OCULTAR_ETIQUETA_VISIBLE}>
+          <Texto variante="subtitulo" testID="arqueo-esperado" {...OCULTAR_ETIQUETA_VISIBLE}>
             {preguntaCantidad}
           </Texto>
           <GrupoChips
@@ -211,9 +208,6 @@ function Arqueo({
             prefijoTestID="arqueo"
             etiqueta={preguntaCantidad}
           />
-              </>
-            );
-          })()}
           {otra ? (
             <>
               <CampoMonto
@@ -334,10 +328,11 @@ function Sobrante({
 }) {
   const teDeben = useVista((ctx) => listarCuentas(ctx).teDeben);
   const [opcion, setOpcion] = useState<OpcionSobrante | null>(null);
+  const preguntaSobrante = textoSobrante(-calculo.hueco);
   return (
     <View style={{ gap: espacio.s }} testID="arqueo-sobrante">
-      <Texto variante="subtitulo">
-        {textoSobrante(-calculo.hueco)}
+      <Texto variante="subtitulo" {...OCULTAR_ETIQUETA_VISIBLE}>
+        {preguntaSobrante}
       </Texto>
       <GrupoChips
         opciones={[
@@ -354,6 +349,7 @@ function Sobrante({
           else alResponder({ tipo: o } as RespuestaSobrante);
         }}
         prefijoTestID="arqueo-sobrante"
+        etiqueta={preguntaSobrante}
       />
       {opcion === 'me_pagaron' ? (
         <Chips

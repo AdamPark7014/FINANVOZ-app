@@ -20,27 +20,27 @@ export default function Movimientos() {
       testID={TEST_ID_PANTALLA_PESTANA.movimientos}
       accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA.movimientos}
     >
-    <PantallaMovimientos
-      filtro={filtro}
-      detalleInicial={detalle}
-      {...(filtro
-        ? {
-            alQuitarFiltro: () => {
-              router.setParams({
-                desde: undefined,
-                hasta: undefined,
-                categorias: undefined,
-                cuenta: undefined,
-                gastos: undefined,
-                detalle: undefined,
-              });
-            },
-          }
-        : {})}
-      alRegistrar={() => router.navigate('/registrar')}
-      alRevisar={(id) => router.navigate({ pathname: '/registrar', params: { frase: id } })}
-      alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
-    />
+      <PantallaMovimientos
+        filtro={filtro}
+        detalleInicial={detalle}
+        {...(filtro
+          ? {
+              alQuitarFiltro: () => {
+                router.setParams({
+                  desde: undefined,
+                  hasta: undefined,
+                  categorias: undefined,
+                  cuenta: undefined,
+                  gastos: undefined,
+                  detalle: undefined,
+                });
+              },
+            }
+          : {})}
+        alRegistrar={() => router.navigate('/registrar')}
+        alRevisar={(id) => router.navigate({ pathname: '/registrar', params: { frase: id } })}
+        alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
+      />
     </View>
   );
 }

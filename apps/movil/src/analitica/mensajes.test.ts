@@ -27,6 +27,7 @@ describe('mensajes técnicos de analítica (regla 9)', () => {
     expect(codigoEnvioHttpAnalitica(500)).toBe('analitica_http_500');
     expect(codigoEnvioHttpAnalitica(429)).toBe('analitica_http_429');
     expect(esCodigo(codigoEnvioHttpAnalitica(503))).toBe(true);
+    expect(esCodigo(codigoEnvioHttpAnalitica(0))).toBe(true);
   });
 
   it('errorEnvioHttpAnalitica no incluye el cuerpo de la respuesta', () => {

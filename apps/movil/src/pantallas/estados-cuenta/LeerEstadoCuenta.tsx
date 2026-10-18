@@ -15,9 +15,7 @@ import {
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Casilla, Chips, MensajeError } from '../onboarding/componentes';
-import { EstadoVacio } from '../principal/EstadoVacio';
 import {
-  AVISO_NO_CUADRA,
   AYUDA_PDF_ESCANEADO,
   BTN_ABRIR,
   BTN_AJUSTAR,
@@ -29,9 +27,7 @@ import {
   CHIP_MISMO,
   CHIP_OTRO,
   ERROR_CONTRASENA_PDF,
-  ETIQUETA_AVISO_ESTADO,
   ETIQUETA_CONTRASENA_PDF,
-  ETIQUETA_RESUMEN_ESTADO,
   etiquetaBotonTarjeta,
   etiquetaChipsDudoso,
   mensajeAjustado,
@@ -46,16 +42,15 @@ import {
   MENSAJE_DEMASIADO_GRANDE,
   MENSAJE_ERROR_GUARDAR,
   MENSAJE_ESCANEADO,
+  MENSAJE_FALTAN_DUDOSOS,
   MENSAJE_INVALIDO,
   MENSAJE_LEYENDO,
+  MENSAJE_NO_CUADRA,
   MENSAJE_NO_DISPONIBLE,
-  NOMBRE_TIPO_RENGLON,
-  PISTA_CONTESTAR_DUDOSOS,
   preguntaConciliacion,
   preguntaElegirTarjeta,
   preguntaMismoMovimiento,
   resumenEstado,
-  TEXTO_SIN_NUEVOS,
   tituloNuevos,
   TITULO_DUDOSOS,
   TITULO_PANTALLA,
@@ -357,13 +352,13 @@ function Revisar({
           variante="cuerpo"
           testID="estado-resumen-texto"
           accessibilityLiveRegion="polite"
-          accessibilityLabel={`${ETIQUETA_RESUMEN_ESTADO}. ${resumenEstado(a)}`}
+          accessibilityLabel={`${ETIQUETA_RESUMEN_ESTADO}. ${resumen}`}
         >
-          {resumenEstado(a)}
+          {resumen}
         </Texto>
         {a.cuadra === false ? (
           <Texto variante="secundario" tono="faltante" testID="estado-no-cuadra">
-            {MENSAJE_NO_CUADRA}
+            {AVISO_NO_CUADRA}
           </Texto>
         ) : null}
         {a.renglonesSinLeer > 0 ? (
@@ -372,7 +367,7 @@ function Revisar({
           </Texto>
         ) : null}
         {a.anteriores > 0 ? (
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="secundario" tono="secundario" testID="estado-anteriores">
             {mensajeAnteriores(a.anteriores)}
           </Texto>
         ) : null}
@@ -380,7 +375,9 @@ function Revisar({
 
       {a.nuevos.length > 0 ? (
         <View style={{ gap: espacio.xs }} testID="estado-nuevos">
-          <Texto variante="subtitulo">{tituloNuevos(a.nuevos.length)}</Texto>
+          <Texto variante="subtitulo" accessibilityRole="header">
+            {tituloNuevos(a.nuevos.length)}
+          </Texto>
           {a.nuevos.map((n) => (
             <Casilla
               key={n.indice}
@@ -398,7 +395,9 @@ function Revisar({
             />
           ))}
         </View>
-      ) : null}
+      ) : (
+        <EstadoVacio texto={TEXTO_SIN_NUEVOS} testID="estado-sin-nuevos" />
+      )}
 
       {a.dudosos.length > 0 ? (
         <View style={{ gap: espacio.m }} testID="estado-dudosos">
@@ -419,7 +418,7 @@ function Revisar({
       <MensajeError texto={error} />
       <Boton etiqueta={BTN_GUARDAR} alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
       {faltan ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="secundario" tono="secundario" testID="estado-faltan-dudosos">
           {MENSAJE_FALTAN_DUDOSOS}
         </Texto>
       ) : null}
@@ -441,12 +440,12 @@ function Dudoso({
     <Tarjeta testID={`estado-dudoso-${d.indice}`} accionesAnidadas>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="cuerpo" style={{ flex: 1 }}>
-          {`${d.descripcion} · ${etiquetaDiaMes(d.fecha)}`}
+          {lineaEncabezadoDudoso(d.descripcion, d.fecha)}
         </Texto>
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
       <Texto variante="secundario" tono="secundario">
-        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
+        {preguntaEsMismoMovimiento(d)}
       </Texto>
       <Chips
         etiqueta={etiquetaChipsDudoso(d.descripcion)}
