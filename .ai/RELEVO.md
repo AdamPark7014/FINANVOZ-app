@@ -6,11 +6,14 @@
 
 ## Hecho en este turno
 
-- **widget / Ajustes:** copy `widget-textos` (`PISTA_PREVIA`, instrucción Widgets, desc. ocultar montos); `PreviaWidget` hint TalkBack, textos internos fuera de lectura, `previa-widget-fila` / `previa-widget-solo-texto`; tests `widget.test.tsx` (rama ocultar montos con `within(previa)`).
+- **Personas:** `persona-movimientos-titulo` con rol header; prueba en `personas.test.tsx`.
+- **Tandas:** `tandas-titulo` con `accessibilityRole="header"` (paridad con test).
+- **Onboarding:** tips O3–O7 viven en `textos.ts`; `tips.ts` reexporta sin ciclo con `textos`.
+- **Principal:** aserción de cuentas usa `listarCuentas` con nombre real del escenario.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips O3–O7 en `tips.ts`, pestañas TalkBack, Cuentas/deducciones copy. Ver `git log`.
+- Tabs TalkBack, deducciones copy, PreviaWidget, captura. Ver `git log`.
 
 ## A medias — CUIDADO
 
@@ -21,7 +24,8 @@
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Rescates WIP en commits pequeños (`git log --grep=rescate`).
+2. Centralizar tips O2/O6 en `textos` si se quiere un solo módulo.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
