@@ -61,7 +61,13 @@ export function TarjetaConsulta({
             testID="boton-ver-movimientos-consulta"
           />
         ) : null}
-        <Boton etiqueta={BTN_LISTO} variante="texto" ancho="contenido" alPresionar={alCerrar} />
+        <Boton
+          etiqueta={BTN_LISTO}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alCerrar}
+          testID="boton-cerrar-consulta"
+        />
       </View>
     </Tarjeta>
   );

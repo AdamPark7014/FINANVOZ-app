@@ -395,10 +395,6 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
         <>
           {p.candidatas.length > 0 ? (
             <View style={{ gap: espacio.xs }}>
-              {(() => {
-                const preguntaCandidatas = '¿Es alguna de estas?';
-                return (
-                  <>
               <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
                 {preguntaCandidatas}
               </Texto>
@@ -409,9 +405,6 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
                 prefijoTestID={`${testID}-cuenta`}
                 etiqueta={preguntaCandidatas}
               />
-                  </>
-                );
-              })()}
             </View>
           ) : null}
           <Boton
@@ -546,10 +539,11 @@ function FueAMeses({ p, testID }: { p: Pregunta<'fue_a_meses'>; testID: string }
   const { responder, error } = useResponder();
   const [errorMeses, setErrorMeses] = useState<string | null>(null);
   const que = p.comercio ? `${p.comercio} ` : '';
+  const titulo = '¿Fue a meses?';
   return (
     <Marco
       testID={testID}
-      titulo="¿Fue a meses?"
+      titulo={titulo}
       detalle={`${que}${formatearCentavos(p.monto)} con tu ${p.tarjeta} · ${etiquetaFecha(p.fecha)}`}
       error={error ?? errorMeses}
     >

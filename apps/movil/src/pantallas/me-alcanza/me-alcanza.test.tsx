@@ -563,6 +563,14 @@ describe('Hoy · probabilidad de llegar', () => {
   });
 });
 
+function idMovimientoConDescripcion(p: ReturnType<typeof e401>, descripcion: string): string {
+  const m = listarMovimientos(p.ctx)
+    .flatMap((d) => d.movimientos)
+    .find((x) => x.descripcion === descripcion);
+  if (!m) throw new Error(`sin movimiento: ${descripcion}`);
+  return m.id;
+}
+
 describe('Movimientos · "Fue algo extraordinario"', () => {
   it('lo saca de la estimación con "Deshacer"', () => {
     const p = e401();
@@ -574,12 +582,17 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
+    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByText('la boda'));
+    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByText('Listo: no lo uso para estimar tus gastos de cada día.')).toBeTruthy();
-    fireEvent.press(within(aviso).getByText(BTN_DESHACER));
+    expect(
+      within(aviso).getByLabelText(
+        etiquetaHablada('Listo: no lo uso para estimar tus gastos de cada día.'),
+      ),
+    ).toBeTruthy();
+    fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(screen.queryByTestId('aviso')).toBeNull();
   });
 
@@ -593,8 +606,9 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
       fecha: '2026-10-11',
       descripcion: 'la boda',
     });
+    const id = idMovimientoConDescripcion(p, 'la boda');
     montar(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
-    fireEvent.press(screen.getByText('la boda'));
+    fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     expect(screen.getByTestId('nota-extraordinario')).toBeTruthy();
     expect(screen.queryByTestId('boton-extraordinario')).toBeNull();

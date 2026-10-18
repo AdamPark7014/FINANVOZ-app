@@ -212,6 +212,7 @@ describe('Tandas (02 §18)', () => {
       textoYaEmpezoCompleto({
         aportacionesHechas: 6,
         yaCobraste: true,
+        saldoInicial: -200_000,
         faltan: 4,
         porAportar: 200_000,
       }),

@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **suscripciones:** copy §20 en `textos.ts`; pantalla enlazada; tests de textos; `index` reexporta como Plan; ayuda en plural.
+- **movil/estados-cuenta:** copy de usuario centralizado en `textos.ts` (`LeerEstadoCuenta.tsx` sin cadenas es-MX inline); helpers de renglones/dudosos; a11y resumen/aviso; pruebas `estados-cuenta.test.tsx` en verde.
 
 ## Hecho (acumulado reciente)
 
-- Oleadas copy movil (Ajustes, plan, captura, ayuda). Ver `git log`.
+- Oleadas copy/a11y (tarjetas, principal, onboarding, tandas, privacidad). Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (principal, estados-cuenta, me-alcanza, tandas) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- WIP local sin commitear (ajustes/ingreso, arqueo, plan, personas, etc.) — otro turno; no mezclar en commits ajenos.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits del WIP ajeno si Adam lo pide.
+2. Siguiente carpeta movil con copy inline (p. ej. privacidad `Reconsentimiento`).
 
 ## No tocar
 

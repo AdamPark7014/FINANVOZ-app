@@ -64,7 +64,7 @@ describe('consultas tipadas en Hoy (RF-CON-01, CA-M7-03)', () => {
     const lineas = screen.getByTestId('respuesta-consulta-lineas');
     expect(within(lineas).getByText('tanda · mar 13 oct')).toBeTruthy();
     expect(within(lineas).getByText('$674')).toBeTruthy();
-    fireEvent.press(screen.getByText('Listo'));
+    fireEvent.press(screen.getByTestId('boton-cerrar-consulta'));
     expect(screen.queryByTestId('respuesta-consulta')).toBeNull();
   });
 });

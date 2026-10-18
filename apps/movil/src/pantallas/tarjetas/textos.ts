@@ -1,4 +1,9 @@
-import { etiquetaDiaMes, type CompraMsiRegistrada, type TarjetaEditada } from '../../servicios';
+import {
+  etiquetaDiaMes,
+  type CompraMsiRegistrada,
+  type ResultadoTexto,
+  type TarjetaEditada,
+} from '../../servicios';
 import { formatearCentavos } from '../../ui';
 
 /** Redacción de Tarjetas (`02 §8`, `02 §14`): solo presenta lo que ya calculó `servicios/`. */
@@ -129,6 +134,38 @@ export const TITULO_MESES_SIN_INTERESES = 'Meses sin intereses';
 export const TITULO_COMPROMISO_MSI = 'Lo que pagarás en meses sin intereses';
 export const SUBTITULO_COMPROMISO_MSI = 'Próximos 12 meses, por mes de fecha límite';
 export const TITULO_PAGOS_PLANEADOS = 'Pagos planeados';
+
+/** Confirmación de compra a meses por voz (CA-M4-06). */
+export const TITULO_CONFIRMAR_MSI: Record<
+  Extract<ResultadoTexto, { resultado: 'confirmar_msi' }>['motivo'],
+  string
+> = {
+  monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
+  cuenta: '¿Con qué tarjeta fue?',
+  aproximado: 'Confírmame la tarjeta.',
+};
+
+export function tituloCompraMsiMeses(meses: number): string {
+  return `Compra a ${meses} meses sin intereses`;
+}
+
+export const APOYO_CONFIRMAR_MSI =
+  'La compra cuenta completa como gasto hoy; cada mes aparto solo la mensualidad.';
+
+export function preguntaTarjetaConfirmarMsi(falta: {
+  motivo: string;
+  alias?: string | null;
+}): string {
+  if (falta.motivo === 'no_encontrada' && falta.alias) {
+    return `No tengo una tarjeta «${falta.alias}». ¿Con cuál fue?`;
+  }
+  return TITULO_CONFIRMAR_MSI.cuenta;
+}
+
+export const PREGUNTA_CATEGORIA_MSI = '¿En qué categoría va?';
+export const ETIQUETA_DESCRIPCION_MSI = '¿Qué compraste? (opcional)';
+export const EJEMPLO_DESCRIPCION_MSI = 'tele';
+export const BTN_GUARDAR_MSI = 'Guardar';
 
 export function subtituloPagosPlaneados(conPagos: boolean): string {
   return conPagos

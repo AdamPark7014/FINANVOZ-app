@@ -10,15 +10,20 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
+import {
+  APOYO_CONFIRMAR_MSI,
+  BTN_CANCELAR,
+  BTN_GUARDAR_MSI,
+  EJEMPLO_DESCRIPCION_MSI,
+  ETIQUETA_DESCRIPCION_MSI,
+  preguntaTarjetaConfirmarMsi,
+  PREGUNTA_CATEGORIA_MSI,
+  tituloCompraMsiMeses,
+  TITULO_CONFIRMAR_MSI,
+} from './textos';
 
 type ConfirmarMsi = Extract<ResultadoTexto, { resultado: 'confirmar_msi' }>;
 type RegistradoMsi = Extract<ResultadoTexto, { resultado: 'registrado_msi' }>;
-
-const TITULO: Record<ConfirmarMsi['motivo'], string> = {
-  monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
-  cuenta: '¿Con qué tarjeta fue?',
-  aproximado: 'Confírmame la tarjeta.',
-};
 
 /**
  * Compra a meses que necesita confirmación (CA-M4-06): tarjeta (si falta), categoría y qué fue. Nada se guarda
@@ -73,22 +78,20 @@ export function TarjetaConfirmarMsi({
 
   return (
     <Tarjeta testID="confirmacion-msi">
-      <Texto variante="subtitulo">{TITULO[datos.motivo]}</Texto>
+      <Texto variante="subtitulo">{TITULO_CONFIRMAR_MSI[datos.motivo]}</Texto>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="cuerpoFuerte" style={{ flex: 1 }}>
-          {`Compra a ${entrada.meses} meses sin intereses`}
+          {tituloCompraMsiMeses(entrada.meses)}
         </Texto>
         <Cifra centavos={entrada.monto} />
       </View>
       <Texto variante="secundario" tono="secundario">
-        La compra cuenta completa como gasto hoy; cada mes aparto solo la mensualidad.
+        {APOYO_CONFIRMAR_MSI}
       </Texto>
       {faltaTarjeta ? (
         <View style={{ gap: espacio.xs }}>
           <Texto variante="secundario" tono="secundario">
-            {faltaTarjeta.motivo === 'no_encontrada' && faltaTarjeta.alias
-              ? `No tengo una tarjeta «${faltaTarjeta.alias}». ¿Con cuál fue?`
-              : '¿Con qué tarjeta fue?'}
+            {preguntaTarjetaConfirmarMsi(faltaTarjeta)}
           </Texto>
           <GrupoChips
             opciones={faltaTarjeta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
