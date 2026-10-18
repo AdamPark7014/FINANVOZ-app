@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Personas:** prueba de `accessibilityLabel` en vacío de movimientos (`etiquetaVacioMovimientosPersona`, `02 §15`).
+- **Onboarding tips:** quitado reexport circular en `textos.ts`; copy O3–O7 en `textos.ts`, `tips.ts` reexporta hacia pantallas legacy.
 
 ## Hecho (acumulado reciente)
 
-- Onboarding tips en `textos.ts`, PreviaWidget TalkBack, headers varias pantallas. Ver `git log`.
+- Personas/tandas WIP, Cuentas compartidos, pestañas TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`git status`) — no mezclar sin revisar diff.
+- WIP local: `PantallaPersona`, `PantallaTandas`, tests asociados (no mezclar al reescribir).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños desde rescates WIP.
+2. Commitear o integrar WIP personas/tandas.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
