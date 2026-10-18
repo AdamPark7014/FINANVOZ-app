@@ -27,6 +27,7 @@ import { matrizQr, tramos } from './CodigoQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
 import {
+  BTN_COMPARTIDOS_CUENTAS,
   ETIQUETA_ACCESIBILIDAD_QR_UNION,
   ETIQUETA_CON_QUIEN_COMPARTES,
   ERROR_NOMBRE_PAREJA,

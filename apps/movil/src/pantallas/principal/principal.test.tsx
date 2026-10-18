@@ -458,7 +458,7 @@ describe('Cuentas', () => {
       `${contextoSaldoTarjeta(nu.nombre, false)} ${cifraEnPalabras(nu.saldo)}`,
     );
     expect(screen.getByTestId('cuenta-internet-saldo').props.accessibilityLabel).toBe(
-      `${contextoSaldoCompromiso('internet', 'mié 14')} ${cifraEnPalabras(500_00)}`,
+      `${contextoSaldoCompromiso(internet.concepto, etiquetaFecha(internet.fecha))} ${cifraEnPalabras(internet.monto)}`,
     );
     p.cerrar();
   });
