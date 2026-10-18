@@ -6,24 +6,28 @@
 
 ## Hecho en este turno
 
-- **Personas:** prueba TalkBack `PISTA_GUARDAR_PAGO` en Guardar del panel «Ya me pagó» — commit `6ee29db`.
-- **En main:** `PISTA_COBRAR`, `PISTA_YA_ME_PAGO`, `PISTA_VOLVER`; ¿Me alcanza? `PISTA_CALCULAR` (`89f4685`).
+- **Suscripciones:** prueba Cuentas → Suscripciones verifica `accessibilityLabel` del botón (no solo texto visible).
+- **Movimientos:** test TalkBack encabezado `movimientos-dia-*` (`10acbe2`).
+
+## Hecho (acumulado reciente)
+
+- Riesgo Hoy alert, widget PreviaWidget auditoría, onboarding tips. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local sin commitear: captura, me-alcanza, widget, ayuda/onboarding (revisar `git status` antes de editar).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commitear o descartar WIP captura/widget/me-alcanza.
-3. Arreglar test «Ya me pagó de Caro» si sigue rojo en suite completa.
+2. Revisar stashes WIP antes de tocar tabs/onboarding.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
