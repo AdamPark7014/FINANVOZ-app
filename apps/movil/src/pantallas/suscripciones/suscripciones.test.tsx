@@ -129,6 +129,9 @@ describe('Suscripciones (02 §20)', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
     expect(screen.getByTestId('suscripciones-vacio')).toHaveTextContent(TEXTO_SUSCRIPCIONES_VACIO);
+    expect(screen.getByTestId('suscripciones-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioSuscripciones(),
+    );
     expect(screen.queryByTestId('suscripciones-inactivas')).toBeNull();
   });
 

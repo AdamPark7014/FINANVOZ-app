@@ -182,7 +182,7 @@ describe('CampoMonto', () => {
   it('marca el texto que no es monto', () => {
     const alCambiar = jest.fn();
     render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
-    fireEvent.changeText(screen.getByLabelText('Monto'), '12.345');
+    fireEvent.changeText(screen.getByLabelText('Monto en pesos'), '12.345');
     expect(alCambiar).toHaveBeenLastCalledWith(null);
     expect(screen.getByText(ERROR_FORMATO_MONTO)).toBeTruthy();
   });
@@ -190,6 +190,17 @@ describe('CampoMonto', () => {
   it('muestra el valor inicial sin signo de pesos', () => {
     render(<CampoMonto etiqueta="Monto" valorInicial={150050} alCambiar={() => {}} />);
     expect(screen.getByLabelText('Monto').props.value).toBe('1,500.50');
+  });
+
+  it('etiqueta TalkBack en pesos y lee el monto escrito en palabras', () => {
+    const alCambiar = jest.fn();
+    render(<CampoMonto etiqueta="Monto" alCambiar={alCambiar} />);
+    expect(screen.getByLabelText('Monto en pesos')).toHaveProp('accessibilityLabel', 'Monto en pesos');
+    fireEvent.changeText(screen.getByLabelText(/Monto/), '1,099.90');
+    expect(screen.getByLabelText(/Monto/)).toHaveProp(
+      'accessibilityLabel',
+      'Monto en pesos, mil noventa y nueve pesos con noventa centavos',
+    );
   });
 });
 

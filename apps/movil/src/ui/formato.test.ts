@@ -107,6 +107,16 @@ describe('palabras para TalkBack', () => {
   });
 });
 
+describe('etiquetaCampoMonto', () => {
+  it.each([
+    ['Monto', '', 'Monto en pesos'],
+    ['Saldo', '1,500.50', 'Saldo en pesos, mil quinientos pesos con cincuenta centavos'],
+    ['Pago $500', '500', 'Pago quinientos pesos en pesos, quinientos pesos'],
+  ])('%s + %j → %s', (etiqueta, texto, esperado) => {
+    expect(etiquetaCampoMonto(etiqueta, texto)).toBe(esperado);
+  });
+});
+
 describe('etiquetaHablada (02-UX §15: cada cifra dentro de una frase se lee en palabras)', () => {
   it.each([
     [

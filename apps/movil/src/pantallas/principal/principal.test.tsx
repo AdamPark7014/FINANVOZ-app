@@ -511,6 +511,32 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
+  it('encabezados y filas con etiquetas TalkBack (`02 §15`)', () => {
+    const p = conEscenario('e4-01');
+    todas(p.ctx);
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
+    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    expect(screen.getByTestId('movimientos-titulo')).toHaveProp('accessibilityRole', 'header');
+    const dia = listarMovimientos(p.ctx)[0]?.fecha;
+    const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
+    expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId(`movimiento-${id}`).props.accessibilityLabel).toMatch(/veinticinco pesos/);
+    p.cerrar();
+  });
+
+  it('filtro activo anuncia contexto en TalkBack', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(
+      p.ctx,
+      <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ cuentaId: p.e.cuentas.bbva as string }} />,
+    );
+    expect(screen.getByText(TEXTO_MOVIMIENTOS_FILTRO_ACTIVO).props.accessibilityLabel).toBe(
+      etiquetaFiltroMovimientosActivo(),
+    );
+    p.cerrar();
+  });
+
   it('sin movimientos muestra TEXTO_MOVIMIENTOS_VACIO; filtro vacío muestra TEXTO_MOVIMIENTOS_FILTRO_VACIO', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });

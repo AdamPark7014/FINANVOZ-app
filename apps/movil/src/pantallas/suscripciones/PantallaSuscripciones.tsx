@@ -32,6 +32,7 @@ import {
   PISTA_NO_ES,
   PISTA_VOLVER,
   TEXTO_HOY_APARTA,
+  etiquetaVacioSuscripciones,
   TEXTO_SUSCRIPCIONES_VACIO,
   TITULO_PANTALLA,
   type AccionSuscripcion,
@@ -84,9 +85,11 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
           {v.textoResumen}
         </Texto>
       ) : (
-        <Texto variante="cuerpo" tono="secundario" testID="suscripciones-vacio">
-          {TEXTO_SUSCRIPCIONES_VACIO}
-        </Texto>
+        <EstadoVacio
+          texto={TEXTO_SUSCRIPCIONES_VACIO}
+          testID="suscripciones-vacio"
+          etiquetaAccesible={etiquetaVacioSuscripciones()}
+        />
       )}
       {mensaje ? (
         <Texto

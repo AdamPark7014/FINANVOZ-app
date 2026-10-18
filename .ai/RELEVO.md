@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **Movimientos:** aserción TalkBack `accessibilityRole="header"` en encabezado de día (`movimientos-dia-*`).
+- **Hoy / principal:** TalkBack en héroe (OCULTAR etiquetas duplicadas), tarjeta del día (`etiquetaTarjetaDelDia`), probabilidad calculando y aviso de riesgo.
 
 ## Hecho (acumulado reciente)
 
-- Cuentas BTN Ajustes/tarjeta centralizados; captura/personas; onboarding. Ver `git log`.
+- PreviaWidget testIDs y a11y ocultar montos; Cuentas/personas TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP sin commitear en disco: `onboarding/textos.ts`, `principal/principal.test.tsx`, `PantallaTandas.tsx` (turno anterior).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Headers TalkBack en pantallas restantes (Registrar, etc.) si hace falta.
+2. Commitear o descartar WIP onboarding/tandas/principal.test del turno previo.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar

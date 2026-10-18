@@ -14,6 +14,16 @@ import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
+import {
+  ACCESIBILIDAD_ABRIR,
+  AHORA_NO,
+  AYUDA_POR_ASIGNAR,
+  ETIQUETA_OTRA_CANTIDAD,
+  mensajeCuadra,
+  MENSAJE_POSPONER,
+  TITULO,
+  textoDeberiasTraer,
+} from '../arqueo/textos';
 import { ActivarCaptura } from './ActivarCaptura';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;

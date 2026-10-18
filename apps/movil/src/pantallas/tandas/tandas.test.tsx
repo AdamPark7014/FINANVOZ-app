@@ -103,6 +103,7 @@ describe('Tandas (02 §18)', () => {
     const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
     renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
     expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
+    expect(screen.getByTestId('tanda-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {

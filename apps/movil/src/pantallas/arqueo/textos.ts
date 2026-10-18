@@ -8,9 +8,15 @@ export const CERRAR = 'Cerrar';
 /** TalkBack: más contexto que el botón «Cerrar». */
 export const ACCESIBILIDAD_CERRAR = 'Cerrar conteo de efectivo';
 export const LISTO = 'Listo';
+/** TalkBack: cierra tras confirmar el conteo. */
+export const ACCESIBILIDAD_LISTO = 'Listo, cerrar conteo de efectivo';
+/** TalkBack: abre la pantalla desde Hoy o la tarjeta de arqueo. */
+export const ACCESIBILIDAD_ABRIR = 'Abrir conteo de efectivo';
 export const CONTINUAR = 'Continuar';
 export const CONFIRMAR = 'Confirmar';
 export const TOTAL = 'Total';
+export const AHORA_NO = 'Ahora no';
+export const MENSAJE_POSPONER = 'Va. Te pregunto mañana.';
 
 /** Sin cuenta de efectivo (`02 §7`). */
 export const TEXTO_SIN_CUENTA_EFECTIVO =

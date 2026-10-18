@@ -79,10 +79,11 @@ describe('accesibilidad (CA-M7-05)', () => {
         motor={crearMotorFalso().motor}
       />,
     );
-    expect(screen.getByText('Deberías traer $1,140 en efectivo. ¿Cuánto traes?')).toHaveProp(
-      'accessibilityLabel',
-      'Deberías traer mil ciento cuarenta pesos en efectivo. ¿Cuánto traes?',
-    );
+    expect(
+      screen.getByRole('radiogroup', {
+        name: 'Deberías traer mil ciento cuarenta pesos en efectivo. ¿Cuánto traes?',
+      }),
+    ).toBeTruthy();
     sinHallazgos();
     p.cerrar();
   });
