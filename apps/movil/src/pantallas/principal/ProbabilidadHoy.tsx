@@ -75,13 +75,15 @@ export function ProbabilidadHoy({
   if (!vista) {
     return (
       <View
+        accessible
         testID="probabilidad-calculando"
         accessibilityLiveRegion="polite"
+        accessibilityLabel={ETIQUETA_PROBABILIDAD_CALCULANDO}
         style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}
       >
-        <ActivityIndicator size="small" color={c.textoSecundario} />
-        <Texto variante="secundario" tono="secundario">
-          Calculando si llegas…
+        <ActivityIndicator size="small" color={c.textoSecundario} importantForAccessibility="no" />
+        <Texto variante="secundario" tono="secundario" {...{ accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }}>
+          {ETIQUETA_PROBABILIDAD_CALCULANDO}
         </Texto>
       </View>
     );

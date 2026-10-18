@@ -21,6 +21,7 @@ import { cifraEnPalabras } from '../../ui/formato';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
 import {
+  BTN_AJUSTES_CUENTAS,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,

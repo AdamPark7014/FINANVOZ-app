@@ -233,7 +233,7 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
   }
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto variante="subtitulo" testID="hoy-puedes-etiqueta">
+      <Texto variante="subtitulo" testID="hoy-puedes-etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
         {TITULO_HOY_PUEDES_GASTAR}
       </Texto>
       <Cifra

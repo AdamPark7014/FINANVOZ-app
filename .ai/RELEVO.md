@@ -1,28 +1,27 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-18
+- **Fecha:** 2026-10-17
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Deducciones importar:** `importar-titulo` con `accessibilityRole="header"` + aserción en `deducciones.test.tsx` (TalkBack §15).
+- **Captura (`pantallas/captura/`):** `EstadoVacio` + etiquetas TalkBack en Por revisar y sin apps; título divulgación; botones agrupados; headers en filas; `testID` cancelar formularios; prueba a11y vacío.
 
 ## Hecho (acumulado reciente)
 
-- Movimientos/Cuentas headers, captura/personas vacíos, onboarding tips, suscripciones. Ver `git log`.
+- Onboarding/tandas/cuentas a11y, PreviaWidget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
-- Typecheck móvil: otros TS pendientes — no mezclar en commits a11y.
+- WIP paralelo en onboarding/tandas/principal — no reescribir sin leer disco.
+- Tests captura: arqueo/reactivar/ingesta a veces fallan en jest local (revisar si persisten en CI).
+- M0 / teléfono: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Headers TalkBack en pantallas restantes (Registrar, etc.) si hace falta.
-3. M11 negocio cuando toque el hito.
+2. Commitear o descartar WIP ajeno en disco si sigue sin push.
 
 ## No tocar
 

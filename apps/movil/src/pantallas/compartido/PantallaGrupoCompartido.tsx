@@ -19,6 +19,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
+import { EstadoVacio } from '../principal/EstadoVacio';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
 import { FormularioGastoCompartido } from './FormularioGastoCompartido';

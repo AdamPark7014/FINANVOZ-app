@@ -48,7 +48,7 @@ export const BTN_AYUDA = BTN_ABRIR_DESDE_AJUSTES;
 
 export const CONTACTO_TITULO = '¿No encontraste tu respuesta?';
 export const BTN_ESCRIBIR_CORREO = 'Escribir un correo';
-export const PISTA_ESCRIBIR_CORREO = 'Abre tu app de correo';
+export const PISTA_ESCRIBIR_CORREO = 'Abre tu app de correo; el asunto ya viene listo';
 export const ACCESIBILIDAD_ESCRIBIR_CORREO = 'Escribir un correo de ayuda';
 
 /** Asunto fijo del correo. No lleva datos de la persona ni de su libro. */

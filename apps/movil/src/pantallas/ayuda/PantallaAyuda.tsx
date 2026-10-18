@@ -60,8 +60,11 @@ export function PantallaAyuda({
       <Texto variante="cuerpo" tono="secundario" testID="ayuda-intro">
         {INTRO}
       </Texto>
+      <Texto variante="subtitulo" testID="ayuda-preguntas-titulo" accessibilityRole="header">
+        {PREGUNTAS_TITULO}
+      </Texto>
 
-      <View style={{ gap: espacio.s }} testID="ayuda-preguntas">
+      <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityLabel={PREGUNTAS_TITULO}>
         {PREGUNTAS_FRECUENTES.map((p) => (
           <Pregunta
             key={p.id}

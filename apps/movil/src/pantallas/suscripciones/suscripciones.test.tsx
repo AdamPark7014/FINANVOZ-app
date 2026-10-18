@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { listarCuentas, obtenerHoy, sincronizarPlan, type Contexto } from '../../servicios';
 import { registrarGastosE14, type GastoVectorE14 } from '../../servicios/__pruebas__/suscripciones';
+import { auditar } from '../__pruebas__/accesibilidad';
 import { conEscenario, vector } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';

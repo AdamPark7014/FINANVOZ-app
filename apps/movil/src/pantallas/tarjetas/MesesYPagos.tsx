@@ -64,8 +64,21 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
   const [confirmando, setConfirmando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const activo = p.estado === 'activo' && p.restante > 0;
+  const cuota = formatearCentavos(p.cuota);
   return (
-    <Tarjeta testID={`plan-${p.id}`}>
+    <Tarjeta
+      testID={`plan-${p.id}`}
+      {...(activo
+        ? {
+            etiquetaAccesible: etiquetaAccesiblePlanMsi(
+              p.descripcion,
+              cuota,
+              p.cuotasRestantes,
+              p.meses,
+            ),
+          }
+        : {})}
+    >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="cuerpoFuerte" style={{ flex: 1 }}>
           {p.descripcion}
@@ -75,7 +88,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
       {activo ? (
         <>
           <Texto variante="secundario" testID={`plan-${p.id}-cuotas`}>
-            {`${formatearCentavos(p.cuota)} al mes · faltan ${p.cuotasRestantes} de ${p.meses}`}
+            {`${cuota} al mes · faltan ${p.cuotasRestantes} de ${p.meses}`}
           </Texto>
           {p.terminaEn ? (
             <Texto variante="secundario" tono="secundario">

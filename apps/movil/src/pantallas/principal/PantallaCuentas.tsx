@@ -348,7 +348,8 @@ function Fila({
           {...(testID ? { testID: `${testID}-accion` } : {})}
         />
       ) : null}
-    </Tarjeta>
+      </Tarjeta>
+    </View>
   );
 }
 
