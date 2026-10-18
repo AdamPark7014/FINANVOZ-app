@@ -11,6 +11,7 @@ import {
   ETIQUETA_PREVIA,
   PISTA_OCULTAR_MONTOS,
   PISTA_PREVIA,
+  PISTA_PREVIA_OCULTA,
   SECCION_WIDGET,
   TEXTO_INSTRUCCION,
 } from './widget-textos';
@@ -51,7 +52,11 @@ export function SeccionWidget() {
         {ETIQUETA_PREVIA}
       </Texto>
       <View testID="ajustes-widget-previa" style={{ marginTop: espacio.xs }}>
-        <PreviaWidget vista={vistaPrevia} esquema={esquema} pistaAccesible={PISTA_PREVIA} />
+        <PreviaWidget
+          vista={vistaPrevia}
+          esquema={esquema}
+          pistaAccesible={ocultarMontos ? PISTA_PREVIA_OCULTA : PISTA_PREVIA}
+        />
       </View>
       <View style={{ marginTop: espacio.m }}>
         <Interruptor

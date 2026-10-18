@@ -14,7 +14,11 @@ import { ProveedorSesion, useSesion } from '../sesion/ProveedorSesion';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { SeccionWidget } from '../pantallas/ajustes/SeccionWidget';
 import { auditar } from '../pantallas/__pruebas__/accesibilidad';
-import { PISTA_OCULTAR_MONTOS, PISTA_PREVIA } from '../pantallas/ajustes/widget-textos';
+import {
+  PISTA_OCULTAR_MONTOS,
+  PISTA_PREVIA,
+  PISTA_PREVIA_OCULTA,
+} from '../pantallas/ajustes/widget-textos';
 import { SincronizarWidget } from './SincronizarWidget';
 import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
 import { WidgetHoy } from './WidgetHoy';
@@ -86,10 +90,10 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
       { estado: 'normal', hoyPuedesPesos: 214, dias: 4 },
       { ocultarMontos: true },
     );
-    render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
+    render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA_OCULTA} />);
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityLabel).toBe('Vista previa. Toca para ver tu día');
-    expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA);
+    expect(previa.props.accessibilityHint).toBe(PISTA_PREVIA_OCULTA);
     expect(previa.props.accessibilityLabel).not.toMatch(/\$|\d/);
     expect(JSON.stringify(screen.toJSON())).not.toMatch(/\$|214/);
     expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toEqual([]);
@@ -263,9 +267,9 @@ describe('Ajustes → Widget', () => {
     fireEvent.press(interruptor);
     await act(async () => {});
     expect(obtenerAjustesWidget(p.ctx)).toEqual({ ocultarMontos: true });
-    expect(
-      within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget').props.accessibilityLabel,
-    ).not.toMatch(/\$|\d/);
+    const previaOculta = within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget');
+    expect(previaOculta.props.accessibilityLabel).not.toMatch(/\$|\d/);
+    expect(previaOculta.props.accessibilityHint).toBe(PISTA_PREVIA_OCULTA);
     expect(auditar(screen.toJSON())).toEqual([]);
     expect(screen.getByTestId('ajustes-widget-ocultar').props.accessibilityState).toMatchObject({
       checked: true,
@@ -275,6 +279,9 @@ describe('Ajustes → Widget', () => {
     fireEvent.press(screen.getByTestId('ajustes-widget-ocultar'));
     await act(async () => {});
     expect(mockActualizar.mock.calls.at(-1)?.[0].texto).toBe('Hoy puedes $214 · 4 días');
+    expect(
+      within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget').props.accessibilityHint,
+    ).toBe(PISTA_PREVIA);
     p.cerrar();
   });
 

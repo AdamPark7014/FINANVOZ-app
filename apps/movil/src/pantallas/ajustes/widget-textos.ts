@@ -10,6 +10,10 @@ export const ETIQUETA_PREVIA = 'Vista previa';
 /** TalkBack en la vista previa de Ajustes (cifras fijas e4-01, no el libro del usuario). */
 export const PISTA_PREVIA = 'Cifras de ejemplo; no muestra tu saldo real.';
 
+/** TalkBack cuando la previa muestra «Toca para ver tu día» (montos ocultos). */
+export const PISTA_PREVIA_OCULTA =
+  'Texto de ejemplo con montos ocultos; no muestra tu saldo real.';
+
 export const ETIQUETA_OCULTAR = 'Ocultar montos';
 
 export const DESC_OCULTAR =
