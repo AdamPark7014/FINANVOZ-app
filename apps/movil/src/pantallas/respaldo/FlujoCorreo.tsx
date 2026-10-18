@@ -77,7 +77,7 @@ export function FlujoCorreo({
     <>
       <CampoTexto
         testID="respaldo-correo"
-        etiqueta="Tu correo"
+        etiqueta={ETIQUETA_CORREO}
         valor={correo}
         alCambiar={setCorreo}
         teclado="email-address"
@@ -86,7 +86,7 @@ export function FlujoCorreo({
       />
       <Boton
         testID="respaldo-pedir-codigo"
-        etiqueta="Enviarme el código"
+        etiqueta={BTN_ENVIAR_CODIGO}
         cargando={trabajando}
         deshabilitado={trabajando || correo.trim() === ''}
         alPresionar={() => void pedir()}

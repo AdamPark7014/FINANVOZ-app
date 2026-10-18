@@ -364,7 +364,7 @@ function Revisar({
 
       {a.nuevos.length > 0 ? (
         <View style={{ gap: espacio.xs }} testID="estado-nuevos">
-          <Texto variante="subtitulo">{a.nuevos.length === 1 ? 'El que no tenía' : 'Los que no tenía'}</Texto>
+          <Texto variante="subtitulo">{tituloNuevos(a.nuevos.length)}</Texto>
           {a.nuevos.map((n) => (
             <Casilla
               key={n.indice}
@@ -481,11 +481,6 @@ function Guardado({
         </Tarjeta>
       ) : (
         <Boton etiqueta={BTN_VER_TARJETA} alPresionar={alVerTarjeta} testID="estado-ver-tarjeta" />
-      )}
-    </>
-  );
-}
-a" />
       )}
     </>
   );

@@ -284,12 +284,19 @@ export function FormularioMovimiento({
         ) : null}
         {campos.origen ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto variante="etiqueta">{campos.origen.pregunta}</Texto>
+            <Texto
+              variante="etiqueta"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {campos.origen.pregunta}
+            </Texto>
             <GrupoChips
               opciones={opciones(campos.origen.clases)}
               valor={origenId}
               alCambiar={setOrigenId}
               prefijoTestID="origen"
+              etiqueta={campos.origen.pregunta}
             />
           </View>
         ) : null}
@@ -300,12 +307,19 @@ export function FormularioMovimiento({
         ) : null}
         {campos.destino ? (
           <View style={{ gap: espacio.xs }}>
-            <Texto variante="etiqueta">{campos.destino.pregunta}</Texto>
+            <Texto
+              variante="etiqueta"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              {campos.destino.pregunta}
+            </Texto>
             <GrupoChips
               opciones={opciones(campos.destino.clases)}
               valor={destinoId}
               alCambiar={setDestinoId}
               prefijoTestID="destino"
+              etiqueta={campos.destino.pregunta}
             />
           </View>
         ) : null}

@@ -13,25 +13,17 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips } from './Chip';
-import { mensajeError, NOMBRE_TIPO, PISTA_ELEGIR_CUENTA_CONFIRMACION } from './textos';
+import {
+  ETIQUETA_CANCELAR,
+  ETIQUETA_GUARDAR,
+  mensajeError,
+  NOMBRE_TIPO,
+  PISTA_ELEGIR_CUENTA_CONFIRMACION,
+  preguntaCuentaConfirmacionRegistro,
+  TITULO_CONFIRMAR_REGISTRO,
+} from './textos';
 
-type Motivo = Extract<ResultadoTexto, { resultado: 'confirmar' }>['motivo'];
 type Registrado = Extract<ResultadoTexto, { resultado: 'registrado' }>;
-
-const TITULO: Record<Motivo, string> = {
-  monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
-  cuenta: 'Confirma la cuenta.',
-  aproximado: 'Confírmame la cuenta.',
-  impuestos: 'Es un gasto de impuestos. Revísalo antes de guardar.',
-};
-
-function pregunta(f: CuentaPorElegir): string {
-  if (f.motivo === 'no_encontrada' && f.alias) {
-    return `No tengo una cuenta «${f.alias}». ¿Cuál fue?`;
-  }
-  if (f.motivo === 'aproximado' && f.alias) return `¿Con «${f.alias}» te refieres a esta?`;
-  return f.campo === 'origenId' ? '¿De qué cuenta salió?' : '¿A qué cuenta llegó?';
-}
 
 const clave = (i: number, campo: CuentaPorElegir['campo']) => `${i}:${campo}`;
 
@@ -57,7 +49,7 @@ export function ConfirmacionRegistro({
   alCancelar,
 }: {
   propuestas: readonly PropuestaMovimiento[];
-  motivo: Motivo;
+  motivo: Extract<ResultadoTexto, { resultado: 'confirmar' }>['motivo'];
   origen: OrigenDictado;
   alGuardar: (r: Registrado) => void;
   alCancelar: () => void;

@@ -21,3 +21,5 @@ export const TEST_ID_PANTALLA_PESTANA = {
 } as const;
 
 export const TEST_ID_PANTALLA_REGISTRAR = 'tab-registrar';
+
+export const ETIQUETA_ACCESIBILIDAD_REGISTRAR = 'Registrar gasto o ingreso';

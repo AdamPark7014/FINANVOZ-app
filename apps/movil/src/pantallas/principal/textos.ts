@@ -10,6 +10,7 @@ import {
   MENSAJE_NO_ENTENDI,
   mensajeError,
   type CompromisoConfigurado,
+  type CuentaPorElegir,
   type EntradaMovimiento,
   type MotivoNoSoportado,
   type MotivoPorInterpretar,
@@ -109,6 +110,29 @@ export const PREGUNTA_CUENTA_TANDA = {
   aportacion: '¿De qué cuenta salió?',
   cobro: '¿A qué cuenta llegó?',
 } as const;
+
+/** Títulos de la tarjeta de confirmación al registrar (02-UX §5.3). */
+export const TITULO_CONFIRMAR_REGISTRO: Record<
+  Extract<ResultadoTexto, { resultado: 'confirmar' }>['motivo'],
+  string
+> = {
+  monto_alto: 'Es un monto alto. Revísalo antes de guardar.',
+  cuenta: 'Confirma la cuenta.',
+  aproximado: 'Confírmame la cuenta.',
+  impuestos: 'Es un gasto de impuestos. Revísalo antes de guardar.',
+};
+
+/** Leyenda de chips cuando falta elegir cuenta en la confirmación de registro. */
+export function preguntaCuentaConfirmacionRegistro(f: CuentaPorElegir): string {
+  if (f.motivo === 'no_encontrada' && f.alias) {
+    return `No tengo una cuenta «${f.alias}». ¿Cuál fue?`;
+  }
+  if (f.motivo === 'aproximado' && f.alias) return `¿Con «${f.alias}» te refieres a esta?`;
+  return f.campo === 'origenId' ? PREGUNTA_CUENTA_TANDA.aportacion : PREGUNTA_CUENTA_TANDA.cobro;
+}
+
+export const ETIQUETA_GUARDAR = 'Guardar';
+export const ETIQUETA_CANCELAR = 'Cancelar';
 
 export const MENSAJE_NO_ENCONTRE = 'No encontré ese movimiento.';
 export const MENSAJE_SIN_DUPLICADOS = 'No vi movimientos repetidos.';

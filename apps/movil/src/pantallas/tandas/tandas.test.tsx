@@ -159,7 +159,7 @@ describe('Tandas (02 §18)', () => {
     ).toBeTruthy();
     const ronda = listarOcurrencias(p.ctx, { programadoId }).find((o) => o.fecha === '2026-10-16');
     expect(ronda?.estado).toBe('cubierta');
-    expect(screen.queryByText('¿Ya diste tu tanda?')).toBeNull();
+    expect(screen.queryByText(PREGUNTA_YA_DISTE)).toBeNull();
   });
 
   it('CA-M8-04 · en tu turno, "Me tocó la tanda" registra el cobro y avisa que no es ingreso', () => {
@@ -171,7 +171,7 @@ describe('Tandas (02 §18)', () => {
       yaCobraste: false,
     });
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
-    const cobro = screen.getAllByText('Hoy te toca cobrar tu tanda.');
+    const cobro = screen.getAllByText(PREGUNTA_HOY_COBRO);
     expect(cobro).toHaveLength(1);
     const testID = screen
       .getAllByTestId(/^tarjeta-accion-\d$/)

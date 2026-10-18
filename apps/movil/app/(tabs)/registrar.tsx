@@ -5,7 +5,7 @@ import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaRegistrar, paramsDeDetalle, paramsDeFiltro } from '../../src/pantallas/principal';
-import { TEST_ID_PANTALLA_REGISTRAR } from './pestanas-textos';
+import { ETIQUETA_ACCESIBILIDAD_REGISTRAR, TEST_ID_PANTALLA_REGISTRAR } from './pestanas-textos';
 
 /** Ruta Registrar (sin pestaña): dictado, texto y formulario (`02 §2`). */
 export default function Registrar() {
@@ -17,7 +17,7 @@ export default function Registrar() {
     <View
       style={{ flex: 1 }}
       testID={TEST_ID_PANTALLA_REGISTRAR}
-      accessibilityLabel="Registrar gasto o ingreso"
+      accessibilityLabel={ETIQUETA_ACCESIBILIDAD_REGISTRAR}
     >
     <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
       <PantallaRegistrar

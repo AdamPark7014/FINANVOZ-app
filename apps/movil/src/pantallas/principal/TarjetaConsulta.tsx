@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import type { FiltroMovimientos, RespuestaConsulta } from '../../servicios';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
+import { BTN_LISTO, BTN_VER_MOVIMIENTOS, BTN_VER_PLUS } from './textos';
 
 /**
  * Respuesta de una consulta tipada (`06 §6`, RF-CON-01): la frase de la plantilla, las filas (pagos, top de
