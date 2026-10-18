@@ -6,15 +6,16 @@
 
 ## Hecho en este turno
 
-- **Chip / Movimientos / principal (TalkBack):** `Chip.test.tsx` (estado, hitSlop, radiogroup); `principal.test.tsx` (título, días, filtro/vacíos `liveRegion`, filas habladas, anular por etiqueta).
+- **TalkBack micro (principal / me-alcanza / arqueo):** ya en `main` — `principal.test.tsx` (Hoy sin ingreso header+hint, Movimientos filtro/por revisar), `me-alcanza.test.tsx` (cabecera, datos insuficientes `etiquetaVacioDatosInsuficientes`), `arqueo.test.tsx` (vacío `etiquetaVacioSinEfectivo`, Listo `ACCESIBILIDAD_LISTO` con `queryByTestId` sobrante). Commit clave arqueo: `00e47a2`.
 
 ## Hecho (acumulado reciente)
 
-- Widget/EstadoVacio, suscripciones, onboarding O1–O7. Ver `git log`.
+- Suscripciones, O5, tandas, Cuentas list a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (`git status`) — no mezclar.
+- Stashes locales (`git stash list`) — no aplicar sin revisar.
+- WIP en disco de otros agentes — `git status` antes de editar.
 - CI Windows, M0: Adam.
 
 ## Siguiente paso
