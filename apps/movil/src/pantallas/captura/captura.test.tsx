@@ -127,6 +127,7 @@ describe('Movimientos → capturas por revisar', () => {
     const p = eCaptura();
     activarCaptura(p.ctx, ['mx.ejemplo.bancoa']);
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    expect(screen.getByTestId('capturas-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveTextContent(
       TEXTO_CAPTURAS_POR_REVISAR_VACIO,
     );

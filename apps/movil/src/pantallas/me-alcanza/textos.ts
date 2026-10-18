@@ -55,9 +55,10 @@ export const BTN_CERRAR = 'Cerrar';
 export const ACCESIBILIDAD_CERRAR = 'Cerrar simulación ¿Me alcanza?';
 export const BTN_CALCULAR = 'Calcular';
 /** TalkBack en formulario (`02 §19`). */
-export const PISTA_CALCULAR = 'Simula la compra con tu dinero libre y tus pagos pendientes';
+export const PISTA_CALCULAR = 'Calcula si te alcanza con tu dinero libre y tus pagos pendientes';
 export const BTN_CANCELAR = 'Cancelar';
-export const PISTA_CANCELAR = 'Detiene el cálculo y vuelves al formulario';
+/** TalkBack mientras calcula (`02 §19`). */
+export const PISTA_CANCELAR = 'Detiene el cálculo y vuelve al formulario';
 export const BTN_INTENTAR_DE_NUEVO = 'Intentar de nuevo';
 export const BTN_CAMBIAR_DATOS = 'Cambiar los datos';
 export const BTN_LISTO = 'Listo';

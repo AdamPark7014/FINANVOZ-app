@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **PreviaWidget (widget/previa día):** verificado en `origin/main` — testIDs `previa-widget-*`, `ajustes-widget-previa-etiqueta`, TalkBack con `etiquetaAccesibleWidget`, `auditar()` y etiqueta sin `$`/dígitos al ocultar montos.
+- **¿Me alcanza?:** pistas TalkBack Calcular/Cancelar, test `accessibilityLabel` ayuda datos insuficientes.
 
 ## Hecho (acumulado reciente)
 
-- `6ef147b` / `aaf0f92` widget TalkBack; personas/cuentas/captura polish paralelo.
+- Encabezado, alertas cancel/error/recordatorio, `etiquetaVacioDatosInsuficientes`. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- Working tree: tarjetas/EstadoVacio sin commitear — otro hilo.
+- WIP ajeno (onboarding, tarjetas, EstadoVacio, widget) — no mezclar sin `git status`.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Rescatar WIP tarjetas si aplica.
-3. M11 negocio cuando toque el hito.
+2. Commits pequeños del WIP ajeno si Adam lo pide.
 
 ## No tocar
 

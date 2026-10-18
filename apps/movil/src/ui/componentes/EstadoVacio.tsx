@@ -20,8 +20,9 @@ export function EstadoVacio({
       variante="cuerpo"
       tono="secundario"
       testID={testID}
+      accessibilityRole="text"
       accessibilityLiveRegion="polite"
-      {...(etiquetaAccesible ? { accessibilityLabel: etiquetaAccesible } : {})}
+      accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(texto)}
     >
       {texto}
     </Texto>

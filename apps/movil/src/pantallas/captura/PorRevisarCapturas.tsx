@@ -109,7 +109,9 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
     const texto = [c.texto?.titulo, c.texto?.texto].filter((t) => t).join(' · ');
     return (
       <Tarjeta testID={testID}>
-        <Texto variante="cuerpoFuerte">{`${c.banco} mandó un aviso que no entendí`}</Texto>
+        <Texto variante="cuerpoFuerte" accessibilityRole="header">
+          {`${c.banco} mandó un aviso que no entendí`}
+        </Texto>
         {texto ? (
           <Texto variante="cuerpo">{`«${texto}»`}</Texto>
         ) : (
