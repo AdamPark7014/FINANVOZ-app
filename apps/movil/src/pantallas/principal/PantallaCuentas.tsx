@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { UMBRAL_USO_BP } from '@cartera/core';
 import {
   etiquetaFecha,
   fijarApartarDeuda,
   listarCuentas,
   listarTarjetas,
   type CuentaDebes,
-  type TarjetaVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
@@ -15,7 +13,6 @@ import {
   Boton,
   Cifra,
   espacio,
-  formatearCentavos,
   Interruptor,
   Pantalla,
   Tarjeta,
@@ -26,6 +23,7 @@ import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
+import { TarjetaCreditoLista } from '../tarjetas/TarjetaCreditoLista';
 import { EstadoVacio } from './EstadoVacio';
 import {
   BTN_AGREGAR_TARJETA_CREDITO,
@@ -33,7 +31,6 @@ import {
   BTN_AJUSTES_CUENTAS_ACCESIBLE,
   contextoSaldoCompromiso,
   contextoSaldoLeDebes,
-  contextoSaldoTarjeta,
   contextoSaldoTeDebe,
   contextoSaldoTienes,
   SUBTITULO_CUENTAS_COMPROMISOS,
@@ -154,7 +151,7 @@ export function PantallaCuentas({
             {v.debes.map((d) =>
               d.tipo === 'tarjeta' ? (
                 <View key={d.id} accessibilityRole="listitem">
-                  <TarjetaCredito
+                  <TarjetaCreditoLista
                     d={d}
                     t={tarjetas.find((t) => t.id === d.id) ?? null}
                     {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}

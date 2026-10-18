@@ -2,10 +2,13 @@ import type { Centavos } from '@cartera/core';
 import {
   etiquetaDiaMes,
   type CompraMsiRegistrada,
+  type CuentaDebes,
   type ResultadoTexto,
   type TarjetaEditada,
+  type TarjetaVista,
 } from '../../servicios';
 import { cifraEnPalabras, formatearCentavos } from '../../ui';
+import { contextoSaldoTarjeta } from '../principal/textos';
 
 /** Redacción de Tarjetas (`02 §8`, `02 §14`): solo presenta lo que ya calculó `servicios/`. */
 
@@ -78,6 +81,8 @@ export const NOMBRE_ESTADO_PLAN = {
 
 export const BTN_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';
+/** Cuentas → Debes: fila de tarjeta abre el detalle (`02 §11`, `02 §15`). */
+export const PISTA_ABRIR_DETALLE_TARJETA = 'Abre el detalle de la tarjeta';
 export const TEXTO_TARJETA_NO_ENCONTRADA = 'No encontré esa tarjeta.';
 export const ACCESIBILIDAD_TARJETA_NO_ENCONTRADA =
   'No encontré esa tarjeta. Usa Volver para regresar a Cuentas.';
@@ -160,6 +165,41 @@ export function etiquetaAccesibleUsoTarjeta(porcentaje: number): string {
 /** TalkBack en la barra de uso: incluye límite y la marca del 30 % (el pie visual queda oculto). */
 export function etiquetaAccesibleBarraUsoTarjeta(porcentaje: number, limite: Centavos): string {
   return `Usas ${porcentaje} % de tu límite de ${cifraEnPalabras(limite, 'pesos')}. La marca es el 30 %.`;
+}
+
+const TEXTO_TARJETA_CREDITO_LISTA = 'Tarjeta de crédito';
+const TEXTO_MSI_FALTAN_LISTA = 'Meses sin intereses que faltan';
+const TEXTO_NO_SUMA_DINERO_LIBRE = 'No se suma a tu dinero libre.';
+
+/** TalkBack: fila de tarjeta en Cuentas → Debes (el detalle ya tiene filas propias). */
+export function etiquetaAccesibleTarjetaEnLista(d: CuentaDebes, t: TarjetaVista | null): string {
+  const aFavor = d.saldo < 0;
+  const saldo = (aFavor ? -d.saldo : d.saldo) as Centavos;
+  const partes = [
+    d.nombre,
+    aFavor ? ETIQUETA_SALDO_A_FAVOR : TEXTO_TARJETA_CREDITO_LISTA,
+    `${contextoSaldoTarjeta(d.nombre, aFavor)} ${cifraEnPalabras(saldo, 'pesos')}`,
+  ];
+  if (d.meses > 0) {
+    partes.push(`${TEXTO_MSI_FALTAN_LISTA}: ${cifraEnPalabras(d.meses, 'pesos')}`);
+  }
+  if (aFavor) {
+    partes.push(TEXTO_NO_SUMA_DINERO_LIBRE);
+  }
+  if (t && t.pngi > 0) {
+    partes.push(
+      `${ETIQUETA_PNGI}: ${cifraEnPalabras(t.pngi, 'pesos')} antes del ${t.etiquetaFechaLimite}`,
+    );
+  } else if (t) {
+    partes.push(etiquetaAccesibleDato(ETIQUETA_FECHA_LIMITE, t.etiquetaFechaLimite));
+    partes.push(etiquetaAccesibleDato(ETIQUETA_PROXIMO_CORTE, t.etiquetaProximoCorte));
+  }
+  if (t) {
+    partes.push(etiquetaAccesibleBarraUsoTarjeta(t.usoPorcentaje, t.limiteCredito));
+  } else if (d.limiteCredito !== null) {
+    partes.push(`Límite: ${cifraEnPalabras(d.limiteCredito, 'pesos')}`);
+  }
+  return partes.join('. ');
 }
 
 export function textoUsoLimiteTarjeta(porcentaje: number, limite: string): string {
