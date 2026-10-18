@@ -21,6 +21,8 @@ import type { ArchivosFacturas } from './archivos';
 import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
+  BTN_DEDUCCIONES_CUENTAS,
+  DESCRIPCION_PUERTA_PLUS,
   ETIQUETA_LEYENDA_ESTIMACION,
   LEYENDA_ESTIMACION,
   MENSAJE_IMPORTAR_ERROR,
@@ -29,6 +31,7 @@ import {
   TEXTO_FACTURAS_OCULTAS,
   TEXTO_FACTURAS_VACIO,
   TEXTO_IMPORTAR_VACIO,
+  TITULO_PUERTA_PLUS,
   TITULO_TUS_FACTURAS,
   tituloPantallaDeducciones,
 } from './textos';

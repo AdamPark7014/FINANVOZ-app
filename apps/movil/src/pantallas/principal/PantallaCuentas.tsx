@@ -214,7 +214,7 @@ export function PantallaCuentas({
       {alAbrirTandas ? (
         <Seccion titulo="Tandas" testID="seccion-tandas">
           <Boton
-            etiqueta="Ver mis tandas"
+            etiqueta={BTN_TANDAS_CUENTAS}
             variante="secundario"
             alPresionar={alAbrirTandas}
             testID="boton-tandas"

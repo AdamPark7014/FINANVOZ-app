@@ -6,23 +6,22 @@
 
 ## Hecho en este turno
 
-- **Onboarding O3/O4:** copy de ingreso y cuentas centralizado en `onboarding/textos.ts` (pantallas, tips, botones, formulario). Eliminado reexport circular `textos` ↔ `tips`; `tips.ts` reexporta O3–O7 desde `textos`. Tests onboarding en verde.
+- **widget / Ajustes:** copy `widget-textos` (`PISTA_PREVIA`, instrucción Widgets, desc. ocultar montos); `PreviaWidget` hint TalkBack, textos internos fuera de lectura, `previa-widget-fila` / `previa-widget-solo-texto`; tests `widget.test.tsx` (rama ocultar montos con `within(previa)`).
 
 ## Hecho (acumulado reciente)
 
-- O5/O7 en `textos.ts`, tabs TalkBack, personas/widget. Ver `git log`.
+- Onboarding tips O3–O7 en `tips.ts`, pestañas TalkBack, Cuentas/deducciones copy. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno: deducciones/tarjetas TS móvil — no mezclar.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar tips O2/O6 en `textos` si se quiere un solo módulo.
-3. M11 negocio cuando toque el hito.
+2. Rescates WIP en commits pequeños (`git log --grep=rescate`).
 
 ## No tocar
 

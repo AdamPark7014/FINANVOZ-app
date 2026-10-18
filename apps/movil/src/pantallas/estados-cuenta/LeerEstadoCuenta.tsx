@@ -56,6 +56,7 @@ import {
   preguntaElegirTarjeta,
   preguntaMismoMovimiento,
   resumenEstado,
+  etiquetaVacioSinNuevosEstado,
   TEXTO_SIN_NUEVOS,
   tituloNuevos,
   TITULO_DUDOSOS,

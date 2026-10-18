@@ -102,6 +102,11 @@ export function tituloNuevos(cantidad: number): string {
   return cantidad === 1 ? 'El que no tenía' : 'Los que no tenía';
 }
 
+/** Vacío de renglones nuevos: encabezado de sección + copy para TalkBack (`02 §15`). */
+export function etiquetaVacioSinNuevosEstado(): string {
+  return `${tituloNuevos(2)}. ${TEXTO_SIN_NUEVOS}`;
+}
+
 export function mensajeRenglonesSinLeer(cantidad: number): string {
   return cantidad === 1
     ? '1 renglón no lo pude leer; revísalo en tu PDF.'

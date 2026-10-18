@@ -14,6 +14,7 @@ import {
   registrarMovimiento,
   registrarPrestamo,
 } from '../../servicios';
+import { listarCuentas } from '../../servicios/cuentas';
 import { formatearCentavos } from '../../ui';
 import { cifraEnPalabras } from '../../ui/formato';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
@@ -442,15 +443,19 @@ describe('Cuentas', () => {
 
   it('cada saldo trae accessibilityLabel con contexto y la cifra en palabras (02 §15)', () => {
     const p = conEscenario('e4-01');
+    const vista = listarCuentas(p.ctx);
     const bbvaId = p.e.cuentas.bbva as string;
-    const bbva = listarCuentas(p.ctx).tienes.find((c) => c.id === bbvaId);
+    const nuId = p.e.cuentas.nu as string;
+    const bbva = vista.tienes.find((c) => c.id === bbvaId);
+    const nu = vista.debes.find((d) => d.id === nuId);
     if (!bbva) throw new Error('e4-01 sin BBVA en Tienes');
+    if (!nu) throw new Error('e4-01 sin Nu en Debes');
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
     expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(359_000)}`,
     );
-    expect(screen.getByTestId(`cuenta-${p.e.cuentas.nu}-saldo`).props.accessibilityLabel).toBe(
-      `${contextoSaldoTarjeta('Nu', false)} ${cifraEnPalabras(200_000)}`,
+    expect(screen.getByTestId(`cuenta-${nuId}-saldo`).props.accessibilityLabel).toBe(
+      `${contextoSaldoTarjeta(nu.nombre, false)} ${cifraEnPalabras(200_000)}`,
     );
     expect(screen.getByTestId('cuenta-internet-saldo').props.accessibilityLabel).toBe(
       `${contextoSaldoCompromiso('internet', 'mié 14')} ${cifraEnPalabras(500_00)}`,

@@ -74,11 +74,13 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
       { ocultarMontos: true },
     );
     render(<PreviaWidget vista={soloTexto} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
-    expect(screen.getByTestId('previa-widget').props.accessibilityLabel).toBe('Toca para ver tu día');
-    expect(screen.getByTestId('previa-widget-solo-texto').props.importantForAccessibility).toBe(
-      'no-hide-descendants',
-    );
-    expect(screen.getByText('Toca para ver tu día', { hidden: true }).props.importantForAccessibility).toBe(
+    const previa = screen.getByTestId('previa-widget');
+    expect(previa.props.accessibilityLabel).toBe('Toca para ver tu día');
+    expect(
+      within(previa).getByTestId('previa-widget-solo-texto', { includeHiddenElements: true }).props
+        .importantForAccessibility,
+    ).toBe('no-hide-descendants');
+    expect(within(previa).getByText('Toca para ver tu día', { hidden: true }).props.importantForAccessibility).toBe(
       'no',
     );
   });
