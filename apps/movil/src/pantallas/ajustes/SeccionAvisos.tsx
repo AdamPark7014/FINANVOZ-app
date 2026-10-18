@@ -33,6 +33,9 @@ import {
   ETIQUETA_HORARIO_SILENCIOSO,
   ETIQUETA_SILENCIO_DESDE,
   ETIQUETA_SILENCIO_HASTA,
+  PISTA_ABRIR_AJUSTES_AVISOS,
+  PISTA_GUARDAR_HORARIO,
+  PISTA_PERMITIR_AVISOS,
   SECCION_AVISOS,
 } from './avisos-textos';
 
@@ -105,6 +108,7 @@ export function SeccionAvisos() {
             testID="ajustes-avisos-permitir"
             variante="secundario"
             etiqueta={permiso === 'sin_preguntar' ? BTN_PERMITIR_AVISOS : BTN_ABRIR_AJUSTES_TELEFONO}
+            pista={permiso === 'sin_preguntar' ? PISTA_PERMITIR_AVISOS : PISTA_ABRIR_AJUSTES_AVISOS}
             alPresionar={() => {
               if (permiso === 'denegado') {
                 notificaciones.abrirAjustesSistema?.();
@@ -208,6 +212,7 @@ export function SeccionAvisos() {
         testID="ajustes-guardar-horario"
         variante="secundario"
         etiqueta={BTN_GUARDAR_HORARIO}
+        pista={PISTA_GUARDAR_HORARIO}
         alPresionar={guardarHorario}
       />
       {mensaje ? (

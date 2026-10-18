@@ -299,12 +299,24 @@ export function FormularioCuentaDividida({
         />
       </View>
       {intentado && pendiente ? (
-        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="division-pendiente"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {pendiente}
         </Texto>
       ) : null}
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="division-error"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Texto>
       ) : null}

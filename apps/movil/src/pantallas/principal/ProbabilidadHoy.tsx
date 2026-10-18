@@ -11,7 +11,7 @@ import {
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
 import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
-import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
+import { ETIQUETA_PROBABILIDAD_CALCULANDO, etiquetaAvisoRiesgo } from './textos';
 import { useNotificaciones } from '../avisos/notificaciones';
 
 /** Aviso de riesgo en Hoy (P < 50 %, `02 §13`): sin cifras nuevas, solo qué significa la probabilidad. */
@@ -130,7 +130,13 @@ export function ProbabilidadHoy({
       ) : null}
       {vista.riesgo ? (
         <Tarjeta testID="aviso-riesgo">
-          <Texto variante="secundario" accessibilityRole="alert" accessibilityLiveRegion="polite">
+          <Texto
+            variante="secundario"
+            testID="aviso-riesgo-texto"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={etiquetaAvisoRiesgo(TEXTO_RIESGO)}
+          >
             {TEXTO_RIESGO}
           </Texto>
         </Tarjeta>

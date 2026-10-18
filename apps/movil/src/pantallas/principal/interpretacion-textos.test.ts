@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  etiquetaAvisoRiesgo,
   etiquetaBotonElegirMovimiento,
   etiquetaTarjetaDelDia,
+  ETIQUETA_AVISO_RIESGO,
   TITULO_DUPLICADOS,
   TITULO_ELEGIR_MOVIMIENTO,
   TITULO_TARJETA_DEL_DIA,
 } from './textos';
+import { TEXTO_RIESGO } from './ProbabilidadHoy';
 
 describe('principal/textos · interpretación', () => {
   it('títulos de elegir movimiento en tuteo', () => {
@@ -22,5 +25,9 @@ describe('principal/textos · interpretación', () => {
     expect(etiquetaTarjetaDelDia('Paga la luz antes del viernes')).toBe(
       `${TITULO_TARJETA_DEL_DIA}. Paga la luz antes del viernes`,
     );
+  });
+
+  it('aviso de riesgo en Hoy lleva prefijo para TalkBack', () => {
+    expect(etiquetaAvisoRiesgo(TEXTO_RIESGO)).toBe(`${ETIQUETA_AVISO_RIESGO}. ${TEXTO_RIESGO}`);
   });
 });

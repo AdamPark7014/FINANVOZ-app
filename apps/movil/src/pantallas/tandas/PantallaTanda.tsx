@@ -36,6 +36,7 @@ import {
   ACCESIBILIDAD_TANDA_ARCHIVADA,
   ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   ERROR_NOMBRE_TANDA_VACIO,
+  etiquetaAccesibleRondaTanda,
   etiquetaEstadoRonda,
   TEXTO_CONFIRMAR_ARCHIVAR,
   TEXTO_NO_ES_INGRESO,
@@ -175,17 +176,32 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
         {d.rondas.map((r) => (
           <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-              <Texto variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'} style={{ flex: 1 }}>
-                {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
-              </Texto>
-              <Texto variante="secundario" tono="secundario">
-                {etiquetaEstadoRonda(r, !d.activa)}
+            <View
+              accessible
+              accessibilityLabel={etiquetaAccesibleRondaTanda(r, !d.activa)}
+              style={{ gap: espacio.xxs }}
+            >
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+                <Texto
+                  variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'}
+                  style={{ flex: 1 }}
+                  importantForAccessibility="no"
+                >
+                  {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
+                </Texto>
+                <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
+                  {etiquetaEstadoRonda(r, !d.activa)}
+                </Texto>
+              </View>
+              <Texto
+                variante="secundario"
+                tono="secundario"
+                testID={`tanda-ronda-${r.t}-riesgo`}
+                importantForAccessibility="no"
+              >
+                {textoDespuesRondaRiesgo(r.enRiesgo)}
               </Texto>
             </View>
-            <Texto variante="secundario" tono="secundario" testID={`tanda-ronda-${r.t}-riesgo`}>
-              {textoDespuesRondaRiesgo(r.enRiesgo)}
-            </Texto>
           </Tarjeta>
         ))}
       </Seccion>

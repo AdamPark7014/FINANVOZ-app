@@ -29,10 +29,12 @@ import {
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { ActivarCaptura } from './ActivarCaptura';
 import {
+  CUERPO_REACTIVAR_CAPTURA,
   etiquetaGuiaCapturaInactiva,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
   PISTA_REVISAR_ACCESO_CAPTURA,
   TITULO_CAPTURA_INACTIVA,
+  TITULO_REACTIVAR_CAPTURA,
 } from './textos';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;
@@ -181,10 +183,15 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
   return (
     <Tarjeta testID={testID}>
       <Texto variante="cuerpoFuerte" accessibilityRole="header">
-        Vuelve a activar la lectura de notificaciones
+        {TITULO_REACTIVAR_CAPTURA}
       </Texto>
-      <Texto variante="secundario" tono="secundario">
-        Recuperé tus datos, pero en este teléfono todavía no puedo leer los avisos de tu banco.
+      <Texto
+        variante="secundario"
+        tono="secundario"
+        testID={`${testID}-cuerpo`}
+        accessibilityLabel={etiquetaCuerpoReactivarCaptura()}
+      >
+        {CUERPO_REACTIVAR_CAPTURA}
       </Texto>
       <View style={{ gap: espacio.s }}>
         {puente ? (

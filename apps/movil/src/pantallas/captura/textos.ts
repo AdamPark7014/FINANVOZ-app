@@ -27,6 +27,16 @@ export const PISTA_CONFIRMAR_CAPTURA = 'Confirma que la captura está correcta';
 export const PISTA_CAPTURA_DE_CONTADO = 'Indica que no fue a meses sin intereses';
 export const PISTA_CAMBIAR_CATEGORIA_CAPTURA = 'Elige otra categoría para esta captura';
 
+/** Tarjeta de Hoy tras restaurar un respaldo (`TarjetaReactivarCaptura`). */
+export const TITULO_REACTIVAR_CAPTURA = 'Vuelve a activar la lectura de notificaciones';
+export const CUERPO_REACTIVAR_CAPTURA =
+  'Recuperé tus datos, pero en este teléfono todavía no puedo leer los avisos de tu banco.';
+
+/** TalkBack: título + cuerpo de la tarjeta reactivar (`02 §15`). */
+export function etiquetaCuerpoReactivarCaptura(): string {
+  return `${TITULO_REACTIVAR_CAPTURA} ${CUERPO_REACTIVAR_CAPTURA}`;
+}
+
 /** TalkBack: tarjeta de Hoy tras restaurar (`TarjetaReactivarCaptura`). */
 export const PISTA_DESCARTAR_REACTIVAR_CAPTURA = 'Deja la captura apagada y quita esta tarjeta';
 /** TalkBack: tarjeta captura inactiva (RF-CAP-07). */

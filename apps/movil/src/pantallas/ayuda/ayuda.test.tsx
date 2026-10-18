@@ -100,10 +100,10 @@ describe('pantalla de ayuda', () => {
     expect(boton).toHaveProp('accessibilityState', { expanded: false });
     expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
-    const respaldo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo')!;
-    expect(screen.getByText(respaldo.respuesta[0]).parent).toHaveProp(
+    const faqRespaldo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo')!;
+    expect(screen.getByText(faqRespaldo.respuesta[0])).toHaveProp(
       'accessibilityLabel',
-      etiquetaAccesibleParrafoRespuesta(respaldo.respuesta[0], true),
+      etiquetaAccesibleParrafoRespuesta(faqRespaldo.respuesta[0], true),
     );
     expect(screen.getByTestId('ayuda-pregunta-respaldo')).toHaveProp('accessibilityState', {
       expanded: true,
@@ -154,6 +154,10 @@ describe('pantalla de ayuda', () => {
     expect(abrir).toHaveBeenCalledWith(enlaceCorreoAyuda());
     expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(mensajeSinAppCorreo(CORREO_AYUDA));
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleSinAppCorreo(CORREO_AYUDA),
+    );
     expect(auditar(screen.toJSON())).toEqual([]);
   });
 

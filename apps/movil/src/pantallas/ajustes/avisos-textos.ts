@@ -42,6 +42,12 @@ export const EJEMPLO_SILENCIO_DESDE = '22:00';
 export const EJEMPLO_SILENCIO_HASTA = '08:00';
 
 export const BTN_GUARDAR_HORARIO = 'Guardar horario';
+/** TalkBack al guardar hora y silencio (`02 §12`). */
+export const PISTA_GUARDAR_HORARIO = 'Guarda la hora de avisos y el horario silencioso';
+/** TalkBack cuando el teléfono aún no concedió avisos (`02 §12`). */
+export const PISTA_PERMITIR_AVISOS = 'Pide permiso para mandarte avisos en este teléfono';
+/** TalkBack cuando el permiso está denegado (`02 §12`). */
+export const PISTA_ABRIR_AJUSTES_AVISOS = 'Abre los ajustes del teléfono para activar avisos';
 
 export const ERROR_FORMATO_HORA = 'Escribe las horas así: 22:00.';
 export const CONFIRMACION_HORARIO = 'Listo. Tus avisos ya usan este horario.';

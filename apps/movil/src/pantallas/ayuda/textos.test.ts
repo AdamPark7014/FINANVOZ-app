@@ -5,6 +5,9 @@ import {
   ACCESIBILIDAD_VOLVER,
   BTN_ABRIR_DESDE_AJUSTES,
   BTN_AYUDA,
+  etiquetaAccesibleCuerpoContacto,
+  etiquetaAccesibleParrafoRespuesta,
+  etiquetaAccesibleSinAppCorreo,
   ETIQUETA_RESPUESTA,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
@@ -51,5 +54,10 @@ describe('textos de ayuda', () => {
     expect(ACCESIBILIDAD_ESCRIBIR_CORREO).toMatch(/correo/i);
     expect(ETIQUETA_RESPUESTA).toBe('Respuesta');
     expect(PREGUNTAS_TITULO).toMatch(/Preguntas frecuentes/);
+    expect(etiquetaAccesibleCuerpoContacto(CORREO_AYUDA)).toMatch(/arroba/);
+    expect(etiquetaAccesibleCuerpoContacto(CORREO_AYUDA)).not.toContain('@');
+    expect(etiquetaAccesibleSinAppCorreo(CORREO_AYUDA)).toMatch(/arroba/);
+    expect(etiquetaAccesibleParrafoRespuesta('Hola.', true)).toMatch(/^Respuesta\./);
+    expect(etiquetaAccesibleParrafoRespuesta('Hola.', false)).toBe('Hola.');
   });
 });

@@ -9,7 +9,7 @@ import {
 } from '../../servicios';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
-import { SECCION_AVISOS } from '../ajustes/avisos-textos';
+import { PISTA_GUARDAR_HORARIO, PISTA_PERMITIR_AVISOS, SECCION_AVISOS } from '../ajustes/avisos-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
 import {
@@ -17,7 +17,7 @@ import {
   ProbabilidadHoy,
   TEXTO_RIESGO,
 } from './ProbabilidadHoy';
-import { ETIQUETA_PROBABILIDAD_CALCULANDO } from './textos';
+import { ETIQUETA_PROBABILIDAD_CALCULANDO, etiquetaAvisoRiesgo } from './textos';
 
 const sinEspera = { ceder: () => Promise.resolve() };
 
@@ -102,7 +102,11 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     const p = await conGastoDiario(40_000, '2026-10-27');
     const n = montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
     expect(screen.getByTestId('aviso-riesgo')).toHaveTextContent(TEXTO_RIESGO);
-    expect(screen.getByText(TEXTO_RIESGO)).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('aviso-riesgo-texto')).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId('aviso-riesgo-texto')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId('aviso-riesgo-texto').props.accessibilityLabel).toBe(
+      etiquetaAvisoRiesgo(TEXTO_RIESGO),
+    );
     await waitFor(() => expect(n.puerto.lista()).toHaveLength(1));
     expect(n.puerto.lista()[0]).toMatchObject({
       fecha: '2026-10-28',
@@ -123,6 +127,14 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     montar(q.ctx, <ProbabilidadHoy hora={() => '10:00'} />, sinPermiso);
     expect(screen.getAllByTestId('aviso-riesgo').length).toBeGreaterThan(0);
     await waitFor(() => expect(sinPermiso.puerto.lista()).toEqual([]));
+  });
+
+  it('Ajustes → Avisos: pistas TalkBack en permitir y guardar horario', async () => {
+    const p = conEscenario('e4-01');
+    montar(p.ctx, <SeccionAvisos />, notificacionesEnMemoria('sin_preguntar'));
+    await screen.findByTestId('ajustes-avisos-permitir');
+    expect(screen.getByTestId('ajustes-avisos-permitir')).toHaveProp('accessibilityHint', PISTA_PERMITIR_AVISOS);
+    expect(screen.getByTestId('ajustes-guardar-horario')).toHaveProp('accessibilityHint', PISTA_GUARDAR_HORARIO);
   });
 
   it('Ajustes → Avisos apaga "Riesgo de no llegar"', async () => {

@@ -46,6 +46,7 @@ import {
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
   TITULO_CALENDARIO,
+  etiquetaAccesibleRondaTanda,
   etiquetaVacioTandas,
   TEXTO_TANDAS_VACIO,
   TITULO_TANDAS,

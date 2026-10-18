@@ -10,7 +10,12 @@ import {
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { SeccionDatosCobro } from '../ajustes/SeccionDatosCobro';
-import { SECCION_DATOS_COBRO } from '../ajustes/datos-cobro-textos';
+import {
+  PISTA_AGREGAR_DATOS_COBRO,
+  PISTA_BORRAR_DATOS_COBRO,
+  PISTA_CAMBIAR_DATOS_COBRO,
+  SECCION_DATOS_COBRO,
+} from '../ajustes/datos-cobro-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { conEscenario, golden } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
@@ -399,6 +404,10 @@ describe('Ajustes → Datos para cobrar', () => {
     renderConSesion(p.ctx, <SeccionDatosCobro />);
     expect(screen.getByTestId('ajustes-datos-cobro-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(SECCION_DATOS_COBRO)).toBeTruthy();
+    expect(screen.getByTestId('boton-editar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_AGREGAR_DATOS_COBRO,
+    );
   });
 
   it('agrega, cambia y borra', () => {
@@ -415,6 +424,14 @@ describe('Ajustes → Datos para cobrar', () => {
     fireEvent.changeText(screen.getByTestId('campo-celular-cobro'), '2212345678');
     fireEvent.press(screen.getByTestId('boton-guardar-datos-cobro'));
     expect(textoDe('datos-cobro-resumen')).toBe('Celular: 22 1234 5678');
+    expect(screen.getByTestId('boton-editar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CAMBIAR_DATOS_COBRO,
+    );
+    expect(screen.getByTestId('boton-borrar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_BORRAR_DATOS_COBRO,
+    );
     fireEvent.press(screen.getByTestId('boton-borrar-datos-cobro'));
     expect(leerDatosCobro(p.ctx)).toBeNull();
   });

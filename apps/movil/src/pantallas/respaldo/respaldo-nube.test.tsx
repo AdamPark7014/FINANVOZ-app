@@ -173,6 +173,7 @@ describe('Ajustes → Respaldo en la nube (M9, 02 §19)', () => {
     expect(screen.getByTestId('respaldo-pendiente')).toHaveTextContent(
       'Llevas más de 2 semanas sin respaldo.',
     );
+    expect(screen.getByTestId('respaldo-pendiente')).toHaveProp('accessibilityRole', 'alert');
 
     await entrarConCorreo();
     const telefono = nubeMock.mockEstado.telefono;

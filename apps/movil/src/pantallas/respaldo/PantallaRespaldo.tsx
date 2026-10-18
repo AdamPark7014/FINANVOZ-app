@@ -198,7 +198,12 @@ function TarjetaNube({
         {vista.textoUltimo}
       </Texto>
       {vista.pendiente ? (
-        <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          testID="respaldo-pendiente"
+          accessibilityRole="alert"
+        >
           {AVISO_PENDIENTE}
         </Texto>
       ) : null}

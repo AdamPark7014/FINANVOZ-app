@@ -1,6 +1,6 @@
 import type { Centavos } from '@cartera/core';
 import type { FrecuenciaTanda, MovimientoTanda, RondaTandaVista, TandaYaEmpezada } from '../../servicios';
-import { formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui';
 
 /** Copy de tandas (`02 §18`, tuteo). */
 
@@ -166,6 +166,14 @@ export function etiquetaEstadoRonda(r: RondaTandaVista, archivada: boolean): str
   if (!r.estado) return 'Más adelante';
   if (archivada && r.estado === 'omitida') return 'Cancelada';
   return ESTADO_RONDA[r.estado];
+}
+
+/** TalkBack: fila del calendario de rondas en el detalle (`02 §18`). */
+export function etiquetaAccesibleRondaTanda(r: RondaTandaVista, archivada: boolean): string {
+  const turno = r.esCobro ? ', tu turno' : '';
+  const estado = etiquetaEstadoRonda(r, archivada);
+  const riesgo = cifraEnPalabras(r.enRiesgo, 'centavos');
+  return `Ronda ${r.t}, ${r.etiqueta}${turno}. ${estado}. Después de esta ronda arriesgas ${riesgo}`;
 }
 
 export const OPCIONES_FRECUENCIA_TANDA: readonly { valor: FrecuenciaTanda; etiqueta: string }[] = [

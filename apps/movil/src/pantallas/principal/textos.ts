@@ -262,6 +262,13 @@ export function etiquetaTarjetaDelDia(texto: string): string {
 /** Indicador mientras se calcula la probabilidad en Hoy (`02 §15`). */
 export const ETIQUETA_PROBABILIDAD_CALCULANDO = 'Calculando si llegas…';
 
+/** Prefijo TalkBack del aviso bajo la probabilidad cuando P < 50 % (`02 §13`, `02 §15`). */
+export const ETIQUETA_AVISO_RIESGO = 'Aviso de riesgo';
+
+export function etiquetaAvisoRiesgo(cuerpo: string): string {
+  return `${ETIQUETA_AVISO_RIESGO}. ${cuerpo}`;
+}
+
 export { PISTA_CONFIGURAR_INGRESO as PISTA_CONFIGURAR_INGRESO_HOY } from '../ajustes/ingreso-textos';
 
 /** TalkBack en CTAs de Hoy (`02 §15`). */

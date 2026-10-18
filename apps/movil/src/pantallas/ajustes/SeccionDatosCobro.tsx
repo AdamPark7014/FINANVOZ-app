@@ -9,6 +9,9 @@ import {
   BTN_CAMBIAR,
   lineaResumenCelular,
   lineaResumenClabe,
+  PISTA_AGREGAR_DATOS_COBRO,
+  PISTA_BORRAR_DATOS_COBRO,
+  PISTA_CAMBIAR_DATOS_COBRO,
   RESUMEN_VACIO,
   SECCION_DATOS_COBRO,
 } from './datos-cobro-textos';
@@ -43,6 +46,7 @@ export function SeccionDatosCobro() {
           </Texto>
           <Boton
             etiqueta={datos ? BTN_CAMBIAR : BTN_AGREGAR}
+            pista={datos ? PISTA_CAMBIAR_DATOS_COBRO : PISTA_AGREGAR_DATOS_COBRO}
             variante="secundario"
             ancho="contenido"
             alPresionar={() => setEditando(true)}
@@ -51,6 +55,7 @@ export function SeccionDatosCobro() {
           {datos ? (
             <Boton
               etiqueta={BTN_BORRAR}
+              pista={PISTA_BORRAR_DATOS_COBRO}
               variante="texto"
               ancho="contenido"
               alPresionar={() => {

@@ -8,6 +8,13 @@ export const BTN_AGREGAR = 'Agregar';
 export const BTN_CAMBIAR = 'Cambiar';
 export const BTN_BORRAR = 'Borrar mis datos para cobrar';
 
+/** TalkBack sin datos guardados (`02 §17`). */
+export const PISTA_AGREGAR_DATOS_COBRO = 'Abre el formulario para agregar tu celular o CLABE';
+/** TalkBack cuando ya hay celular o CLABE (`02 §17`). */
+export const PISTA_CAMBIAR_DATOS_COBRO = 'Abre el formulario para cambiar tu celular o CLABE';
+/** TalkBack al quitar los datos de este teléfono (`02 §17`). */
+export const PISTA_BORRAR_DATOS_COBRO = 'Quita tu celular y CLABE de este teléfono';
+
 export function lineaResumenCelular(celularFormateado: string): string {
   return `Celular: ${celularFormateado}`;
 }
