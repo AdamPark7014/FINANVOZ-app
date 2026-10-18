@@ -124,6 +124,15 @@ async function vincular(A: Telefono, B: Telefono): Promise<string> {
 }
 
 describe('02 §27 · Gastos con tu pareja', () => {
+  it('lista vacía muestra copy y testID', () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
+    expect(screen.getByTestId('compartidos-vacio')).toHaveTextContent(TEXTO_COMPARTIDOS_VACIO);
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    A.cerrar();
+  });
+
   it('CA-M16-03 · crear con alguien, escanear, agregar y saldar: los dos ven lo mismo', async () => {
     const servidor = servidorCompartidoFalso();
     const A = telefono(servidor, 'usuario-a');
