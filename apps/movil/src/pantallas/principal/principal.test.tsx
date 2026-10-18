@@ -15,7 +15,9 @@ import {
   registrarPrestamo,
 } from '../../servicios';
 import { formatearCentavos } from '../../ui';
+import { cifraEnPalabras } from '../../ui/formato';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
+import { contextoSaldoCompromiso, contextoSaldoTarjeta, contextoSaldoTienes } from './textos';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
@@ -392,6 +394,21 @@ describe('Cuentas', () => {
 
     fireEvent.press(screen.getByTestId(`apartar-${jefa}`));
     expect(textoDe('hoy-puedes')).toBe('$214');
+  });
+
+  it('cada saldo trae accessibilityLabel con contexto y la cifra en palabras (02 §15)', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.getByTestId(`cuenta-${p.e.cuentas.bbva}-saldo`).props.accessibilityLabel).toBe(
+      `${contextoSaldoTienes('BBVA')} ${cifraEnPalabras(359_000)}`,
+    );
+    expect(screen.getByTestId(`cuenta-${p.e.cuentas.nu}-saldo`).props.accessibilityLabel).toBe(
+      `${contextoSaldoTarjeta('Nu', false)} ${cifraEnPalabras(200_000)}`,
+    );
+    expect(screen.getByTestId('cuenta-internet-saldo').props.accessibilityLabel).toBe(
+      `${contextoSaldoCompromiso('internet', 'mié 14')} ${cifraEnPalabras(500_00)}`,
+    );
+    p.cerrar();
   });
 
   it('muestra Tienes, Debes con la tarjeta y Compromisos; el engrane abre Ajustes', () => {
