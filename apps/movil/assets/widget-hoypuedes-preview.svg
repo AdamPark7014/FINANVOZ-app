@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vista previa del widget HoyPuedes (pendiente 78): selector del lanzador Android.
+     Fuente editable; el plugin usa el PNG homónimo en app.json ’ previewImage.
+     Colores de marca: docs en tokens.ts (marca.oscuro #0A6B57). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="160" viewBox="0 0 440 160" role="img" aria-label="Widget Hoy puedes de Finanvoz">
+  <rect width="440" height="160" fill="#F7F9F8"/>
+  <rect x="24" y="48" width="392" height="64" rx="16" fill="#FFFFFF" stroke="#C9D3CF" stroke-width="1"/>
+  <circle cx="48" cy="80" r="14" fill="#0A6B57"/>
+  <text x="48" y="85" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700">F</text>
+  <text x="72" y="76" fill="#111816" font-family="system-ui, sans-serif" font-size="16">Hoy puedes</text>
+  <text x="168" y="76" fill="#0A6B57" font-family="system-ui, sans-serif" font-size="22" font-weight="700">$214</text>
+  <text x="248" y="76" fill="#4A5652" font-family="system-ui, sans-serif" font-size="16">· 4 días</text>
+  <text x="220" y="132" text-anchor="middle" fill="#4A5652" font-family="system-ui, sans-serif" font-size="12">Finanvoz</text>
+</svg>

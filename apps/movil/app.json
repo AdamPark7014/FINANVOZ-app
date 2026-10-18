@@ -96,6 +96,7 @@
               "name": "HoyPuedes",
               "label": "Hoy puedes",
               "description": "Cuánto puedes gastar hoy y cuántos días faltan para tu ingreso.",
+              "previewImage": "./assets/widget-hoypuedes-preview.png",
               "minWidth": "110dp",
               "minHeight": "40dp",
               "targetCellWidth": 2,
