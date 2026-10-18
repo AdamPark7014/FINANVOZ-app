@@ -281,6 +281,12 @@ describe('Registrar', () => {
 });
 
 describe('Tarjetas', () => {
+  it('TalkBack: volver regresa a Cuentas', () => {
+    const p = conEscenario('e4-01');
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.e.cuentas.nu as string} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tarjeta-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+  });
+
   it('sin MSI ni movimientos muestra el copy vacío de textos.ts', () => {
     const p = conEscenario('e4-01');
     const nu = p.e.cuentas.nu as string;
