@@ -61,6 +61,8 @@ import {
   PISTA_CANCELAR,
   PISTA_HACER_OTRA_CUENTA,
   PISTA_LISTO,
+  PISTA_MOSTRAR_COMO_LO_CALCULE,
+  PISTA_OCULTAR_COMO_LO_CALCULE,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
   SUFIJO_ACCESIBILIDAD_RECOMENDADA,
@@ -468,6 +470,7 @@ function Resultado({
         variante="texto"
         ancho="contenido"
         alPresionar={() => setVerCalculo((v) => !v)}
+        pista={verCalculo ? PISTA_OCULTAR_COMO_LO_CALCULE : PISTA_MOSTRAR_COMO_LO_CALCULE}
         testID="boton-como-lo-calcule"
       />
       {verCalculo ? (

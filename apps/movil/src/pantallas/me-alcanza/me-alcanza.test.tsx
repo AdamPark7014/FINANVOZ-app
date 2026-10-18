@@ -67,6 +67,8 @@ import {
   PISTA_CANCELAR,
   PISTA_HACER_OTRA_CUENTA,
   PISTA_LISTO,
+  PISTA_MOSTRAR_COMO_LO_CALCULE,
+  PISTA_OCULTAR_COMO_LO_CALCULE,
   PISTA_REINTENTAR_ME_ALCANZA,
   PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
@@ -294,7 +296,15 @@ describe('¿Me alcanza?', () => {
 
     // "Cómo lo calculé" se despliega con las líneas de servicios.
     expect(screen.queryByTestId('como-lo-calcule')).toBeNull();
+    expect(screen.getByTestId('boton-como-lo-calcule')).toHaveProp(
+      'accessibilityHint',
+      PISTA_MOSTRAR_COMO_LO_CALCULE,
+    );
     fireEvent.press(screen.getByTestId('boton-como-lo-calcule'));
+    expect(screen.getByTestId('boton-como-lo-calcule')).toHaveProp(
+      'accessibilityHint',
+      PISTA_OCULTAR_COMO_LO_CALCULE,
+    );
     const calculo = screen.getByTestId('como-lo-calcule');
     expect(
       within(calculo).getByText(

@@ -72,6 +72,10 @@ export const ACCESIBILIDAD_LISTO = 'Listo, cerrar simulación ¿Me alcanza?';
 export const PISTA_LISTO = 'Cierra la pantalla y vuelve a donde estabas';
 export const BTN_COMO_LO_CALCULE = 'Cómo lo calculé';
 export const BTN_OCULTAR_COMO_LO_CALCULE = 'Ocultar cómo lo calculé';
+/** TalkBack al desplegar el detalle (`02 §19`). */
+export const PISTA_MOSTRAR_COMO_LO_CALCULE = 'Muestra el detalle de la simulación';
+/** TalkBack al ocultar el detalle (`02 §19`). */
+export const PISTA_OCULTAR_COMO_LO_CALCULE = 'Oculta el detalle de la simulación';
 export const BTN_VER_MOVIMIENTOS = 'Ver los movimientos';
 export const BTN_LO_COMPRE = 'Lo compré';
 export const BTN_HACER_OTRA_CUENTA = 'Hacer otra cuenta';

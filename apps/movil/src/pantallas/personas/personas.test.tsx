@@ -170,6 +170,10 @@ describe('CA-M8-02 · Cobrar', () => {
     });
     expect(compartir).not.toHaveBeenCalled();
     expect(screen.getByTestId('persona-pedir-datos')).toBeTruthy();
+    expect(screen.getByTestId('boton-guardar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_Y_COBRAR,
+    );
 
     // Una CLABE con el dígito de control mal no se guarda.
     fireEvent.changeText(screen.getByTestId('campo-celular-cobro'), '22 1234 5678');
@@ -178,6 +182,7 @@ describe('CA-M8-02 · Cobrar', () => {
       fireEvent.press(screen.getByTestId('boton-guardar-datos-cobro'));
     });
     expect(textoDe('error-datos-cobro')).toBe('Esa CLABE no es válida. Revisa los 18 dígitos.');
+    expect(screen.getByTestId('error-datos-cobro')).toHaveProp('accessibilityRole', 'alert');
     expect(compartir).not.toHaveBeenCalled();
 
     fireEvent.changeText(screen.getByTestId('campo-clabe-cobro'), '0123 4567 8901 2345 68');
@@ -382,6 +387,10 @@ describe('Ajustes → Datos para cobrar', () => {
     const p = conAmigos();
     renderConSesion(p.ctx, <SeccionDatosCobro />);
     fireEvent.press(screen.getByTestId('boton-editar-datos-cobro'));
+    expect(screen.getByTestId('boton-guardar-datos-cobro')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_DATOS_COBRO,
+    );
     fireEvent.changeText(screen.getByTestId('campo-celular-cobro'), '221234');
     fireEvent.press(screen.getByTestId('boton-guardar-datos-cobro'));
     expect(textoDe('error-datos-cobro')).toBe('El celular debe tener 10 dígitos.');

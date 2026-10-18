@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { construirVistaWidget, type VistaWidget } from '../servicios';
 import { colores, NUMEROS_TABULARES, type EsquemaColor } from '../ui/tokens';
+import { ETIQUETA_PREVIA } from '../pantallas/ajustes/widget-textos';
 import { detalleConSeparador, etiquetaAccesibleWidget, tamanoFuenteCifra } from './formatoWidget';
 
 /** Ejemplo fijo para Ajustes y documentación (misma línea que la semilla e4-01). */
