@@ -3,9 +3,17 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
 import { TIP_COLCHON_SIN_POR_AHORA } from '../../src/pantallas/onboarding/tips';
+import {
+  ayudaSugerenciaColchonOnboarding,
+  AYUDA_COLCHON_ONB,
+  BTN_SIN_COLCHON_POR_AHORA,
+  BTN_VER_MI_DIA,
+  ETIQUETA_COLCHON,
+  TITULO_COLCHON,
+} from '../../src/pantallas/onboarding/textos';
 import { colchonSugerido, completarOnboarding, fijarColchon } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
-import { Boton, CampoMonto, formatearCentavos } from '../../src/ui';
+import { Boton, CampoMonto } from '../../src/ui';
 
 /** O7 · Colchón (RF-CFG-02): sugerencia del 10 % del ingreso del periodo → "Ver mi día" termina el onboarding. */
 export default function Colchon() {

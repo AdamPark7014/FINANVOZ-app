@@ -415,6 +415,8 @@ function PersonaDebes({
       {alAbrirPersona ? (
         <Boton
           etiqueta="Ver"
+          etiquetaAccesible={`Ver ${d.nombre}`}
+          pista="Abre el detalle de la persona"
           variante="texto"
           ancho="contenido"
           alPresionar={() => alAbrirPersona(d.id)}

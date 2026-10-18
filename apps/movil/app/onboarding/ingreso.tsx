@@ -150,19 +150,19 @@ export default function Ingreso() {
               valor={diaMesTexto}
               alCambiar={setDiaMesTexto}
               error={
-                diaMesTexto !== '' && leerDiaMes(diaMesTexto) === null ? 'Escribe un día del 1 al 31.' : null
+                diaMesTexto !== '' && leerDiaMes(diaMesTexto) === null ? ERROR_DIA_MES_INGRESO : null
               }
             />
           ) : null}
           <CampoMonto
             testID="onb-ingreso-monto"
-            etiqueta="¿Cuánto te pagan cada vez?"
-            ayuda="Lo que te llega a la cuenta, ya con descuentos."
+            etiqueta={ETIQUETA_MONTO_INGRESO}
+            ayuda={AYUDA_MONTO_INGRESO}
             alCambiar={setMonto}
           />
           <Chips
             testID="onb-fin-semana"
-            etiqueta="Si cae en fin de semana te pagan:"
+            etiqueta={ETIQUETA_FIN_DE_SEMANA_INGRESO}
             opciones={OPCIONES_FIN_DE_SEMANA}
             valor={finDeSemana}
             alCambiar={setFinDeSemana}

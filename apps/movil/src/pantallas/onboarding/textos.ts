@@ -1,3 +1,6 @@
+import type { Centavos } from '@cartera/core';
+import { formatearCentavos } from '../../ui';
+
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
 
 /** Total de pasos visibles del onboarding (O1–O7, `02 §3`). */
@@ -27,6 +30,34 @@ export const CASILLA_ESTADISTICAS_OPCIONAL =
 
 /** O3 · Ingreso */
 export const TITULO_INGRESO = '¿Cada cuándo te pagan?';
+export const BTN_ONB_SALTAR = 'Saltar por ahora';
+
+/** O5 · Pagos fijos */
+export const TITULO_PAGOS_FIJOS = '¿Qué pagos tienes cada mes?';
+export const AYUDA_PAGOS_FIJOS =
+  'Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar.';
+export const ERROR_PAGO_FIJO_INCOMPLETO = 'Escribe cuánto pagas y qué día del mes (1 a 31).';
+export const ETIQUETA_PAGO_MONTO_FIJO = '¿Cuánto pagas?';
+export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
+export const AYUDA_PAGO_VARIABLE =
+  'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
+export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
+
+export function etiquetaAgregarPago(concepto: string): string {
+  return `Agregar ${concepto}`;
+}
+
+/** O7 · Colchón */
+export const TITULO_COLCHON = '¿Cuánto quieres no tocar nunca?';
+export const AYUDA_COLCHON_ONB =
+  'Tu colchón no cuenta para lo que puedes gastar. Lo cambias cuando quieras en Ajustes › Colchón.';
+export const ETIQUETA_COLCHON = 'Tu colchón';
+export const BTN_VER_MI_DIA = 'Ver mi día';
+export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
+
+export function ayudaSugerenciaColchonOnboarding(sugerido: Centavos): string {
+  return `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan.`;
+}
 
 /** Texto visible del indicador «Paso n de 7». */
 export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
