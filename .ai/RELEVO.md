@@ -6,26 +6,28 @@
 
 ## Hecho en este turno
 
-- **Onboarding O5/O7:** copy de pagos fijos y colchón en `onboarding/textos.ts`; pantallas importan desde ahí. Tips O3–O7 en `textos.ts`; `tips.ts` solo reexporta (sin ciclo con `textos`). Sugerencia 10 %: `sugerenciaMontoColchon10` en `colchon-textos.ts`. Commit **`34ffca6`** en `origin/main`.
+- **Cuentas:** botón «Agregar tarjeta de crédito» usa `BTN_AGREGAR_TARJETA_CREDITO` de `principal/textos.ts` (mismo copy que onboarding O4).
 
 ## Hecho (acumulado reciente)
 
-- O3/O4 centralizados (`43574fd`), tabs/personas/captura TalkBack. Ver `git log`.
+- Tandas volver TalkBack, captura/personas EstadoVacio, ajustes Cuentas, onboarding tips. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local ajeno (principal, deducciones, etc.) — no mezclar.
-- Typecheck móvil / CI Windows pendientes.
+- CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
+- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Tips O2/O6 en `textos` si se busca un solo módulo.
+2. Inline restante en Cuentas (p. ej. secciones) si conviene centralizar.
+3. M11 negocio cuando toque el hito.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
