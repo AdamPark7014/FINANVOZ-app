@@ -140,14 +140,12 @@ describe('PantallaArqueo · vacío y errores', () => {
   });
 
   it('TalkBack pistas en paso marcar y continuar', () => {
-    const p = abrirPruebaPantalla();
-    const e = conEscenario('e4-01');
-    renderConSesion(e.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
     const continuar = screen.queryByTestId('arqueo-continuar');
     if (continuar) {
       expect(continuar).toHaveProp('accessibilityHint', PISTA_CONTINUAR);
     }
     p.cerrar();
-    e.cerrar();
   });
 });

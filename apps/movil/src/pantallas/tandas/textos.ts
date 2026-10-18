@@ -106,6 +106,9 @@ export const TEXTO_TANDA_NO_ENCONTRADA = 'No encontré esa tanda.';
 export const ACCESIBILIDAD_TANDA_NO_ENCONTRADA =
   'No encontré esa tanda. Usa Volver para regresar a la lista de tandas.';
 export const TEXTO_TANDA_ARCHIVADA = 'Archivada · ya no aparto aportaciones';
+/** TalkBack al ver una tanda archivada (`02 §18`). */
+export const ACCESIBILIDAD_TANDA_ARCHIVADA =
+  'Archivada. Ya no aparto aportaciones futuras. Lo registrado se queda.';
 export const ETIQUETA_YA_LA_DI = 'Ya la di';
 /** TalkBack al registrar la aportación del día (`02 §18`). */
 export const PISTA_YA_LA_DI = 'Registra que diste tu aportación de esta ronda';

@@ -33,6 +33,7 @@ import {
   PISTA_VOLVER_DETALLE,
   PISTA_YA_LA_DI,
   ETIQUETA_YA_LA_DI,
+  ACCESIBILIDAD_TANDA_ARCHIVADA,
   ACCESIBILIDAD_TANDA_NO_ENCONTRADA,
   ERROR_NOMBRE_TANDA_VACIO,
   etiquetaEstadoRonda,
@@ -117,6 +118,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
             variante="secundario"
             tono="secundario"
             testID="tanda-archivada"
+            accessibilityLabel={ACCESIBILIDAD_TANDA_ARCHIVADA}
             accessibilityLiveRegion="polite"
           >
             {TEXTO_TANDA_ARCHIVADA}

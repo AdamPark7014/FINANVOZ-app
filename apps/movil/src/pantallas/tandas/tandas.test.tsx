@@ -346,6 +346,7 @@ describe('Tandas (02 §18)', () => {
     vista.unmount();
 
     renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tanda-archivada')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_TANDA_ARCHIVADA);
     expect(screen.getByTestId('tanda-archivada')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.queryByTestId('tanda-ya-la-di')).toBeNull();
   });

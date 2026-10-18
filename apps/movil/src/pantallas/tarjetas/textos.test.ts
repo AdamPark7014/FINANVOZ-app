@@ -3,6 +3,7 @@ import {
   ACCESIBILIDAD_TARJETA_NO_ENCONTRADA,
   etiquetaAccesibleDato,
   etiquetaAccesibleMovimientoTarjeta,
+  etiquetaAccesibleEstadoCuentaTarjeta,
   etiquetaAccesiblePlanMsi,
   etiquetaAccesibleBarraUsoTarjeta,
   etiquetaAccesibleUsoTarjeta,
@@ -83,6 +84,14 @@ describe('tarjetas/textos · TalkBack', () => {
   it('plan MSI describe cuota y cuotas restantes', () => {
     expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe(
       'Tele, $500.00 al mes, faltan 6 de 12',
+    );
+  });
+
+  it('estado de cuenta cerrado resume saldo, pagos y PNGI en palabras', () => {
+    expect(
+      etiquetaAccesibleEstadoCuentaTarjeta('10 nov', 450_000, 100_000, 350_000, '30 nov'),
+    ).toBe(
+      'Corte del 10 nov. Lo que debías el día de corte: cuatro mil quinientos pesos. Lo que ya pagaste desde entonces: mil pesos. Para no generar intereses: tres mil quinientos pesos. Fecha límite: 30 nov',
     );
   });
 });
