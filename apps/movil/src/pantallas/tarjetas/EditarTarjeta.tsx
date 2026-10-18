@@ -226,7 +226,12 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
           }
         }}
       />
-      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
+      <Boton
+        etiqueta={BTN_CANCELAR}
+        variante="texto"
+        alPresionar={alTerminar}
+        testID="corregir-cancelar"
+      />
     </View>
   );
 }

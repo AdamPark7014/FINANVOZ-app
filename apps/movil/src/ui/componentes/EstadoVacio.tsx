@@ -1,6 +1,9 @@
 import { Texto } from './Texto';
 
-/** Copy secundario cuando una sección no tiene filas (`02 §10`, `02 §11`). */
+/**
+ * Copy secundario cuando una sección no tiene filas (`02 §10`, `02 §11`).
+ * Convención es-MX: listas sin datos → «Todavía no…»; neutros → «No hay…» / «No debes…» en los `textos.ts` de cada pantalla.
+ */
 export function EstadoVacio({
   texto,
   testID,
