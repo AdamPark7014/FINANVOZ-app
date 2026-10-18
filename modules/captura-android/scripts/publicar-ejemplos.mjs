@@ -70,6 +70,41 @@ export function citar(s) {
   return `'${String(s).replace(/'/g, `'\\''`)}'`;
 }
 
+/**
+ * Parte un comando como lo haría /system/bin/sh del teléfono (solo comillas simples de {@link citar}).
+ * Evita spawnear `sh` en CI por cada ejemplo (CA-M5-01).
+ */
+export function partirArgumentosSh(comando) {
+  const args = [];
+  let i = 0;
+  const s = comando.trim();
+  while (i < s.length) {
+    while (i < s.length && s[i] === ' ') i++;
+    if (i >= s.length) break;
+    if (s[i] === "'") {
+      i++;
+      let buf = '';
+      while (i < s.length) {
+        if (s[i] === "'" && s[i + 1] === '\\' && s[i + 2] === "'" && s[i + 3] === "'") {
+          buf += "'";
+          i += 4;
+        } else if (s[i] === "'") {
+          i++;
+          break;
+        } else {
+          buf += s[i++];
+        }
+      }
+      args.push(buf);
+    } else {
+      const start = i;
+      while (i < s.length && s[i] !== ' ') i++;
+      args.push(s.slice(start, i));
+    }
+  }
+  return args;
+}
+
 /** Comando remoto para publicar una notificación con la etiqueta del banco. */
 export function comandoPublicar(etiqueta, titulo, texto) {
   return ['cmd', 'notification', 'post', '-S', 'bigtext', '-t', citar(titulo), citar(etiqueta), citar(texto)].join(

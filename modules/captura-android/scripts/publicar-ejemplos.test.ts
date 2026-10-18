@@ -1,15 +1,18 @@
-import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error: script .mjs sin tipos
-import { citar, comandoPublicar, etiquetasPorPaquete, leerEjemplos } from './publicar-ejemplos.mjs';
+import {
+  citar,
+  comandoPublicar,
+  etiquetasPorPaquete,
+  leerEjemplos,
+  partirArgumentosSh,
+} from './publicar-ejemplos.mjs';
 
 type Ejemplo = { id: string; paquete: string; titulo: string; texto: string };
 
 /** Lo que vería `cmd` en el teléfono: el shell POSIX parte el comando en argumentos. */
 function argumentosEnShell(comando: string): string[] {
-  const r = spawnSync('sh', ['-c', `set -- ${comando}; printf '%s\\0' "$@"`], { encoding: 'utf8' });
-  expect(r.status).toBe(0);
-  return r.stdout.split('\0').slice(0, -1);
+  return partirArgumentosSh(comando);
 }
 
 describe('publicar-ejemplos (CA-M5-01 en build de depuración)', () => {

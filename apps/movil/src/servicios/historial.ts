@@ -25,13 +25,14 @@ const TIPOS_CONSUMO = ['gasto', 'cuenta_dividida', 'ajuste_arqueo', 'reembolso']
  * hoy (0 días de historial). Así nunca se cuentan días incompletos como días de consumo bajo (regla 12).
  */
 export function inicioUso(ctx: Contexto): PlainDate {
-  const minimo = (soloSaldoInicial: boolean) =>
-    ctx.db
-      .select({ fecha: sql<string | null>`min(${transaccion.fecha})` })
-      .from(transaccion)
-      .where(soloSaldoInicial ? eq(transaccion.tipo, 'saldo_inicial') : sql`1 = 1`)
-      .get()?.fecha ?? null;
-  const primera = minimo(true) ?? minimo(false);
+  const fila = ctx.db
+    .select({
+      minSaldoInicial: sql<string | null>`min(case when ${transaccion.tipo} = 'saldo_inicial' then ${transaccion.fecha} end)`,
+      minCualquiera: sql<string | null>`min(${transaccion.fecha})`,
+    })
+    .from(transaccion)
+    .get();
+  const primera = fila?.minSaldoInicial ?? fila?.minCualquiera ?? null;
   return primera ? sumarDias(primera, 1) : ctx.reloj.hoy();
 }
 
