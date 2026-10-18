@@ -26,7 +26,14 @@ import { abrirPruebaPantalla, conEscenario, escenario, vector } from '../princip
 import { navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { apagarCapturaTrasRestaurar, reactivarCapturaPendiente } from '../../servicios/estado-captura';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from './ActivarCaptura';
-import { PERMISO_DENEGADO, TEXTO_CAPTURAS_POR_REVISAR_VACIO } from './textos';
+import {
+  BTN_NO_ES_MIA,
+  ETIQUETA_SALIDA_CUENTA,
+  ETIQUETA_CUENTA_EXTERNA,
+  PERMISO_DENEGADO,
+  TEXTO_CAPTURAS_POR_REVISAR_VACIO,
+  tituloSalidaSinPareja,
+} from './textos';
 
 const FIXTURES = join(__dirname, '../../../../../fixtures');
 const MINUTO = 60_000;

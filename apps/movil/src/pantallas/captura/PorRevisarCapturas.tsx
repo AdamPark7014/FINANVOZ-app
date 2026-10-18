@@ -19,11 +19,11 @@ import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { mensajeCompraMsi } from '../tarjetas/textos';
-import { MESES_CAPTURA } from './PreguntasCaptura';
 import {
   AVISO_SIN_TEXTO,
   ETIQUETA_SIN_CATEGORIA,
   INTRO_CAPTURAS_POR_REVISAR,
+  MESES_CAPTURA,
   TEXTO_CAPTURAS_POR_REVISAR_VACIO,
   TITULO_CAPTURAS_POR_REVISAR,
   TITULO_SIN_COMERCIO,

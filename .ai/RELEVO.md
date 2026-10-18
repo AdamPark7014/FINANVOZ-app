@@ -7,7 +7,7 @@
 ## Hecho en este turno
 
 - **ajustes:** título con `accessibilityRole="header"` y `testID="ajustes-titulo"`; aserción en `ajustes.test.tsx`.
-- **Chip:** TalkBack + `Chip.test.tsx` (commit previo en main).
+- **Chip / GrupoChips:** TalkBack en `e8a8368`, pruebas en `c6e1566`; `main` = `origin/main` (`c90d2cb`).
 
 ## Hecho (acumulado reciente)
 

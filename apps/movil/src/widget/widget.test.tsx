@@ -42,9 +42,9 @@ function textos(a: Arbol): string[] {
 describe('PreviaWidget (vista previa en Ajustes)', () => {
   it('muestra la misma línea de ejemplo que e4-01', () => {
     render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" />);
-    expect(screen.getByText('Hoy puedes')).toBeTruthy();
-    expect(screen.getByText('$214')).toBeTruthy();
-    expect(screen.getByText('· 4 días')).toBeTruthy();
+    expect(screen.getByText('Hoy puedes', { hidden: true })).toBeTruthy();
+    expect(screen.getByText('$214', { hidden: true })).toBeTruthy();
+    expect(screen.getByText('· 4 días', { hidden: true })).toBeTruthy();
   });
 
   it('anuncia una etiqueta hablada y oculta los textos internos para TalkBack', () => {
