@@ -6,27 +6,26 @@
 
 ## Hecho en este turno
 
-- **Suscripciones TalkBack:** auditoría estricta en vacío, header de sección en Cuentas, prueba de `etiquetaVacioSuscripciones` en `textos.test.ts`.
+- **CampoMonto / teclado numérico:** TalkBack usa `etiquetaCampoMonto` (`… en pesos` + monto en palabras); wiring en `CampoTexto.etiquetaAccesible`. Tests en `formato.test.ts` y `componentes.test.tsx`. Doc en `ui/README.md`.
 
 ## Hecho (acumulado reciente)
 
-- CTAs y filas Suscripciones (montos en palabras, `auditar`, botón Cuentas). Ver `git log`.
+- PreviaWidget, captura/onboarding headers, suscripciones TalkBack. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno en disco (`EstadoVacio`, `PantallaAyuda`) — no mezclar en commits de otra pantalla.
+- WIP paralelo: revisar `git status` antes de editar (onboarding/tarjetas/principal tests).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Paridad TalkBack CTAs tandas/compartidos desde Cuentas (pista + prueba).
+2. No mezclar commits a11y con WIP ajeno.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
-- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
