@@ -141,6 +141,11 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     );
     expect(screen.getByTestId('ajustes-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-colchon-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-captura-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_CAPTURA_NO_DISPONIBLE,
+    );
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityHint',
       'Abre el formulario para cambiar cuánto y cada cuándo te pagan',

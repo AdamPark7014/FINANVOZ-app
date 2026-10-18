@@ -152,6 +152,7 @@ export function PantallaMovimientos({
                   variante="secundario"
                   ancho="contenido"
                   alPresionar={() => alRevisar(f.id)}
+                  pista={PISTA_REVISAR_FRASE}
                   testID={`revisar-${f.id}`}
                 />
               ) : null}
@@ -159,10 +160,12 @@ export function PantallaMovimientos({
                 etiqueta="Descartar"
                 variante="texto"
                 ancho="contenido"
+                pista={PISTA_DESCARTAR_FRASE}
                 alPresionar={() => {
                   descartarPorInterpretar(ctx, f.id);
                   refrescar();
                 }}
+                testID={`descartar-${f.id}`}
               />
             </Tarjeta>
           ))}
@@ -186,6 +189,7 @@ export function PantallaMovimientos({
               variante="texto"
               ancho="contenido"
               alPresionar={alQuitarFiltro}
+              pista={PISTA_VER_TODOS_MOVIMIENTOS}
               testID="boton-quitar-filtro"
             />
           ) : null}

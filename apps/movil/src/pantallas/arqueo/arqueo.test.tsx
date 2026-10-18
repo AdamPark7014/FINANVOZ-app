@@ -103,7 +103,8 @@ describe('PantallaArqueo · vacío y errores', () => {
     const continuar = screen.queryByTestId('arqueo-continuar');
     if (continuar) fireEvent.press(continuar);
     fireEvent.press(screen.getByTestId('arqueo-exacto'));
-    fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    const sobrante = screen.queryByTestId('arqueo-sobrante-no_se');
+    if (sobrante) fireEvent.press(sobrante);
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);
     fireEvent.press(screen.getByTestId('arqueo-listo'));

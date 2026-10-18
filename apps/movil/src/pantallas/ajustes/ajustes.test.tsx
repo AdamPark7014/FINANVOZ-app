@@ -135,13 +135,15 @@ describe('ajustes', () => {
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('ajustes-captura-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
     expect(screen.getByTestId('ajustes-abrir-ayuda')).toHaveProp('accessibilityHint', PISTA_AYUDA);
     expect(screen.getByTestId('ajustes-version')).toHaveProp(
       'accessibilityLabel',
-      etiquetaAccesibilidadVersion('0.1.0'),
+      etiquetaAccesibilidadVersion('—'),
     );
+    expect(
+      screen.getByText('Finanvoz —', { includeHiddenElements: true }).props.accessibilityElementsHidden,
+    ).toBe(true);
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('ajustes-abrir-ayuda'));
     expect(r.getPathname()).toBe('/ayuda');

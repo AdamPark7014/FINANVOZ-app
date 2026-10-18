@@ -133,15 +133,30 @@ describe('02 §27 · Gastos con tu pareja', () => {
     expect(BTN_COMPARTIDOS_CUENTAS).toBe('Gastos con tu pareja');
   });
 
-  it('lista vacía muestra copy y testID', () => {
+  it('lista vacía: TalkBack título, vacío y Volver', () => {
     const servidor = servidorCompartidoFalso();
     const A = telefono(servidor, 'usuario-a');
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
     expect(screen.getByTestId('compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_CUENTAS);
     expect(screen.getByTestId('compartidos-vacio')).toHaveTextContent(TEXTO_COMPARTIDOS_VACIO);
     expect(screen.getByTestId('compartidos-vacio').props.accessibilityLabel).toBe(etiquetaVacioCompartidos());
-    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
     A.cerrar();
+  });
+
+  it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {
+    const p = abrirPruebaPantalla('2026-10-11');
+    const alAbrir = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirCompartidos={alAbrir} />,
+    );
+    expect(screen.getByTestId('seccion-compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
+    expect(screen.getByTestId('boton-compartidos').props.accessibilityLabel).toBe(BTN_COMPARTIDOS_CUENTAS);
+    fireEvent.press(screen.getByTestId('boton-compartidos'));
+    expect(alAbrir).toHaveBeenCalled();
+    p.cerrar();
   });
 
   it('CA-M16-03 · crear con alguien, escanear, agregar y saldar: los dos ven lo mismo', async () => {

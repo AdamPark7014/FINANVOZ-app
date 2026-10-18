@@ -77,7 +77,12 @@ export function SeccionCaptura() {
         </>
       ) : (
         <>
-          <Texto variante="cuerpo" tono="secundario" testID="ajustes-captura-estado">
+          <Texto
+            variante="cuerpo"
+            tono="secundario"
+            testID="ajustes-captura-estado"
+            accessibilityLabel={puente ? ETIQUETA_CAPTURA_APAGADA : ETIQUETA_CAPTURA_NO_DISPONIBLE}
+          >
             {puente ? ESTADO_APAGADA : ESTADO_NO_DISPONIBLE}
           </Texto>
           {puente ? (

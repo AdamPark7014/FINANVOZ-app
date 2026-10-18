@@ -111,6 +111,15 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId('tanda-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_DETALLE);
     expect(screen.getByTestId('tanda-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('tanda-me-toco')).toHaveProp('accessibilityHint', PISTA_ME_TOCO);
+    expect(screen.getByTestId('tanda-ya-la-di')).toHaveProp('accessibilityHint', PISTA_YA_LA_DI);
+  });
+
+  it('Ver calendario en la lista tiene pista TalkBack', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
+    expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp('accessibilityHint', PISTA_VER_CALENDARIO);
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {

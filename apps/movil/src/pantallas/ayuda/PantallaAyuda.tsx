@@ -137,13 +137,7 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         </Texto>
       </Pressable>
       {abierta ? (
-        <View
-          style={{ gap: espacio.s }}
-          testID={`ayuda-respuesta-${p.id}`}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={ETIQUETA_RESPUESTA}
-        >
+        <View style={{ gap: espacio.s }} testID={`ayuda-respuesta-${p.id}`}>
           {p.respuesta.map((parrafo) => (
             <Texto key={parrafo} variante="cuerpo">
               {parrafo}

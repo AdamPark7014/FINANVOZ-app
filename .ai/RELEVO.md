@@ -6,26 +6,28 @@
 
 ## Hecho en este turno
 
-- **Chip / Movimientos / principal (TalkBack):** pruebas de `Chip.test` alineadas con `accessibilityState` y `hitSlop`; `principal.test` cubre título, días, filtro activo, vacíos con `liveRegion` y filas habladas.
+- **Suscripciones + O5 pagos fijos (TalkBack):** encabezado por fila, `alert` en error, vacío `EstadoVacio`, auditoría E14; O5 pistas y fila agregada en palabras — `PantallaSuscripciones.tsx`, `pagos-fijos.tsx`, `suscripciones.test.tsx`, `onboarding.test.tsx` (`4b1b5c5`, `f744751`, `600fe8a`).
+- **Arqueo efectivo TalkBack/copy:** `arqueo/textos.ts`, `PantallaArqueo`, tests (`682a231`, `4ef5253`).
 
 ## Hecho (acumulado reciente)
 
-- Captura, suscripciones, widget, Hoy/Cuentas a11y. Ver `git log`.
+- Me alcanza, tandas, suscripciones, Hoy CTAs. Ver `git log` (`a36fc17`).
 
 ## A medias — CUIDADO
 
-- WIP ajeno en móvil (`git status`) — no mezclar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP ajeno en working tree — no mezclar sin revisar `git status`.
+- CA-M6-05 probabilidad: intermitente en local.
+- M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Video flujo divulgación → captura para Play (`08 §3.1`).
+2. Cerrar WIP paralelo en commits pequeños.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) literal.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
