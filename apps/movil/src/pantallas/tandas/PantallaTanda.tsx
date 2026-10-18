@@ -24,6 +24,8 @@ import {
   ETIQUETA_NOMBRE,
   ETIQUETA_VOLVER,
   PISTA_ARCHIVAR_TANDA,
+  PISTA_CANCELAR_ARCHIVAR,
+  PISTA_CANCELAR_EDICION,
   PISTA_CONFIRMAR_ARCHIVAR,
   PISTA_EDITAR_NOMBRE_CUENTA,
   PISTA_GUARDAR_CAMBIOS,
@@ -111,7 +113,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
           {d.nombre}
         </Texto>
         {!d.activa ? (
-          <Texto variante="secundario" tono="secundario" testID="tanda-archivada">
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="tanda-archivada"
+            accessibilityLiveRegion="polite"
+          >
             {TEXTO_TANDA_ARCHIVADA}
           </Texto>
         ) : null}
@@ -250,6 +257,7 @@ function Ajustes({
           etiqueta={ETIQUETA_CANCELAR}
           variante="texto"
           alPresionar={() => setArchivando(false)}
+          pista={PISTA_CANCELAR_ARCHIVAR}
         />
         {error ? <MensajeError texto={error} /> : null}
       </Tarjeta>

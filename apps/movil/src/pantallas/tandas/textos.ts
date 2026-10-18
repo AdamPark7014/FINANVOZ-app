@@ -39,7 +39,17 @@ export const ETIQUETA_YA_TE_TOCO = '¿Ya te tocó?';
 export const SUFIJO_RONDAS_NO_APARTO = 'Esas rondas no las vuelvo a apartar.';
 export const ETIQUETA_GUARDAR_TANDA = 'Guardar tanda';
 /** TalkBack al guardar una tanda nueva (`02 §18`). */
+export const PISTA_GUARDAR_TANDA = 'Guarda la tanda y aparto cada aportación el día que toca';
+/** TalkBack al guardar una tanda nueva (`02 §18`). */
 export const PISTA_GUARDAR_TANDA = 'Guarda la tanda con los datos que escribiste';
+/** TalkBack al cerrar el formulario sin guardar (`02 §18`). */
+export const PISTA_CANCELAR_FORMULARIO = 'Cierra el formulario sin guardar la tanda';
+/** TalkBack al salir del flujo de cobro sin registrar (`02 §18`). */
+export const PISTA_CANCELAR_COBRO = 'Cierra sin registrar el cobro';
+/** TalkBack al cerrar edición sin guardar (`02 §18`). */
+export const PISTA_CANCELAR_EDICION = 'Cierra la edición sin guardar cambios';
+/** TalkBack al volver del diálogo de archivar (`02 §18`). */
+export const PISTA_CANCELAR_ARCHIVAR = 'Vuelve al detalle sin archivar';
 
 export const OPCIONES_SI_NO = [
   { valor: 'si' as const, etiqueta: 'Sí' },
