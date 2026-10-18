@@ -1,3 +1,4 @@
+/** API pública de copy y a11y de respaldo (`02 §19`). */
 export {
   ACCESIBILIDAD_VOLVER,
   ACCESIBILIDAD_VOLVER_RESTAURAR,
