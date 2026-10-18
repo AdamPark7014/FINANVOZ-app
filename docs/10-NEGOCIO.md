@@ -96,6 +96,8 @@ Ventas, gastos por categoría, impuestos pagados, retiros del dueño y **utilida
 }
 ```
 
+> **Tip lectura (`config/fiscal/`):** centavos y puntos base en el JSON; `"POR_DEFINIR"` bloquea `validarConfigFiscal` hasta que un contador llene esos campos; la app solo calcula con `estado: "validado"`. Detalle, validación y SHA-256 para Decisiones (hash no lo revisa el cargador): `config/fiscal/README.md`.
+
 - La UMA diaria de 2026 ($117.31) y el valor anual que de ella resulta ($42,794.64) se confirman con el INEGI antes de M12. Una fuente secundaria publicó $43,794.64 y, con eso, un tope de 5 UMA de $218,973. Es la razón por la que ningún valor fiscal se escribe en código ni se toma de blogs sin validar.
 - Retenciones de plataformas digitales: las tasas cambiaron en 2026 (por ejemplo, la retención de ISR a vendedores en plataformas sube de 1 % a 2.5 % según la prensa especializada). La app no calcula esas retenciones: el usuario las registra o las importa del CFDI de retenciones que le da la plataforma, y E15 las acredita.
 

@@ -1,7 +1,8 @@
-import type { Centavos, DiaSemana, ModoFinDeSemana, PlainDate, Regla } from '@cartera/core';
+import type { Centavos, ModoFinDeSemana, PlainDate } from '@cartera/core';
 import { proximoPago, type VistaAjustes } from '../../servicios';
-import { OPCIONES_DIA_SEMANA, type FinDeSemana, type Frecuencia } from '../onboarding/ingreso';
+import { type FinDeSemana, type Frecuencia } from '../onboarding/ingreso';
 import {
+  fraseCuandoTePagan,
   lineaResumenIngreso,
   mensajeIngresoGuardado,
   RESUMEN_INGRESO_VARIABLE,
@@ -73,34 +74,11 @@ export function valoresDeIngreso(vista: VistaIngreso, hoy: PlainDate): ValoresIn
   }
 }
 
-function nombreDia(dia: DiaSemana): string {
-  return (OPCIONES_DIA_SEMANA.find((o) => o.valor === dia)?.etiqueta ?? '').toLowerCase();
-}
-
-function cuando(regla: Regla): string {
-  switch (regla.tipo) {
-    case 'quincenal_15_ultimo':
-      return 'cada quincena, el 15 y el último día del mes';
-    case 'quincenal_dias':
-      return `los días ${regla.dias[0]} y ${regla.dias[1]} de cada mes`;
-    case 'semanal':
-      return `cada ${nombreDia(regla.dia_semana)}`;
-    case 'catorcenal':
-      return 'cada 14 días';
-    case 'mensual':
-      return `cada mes, el día ${regla.dia}`;
-    case 'anual':
-      return 'una vez al año';
-    case 'unica':
-      return 'una sola vez';
-  }
-}
-
 /** "Te pagan $13,000 cada quincena, el 15 y el último día del mes. Tu próximo pago: jue 15." */
 export function resumenIngreso(vista: VistaIngreso, hoy: PlainDate): string {
   if (vista.ingresoVariable) return RESUMEN_INGRESO_VARIABLE;
   const ingreso = vista.ingreso;
   if (!ingreso) return RESUMEN_SIN_INGRESO;
   const proximo = proximoPago(ingreso.regla, hoy);
-  return lineaResumenIngreso(ingreso.monto, cuando(ingreso.regla), proximo);
+  return lineaResumenIngreso(ingreso.monto, fraseCuandoTePagan(ingreso.regla), proximo);
 }

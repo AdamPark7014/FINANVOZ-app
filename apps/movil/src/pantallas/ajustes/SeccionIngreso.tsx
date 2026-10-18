@@ -10,7 +10,7 @@ import {
 } from './ingreso-textos';
 import { resumenIngreso } from './ingreso';
 
-/** Ajustes ? Ingreso (`02 ?12`): cu?nto y cada cu?ndo te pagan, en palabras; "Cambiar" abre la edici?n. */
+/** Ajustes › Ingreso (`02 §12`): cuánto y cada cuándo te pagan, en palabras; "Cambiar" abre la edición. */
 export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
   const { ctx } = useSesion();
   const vista = useVista(obtenerAjustes);

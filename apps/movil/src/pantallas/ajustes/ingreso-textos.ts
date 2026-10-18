@@ -1,6 +1,7 @@
-import type { Centavos, PlainDate } from '@cartera/core';
+import type { Centavos, DiaSemana, PlainDate, Regla } from '@cartera/core';
 import { etiquetaFecha } from '../../servicios';
 import { formatearCentavos } from '../../ui';
+import { OPCIONES_DIA_SEMANA } from '../onboarding/ingreso';
 
 /** Redacción Ajustes › Ingreso (`02 §3`, `02 §12`, `02 §14`): tuteo; montos y fechas vienen de `servicios/` y `ui/`. */
 
@@ -32,6 +33,30 @@ export const ETIQUETA_PROXIMO_PAGO = 'Tu próximo pago';
 
 export const RESUMEN_SIN_INGRESO = 'Todavía no me dices cada cuándo te pagan.';
 export const RESUMEN_INGRESO_VARIABLE = 'Tu ingreso varía: reparto tu dinero libre en 30 días.';
+
+function nombreDia(dia: DiaSemana): string {
+  return (OPCIONES_DIA_SEMANA.find((o) => o.valor === dia)?.etiqueta ?? '').toLowerCase();
+}
+
+/** Fragmento "cada quincena…", "cada viernes", etc., para el resumen de Ajustes › Ingreso. */
+export function fraseCuandoTePagan(regla: Regla): string {
+  switch (regla.tipo) {
+    case 'quincenal_15_ultimo':
+      return 'cada quincena, el 15 y el último día del mes';
+    case 'quincenal_dias':
+      return `los días ${regla.dias[0]} y ${regla.dias[1]} de cada mes`;
+    case 'semanal':
+      return `cada ${nombreDia(regla.dia_semana)}`;
+    case 'catorcenal':
+      return 'cada 14 días';
+    case 'mensual':
+      return `cada mes, el día ${regla.dia}`;
+    case 'anual':
+      return 'una vez al año';
+    case 'unica':
+      return 'una sola vez';
+  }
+}
 
 export function lineaResumenIngreso(monto: Centavos, cuando: string, proximo: PlainDate | null): string {
   const frase = `Te pagan ${formatearCentavos(monto)} ${cuando}.`;

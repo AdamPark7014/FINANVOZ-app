@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { listarTandas, type TandaCreada } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Boton, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, Pantalla, Tarjeta, Texto } from '../../ui';
 import { FormularioTanda } from './FormularioTanda';
-import { TEXTO_TANDAS_VACIO, textoEnRiesgo } from './textos';
+import {
+  ETIQUETA_NUEVA_TANDA,
+  ETIQUETA_VER_CALENDARIO,
+  ETIQUETA_VOLVER,
+  TEXTO_TANDAS_VACIO,
+  TITULO_TANDAS,
+  textoEnRiesgo,
+  textoSubtituloListaConProxima,
+  textoSubtituloListaSinProxima,
+} from './textos';
 
 /**
  * Cuentas → Tandas (`02 §18`, gratis): tus tandas con su próxima aportación y lo que arriesgas, y "Nueva tanda"
@@ -24,7 +33,7 @@ export function PantallaTandas({
     <Pantalla testID="pantalla-tandas" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
         testID="tandas-volver"
-        etiqueta="Volver"
+        etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}

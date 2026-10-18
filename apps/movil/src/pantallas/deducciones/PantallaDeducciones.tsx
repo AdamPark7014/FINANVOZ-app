@@ -187,10 +187,10 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
       {v.ocultas.length > 0 ? (
         <View style={{ gap: espacio.s }}>
           <Texto variante="subtitulo" testID="deducciones-ocultas-titulo">
-            Importadas por error
+            {TITULO_FACTURAS_OCULTAS}
           </Texto>
-          <Texto variante="secundario" tono="secundario">
-            No cuentan en tu estimación. Puedes volver a mostrarlas.
+          <Texto variante="secundario" tono="secundario" testID="deducciones-ocultas-ayuda">
+            {TEXTO_FACTURAS_OCULTAS}
           </Texto>
           {v.ocultas.map((f) => (
             <FilaFacturaOculta key={f.uuid} f={f} />
@@ -201,7 +201,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
       {v.estado !== 'sin_perfil' && !editando ? (
         <Boton
           testID="deducciones-editar-perfil"
-          etiqueta="Cambiar mi RFC o mis ingresos"
+          etiqueta={BTN_CAMBIAR_PERFIL}
           variante="texto"
           ancho="contenido"
           alPresionar={() => setEditando(true)}

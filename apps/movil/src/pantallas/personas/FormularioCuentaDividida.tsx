@@ -81,11 +81,11 @@ export function FormularioCuentaDividida({
   const reparto = repartoCuentaDividida(total, partes);
 
   const faltante = (): string | null => {
-    if (total === null || total <= 0) return 'Escribe cuánto fue en total.';
-    if (!reparto) return 'El total no alcanza para repartirlo entre todos.';
+    if (total === null || total <= 0) return ERROR_DIVISION_TOTAL;
+    if (!reparto) return ERROR_DIVISION_REPARTO;
     if (elegidas.length !== ajenas) return textoFaltanPersonas(ajenas, elegidas.length);
-    if (!categoria) return 'Elige una categoría.';
-    if (!origenId) return '¿Con qué pagaste?';
+    if (!categoria) return ERROR_DIVISION_CATEGORIA;
+    if (!origenId) return ERROR_DIVISION_ORIGEN;
     return null;
   };
   const pendiente = faltante();

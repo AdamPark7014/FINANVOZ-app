@@ -22,6 +22,7 @@ import {
   MENSAJE_PERMISO_AVISOS,
   mensajeRecordatorioCobro,
   mensajeRegistroCobro,
+  TEXTO_CONTACTOS_VACIO,
   TEXTO_MOVIMIENTOS_PERSONA_VACIO,
   TEXTO_PERSONA_NO_ENCONTRADA,
   TIP_SALDO_TE_DEBEN,
@@ -304,27 +305,28 @@ describe('estados vacíos (es-MX)', () => {
   it('persona inexistente', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
-    expect(screen.getByText(TEXTO_PERSONA_NO_ENCONTRADA)).toBeTruthy();
+    expect(textoDe('persona-no-encontrada')).toBe(TEXTO_PERSONA_NO_ENCONTRADA);
+    expect(screen.getByTestId('persona-volver')).toBeTruthy();
   });
 
   it('sin movimientos lo explica', () => {
     const p = conEscenario('e4-01');
     const pepe = crearPersona(p.ctx, { nombre: 'Pepe' });
     renderConSesion(p.ctx, <PantallaPersona personaId={pepe} alVolver={jest.fn()} />);
-    expect(screen.getByText(TEXTO_MOVIMIENTOS_PERSONA_VACIO)).toBeTruthy();
+    expect(textoDe('persona-movimientos-vacio')).toBe(TEXTO_MOVIMIENTOS_PERSONA_VACIO);
   });
 
   it('con saldo a favor muestra el tip de dinero libre', () => {
     const p = conAmigos();
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
-    expect(screen.getByText(TIP_SALDO_TE_DEBEN)).toBeTruthy();
+    expect(textoDe('persona-tip-te-deben')).toBe(TIP_SALDO_TE_DEBEN);
   });
 
   it('cuenta dividida sin contactos', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <FormularioCuentaDividida alGuardar={jest.fn()} />);
-    expect(screen.getByTestId('division-contactos-vacio')).toBeTruthy();
+    expect(textoDe('division-contactos-vacio')).toBe(TEXTO_CONTACTOS_VACIO);
   });
 });
 

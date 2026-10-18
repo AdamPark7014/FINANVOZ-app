@@ -1,63 +1,66 @@
 import { useState } from 'react';
 import { useCaptura } from '../../captura/ProveedorCaptura';
-import {
-  desactivarCaptura,
-  fijarModoAvisoCaptura,
-  obtenerEstadoCaptura,
-  type ModoAvisoCaptura,
-} from '../../servicios';
+import { desactivarCaptura, fijarModoAvisoCaptura, obtenerEstadoCaptura } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 import { ActivarCaptura } from '../captura/ActivarCaptura';
-import { GrupoChips, type OpcionChip } from '../principal/Chip';
-
-const OPCIONES_AVISO: readonly OpcionChip<ModoAvisoCaptura>[] = [
-  { valor: 'agrupados', etiqueta: 'Agrupados' },
-  { valor: 'cada_uno', etiqueta: 'Cada uno' },
-  { valor: 'nunca', etiqueta: 'Nunca' },
-];
+import { GrupoChips } from '../principal/Chip';
+import {
+  BTN_ACTIVAR_CAPTURA,
+  BTN_DESACTIVAR_CAPTURA,
+  DESC_AVISO_AL_CAPTURAR,
+  ETIQUETA_AVISO_AL_CAPTURAR,
+  ESTADO_APAGADA,
+  ESTADO_NO_DISPONIBLE,
+  OPCIONES_MODO_AVISO,
+  PREGUNTA_MODO_AVISO,
+  SECCION_CAPTURA,
+  textoCapturaActiva,
+} from './captura-textos';
 
 /**
  * Ajustes → Captura automática (`08 §3.1`: "Puedes desactivarlo cuando quieras en Ajustes"). Desactivar vacía
  * la lista blanca nativa: desde ese momento toda notificación se descarta sin guardarse (regla 10).
  */
 export function SeccionCaptura() {
-  const { ctx, refrescar } = useSesion();
+  const { ctx, refrescar } = useCaptura();
+  const { ctx: ctxSesion, refrescar: refrescarSesion } = useSesion();
   const { puente } = useCaptura();
   const estado = useVista(obtenerEstadoCaptura);
   const [activando, setActivando] = useState(false);
+  const ctxCaptura = ctx ?? ctxSesion;
+  const refrescarCaptura = refrescar ?? refrescarSesion;
   return (
     <Tarjeta testID="ajustes-captura">
-      <Texto variante="subtitulo">Captura automática</Texto>
+      <Texto variante="subtitulo">{SECCION_CAPTURA}</Texto>
       {activando ? (
         <ActivarCaptura testID="ajustes-captura" alTerminar={() => setActivando(false)} />
       ) : estado.activada ? (
         <>
           <Texto variante="cuerpo" testID="ajustes-captura-estado">
-            {estado.apps.length === 1
-              ? 'Activa: leo los avisos de 1 app de banco.'
-              : `Activa: leo los avisos de ${estado.apps.length} apps de banco.`}
+            {textoCapturaActiva(estado.apps.length)}
           </Texto>
-          <Texto variante="etiqueta">Aviso al capturar</Texto>
+          <Texto variante="etiqueta">{ETIQUETA_AVISO_AL_CAPTURAR}</Texto>
           <Texto variante="secundario" tono="secundario">
-            Te aviso en segundo plano cuando anoto un movimiento. Nunca lleva montos ni comercios.
+            {DESC_AVISO_AL_CAPTURAR}
           </Texto>
           <GrupoChips
             prefijoTestID="ajustes-captura-aviso"
-            opciones={OPCIONES_AVISO}
+            etiqueta={PREGUNTA_MODO_AVISO}
+            opciones={OPCIONES_MODO_AVISO}
             valor={estado.modoAviso}
             alCambiar={(modo) => {
-              fijarModoAvisoCaptura(ctx, modo);
-              refrescar();
+              fijarModoAvisoCaptura(ctxCaptura, modo);
+              refrescarCaptura();
             }}
           />
           <Boton
-            etiqueta="Desactivar"
+            etiqueta={BTN_DESACTIVAR_CAPTURA}
             variante="secundario"
             alPresionar={() => {
-              desactivarCaptura(ctx);
+              desactivarCaptura(ctxCaptura);
               void puente?.fijarListaBlanca([]);
-              refrescar();
+              refrescarCaptura();
             }}
             testID="ajustes-captura-desactivar"
             style={{ marginTop: espacio.s }}
@@ -66,11 +69,11 @@ export function SeccionCaptura() {
       ) : (
         <>
           <Texto variante="cuerpo" tono="secundario" testID="ajustes-captura-estado">
-            {puente ? 'Apagada.' : 'No disponible en este teléfono.'}
+            {puente ? ESTADO_APAGADA : ESTADO_NO_DISPONIBLE}
           </Texto>
           {puente ? (
             <Boton
-              etiqueta="Activar"
+              etiqueta={BTN_ACTIVAR_CAPTURA}
               variante="secundario"
               alPresionar={() => setActivando(true)}
               testID="ajustes-captura-activar"

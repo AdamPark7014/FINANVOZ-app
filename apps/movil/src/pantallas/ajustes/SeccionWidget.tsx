@@ -59,7 +59,8 @@ export function SeccionWidget() {
             setError(true);
           }
         }}
-      />
+        />
+      </View>
       {error ? (
         <Texto
           variante="secundario"

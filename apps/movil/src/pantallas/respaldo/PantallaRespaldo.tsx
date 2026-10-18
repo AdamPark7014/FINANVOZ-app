@@ -168,7 +168,7 @@ function TarjetaNube({
     // El usuario del proxy cambió (anónimo nuevo): las compras de Plus pasan a él (pendiente 58).
     await reidentificar();
     await leerCuenta();
-    setMensaje({ texto: 'Listo: borré tu cuenta de respaldo y tus respaldos de la nube.', error: false });
+    setMensaje({ texto: MENSAJE_BORRAR_CUENTA_OK, error: false });
   };
 
   const fijar = (cambios: Parameters<typeof fijarRespaldoAutomatico>[1]) => {
@@ -176,7 +176,7 @@ function TarjetaNube({
       fijarRespaldoAutomatico(ctx, cambios);
       refrescar();
     } catch {
-      setMensaje({ texto: 'No pude guardar el cambio. Intenta de nuevo.', error: true });
+      setMensaje({ texto: MENSAJE_NO_GUARDAR_AJUSTE, error: true });
     }
   };
 
@@ -184,7 +184,7 @@ function TarjetaNube({
 
   return (
     <Tarjeta testID="respaldo-nube">
-      <Texto variante="subtitulo">En la nube</Texto>
+      <Texto variante="subtitulo">{SUBTITULO_NUBE}</Texto>
       <Texto variante="cuerpo" testID="respaldo-ultimo">
         {vista.textoUltimo}
       </Texto>
