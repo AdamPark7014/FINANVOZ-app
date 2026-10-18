@@ -184,6 +184,31 @@ describe('Tandas (02 §18)', () => {
     expect(t).toMatchObject({ posicion: -200_000, cobrada: true, aportacionesHechas: 6 });
   });
 
+  it('editar y archivar desde el detalle: cambia nombre y cuenta y quita la tanda de la lista', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-10-16');
+    const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
+    const alVolver = jest.fn();
+    const vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={alVolver} />);
+
+    fireEvent.press(screen.getByTestId('tanda-editar-abrir'));
+    fireEvent.changeText(screen.getByTestId('tanda-editar-nombre'), 'Tanda vecinos');
+    fireEvent.press(screen.getByTestId(`tanda-editar-cuenta-${p.efectivo}`));
+    fireEvent.press(screen.getByTestId('tanda-editar-guardar'));
+    expect(detalleTanda(p.ctx, tandaId).nombre).toBe('Tanda vecinos');
+    expect(detalleTanda(p.ctx, tandaId).cuentaOrigenId).toBe(p.efectivo);
+
+    fireEvent.press(screen.getByTestId('tanda-archivar-abrir'));
+    fireEvent.press(screen.getByTestId('tanda-archivar-confirmar'));
+    expect(listarTandas(p.ctx)).toEqual([]);
+    expect(alVolver).toHaveBeenCalled();
+    vista.unmount();
+
+    renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tanda-archivada')).toBeTruthy();
+    expect(screen.queryByTestId('tanda-ya-la-di')).toBeNull();
+  });
+
   it('TK01 · la frase dictada abre el formulario prellenado y "Guardar tanda" la crea', async () => {
     const p = preparar('2026-10-11');
     const caso = golden('TK01');

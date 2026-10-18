@@ -31,7 +31,7 @@ import { registrarSaldoInicial } from './onboarding';
 import { escribirAjuste, leerAjuste } from './preferencias';
 import { insertarProgramado, programadoPorId, validarRegla } from './programados';
 
-const { tanda, ocurrencia, transaccion, asiento } = esquema;
+const { tanda, ocurrencia, transaccion, asiento, programado, cuenta } = esquema;
 
 /** "Cada cuándo" del formulario (`02 §18`); la regla sale de la primera fecha. */
 export const FRECUENCIAS_TANDA = ['semanal', 'quincenal', 'catorcenal', 'mensual'] as const;
@@ -290,6 +290,17 @@ function filaTanda(ctx: Contexto, tandaId: string): FilaTanda {
   return f;
 }
 
+function exigirTandaActiva(t: FilaTanda): void {
+  if (t.activa !== 1) throw new ErrorDominio('tanda_archivada', 'esa tanda está archivada');
+}
+
+/** Solo nombre y cuenta de aportación; el monto de la ronda no se edita. */
+export const EditarTanda = z.strictObject({
+  nombre: z.string().trim().min(1).max(80).optional(),
+  cuentaId: z.string().min(1).nullable().optional(),
+});
+export type EditarTanda = z.input<typeof EditarTanda>;
+
 function tandasActivas(ctx: Contexto): FilaTanda[] {
   return ctx.db
     .select()
@@ -297,6 +308,32 @@ function tandasActivas(ctx: Contexto): FilaTanda[] {
     .where(eq(tanda.activa, 1))
     .orderBy(asc(tanda.inicio), asc(tanda.id))
     .all();
+}
+
+/** Ocurrencias del programado de la tanda; si está archivada el programado ya no está activo. */
+function ocurrenciasTanda(ctx: Contexto, t: FilaTanda): OcurrenciaVista[] {
+  if (t.activa === 1) return listarOcurrencias(ctx, { programadoId: t.programadoId });
+  const p = programadoPorId(ctx, t.programadoId);
+  return ctx.db
+    .select()
+    .from(ocurrencia)
+    .where(eq(ocurrencia.programadoId, t.programadoId))
+    .orderBy(asc(ocurrencia.fecha))
+    .all()
+    .map((o) => ({
+      programadoId: o.programadoId,
+      fecha: o.fecha,
+      estado: o.estado,
+      tipo: p.tipo,
+      concepto: p.concepto,
+      monto: p.monto,
+      cuentaId: p.cuentaId,
+      categoriaCuentaId: p.categoriaCuentaId,
+      tarjetaId: p.tarjetaId,
+      variable: p.variable,
+      defineHorizonte: p.defineHorizonte,
+      transaccionId: o.transaccionId,
+    }));
 }
 
 /** Ids de los programados que son aportaciones de una tanda (Hoy les pone su propia tarjeta). */
@@ -390,6 +427,7 @@ export interface TandaVista {
 }
 
 export interface DetalleTanda extends TandaVista {
+  readonly activa: boolean;
   readonly rondas: readonly RondaTandaVista[];
   readonly cuentaId: string;
   /** Cuenta de donde sale la aportación, si la eligió. */
@@ -428,15 +466,13 @@ function vistaTanda(ctx: Contexto, t: FilaTanda, ocurrencias: readonly Ocurrenci
 
 /** Tandas activas, por fecha de inicio. */
 export function listarTandas(ctx: Contexto): TandaVista[] {
-  return tandasActivas(ctx).map((t) =>
-    vistaTanda(ctx, t, listarOcurrencias(ctx, { programadoId: t.programadoId })),
-  );
+  return tandasActivas(ctx).map((t) => vistaTanda(ctx, t, ocurrenciasTanda(ctx, t)));
 }
 
 /** Detalle (`02 §18`): calendario con tu ronda marcada, lo aportado, el dinero en riesgo y lo que falta. */
 export function detalleTanda(ctx: Contexto, tandaId: string): DetalleTanda {
   const t = filaTanda(ctx, tandaId);
-  const ocurrencias = listarOcurrencias(ctx, { programadoId: t.programadoId });
+  const ocurrencias = ocurrenciasTanda(ctx, t);
   const regla = validarRegla(JSON.parse(t.regla));
   const c = calendarioTanda(
     { aportacion: t.aportacion, participantes: t.participantes, turno: t.turno, regla, inicio: t.inicio },
@@ -445,6 +481,7 @@ export function detalleTanda(ctx: Contexto, tandaId: string): DetalleTanda {
   const estado = new Map(ocurrencias.map((o) => [o.fecha, o.estado]));
   return {
     ...vistaTanda(ctx, t, ocurrencias),
+    activa: t.activa === 1,
     cuentaId: t.cuentaId,
     cuentaOrigenId: programadoPorId(ctx, t.programadoId).cuentaId,
     rondas: c.posiciones.map((p) => ({
@@ -457,6 +494,59 @@ export function detalleTanda(ctx: Contexto, tandaId: string): DetalleTanda {
       porAportar: p.porAportar,
     })),
   };
+}
+
+/**
+ * Archiva la tanda: deja de aparecer en la lista, desactiva el programado de aportaciones y marca como omitidas
+ * las rondas pendientes (el historial en el libro no cambia).
+ */
+export function archivarTanda(ctx: Contexto, tandaId: string): void {
+  exigirConsentimiento(ctx);
+  enTransaccion(ctx, () => {
+    const t = filaTanda(ctx, tandaId);
+    if (t.activa !== 1) return;
+    ctx.db.update(tanda).set({ activa: 0 }).where(eq(tanda.id, tandaId)).run();
+    ctx.db.update(programado).set({ activo: 0 }).where(eq(programado.id, t.programadoId)).run();
+    ctx.db
+      .update(ocurrencia)
+      .set({ estado: 'omitida' })
+      .where(and(eq(ocurrencia.programadoId, t.programadoId), eq(ocurrencia.estado, 'pendiente')))
+      .run();
+  });
+}
+
+/** Cambia el nombre visible y la cuenta de donde sale la aportación (no el monto). */
+export function editarTanda(ctx: Contexto, tandaId: string, cambios: EditarTanda): void {
+  exigirConsentimiento(ctx);
+  const parsed = EditarTanda.safeParse(cambios);
+  if (!parsed.success) throw new ErrorDominio('tanda_invalida', 'revisa los datos de la tanda');
+  const { nombre, cuentaId } = parsed.data;
+  if (nombre === undefined && cuentaId === undefined) return;
+  enTransaccion(ctx, () => {
+    const t = filaTanda(ctx, tandaId);
+    exigirTandaActiva(t);
+    if (cuentaId !== undefined && cuentaId !== null) {
+      const origen = cuentaPorId(ctx, cuentaId);
+      if (origen.liquida !== 1)
+        throw new ErrorDominio('tanda_invalida', 'la aportación sale de una cuenta líquida');
+    }
+    if (nombre !== undefined) {
+      ctx.db.update(tanda).set({ nombre }).where(eq(tanda.id, tandaId)).run();
+      ctx.db.update(cuenta).set({ nombre }).where(eq(cuenta.id, t.cuentaId)).run();
+      ctx.db
+        .update(programado)
+        .set({ concepto: nombre })
+        .where(eq(programado.id, t.programadoId))
+        .run();
+    }
+    if (cuentaId !== undefined) {
+      ctx.db
+        .update(programado)
+        .set({ cuentaId })
+        .where(eq(programado.id, t.programadoId))
+        .run();
+    }
+  });
 }
 
 export interface MovimientoTanda {
@@ -524,6 +614,7 @@ export function aportarTanda(
   exigirConsentimiento(ctx);
   return enTransaccion(ctx, () => {
     const t = filaTanda(ctx, e.tandaId);
+    exigirTandaActiva(t);
     const p = programadoPorId(ctx, t.programadoId);
     const cuentaId = exigirCuenta(e.cuentaId ?? p.cuentaId, '¿de qué cuenta salió?');
     if (e.fecha !== undefined) {
@@ -586,6 +677,7 @@ export function cobrarTanda(
   exigirConsentimiento(ctx);
   return enTransaccion(ctx, () => {
     const t = filaTanda(ctx, e.tandaId);
+    exigirTandaActiva(t);
     const cuentaId = exigirCuenta(e.cuentaId, '¿a qué cuenta llegó?');
     const monto = e.monto ?? t.aportacion * t.participantes;
     const fecha = e.fecha ?? ctx.reloj.hoy();
