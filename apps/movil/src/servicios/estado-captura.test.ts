@@ -4,7 +4,9 @@ import {
   activarCaptura,
   apagarCapturaTrasRestaurar,
   desactivarCaptura,
+  fijarModoAvisoCaptura,
   obtenerEstadoCaptura,
+  obtenerModoAvisoCaptura,
   reactivarCapturaPendiente,
   registrarSenalesCaptura,
 } from './estado-captura';
@@ -21,6 +23,17 @@ function conCapturaActiva() {
   });
   return p;
 }
+
+describe('modo de aviso al capturar (pendiente 16)', () => {
+  it('por omisión es agrupados y la vista lo expone', () => {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    expect(obtenerModoAvisoCaptura(p.ctx)).toBe('agrupados');
+    expect(obtenerEstadoCaptura(p.ctx).modoAviso).toBe('agrupados');
+    fijarModoAvisoCaptura(p.ctx, 'cada_uno');
+    expect(obtenerEstadoCaptura(p.ctx).modoAviso).toBe('cada_uno');
+  });
+});
 
 describe('captura tras restaurar un respaldo (pendiente 47)', () => {
   it('apaga la captura, olvida las señales del teléfono anterior y deja la marca de reactivar', () => {

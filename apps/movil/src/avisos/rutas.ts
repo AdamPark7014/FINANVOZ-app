@@ -41,6 +41,8 @@ export function rutaDeAviso(id: string): string {
       return '/respaldo';
     case 'me-alcanza:':
       return '/me-alcanza';
+    case 'captura:':
+      return '/movimientos';
     default:
       return RUTA_HOY;
   }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { crearAnaliticaExpo } from '../src/analitica/expo';
 import { ProveedorCaptura } from '../src/captura/ProveedorCaptura';
+import { SincronizarCaptura } from '../src/captura/SincronizarCaptura';
 import { puenteCaptura } from '../src/captura/puente';
 import { sha256Expo } from '../src/captura/sha256Expo';
 import { dependenciasCompartidoExpo } from '../src/compartido/expo';
@@ -214,6 +215,8 @@ function AppProtegida({
           conectividad={conectividadExpo}
           programar={programarSincronizacionCompartido}
         />
+        {/* Cola de captura en segundo plano mientras la lectura de avisos bancarios está activa. */}
+        <SincronizarCaptura />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />

@@ -8,6 +8,7 @@ import { PREFIJO_AVISO_RESPALDO } from './respaldo';
 import { PREFIJO_AVISO_RIESGO } from './riesgo';
 import { destinoDeAviso, RUTA_HOY, rutaDeAviso, rutaSegura } from './rutas';
 import { PREFIJO_AVISO_TANDA } from './tandas';
+import { PREFIJO_AVISO_CAPTURA } from '../captura/aviso-capturas';
 
 describe('ruta de cada aviso', () => {
   it.each([
@@ -20,6 +21,7 @@ describe('ruta de cada aviso', () => {
     [`${PREFIJO_AVISO_RIESGO}2026-10-30`, RUTA_HOY],
     [`${PREFIJO_AVISO_COMPROMISO}prog-1:2026-10-15`, RUTA_HOY],
     [`${PREFIJO_AVISO_INGRESO}prog-2:2026-10-15`, RUTA_HOY],
+    [`${PREFIJO_AVISO_CAPTURA}1730:1`, '/movimientos'],
     ['otro:algo', RUTA_HOY],
     ['sin-prefijo', RUTA_HOY],
     ['', RUTA_HOY],

@@ -26,6 +26,13 @@ const Guardado = z.strictObject({
 type Guardado = z.infer<typeof Guardado>;
 
 const CLAVE = 'captura';
+const ModoAviso = z.enum(['agrupados', 'cada_uno', 'nunca']);
+const CLAVE_MODO_AVISO = 'captura_modo_aviso';
+const AcumuloAviso = z.strictObject({
+  pendiente: z.int().min(0),
+  ultimo_aviso: z.int().nullable(),
+});
+const CLAVE_ACUMULO_AVISO = 'captura_aviso_acumulo';
 const INICIAL: Guardado = {
   divulgacion_en: null,
   activada: false,
@@ -36,6 +43,9 @@ const INICIAL: Guardado = {
   permiso: 'desconocido',
 };
 
+/** Aviso local al capturar movimientos (`02 §6`, pendiente 16). Por omisión: agrupados. */
+export type ModoAvisoCaptura = 'agrupados' | 'cada_uno' | 'nunca';
+
 export interface EstadoCapturaVista {
   readonly divulgacionAceptada: boolean;
   readonly activada: boolean;
@@ -45,6 +55,7 @@ export interface EstadoCapturaVista {
   readonly ultimoEvento: number | null;
   /** RF-CAP-07: "No he visto notificaciones de tu banco en 3 días." */
   readonly inactiva: boolean;
+  readonly modoAviso: ModoAvisoCaptura;
 }
 
 /**
@@ -62,6 +73,51 @@ function escribir(ctx: Contexto, valor: Guardado): void {
   escribirAjuste(ctx, CLAVE, Guardado, valor);
 }
 
+export function obtenerModoAvisoCaptura(ctx: Contexto): ModoAvisoCaptura {
+  return leerAjuste(ctx, CLAVE_MODO_AVISO, ModoAviso) ?? 'agrupados';
+}
+
+/** Ajustes → Captura: agrupados / cada uno / nunca (`02 §6`). */
+export function fijarModoAvisoCaptura(ctx: Contexto, modo: ModoAvisoCaptura): void {
+  exigirConsentimiento(ctx);
+  escribirAjuste(ctx, CLAVE_MODO_AVISO, ModoAviso, modo);
+  if (modo === 'nunca') borrarAjuste(ctx, CLAVE_ACUMULO_AVISO);
+}
+
+export interface AcumuloAvisoCaptura {
+  readonly pendiente: number;
+  readonly ultimoAviso: number | null;
+}
+
+function leerAcumulo(ctx: Contexto): AcumuloAvisoCaptura {
+  const g = leerAjuste(ctx, CLAVE_ACUMULO_AVISO, AcumuloAviso);
+  return g ? { pendiente: g.pendiente, ultimoAviso: g.ultimo_aviso } : { pendiente: 0, ultimoAviso: null };
+}
+
+function escribirAcumulo(ctx: Contexto, a: AcumuloAvisoCaptura): void {
+  if (a.pendiente === 0 && a.ultimoAviso === null) {
+    borrarAjuste(ctx, CLAVE_ACUMULO_AVISO);
+    return;
+  }
+  escribirAjuste(ctx, CLAVE_ACUMULO_AVISO, AcumuloAviso, {
+    pendiente: a.pendiente,
+    ultimo_aviso: a.ultimoAviso,
+  });
+}
+
+/** Suma movimientos al acumulado agrupado (solo modo agrupados). */
+export function acumularAvisoCaptura(ctx: Contexto, movimientos: number): AcumuloAvisoCaptura {
+  if (movimientos <= 0) return leerAcumulo(ctx);
+  const prev = leerAcumulo(ctx);
+  const siguiente = { pendiente: prev.pendiente + movimientos, ultimoAviso: prev.ultimoAviso };
+  escribirAcumulo(ctx, siguiente);
+  return siguiente;
+}
+
+export function fijarAcumuloAvisoCaptura(ctx: Contexto, a: AcumuloAvisoCaptura): void {
+  escribirAcumulo(ctx, a);
+}
+
 export function obtenerEstadoCaptura(ctx: Contexto): EstadoCapturaVista {
   const g = leer(ctx);
   return {
@@ -72,6 +128,7 @@ export function obtenerEstadoCaptura(ctx: Contexto): EstadoCapturaVista {
     permiso: g.permiso,
     ultimoEvento: g.ultimo_evento,
     inactiva: esInactiva(ctx, g),
+    modoAviso: obtenerModoAvisoCaptura(ctx),
   };
 }
 
