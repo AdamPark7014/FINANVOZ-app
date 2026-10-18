@@ -6,21 +6,22 @@
 
 ## Hecho en este turno
 
-- **PantallaTanda TalkBack:** `ACCESIBILIDAD_TANDA_NO_ENCONTRADA` en detalle inexistente (paridad con tarjeta); tests en `tandas.test.tsx`.
+- **Ayuda TalkBack:** `ayuda.test.tsx` ancla `ACCESIBILIDAD_VOLVER` en botón Volver (`bb2f7e4`, push main).
+- **Principal (main):** cola por revisar, filtro `PISTA_VER_TODOS`, CTAs en `principal.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Movimientos/me-alcanza TalkBack, tandas pistas, widget, tarjetas. Ver `git log`.
+- Tandas detalle inexistente, Movimientos/me-alcanza, widget. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local (ajustes avisos/datos cobro, ayuda, personas, riesgo) — salvar antes de mezclar.
+- WIP local (ajustes, personas, riesgo) — salvar antes de mezclar.
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. TalkBack CTAs resultado me-alcanza (recuérdamelo, otra cuenta).
+2. TalkBack CTAs resultado me-alcanza.
 
 ## No tocar
 
