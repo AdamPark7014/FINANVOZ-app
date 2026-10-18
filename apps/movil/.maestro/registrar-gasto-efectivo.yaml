@@ -1,0 +1,40 @@
+# CA-M2-02 · Registrar "coca 25 en efectivo" (NLU nivel 0, sin red).
+# Parte del onboarding feliz (efectivo inicial $600) y termina con el aviso "Deshacer".
+#   maestro test apps/movil/.maestro/registrar-gasto-efectivo.yaml
+appId: com.finanvoz.app
+name: Registrar gasto en efectivo
+---
+- runFlow:
+    file: onboarding.yaml
+
+- assertVisible:
+    id: pantalla-hoy
+
+- tapOn:
+    id: boton-escribir
+- extendedWaitUntil:
+    visible:
+      id: campo-registrar
+    timeout: 5000
+- tapOn:
+    id: campo-registrar
+- inputText: 'coca 25 en efectivo'
+- hideKeyboard
+- tapOn:
+    id: boton-enviar-registro
+
+- extendedWaitUntil:
+    visible:
+      id: aviso
+    timeout: 10000
+- assertVisible: 'Deshacer'
+
+# Saldo de efectivo: $600 − $25 = $575
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: seccion-tienes
+    timeout: 5000
+- assertVisible: 'Efectivo'
+- assertVisible: '$575'

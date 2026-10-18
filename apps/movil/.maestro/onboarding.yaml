@@ -166,10 +166,10 @@ name: Onboarding completo
 - tapOn:
     id: onb-pagos-continuar
 
-# O6 · Captura automática: "Disponible pronto"
+# O6 · Captura: sin módulo nativo (Metro / emulador sin captura) → "No disponible en este teléfono"
 - assertVisible:
     id: onb-captura-pronto
-- assertVisible: 'Disponible pronto'
+- assertVisible: 'No disponible en este teléfono'
 - tapOn:
     id: onb-captura-continuar
 
@@ -180,9 +180,18 @@ name: Onboarding completo
 - tapOn:
     id: onb-ver-mi-dia
 
-# Hoy
+# Hoy (O7 terminado)
 - extendedWaitUntil:
-    notVisible:
-      id: onb-colchon
-    timeout: 10000
-- assertVisible: 'Hoy'
+    visible:
+      id: pantalla-hoy
+    timeout: 15000
+- assertVisible:
+    id: pestana-hoy
+# Aviso único de MSI "No sé" (CA-M2-12), si aparece
+- runFlow:
+    when:
+      visible:
+        id: boton-aviso-entendido
+    commands:
+      - tapOn:
+          id: boton-aviso-entendido

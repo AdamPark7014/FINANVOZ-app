@@ -1,0 +1,39 @@
+# Arqueo de efectivo cuadrado (E7): tras un gasto en efectivo, Cuentas → Contar → cantidad exacta.
+#   maestro test apps/movil/.maestro/arqueo-basico.yaml
+appId: com.finanvoz.app
+name: Arqueo básico (efectivo cuadra)
+---
+- runFlow:
+    file: registrar-gasto-efectivo.yaml
+
+- tapOn:
+    id: pestana-cuentas
+- scrollUntilVisible:
+    element:
+      text: 'Contar mi efectivo'
+- tapOn:
+    text: 'Contar mi efectivo'
+
+- extendedWaitUntil:
+    visible:
+      id: pantalla-arqueo
+    timeout: 10000
+- assertVisible:
+    id: arqueo-paso-cantidad
+- assertVisible:
+    id: arqueo-esperado
+
+# Chip con el monto esperado ($575); confirma sin faltante ni sobrante
+- tapOn:
+    id: arqueo-exacto
+
+- extendedWaitUntil:
+    visible:
+      id: arqueo-hecho
+    timeout: 10000
+- assertVisible: 'cuadra'
+- tapOn:
+    id: arqueo-listo
+
+- assertVisible:
+    id: seccion-tienes
