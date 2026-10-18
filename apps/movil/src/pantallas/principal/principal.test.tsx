@@ -452,10 +452,10 @@ describe('Cuentas', () => {
     if (!nu) throw new Error('e4-01 sin Nu en Debes');
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
     expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
-      `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(359_000)}`,
+      `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(bbva.saldo)}`,
     );
     expect(screen.getByTestId(`cuenta-${nuId}-saldo`).props.accessibilityLabel).toBe(
-      `${contextoSaldoTarjeta(nu.nombre, false)} ${cifraEnPalabras(200_000)}`,
+      `${contextoSaldoTarjeta(nu.nombre, false)} ${cifraEnPalabras(nu.saldo)}`,
     );
     expect(screen.getByTestId('cuenta-internet-saldo').props.accessibilityLabel).toBe(
       `${contextoSaldoCompromiso('internet', 'mié 14')} ${cifraEnPalabras(500_00)}`,

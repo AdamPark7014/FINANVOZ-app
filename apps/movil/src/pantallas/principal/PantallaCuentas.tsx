@@ -90,7 +90,7 @@ export function PantallaCuentas({
           gap: espacio.s,
         }}
       >
-        <Texto variante="titulo" testID="cuentas-titulo">
+        <Texto variante="titulo" testID="cuentas-titulo" accessibilityRole="header">
           Cuentas
         </Texto>
         <Boton

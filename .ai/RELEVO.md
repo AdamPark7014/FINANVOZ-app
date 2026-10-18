@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **Personas (detalle):** `testID="persona-movimientos-titulo"` en sección movimientos; aserción TalkBack en prueba vacía.
+- **Cuentas (a11y):** `cuentas-titulo` con `accessibilityRole="header"` (simétrico a otras pantallas); ya cubierto en `principal.test.tsx`.
 
 ## Hecho (acumulado reciente)
 
-- Cuentas/tandas BTN centralizado; onboarding O5/O7; PreviaWidget/widget; personas nombre header. Ver `git log`.
+- Secciones Cuentas, Persona/movimientos, deducciones, arqueo, suscripciones headers; ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local en deducciones/estados-cuenta/principal/widget tests — revisar `git status`.
+- Pantallas negocio (M11) aún no en UI; paquete contador pendiente de hito.
 - CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- M0 / teléfono / fiscal params: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Centralizar inline restante en `PantallaCuentas` si conviene.
+2. Centralizar copy O3–O7 restante en `onboarding/textos.ts`.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
