@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Formulario movimiento TalkBack:** `PISTA_GUARDAR_MOVIMIENTO` en botón Guardar; prueba en `FormularioMovimiento.test.tsx`.
+- **TalkBack tarjetas captura Hoy:** aviso `alert` + live region en reactivar e inactiva; título visual sin duplicar lectura.
 
 ## Hecho (acumulado reciente)
 
-- Chip/Boton hints, CampoMonto, personas vacío/alta, Agregar persona. Ver `git log`.
+- Chip/Boton hints, CampoMonto, personas vacío/alta, formulario movimiento. Ver `git log`.
 
 ## A medias — CUIDADO
 

@@ -130,6 +130,8 @@ describe('preguntas de captura en Hoy', () => {
       'accessibilityLabel',
       etiquetaGuiaCapturaInactiva(guia),
     );
+    expect(screen.getByTestId(/-guia$/)).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId(/-guia$/)).toHaveProp('accessibilityLiveRegion', 'polite');
     p.cerrar();
   });
 
@@ -414,6 +416,8 @@ describe('O6 · activar la captura', () => {
       'accessibilityLabel',
       etiquetaCuerpoReactivarCaptura(),
     );
+    expect(screen.getByTestId(/-cuerpo$/)).toHaveProp('accessibilityRole', 'alert');
+    expect(screen.getByTestId(/-cuerpo$/)).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId(/-reactivar$/)).toHaveProp('accessibilityHint', PISTA_ACTIVAR_CAPTURA);
     expect(screen.getByTestId(/-ahora-no$/)).toHaveProp(
       'accessibilityHint',
