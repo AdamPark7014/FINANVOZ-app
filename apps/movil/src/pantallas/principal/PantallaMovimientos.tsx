@@ -15,7 +15,17 @@ import {
   type MovimientoVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, Cifra, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  CampoTexto,
+  Cifra,
+  espacio,
+  etiquetaHablada,
+  formatearCentavos,
+  Pantalla,
+  Tarjeta,
+  Texto,
+} from '../../ui';
 import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
 import { mensajeCompraMsi } from '../tarjetas/textos';
@@ -260,7 +270,13 @@ function PasarAMeses({
   };
   return (
     <View style={{ gap: espacio.s }} testID={`pasar-a-meses-${m.id}`}>
-      <Texto variante="cuerpo">¿A cuántos meses sin intereses fue?</Texto>
+      <Texto
+        variante="cuerpo"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
+        {PREGUNTA_PASAR_A_MESES}
+      </Texto>
       <GrupoChips
         opciones={MESES_COMUNES.map((n) => ({ valor: n, etiqueta: `${n} meses` }))}
         valor={meses}
@@ -269,6 +285,7 @@ function PasarAMeses({
           setOtro('');
         }}
         prefijoTestID="meses"
+        etiqueta={PREGUNTA_PASAR_A_MESES}
       />
       <CampoTexto
         testID="meses-otro"
@@ -314,11 +331,16 @@ function FilaMovimiento({
   const [pasando, setPasando] = useState(false);
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
   const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
+  const etiquetaAccesible = etiquetaHablada(
+    [titulo(m), subtitulo, formatearCentavos(centavos)].filter(Boolean).join(', '),
+  );
   return (
     <Tarjeta
       testID={`movimiento-${m.id}`}
       alPresionar={alTocar}
-      etiquetaAccesible={`${titulo(m)}, ${subtitulo}`}
+      accionesAnidadas={abierto}
+      expandida={abierto}
+      etiquetaAccesible={etiquetaAccesible}
       pista={abierto ? 'Oculta el detalle' : 'Muestra el detalle'}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>

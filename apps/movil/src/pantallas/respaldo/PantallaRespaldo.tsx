@@ -262,6 +262,7 @@ function TarjetaNube({
               variante="texto"
               ancho="contenido"
               etiqueta={BTN_BORRAR_CUENTA}
+              pista={PISTA_BORRAR_CUENTA}
               alPresionar={() => {
                 setMensaje(null);
                 setBorrando('confirmar');
@@ -300,10 +301,6 @@ function TarjetaNube({
           {mensaje.texto}
         </Texto>
       ) : null}
-    </Tarjeta>
-  );
-}
-null}
     </Tarjeta>
   );
 }

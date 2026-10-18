@@ -6,8 +6,10 @@ import {
   AVISO_SIN_EXPLICACION,
   explicar,
   LLAMADAS_MAXIMAS_EXPLICAR,
+  MENSAJE_LIMITE_EXPLICAR_DIARIO,
   MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
   MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+  MENSAJE_LIMITE_EXPLICAR_TOPE,
   mensajeLimiteExplicar,
 } from './explicar';
 import { registrarMovimiento } from './formulario';
@@ -279,17 +281,26 @@ describe('modo explicar: límites y fallas', () => {
     expect(t.vueltas).toHaveLength(1);
   });
 
-  it('el proxy dice solo_plus o límite: lo respeta', async () => {
+  it('el proxy dice solo_plus: lo respeta', async () => {
     const p = semilla();
     expect(await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'solo_plus' }]).nube })).toEqual({
       tipo: 'solo_plus',
     });
-    expect(
-      await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'limite', codigo: 'limite_mensual' }]).nube }),
-    ).toEqual({
+  });
+
+  it.each([
+    ['limite_mensual', true, MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS],
+    ['limite_mensual', false, MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS],
+    ['limite_diario', true, MENSAJE_LIMITE_EXPLICAR_DIARIO],
+    ['limite_diario', false, MENSAJE_LIMITE_EXPLICAR_DIARIO],
+    ['tope_global', true, MENSAJE_LIMITE_EXPLICAR_TOPE],
+    ['tope_global', false, MENSAJE_LIMITE_EXPLICAR_TOPE],
+  ] as const)('proxy devuelve límite %s (plus=%s): tipo y mensaje', async (codigo, plus, mensaje) => {
+    const p = semilla({ plus });
+    expect(await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'limite', codigo }]).nube })).toEqual({
       tipo: 'limite',
-      codigo: 'limite_mensual',
-      mensaje: MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+      codigo,
+      mensaje,
     });
   });
 
@@ -305,6 +316,8 @@ describe('modo explicar: límites y fallas', () => {
     const diario = mensajeLimiteExplicar('limite_diario', 'plus');
     expect(diario).toContain('Pregúntame de nuevo mañana');
     expect(diario).not.toMatch(/Por revisar/i);
+    expect(mensajeLimiteExplicar('tope_global', 'gratis')).toBe(MENSAJE_LIMITE_EXPLICAR_TOPE);
+    expect(mensajeLimiteExplicar('tope_global', 'plus')).toBe(MENSAJE_LIMITE_EXPLICAR_TOPE);
   });
 
   it('falla a media pregunta: muestra en plantilla lo ya consultado; al inicio, error', async () => {

@@ -122,9 +122,9 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
 
 export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
   return (
-    <Seccion titulo="Meses sin intereses" testID="tarjeta-meses">
+    <Seccion titulo={TITULO_MESES_SIN_INTERESES} testID="tarjeta-meses">
       {planes.length === 0 ? (
-        <Texto variante="secundario" tono="secundario">
+        <Texto variante="cuerpo" tono="secundario" testID="tarjeta-meses-vacio">
           {VACIO_MSI_TARJETA}
         </Texto>
       ) : null}
@@ -141,8 +141,8 @@ export function CompromisoMeses({ meses }: { meses: readonly MesCompromiso[] }) 
   const mayor = Math.max(...meses.map((m) => m.monto));
   return (
     <Seccion
-      titulo="Lo que pagarás en meses sin intereses"
-      subtitulo="Próximos 12 meses, por mes de fecha límite"
+      titulo={TITULO_COMPROMISO_MSI}
+      subtitulo={SUBTITULO_COMPROMISO_MSI}
       testID="compromiso-12-meses"
     >
       {meses.map((m) => {
@@ -315,12 +315,8 @@ export function PagosPlaneados({ d }: { d: DetalleTarjeta }) {
   const primera = avalancha[0];
   return (
     <Seccion
-      titulo="Pagos planeados"
-      subtitulo={
-        d.pagosPlaneados.length > 0
-          ? 'Aparto solo los pagos que vencen antes de tu próximo ingreso.'
-          : 'Sin pagos planeados aparto lo que debes completo.'
-      }
+      titulo={TITULO_PAGOS_PLANEADOS}
+      subtitulo={subtituloPagosPlaneados(d.pagosPlaneados.length > 0)}
       testID="tarjeta-pagos-planeados"
     >
       {d.pagosPlaneados.map((p) => (

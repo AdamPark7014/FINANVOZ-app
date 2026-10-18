@@ -6,7 +6,13 @@ import { Boton, espacio, Texto } from '../../ui';
 import { GrupoChips } from '../principal/Chip';
 import { codigoError, mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
-import { mensajeAportacion, mensajeCobro } from './textos';
+import {
+  ETIQUETA_CANCELAR,
+  mensajeAportacion,
+  mensajeCobro,
+  PREGUNTA_CUENTA_LLEGO,
+  PREGUNTA_CUENTA_SALIO,
+} from './textos';
 
 /** Chips con las cuentas de las que puede salir o a las que puede llegar la tanda (efectivo, débito, billetera). */
 export function ElegirCuentaTanda({
@@ -57,7 +63,7 @@ export function useYaLaDi(tandaId: string, fecha: string | null, testID: string)
     }
   };
   const elegir = eligiendo ? (
-    <ElegirCuentaTanda pregunta="¿De qué cuenta salió?" alElegir={dar} prefijoTestID={`${testID}-cuenta`} />
+    <ElegirCuentaTanda pregunta={PREGUNTA_CUENTA_SALIO} alElegir={dar} prefijoTestID={`${testID}-cuenta`} />
   ) : null;
   return { dar, elegir, error };
 }
@@ -78,7 +84,7 @@ export function MeTocoLaTanda({
   return (
     <View style={{ gap: espacio.s }}>
       <ElegirCuentaTanda
-        pregunta="¿A qué cuenta llegó?"
+        pregunta={PREGUNTA_CUENTA_LLEGO}
         prefijoTestID={`${testID}-cuenta`}
         alElegir={(cuentaId) => {
           try {

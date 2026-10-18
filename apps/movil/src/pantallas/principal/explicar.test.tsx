@@ -1,5 +1,10 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import type { NivelNube } from '../../servicios';
+import {
+  MENSAJE_LIMITE_EXPLICAR_DIARIO,
+  MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
+  MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+} from '../../servicios/explicar';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { pide, responde, turnoGuionado, type PasoGuion } from '../../servicios/__pruebas__/turno';
 import { activarPlus, conEscenario, golden } from './__pruebas__/base';
@@ -43,7 +48,7 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
     );
     fireEvent.press(screen.getByTestId('boton-ver-movimientos-explicar'));
     expect(p.navegacion.alVerMovimientos).toHaveBeenCalledWith({ desde: '2026-10-11', hasta: '2026-10-17' });
-    fireEvent.press(screen.getByText('Listo'));
+    fireEvent.press(screen.getByRole('button', { name: 'Listo' }));
     expect(screen.queryByTestId('respuesta-explicar')).toBeNull();
   });
 
@@ -83,12 +88,23 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
     expect(aviso.props.accessibilityRole).toBe('alert');
   });
 
-  it('con cupo agotado muestra el aviso en la tarjeta explicar, sin Por revisar', async () => {
-    preparar([{ tipo: 'limite', codigo: 'limite_mensual' }]);
+  it.each([
+    ['limite_mensual', MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS],
+    ['limite_diario', MENSAJE_LIMITE_EXPLICAR_DIARIO],
+  ] as const)('con cupo %s agotado muestra el mensaje en explicacion-limite', async (codigo, mensaje) => {
+    preparar([{ tipo: 'limite', codigo }]);
     await escribir(golden('Q13').texto);
     const limite = await screen.findByTestId('explicacion-limite');
-    expect(limite).toHaveTextContent('No pude responderte esta pregunta', { exact: false });
+    expect(limite).toHaveTextContent(mensaje);
     expect(limite).not.toHaveTextContent('Por revisar');
     expect(screen.queryByTestId('explicacion-pie')).toBeNull();
+  });
+
+  it('en Gratis con cupo mensual agotado muestra el mensaje de Gratis', async () => {
+    preparar([{ tipo: 'limite', codigo: 'limite_mensual' }], { plus: false });
+    await escribir(golden('Q13').texto);
+    expect(await screen.findByTestId('explicacion-limite')).toHaveTextContent(
+      MENSAJE_LIMITE_EXPLICAR_MENSUAL_GRATIS,
+    );
   });
 });

@@ -13,7 +13,7 @@ import {
   type TandaCreada,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerEntero } from '../onboarding/ingreso';
 import {
@@ -38,12 +38,11 @@ import {
   ETIQUETA_YA_TE_TOCO,
   OPCIONES_FRECUENCIA_TANDA,
   OPCIONES_SI_NO,
-  SUFIJO_RONDAS_NO_APARTO,
   TEXTO_COMPROMISO_APORTACION,
   TITULO_YA_EMPEZO,
   errorTurno,
   textoResumenCobro,
-  textoYaEmpezo,
+  textoYaEmpezoCompleto,
 } from './textos';
 
 type SiNo = 'si' | 'no';
@@ -252,10 +251,10 @@ export function FormularioTanda({
       ) : null}
       {ya ? (
         <Tarjeta testID="tanda-ya-empezo">
-          <Texto variante="cuerpoFuerte">Esta tanda ya empezó.</Texto>
+          <Texto variante="cuerpoFuerte">{TITULO_YA_EMPEZO}</Texto>
           <CampoTexto
             testID="tanda-hechas"
-            etiqueta="¿Cuántas aportaciones llevas?"
+            etiqueta={ETIQUETA_APORTACIONES_HECHAS}
             ejemplo={String(ya.aportacionesHechas)}
             teclado="number-pad"
             valor={hechas ?? String(ya.aportacionesHechas)}
@@ -263,21 +262,21 @@ export function FormularioTanda({
           />
           <Chips
             testID="tanda-ya-cobraste"
-            etiqueta="¿Ya te tocó?"
+            etiqueta={ETIQUETA_YA_TE_TOCO}
             opciones={OPCIONES_SI_NO}
             valor={cobro ?? (ya.yaCobraste ? 'si' : 'no')}
             alCambiar={setCobro}
           />
           {corregida ? (
             <Texto variante="secundario" testID="tanda-ya-empezo-texto">
-              {`${textoYaEmpezo(corregida)}. Esas rondas no las vuelvo a apartar.`}
+              {textoYaEmpezoCompleto(corregida)}
             </Texto>
           ) : null}
         </Tarjeta>
       ) : null}
       <MensajeError texto={error} />
-      <Boton testID="tanda-guardar" etiqueta="Guardar tanda" alPresionar={guardar} />
-      <Boton testID="tanda-cancelar" variante="texto" etiqueta="Cancelar" alPresionar={alCancelar} />
+      <Boton testID="tanda-guardar" etiqueta={ETIQUETA_GUARDAR_TANDA} alPresionar={guardar} />
+      <Boton testID="tanda-cancelar" variante="texto" etiqueta={ETIQUETA_CANCELAR} alPresionar={alCancelar} />
     </View>
   );
 }

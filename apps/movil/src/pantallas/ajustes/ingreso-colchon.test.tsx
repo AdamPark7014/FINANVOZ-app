@@ -56,6 +56,7 @@ jest.mock('../principal', () => {
   const real = jest.requireActual('../principal');
   const { createElement } = jest.requireActual('react');
   const { Pressable, Text } = jest.requireActual('react-native');
+  const { ETIQUETA_CONFIGURAR_INGRESO } = jest.requireActual('./ingreso-textos');
   return {
     ...real,
     PantallaHoy: ({ navegacion }: { navegacion: { alConfigurarIngreso: () => void } }) =>

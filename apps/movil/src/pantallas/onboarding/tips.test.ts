@@ -1,7 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { TIP_CAPTURA_AHORA_NO, TIP_COLCHON_SIN_POR_AHORA, TIP_CONSENTIMIENTO } from './tips';
+import {
+  TIP_CAPTURA_AHORA_NO,
+  TIP_COLCHON_SIN_POR_AHORA,
+  TIP_CONSENTIMIENTO,
+  TIP_CUENTAS_MINIMO,
+  TIP_INGRESO_SALTAR,
+  TIP_PAGOS_SALTAR,
+} from './tips';
 
-const TODOS_LOS_TIPS = [TIP_CONSENTIMIENTO, TIP_CAPTURA_AHORA_NO, TIP_COLCHON_SIN_POR_AHORA] as const;
+const TODOS_LOS_TIPS = [
+  TIP_CONSENTIMIENTO,
+  TIP_INGRESO_SALTAR,
+  TIP_CUENTAS_MINIMO,
+  TIP_PAGOS_SALTAR,
+  TIP_CAPTURA_AHORA_NO,
+  TIP_COLCHON_SIN_POR_AHORA,
+] as const;
 
 describe('tips de onboarding', () => {
   it('cumplen 02 §14: sin exclamación, «por favor» ni marcadores de conflicto', () => {
@@ -30,5 +44,21 @@ describe('tips de onboarding', () => {
     expect(TIP_COLCHON_SIN_POR_AHORA).toMatch(/Sin colchón por ahora/);
     expect(TIP_COLCHON_SIN_POR_AHORA).toMatch(/Ajustes/);
     expect(TIP_COLCHON_SIN_POR_AHORA).not.toMatch(/!/);
+  });
+
+  it('TIP_INGRESO_SALTAR menciona «Saltar por ahora» y Ajustes › Ingreso', () => {
+    expect(TIP_INGRESO_SALTAR).toMatch(/Saltar por ahora/);
+    expect(TIP_INGRESO_SALTAR).toMatch(/Ajustes/);
+    expect(TIP_INGRESO_SALTAR).toMatch(/Ingreso/);
+  });
+
+  it('TIP_CUENTAS_MINIMO menciona «Continuar» y Cuentas', () => {
+    expect(TIP_CUENTAS_MINIMO).toMatch(/Continuar/);
+    expect(TIP_CUENTAS_MINIMO).toMatch(/Cuentas/);
+  });
+
+  it('TIP_PAGOS_SALTAR menciona «Saltar por ahora»', () => {
+    expect(TIP_PAGOS_SALTAR).toMatch(/Saltar por ahora/);
+    expect(TIP_PAGOS_SALTAR).toMatch(/Hoy/);
   });
 });

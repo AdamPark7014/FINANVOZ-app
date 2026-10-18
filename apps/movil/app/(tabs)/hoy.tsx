@@ -1,10 +1,12 @@
 import { useRouter } from 'expo-router';
+import { View } from 'react-native';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacion';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaHoy, paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
+import { TEST_ID_TAB_HOY } from './hoy-textos';
 
 export default function Hoy() {
   const router = useRouter();
@@ -13,8 +15,9 @@ export default function Hoy() {
   useConfirmacionAlVolver((mensaje) => mostrarAviso({ mensaje }));
   return (
     // Un gasto compartido dictado se confirma aquí mismo (`02 §27`).
-    <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
-      <PantallaHoy
+    <View style={{ flex: 1 }} testID={TEST_ID_TAB_HOY}>
+      <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
+        <PantallaHoy
         navegacion={{
           alVerMovimientos: (filtro) =>
             router.navigate({ pathname: '/movimientos', params: filtro ? paramsDeFiltro(filtro) : {} }),
@@ -27,7 +30,8 @@ export default function Hoy() {
             abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
           alAbrirMeAlcanza: (consulta) => abrirMeAlcanza(router, consulta),
         }}
-      />
-    </ProveedorCompartido>
+        />
+      </ProveedorCompartido>
+    </View>
   );
 }

@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { Reconsentimiento } from '../src/pantallas/privacidad';
+import { Reconsentimiento, TITULO_RECONSENTIMIENTO } from '../src/pantallas/privacidad';
 import { useControlApp } from '../src/sesion/ControlApp';
 
 /** Si el aviso aceptado va atrás de la versión actual: aceptar, solo lectura o borrar todo (`08`). */

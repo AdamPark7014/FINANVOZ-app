@@ -51,14 +51,14 @@ export function SeccionWidget() {
           descripcion={DESC_OCULTAR}
           valor={ocultarMontos}
           alCambiar={(valor) => {
-          try {
-            fijarOcultarMontosWidget(ctx, valor);
-            setError(false);
-            refrescar();
-          } catch {
-            setError(true);
-          }
-        }}
+            try {
+              fijarOcultarMontosWidget(ctx, valor);
+              setError(false);
+              refrescar();
+            } catch {
+              setError(true);
+            }
+          }}
         />
       </View>
       {error ? (

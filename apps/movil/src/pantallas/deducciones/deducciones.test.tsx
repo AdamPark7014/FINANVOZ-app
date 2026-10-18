@@ -22,9 +22,12 @@ import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones'
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   LEYENDA_ESTIMACION,
+  MENSAJE_IMPORTAR_ERROR,
   MENSAJE_SIN_PARAMETROS,
+  PEDIR_PERFIL,
   TEXTO_FACTURAS_VACIO,
   TEXTO_IMPORTAR_VACIO,
+  tituloPantallaDeducciones,
 } from './textos';
 
 const CARPETA_CFDI = join(__dirname, '../../../../../fixtures/cfdi');
@@ -99,9 +102,7 @@ describe('Importar por la hoja de compartir (CA-M12-02)', () => {
       ctx,
       <ImportarCompartidas leer={() => Promise.reject(new Error('x'))} alVerDeducciones={jest.fn()} />,
     );
-    expect(await screen.findByTestId('error-formulario')).toHaveTextContent(
-      'No pude leer esos archivos. Intenta de nuevo.',
-    );
+    expect(await screen.findByTestId('error-formulario')).toHaveTextContent(MENSAJE_IMPORTAR_ERROR);
   });
 });
 
@@ -118,7 +119,10 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar();
     const archivos = selectorFalso();
     renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={archivos} />);
-    expect(screen.getByText(/Para estimar, necesito tu RFC, tus ingresos brutos del año/)).toBeTruthy();
+    expect(textoDe('perfil-pedir')).toBe(PEDIR_PERFIL);
+    expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveTextContent(
+      tituloPantallaDeducciones(2026),
+    );
 
     const v = deduccionE13('E13-10');
     llenarPerfil('PEPJ800101AB', '300,000');

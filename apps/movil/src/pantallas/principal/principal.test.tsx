@@ -23,6 +23,8 @@ import {
   TEXTO_CUENTAS_TIENES_VACIO,
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
+  SUBTITULO_SIN_INGRESO,
+  TITULO_SIN_INGRESO,
   contextoSaldoCompromiso,
   contextoSaldoTarjeta,
   contextoSaldoTienes,
@@ -207,7 +209,9 @@ describe('Hoy', () => {
     agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Cartera', saldo: 300_000 });
     const nav = navegacionFalsa();
     renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
-    expect(screen.getByText('Dime cada cuándo te pagan')).toBeTruthy();
+    expect(screen.getByTestId('hoy-sin-ingreso')).toBeTruthy();
+    expect(screen.getByTestId('hoy-sin-ingreso-titulo')).toHaveTextContent(TITULO_SIN_INGRESO);
+    expect(screen.getByTestId('hoy-sin-ingreso-subtitulo')).toHaveTextContent(SUBTITULO_SIN_INGRESO);
     fireEvent.press(screen.getByTestId('boton-configurar-ingreso'));
     expect(nav.alConfigurarIngreso).toHaveBeenCalled();
   });

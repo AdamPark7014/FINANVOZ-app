@@ -81,6 +81,7 @@ export default function Cuentas() {
       testID="onb-cuentas"
       paso={4}
       titulo="¿Con qué pagas?"
+      tip={TIP_CUENTAS_MINIMO}
       pie={<Boton testID="onb-cuentas-continuar" etiqueta="Continuar" alPresionar={continuar} />}
     >
       {tieneEfectivo ? null : (

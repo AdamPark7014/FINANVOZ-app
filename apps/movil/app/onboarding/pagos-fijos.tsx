@@ -76,6 +76,7 @@ export default function PagosFijos() {
       paso={5}
       titulo="¿Qué pagos tienes cada mes?"
       ayuda="Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar."
+      tip={TIP_PAGOS_SALTAR}
       pie={
         <Boton
           testID="onb-pagos-continuar"

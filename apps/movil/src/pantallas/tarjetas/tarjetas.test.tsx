@@ -36,7 +36,9 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { PantallaTarjeta } from './PantallaTarjeta';
 import {
   AYUDA_SALDO_A_FAVOR,
+  ERROR_ORIGEN_PAGO,
   TEXTO_TARJETA_NO_ENCONTRADA,
+  VACIO_MSI_TARJETA,
   VACIO_MOVIMIENTOS_TARJETA,
 } from './textos';
 
@@ -275,6 +277,14 @@ describe('Registrar', () => {
 });
 
 describe('Tarjetas', () => {
+  it('sin MSI ni movimientos muestra el copy vacío de textos.ts', () => {
+    const p = conEscenario('e4-01');
+    const nu = p.e.cuentas.nu as string;
+    montar(p.ctx, <PantallaTarjeta tarjetaId={nu} alVolver={jest.fn()} />);
+    expect(screen.getByTestId('tarjeta-meses-vacio')).toHaveTextContent(VACIO_MSI_TARJETA);
+    expect(screen.getByTestId('tarjeta-movimientos-vacio')).toHaveTextContent(VACIO_MOVIMIENTOS_TARJETA);
+  });
+
   it('Cuentas lleva al detalle y muestra uso, fecha límite y próximo corte', () => {
     const p = e510();
     const alAbrirTarjeta = jest.fn();
@@ -293,6 +303,8 @@ describe('Tarjetas', () => {
     expect(textoDe('tarjeta-disponible')).toBe('$28,800');
     expect(textoDe('tarjeta-uso')).toBe('Usas 4 % de tu límite de $30,000. La marca es el 30 %.');
     expect(screen.getByTestId('tarjeta-sin-corte')).toBeTruthy();
+    expect(screen.getByLabelText(`Fecha límite: ${t?.etiquetaFechaLimite}`)).toBeTruthy();
+    expect(screen.getByTestId('tarjeta-nombre')).toHaveProp('accessibilityRole', 'header');
   });
 
   it('Pagar desde el detalle (cuenta de origen) y Deshacer devuelve la deuda', () => {

@@ -4,6 +4,16 @@ import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Tarjeta, Texto } from '../../ui';
 import { FormularioContrasena } from './FormularioContrasena';
+import {
+  BTN_CAMBIAR_CONTRASENA,
+  BTN_CREAR_CONTRASENA,
+  BTN_EXPORTAR_ARCHIVO,
+  BTN_RESTAURAR_RESPALDO,
+  DESCRIPCION_ARCHIVO,
+  MENSAJE_CONTRASENA_GUARDADA,
+  MENSAJE_NO_EXPORTAR,
+  SUBTITULO_ARCHIVO,
+} from './textos';
 
 /**
  * Respaldo cifrado en el centro de privacidad (M9, `02 §19`): crear o cambiar la contraseña, exportar el
@@ -40,7 +50,7 @@ export function TarjetaRespaldo({
       const archivo = await generarRespaldo(respaldo.deps, ctx);
       await respaldo.archivos.compartir(nombreArchivoRespaldo(ctx), archivo);
     } catch {
-      setMensaje('No pude preparar tu respaldo. Intenta de nuevo.');
+      setMensaje(MENSAJE_NO_EXPORTAR);
     } finally {
       setExportando(false);
     }
@@ -48,10 +58,9 @@ export function TarjetaRespaldo({
 
   return (
     <Tarjeta testID="privacidad-respaldo">
-      <Texto variante="subtitulo">Respaldo cifrado</Texto>
+      <Texto variante="subtitulo">{SUBTITULO_ARCHIVO}</Texto>
       <Texto variante="secundario" tono="secundario">
-        Un archivo con todos tus datos, cifrado con una contraseña que solo tú conoces. Guárdalo donde quieras
-        y úsalo para pasar tus datos a otro teléfono.
+        {DESCRIPCION_ARCHIVO}
       </Texto>
       {editando ? (
         <FormularioContrasena
@@ -61,7 +70,7 @@ export function TarjetaRespaldo({
             setConContrasena(true);
             setEditando(false);
             alCambiarContrasena?.();
-            setMensaje('Listo: guardé tu contraseña de respaldo.');
+            setMensaje(MENSAJE_CONTRASENA_GUARDADA);
           }}
           alCancelar={() => setEditando(false)}
         />

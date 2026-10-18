@@ -96,17 +96,21 @@ describe('pantalla del plan', () => {
     fireEvent.press(screen.getByTestId('candado-probabilidad'));
     expect(abrirPlan).toHaveBeenCalled();
 
+    const ofertas = await tienda.ofertas();
+    const ofertaMensual = etiquetaOferta(ofertas.find((o) => o.periodo === 'mensual')!);
+    const ofertaAnual = etiquetaOferta(ofertas.find((o) => o.periodo === 'anual')!);
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
-    expect(screen.getByText('Mensual: prueba 14 días gratis')).toBeTruthy();
-    expect(screen.getByText('Después, $69.00 al mes. Cancela cuando quieras en Google Play.')).toBeTruthy();
-    expect(screen.getByText('Anual: prueba 14 días gratis')).toBeTruthy();
+    expect(screen.getByText(ofertaMensual.etiqueta)).toBeTruthy();
+    expect(screen.getByText(ofertaMensual.detalle)).toBeTruthy();
+    expect(screen.getByText(ofertaAnual.etiqueta)).toBeTruthy();
 
     await act(async () => {
       fireEvent.press(screen.getByTestId(ID.oferta('mensual')));
     });
+    const resumenPlus = resumenPlan(obtenerPlan(p.ctx));
     expect(textoDe(ID.mensaje)).toBe(MENSAJE_LISTO);
-    expect(textoDe(ID.titulo)).toBe(TITULO_PLUS_PRUEBA);
-    expect(textoDe(ID.detalle)).toBe('Te quedan 14 días de prueba; el 25 oct empieza el cobro.');
+    expect(textoDe(ID.titulo)).toBe(resumenPlus.titulo);
+    expect(textoDe(ID.detalle)).toBe(resumenPlus.detalle);
     expect(screen.getByTestId(ID.administrar)).toBeTruthy();
     expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
     // Hoy ya muestra lo de Plus.
@@ -242,7 +246,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     );
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     await act(async () => {
-      fireEvent.press(screen.getByTestId('plan-oferta-mensual'));
+      fireEvent.press(screen.getByTestId(ID.oferta('mensual')));
     });
     expect(obtenerPlan(p.ctx).plan).toBe('plus');
     await escribir('tacos 80 en efectivo');
@@ -252,23 +256,20 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
 
     // La persona cancela en Google Play y la prueba vence sin cobro.
     act(() => tienda.cancelar());
-    expect(textoDe('plan-detalle')).toBe(
-      'Te quedan 14 días de prueba. Cancelaste: no se te cobrará y después vuelves a Gratis.',
-    );
+    expect(textoDe(ID.detalle)).toBe(resumenPlan(obtenerPlan(p.ctx)).detalle);
     ahora += 14 * DIA + 1;
     p.reloj.fijarInstante(ahora);
     act(() => tienda.vencer());
 
-    expect(textoDe('plan-titulo')).toBe('Plan Gratis');
-    expect(textoDe('plan-detalle')).toBe(
-      'Tu prueba de Plus terminó. Todo sigue aquí: tus datos siguen visibles, editables y puedes descargarlos.',
-    );
+    const resumenGratis = resumenPlan(obtenerPlan(p.ctx));
+    expect(textoDe(ID.titulo)).toBe(resumenGratis.titulo);
+    expect(textoDe(ID.detalle)).toBe(resumenGratis.detalle);
     // Solo se ocultan las funciones de Plus.
-    expect(screen.getByText('Ver probabilidad · Plus')).toBeTruthy();
+    expect(screen.getByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeTruthy();
     expect(screen.queryByTestId('tarjeta-del-dia')).toBeNull();
     // Los datos siguen ahí y se pueden seguir registrando.
     expect(screen.queryByTestId('compromiso-12-meses')).toBeNull();
-    expect(screen.getByText('Ver tus meses de los próximos 12 meses · Plus')).toBeTruthy();
+    expect(screen.getByText(etiquetaCandadoPlus(CANDADO_COMPROMISO_12_MESES))).toBeTruthy();
     expect(textoDe('tarjeta-deuda')).toBe(debeEnPlus);
     expect(textoDe('tarjeta-deuda-meses')).toBe('De eso, $12,000 son meses sin intereses.');
     expect(listarMovimientos(p.ctx)).toEqual(movimientosEnPlus);

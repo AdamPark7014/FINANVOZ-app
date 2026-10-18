@@ -18,6 +18,7 @@ export interface TarjetaProps {
   testID?: string;
 }
 
+/** Superficie con borde; opcionalmente botón con `etiquetaAccesible` o fondo tocable si hay controles anidados. */
 export function Tarjeta({
   children,
   alPresionar,

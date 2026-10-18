@@ -19,6 +19,10 @@ import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaTanda } from './PantallaTanda';
 import { PantallaTandas } from './PantallaTandas';
 import {
+  ETIQUETA_GUARDAR_TANDA,
+  MENSAJE_TANDA_GUARDADA,
+  MENSAJE_TODAVIA_NO_APORTACION,
+  MENSAJE_TODAVIA_NO_COBRO,
   TEXTO_TANDA_NO_ENCONTRADA,
   textoDespuesRondaRiesgo,
   textoEnRiesgo,
@@ -247,9 +251,15 @@ describe('Tandas (02 §18)', () => {
     const [t] = listarTandas(p.ctx);
     expect(t).toMatchObject({ aportacion: 50_000, participantes: 10, turno: 4 });
     expect(
-      within(screen.getByTestId('aviso')).getByText(
-        'Listo: guardé tu tanda. Aparto cada aportación el día que toca.',
-      ),
+      within(screen.getByTestId('aviso')).getByText(MENSAJE_TANDA_GUARDADA),
     ).toBeTruthy();
+  });
+});
+
+describe('copy centralizado (textos.ts)', () => {
+  it('formulario y tarjetas de Hoy usan los mismos mensajes de Todavía no', () => {
+    expect(MENSAJE_TODAVIA_NO_APORTACION).toBe('La sigo apartando. Te pregunto mañana.');
+    expect(MENSAJE_TODAVIA_NO_COBRO).toBe('Va. Te pregunto mañana.');
+    expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
   });
 });

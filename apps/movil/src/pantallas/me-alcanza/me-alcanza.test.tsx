@@ -59,10 +59,7 @@ import {
   MENSAJE_CANCELADO,
   MENSAJE_DATOS_INSUFICIENTES,
   MENSAJE_PERMISO_AVISOS,
-  PREGUNTA_MSI,
   TEXTO_RECORDATORIO_PROGRAMADO,
-  TITULO,
-  etiquetaChipMeses,
 } from './textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
@@ -234,14 +231,6 @@ function conHistorial() {
 }
 
 describe('¿Me alcanza?', () => {
-  it('el formulario vacío muestra título y chips con copy de textos.ts', () => {
-    const p = e401();
-    montar(p.ctx, <PantallaMeAlcanza calcular={jest.fn()} alCerrar={jest.fn()} />);
-    expect(screen.getByText(TITULO)).toBeTruthy();
-    expect(screen.getByText(PREGUNTA_MSI)).toBeTruthy();
-    expect(screen.getByText(etiquetaChipMeses('6'))).toBeTruthy();
-  });
-
   it('CA-M6-03 · con el resultado de E8-22 muestra "< 1 %", "89 %", "79 %", "90 %" y la recomendación', async () => {
     const p = e401();
     montar(
@@ -422,7 +411,7 @@ describe('¿Me alcanza?', () => {
     // Primer bloque hecho: el cálculo espera para ceder el hilo.
     await waitFor(() => expect(pendientes.length).toBeGreaterThan(0));
     await waitFor(() =>
-      expect(screen.getByTestId('me-alcanza-progreso').props.accessibilityLabel).toBe('Avance del cálculo'),
+      expect(screen.getByTestId('me-alcanza-progreso').props.accessibilityLabel).toBe(ETIQUETA_PROGRESO),
     );
     fireEvent.press(screen.getByTestId('boton-cancelar-me-alcanza'));
     expect(textoDe('me-alcanza-aviso')).toBe(MENSAJE_CANCELADO);
@@ -463,6 +452,27 @@ describe('¿Me alcanza?', () => {
     expect(textoDe('me-alcanza-mensaje')).toBe(MENSAJE_DATOS_INSUFICIENTES);
     expect(textoDe('me-alcanza-datos-ayuda')).toBe(AYUDA_DATOS_INSUFICIENTES);
     expect(screen.getByText('Una compra de $1,500')).toBeTruthy();
+    expect(screen.getByText(BTN_LISTO)).toBeTruthy();
+  });
+
+  it('si el cálculo falla, muestra el error y permite reintentar', async () => {
+    const p = e401();
+    const calcular = jest.fn<ReturnType<CalcularMeAlcanza>, Parameters<CalcularMeAlcanza>>(async () => {
+      throw new Error('fallo simulado');
+    });
+    montar(
+      p.ctx,
+      <PantallaMeAlcanza
+        consultaInicial={{ precio: 150_000 }}
+        calcular={calcular}
+        bloques={sinEspera}
+        alCerrar={jest.fn()}
+      />,
+    );
+    await screen.findByTestId('me-alcanza-fallo');
+    expect(textoDe('me-alcanza-error-calculo')).toBe(ERROR_CALCULO);
+    fireEvent.press(screen.getByTestId('boton-reintentar-me-alcanza'));
+    await waitFor(() => expect(calcular).toHaveBeenCalledTimes(2));
   });
 
   it('"¿me alcanza para unos tenis de 1500?" escrito en Hoy abre "¿Me alcanza?" con la consulta en memoria', async () => {

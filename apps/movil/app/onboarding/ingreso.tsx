@@ -75,6 +75,7 @@ export default function Ingreso() {
       testID="onb-ingreso"
       paso={3}
       titulo="¿Cada cuándo te pagan?"
+      tip={TIP_INGRESO_SALTAR}
       pie={
         <>
           <Boton

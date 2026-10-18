@@ -348,21 +348,17 @@ function Revisar({
         </Texto>
         {a.cuadra === false ? (
           <Texto variante="secundario" tono="faltante" testID="estado-no-cuadra">
-            Lo que leí no suma lo que dice tu banco: revisa los movimientos con tu PDF antes de guardar.
+            {AVISO_NO_CUADRA}
           </Texto>
         ) : null}
         {a.renglonesSinLeer > 0 ? (
           <Texto variante="secundario" tono="faltante" testID="estado-sin-leer">
-            {a.renglonesSinLeer === 1
-              ? '1 renglón no lo pude leer; revísalo en tu PDF.'
-              : `${a.renglonesSinLeer} renglones no los pude leer; revísalos en tu PDF.`}
+            {mensajeRenglonesSinLeer(a.renglonesSinLeer)}
           </Texto>
         ) : null}
         {a.anteriores > 0 ? (
           <Texto variante="secundario" tono="secundario">
-            {a.anteriores === 1
-              ? '1 es de antes de que agregaras la tarjeta; ya está en su saldo.'
-              : `${a.anteriores} son de antes de que agregaras la tarjeta; ya están en su saldo.`}
+            {mensajeAnteriores(a.anteriores)}
           </Texto>
         ) : null}
       </Tarjeta>
@@ -391,7 +387,9 @@ function Revisar({
 
       {a.dudosos.length > 0 ? (
         <View style={{ gap: espacio.m }} testID="estado-dudosos">
-          <Texto variante="subtitulo">¿Ya los tenías?</Texto>
+          <Texto variante="subtitulo" accessibilityRole="header">
+            {TITULO_DUDOSOS}
+          </Texto>
           {a.dudosos.map((d) => (
             <Dudoso
               key={d.indice}
@@ -404,13 +402,13 @@ function Revisar({
       ) : null}
 
       <MensajeError texto={error} />
-      <Boton etiqueta="Guardar" alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
+      <Boton etiqueta={BTN_GUARDAR} alPresionar={guardar} deshabilitado={faltan} testID="estado-guardar" />
       {faltan ? (
         <Texto variante="secundario" tono="secundario">
-          Contesta si ya tenías cada movimiento para poder guardar.
+          {PISTA_CONTESTAR_DUDOSOS}
         </Texto>
       ) : null}
-      <Boton etiqueta="Cancelar" variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alSalir} testID="estado-cancelar" />
     </>
   );
 }
@@ -424,21 +422,22 @@ function Dudoso({
   valor: 'mismo' | 'otro' | null;
   alCambiar: (v: 'mismo' | 'otro') => void;
 }) {
-  const ya = `${d.existente.descripcion ?? 'un movimiento'} del ${etiquetaDiaMes(d.existente.fecha)} por ${formatearCentavos(d.existente.monto)}`;
   return (
-    <Tarjeta testID={`estado-dudoso-${d.indice}`}>
+    <Tarjeta testID={`estado-dudoso-${d.indice}`} accionesAnidadas>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <Texto variante="cuerpo" style={{ flex: 1 }}>
           {`${d.descripcion} · ${etiquetaDiaMes(d.fecha)}`}
         </Texto>
         <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
       </View>
-      <Texto variante="secundario" tono="secundario">{`¿Es el mismo que ya tenías: ${ya}?`}</Texto>
+      <Texto variante="secundario" tono="secundario">
+        {preguntaMismoMovimiento(d.existente.descripcion, d.existente.fecha, d.existente.monto)}
+      </Texto>
       <Chips
-        etiqueta={`¿${d.descripcion} ya lo tenías?`}
+        etiqueta={etiquetaChipsDudoso(d.descripcion)}
         opciones={[
-          { valor: 'mismo', etiqueta: 'Es el mismo' },
-          { valor: 'otro', etiqueta: 'Es otro' },
+          { valor: 'mismo', etiqueta: CHIP_MISMO },
+          { valor: 'otro', etiqueta: CHIP_OTRO },
         ]}
         valor={valor}
         alCambiar={alCambiar}
@@ -466,22 +465,28 @@ function Guardado({
   return (
     <>
       <Texto variante="cuerpo" testID="estado-guardado" accessibilityLiveRegion="polite">
-        {agregados === 0
-          ? `No agregué nada: tu ${nombre} ya tenía todo.`
-          : agregados === 1
-            ? `Agregué 1 movimiento a tu ${nombre}.`
-            : `Agregué ${agregados} movimientos a tu ${nombre}.`}
+        {mensajeGuardado(agregados, nombre)}
       </Texto>
       {propuesta ? (
-        <Tarjeta testID="estado-conciliacion">
-          <Texto variante="cuerpo" testID="estado-conciliacion-texto">
+        <Tarjeta testID="estado-conciliacion" accionesAnidadas>
+          <Texto variante="cuerpo" testID="estado-conciliacion-texto" accessibilityLiveRegion="polite">
             {preguntaConciliacion(propuesta)}
           </Texto>
-          <Boton etiqueta="Ajustar" alPresionar={() => alAjustar(propuesta)} testID="estado-ajustar" />
-          <Boton etiqueta="No" variante="secundario" alPresionar={alNoAjustar} testID="estado-no-ajustar" />
+          <Boton etiqueta={BTN_AJUSTAR} alPresionar={() => alAjustar(propuesta)} testID="estado-ajustar" />
+          <Boton
+            etiqueta={BTN_NO_AJUSTAR}
+            variante="secundario"
+            alPresionar={alNoAjustar}
+            testID="estado-no-ajustar"
+          />
         </Tarjeta>
       ) : (
-        <Boton etiqueta="Ver la tarjeta" alPresionar={alVerTarjeta} testID="estado-ver-tarjeta" />
+        <Boton etiqueta={BTN_VER_TARJETA} alPresionar={alVerTarjeta} testID="estado-ver-tarjeta" />
+      )}
+    </>
+  );
+}
+a" />
       )}
     </>
   );
