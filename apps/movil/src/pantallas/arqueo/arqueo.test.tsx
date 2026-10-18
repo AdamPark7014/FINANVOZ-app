@@ -4,6 +4,7 @@ import { abrirPruebaPantalla, conEscenario } from '../principal/__pruebas__/base
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
 import {
+  ACCESIBILIDAD_ABRIR,
   ACCESIBILIDAD_CERRAR,
   ACCESIBILIDAD_LISTO,
   AHORA_NO,
@@ -47,6 +48,8 @@ describe('copy del arqueo (es-MX)', () => {
     expect(AHORA_NO).toBe('Ahora no');
     expect(MENSAJE_POSPONER).toBe('Va. Te pregunto mañana.');
     expect(AYUDA_POR_ASIGNAR).toMatch(/gastos/);
+    expect(ACCESIBILIDAD_ABRIR).toBe('Abrir conteo de efectivo');
+    expect(ACCESIBILIDAD_CERRAR).toBe('Cerrar conteo de efectivo');
     expect(ACCESIBILIDAD_LISTO).toMatch(/cerrar/);
   });
 

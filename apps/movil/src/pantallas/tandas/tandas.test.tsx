@@ -343,4 +343,10 @@ describe('copy centralizado (textos.ts)', () => {
     expect(MENSAJE_TODAVIA_NO_COBRO).toBe('Va. Te pregunto mañana.');
     expect(ETIQUETA_GUARDAR_TANDA).toBe('Guardar tanda');
   });
+
+  it('pistas TalkBack de lista, detalle y Hoy', () => {
+    expect(PISTA_VER_CALENDARIO).toMatch(/calendario/i);
+    expect(PISTA_YA_LA_DI).toContain('aportación');
+    expect(PISTA_ME_TOCO).toMatch(/cobr/i);
+  });
 });
