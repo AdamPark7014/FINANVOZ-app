@@ -140,12 +140,10 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
   it('sin ingreso lo dice y ofrece decir cada cuándo te pagan', () => {
     mockPreparar = base;
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
-    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(
-      'Todavía no me dices cada cuándo te pagan.',
-    );
+    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(RESUMEN_SIN_INGRESO);
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityLabel',
-      'Decir cada cuándo me pagan',
+      ETIQUETA_CONFIGURAR_INGRESO,
     );
   });
 
@@ -180,9 +178,17 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       regla: { tipo: 'semanal', dia_semana: 5, ajuste: 'anterior' },
     });
     expect(screen.getByTestId('ajustes-ingreso-confirmacion')).toHaveTextContent(
-      'Listo: guardé tu ingreso. Tu próximo pago es el vie 16.',
+      mensajeIngresoGuardado(false, '2026-10-16'),
     );
-    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(/Te pagan \$13,000 cada viernes/);
+    expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(
+      new RegExp(
+        lineaResumenIngreso(
+          1_300_000,
+          fraseCuandoTePagan({ tipo: 'semanal', dia_semana: 5, ajuste: 'anterior' }),
+          null,
+        ).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      ),
+    );
   });
 
   it('"Varía" deja el modo ingreso variable', () => {
