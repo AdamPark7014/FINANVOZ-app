@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Compartidos:** `compartidos-titulo` con `accessibilityRole="header"` (TalkBack §15; ya cubierto en `compartido.test.tsx`).
+- **Hoy (Plus):** prueba ancla `etiquetaTarjetaDelDia` en `interpretacion-textos.test.ts` (TalkBack título + tip).
 
 ## Hecho (acumulado reciente)
 
-- Movimientos/Cuentas/Registrar headers, onboarding consent pista, EstadoVacio. Ver `git log`.
+- Onboarding tips en `tips.ts`, captura/cuentas headers, ProbabilidadHoy. Ver `git log`.
 
 ## A medias — CUIDADO
 
@@ -21,7 +21,7 @@
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Headers TalkBack en pantallas restantes si hace falta.
+2. CTAs inline restantes en Cuentas si conviene centralizar.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar

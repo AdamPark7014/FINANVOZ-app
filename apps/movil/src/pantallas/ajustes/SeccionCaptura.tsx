@@ -37,7 +37,11 @@ export function SeccionCaptura() {
         <ActivarCaptura testID="ajustes-captura" alTerminar={() => setActivando(false)} />
       ) : estado.activada ? (
         <>
-          <Texto variante="cuerpo" testID="ajustes-captura-estado">
+          <Texto
+            variante="cuerpo"
+            testID="ajustes-captura-estado"
+            accessibilityLabel={etiquetaCapturaActiva(estado.apps.length)}
+          >
             {textoCapturaActiva(estado.apps.length)}
           </Texto>
           <Texto variante="etiqueta">{ETIQUETA_AVISO_AL_CAPTURAR}</Texto>
