@@ -236,7 +236,7 @@ describe('¿Me alcanza?', () => {
     const p = e401();
     montar(p.ctx, <PantallaMeAlcanza calcular={jest.fn()} alCerrar={jest.fn()} />);
     expect(screen.getByRole('header', { name: TITULO })).toBeTruthy();
-    expect(screen.getByRole('radiogroup', { name: PREGUNTA_MSI })).toBeTruthy();
+    expect(screen.getByLabelText(PREGUNTA_MSI)).toBeTruthy();
     expect(screen.getByTestId('me-alcanza-meses-6')).toBeTruthy();
     expect(screen.getByRole('button', { name: etiquetaHablada(BTN_CALCULAR) })).toBeTruthy();
   });
