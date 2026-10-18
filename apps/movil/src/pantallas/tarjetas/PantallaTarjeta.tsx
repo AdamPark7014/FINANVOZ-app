@@ -111,6 +111,7 @@ function Detalle({
         variante="texto"
         ancho="contenido"
         alPresionar={alVolver}
+        pista={PISTA_VOLVER}
       />
       <View style={{ gap: espacio.xxs }}>
         <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">

@@ -131,9 +131,6 @@ describe('Movimientos → capturas por revisar', () => {
       TEXTO_CAPTURAS_POR_REVISAR_VACIO,
     );
     expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
-    expect(screen.getByTestId('capturas-por-revisar-vacio').props.accessibilityLabel).toBe(
-      etiquetaVacioCapturasPorRevisar(),
-    );
     expect(screen.getByTestId('capturas-por-revisar-vacio')).toHaveProp(
       'accessibilityLabel',
       etiquetaVacioCapturasPorRevisar(),

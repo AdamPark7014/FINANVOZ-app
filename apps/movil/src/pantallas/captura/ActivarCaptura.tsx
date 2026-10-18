@@ -151,6 +151,9 @@ export function ActivarCaptura({
 
       {paso.tipo === 'divulgacion' ? (
         <>
+          <Texto variante="subtitulo" accessibilityRole="header">
+            {DIVULGACION_CAPTURA.titulo}
+          </Texto>
           <Tarjeta testID={`${testID}-divulgacion`}>
             {DIVULGACION_CAPTURA.parrafos.map((p) => (
               <Texto key={p} variante="cuerpo">
@@ -158,8 +161,10 @@ export function ActivarCaptura({
               </Texto>
             ))}
           </Tarjeta>
-          <Boton etiqueta="Activar" alPresionar={() => void activar()} testID={`${testID}-activar`} />
-          {ahoraNo}
+          <View style={{ gap: espacio.s }}>
+            <Boton etiqueta="Activar" alPresionar={() => void activar()} testID={`${testID}-activar`} />
+            {ahoraNo}
+          </View>
         </>
       ) : null}
 

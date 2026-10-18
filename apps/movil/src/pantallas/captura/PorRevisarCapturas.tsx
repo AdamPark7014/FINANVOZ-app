@@ -58,14 +58,11 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
         <Texto variante="subtitulo" accessibilityRole="header">
           {TITULO_CAPTURAS_POR_REVISAR}
         </Texto>
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
+        <EstadoVacio
+          texto={TEXTO_CAPTURAS_POR_REVISAR_VACIO}
           testID="capturas-por-revisar-vacio"
-          accessibilityLabel={etiquetaVacioCapturasPorRevisar()}
-        >
-          {TEXTO_CAPTURAS_POR_REVISAR_VACIO}
-        </Texto>
+          etiquetaAccesible={etiquetaVacioCapturasPorRevisar()}
+        />
       </View>
     );
   }

@@ -6,23 +6,20 @@
 
 ## Hecho en este turno
 
-- **Suscripciones a11y:** `etiquetaVacioSuscripciones`; vacío con `EstadoVacio` + live region; test en `suscripciones.test.tsx`.
-
-## Hecho (acumulado reciente)
-
-- Persona / estado cuenta / Movimientos vacíos TalkBack, tabs a11y. Ver `git log`.
+- **Personas:** prueba TalkBack `PISTA_GUARDAR_PAGO` en Guardar del panel «Ya me pagó» — commit `6ee29db`.
+- **En main:** `PISTA_COBRAR`, `PISTA_YA_ME_PAGO`, `PISTA_VOLVER`; ¿Me alcanza? `PISTA_CALCULAR` (`89f4685`).
 
 ## A medias — CUIDADO
 
-- WIP sin commitear (no tocar): `hoy-textos`, onboarding cuentas/pagos-fijos, `principal.test`, `Boton`, `CampoTexto`, captura/principal varios.
+- WIP local sin commitear: captura, me-alcanza, widget, ayuda/onboarding (revisar `git status` antes de editar).
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Rescatar/cerrar WIP local sin pisar.
-3. Centralizar copy O3–O7 en `textos.ts`.
+2. Commitear o descartar WIP captura/widget/me-alcanza.
+3. Arreglar test «Ya me pagó de Caro» si sigue rojo en suite completa.
 
 ## No tocar
 

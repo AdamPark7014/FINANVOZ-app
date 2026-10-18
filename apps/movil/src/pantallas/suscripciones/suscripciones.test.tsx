@@ -139,7 +139,9 @@ describe('Suscripciones (02 §20)', () => {
     const p = conEscenario('e4-01');
     const alAbrir = jest.fn();
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirSuscripciones={alAbrir} />);
-    expect(screen.getByText(BTN_SUSCRIPCIONES_CUENTAS)).toBeTruthy();
+    expect(screen.getByTestId('boton-suscripciones').props.accessibilityLabel).toBe(
+      BTN_SUSCRIPCIONES_CUENTAS,
+    );
     fireEvent.press(screen.getByTestId('boton-suscripciones'));
     expect(alAbrir).toHaveBeenCalled();
   });

@@ -5,6 +5,7 @@ import {
   Aviso,
   Barra,
   Boton,
+  Chip,
   CampoMonto,
   CampoTexto,
   EstadoVacio,
@@ -73,6 +74,7 @@ describe('Boton', () => {
     fireEvent.press(boton);
     expect(alPresionar).not.toHaveBeenCalled();
     expect(boton).toBeDisabled();
+    expect(boton.props.accessibilityState).toEqual({ disabled: true, busy: false });
   });
 
   it.each(['primario', 'secundario', 'texto'] as const)('variante %s mide al menos 48 dp', (v) => {
@@ -86,6 +88,21 @@ describe('Boton', () => {
     expect(boton.props.accessibilityState).toEqual({ disabled: true, busy: true });
     expect(boton.props.accessibilityHint).toBe('Espera, termina de cargar');
     expect(boton).toBeDisabled();
+  });
+});
+
+
+describe('Chip', () => {
+  it('hitSlop táctil y deshabilitado en TalkBack', () => {
+    const alPresionar = jest.fn();
+    render(
+      <Chip etiqueta="Efectivo" seleccionado={false} alPresionar={alPresionar} deshabilitado testID="chip" />,
+    );
+    const chip = screen.getByTestId('chip');
+    expect(chip.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
+    expect(chip.props.accessibilityState).toEqual({ selected: false, disabled: true });
+    fireEvent.press(chip);
+    expect(alPresionar).not.toHaveBeenCalled();
   });
 });
 
@@ -129,6 +146,13 @@ describe('CampoTexto', () => {
     expect(alCambiar).toHaveBeenCalledWith('coca 25');
     expect(screen.getByText('Falta el monto. Escríbelo con números.')).toBeTruthy();
     expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true });
+  });
+
+  it('deshabilitado anuncia disabled', () => {
+    render(
+      <CampoTexto etiqueta="Notas" valor="" alCambiar={() => {}} deshabilitado />,
+    );
+    expect(screen.getByLabelText('Notas').props.accessibilityState).toEqual({ invalid: false, disabled: true });
   });
 
   it('la ayuda visible no duplica la pista del campo', () => {
@@ -189,7 +213,7 @@ describe('CampoMonto', () => {
 
   it('muestra el valor inicial sin signo de pesos', () => {
     render(<CampoMonto etiqueta="Monto" valorInicial={150050} alCambiar={() => {}} />);
-    expect(screen.getByLabelText('Monto').props.value).toBe('1,500.50');
+    expect(screen.getByLabelText(/Monto en pesos/).props.value).toBe('1,500.50');
   });
 
   it('etiqueta TalkBack en pesos y lee el monto escrito en palabras', () => {
