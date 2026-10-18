@@ -44,6 +44,8 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
   it('muestra la misma línea de ejemplo que e4-01', () => {
     render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" />);
     const previa = screen.getByTestId('previa-widget');
+    expect(previa.props.accessibilityRole).toBe('summary');
+    expect(previa.props.accessibilityHint).toBeUndefined();
     expect(within(previa).getByTestId('previa-widget-titulo', { includeHiddenElements: true }).props.children).toBe(
       'Hoy puedes',
     );

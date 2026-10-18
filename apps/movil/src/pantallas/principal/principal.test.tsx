@@ -15,6 +15,7 @@ import {
   registrarCuentaDividida,
   registrarMovimiento,
   registrarPrestamo,
+  registrarTexto,
 } from '../../servicios';
 import { listarCuentas } from '../../servicios/cuentas';
 import { formatearCentavos } from '../../ui';

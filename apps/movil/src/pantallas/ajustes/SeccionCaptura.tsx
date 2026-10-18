@@ -4,7 +4,7 @@ import { desactivarCaptura, fijarModoAvisoCaptura, obtenerEstadoCaptura } from '
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 import { ActivarCaptura } from '../captura/ActivarCaptura';
-import { GrupoChips } from '../principal/Chip';
+import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import {
   BTN_ACTIVAR_CAPTURA,
   BTN_DESACTIVAR_CAPTURA,
@@ -57,6 +57,9 @@ export function SeccionCaptura() {
           </Texto>
           <Texto variante="secundario" tono="secundario">
             {DESC_AVISO_AL_CAPTURAR}
+          </Texto>
+          <Texto variante="secundario" testID="ajustes-captura-aviso-pregunta" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {PREGUNTA_MODO_AVISO}
           </Texto>
           <GrupoChips
             prefijoTestID="ajustes-captura-aviso"

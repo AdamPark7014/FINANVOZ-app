@@ -156,6 +156,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     expect(screen.getByTestId('boton-compartidos').props.accessibilityLabel).toBe(BTN_COMPARTIDOS_CUENTAS);
     fireEvent.press(screen.getByTestId('boton-compartidos'));
     expect(alAbrir).toHaveBeenCalled();
+    expect(auditar(screen.toJSON() as never, { etiquetaExplicita: true })).toEqual([]);
     p.cerrar();
   });
 

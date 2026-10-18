@@ -10,6 +10,10 @@ import {
   ETIQUETA_CAPTURA_APAGADA,
   ETIQUETA_CAPTURA_NO_DISPONIBLE,
   etiquetaCapturaActiva,
+  PISTA_ACTIVAR_CAPTURA,
+  PISTA_DESACTIVAR_CAPTURA,
+  PREGUNTA_MODO_AVISO,
+  SECCION_CAPTURA,
   textoCapturaActiva,
 } from './captura-textos';
 import { SeccionCaptura } from './SeccionCaptura';

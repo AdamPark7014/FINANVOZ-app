@@ -6,26 +6,27 @@
 
 ## Hecho en este turno
 
-- **Movimientos TalkBack:** test encabezado «Por revisar» (`movimientos-por-revisar-titulo` → `header`). CTAs `PISTA_*` (Registrar, Ver todos, Revisar, Descartar) y ProbabilidadHoy ya en main.
+- **TalkBack micro:** `compartido.test.tsx` (auditoría M13 en Cuentas→compartidos) y `widget.test.tsx` (PreviaWidget sin pista: rol summary, sin hint).
 
 ## Hecho (acumulado reciente)
 
-- Tandas Hoy, Hoy héroe/probabilidad, onboarding O1–O7. Ver `git log`.
+- EstadoVacio/componentes, principal/me-alcanza/arqueo, suscripciones, tandas. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP ajeno (tarjetas, tandas) — revisar `git status` antes de editar.
-- CI Windows: `publicar-ejemplos`, RNF-01.
-- M0 / teléfono / fiscal: Adam.
+- WIP en disco (`git status`): principal/tarjetas — no mezclar sin revisar.
+- Stashes locales — no aplicar sin revisar.
+- CI Windows, M0: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. No mezclar commits a11y con WIP ajeno.
+2. Seguir hints TalkBack compartidos/captura si sigue la tanda a11y.
 
 ## No tocar
 
 - Solo `main`; sin ramas/PR/reset duro sin Adam.
+- `LEYENDA_ESTIMACION` (`08 §1`) sin cambiar palabra.
 - `packages/core` E*, vectores a mano.
 
 ## Estimación rápida
