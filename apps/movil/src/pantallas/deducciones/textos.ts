@@ -68,3 +68,6 @@ export const BTN_OCULTAR_FACTURA = 'La importé por error';
 export const BTN_RECUPERAR_FACTURA = 'Volver a mostrar';
 
 export const ESTADO_DEDUCIBLE = 'Deducible';
+
+/** TalkBack: la leyenda `LEYENDA_ESTIMACION` (`08 §1`). */
+export const ETIQUETA_LEYENDA_ESTIMACION = 'Aviso sobre estimaciones fiscales';

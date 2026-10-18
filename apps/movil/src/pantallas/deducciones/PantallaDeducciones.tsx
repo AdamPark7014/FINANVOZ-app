@@ -55,6 +55,7 @@ import {
   ETIQUETA_BASE_GRAVABLE,
   ETIQUETA_VOLVER,
   ESTADO_DEDUCIBLE,
+  ETIQUETA_LEYENDA_ESTIMACION,
   LEYENDA_ESTIMACION,
   MENSAJE_IMPORTAR_ERROR,
   PEDIR_PERFIL,
@@ -226,7 +227,7 @@ function AvisoFiscalEstimacion() {
       tono="secundario"
       testID="deducciones-leyenda"
       accessibilityRole="text"
-      accessibilityLabel="Aviso sobre estimaciones fiscales"
+      accessibilityLabel={ETIQUETA_LEYENDA_ESTIMACION}
     >
       {LEYENDA_ESTIMACION}
     </Texto>

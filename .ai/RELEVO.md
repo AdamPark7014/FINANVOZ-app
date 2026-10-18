@@ -6,22 +6,22 @@
 
 ## Hecho en este turno
 
-- **tarjetas/MesesYPagos:** botones y errores de pago planeado usan constantes de `textos.ts` (sin cadenas inline).
+- **personas / cuenta dividida:** `ETIQUETA_CATEGORIA_PARTE` y `ETIQUETA_ORIGEN_DIVISION` en `textos.ts`; `FormularioCuentaDividida` sin strings locales; `ERROR_DIVISION_ORIGEN` apunta a la misma etiqueta (TalkBack del radiogroup alineado con validación); prueba de textos.
 
 ## Hecho (acumulado reciente)
 
-- Copy y a11y móvil (me-alcanza, captura, anulación, estados-cuenta). Ver `git log`.
+- me-alcanza, tandas, estados de cuenta, respaldo, consulta: copy/a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
-- WIP local: `ajustes`, `personas`, `EditarTarjeta`/`textos` tarjetas — no mezclar en commits ajenos.
-- CI Windows: `publicar-ejemplos`, RNF-01.
+- Working tree ajeno (turno anterior): `PreguntasCaptura.tsx`, `EditarTarjeta.tsx`, `tarjetas/textos.ts` — no mezclar.
+- CI Windows: `publicar-ejemplos`, RNF-01 rendimiento.
 - M0 / teléfono / fiscal: Adam.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. Commits pequeños del WIP tarjetas/personas cuando toque.
+2. Commitear o descartar WIP captura/tarjetas según Adam.
 
 ## No tocar
 

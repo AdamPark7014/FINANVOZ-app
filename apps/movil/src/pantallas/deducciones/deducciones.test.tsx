@@ -21,6 +21,7 @@ import type { ArchivosFacturas } from './archivos';
 import { ImportarCompartidas, PantallaDeducciones } from './PantallaDeducciones';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
+  ETIQUETA_LEYENDA_ESTIMACION,
   LEYENDA_ESTIMACION,
   MENSAJE_IMPORTAR_ERROR,
   MENSAJE_SIN_PARAMETROS,
@@ -163,6 +164,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     );
     expect(textoDe('deducciones-ahorro')).toMatch(/agrega tu base gravable/);
     expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(LEYENDA_ESTIMACION);
+    expect(screen.getByLabelText(ETIQUETA_LEYENDA_ESTIMACION)).toBeTruthy();
 
     fireEvent.press(screen.getByTestId(`factura-${hospital}-ya-la-pague`));
     for (const forma of ['Transferencia', 'Tarjeta', 'Efectivo', 'Cheque'])
