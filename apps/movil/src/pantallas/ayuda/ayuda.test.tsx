@@ -13,6 +13,7 @@ import {
 import {
   BTN_ESCRIBIR_CORREO,
   CONTACTO_TITULO,
+  ETIQUETA_RESPUESTA,
   ETIQUETA_VOLVER,
   INTRO,
   mensajeSinAppCorreo,
@@ -95,7 +96,10 @@ describe('pantalla de ayuda', () => {
     expect(boton).toHaveProp('accessibilityState', { expanded: false });
     expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
-    expect(screen.getByTestId('ayuda-respuesta-respaldo')).toBeTruthy();
+    expect(screen.getByTestId('ayuda-respuesta-respaldo')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_RESPUESTA,
+    );
     expect(screen.getByTestId('ayuda-pregunta-respaldo')).toHaveProp('accessibilityState', {
       expanded: true,
     });

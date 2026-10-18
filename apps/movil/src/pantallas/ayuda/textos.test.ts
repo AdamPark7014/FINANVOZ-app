@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { CORREO_AYUDA } from './preguntas';
 import {
+  ACCESIBILIDAD_ESCRIBIR_CORREO,
+  ACCESIBILIDAD_VOLVER,
   BTN_ABRIR_DESDE_AJUSTES,
   BTN_AYUDA,
+  ETIQUETA_RESPUESTA,
   ICONO_PREGUNTA_ABIERTA,
   ICONO_PREGUNTA_CERRADA,
   INTRO,
   PISTA_ABRIR_DESDE_AJUSTES,
   PISTA_ESCRIBIR_CORREO,
+  PISTA_VOLVER,
   PREGUNTAS_TITULO,
   SECCION_AJUSTES,
   SECCION_AYUDA,
@@ -37,5 +41,15 @@ describe('textos de ayuda', () => {
     expect(pistaPreguntaFrecuente(true)).toMatch(/Pliega/);
     expect(textoCuerpoContacto(CORREO_AYUDA)).toContain(CORREO_AYUDA);
     expect(mensajeSinAppCorreo(CORREO_AYUDA)).toContain(CORREO_AYUDA);
+  });
+
+  it('TalkBack: pistas, etiquetas accesibles y región de respuesta', () => {
+    expect(PISTA_VOLVER).toMatch(/Ajustes/);
+    expect(ACCESIBILIDAD_VOLVER).toMatch(/ajustes/i);
+    expect(PISTA_ABRIR_DESDE_AJUSTES).toMatch(/preguntas frecuentes/i);
+    expect(PISTA_ESCRIBIR_CORREO).toMatch(/correo/i);
+    expect(ACCESIBILIDAD_ESCRIBIR_CORREO).toMatch(/correo/i);
+    expect(ETIQUETA_RESPUESTA).toBe('Respuesta');
+    expect(PREGUNTAS_TITULO).toMatch(/Preguntas frecuentes/);
   });
 });

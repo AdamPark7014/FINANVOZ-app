@@ -66,6 +66,9 @@ export function pistaPreguntaFrecuente(abierta: boolean): string {
   return abierta ? 'Pliega la respuesta' : 'Despliega la respuesta';
 }
 
+/** TalkBack: región de texto al expandir una pregunta (antes del contenido). */
+export const ETIQUETA_RESPUESTA = 'Respuesta';
+
 /**
  * Diez dudas probables según los flujos de la especificación (pendiente sustituir tras beta en `docs/ESTADO.md`).
  */
