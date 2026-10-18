@@ -122,20 +122,18 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp('accessibilityHint', PISTA_VER_CALENDARIO);
   });
 
-  it('Tarjetas de Hoy tienen pista TalkBack en Ya la di y Me tocó', () => {
+  it('Tarjeta de Hoy "Ya la di" tiene pista TalkBack', () => {
     const v = vector<VectorE11>('E11-01');
     const p = preparar('2026-10-16');
     crearTanda(p.ctx, entradaDe(v));
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     expect(screen.getByTestId('tarjeta-accion-0-ya-la-di')).toHaveProp('accessibilityHint', PISTA_YA_LA_DI);
+  });
 
-    p.reloj.fijar('2026-11-06');
-    crearTanda(p.ctx, {
-      ...entradaDe(v),
-      nombre: 'Otra tanda',
-      aportacionesHechas: 4,
-      yaCobraste: false,
-    });
+  it('Tarjeta de Hoy "Me tocó" tiene pista TalkBack', () => {
+    const v = vector<VectorE11>('E11-01');
+    const p = preparar('2026-11-06');
+    crearTanda(p.ctx, { ...entradaDe(v), aportacionesHechas: 4, yaCobraste: false });
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     const testID = screen
       .getAllByTestId(/^tarjeta-accion-\d$/)
