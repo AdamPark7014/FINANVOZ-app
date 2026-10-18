@@ -6,22 +6,23 @@
 
 ## Hecho en este turno
 
-- **Tarjeta a11y:** `pista={PISTA_VOLVER}` en botón volver (estado no encontrada + detalle); cierra test `TalkBack: volver regresa a Cuentas`.
+- **Micro polish batch (`18fcd70`):** leftovers TalkBack/copy en ajustes, captura, tandas y `CampoMonto` (ver diff del commit).
+- **Previo en main:** Movimientos testID por día; personas `PISTA_GUARDAR_PAGO`; Cuentas CTAs centralizados.
 
 ## Hecho (acumulado reciente)
 
-- Ayuda/deducciones/tandas pista volver; Cuentas headers; onboarding tips. Ver `git log`.
+- Onboarding O4 pista Continuar, widget/personas/deducciones a11y. Ver `git log`.
 
 ## A medias — CUIDADO
 
+- WIP: `me-alcanza/textos.ts` en disco — no commiteado este cierre.
 - CI Windows: `publicar-ejemplos`, RNF-01.
 - M0 / teléfono / fiscal: Adam.
-- Pantallas negocio (M11) aún no en UI.
 
 ## Siguiente paso
 
 1. Adam — M0 / EAS.
-2. WIP ajeno descartado al limpiar árbol antes del commit — revisar si algo faltaba rescatar.
+2. Cerrar o descartar WIP `me-alcanza/textos.ts`.
 3. M11 negocio cuando toque el hito.
 
 ## No tocar
