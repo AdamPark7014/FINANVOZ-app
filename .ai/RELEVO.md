@@ -6,11 +6,11 @@
 
 ## Hecho en este turno
 
-- **Suscripciones inactivas:** acordeón con `pistaInactivasSuscripciones` (Despliega/Pliega el detalle), `accessibilityState.expanded` y etiqueta en el botón desplegar.
+- **PantallaRegistrar:** TalkBack en Cerrar (`etiquetaAccesible`, `pista`) y encabezado en «O llena los datos».
 
 ## Hecho (acumulado reciente)
 
-- Onboarding/captura O6, PreviaWidget, compromiso suscripciones. Ver `git log`.
+- Suscripciones inactivas acordeón; onboarding/captura O6, PreviaWidget. Ver `git log`.
 
 ## A medias — CUIDADO
 

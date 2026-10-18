@@ -5,6 +5,10 @@ import type { MotorDictado } from '../../voz';
 import { FormularioMovimiento } from './FormularioMovimiento';
 import { PanelRegistrar } from './PanelRegistrar';
 
+/** TalkBack al cerrar la pantalla (`02 §15`). */
+const ACCESIBILIDAD_CERRAR_REGISTRAR = 'Cerrar registro';
+const PISTA_CERRAR_REGISTRAR = 'Vuelve a la pantalla anterior; lo que no guardaste no se registra';
+
 /**
  * Registrar (02-UX §5): dictado o texto arriba (la vía rápida) y el formulario completo abajo, para los tipos
  * que origina el usuario. Al guardar regresa a la pantalla anterior con el aviso "Deshacer".
@@ -49,6 +53,8 @@ export function PantallaRegistrar({
           variante="texto"
           ancho="contenido"
           alPresionar={alCerrar}
+          etiquetaAccesible={ACCESIBILIDAD_CERRAR_REGISTRAR}
+          pista={PISTA_CERRAR_REGISTRAR}
           testID="boton-cerrar-registrar"
         />
       </View>
@@ -61,7 +67,9 @@ export function PantallaRegistrar({
         {...(fraseRevision ? { fraseRevision } : {})}
         {...(motor ? { motor } : {})}
       />
-      <Texto variante="subtitulo">O llena los datos</Texto>
+      <Texto variante="subtitulo" testID="registrar-formulario-titulo" accessibilityRole="header">
+        O llena los datos
+      </Texto>
       <FormularioMovimiento
         alGuardar={alCerrar}
         {...(alVerMovimiento ? { alVerMovimiento } : {})}
