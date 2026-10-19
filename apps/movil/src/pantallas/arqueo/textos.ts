@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { cifraEnPalabras, formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui/formato';
 
 /** Redacción del arqueo (`02 §7`, `02 §14`): tuteo, sin tecnicismos contables. */
 
@@ -63,23 +63,20 @@ export const PASO_MARCAR_AYUDA =
   'Los que marques pasan a tu efectivo antes de contar, para no contarlos dos veces.';
 
 /** Tarjeta de Hoy cuando hay gastos por asignar viejos (paso 1 del arqueo). */
-export const AYUDA_POR_ASIGNAR =
-  'Antes revisemos unos gastos que no sé con qué pagaste.';
+export const AYUDA_POR_ASIGNAR = 'Antes revisemos unos gastos que no sé con qué pagaste.';
 
 /** Chips del paso «Deberías traer…» (`02 §7`). */
 export const ETIQUETA_OTRA_CANTIDAD = 'Otra cantidad';
 
 /** TalkBack: chip «traigo justo lo esperado». */
-export const etiquetaChipExacto = (esperado: Centavos): string =>
-  `Llevo ${cifraEnPalabras(esperado)}`;
+export const etiquetaChipExacto = (esperado: Centavos): string => `Llevo ${cifraEnPalabras(esperado)}`;
 
 /** Visible en la casilla del paso 1. */
 export const etiquetaCasillaGasto = (
   descripcion: string | null | undefined,
   monto: Centavos,
   etiqueta: string,
-): string =>
-  `${descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION} ${formatearCentavos(monto)} · ${etiqueta}`;
+): string => `${descripcion ?? ETIQUETA_GASTO_SIN_DESCRIPCION} ${formatearCentavos(monto)} · ${etiqueta}`;
 
 /** TalkBack en la casilla del paso 1 (montos en palabras). */
 export const etiquetaAccesibleCasillaGasto = (

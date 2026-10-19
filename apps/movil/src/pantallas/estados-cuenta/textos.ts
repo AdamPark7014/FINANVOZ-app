@@ -7,7 +7,7 @@ import {
   type RenglonDudoso,
   type RenglonEstado,
 } from '../../servicios';
-import { formatearCentavos } from '../../ui';
+import { formatearCentavos } from '../../ui/formato';
 
 /** Botones de la pantalla (`02 §14`: verbo primero). */
 export const BTN_ENTENDIDO = 'Entendido';
@@ -64,8 +64,7 @@ export const MENSAJE_LEYENDO = 'Leyendo tu estado de cuenta…';
 /** TalkBack mientras se extrae el PDF en el teléfono. */
 export const ETIQUETA_LEYENDO = 'Leyendo estado de cuenta';
 
-export const MENSAJE_CONTRASENA =
-  'Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.';
+export const MENSAJE_CONTRASENA = 'Tu PDF tiene contraseña. Escríbela para abrirlo; no la guardo.';
 export const ETIQUETA_CONTRASENA_PDF = 'Contraseña del PDF';
 export const ERROR_CONTRASENA_PDF = 'Esa contraseña no abre el PDF. Intenta de nuevo.';
 

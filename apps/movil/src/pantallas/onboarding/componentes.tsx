@@ -235,4 +235,3 @@ export function MensajeError({ texto }: { texto: string | null }) {
     </Texto>
   );
 }
-

@@ -95,8 +95,7 @@ export const LISTA_ESPERA_ENLACE_AVISO = 'Aviso de privacidad completo';
 export const LISTA_ESPERA_CONSENTIMIENTO =
   'Leí el aviso de privacidad y acepto que usen mis datos para esto.';
 
-export const LISTA_ESPERA_ERROR_RED =
-  'No pude anotarte. Revisa tu conexión e intenta de nuevo.';
+export const LISTA_ESPERA_ERROR_RED = 'No pude anotarte. Revisa tu conexión e intenta de nuevo.';
 
 export const LISTA_ESPERA_ERROR_LIMITE =
   'Recibimos varios intentos desde tu conexión. Intenta de nuevo en una hora.';

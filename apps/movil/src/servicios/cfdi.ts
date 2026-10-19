@@ -335,11 +335,7 @@ export function contarCfdi(ctx: Contexto): number {
 }
 
 /** Estatus que dio el usuario (`05 §E13.2`): vigente, cancelada en el SAT o desconocido. */
-export function actualizarEstatusCfdi(
-  ctx: Contexto,
-  uuid: string,
-  estatus: CfdiGuardado['estatus'],
-): void {
+export function actualizarEstatusCfdi(ctx: Contexto, uuid: string, estatus: CfdiGuardado['estatus']): void {
   exigirConsentimiento(ctx);
   enTransaccion(ctx, () => {
     const cambios = ctx.db.update(cfdi).set({ estatus }).where(eq(cfdi.uuid, uuid)).run();

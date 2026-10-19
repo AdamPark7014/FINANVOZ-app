@@ -1,7 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from '../../src/pantallas/onboarding/aviso';
+import {
+  AVISO_SIMPLIFICADO,
+  etiquetaAvisoSimplificadoOnboarding,
+} from '../../src/pantallas/onboarding/aviso';
 import {
   Casilla,
   ERROR_GUARDAR,
@@ -66,7 +69,10 @@ export default function Consentimiento() {
         testID="onb-aviso-simplificado"
         accessible
         accessibilityRole="summary"
-        accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(TITULO_AVISO_SIMPLIFICADO, AVISO_SIMPLIFICADO)}
+        accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(
+          TITULO_AVISO_SIMPLIFICADO,
+          AVISO_SIMPLIFICADO,
+        )}
       >
         <Tarjeta>
           <Texto variante="subtitulo" accessibilityElementsHidden>

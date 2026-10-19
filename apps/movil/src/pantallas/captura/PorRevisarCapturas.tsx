@@ -248,9 +248,7 @@ function FilaCaptura({ c, alRegistrar }: { c: CapturaPorRevisar; alRegistrar: ()
           <Boton
             etiqueta={c.motivos.includes('fue_a_meses') ? 'No, fue de contado' : 'Está bien así'}
             alPresionar={() => hacer(() => confirmarCaptura(ctx, c.capturaId), 'Listo, revisado.')}
-            pista={
-              c.motivos.includes('fue_a_meses') ? PISTA_CAPTURA_DE_CONTADO : PISTA_CONFIRMAR_CAPTURA
-            }
+            pista={c.motivos.includes('fue_a_meses') ? PISTA_CAPTURA_DE_CONTADO : PISTA_CONFIRMAR_CAPTURA}
             testID={`${testID}-confirmar`}
           />
         ) : null}

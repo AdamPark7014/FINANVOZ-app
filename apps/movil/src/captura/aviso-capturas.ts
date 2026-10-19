@@ -31,7 +31,9 @@ export interface PublicadorAvisoCaptura {
 }
 
 /** Para pruebas y builds sin `expo-notifications`. */
-export function publicadorEnMemoria(): PublicadorAvisoCaptura & { readonly cuerpos: () => readonly string[] } {
+export function publicadorEnMemoria(): PublicadorAvisoCaptura & {
+  readonly cuerpos: () => readonly string[];
+} {
   const lista: string[] = [];
   return {
     cuerpos: () => [...lista],

@@ -315,9 +315,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
         <ElegirPersona
           testID={testID}
           pregunta={PREGUNTA_A_QUIEN_PRESTASTE}
-          alElegir={(personaId) =>
-            contestar({ destino: 'prestamo', personaId }, AVISO_SALIDA_PRESTAMO)
-          }
+          alElegir={(personaId) => contestar({ destino: 'prestamo', personaId }, AVISO_SALIDA_PRESTAMO)}
         />
       ) : null}
       {opcion === 'gasto' ? (
@@ -328,9 +326,7 @@ function SalidaSinPareja({ p, testID }: { p: Pregunta<'salida_sin_pareja'>; test
           <GrupoChips
             opciones={categorias.map((c) => ({ valor: c.slug, etiqueta: c.nombre }))}
             valor={null}
-            alCambiar={(categoria) =>
-              contestar({ destino: 'gasto', categoria }, AVISO_SALIDA_GASTO)
-            }
+            alCambiar={(categoria) => contestar({ destino: 'gasto', categoria }, AVISO_SALIDA_GASTO)}
             prefijoTestID={`${testID}-categoria`}
             etiqueta={PREGUNTA_QUE_PAGASTE}
           />
@@ -422,9 +418,7 @@ function PagoSinOrigen({ p, testID }: { p: Pregunta<'pago_sin_origen'>; testID: 
             <ElegirPersona
               testID={testID}
               pregunta={PREGUNTA_QUIEN_PAGO}
-              alElegir={(personaId) =>
-                contestar({ origen: 'persona', personaId }, AVISO_PAGO_DEBES)
-              }
+              alElegir={(personaId) => contestar({ origen: 'persona', personaId }, AVISO_PAGO_DEBES)}
             />
           ) : null}
         </View>
@@ -442,8 +436,7 @@ function CuentaNueva({ p, testID }: { p: Pregunta<'cuenta_nueva'>; testID: strin
   const registrarEvento = useAnalitica();
   const { responder, error } = useResponder();
   const [agregando, setAgregando] = useState(false);
-  const que =
-    p.sugerencia === 'tarjeta_credito' ? CUENTA_NUEVA_UNA_TARJETA : CUENTA_NUEVA_UNA_CUENTA;
+  const que = p.sugerencia === 'tarjeta_credito' ? CUENTA_NUEVA_UNA_TARJETA : CUENTA_NUEVA_UNA_CUENTA;
   const titulo = p.ultimos4
     ? tituloCuentaNuevaDetectada(que, p.ultimos4, p.banco)
     : tituloCuentaNuevaSinUltimos4(p.banco);

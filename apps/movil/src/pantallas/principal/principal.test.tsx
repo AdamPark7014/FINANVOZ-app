@@ -23,7 +23,6 @@ import { cifraEnPalabras } from '../../ui/formato';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
 import {
-  BTN_AJUSTES_CUENTAS,
   BTN_AJUSTES_CUENTAS_ACCESIBLE,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
@@ -446,10 +445,16 @@ describe('Cuentas', () => {
     expect(screen.getByTestId('seccion-tienes-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveTextContent(TEXTO_CUENTAS_TIENES_VACIO);
     expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
-    expect(screen.getByTestId('cuentas-tienes-vacio').props.accessibilityLabel).toBe(etiquetaVacioCuentasTienes());
+    expect(screen.getByTestId('cuentas-tienes-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioCuentasTienes(),
+    );
     expect(screen.getByTestId('cuentas-debes-vacio')).toHaveTextContent(TEXTO_CUENTAS_DEBES_VACIO);
-    expect(screen.getByTestId('cuentas-debes-vacio').props.accessibilityLabel).toBe(etiquetaVacioCuentasDebes());
-    expect(screen.getByTestId('cuentas-compromisos-vacio')).toHaveTextContent(TEXTO_CUENTAS_COMPROMISOS_VACIO);
+    expect(screen.getByTestId('cuentas-debes-vacio').props.accessibilityLabel).toBe(
+      etiquetaVacioCuentasDebes(),
+    );
+    expect(screen.getByTestId('cuentas-compromisos-vacio')).toHaveTextContent(
+      TEXTO_CUENTAS_COMPROMISOS_VACIO,
+    );
     expect(screen.getByTestId('cuentas-compromisos-vacio').props.accessibilityLabel).toBe(
       etiquetaVacioCuentasCompromisos(),
     );
@@ -481,7 +486,7 @@ describe('Cuentas', () => {
     const caro = crearPersona(q.ctx, { nombre: 'Caro' });
     registrarCuentaDividida(q.ctx, {
       total: 40_000,
-      partes: 1,
+      partes: 2,
       personaIds: [caro],
       origenId: q.e.cuentas.nu as string,
       categoria: 'comida_fuera',
@@ -535,7 +540,7 @@ describe('Cuentas', () => {
     if (!nu) throw new Error('e4-01 sin Nu en Debes');
     renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
     expect(screen.getByTestId('seccion-tienes-lista')).toHaveProp('accessibilityRole', 'list');
-    expect(screen.getByTestId(`cuenta-${bbvaId}`)).toHaveProp('accessibilityRole', 'listitem');
+    expect(screen.getByTestId(`cuenta-${bbvaId}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
       `${contextoSaldoTienes(bbva.nombre)} ${cifraEnPalabras(bbva.saldo)}`,
     );
@@ -557,9 +562,7 @@ describe('Cuentas', () => {
     expect(textoDe(`cuenta-${p.e.cuentas.nu}-saldo`)).toBe('$2,000');
     expect(screen.getByText('internet')).toBeTruthy();
     expect(screen.getByText('mié 14')).toBeTruthy();
-    expect(screen.getByTestId('boton-ajustes').props.accessibilityLabel).toBe(
-      BTN_AJUSTES_CUENTAS_ACCESIBLE,
-    );
+    expect(screen.getByTestId('boton-ajustes').props.accessibilityLabel).toBe(BTN_AJUSTES_CUENTAS_ACCESIBLE);
     fireEvent.press(screen.getByTestId('boton-ajustes'));
     expect(alAbrirAjustes).toHaveBeenCalled();
   });
@@ -568,10 +571,7 @@ describe('Cuentas', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     const alAbrirTandas = jest.fn();
-    renderConSesion(
-      p.ctx,
-      <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTandas={alAbrirTandas} />,
-    );
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTandas={alAbrirTandas} />);
     expect(screen.getByTestId('boton-tandas').props.accessibilityLabel).toBe(BTN_TANDAS_CUENTAS);
     expect(screen.getByTestId('seccion-tandas-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('boton-tandas'));
@@ -629,7 +629,7 @@ describe('Movimientos', () => {
       etiquetaEncabezadoDiaMovimientos(listarMovimientos(p.ctx)[0]?.etiqueta ?? ''),
     );
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
-    expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('accessibilityRole', 'listitem');
+    expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`)).toHaveProp(
       'accessibilityHint',
       PISTA_MOSTRAR_DETALLE_MOVIMIENTO,
@@ -663,10 +663,7 @@ describe('Movimientos', () => {
     const p = conEscenario('e4-01');
     todas(p.ctx);
     fireEvent.press(screen.getByTestId('boton-escribir'));
-    fireEvent.changeText(
-      screen.getByTestId('campo-registrar'),
-      'ayer fui al súper con mi prima y pagó ella',
-    );
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     await screen.findByTestId('mensaje-registro');
     screen.unmount();
@@ -695,10 +692,7 @@ describe('Movimientos', () => {
     const p2 = conEscenario('e4-01');
     renderConSesion(
       p2.ctx,
-      <PantallaMovimientos
-        alRegistrar={jest.fn()}
-        filtro={{ desde: '2099-01-01', hasta: '2099-01-02' }}
-      />,
+      <PantallaMovimientos alRegistrar={jest.fn()} filtro={{ desde: '2099-01-01', hasta: '2099-01-02' }} />,
     );
     expect(screen.getByTestId('movimientos-vacio')).toHaveTextContent(TEXTO_MOVIMIENTOS_FILTRO_VACIO);
     expect(screen.getByTestId('movimientos-vacio')).toHaveProp('accessibilityLiveRegion', 'polite');
@@ -719,10 +713,7 @@ describe('Movimientos', () => {
       descripcion: 'coca',
     });
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id;
-    renderConSesion(
-      p.ctx,
-      <PantallaMovimientos alRegistrar={jest.fn()} detalleInicial={id ?? null} />,
-    );
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} detalleInicial={id ?? null} />);
     const fechaDia = listarMovimientos(p.ctx)[0]?.fecha;
     expect(screen.getByTestId(`movimientos-dia-${fechaDia}`)).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId(`detalle-${id}`)).toBeTruthy();
@@ -774,10 +765,7 @@ describe('Movimientos', () => {
     });
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
     const alAbrirPersona = jest.fn();
-    renderConSesion(
-      p.ctx,
-      <PantallaMovimientos alRegistrar={jest.fn()} alAbrirPersona={alAbrirPersona} />,
-    );
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} alAbrirPersona={alAbrirPersona} />);
     fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     fireEvent.press(screen.getByTestId(`movimiento-persona-${id}-${caro}`));
     expect(alAbrirPersona).toHaveBeenCalledWith(caro);

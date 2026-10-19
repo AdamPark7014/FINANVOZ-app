@@ -119,8 +119,7 @@ export const PERMISOS: readonly { readonly nombre: string; readonly para: string
 ];
 
 export const SECCION_DATOS = 'Tus datos';
-export const TEXTO_DESCARGA_GRATIS =
-  'Descárgalos cuando quieras, gratis, también si cancelas Plus.';
+export const TEXTO_DESCARGA_GRATIS = 'Descárgalos cuando quieras, gratis, también si cancelas Plus.';
 export const BTN_EXPORTAR_JSON = 'Descargar todos mis datos (JSON)';
 export const BTN_EXPORTAR_CSV = 'Descargar mis movimientos (CSV)';
 export const PISTA_EXPORTAR_JSON = 'Prepara un archivo con todos tus datos para compartir';
@@ -144,8 +143,7 @@ export const PISTA_BORRAR_CANCELAR = 'Cierra la confirmación sin borrar nada';
 export const BTN_CANCELAR = 'Cancelar';
 
 export const MENSAJE_NO_GUARDAR = 'No pude guardar el cambio. Intenta de nuevo.';
-export const MENSAJE_NO_EXPORTAR =
-  'No pude preparar el archivo para compartir. Intenta de nuevo.';
+export const MENSAJE_NO_EXPORTAR = 'No pude preparar el archivo para compartir. Intenta de nuevo.';
 
 export const TITULO_TERMINOS = 'Términos de uso';
 
@@ -236,11 +234,7 @@ export const TEXTO_SIN_CONSENTIMIENTO =
   'Todavía no consta aquí que aceptaste el aviso; al abrir la app te lo pedimos de nuevo si hace falta.';
 
 export function lineaPersonas(n: number): string {
-  return cuenta(
-    n,
-    'persona a quien prestas o que te debe',
-    'personas a quienes prestas o que te deben',
-  );
+  return cuenta(n, 'persona a quien prestas o que te debe', 'personas a quienes prestas o que te deben');
 }
 
 export function lineaAvisosBanco(n: number): string {

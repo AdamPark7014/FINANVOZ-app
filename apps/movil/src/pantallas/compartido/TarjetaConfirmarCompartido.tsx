@@ -23,11 +23,7 @@ export function TarjetaConfirmarCompartido({
   if (!grupo) {
     return (
       <Tarjeta testID="confirmar-compartido-grupo">
-        <Texto
-          variante="subtitulo"
-          testID="confirmar-compartido-titulo"
-          accessibilityRole="header"
-        >
+        <Texto variante="subtitulo" testID="confirmar-compartido-titulo" accessibilityRole="header">
           {ETIQUETA_CON_QUIEN_COMPARTES}
         </Texto>
         <Chips

@@ -15,7 +15,7 @@ export interface BotonProps {
   /** Etiqueta de TalkBack si el texto visible no basta. */
   etiquetaAccesible?: string;
   /** Qué pasa al tocarlo, leído por TalkBack después de la etiqueta. */
-  pista?: string;
+  pista?: string | undefined;
   ancho?: 'completo' | 'contenido';
   style?: StyleProp<ViewStyle>;
   testID?: string;

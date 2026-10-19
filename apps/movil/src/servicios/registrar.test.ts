@@ -15,7 +15,7 @@ import {
   TOPE_OPTIMISTA,
 } from './registrar';
 import { crearTanda } from './tandas';
-import { abrirPrueba, golden, vector } from './__pruebas__/base';
+import { abrirPrueba, vector } from './__pruebas__/base';
 import { nubeFalsa } from './__pruebas__/nube';
 
 interface VectorE11 {

@@ -109,7 +109,12 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
 
   return (
     <View style={{ gap: espacio.m }} testID="editar-tarjeta">
-      <CampoTexto testID="editar-nombre" etiqueta={ETIQUETA_NOMBRE_TARJETA} valor={nombre} alCambiar={setNombre} />
+      <CampoTexto
+        testID="editar-nombre"
+        etiqueta={ETIQUETA_NOMBRE_TARJETA}
+        valor={nombre}
+        alCambiar={setNombre}
+      />
       <CampoTexto
         testID="editar-ultimos4"
         etiqueta={ETIQUETA_ULTIMOS4}
@@ -226,12 +231,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
           }
         }}
       />
-      <Boton
-        etiqueta={BTN_CANCELAR}
-        variante="texto"
-        alPresionar={alTerminar}
-        testID="corregir-cancelar"
-      />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} testID="corregir-cancelar" />
     </View>
   );
 }

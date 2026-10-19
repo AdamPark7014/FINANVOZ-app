@@ -1,6 +1,6 @@
 import type { Centavos } from '@cartera/core';
 import type { FrecuenciaTanda, MovimientoTanda, RondaTandaVista, TandaYaEmpezada } from '../../servicios';
-import { cifraEnPalabras, formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui/formato';
 
 /** Copy de tandas (`02 §18`, tuteo). */
 
@@ -18,8 +18,7 @@ export const PREGUNTA_YA_DISTE = '¿Ya diste tu tanda?';
 export const PREGUNTA_HOY_COBRO = 'Hoy te toca cobrar tu tanda.';
 export const ETIQUETA_TODAVIA_NO = 'Todavía no';
 /** TalkBack al posponer la aportación en Hoy (`02 §18`). */
-export const PISTA_TODAVIA_NO_APORTACION =
-  'Pospone el registro; la sigo apartando y te pregunto mañana';
+export const PISTA_TODAVIA_NO_APORTACION = 'Pospone el registro; la sigo apartando y te pregunto mañana';
 /** TalkBack al posponer el cobro en Hoy (`02 §18`). */
 export const PISTA_TODAVIA_NO_COBRO = 'Pospone el cobro; te pregunto mañana';
 export const MENSAJE_TODAVIA_NO_APORTACION = 'La sigo apartando. Te pregunto mañana.';
@@ -64,8 +63,7 @@ export const ERROR_FRECUENCIA = 'Dime cada cuándo das tu tanda.';
 export const ERROR_PARTICIPANTES = 'Escribe cuántos son en la tanda (de 2 a 50).';
 export const errorTurno = (max: number) => `Escribe tu turno, del 1 al ${max}.`;
 export const ERROR_FECHA_INICIO = 'Escribe la primera fecha así: 16/10/2026.';
-export const ERROR_APORTACIONES_HECHAS =
-  'Escribe cuántas aportaciones llevas, o déjalo como te lo propuse.';
+export const ERROR_APORTACIONES_HECHAS = 'Escribe cuántas aportaciones llevas, o déjalo como te lo propuse.';
 export const ERROR_GUARDAR_TANDA = 'No pude guardar la tanda. Revisa los datos.';
 
 export const TEXTO_COMPROMISO_APORTACION =
@@ -111,8 +109,7 @@ export function etiquetaAccesibleTandaEnLista(t: {
 }
 
 /** Aviso al guardar desde voz o formulario. */
-export const MENSAJE_TANDA_GUARDADA =
-  'Listo: guardé tu tanda. Aparto cada aportación el día que toca.';
+export const MENSAJE_TANDA_GUARDADA = 'Listo: guardé tu tanda. Aparto cada aportación el día que toca.';
 
 /** Detalle (`tandas/[id]`). */
 export const ETIQUETA_VOLVER = 'Volver';
@@ -198,7 +195,7 @@ export function etiquetaAccesibleProximaAportacionDetalle(etiqueta: string): str
 
 /** TalkBack: bloque de cobro pendiente en el detalle (`02 §18`). */
 export function etiquetaAccesibleCobroDetalle(cobro: Centavos, etiquetaCobro: string): string {
-  return `${textoCobras(cobro, etiquetaCobro)} ${TEXTO_NO_ES_INGRESO}`;
+  return `Cobras ${cifraEnPalabras(cobro, 'pesos')} el ${etiquetaCobro}. ${TEXTO_NO_ES_INGRESO}`;
 }
 
 /** TalkBack: resumen al crear tanda (cuándo cobras + compromiso) (`02 §18`). */
@@ -234,9 +231,7 @@ export function etiquetaAccesibleTarjetaHoyAportacion(t: {
 }): string {
   const monto = cifraEnPalabras(t.monto, 'pesos');
   const detalle =
-    t.cuando === 'hoy'
-      ? `${t.nombre}. ${monto} hoy`
-      : `${t.nombre}. ${monto}, tocaba el ${t.etiquetaFecha}`;
+    t.cuando === 'hoy' ? `${t.nombre}. ${monto} hoy` : `${t.nombre}. ${monto}, tocaba el ${t.etiquetaFecha}`;
   return `${t.pregunta} ${detalle}`;
 }
 
@@ -290,8 +285,7 @@ export const OPCIONES_FRECUENCIA_TANDA: readonly { valor: FrecuenciaTanda; etiqu
 export const TEXTO_NO_ES_INGRESO = 'Esto es tu dinero de vuelta, no un ingreso.';
 
 /** Lista de tandas vacía (`02 §18`). */
-export const TEXTO_TANDAS_VACIO =
-  'Agrega tu tanda y aparto cada aportación el día que toca.';
+export const TEXTO_TANDAS_VACIO = 'Agrega tu tanda y aparto cada aportación el día que toca.';
 
 export function etiquetaVacioTandas(): string {
   return `${TITULO_TANDAS}. ${TEXTO_TANDAS_VACIO}`;

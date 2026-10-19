@@ -31,7 +31,12 @@ export default function EstadoCuentaRuta() {
   if (!uri) {
     return (
       <Pantalla bordes={['top', 'left', 'right', 'bottom']}>
-        <Texto variante="cuerpo" tono="secundario" testID="estado-elegir-pdf" accessibilityLiveRegion="polite">
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          testID="estado-elegir-pdf"
+          accessibilityLiveRegion="polite"
+        >
           {MENSAJE_ELEGIR_PDF}
         </Texto>
       </Pantalla>

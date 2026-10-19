@@ -4,9 +4,7 @@ import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../../ui/componentes
 
 describe('Chip (TalkBack)', () => {
   it('radio: etiqueta hablada, selected sin checked, texto visible oculto', () => {
-    render(
-      <Chip etiqueta="Efectivo" seleccionado alPresionar={() => {}} testID="c" />,
-    );
+    render(<Chip etiqueta="Efectivo" seleccionado alPresionar={() => {}} testID="c" />);
     const chip = screen.getByTestId('c');
     expect(chip.props.accessibilityRole).toBe('radio');
     expect(chip.props.accessibilityLabel).toBe('Efectivo');
@@ -18,18 +16,14 @@ describe('Chip (TalkBack)', () => {
   });
 
   it('checkbox: anuncia checked', () => {
-    render(
-      <Chip etiqueta="Caro" seleccionado multiple alPresionar={() => {}} testID="c" />,
-    );
+    render(<Chip etiqueta="Caro" seleccionado multiple alPresionar={() => {}} testID="c" />);
     expect(screen.getByTestId('c').props.accessibilityState).toMatchObject({ checked: true });
     expect(screen.getByTestId('c').props.accessibilityRole).toBe('checkbox');
     expect(screen.getByTestId('c').props.accessibilityHint).toBe('Marca o desmarca esta opción');
   });
 
   it('«Nombre ×2» se lee como «Nombre, 2 veces»', () => {
-    render(
-      <Chip etiqueta="Caro ×2" seleccionado multiple alPresionar={() => {}} testID="c" />,
-    );
+    render(<Chip etiqueta="Caro ×2" seleccionado multiple alPresionar={() => {}} testID="c" />);
     expect(screen.getByTestId('c').props.accessibilityLabel).toBe('Caro, 2 veces');
   });
 

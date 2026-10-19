@@ -463,7 +463,9 @@ describe('¿Me alcanza?', () => {
     // Una sola compra: las demás opciones ya no ofrecen "Lo compré".
     expect(screen.queryByTestId('lo-compre-contado_hoy')).toBeNull();
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByRole('text').props.accessibilityLabel).toMatch(/Unos tenis/);
+    expect(
+      within(aviso).getByRole('text', { includeHiddenElements: false }).props.accessibilityLabel,
+    ).toMatch(/Unos tenis/);
 
     fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(listarPlanesMsi(p.ctx, p.nu)).toHaveLength(0);
@@ -494,7 +496,9 @@ describe('¿Me alcanza?', () => {
       />,
     );
     expect(screen.getByTestId('me-alcanza-calculando')).toBeTruthy();
-    expect(screen.getByTestId('me-alcanza-calculando-aviso').props.accessibilityLabel).toBe(ETIQUETA_CALCULANDO);
+    expect(screen.getByTestId('me-alcanza-calculando-aviso').props.accessibilityLabel).toBe(
+      ETIQUETA_CALCULANDO,
+    );
     expect(screen.getByTestId('me-alcanza-calculando-aviso')).toHaveProp('accessibilityLiveRegion', 'polite');
     // Primer bloque hecho: el cálculo espera para ceder el hilo.
     await waitFor(() => expect(pendientes.length).toBeGreaterThan(0));
@@ -538,7 +542,10 @@ describe('¿Me alcanza?', () => {
     const p = e401();
     montar(p.ctx, <PantallaMeAlcanza alCerrar={jest.fn()} />);
     expect(screen.getByTestId('me-alcanza-encabezado')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('boton-cerrar-me-alcanza')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_CERRAR);
+    expect(screen.getByTestId('boton-cerrar-me-alcanza')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_CERRAR,
+    );
     expect(screen.getByTestId('boton-calcular-me-alcanza')).toHaveProp('accessibilityHint', PISTA_CALCULAR);
   });
 
@@ -581,7 +588,10 @@ describe('¿Me alcanza?', () => {
       'accessibilityLabel',
       ACCESIBILIDAD_LISTO,
     );
-    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toHaveProp('accessibilityHint', PISTA_LISTO);
+    expect(screen.getByTestId('boton-listo-datos-insuficientes')).toHaveProp(
+      'accessibilityHint',
+      PISTA_LISTO,
+    );
   });
 
   it('si el cálculo falla, muestra el error y permite reintentar', async () => {
@@ -717,9 +727,7 @@ describe('Movimientos · "Fue algo extraordinario"', () => {
     fireEvent.press(screen.getByTestId('boton-extraordinario'));
     const aviso = screen.getByTestId('aviso');
     expect(
-      within(aviso).getByLabelText(
-        etiquetaHablada('Listo: no lo uso para estimar tus gastos de cada día.'),
-      ),
+      within(aviso).getByLabelText(etiquetaHablada('Listo: no lo uso para estimar tus gastos de cada día.')),
     ).toBeTruthy();
     fireEvent.press(within(aviso).getByRole('button', { name: BTN_DESHACER }));
     expect(screen.queryByTestId('aviso')).toBeNull();

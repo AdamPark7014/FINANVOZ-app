@@ -32,7 +32,6 @@ import {
   ETIQUETA_ORIGEN_DIVISION,
   MENSAJE_PERMISO_AVISOS,
   mensajeRecordatorioCobro,
-  mensajeRegistroCobro,
   PISTA_AGREGAR_PERSONA,
   PISTA_COBRAR,
   PISTA_YA_ME_PAGO,
@@ -248,7 +247,10 @@ describe('CA-M8-02 · Cobrar', () => {
     expect(screen.getByTestId('boton-ya-me-pago')).toHaveProp('accessibilityState', { expanded: true });
     expect(screen.getByTestId('persona-ya-me-pago-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(TITULO_YA_ME_PAGO)).toBeTruthy();
-    expect(screen.getByTestId('boton-guardar-pago-persona')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO);
+    expect(screen.getByTestId('boton-guardar-pago-persona')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_PAGO,
+    );
     fireEvent.press(screen.getByTestId('boton-guardar-pago-persona'));
     expect(screen.getByTestId('persona-ya-me-pago-faltante')).toHaveProp('accessibilityRole', 'alert');
   });
@@ -336,10 +338,7 @@ describe('recordatorio de cobro', () => {
     });
     expect(n.vecesPedido()).toBe(1);
     expect(textoDe('persona-recordatorio-fecha')).toBe(mensajeRecordatorioCobro('mié 14 oct'));
-    expect(screen.getByTestId('persona-recordatorio-fecha')).toHaveProp(
-      'accessibilityLiveRegion',
-      'polite',
-    );
+    expect(screen.getByTestId('persona-recordatorio-fecha')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('persona-recordatorio-fecha')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-quitar-recordatorio')).toHaveProp(
       'accessibilityHint',
@@ -383,7 +382,10 @@ describe('recordatorio de cobro', () => {
 describe('estados vacíos (es-MX)', () => {
   it('persona inexistente', () => {
     const p = conEscenario('e4-01');
-    renderConSesion(p.ctx, <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />);
+    renderConSesion(
+      p.ctx,
+      <PantallaPersona personaId="contraparte:persona:inexistente" alVolver={jest.fn()} />,
+    );
     expect(textoDe('persona-no-encontrada')).toBe(TEXTO_PERSONA_NO_ENCONTRADA);
     expect(screen.getByTestId('persona-no-encontrada').props.accessibilityLabel).toBe(
       etiquetaPersonaNoEncontrada(),
@@ -407,9 +409,10 @@ describe('estados vacíos (es-MX)', () => {
     cena(p);
     renderConSesion(p.ctx, <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />);
     expect(screen.getByTestId('persona-nombre')).toHaveProp('accessibilityRole', 'header');
-    expect(
-      screen.getByTestId('persona-saldo-etiqueta', { includeHiddenElements: true }),
-    ).toHaveProp('importantForAccessibility', 'no-hide-descendants');
+    expect(screen.getByTestId('persona-saldo-etiqueta', { includeHiddenElements: true })).toHaveProp(
+      'importantForAccessibility',
+      'no-hide-descendants',
+    );
     expect(textoDe('persona-tip-te-deben')).toBe(TIP_SALDO_TE_DEBEN);
     expect(screen.getByTestId('persona-tip-te-deben')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('persona-movimientos-lista')).toHaveProp('accessibilityRole', 'list');

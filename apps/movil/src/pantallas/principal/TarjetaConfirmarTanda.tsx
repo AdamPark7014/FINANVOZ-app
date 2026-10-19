@@ -104,7 +104,10 @@ export function TarjetaConfirmarTanda({
             {preguntaCuenta}
           </Texto>
           <GrupoChips
-            opciones={propuesta.faltaCuenta!.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+            opciones={(propuesta.faltaCuenta?.candidatas ?? []).map((c) => ({
+              valor: c.id,
+              etiqueta: c.nombre,
+            }))}
             valor={cuentaId}
             alCambiar={setCuentaId}
             prefijoTestID="tanda-confirmar-cuenta"
@@ -117,7 +120,12 @@ export function TarjetaConfirmarTanda({
           {error}
         </Texto>
       ) : null}
-      <Boton etiqueta="Guardar" alPresionar={guardar} deshabilitado={!completo} testID="boton-guardar-tanda" />
+      <Boton
+        etiqueta="Guardar"
+        alPresionar={guardar}
+        deshabilitado={!completo}
+        testID="boton-guardar-tanda"
+      />
       <Boton etiqueta="Cancelar" variante="texto" alPresionar={alCancelar} testID="boton-cancelar-tanda" />
     </Tarjeta>
   );

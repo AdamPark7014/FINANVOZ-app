@@ -76,9 +76,7 @@ describe('Suscripciones (02 §20)', () => {
     );
     expect(screen.getByTestId('suscripciones-resumen')).toHaveProp(
       'accessibilityLabel',
-      etiquetaAccesibleResumenSuscripciones(
-        'Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)',
-      ),
+      etiquetaAccesibleResumenSuscripciones('Pagas unos $1,626 al mes en 5 suscripciones ($19,514 al año)'),
     );
     expect(screen.getByTestId('suscripcion-netflix-monto')).toHaveProp(
       'accessibilityLabel',

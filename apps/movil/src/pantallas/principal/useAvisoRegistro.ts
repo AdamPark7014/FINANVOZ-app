@@ -40,9 +40,7 @@ export function useAvisoRegistro(alVerDetalle?: (transaccionId: string) => void)
               },
             }
           : {}),
-        ...(transaccionId && alVerDetalle
-          ? { alPresionarMensaje: () => alVerDetalle(transaccionId) }
-          : {}),
+        ...(transaccionId && alVerDetalle ? { alPresionarMensaje: () => alVerDetalle(transaccionId) } : {}),
       });
     },
     [alVerDetalle, ctx, refrescar, mostrar],

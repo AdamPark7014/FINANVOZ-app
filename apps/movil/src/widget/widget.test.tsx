@@ -14,11 +14,7 @@ import { ProveedorSesion, useSesion } from '../sesion/ProveedorSesion';
 import { conEscenario } from '../pantallas/principal/__pruebas__/base';
 import { SeccionWidget } from '../pantallas/ajustes/SeccionWidget';
 import { auditar } from '../pantallas/__pruebas__/accesibilidad';
-import {
-  PISTA_OCULTAR_MONTOS,
-  PISTA_PREVIA,
-  PISTA_PREVIA_OCULTA,
-} from '../pantallas/ajustes/widget-textos';
+import { PISTA_OCULTAR_MONTOS, PISTA_PREVIA, PISTA_PREVIA_OCULTA } from '../pantallas/ajustes/widget-textos';
 import { SincronizarWidget } from './SincronizarWidget';
 import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
 import { WidgetHoy } from './WidgetHoy';
@@ -50,25 +46,19 @@ describe('PreviaWidget (vista previa en Ajustes)', () => {
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityRole).toBe('summary');
     expect(previa.props.accessibilityHint).toBeUndefined();
-    expect(within(previa).getByTestId('previa-widget-titulo', { includeHiddenElements: true }).props.children).toBe(
-      'Hoy puedes',
-    );
-    expect(within(previa).getByTestId('previa-widget-cifra', { includeHiddenElements: true }).props.children).toBe(
-      '$214',
-    );
-    expect(within(previa).getByTestId('previa-widget-detalle', { includeHiddenElements: true }).props.children).toBe(
-      '· 4 días',
-    );
+    expect(
+      within(previa).getByTestId('previa-widget-titulo', { includeHiddenElements: true }).props.children,
+    ).toBe('Hoy puedes');
+    expect(
+      within(previa).getByTestId('previa-widget-cifra', { includeHiddenElements: true }).props.children,
+    ).toBe('$214');
+    expect(
+      within(previa).getByTestId('previa-widget-detalle', { includeHiddenElements: true }).props.children,
+    ).toBe('· 4 días');
   });
 
   it('anuncia una etiqueta hablada y oculta los textos internos para TalkBack', () => {
-    render(
-      <PreviaWidget
-        vista={VISTA_EJEMPLO_WIDGET}
-        esquema="claro"
-        pistaAccesible={PISTA_PREVIA}
-      />,
-    );
+    render(<PreviaWidget vista={VISTA_EJEMPLO_WIDGET} esquema="claro" pistaAccesible={PISTA_PREVIA} />);
     const previa = screen.getByTestId('previa-widget');
     expect(previa.props.accessibilityRole).toBe('summary');
     expect(previa.props.accessibilityLabel).toBe(
@@ -281,7 +271,8 @@ describe('Ajustes → Widget', () => {
     await act(async () => {});
     expect(mockActualizar.mock.calls.at(-1)?.[0].texto).toBe('Hoy puedes $214 · 4 días');
     expect(
-      within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget').props.accessibilityHint,
+      within(screen.getByTestId('ajustes-widget-previa')).getByTestId('previa-widget').props
+        .accessibilityHint,
     ).toBe(PISTA_PREVIA);
     p.cerrar();
   });

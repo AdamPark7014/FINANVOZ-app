@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { Text, type StyleProp, type TextStyle } from 'react-native';
+import { Text, type StyleProp, type TextProps, type TextStyle } from 'react-native';
 import { cifraEnPalabras, formatearCentavos, type ModoCifra } from '../formato';
 import { useTema } from '../tema';
 import { NUMEROS_TABULARES, tipo } from '../tokens';
@@ -18,6 +18,8 @@ export interface CifraProps {
   contexto?: string;
   style?: StyleProp<TextStyle>;
   testID?: string;
+  /** "no" cuando el contenedor ya anuncia la cifra en su propia etiqueta. */
+  importantForAccessibility?: TextProps['importantForAccessibility'];
 }
 
 const tamanos = {
@@ -39,6 +41,7 @@ export function Cifra({
   contexto,
   style,
   testID,
+  importantForAccessibility,
 }: CifraProps) {
   const { c } = useTema();
   const palabras = cifraEnPalabras(centavos, modo);
@@ -46,6 +49,7 @@ export function Cifra({
     <Text
       testID={testID}
       accessible
+      {...(importantForAccessibility ? { importantForAccessibility } : {})}
       accessibilityLabel={contexto ? `${contexto} ${palabras}` : palabras}
       style={[
         tamanos[tamano],

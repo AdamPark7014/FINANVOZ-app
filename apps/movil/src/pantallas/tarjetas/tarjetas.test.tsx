@@ -58,9 +58,7 @@ import {
   PISTA_GUARDAR_PAGO_TARJETA,
   PISTA_PAGAR_TARJETA,
   etiquetaVacioEstadosTarjeta,
-  etiquetaSiLiquidar,
   etiquetaVacioMovimientosTarjeta,
-  preguntaTarjetaConfirmarMsi,
   TEXTO_TARJETA_NO_ENCONTRADA,
   TITULO_CONFIRMAR_MSI,
   TITULO_DESDE_ULTIMO_CORTE,
@@ -317,15 +315,11 @@ describe('tarjetas/textos · TalkBack', () => {
   it('filas del resumen y movimientos leen etiqueta, uso y gasto o abono', () => {
     expect(etiquetaAccesibleDato('Próximo corte', '28 oct')).toBe('Próximo corte: 28 oct');
     expect(etiquetaAccesibleUsoTarjeta(42)).toBe('Usas 42 % de tu límite');
-    expect(
-      etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', 15_000, true),
-    ).toBe('Oxxo, 12 oct, gasto ciento cincuenta pesos');
-    expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe(
-      'Tele, $500.00 al mes, faltan 6 de 12',
+    expect(etiquetaAccesibleMovimientoTarjeta('Oxxo', '12 oct', 15_000, true)).toBe(
+      'Oxxo, 12 oct, gasto ciento cincuenta pesos',
     );
-    expect(
-      etiquetaAccesibleEstadoCuentaTarjeta('10 nov', 450_000, 100_000, 350_000, '30 nov'),
-    ).toBe(
+    expect(etiquetaAccesiblePlanMsi('Tele', '$500.00', 6, 12)).toBe('Tele, $500.00 al mes, faltan 6 de 12');
+    expect(etiquetaAccesibleEstadoCuentaTarjeta('10 nov', 450_000, 100_000, 350_000, '30 nov')).toBe(
       'Corte del 10 nov. Lo que debías el día de corte: cuatro mil quinientos pesos. Lo que ya pagaste desde entonces: mil pesos. Para no generar intereses: tres mil quinientos pesos. Fecha límite: 30 nov',
     );
   });
@@ -414,16 +408,17 @@ describe('Tarjetas', () => {
     procesarApertura(p.ctx);
     const e0 = detalleTarjeta(p.ctx, p.oro).estadosCuenta[0];
     expect(e0).toBeTruthy();
+    if (!e0) return;
     montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
-    const fechaCorte = etiquetaDiaMes(e0!.corte);
-    const fechaLimite = etiquetaDiaMes(e0!.limite);
+    const fechaCorte = etiquetaDiaMes(e0.corte);
+    const fechaLimite = etiquetaDiaMes(e0.limite);
     expect(
       screen.getByLabelText(
         etiquetaAccesibleEstadoCuentaTarjeta(
           fechaCorte,
-          e0!.saldoCorte,
-          e0!.pagosPosteriores,
-          e0!.pngi,
+          e0.saldoCorte,
+          e0.pagosPosteriores,
+          e0.pngi,
           fechaLimite,
         ),
       ),

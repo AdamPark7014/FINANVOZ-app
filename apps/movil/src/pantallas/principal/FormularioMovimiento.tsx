@@ -192,10 +192,10 @@ export function FormularioMovimiento({
               nombre: 'movimiento_registrado',
               propiedades: { origen: 'formulario', pregunto: false, espacio: 'personal' },
             });
-            avisarRegistro(
-              mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
-              { deshacer: r.deshacer, transaccionId: r.registro.transaccionId },
-            );
+            avisarRegistro(mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal), {
+              deshacer: r.deshacer,
+              transaccionId: r.registro.transaccionId,
+            });
             setClave((k) => k + 1);
             alGuardar?.();
           }}

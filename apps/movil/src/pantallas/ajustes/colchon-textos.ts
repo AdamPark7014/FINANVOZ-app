@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { formatearCentavos } from '../../ui/formato';
 
 /** Redacción Ajustes › Colchón (`02 §12`, RF-CFG-02): tuteo; montos vienen de `servicios/` y `ui/`. */
 
@@ -32,8 +32,7 @@ export function resumenConColchon(monto: Centavos): string {
   return `Apartas ${formatearCentavos(monto)} que no cuentan para lo que puedes gastar.`;
 }
 
-export const RESUMEN_SIN_COLCHON =
-  'Sin colchón: todo tu dinero libre cuenta para lo que puedes gastar.';
+export const RESUMEN_SIN_COLCHON = 'Sin colchón: todo tu dinero libre cuenta para lo que puedes gastar.';
 
 export function confirmacionColchon(monto: Centavos): string {
   return `Listo: tu colchón ahora es ${formatearCentavos(monto)}.`;

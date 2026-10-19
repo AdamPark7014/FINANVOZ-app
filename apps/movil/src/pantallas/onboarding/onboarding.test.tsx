@@ -36,7 +36,6 @@ import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
   PISTA_AGREGAR_TARJETA_ONB,
-  PISTA_CAPTURA_AHORA_NO,
   PISTA_COMPLETAR_INGRESO,
   PISTA_LEER_AVISO_COMPLETO,
   PISTA_MARCAR_CASILLA_DATOS,
@@ -48,10 +47,7 @@ import {
   PISTA_TARJETA_GUARDAR_ONB,
   TITULO_BIENVENIDA,
 } from './textos';
-import {
-  AVISO_SIMPLIFICADO,
-  etiquetaAvisoSimplificadoOnboarding,
-} from './aviso';
+import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from './aviso';
 import { TITULO_AVISO_SIMPLIFICADO } from './textos';
 
 /** Las rutas reales del onboarding sobre una raíz mínima; las pestañas son de otra pantalla y aquí se simulan. */
@@ -98,10 +94,7 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-titulo-paso')).toHaveProp('accessibilityLabel', TITULO_BIENVENIDA);
     expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
     expect(screen.getByTestId('onb-empezar')).toHaveProp('accessibilityHint', PISTA_ONB_EMPEZAR);
-    expect(screen.getByTestId('onb-restaurar')).toHaveProp(
-      'accessibilityHint',
-      PISTA_ONBOARDING_RESTAURAR,
-    );
+    expect(screen.getByTestId('onb-restaurar')).toHaveProp('accessibilityHint', PISTA_ONBOARDING_RESTAURAR);
   });
 
   it('CA-M2-05 · no se escribe nada antes de aceptar; al aceptar queda la evidencia', () => {
@@ -109,8 +102,10 @@ describe('onboarding', () => {
     const antes = conteoTablas();
     tocar('onb-empezar');
     expect(r.getPathname()).toBe('/onboarding/consentimiento');
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CONSENTIMIENTO);
-    expect(screen.getByTestId('onb-tip')).toHaveProp(
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_CONSENTIMIENTO,
+    );
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveProp(
       'accessibilityLabel',
       `Consejo: ${TIP_CONSENTIMIENTO}`,
     );
@@ -134,7 +129,9 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-aceptar')).toHaveProp('accessibilityHint', PISTA_ONB_CONTINUAR);
     tocar('onb-aceptar');
     expect(r.getPathname()).toBe('/onboarding/ingreso');
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_INGRESO_SALTAR,
+    );
     expect(screen.getByTestId('onb-ingreso-continuar')).toHaveProp(
       'accessibilityHint',
       PISTA_COMPLETAR_INGRESO,
@@ -175,7 +172,9 @@ describe('onboarding', () => {
 
     it('CA-M2-12 · con meses que ya tenía y "No sé": no resta los meses del saldo y Hoy avisa', () => {
       const r = abrir('/onboarding/cuentas');
-      expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CUENTAS_MINIMO);
+      expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+        TIP_CUENTAS_MINIMO,
+      );
       expect(screen.getByTestId('onb-agregar-tarjeta')).toHaveProp(
         'accessibilityHint',
         PISTA_AGREGAR_TARJETA_ONB,
@@ -199,8 +198,11 @@ describe('onboarding', () => {
       // Sin responder "¿El saldo ya los incluye?" no se guarda.
       tocar('tarjeta-guardar');
       expect(screen.getByTestId('error-formulario')).toHaveTextContent(/ya incluye esos meses/);
-    expect(screen.getByTestId('error-formulario')).toHaveProp('accessibilityLabel', expect.stringMatching(/ya incluye esos meses/));
-    expect(screen.getByTestId('error-formulario')).toHaveProp('importantForAccessibility', 'yes');
+      expect(screen.getByTestId('error-formulario')).toHaveProp(
+        'accessibilityLabel',
+        expect.stringMatching(/ya incluye esos meses/),
+      );
+      expect(screen.getByTestId('error-formulario')).toHaveProp('importantForAccessibility', 'yes');
       expect(listarCuentas(s.ctx).debes).toHaveLength(0);
 
       tocar('tarjeta-incluye-no_se');
@@ -243,7 +245,9 @@ describe('onboarding', () => {
     tocar('onb-aceptar');
 
     // O3: quincena por omisión; se ve el próximo pago (15 oct 2026 es jueves).
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_INGRESO_SALTAR);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_INGRESO_SALTAR,
+    );
     escribir('onb-ingreso-monto', '13,000');
     expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/jue 15/);
     expect(screen.getByTestId('onb-proximo-pago').props.accessibilityLabel).toBe(
@@ -253,7 +257,9 @@ describe('onboarding', () => {
     expect(r.getPathname()).toBe('/onboarding/cuentas');
 
     // O4: efectivo y una cuenta de débito.
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CUENTAS_MINIMO);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_CUENTAS_MINIMO,
+    );
     escribir('onb-efectivo', '600');
     tocar('onb-agregar-cuenta');
     escribir('onb-cuenta-nombre', 'BBVA');
@@ -263,7 +269,9 @@ describe('onboarding', () => {
     expect(r.getPathname()).toBe('/onboarding/pagos-fijos');
 
     // O5: renta con chip sugerido.
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_PAGOS_SALTAR);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_PAGOS_SALTAR,
+    );
     tocar('onb-pago-renta');
     escribir('onb-pago-monto', '4,500');
     escribir('onb-pago-dia', '1');
@@ -272,12 +280,16 @@ describe('onboarding', () => {
     tocar('onb-pagos-continuar');
 
     // O6: sin módulo nativo, "No disponible en este teléfono".
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_CAPTURA_AHORA_NO);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_CAPTURA_AHORA_NO,
+    );
     expect(screen.getByTestId('onb-captura-pronto')).toHaveTextContent(/No disponible en este teléfono/);
     tocar('onb-captura-continuar');
 
     // O7: sugerencia del 10 % del ingreso ya escrita.
-    expect(screen.getByTestId('onb-tip')).toHaveTextContent(TIP_COLCHON_SIN_POR_AHORA);
+    expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
+      TIP_COLCHON_SIN_POR_AHORA,
+    );
     expect(screen.getByTestId('onb-colchon-monto')).toHaveProp('value', '1,300');
     tocar('onb-ver-mi-dia');
 

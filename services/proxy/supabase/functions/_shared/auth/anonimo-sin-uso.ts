@@ -29,8 +29,7 @@ export function plusNegocioVigente(
 }
 
 export type ResultadoCandidato =
-  | { readonly candidato: true }
-  | { readonly candidato: false; readonly motivo: string };
+  { readonly candidato: true } | { readonly candidato: false; readonly motivo: string };
 
 /** `inactivoAntesDe`: instante límite; la actividad debe ser estrictamente anterior. */
 export function evaluarCandidatoAnonimo(
@@ -47,9 +46,7 @@ export function evaluarCandidatoAnonimo(
   if (perfil.enGrupoCompartidoActivo) return { candidato: false, motivo: 'grupo_compartido' };
 
   const u =
-    perfil.ultimaActividad instanceof Date
-      ? perfil.ultimaActividad
-      : new Date(perfil.ultimaActividad);
+    perfil.ultimaActividad instanceof Date ? perfil.ultimaActividad : new Date(perfil.ultimaActividad);
   if (Number.isNaN(u.getTime())) return { candidato: false, motivo: 'actividad_invalida' };
   if (u.getTime() >= inactivoAntesDe.getTime()) return { candidato: false, motivo: 'activo_reciente' };
 

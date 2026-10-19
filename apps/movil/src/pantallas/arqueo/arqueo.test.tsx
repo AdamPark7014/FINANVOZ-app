@@ -1,4 +1,3 @@
-import { describe, expect, it } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { abrirPruebaPantalla, conEscenario } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
@@ -85,9 +84,7 @@ describe('copy del arqueo (es-MX)', () => {
     expect(textoFaltante(31_500)).toBe('Faltan $315. Lo repartí según tus gastos en efectivo:');
     expect(textoSobrante(6_000)).toBe('Traes $60 más de lo esperado. ¿De dónde salió?');
     expect(mensajeCuadra()).toBe('Listo: tu efectivo cuadra.');
-    expect(mensajeSumaPropuesta(31_500, 30_000)).toBe(
-      'Los montos deben sumar $315; ahora suman $300.',
-    );
+    expect(mensajeSumaPropuesta(31_500, 30_000)).toBe('Los montos deben sumar $315; ahora suman $300.');
   });
 });
 
@@ -129,7 +126,10 @@ describe('PantallaArqueo · vacío y errores', () => {
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityRole', 'alert');
-    expect(screen.getByTestId('arqueo-hecho')).toHaveProp('accessibilityLabel', ETIQUETA_TARJETA_CONTEO_LISTO);
+    expect(screen.getByTestId('arqueo-hecho')).toHaveProp(
+      'accessibilityLabel',
+      ETIQUETA_TARJETA_CONTEO_LISTO,
+    );
     expect(screen.getByTestId('arqueo-hecho')).toHaveProp('accessibilityHint', PISTA_TARJETA_CONTEO_LISTO);
     expect(textoDe('arqueo-mensaje-hecho')).toBe(mensajeCuadra());
     expect(screen.getByTestId('arqueo-listo')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_LISTO);

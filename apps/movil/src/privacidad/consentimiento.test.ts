@@ -127,7 +127,9 @@ describe('consentimiento con evidencia', () => {
     expect(() =>
       agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'Nu', saldo: 0, institucion: 'nu' }),
     ).toThrow(expect.objectContaining({ codigo: 'solo_lectura' }));
-    await expect(registrarTexto(p.ctx, 'coca 25 en efectivo')).rejects.toMatchObject({ codigo: 'solo_lectura' });
+    await expect(registrarTexto(p.ctx, 'coca 25 en efectivo')).rejects.toMatchObject({
+      codigo: 'solo_lectura',
+    });
     expect(() => exportarJson(p.ctx)).not.toThrow();
 
     const nueva = aceptarConsentimiento(p.ctx, { datosFinancieros: true, medio: 'reconsentimiento' });

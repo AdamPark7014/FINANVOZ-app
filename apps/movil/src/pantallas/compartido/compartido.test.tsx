@@ -193,7 +193,10 @@ describe('02 §27 · Gastos con tu pareja', () => {
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
     fireEvent.press(screen.getByTestId('compartidos-crear'));
     expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
-    expect(screen.getByTestId('compartidos-crear-codigo')).toHaveProp('accessibilityHint', PISTA_CREAR_CODIGO);
+    expect(screen.getByTestId('compartidos-crear-codigo')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CREAR_CODIGO,
+    );
     fireEvent.press(screen.getByTestId('compartidos-volver'));
     fireEvent.press(screen.getByTestId('compartidos-escanear'));
     expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
@@ -202,7 +205,10 @@ describe('02 §27 · Gastos con tu pareja', () => {
       PISTA_ESCRIBIR_NOMBRE_PAREJA,
     );
     fireEvent.changeText(screen.getByTestId('compartidos-nombre'), 'Ana');
-    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp('accessibilityHint', PISTA_ABRIR_ESCANER);
+    expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp(
+      'accessibilityHint',
+      PISTA_ABRIR_ESCANER,
+    );
     fireEvent.press(screen.getByTestId('compartidos-abrir-escaner'));
     expect(screen.getByTestId('escaner-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ESCANER);
     A.cerrar();
@@ -229,10 +235,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
   it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {
     const p = abrirPruebaPantalla('2026-10-11');
     const alAbrir = jest.fn();
-    renderConSesion(
-      p.ctx,
-      <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirCompartidos={alAbrir} />,
-    );
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirCompartidos={alAbrir} />);
     expect(screen.getByTestId('seccion-compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-compartidos')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('boton-compartidos').props.accessibilityLabel).toBe(BTN_COMPARTIDOS_CUENTAS);
@@ -311,9 +314,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     a.unmount();
 
     const b = en(B, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
-    await waitFor(() =>
-      expect(screen.getByLabelText(/Ana cerró el grupo compartido/)).toBeTruthy(),
-    );
+    await waitFor(() => expect(screen.getByLabelText(/Ana cerró el grupo compartido/)).toBeTruthy());
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     b.unmount();
     A.cerrar();

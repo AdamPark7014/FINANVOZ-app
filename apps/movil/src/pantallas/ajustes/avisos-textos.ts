@@ -10,12 +10,10 @@ export const AVISO_CORTE = 'Día de corte';
 export const DESC_CORTE = 'El día que corta cada tarjeta.';
 
 export const AVISO_LIMITE = 'Fecha límite de pago';
-export const DESC_LIMITE =
-  '3 días antes, con lo que tienes que pagar para no generar intereses.';
+export const DESC_LIMITE = '3 días antes, con lo que tienes que pagar para no generar intereses.';
 
 export const AVISO_RIESGO = 'Riesgo de no llegar';
-export const DESC_RIESGO =
-  'Si es más probable que tengas que tocar tu colchón antes de tu próximo ingreso.';
+export const DESC_RIESGO = 'Si es más probable que tengas que tocar tu colchón antes de tu próximo ingreso.';
 
 export const AVISO_RESPALDO = 'Respaldo pendiente';
 export const DESC_RESPALDO = 'Si pasan 2 semanas sin respaldo, una vez por semana.';

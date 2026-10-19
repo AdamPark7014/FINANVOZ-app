@@ -107,7 +107,7 @@ describe('pantalla del plan', () => {
     );
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     const ofertas = await tienda.ofertas();
-    const mensual = ofertas.find((o) => o.periodo === 'mensual')!;
+    const mensual = definido(ofertas.find((o) => o.periodo === 'mensual'));
     const e = etiquetaOferta(mensual);
     expect(screen.getByTestId(ID.oferta('mensual'))).toHaveProp(
       'accessibilityHint',
@@ -141,8 +141,8 @@ describe('pantalla del plan', () => {
     expect(abrirPlan).toHaveBeenCalled();
 
     const ofertas = await tienda.ofertas();
-    const ofertaMensual = etiquetaOferta(ofertas.find((o) => o.periodo === 'mensual')!);
-    const ofertaAnual = etiquetaOferta(ofertas.find((o) => o.periodo === 'anual')!);
+    const ofertaMensual = etiquetaOferta(definido(ofertas.find((o) => o.periodo === 'mensual')));
+    const ofertaAnual = etiquetaOferta(definido(ofertas.find((o) => o.periodo === 'anual')));
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     expect(screen.getByLabelText(ofertaMensual.etiqueta)).toBeTruthy();
     expect(screen.getByText(ofertaMensual.detalle)).toBeTruthy();
@@ -332,3 +332,9 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: Coca \$25/);
   });
 });
+
+/** Falla la prueba si el valor no existe (evita `!`). */
+function definido<T>(v: T | undefined): T {
+  if (v === undefined) throw new Error('valor esperado no encontrado');
+  return v;
+}

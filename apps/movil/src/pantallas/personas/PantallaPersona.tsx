@@ -259,11 +259,13 @@ function Detalle({
             {d.movimientos.map((m) => (
               <Tarjeta key={m.id} testID={`persona-mov-${m.id}`} style={{ gap: espacio.s }}>
                 <View
-                  accessibilityRole="listitem"
+                  role="listitem"
                   style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
                 >
                   <View style={{ flex: 1, gap: espacio.xxs }}>
-                    <Texto variante="cuerpoFuerte">{m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}</Texto>
+                    <Texto variante="cuerpoFuerte">
+                      {m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
+                    </Texto>
                     <Texto variante="secundario" tono="secundario">
                       {`${NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} · ${etiquetaDiaMes(m.fecha)}`}
                     </Texto>
@@ -355,7 +357,12 @@ function YaMePago({
       <Texto variante="subtitulo" testID="persona-ya-me-pago-titulo" accessibilityRole="header">
         {TITULO_YA_ME_PAGO}
       </Texto>
-      <CampoMonto etiqueta={ETIQUETA_MONTO} valorInicial={saldo} alCambiar={setMonto} testID="pago-persona-monto" />
+      <CampoMonto
+        etiqueta={ETIQUETA_MONTO}
+        valorInicial={saldo}
+        alCambiar={setMonto}
+        testID="pago-persona-monto"
+      />
       <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
         {ETIQUETA_A_DONDE_LLEGO}
       </Texto>

@@ -81,10 +81,12 @@ describe('Lista de espera', () => {
     contestar('ana@ejemplo.mx');
     fireEvent.click(screen.getByLabelText(/acepto/i));
     enviar();
-    expect(screen.getByRole('button', { name: LISTA_ESPERA_ARIA_CTA_ENVIANDO }).getAttribute('aria-busy')).toBe(
-      'true',
+    expect(
+      screen.getByRole('button', { name: LISTA_ESPERA_ARIA_CTA_ENVIANDO }).getAttribute('aria-busy'),
+    ).toBe('true');
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: LISTA_ESPERA_TITULO_EXITO })).toBeTruthy(),
     );
-    await waitFor(() => expect(screen.getByRole('heading', { name: LISTA_ESPERA_TITULO_EXITO })).toBeTruthy());
     const exito = screen.getByRole('status');
     expect(exito.getAttribute('aria-live')).toBe('polite');
     expect(exito.getAttribute('aria-atomic')).toBe('true');
@@ -118,7 +120,7 @@ describe('Lista de espera', () => {
     enviar();
     expect(fetch).not.toHaveBeenCalled();
     expect(screen.getByRole('alert').textContent).toBe(
-      listaEsperaErrorFaltaUna(LISTA_ESPERA_PREGUNTAS[1]!.texto),
+      listaEsperaErrorFaltaUna(LISTA_ESPERA_PREGUNTAS[1]?.texto ?? ''),
     );
     const grupo = screen.getByRole('radiogroup', { name: /tu banco te avisa/i });
     expect(grupo.getAttribute('aria-invalid')).toBe('true');
@@ -137,7 +139,7 @@ describe('Lista de espera', () => {
     fireEvent.change(screen.getByLabelText(/tu correo/i), { target: { value: 'ana@ejemplo.mx' } });
     enviar();
     expect(screen.getByRole('alert').textContent).toBe(
-      listaEsperaErrorFaltanVarias(4, LISTA_ESPERA_PREGUNTAS[0]!.texto),
+      listaEsperaErrorFaltanVarias(4, LISTA_ESPERA_PREGUNTAS[0]?.texto ?? ''),
     );
     expect(document.activeElement).toBe(screen.getByLabelText('Android'));
     expect(document.querySelectorAll('[aria-invalid="true"]')).toHaveLength(4);

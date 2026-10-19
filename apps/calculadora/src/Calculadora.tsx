@@ -184,9 +184,7 @@ function Resultado({ resultado: r, meses }: { resultado: ResultadoCapacidad; mes
 
       <h3>La compra más cara que te cabe, según los meses</h3>
       <table className="plazos">
-        <caption className="solo-lector">
-          Compra más cara que te cabe según los meses sin intereses
-        </caption>
+        <caption className="solo-lector">Compra más cara que te cabe según los meses sin intereses</caption>
         <thead>
           <tr>
             <th scope="col">Meses</th>

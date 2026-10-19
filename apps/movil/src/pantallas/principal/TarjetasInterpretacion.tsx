@@ -111,7 +111,7 @@ export function TarjetaElegir({
             {preguntaCuenta}
           </Texto>
           <GrupoChips
-            opciones={falta!.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+            opciones={(falta?.candidatas ?? []).map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
             valor={cuenta}
             alCambiar={setCuenta}
             prefijoTestID="elegir-cuenta"

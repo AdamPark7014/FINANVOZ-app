@@ -366,7 +366,9 @@ describe('tandas (M8, E11)', () => {
     ]);
     expect(obtenerHoy(p.ctx).desglose.compromisos).toBe(0);
     expect(p.ctx.libro.saldo(cuentaId)).toBe(50_000);
-    expect(() => aportarTanda(p.ctx, { tandaId, fecha: '2026-10-23', cuentaId: p.bbva })).toThrow(/archivada/);
+    expect(() => aportarTanda(p.ctx, { tandaId, fecha: '2026-10-23', cuentaId: p.bbva })).toThrow(
+      /archivada/,
+    );
   });
 
   it('editar: cambia nombre y cuenta de aportación, no el monto', () => {
@@ -474,10 +476,7 @@ describe('tandas por voz', () => {
         tipo: 'cobro_tanda',
         monto: 500_000,
         tandaId: null,
-        tandas: [
-          { nombre: 'Tanda A' },
-          { nombre: 'Tanda B' },
-        ],
+        tandas: [{ nombre: 'Tanda A' }, { nombre: 'Tanda B' }],
         cuentaId: p.efectivo,
       },
     });

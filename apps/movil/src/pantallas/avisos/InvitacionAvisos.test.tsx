@@ -38,8 +38,14 @@ describe('InvitacionAvisos · TalkBack', () => {
     expect(screen.getByTestId('invitacion-avisos-cuerpo').props.accessibilityLabel).toBe(
       etiquetaAccesibleInvitacionAvisos(),
     );
-    expect(screen.getByTestId('invitacion-avisos-si')).toHaveProp('accessibilityHint', PISTA_INVITACION_AVISOS_SI);
-    expect(screen.getByTestId('invitacion-avisos-no')).toHaveProp('accessibilityHint', PISTA_INVITACION_AVISOS_NO);
+    expect(screen.getByTestId('invitacion-avisos-si')).toHaveProp(
+      'accessibilityHint',
+      PISTA_INVITACION_AVISOS_SI,
+    );
+    expect(screen.getByTestId('invitacion-avisos-no')).toHaveProp(
+      'accessibilityHint',
+      PISTA_INVITACION_AVISOS_NO,
+    );
     expect(etiquetaAccesibleInvitacionAvisos()).toContain(TITULO_INVITACION_AVISOS);
   });
 });

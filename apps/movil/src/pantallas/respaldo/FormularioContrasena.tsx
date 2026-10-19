@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import {
-  fijarContrasenaRespaldo,
-  validarContrasenaNueva,
-  type DependenciasRespaldo,
-} from '../../servicios';
+import { fijarContrasenaRespaldo, validarContrasenaNueva, type DependenciasRespaldo } from '../../servicios';
 import { Boton, CampoTexto, Texto } from '../../ui';
 import {
   AVISO_CONTRASENA,
@@ -64,11 +60,7 @@ export function FormularioContrasena({
       setConfirmacion('');
       alGuardar();
     } catch (e) {
-      setError(
-        e instanceof Error && 'codigo' in e
-          ? mensajeErrorRespaldo(e)
-          : MENSAJE_NO_GUARDAR_CONTRASENA,
-      );
+      setError(e instanceof Error && 'codigo' in e ? mensajeErrorRespaldo(e) : MENSAJE_NO_GUARDAR_CONTRASENA);
     } finally {
       setGuardando(false);
     }
@@ -76,11 +68,7 @@ export function FormularioContrasena({
 
   return (
     <>
-      <Texto
-        variante="cuerpo"
-        testID="respaldo-aviso-contrasena"
-        accessibilityRole="alert"
-      >
+      <Texto variante="cuerpo" testID="respaldo-aviso-contrasena" accessibilityRole="alert">
         {AVISO_CONTRASENA}
       </Texto>
       {cambiando ? (

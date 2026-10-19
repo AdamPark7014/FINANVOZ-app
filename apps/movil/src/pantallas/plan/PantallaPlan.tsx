@@ -139,12 +139,7 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
           {resumen.titulo}
         </Texto>
         {resumen.detalle ? (
-          <Texto
-            variante="cuerpo"
-            tono="secundario"
-            testID={ID.detalle}
-            importantForAccessibility="no"
-          >
+          <Texto variante="cuerpo" tono="secundario" testID={ID.detalle} importantForAccessibility="no">
             {resumen.detalle}
           </Texto>
         ) : null}
@@ -166,16 +161,12 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
             <Texto
               key={t}
               variante="cuerpo"
-              accessibilityRole="listitem"
+              role="listitem"
               accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
             >{`• ${t}`}</Texto>
           ))}
         </View>
-        <Texto
-          variante="secundario"
-          tono="secundario"
-          accessibilityLabel={etiquetaAccesibleIncluyeGratis()}
-        >
+        <Texto variante="secundario" tono="secundario" accessibilityLabel={etiquetaAccesibleIncluyeGratis()}>
           {INCLUYE_GRATIS}
         </Texto>
       </Tarjeta>

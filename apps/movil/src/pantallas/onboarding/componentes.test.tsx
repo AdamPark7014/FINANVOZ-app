@@ -69,9 +69,7 @@ describe('componentes onboarding · TalkBack', () => {
   });
 
   it('Casilla trae pista para marcar o desmarcar', () => {
-    render(
-      envolver(<Casilla testID="casilla" etiqueta="Acepto" valor={false} alCambiar={() => {}} />),
-    );
+    render(envolver(<Casilla testID="casilla" etiqueta="Acepto" valor={false} alCambiar={() => {}} />));
     expect(screen.getByTestId('casilla')).toHaveProp('accessibilityHint', PISTA_CASILLA_ONB);
   });
 });

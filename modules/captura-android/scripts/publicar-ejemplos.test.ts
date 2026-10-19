@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error: script .mjs sin tipos
 import {
   citar,
   comandoPublicar,
@@ -25,7 +24,7 @@ describe('publicar-ejemplos (CA-M5-01 en build de depuración)', () => {
     for (const e of ejemplos) {
       const etiqueta = etiquetas.get(e.paquete);
       expect(etiqueta, e.id).toBeDefined();
-      const args = argumentosEnShell(comandoPublicar(etiqueta, e.titulo, e.texto));
+      const args = argumentosEnShell(comandoPublicar(etiqueta ?? '', e.titulo, e.texto));
       expect(args).toEqual(['cmd', 'notification', 'post', '-S', 'bigtext', '-t', e.titulo, etiqueta, e.texto]);
     }
   });

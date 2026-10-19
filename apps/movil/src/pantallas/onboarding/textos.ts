@@ -88,13 +88,11 @@ export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 
 /** O5 · Pagos fijos */
 export const TITULO_PAGOS_FIJOS = '¿Qué pagos tienes cada mes?';
-export const AYUDA_PAGOS_FIJOS =
-  'Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar.';
+export const AYUDA_PAGOS_FIJOS = 'Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar.';
 export const ERROR_PAGO_FIJO_INCOMPLETO = 'Escribe cuánto pagas y qué día del mes (1 a 31).';
 export const ETIQUETA_PAGO_MONTO_FIJO = '¿Cuánto pagas?';
 export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
-export const AYUDA_PAGO_VARIABLE =
-  'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
+export const AYUDA_PAGO_VARIABLE = 'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';
 export const ETIQUETA_PAGO_DIA_MES = '¿Qué día del mes?';
 export const PISTA_PAGOS_SALTAR = 'Pasa al siguiente paso sin registrar pagos fijos';
 export const PISTA_PAGOS_CONTINUAR = 'Pasa a activar la captura automática';
@@ -168,6 +166,10 @@ export function etiquetaAyudaPasoOnboarding(ayuda: string): string {
  * Anuncio al entrar a un paso (TalkBack): progreso + título, sin datos personales.
  * Solo se usa con `AccessibilityInfo.announceForAccessibility`.
  */
-export function anuncioCambioPasoOnboarding(paso: number, titulo: string, total: number = PASOS_ONBOARDING): string {
+export function anuncioCambioPasoOnboarding(
+  paso: number,
+  titulo: string,
+  total: number = PASOS_ONBOARDING,
+): string {
   return `${textoProgresoOnboarding(paso, total)}. ${titulo}`;
 }

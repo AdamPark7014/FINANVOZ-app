@@ -1,10 +1,8 @@
-import { Tabs } from 'expo-router/js-tabs';
-import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { Tabs, type BottomTabNavigationOptions } from 'expo-router/js-tabs';
 import { IconoPestana, ProveedorAvisos } from '../../src/pantallas/principal';
 import { barraPestanas, estiloBarraPestanas, useTema } from '../../src/ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
-  ROL_ACCESIBILIDAD_BOTON_PESTANA,
   testIdBotonPestana,
   type RutaPestanaVisible,
 } from './pestanas-textos';
@@ -12,12 +10,11 @@ import {
 export { ETIQUETA_ACCESIBILIDAD_PESTANA } from './pestanas-textos';
 
 function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
-  const { etiqueta } = barraPestanas.pestanas.find((p) => p.ruta === ruta)!;
+  const etiqueta = barraPestanas.pestanas.find((p) => p.ruta === ruta)?.etiqueta ?? ruta;
   return {
     title: etiqueta,
     tabBarLabel: etiqueta,
     tabBarButtonTestID: testIdBotonPestana(ruta),
-    tabBarAccessibilityRole: ROL_ACCESIBILIDAD_BOTON_PESTANA,
     tabBarAccessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta],
     tabBarIcon: ({ color }) => <IconoPestana ruta={ruta} color={color} />,
   };

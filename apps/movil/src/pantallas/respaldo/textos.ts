@@ -20,10 +20,8 @@ export const ACCESIBILIDAD_VOLVER_RESTAURAR = 'Volver';
 export const PISTA_VOLVER_RESTAURAR = 'Regresa al paso anterior';
 export const PISTA_BORRAR_CUENTA = 'Elimina tu cuenta de respaldo en la nube';
 /** TalkBack al confirmar borrar cuenta (`02 §19`). */
-export const PISTA_CONFIRMAR_BORRAR_CUENTA =
-  'Confirma borrar la cuenta y todos los respaldos en la nube';
-export const PISTA_CANCELAR_BORRAR_CUENTA =
-  'Cierra la confirmación y conserva tu cuenta en la nube';
+export const PISTA_CONFIRMAR_BORRAR_CUENTA = 'Confirma borrar la cuenta y todos los respaldos en la nube';
+export const PISTA_CANCELAR_BORRAR_CUENTA = 'Cierra la confirmación y conserva tu cuenta en la nube';
 export const TITULO_RESPALDO = 'Respaldo';
 export const SUBTITULO_NUBE = 'En la nube';
 export const AVISO_PENDIENTE = 'Llevas más de 2 semanas sin respaldo.';
@@ -34,8 +32,7 @@ export const TEXTO_ACTIVAR_NUBE =
   'Guarda tu respaldo cifrado en la nube con tu correo. Te mando un código para confirmarlo.';
 
 export const MENSAJE_LISTO_NUBE = 'Listo: tu respaldo está en la nube.';
-export const MENSAJE_BORRAR_CUENTA_OK =
-  'Listo: borré tu cuenta de respaldo y tus respaldos de la nube.';
+export const MENSAJE_BORRAR_CUENTA_OK = 'Listo: borré tu cuenta de respaldo y tus respaldos de la nube.';
 export const MENSAJE_CORREO_CUENTA_OK = 'Listo: tu correo quedó como cuenta de respaldo.';
 export const MENSAJE_CONTRASENA_GUARDADA = 'Listo: guardé tu contraseña de respaldo.';
 export const MENSAJE_NO_GUARDAR_AJUSTE = 'No pude guardar el cambio. Intenta de nuevo.';
@@ -52,8 +49,7 @@ export const BTN_RESPALDAR_AHORA = 'Respaldar ahora';
 /** TalkBack en cuenta de respaldo activa (`02 §19`). */
 export const PISTA_RESPALDAR_AHORA = 'Sube a la nube una copia cifrada de tus datos';
 export const ETIQUETA_RESPALDO_AUTOMATICO = 'Respaldo automático';
-export const DESC_RESPALDO_AUTOMATICO =
-  'Cada semana, aunque no abras la app. No te pido la contraseña.';
+export const DESC_RESPALDO_AUTOMATICO = 'Cada semana, aunque no abras la app. No te pido la contraseña.';
 export const ETIQUETA_SOLO_WIFI = 'Solo con Wi-Fi';
 export const DESC_SOLO_WIFI = 'Así no gasta tus datos móviles.';
 export const BTN_BORRAR_CUENTA = 'Borrar cuenta de respaldo';
@@ -67,14 +63,11 @@ export const DESCRIPCION_ARCHIVO =
   'Un archivo con todos tus datos, cifrado con una contraseña que solo tú conoces. Guárdalo donde quieras y úsalo para pasar tus datos a otro teléfono.';
 export const BTN_EXPORTAR_ARCHIVO = 'Exportar respaldo (.cartera)';
 /** TalkBack cuando ya hay contraseña (`02 §19`). */
-export const PISTA_EXPORTAR_ARCHIVO =
-  'Genera un archivo cifrado para guardarlo o pasarlo a otro teléfono';
-export const PISTA_CREAR_CONTRASENA =
-  'Abre el formulario para crear la contraseña que cifra tus respaldos';
+export const PISTA_EXPORTAR_ARCHIVO = 'Genera un archivo cifrado para guardarlo o pasarlo a otro teléfono';
+export const PISTA_CREAR_CONTRASENA = 'Abre el formulario para crear la contraseña que cifra tus respaldos';
 export const PISTA_CAMBIAR_CONTRASENA =
   'Genera una contraseña nueva; los respaldos viejos siguen abriéndose con la anterior';
-export const PISTA_RESTAURAR_RESPALDO =
-  'Abre el flujo para recuperar tus datos desde la nube o un archivo';
+export const PISTA_RESTAURAR_RESPALDO = 'Abre el flujo para recuperar tus datos desde la nube o un archivo';
 export const BTN_CAMBIAR_CONTRASENA = 'Cambiar contraseña';
 export const BTN_CREAR_CONTRASENA = 'Crear contraseña de respaldo';
 export const BTN_RESTAURAR_RESPALDO = 'Restaurar un respaldo';
@@ -90,8 +83,7 @@ export const ETIQUETA_CONTRASENA = 'Contraseña del respaldo';
 export const ETIQUETA_CONFIRMAR_CONTRASENA = 'Escríbela otra vez';
 export const BTN_GUARDAR_CONTRASENA = 'Guardar contraseña';
 /** TalkBack al guardar la contraseña de cifrado (`02 §19`). */
-export const PISTA_GUARDAR_CONTRASENA =
-  'Guarda la llave que cifra tus respaldos en este teléfono';
+export const PISTA_GUARDAR_CONTRASENA = 'Guarda la llave que cifra tus respaldos en este teléfono';
 /** TalkBack al cerrar el formulario de contraseña (`02 §19`). */
 export const PISTA_CANCELAR_CONTRASENA = 'Cierra sin guardar la contraseña de respaldo';
 export const ERROR_CONTRASENAS_NO_COINCIDEN = 'Las contraseñas no coinciden.';
@@ -126,8 +118,7 @@ export const INTRO_RESTAURAR_ARCHIVO =
   'Recupera tus cuentas, movimientos y ajustes desde un archivo .cartera que exportaste antes.';
 export const RESTAURAR_NO_DISPONIBLE = 'Restaurar no está disponible en esta versión de la app.';
 export const BTN_DESDE_NUBE = 'Desde la nube';
-export const PISTA_RESTAURAR_DESDE_NUBE =
-  'Entra con tu correo y baja tu respaldo más reciente de la nube';
+export const PISTA_RESTAURAR_DESDE_NUBE = 'Entra con tu correo y baja tu respaldo más reciente de la nube';
 export const BTN_DESDE_ARCHIVO = 'Desde un archivo';
 export const PISTA_RESTAURAR_DESDE_ARCHIVO = 'Elige un archivo cifrado que exportaste antes';
 export const BTN_ELEGIR_ARCHIVO = 'Elegir archivo';
@@ -142,13 +133,11 @@ export const PISTA_RESTAURAR_ABRIR =
   'Descifra el respaldo con la contraseña que usaste al crearlo o exportarlo';
 export const BTN_ELEGIR_OTRO_ARCHIVO = 'Elegir otro archivo';
 export const PISTA_RESTAURAR_OTRO_ARCHIVO = 'Elige otro archivo en lugar del que ya seleccionaste';
-export const PISTA_RESTAURAR_VOLVER_ELEGIR =
-  'Regresa a elegir si restauras desde la nube o un archivo';
+export const PISTA_RESTAURAR_VOLVER_ELEGIR = 'Regresa a elegir si restauras desde la nube o un archivo';
 export const AVISO_REEMPLAZA_DATOS =
   'Se reemplaza todo lo que hay ahora en este teléfono. Si quieres conservarlo, primero exporta un respaldo.';
 export const BTN_RESTAURAR = 'Restaurar';
-export const PISTA_RESTAURAR_CONFIRMAR =
-  'Reemplaza los datos de este teléfono con los del respaldo';
+export const PISTA_RESTAURAR_CONFIRMAR = 'Reemplaza los datos de este teléfono con los del respaldo';
 export const PISTA_RESTAURAR_CANCELAR = 'Cierra el resumen sin restaurar';
 
 /** Tarjeta en Ajustes (`02 §12`). */
@@ -157,5 +146,4 @@ export const BTN_RESPALDAR_RESTAURAR = 'Respaldar y restaurar';
 
 /** Bienvenida · teléfono nuevo (`02 §19`). */
 export const BTN_ONBOARDING_RESTAURAR = '¿Vienes de otro teléfono? Restaurar respaldo';
-export const PISTA_ONBOARDING_RESTAURAR =
-  'Recupera tus datos desde un respaldo en la nube o un archivo';
+export const PISTA_ONBOARDING_RESTAURAR = 'Recupera tus datos desde un respaldo en la nube o un archivo';

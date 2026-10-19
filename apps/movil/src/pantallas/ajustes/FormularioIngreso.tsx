@@ -118,9 +118,7 @@ export function CamposIngreso({ formulario, prefijo }: { formulario: FormularioI
               valor={valores.diaMesTexto}
               alCambiar={(v) => cambiar('diaMesTexto', v)}
               error={
-                valores.diaMesTexto !== '' && leerDiaMes(valores.diaMesTexto) === null
-                  ? ERROR_DIA_MES
-                  : null
+                valores.diaMesTexto !== '' && leerDiaMes(valores.diaMesTexto) === null ? ERROR_DIA_MES : null
               }
             />
           ) : null}

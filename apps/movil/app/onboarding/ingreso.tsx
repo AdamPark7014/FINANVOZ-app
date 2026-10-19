@@ -154,9 +154,7 @@ export default function Ingreso() {
               teclado="number-pad"
               valor={diaMesTexto}
               alCambiar={setDiaMesTexto}
-              error={
-                diaMesTexto !== '' && leerDiaMes(diaMesTexto) === null ? ERROR_DIA_MES_INGRESO : null
-              }
+              error={diaMesTexto !== '' && leerDiaMes(diaMesTexto) === null ? ERROR_DIA_MES_INGRESO : null}
             />
           ) : null}
           <CampoMonto
@@ -177,9 +175,7 @@ export default function Ingreso() {
               testID="onb-proximo-pago"
               accessible
               accessibilityRole="text"
-              accessibilityLabel={etiquetaHablada(
-                etiquetaProximoPagoOnboarding(etiquetaFecha(proximo)),
-              )}
+              accessibilityLabel={etiquetaHablada(etiquetaProximoPagoOnboarding(etiquetaFecha(proximo)))}
             >
               <Tarjeta>
                 <Texto variante="secundario" tono="secundario" accessibilityElementsHidden>

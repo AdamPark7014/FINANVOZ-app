@@ -139,4 +139,3 @@ export function actualizarConceptoProgramado(ctx: Contexto, programadoId: string
   if (!t) throw new ErrorDominio('concepto_vacio', 'escribe un nombre');
   ctx.db.update(programado).set({ concepto: t }).where(eq(programado.id, programadoId)).run();
 }
-

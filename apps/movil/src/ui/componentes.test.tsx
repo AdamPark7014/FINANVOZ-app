@@ -94,7 +94,6 @@ describe('Boton', () => {
   });
 });
 
-
 describe('GrupoChips', () => {
   const opciones = [
     { valor: 'efectivo' as const, etiqueta: 'Efectivo' },
@@ -183,30 +182,28 @@ describe('CampoTexto', () => {
     fireEvent.changeText(screen.getByLabelText('Qué compraste'), 'coca 25');
     expect(alCambiar).toHaveBeenCalledWith('coca 25');
     expect(screen.getByText('Falta el monto. Escríbelo con números.')).toBeTruthy();
-    expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({ invalid: true, disabled: false });
+    expect(screen.getByLabelText('Qué compraste').props.accessibilityState).toEqual({
+      invalid: true,
+      disabled: false,
+    });
   });
 
   it('deshabilitado anuncia disabled', () => {
-    render(
-      <CampoTexto etiqueta="Notas" valor="" alCambiar={() => {}} deshabilitado />,
-    );
-    expect(screen.getByLabelText('Notas').props.accessibilityState).toEqual({ invalid: false, disabled: true });
+    render(<CampoTexto etiqueta="Notas" valor="" alCambiar={() => {}} deshabilitado />);
+    expect(screen.getByLabelText('Notas').props.accessibilityState).toEqual({
+      invalid: false,
+      disabled: true,
+    });
   });
 
   it('la ayuda visible no duplica la pista del campo', () => {
-    render(
-      <CampoTexto
-        etiqueta="Notas"
-        valor=""
-        alCambiar={() => {}}
-        ayuda="Opcional. Solo para ti."
-      />,
-    );
+    render(<CampoTexto etiqueta="Notas" valor="" alCambiar={() => {}} ayuda="Opcional. Solo para ti." />);
     const campo = screen.getByLabelText('Notas');
     expect(campo.props.accessibilityHint).toBe('Opcional. Solo para ti.');
-    expect(screen.getByText('Opcional. Solo para ti.', { includeHiddenElements: true }).props.accessibilityElementsHidden).toBe(
-      true,
-    );
+    expect(
+      screen.getByText('Opcional. Solo para ti.', { includeHiddenElements: true }).props
+        .accessibilityElementsHidden,
+    ).toBe(true);
   });
 });
 
@@ -229,13 +226,7 @@ describe('EstadoVacio', () => {
   });
 
   it('etiquetaAccesible sobrescribe el label de TalkBack', () => {
-    render(
-      <EstadoVacio
-        texto="No debes nada."
-        testID="vacio"
-        etiquetaAccesible="Debes. No debes nada."
-      />,
-    );
+    render(<EstadoVacio texto="No debes nada." testID="vacio" etiquetaAccesible="Debes. No debes nada." />);
     expect(screen.getByTestId('vacio')).toHaveProp('accessibilityLabel', 'Debes. No debes nada.');
   });
 

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { VERSION_CONSENTIMIENTO, compararVersionAviso, versionAvisoDesactualizada } from '../../privacidad/consentimiento';
+import {
+  VERSION_CONSENTIMIENTO,
+  compararVersionAviso,
+  versionAvisoDesactualizada,
+} from '../../privacidad/consentimiento';
 import { VERSION_TERMINOS } from '../privacidad/legales';
 import { AVISO_COMPLETO, AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from './aviso';
 import { TITULO_AVISO_SIMPLIFICADO } from './textos';

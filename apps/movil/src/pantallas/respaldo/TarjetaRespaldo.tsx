@@ -62,11 +62,7 @@ export function TarjetaRespaldo({
 
   return (
     <Tarjeta testID="privacidad-respaldo">
-      <Texto
-        variante="subtitulo"
-        testID="privacidad-respaldo-titulo"
-        accessibilityRole="header"
-      >
+      <Texto variante="subtitulo" testID="privacidad-respaldo-titulo" accessibilityRole="header">
         {SUBTITULO_ARCHIVO}
       </Texto>
       <Texto variante="secundario" tono="secundario">

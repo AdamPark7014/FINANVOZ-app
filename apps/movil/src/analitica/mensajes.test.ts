@@ -1,19 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { esCodigo } from '../observabilidad/depuracion';
-import {
-  MENSAJE_TECNICO_ENVIO_HTTP,
-  codigoEnvioHttpAnalitica,
-  errorEnvioHttpAnalitica,
-} from './mensajes';
+import { MENSAJE_TECNICO_ENVIO_HTTP, codigoEnvioHttpAnalitica, errorEnvioHttpAnalitica } from './mensajes';
 
-const SENSIBLES = [
-  '$1,234.56',
-  'OXXO',
-  'María López',
-  'BBVA: Compra por $1,099.90',
-  '109990',
-  '5512345678',
-];
+const SENSIBLES = ['$1,234.56', 'OXXO', 'María López', 'BBVA: Compra por $1,099.90', '109990', '5512345678'];
 
 describe('mensajes técnicos de analítica (regla 9)', () => {
   it('el mensaje de envío HTTP es fijo y sin datos de la persona', () => {

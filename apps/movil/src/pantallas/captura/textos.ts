@@ -1,7 +1,7 @@
 /** Copy de captura automática y por revisar (`02 §6`, `02 §14`, tuteo). */
 
 import type { Centavos } from '@cartera/core';
-import { etiquetaHablada, formatearCentavos } from '../../ui';
+import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
 
 export const TITULO_CAPTURAS_POR_REVISAR = 'Capturas por revisar';
 export const INTRO_CAPTURAS_POR_REVISAR =
@@ -28,8 +28,7 @@ export const PISTA_CAPTURA_DE_CONTADO = 'Indica que no fue a meses sin intereses
 export const PISTA_CAMBIAR_CATEGORIA_CAPTURA = 'Elige otra categoría para esta captura';
 
 /** Permiso de notificaciones en `ActivarCaptura`. */
-export const PISTA_YA_ACTIVE_PERMISO =
-  'Confirma que ya activaste el permiso en Ajustes del teléfono';
+export const PISTA_YA_ACTIVE_PERMISO = 'Confirma que ya activaste el permiso en Ajustes del teléfono';
 export const PISTA_ABRIR_AJUSTE_PERMISO = 'Abre otra vez el ajuste de notificaciones';
 export const PISTA_ABRIR_INFO_APP_CAPTURA =
   'Abre la información de Finanvoz para permitir ajustes restringidos';
@@ -67,8 +66,7 @@ export function etiquetaGuiaCapturaInactiva(guia: string): string {
 
 export const TITULO_SIN_COMERCIO = 'Movimiento de tu banco';
 export const ETIQUETA_SIN_CATEGORIA = 'sin categoría';
-export const AVISO_SIN_TEXTO =
-  'El aviso no traía detalle. Si fue un gasto o un ingreso, regístralo tú.';
+export const AVISO_SIN_TEXTO = 'El aviso no traía detalle. Si fue un gasto o un ingreso, regístralo tú.';
 
 /** Divulgación destacada antes del acceso a notificaciones (`08 §3.1`, RF-PRI-02). */
 export const DIVULGACION_CAPTURA = {
@@ -116,8 +114,7 @@ export const PISTA_AHORA_NO_ACTIVAR_CAPTURA =
 export const LISTA_CAPTURA_ACTIVA = 'La captura automática está activa.';
 export const LISTA_CAPTURA_APPS = (nombres: readonly string[]) =>
   `Listo: anotaré lo que avisen ${nombres.join(', ')}.`;
-export const LISTA_CAPTURA_POR_REVISAR =
-  'Lo que no entienda queda en Movimientos → Por revisar.';
+export const LISTA_CAPTURA_POR_REVISAR = 'Lo que no entienda queda en Movimientos → Por revisar.';
 
 /** TalkBack: tarjeta «no disponible» en `ActivarCaptura`. */
 export function etiquetaTarjetaNoDisponibleCaptura(): string {
@@ -186,8 +183,7 @@ export const ETIQUETA_MSI_NO = 'No';
 
 export const ETIQUETA_NOMBRE_CUENTA = 'Nombre';
 export const ETIQUETA_SALDO_HOY = '¿Cuánto tiene hoy?';
-export const AYUDA_SALDO_HOY =
-  'El saldo que ves hoy en tu app; ya incluye este movimiento.';
+export const AYUDA_SALDO_HOY = 'El saldo que ves hoy en tu app; ya incluye este movimiento.';
 
 export const ERROR_NOMBRE_CUENTA = 'Ponle un nombre a la cuenta.';
 export const ERROR_SALDO_CUENTA = 'Escribe cuánto tiene la cuenta hoy.';
@@ -266,10 +262,6 @@ export function tituloDuplicado(que: string, fechaEtiqueta: string): string {
   return `¿Es lo mismo que ${que} del ${fechaEtiqueta}?`;
 }
 
-export function detalleDuplicado(
-  monto: Centavos,
-  fechaEtiqueta: string,
-  montoDictado: Centavos,
-): string {
+export function detalleDuplicado(monto: Centavos, fechaEtiqueta: string, montoDictado: Centavos): string {
   return `Tu banco avisó de ${formatearCentavos(monto)} el ${fechaEtiqueta}; anotaste ${formatearCentavos(montoDictado)}.`;
 }

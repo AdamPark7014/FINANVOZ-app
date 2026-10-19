@@ -8,8 +8,7 @@ export type ParamsMovimientos = Record<string, string>;
 
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const SLUG = /^[a-z_]+$/;
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 /** "Ver movimientos" de una consulta → parámetros de la ruta. */
 export function paramsDeFiltro(f: FiltroMovimientos): ParamsMovimientos {
@@ -30,9 +29,7 @@ export function paramsDeDetalle(transaccionId: string): ParamsMovimientos {
 }
 
 /** Id de transacción en la ruta; lo que no parece UUID se ignora. */
-export function detalleDeParams(
-  p: Readonly<Record<string, string | string[] | undefined>>,
-): string | null {
+export function detalleDeParams(p: Readonly<Record<string, string | string[] | undefined>>): string | null {
   const v = uno(p.detalle);
   return v && UUID.test(v) ? v : null;
 }

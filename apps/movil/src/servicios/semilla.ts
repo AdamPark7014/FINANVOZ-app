@@ -69,9 +69,7 @@ export const Escenario = z.looseObject({
   gastos_e14: z
     .object({
       cuenta: z.string().default('efectivo'),
-      gastos: z.array(
-        z.object({ fecha: Fecha, monto: z.int().min(1), comercio: z.string().min(1) }),
-      ),
+      gastos: z.array(z.object({ fecha: Fecha, monto: z.int().min(1), comercio: z.string().min(1) })),
     })
     .optional(),
   /** Catálogo semilla de E14 en builds de desarrollo (vacío = comportamiento de E14-01). */
@@ -91,7 +89,7 @@ export interface EscenarioCargado {
   readonly ingresoId: string | null;
   readonly esperado: unknown;
   /** Si viene en el escenario, fijar en el contexto antes de abrir Suscripciones (E14-01 usa `[]`). */
-  readonly catalogoSuscripciones?: readonly string[];
+  readonly catalogoSuscripciones?: readonly string[] | undefined;
 }
 
 function registrarGastosE14Semilla(

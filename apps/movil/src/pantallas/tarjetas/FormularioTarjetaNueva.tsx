@@ -11,11 +11,7 @@ import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
-import {
-  AVISO_NO_SE_INCLUYE_MSI,
-  BTN_CANCELAR,
-  etiquetaAvisoNoSeIncluyeMsi,
-} from './textos';
+import { AVISO_NO_SE_INCLUYE_MSI, BTN_CANCELAR, etiquetaAvisoNoSeIncluyeMsi } from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 type SiNo = 'si' | 'no';

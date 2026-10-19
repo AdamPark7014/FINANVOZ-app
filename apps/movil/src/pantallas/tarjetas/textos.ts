@@ -7,7 +7,7 @@ import {
   type TarjetaEditada,
   type TarjetaVista,
 } from '../../servicios';
-import { cifraEnPalabras, formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui/formato';
 import { contextoSaldoTarjeta } from '../principal/textos';
 
 /** Redacción de Tarjetas (`02 §8`, `02 §14`): solo presenta lo que ya calculó `servicios/`. */
@@ -197,9 +197,7 @@ export function etiquetaAccesibleTarjetaEnLista(d: CuentaDebes, t: TarjetaVista 
     partes.push(TEXTO_NO_SUMA_DINERO_LIBRE);
   }
   if (t && t.pngi > 0) {
-    partes.push(
-      `${ETIQUETA_PNGI}: ${cifraEnPalabras(t.pngi, 'pesos')} antes del ${t.etiquetaFechaLimite}`,
-    );
+    partes.push(`${ETIQUETA_PNGI}: ${cifraEnPalabras(t.pngi, 'pesos')} antes del ${t.etiquetaFechaLimite}`);
   } else if (t) {
     partes.push(etiquetaAccesibleDato(ETIQUETA_FECHA_LIMITE, t.etiquetaFechaLimite));
     partes.push(etiquetaAccesibleDato(ETIQUETA_PROXIMO_CORTE, t.etiquetaProximoCorte));
@@ -279,10 +277,7 @@ export function tituloCompraMsiMeses(meses: number): string {
 export const APOYO_CONFIRMAR_MSI =
   'La compra cuenta completa como gasto hoy; cada mes aparto solo la mensualidad.';
 
-export function preguntaTarjetaConfirmarMsi(falta: {
-  motivo: string;
-  alias?: string | null;
-}): string {
+export function preguntaTarjetaConfirmarMsi(falta: { motivo: string; alias?: string | null }): string {
   if (falta.motivo === 'no_encontrada' && falta.alias) {
     return `No tengo una tarjeta «${falta.alias}». ¿Con cuál fue?`;
   }

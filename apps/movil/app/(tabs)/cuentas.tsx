@@ -1,5 +1,7 @@
 import type { ComponentProps } from 'react';
-import { useRouter, type Router } from 'expo-router';
+import { useRouter } from 'expo-router';
+
+type Router = ReturnType<typeof useRouter>;
 import { View } from 'react-native';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaCuentas } from '../../src/pantallas/principal';

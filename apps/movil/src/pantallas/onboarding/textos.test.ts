@@ -137,9 +137,7 @@ describe('textos de onboarding', () => {
   });
 
   it('anuncio al cambiar de paso combina progreso y título sin PII', () => {
-    expect(anuncioCambioPasoOnboarding(2, TITULO_CONSENTIMIENTO)).toBe(
-      'Paso 2 de 7. Tus datos son tuyos',
-    );
+    expect(anuncioCambioPasoOnboarding(2, TITULO_CONSENTIMIENTO)).toBe('Paso 2 de 7. Tus datos son tuyos');
     expect(anuncioCambioPasoOnboarding(1, TITULO_BIENVENIDA)).not.toMatch(/\$/);
   });
 
