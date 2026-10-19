@@ -11,7 +11,7 @@ import { propsContenedorRegistrar } from './pestanas-textos';
 export default function Registrar() {
   const router = useRouter();
   // Solo el id de una frase de "Por revisar" viaja en la ruta, nunca su texto (regla 9).
-  const { frase } = useLocalSearchParams<{ frase?: string }>();
+  const { frase, dictar } = useLocalSearchParams<{ frase?: string; dictar?: string }>();
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));
   return (
     <View style={{ flex: 1 }} {...propsContenedorRegistrar()}>
@@ -29,6 +29,8 @@ export default function Registrar() {
           alArqueo={(efectivoReal) => abrirArqueo(router, { efectivoReal })}
           alMeAlcanza={(consulta) => abrirMeAlcanza(router, consulta)}
           {...(typeof frase === 'string' && frase !== '' ? { fraseRevision: frase } : {})}
+          // Micrófono del widget (`finanvoz:///registrar?dictar=1`): escucha al abrir.
+          dictarAlAbrir={dictar === '1'}
         />
       </ProveedorCompartido>
     </View>

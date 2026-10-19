@@ -37,8 +37,12 @@ describe('tarea del widget en segundo plano', () => {
       const renderWidget = jest.fn();
       await manejarTareaWidget({ widgetAction, renderWidget }, abrir);
       expect(renderWidget).toHaveBeenCalledTimes(1);
-      expect(textos(buildWidgetTree(pintado(renderWidget).light)).join(' ')).toBe('Hoy puedes $214 · 4 días');
-      expect(textos(buildWidgetTree(pintado(renderWidget).dark)).join(' ')).toBe('Hoy puedes $214 · 4 días');
+      expect(textos(buildWidgetTree(pintado(renderWidget).light)).join(' ')).toBe(
+        'Hoy puedes $214 · 4 días 🎤',
+      );
+      expect(textos(buildWidgetTree(pintado(renderWidget).dark)).join(' ')).toBe(
+        'Hoy puedes $214 · 4 días 🎤',
+      );
       expect(cerrar).toHaveBeenCalledTimes(1);
     }
   });
@@ -48,14 +52,14 @@ describe('tarea del widget en segundo plano', () => {
     fijarOcultarMontosWidget(p.ctx, true);
     const renderWidget = jest.fn();
     await manejarTareaWidget({ widgetAction: 'WIDGET_UPDATE', renderWidget }, abrir);
-    expect(textos(buildWidgetTree(pintado(renderWidget).light))).toEqual(['Toca para ver tu día']);
+    expect(textos(buildWidgetTree(pintado(renderWidget).light))).toEqual(['Toca para ver tu día', '🎤']);
     p.cerrar();
 
     const fallida = jest.fn();
     await manejarTareaWidget({ widgetAction: 'WIDGET_UPDATE', renderWidget: fallida }, () => {
       throw new Error('sin llave');
     });
-    expect(textos(buildWidgetTree(pintado(fallida).dark))).toEqual(['Toca para ver tu día']);
+    expect(textos(buildWidgetTree(pintado(fallida).dark))).toEqual(['Toca para ver tu día', '🎤']);
   });
 
   it('al tocarlo no pinta ni abre la base', async () => {

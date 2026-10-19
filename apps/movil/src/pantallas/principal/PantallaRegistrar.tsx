@@ -21,6 +21,7 @@ export function PantallaRegistrar({
   alMeAlcanza,
   fraseRevision,
   motor,
+  dictarAlAbrir = false,
 }: {
   alCerrar: () => void;
   /** "Ver movimientos" de una consulta: abre Movimientos con su filtro. */
@@ -34,6 +35,8 @@ export function PantallaRegistrar({
   /** Frase de "Por revisar" que se abre para confirmarla. */
   fraseRevision?: string;
   motor?: MotorDictado;
+  /** Abierta desde el micrófono del widget: empieza a escuchar. */
+  dictarAlAbrir?: boolean;
 }) {
   return (
     <Pantalla testID="pantalla-registrar">
@@ -66,6 +69,7 @@ export function PantallaRegistrar({
         {...(alMeAlcanza ? { alMeAlcanza } : {})}
         {...(fraseRevision ? { fraseRevision } : {})}
         {...(motor ? { motor } : {})}
+        dictarAlAbrir={dictarAlAbrir}
       />
       <Texto variante="subtitulo" testID="registrar-formulario-titulo" accessibilityRole="header">
         O llena los datos

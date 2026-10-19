@@ -17,7 +17,7 @@ import { auditar } from '../pantallas/__pruebas__/accesibilidad';
 import { PISTA_OCULTAR_MONTOS, PISTA_PREVIA, PISTA_PREVIA_OCULTA } from '../pantallas/ajustes/widget-textos';
 import { SincronizarWidget } from './SincronizarWidget';
 import { PreviaWidget, VISTA_EJEMPLO_WIDGET } from './PreviaWidget';
-import { WidgetHoy } from './WidgetHoy';
+import { ETIQUETA_DICTAR_WIDGET, WidgetHoy } from './WidgetHoy';
 import { actualizarWidget } from './actualizar';
 
 const { representacion } = jest.requireActual<typeof import('./actualizar')>('./actualizar');
@@ -123,12 +123,18 @@ describe('WidgetHoy (componente del widget)', () => {
     { ocultarMontos: false },
   );
 
-  it('pinta "Hoy puedes $214 · 4 días" en claro y en oscuro; todo el widget abre Hoy', () => {
+  it('pinta "Hoy puedes $214 · 4 días" en claro y en oscuro; la línea abre Hoy y el micrófono dicta', () => {
     for (const esquema of ['claro', 'oscuro'] as const) {
       const arbol = buildWidgetTree(<WidgetHoy vista={cifra} esquema={esquema} />);
       expect(arbol.type).toBe('LinearLayoutWidget');
-      expect(textos(arbol).join(' ')).toBe('Hoy puedes $214 · 4 días');
-      expect(arbol.props).toMatchObject({
+      const [linea, micro] = arbol.children ?? [];
+      expect(textos(linea as Arbol).join(' ')).toBe('Hoy puedes $214 · 4 días');
+      expect(micro?.props).toMatchObject({
+        clickAction: 'OPEN_URI',
+        clickActionData: { uri: 'finanvoz:///registrar?dictar=1' },
+        accessibilityLabel: ETIQUETA_DICTAR_WIDGET,
+      });
+      expect(linea?.props).toMatchObject({
         clickAction: 'OPEN_URI',
         clickActionData: { uri: 'finanvoz:///' },
         accessibilityLabel: 'Hoy puedes doscientos catorce pesos · 4 días',
@@ -142,9 +148,20 @@ describe('WidgetHoy (componente del widget)', () => {
       { ocultarMontos: true },
     );
     const arbol = buildWidgetTree(<WidgetHoy vista={oculto} esquema="claro" />);
-    expect(textos(arbol)).toEqual(['Toca para ver tu día']);
-    expect(arbol.props).toMatchObject({ clickAction: 'OPEN_URI', clickActionData: { uri: 'finanvoz:///' } });
+    expect(textos(arbol)).toEqual(['Toca para ver tu día', '🎤']);
+    expect(arbol.children?.[0]?.props).toMatchObject({
+      clickAction: 'OPEN_URI',
+      clickActionData: { uri: 'finanvoz:///' },
+    });
     expect(JSON.stringify(arbol)).not.toMatch(/\$|214/);
+  });
+
+  it('sin datos ("Toca para empezar") no ofrece el micrófono', () => {
+    const arbol = buildWidgetTree(
+      <WidgetHoy vista={construirVistaWidget(null, { ocultarMontos: false })} esquema="claro" />,
+    );
+    expect(arbol.children).toHaveLength(1);
+    expect(JSON.stringify(arbol)).not.toMatch(/dictar/);
   });
 });
 

@@ -48,6 +48,7 @@ export {
 } from './ajustes';
 export {
   construirVistaWidget,
+  ENLACE_DICTAR_WIDGET,
   ENLACE_WIDGET,
   fijarOcultarMontosWidget,
   obtenerAjustesWidget,
