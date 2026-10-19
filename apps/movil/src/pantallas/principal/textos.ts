@@ -1,5 +1,5 @@
 import { ErrorDominio } from '@cartera/core';
-import { etiquetaHablada, formatearCentavos } from '../../ui';
+import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import {
   MENSAJE_LIMITE_DIARIO,
   MENSAJE_LIMITE_MENSUAL_GRATIS,
@@ -252,8 +252,7 @@ export const CONTEXTO_CIFRA_HOY_PUEDES = TITULO_HOY_PUEDES_GASTAR;
 /** "Hoy: $0" en libre negativo; no decir "puedes gastar" cuando la cifra es cero por faltante. */
 export const CONTEXTO_CIFRA_LIBRE_NEGATIVO = 'Hoy';
 export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
-export const SUBTITULO_SIN_INGRESO =
-  'Así reparto tu dinero libre hasta el próximo pago.';
+export const SUBTITULO_SIN_INGRESO = 'Así reparto tu dinero libre hasta el próximo pago.';
 
 /** Plus: tip del día en Hoy (`02 §4`). */
 export const TITULO_TARJETA_DEL_DIA = 'Tarjeta del día';
@@ -372,11 +371,9 @@ export const PISTA_MOSTRAR_DETALLE_MOVIMIENTO = 'Muestra el detalle';
 export const PISTA_OCULTAR_DETALLE_MOVIMIENTO = 'Oculta el detalle';
 
 /** Anular desde el detalle (`02 §10`, TalkBack). */
-export const TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO =
-  '¿Anular este movimiento? Sus montos vuelven a tus cuentas.';
+export const TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO = '¿Anular este movimiento? Sus montos vuelven a tus cuentas.';
 export const PISTA_ANULAR_MOVIMIENTO = 'Pide confirmación para anular este movimiento';
-export const PISTA_CONFIRMAR_ANULAR_MOVIMIENTO =
-  'Anula el movimiento y devuelve los montos a tus cuentas';
+export const PISTA_CONFIRMAR_ANULAR_MOVIMIENTO = 'Anula el movimiento y devuelve los montos a tus cuentas';
 
 export function etiquetaConfirmarAnularMovimiento(): string {
   return etiquetaHablada(TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO);

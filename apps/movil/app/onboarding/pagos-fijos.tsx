@@ -26,7 +26,17 @@ import {
 import { leerDiaMes } from '../../src/pantallas/onboarding/ingreso';
 import { agregarPagoFijo, PAGOS_FIJOS_SUGERIDOS } from '../../src/servicios';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Cifra, cifraEnPalabras, espacio, etiquetaHablada, Tarjeta, Texto } from '../../src/ui';
+import {
+  Boton,
+  CampoMonto,
+  CampoTexto,
+  Cifra,
+  cifraEnPalabras,
+  espacio,
+  etiquetaHablada,
+  Tarjeta,
+  Texto,
+} from '../../src/ui';
 
 type Clave = (typeof PAGOS_FIJOS_SUGERIDOS)[number]['clave'];
 

@@ -24,6 +24,8 @@ describe('Aviso', () => {
     for (const s of AVISO_COMPLETO) {
       expect(screen.getByRole('heading', { name: s.titulo })).toBeTruthy();
     }
-    expect(screen.getByRole('heading', { name: 'Esta página web (calculadora y lista de espera)' })).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { name: 'Esta página web (calculadora y lista de espera)' }),
+    ).toBeTruthy();
   });
 });

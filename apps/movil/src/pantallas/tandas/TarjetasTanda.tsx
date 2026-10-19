@@ -41,10 +41,7 @@ function TarjetaAportacion({
   const ya = useYaLaDi(t.tandaId, t.fecha, testID);
   return (
     <Tarjeta testID={testID}>
-      <Texto
-        variante="cuerpoFuerte"
-        accessibilityLabel={etiquetaAccesibleTarjetaHoyAportacion(t)}
-      >
+      <Texto variante="cuerpoFuerte" accessibilityLabel={etiquetaAccesibleTarjetaHoyAportacion(t)}>
         {t.pregunta}
       </Texto>
       <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
@@ -92,10 +89,7 @@ function TarjetaCobro({ t, testID }: { t: Extract<TarjetaTanda, { tipo: 'tanda_c
   const [cobrando, setCobrando] = useState(false);
   return (
     <Tarjeta testID={testID}>
-      <Texto
-        variante="cuerpoFuerte"
-        accessibilityLabel={etiquetaAccesibleTarjetaHoyCobro(t)}
-      >
+      <Texto variante="cuerpoFuerte" accessibilityLabel={etiquetaAccesibleTarjetaHoyCobro(t)}>
         {t.pregunta}
       </Texto>
       <Texto variante="secundario" tono="secundario" importantForAccessibility="no">

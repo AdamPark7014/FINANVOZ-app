@@ -636,7 +636,12 @@ function FilaEscenario({
         })}
         style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
       >
-        <Texto variante="cuerpoFuerte" style={{ flex: 1 }} testID={`etiqueta-${e.tipo}`} importantForAccessibility="no">
+        <Texto
+          variante="cuerpoFuerte"
+          style={{ flex: 1 }}
+          testID={`etiqueta-${e.tipo}`}
+          importantForAccessibility="no"
+        >
           {e.etiqueta}
         </Texto>
         <Texto variante="cuerpoFuerte" testID={`porcentaje-${e.tipo}`} importantForAccessibility="no">

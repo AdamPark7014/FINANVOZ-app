@@ -209,9 +209,7 @@ function notificarCorreccionAnalitica(
   cambios: CambiosResueltos,
   origen: OrigenCorreccion | undefined,
 ): void {
-  const emitir =
-    registrar ??
-    (origen === 'voz' || origen === 'texto' ? registrarEventoCorreccion : null);
+  const emitir = registrar ?? (origen === 'voz' || origen === 'texto' ? registrarEventoCorreccion : null);
   if (!emitir) return;
   for (const campo of camposCorreccionAnalitica(cambios)) {
     try {

@@ -31,8 +31,8 @@ const COPY_FIJO = [
   LISTA_ESPERA_TITULO_EXITO,
   listaEsperaIntro('Finanvoz'),
   listaEsperaTextoExito('Finanvoz'),
-  listaEsperaErrorFaltaUna(LISTA_ESPERA_PREGUNTAS[1]!.texto),
-  listaEsperaErrorFaltanVarias(4, LISTA_ESPERA_PREGUNTAS[0]!.texto),
+  listaEsperaErrorFaltaUna(LISTA_ESPERA_PREGUNTAS[1]?.texto ?? ''),
+  listaEsperaErrorFaltanVarias(4, LISTA_ESPERA_PREGUNTAS[0]?.texto ?? ''),
   listaEsperaAvisoBreve(true, {
     nombre: 'NEXARA',
     domicilio: 'CDMX',

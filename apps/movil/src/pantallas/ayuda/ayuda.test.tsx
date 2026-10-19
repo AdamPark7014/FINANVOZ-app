@@ -101,12 +101,12 @@ describe('pantalla de ayuda', () => {
     expect(boton).toHaveProp('accessibilityState', { expanded: false });
     expect(boton).toHaveProp('accessibilityHint', pistaPreguntaFrecuente(false));
     fireEvent.press(boton);
-    const faqRespaldo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo')!;
+    const faqRespaldo = definido(PREGUNTAS_FRECUENTES.find((p) => p.id === 'respaldo'));
     expect(ordenDeLectura(screen.toJSON()).filter((x) => x === faqRespaldo.pregunta)).toHaveLength(1);
     expect(screen.getByTestId('ayuda-respuesta-respaldo')).toHaveProp('importantForAccessibility', 'yes');
-    expect(screen.getByText(faqRespaldo.respuesta[0])).toHaveProp(
+    expect(screen.getByText(definido(faqRespaldo.respuesta[0]))).toHaveProp(
       'accessibilityLabel',
-      etiquetaAccesibleParrafoRespuesta(faqRespaldo.respuesta[0], true),
+      etiquetaAccesibleParrafoRespuesta(definido(faqRespaldo.respuesta[0]), true),
     );
     expect(screen.getByTestId('ayuda-pregunta-respaldo')).toHaveProp('accessibilityState', {
       expanded: true,
@@ -139,15 +139,15 @@ describe('pantalla de ayuda', () => {
   it('TalkBack: rutas y plazos en respuestas se leen en palabras', () => {
     render(<PantallaAyuda alVolver={jest.fn()} abrirEnlace={jest.fn(async () => {})} />);
     fireEvent.press(screen.getByTestId('ayuda-pregunta-captura'));
-    const captura = PREGUNTAS_FRECUENTES.find((p) => p.id === 'captura')!;
-    expect(screen.getByText(captura.respuesta[0])).toHaveProp(
+    const captura = definido(PREGUNTAS_FRECUENTES.find((p) => p.id === 'captura'));
+    expect(screen.getByText(definido(captura.respuesta[0]))).toHaveProp(
       'accessibilityLabel',
       expect.stringMatching(/sección Captura/),
     );
-    expect(screen.getByText(captura.respuesta[0]).props.accessibilityLabel).not.toContain('›');
+    expect(screen.getByText(definido(captura.respuesta[0])).props.accessibilityLabel).not.toContain('›');
     fireEvent.press(screen.getByTestId('ayuda-pregunta-efectivo'));
-    const efectivo = PREGUNTAS_FRECUENTES.find((p) => p.id === 'efectivo')!;
-    expect(screen.getByText(efectivo.respuesta[0])).toHaveProp(
+    const efectivo = definido(PREGUNTAS_FRECUENTES.find((p) => p.id === 'efectivo'));
+    expect(screen.getByText(definido(efectivo.respuesta[0]))).toHaveProp(
       'accessibilityLabel',
       expect.stringMatching(/cuarenta y ocho horas/),
     );
@@ -161,7 +161,10 @@ describe('pantalla de ayuda', () => {
       'accessibilityLabel',
       etiquetaAccesibleCuerpoContacto(CORREO_AYUDA),
     );
-    expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_ESCRIBIR_CORREO);
+    expect(screen.getByTestId('ayuda-escribir')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_ESCRIBIR_CORREO,
+    );
     expect(screen.getByTestId('ayuda-escribir')).toHaveProp('accessibilityHint', PISTA_ESCRIBIR_CORREO);
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
     expect(abrir).toHaveBeenCalledWith('mailto:gerencia@nexara.com.mx?subject=Ayuda%20con%20Finanvoz');
@@ -173,7 +176,9 @@ describe('pantalla de ayuda', () => {
     render(<PantallaAyuda alVolver={jest.fn()} />);
     fireEvent.press(screen.getByTestId('ayuda-escribir'));
     expect(abrir).toHaveBeenCalledWith(enlaceCorreoAyuda());
-    expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(mensajeSinAppCorreo(CORREO_AYUDA));
+    expect(await screen.findByTestId('ayuda-sin-correo')).toHaveTextContent(
+      mensajeSinAppCorreo(CORREO_AYUDA),
+    );
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('ayuda-sin-correo')).toHaveProp('importantForAccessibility', 'yes');
@@ -206,3 +211,9 @@ describe('pantalla de ayuda', () => {
     expect(screen.getByTestId('ayuda-contacto-titulo')).toHaveProp('accessibilityRole', 'header');
   });
 });
+
+/** Falla la prueba si el valor no existe (evita `!`). */
+function definido<T>(v: T | undefined): T {
+  if (v === undefined) throw new Error('valor esperado no encontrado');
+  return v;
+}

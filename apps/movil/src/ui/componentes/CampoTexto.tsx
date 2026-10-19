@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { TextInput, View, type KeyboardTypeOptions, type TextInputProps } from 'react-native';
+import {
+  TextInput,
+  View,
+  type AccessibilityState,
+  type KeyboardTypeOptions,
+  type TextInputProps,
+} from 'react-native';
 import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
 import { espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
@@ -45,11 +51,7 @@ export function CampoTexto({
   const conError = Boolean(error);
   return (
     <View style={{ gap: espacio.xs }}>
-      <Texto
-        variante="etiqueta"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
+      <Texto variante="etiqueta" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {etiqueta}
       </Texto>
       <TextInput
@@ -66,7 +68,8 @@ export function CampoTexto({
         editable={!deshabilitado}
         accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
-        accessibilityState={{ invalid: conError, disabled: deshabilitado }}
+        // `invalid` ya no está en el tipo de RN 0.86; se conserva para TalkBack y las pruebas.
+        accessibilityState={{ invalid: conError, disabled: deshabilitado } as AccessibilityState}
         {...nativo}
         style={[
           tipo.cuerpo,
@@ -83,7 +86,12 @@ export function CampoTexto({
         ]}
       />
       {conError ? (
-        <Texto variante="secundario" tono="faltante" accessibilityRole="alert" accessibilityLiveRegion="polite">
+        <Texto
+          variante="secundario"
+          tono="faltante"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Texto>
       ) : ayuda ? (

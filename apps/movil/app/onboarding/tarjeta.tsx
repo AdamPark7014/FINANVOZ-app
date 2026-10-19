@@ -1,9 +1,6 @@
 import { useRouter } from 'expo-router';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
-import {
-  PISTA_TARJETA_DESPUES_ONB,
-  PISTA_TARJETA_GUARDAR_ONB,
-} from '../../src/pantallas/onboarding/textos';
+import { PISTA_TARJETA_DESPUES_ONB, PISTA_TARJETA_GUARDAR_ONB } from '../../src/pantallas/onboarding/textos';
 import { useFormularioTarjeta } from '../../src/pantallas/tarjetas/FormularioTarjetaNueva';
 import { Boton } from '../../src/ui';
 

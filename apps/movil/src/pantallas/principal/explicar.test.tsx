@@ -99,5 +99,4 @@ describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
     expect(limite).not.toHaveTextContent('Por revisar');
     expect(screen.queryByTestId('explicacion-pie')).toBeNull();
   });
-
 });

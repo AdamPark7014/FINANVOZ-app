@@ -27,7 +27,9 @@ const TIPOS_CONSUMO = ['gasto', 'cuenta_dividida', 'ajuste_arqueo', 'reembolso']
 export function inicioUso(ctx: Contexto): PlainDate {
   const fila = ctx.db
     .select({
-      minSaldoInicial: sql<string | null>`min(case when ${transaccion.tipo} = 'saldo_inicial' then ${transaccion.fecha} end)`,
+      minSaldoInicial: sql<
+        string | null
+      >`min(case when ${transaccion.tipo} = 'saldo_inicial' then ${transaccion.fecha} end)`,
       minCualquiera: sql<string | null>`min(${transaccion.fecha})`,
     })
     .from(transaccion)

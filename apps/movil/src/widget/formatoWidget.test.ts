@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ENLACE_WIDGET, type VistaWidget } from '../servicios';
-import {
-  detalleConSeparador,
-  etiquetaAccesibleWidget,
-  tamanoFuenteCifra,
-} from './formatoWidget';
+import { detalleConSeparador, etiquetaAccesibleWidget, tamanoFuenteCifra } from './formatoWidget';
 
 describe('formatoWidget (presentación)', () => {
   it('detalle con separador medio', () => {

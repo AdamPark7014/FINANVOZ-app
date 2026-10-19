@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { compromisoPorMes, sumarDias, type DesgloseReservado, type PlainDate } from '@cartera/core';
+import { compromisoPorMes, type DesgloseReservado, type PlainDate } from '@cartera/core';
 import { esquema } from '@cartera/datos';
 import { puertoEnMemoria } from '../avisos/puerto';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
@@ -194,45 +194,49 @@ function recorrer(
 }
 
 describe('M4 · tarjetas, MSI y compromisos', () => {
-  it('CA-M4-01 · del 11 oct 2026 al 31 ene 2027 con el plan E6-01 hay exactamente 3 reclasificaciones; repetir no duplica', { timeout: 20_000 }, () => {
-    const v = vector<VectorPlan>('E6-01');
-    const p = preparar(v.fecha_compra);
-    const oro = p.tarjeta(v.tarjeta);
-    const compra = registrarCompraMsi(p.ctx, {
-      tarjetaId: oro,
-      monto: v.monto,
-      meses: v.meses,
-      fecha: v.fecha_compra,
-      categoria: 'tecnologia',
-    });
-    expect(compra.cuotas.map(({ n, monto, corte, limite }) => ({ n, monto, corte, limite }))).toEqual(
-      v.esperado.cuotas,
-    );
-    expect(compra.compromisoPorMes).toEqual(v.esperado.compromiso_por_mes);
+  it(
+    'CA-M4-01 · del 11 oct 2026 al 31 ene 2027 con el plan E6-01 hay exactamente 3 reclasificaciones; repetir no duplica',
+    { timeout: 20_000 },
+    () => {
+      const v = vector<VectorPlan>('E6-01');
+      const p = preparar(v.fecha_compra);
+      const oro = p.tarjeta(v.tarjeta);
+      const compra = registrarCompraMsi(p.ctx, {
+        tarjetaId: oro,
+        monto: v.monto,
+        meses: v.meses,
+        fecha: v.fecha_compra,
+        categoria: 'tecnologia',
+      });
+      expect(compra.cuotas.map(({ n, monto, corte, limite }) => ({ n, monto, corte, limite }))).toEqual(
+        v.esperado.cuotas,
+      );
+      expect(compra.compromisoPorMes).toEqual(v.esperado.compromiso_por_mes);
 
-    recorrer(p, '2026-10-11', '2027-01-31');
-    const esperadas = v.esperado.cuotas.map((c) => ({
-      clave: `msi:${compra.planId}:${c.n}`,
-      fecha: c.corte,
-    }));
-    expect(reclasificaciones(p)).toEqual(esperadas);
-    expect(cortesCerrados(p, oro)).toEqual(vector<VectorCortes>('E6-07').esperado);
+      recorrer(p, '2026-10-11', '2027-01-31');
+      const esperadas = v.esperado.cuotas.map((c) => ({
+        clave: `msi:${compra.planId}:${c.n}`,
+        fecha: c.corte,
+      }));
+      expect(reclasificaciones(p)).toEqual(esperadas);
+      expect(cortesCerrados(p, oro)).toEqual(vector<VectorCortes>('E6-07').esperado);
 
-    // Repetir el proceso (y abrir Hoy varias veces) no duplica nada.
-    recorrer(p, '2026-10-11', '2027-01-31');
-    obtenerHoy(p.ctx);
-    obtenerHoy(p.ctx);
-    expect(reclasificaciones(p)).toEqual(esperadas);
-    expect(cortesCerrados(p, oro)).toHaveLength(3);
-    expect(listarPlanesMsi(p.ctx, oro)[0]).toMatchObject({
-      estado: 'terminado',
-      cuotasRestantes: 0,
-      restante: 0,
-    });
-    expect(tarjetaPorId(p.ctx, oro).saldoRevolvente).toBe(v.monto);
-    expect(cuotasMsiPendientes(p.ctx)).toEqual([]);
-    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
-  });
+      // Repetir el proceso (y abrir Hoy varias veces) no duplica nada.
+      recorrer(p, '2026-10-11', '2027-01-31');
+      obtenerHoy(p.ctx);
+      obtenerHoy(p.ctx);
+      expect(reclasificaciones(p)).toEqual(esperadas);
+      expect(cortesCerrados(p, oro)).toHaveLength(3);
+      expect(listarPlanesMsi(p.ctx, oro)[0]).toMatchObject({
+        estado: 'terminado',
+        cuotasRestantes: 0,
+        restante: 0,
+      });
+      expect(tarjetaPorId(p.ctx, oro).saldoRevolvente).toBe(v.monto);
+      expect(cuotasMsiPendientes(p.ctx)).toEqual([]);
+      expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
+    },
+  );
 
   it('CA-M4-02 · el PNGI mostrado = saldo al corte − pagos posteriores', () => {
     const p = preparar('2026-10-11');

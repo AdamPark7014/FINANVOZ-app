@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { formatearCentavos } from '../../ui/formato';
 
 /** Mensajes de error de gastos compartidos: viven con los demás en `servicios/mensajes-error`. */
 export { mensajeErrorCompartido } from '../../servicios';
@@ -115,11 +115,7 @@ export function textoPendientesCompartir(pendientes: number): string {
   return pendientes === 1 ? '1 movimiento por compartir' : `${pendientes} movimientos por compartir`;
 }
 
-export function textoRegistroPagoSaldar(
-  debe: 'yo' | 'otro',
-  nombre: string,
-  monto: Centavos,
-): string {
+export function textoRegistroPagoSaldar(debe: 'yo' | 'otro', nombre: string, monto: Centavos): string {
   const cifra = formatearCentavos(monto);
   return debe === 'yo'
     ? `Registra que le pagaste ${cifra} a ${nombre}.`
@@ -164,9 +160,7 @@ export const ETIQUETA_OTRA_PROPORCION = 'Otra proporción';
 export const EJEMPLO_PROPORCION = '70/30';
 export const AYUDA_PROPORCION = 'Tu parte y la de tu pareja; deben sumar 100.';
 
-export type ResultadoProporcionReparto =
-  | { ok: true; miParteBp: number }
-  | { ok: false; mensaje: string };
+export type ResultadoProporcionReparto = { ok: true; miParteBp: number } | { ok: false; mensaje: string };
 
 /** "70/30" → 7000 bp (tu parte primero). Vacío o inválido devuelve mensaje para la UI. */
 export function parsearProporcionReparto(texto: string): ResultadoProporcionReparto {

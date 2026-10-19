@@ -1,11 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import {
-  aceptarConsentimiento,
-  rechazarReconsentimiento,
-  VERSION_CONSENTIMIENTO,
-} from '../../servicios';
+import { aceptarConsentimiento, rechazarReconsentimiento, VERSION_CONSENTIMIENTO } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { AVISO_SIMPLIFICADO, etiquetaAvisoSimplificadoOnboarding } from '../onboarding/aviso';
 import { Casilla, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
@@ -31,11 +27,7 @@ import {
 /**
  * Aviso de privacidad actualizado (pendiente 31): aceptar la nueva versión, seguir en solo lectura o borrar todo.
  */
-export function Reconsentimiento({
-  alBorrarTodo,
-}: {
-  alBorrarTodo: () => Promise<void>;
-}) {
+export function Reconsentimiento({ alBorrarTodo }: { alBorrarTodo: () => Promise<void> }) {
   const router = useRouter();
   const { ctx, refrescar } = useSesion();
   const [acepta, setAcepta] = useState(false);

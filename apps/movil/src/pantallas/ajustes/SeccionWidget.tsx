@@ -28,10 +28,7 @@ export function SeccionWidget() {
   const { esquema } = useTema();
   const { ocultarMontos } = useVista(obtenerAjustesWidget);
   const [error, setError] = useState(false);
-  const vistaPrevia = useMemo(
-    () => construirVistaWidget(EJEMPLO_HOY, { ocultarMontos }),
-    [ocultarMontos],
-  );
+  const vistaPrevia = useMemo(() => construirVistaWidget(EJEMPLO_HOY, { ocultarMontos }), [ocultarMontos]);
 
   if (Platform.OS !== 'android') return null;
 

@@ -43,7 +43,6 @@ import {
   PISTA_CAMBIAR_PERFIL,
   PISTA_LISTO_IMPORTACION,
   PISTA_VER_DEDUCCIONES,
-  PISTA_GUARDAR_ALUMNO_NIVEL,
   PISTA_YA_LA_PAGUE,
   PISTA_MARCAR_CANCELADA_SAT,
   PISTA_OCULTAR_FACTURA,
@@ -173,7 +172,10 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     await importarDesdePantalla();
     expect(screen.getByTestId('importacion-listo')).toHaveProp('accessibilityHint', PISTA_LISTO_IMPORTACION);
     fireEvent.press(screen.getByTestId('importacion-listo'));
-    expect(screen.getByTestId('deducciones-editar-perfil')).toHaveProp('accessibilityHint', PISTA_CAMBIAR_PERFIL);
+    expect(screen.getByTestId('deducciones-editar-perfil')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CAMBIAR_PERFIL,
+    );
     fireEvent.press(screen.getByTestId('deducciones-editar-perfil'));
     expect(screen.getByTestId('perfil-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_PERFIL);
     fireEvent.press(screen.getByTestId('perfil-cancelar'));
@@ -202,7 +204,9 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     llenarPerfil('PEPJ800101AB1', '300,000');
     expect(screen.getByTestId('deducciones-tus-facturas')).toHaveTextContent(TITULO_TUS_FACTURAS);
     expect(textoDe('deducciones-sin-facturas')).toBe(TEXTO_FACTURAS_VACIO);
-    expect(screen.getByTestId('deducciones-sin-facturas').props.accessibilityLabel).toBe(etiquetaVacioFacturas());
+    expect(screen.getByTestId('deducciones-sin-facturas').props.accessibilityLabel).toBe(
+      etiquetaVacioFacturas(),
+    );
     expect(screen.queryByTestId(/^factura-/)).toBeNull();
   });
 
@@ -214,10 +218,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveTextContent(
       tituloPantallaDeducciones(2026),
     );
-    expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveProp(
-      'accessibilityRole',
-      'header',
-    );
+    expect(screen.getByTestId('deducciones-titulo-pantalla')).toHaveProp('accessibilityRole', 'header');
 
     const v = deduccionE13('E13-10');
     llenarPerfil('PEPJ800101AB', '300,000');
@@ -309,9 +310,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     const ctx = preparar();
     const alAbrir = jest.fn();
     renderConSesion(ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirDeducciones={alAbrir} />);
-    expect(screen.getByTestId('boton-deducciones').props.accessibilityLabel).toBe(
-      BTN_DEDUCCIONES_CUENTAS,
-    );
+    expect(screen.getByTestId('boton-deducciones').props.accessibilityLabel).toBe(BTN_DEDUCCIONES_CUENTAS);
     expect(screen.getByTestId('seccion-deducciones-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('boton-deducciones'));
     expect(alAbrir).toHaveBeenCalled();

@@ -309,11 +309,7 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
       ) : null}
       {d.ultimoCorte ? (
         <View style={{ gap: espacio.xxs }}>
-          <Dato
-            etiqueta={ETIQUETA_PNGI}
-            valor={formatearCentavos(d.pngi)}
-            testID="tarjeta-pngi"
-          />
+          <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(d.pngi)} testID="tarjeta-pngi" />
           <Texto variante="secundario" tono="secundario">
             {d.pngi > 0 ? textoPagarPngiAntesDe(d.etiquetaFechaLimite) : TEXTO_PNGI_CUBIERTO}
           </Texto>
@@ -325,7 +321,11 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
       )}
       <Dato etiqueta={ETIQUETA_FECHA_LIMITE} valor={d.etiquetaFechaLimite} testID="tarjeta-fecha-limite" />
       <Dato etiqueta={ETIQUETA_PROXIMO_CORTE} valor={d.etiquetaProximoCorte} testID="tarjeta-proximo-corte" />
-      <Dato etiqueta={ETIQUETA_DISPONIBLE} valor={formatearCentavos(d.disponible)} testID="tarjeta-disponible" />
+      <Dato
+        etiqueta={ETIQUETA_DISPONIBLE}
+        valor={formatearCentavos(d.disponible)}
+        testID="tarjeta-disponible"
+      />
       <Barra
         llenoBp={d.usoBp}
         marcaBp={UMBRAL_USO_BP}

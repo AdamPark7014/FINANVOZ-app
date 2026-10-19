@@ -1,7 +1,11 @@
 /** Copy de deducciones (`02 §24`, `08 §1`, tuteo); las cifras vienen de motores, no de aquí. */
 import { etiquetaHablada } from '../../ui/formato';
 
-export { AVISO_DEDUCIBLE_EFECTIVO, LEYENDA_ESTIMACION, MENSAJE_SIN_PARAMETROS } from '../../servicios/deducciones';
+export {
+  AVISO_DEDUCIBLE_EFECTIVO,
+  LEYENDA_ESTIMACION,
+  MENSAJE_SIN_PARAMETROS,
+} from '../../servicios/deducciones';
 
 export const ETIQUETA_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';

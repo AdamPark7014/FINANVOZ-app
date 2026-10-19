@@ -10,12 +10,7 @@ import {
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
-import {
-  BTN_LISTO,
-  BTN_VER_MOVIMIENTOS_CHEVRON,
-  BTN_VER_PLUS,
-  MENSAJE_EXPLICAR_SOLO_PLUS,
-} from './textos';
+import { BTN_LISTO, BTN_VER_MOVIMIENTOS_CHEVRON, BTN_VER_PLUS, MENSAJE_EXPLICAR_SOLO_PLUS } from './textos';
 
 export type ExplicacionMostrable = Extract<
   RespuestaExplicar,
@@ -59,8 +54,7 @@ export function TarjetaExplicacion({
 }) {
   const { abrirPlan } = usePlanTienda();
   const plan = useVista(obtenerPlan).plan;
-  const filtro =
-    respuesta.tipo === 'solo_plus' || respuesta.tipo === 'limite' ? null : respuesta.filtro;
+  const filtro = respuesta.tipo === 'solo_plus' || respuesta.tipo === 'limite' ? null : respuesta.filtro;
   const mostrarVerPlus =
     abrirPlan &&
     (respuesta.tipo === 'solo_plus' ||

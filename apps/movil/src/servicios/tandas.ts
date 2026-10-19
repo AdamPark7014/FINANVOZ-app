@@ -533,18 +533,10 @@ export function editarTanda(ctx: Contexto, tandaId: string, cambios: EditarTanda
     if (nombre !== undefined) {
       ctx.db.update(tanda).set({ nombre }).where(eq(tanda.id, tandaId)).run();
       ctx.db.update(cuenta).set({ nombre }).where(eq(cuenta.id, t.cuentaId)).run();
-      ctx.db
-        .update(programado)
-        .set({ concepto: nombre })
-        .where(eq(programado.id, t.programadoId))
-        .run();
+      ctx.db.update(programado).set({ concepto: nombre }).where(eq(programado.id, t.programadoId)).run();
     }
     if (cuentaId !== undefined) {
-      ctx.db
-        .update(programado)
-        .set({ cuentaId })
-        .where(eq(programado.id, t.programadoId))
-        .run();
+      ctx.db.update(programado).set({ cuentaId }).where(eq(programado.id, t.programadoId)).run();
     }
   });
 }

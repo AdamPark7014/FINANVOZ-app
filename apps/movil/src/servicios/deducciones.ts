@@ -12,12 +12,7 @@ import {
 } from '@cartera/core';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { cuentaPorId } from './catalogo';
-import {
-  actualizarEstatusCfdi,
-  etiquetarCfdi,
-  listarCfdiGuardados,
-  type CfdiGuardado,
-} from './cfdi';
+import { actualizarEstatusCfdi, etiquetarCfdi, listarCfdiGuardados, type CfdiGuardado } from './cfdi';
 import { listarPersonas } from './personas';
 import { cargarConfigFiscal } from './config-fiscal';
 import type { Contexto } from './contexto';
@@ -113,7 +108,9 @@ export const BENEFICIARIO_TITULAR = 'titular';
 const claveBeneficiarioPersona = (cuentaId: string) => `p:${cuentaId}`;
 
 /** "Yo" y cada persona registrada, para el tope de lentes por beneficiario. */
-export function opcionesBeneficiarioLentes(ctx: Contexto): readonly { readonly valor: string; readonly etiqueta: string }[] {
+export function opcionesBeneficiarioLentes(
+  ctx: Contexto,
+): readonly { readonly valor: string; readonly etiqueta: string }[] {
   return [
     { valor: BENEFICIARIO_TITULAR, etiqueta: 'Yo' },
     ...listarPersonas(ctx).map((p) => ({

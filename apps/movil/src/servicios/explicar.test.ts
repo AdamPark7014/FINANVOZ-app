@@ -190,9 +190,14 @@ describe('analítica modo_explicar (03 §8, pendiente 87)', () => {
     const eventos: EventoAnalitica[] = [];
     const registrarEvento = (e: EventoAnalitica) => eventos.push(e);
 
-    const ok = conTurnos([pide(['mayores_gastos']), responde('En 30 días lo que más pesa es comida fuera ($1,200).')]);
+    const ok = conTurnos([
+      pide(['mayores_gastos']),
+      responde('En 30 días lo que más pesa es comida fuera ($1,200).'),
+    ]);
     await explicar(p.ctx, '¿en qué se me va el dinero?', { nube: ok.nube, registrarEvento });
-    expect(eventos).toEqual([{ nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 2 } }]);
+    expect(eventos).toEqual([
+      { nombre: 'modo_explicar', propiedades: { resultado: 'explicacion', vueltas: 2 } },
+    ]);
 
     eventos.length = 0;
     const plant = conTurnos([
@@ -200,7 +205,9 @@ describe('analítica modo_explicar (03 §8, pendiente 87)', () => {
       responde('Gastaste $1,900 más en comida que el mes pasado.'),
     ]);
     await explicar(p.ctx, golden('Q13').texto, { nube: plant.nube, registrarEvento });
-    expect(eventos).toEqual([{ nombre: 'modo_explicar', propiedades: { resultado: 'plantilla', vueltas: 2 } }]);
+    expect(eventos).toEqual([
+      { nombre: 'modo_explicar', propiedades: { resultado: 'plantilla', vueltas: 2 } },
+    ]);
 
     eventos.length = 0;
     await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'solo_plus' }]).nube, registrarEvento });
@@ -210,7 +217,10 @@ describe('analítica modo_explicar (03 §8, pendiente 87)', () => {
       registrarEvento,
     });
     expect(
-      await explicar(p.ctx, '¿?', { nube: conTurnos([{ tipo: 'error', codigo: 'proveedor', status: 502 }]).nube, registrarEvento }),
+      await explicar(p.ctx, '¿?', {
+        nube: conTurnos([{ tipo: 'error', codigo: 'proveedor', status: 502 }]).nube,
+        registrarEvento,
+      }),
     ).toEqual({ tipo: 'error' });
     expect(eventos).toEqual([]);
   });
@@ -268,7 +278,12 @@ describe('modo explicar: límites y fallas', () => {
       responde('No tengo datos de esas fechas.'),
     ]);
     const r = await explicar(p.ctx, '¿cuánto gasté el 30 de febrero?', { nube: t.nube });
-    expect(r).toMatchObject({ tipo: 'explicacion', texto: 'No tengo datos de esas fechas.', filtro: {}, vueltas: 2 });
+    expect(r).toMatchObject({
+      tipo: 'explicacion',
+      texto: 'No tengo datos de esas fechas.',
+      filtro: {},
+      vueltas: 2,
+    });
     expect(t.resultados()).toEqual(['{"error":"argumentos_invalidos"}']);
   });
 

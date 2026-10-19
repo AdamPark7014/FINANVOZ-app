@@ -46,9 +46,7 @@ export default function Bienvenida() {
         </>
       }
     >
-      <Texto variante="cuerpo">
-        {CUERPO_BIENVENIDA}
-      </Texto>
+      <Texto variante="cuerpo">{CUERPO_BIENVENIDA}</Texto>
     </PasoOnboarding>
   );
 }

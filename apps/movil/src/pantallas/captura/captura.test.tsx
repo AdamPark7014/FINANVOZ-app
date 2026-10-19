@@ -133,10 +133,7 @@ describe('preguntas de captura en Hoy', () => {
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText(TITULO_CAPTURA_INACTIVA)).toBeTruthy();
     const guia = guiaCapturaInactiva(null);
-    expect(screen.getByTestId(/-guia$/)).toHaveProp(
-      'accessibilityLabel',
-      etiquetaGuiaCapturaInactiva(guia),
-    );
+    expect(screen.getByTestId(/-guia$/)).toHaveProp('accessibilityLabel', etiquetaGuiaCapturaInactiva(guia));
     expect(screen.getByTestId(/-guia$/)).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId(/-guia$/)).toHaveProp('accessibilityLiveRegion', 'polite');
     p.cerrar();
@@ -202,9 +199,10 @@ describe('Movimientos → capturas por revisar', () => {
     const conMonto = antes.find((c) => c.motivos[0] !== 'no_reconocida' && c.monto !== null);
     if (conMonto) {
       const titulo = conMonto.comercio ?? conMonto.banco ?? 'Movimiento de tu banco';
-      expect(
-        within(screen.getByTestId(`captura-${conMonto.capturaId}`)).getByRole('header'),
-      ).toHaveProp('accessibilityLabel', expect.stringContaining(titulo));
+      expect(within(screen.getByTestId(`captura-${conMonto.capturaId}`)).getByRole('header')).toHaveProp(
+        'accessibilityLabel',
+        expect.stringContaining(titulo),
+      );
     }
     expect(screen.getByText(/Consulta tu estado de cuenta en la app/)).toBeTruthy();
     fireEvent.press(screen.getByTestId(`captura-${noReconocida?.capturaId}-ya`));
@@ -411,10 +409,7 @@ describe('O6 · activar la captura', () => {
     const puente = puenteFalso();
     const alTerminar = jest.fn();
     conCaptura(p.ctx, puente, <ActivarCaptura testID="o6" alTerminar={alTerminar} />);
-    expect(screen.getByTestId('o6-ahora-no')).toHaveProp(
-      'accessibilityHint',
-      PISTA_AHORA_NO_ACTIVAR_CAPTURA,
-    );
+    expect(screen.getByTestId('o6-ahora-no')).toHaveProp('accessibilityHint', PISTA_AHORA_NO_ACTIVAR_CAPTURA);
     expect(
       screen.getByText(
         'Solo leemos las apps que marques. Las demás notificaciones se ignoran en tu teléfono y no se guardan.',
@@ -462,10 +457,7 @@ describe('O6 · activar la captura', () => {
     const puente = puenteFalso();
     conCaptura(p.ctx, puente, <PantallaHoy navegacion={navegacionFalsa()} />);
     expect(screen.getByText(TITULO_REACTIVAR_CAPTURA)).toBeTruthy();
-    expect(screen.getByTestId(/-cuerpo$/)).toHaveProp(
-      'accessibilityLabel',
-      etiquetaCuerpoReactivarCaptura(),
-    );
+    expect(screen.getByTestId(/-cuerpo$/)).toHaveProp('accessibilityLabel', etiquetaCuerpoReactivarCaptura());
     expect(screen.getByTestId(/-cuerpo$/)).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId(/-cuerpo$/)).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId(/-reactivar$/)).toHaveProp('accessibilityHint', PISTA_ACTIVAR_CAPTURA);

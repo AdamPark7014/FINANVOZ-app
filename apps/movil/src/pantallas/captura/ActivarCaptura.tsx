@@ -156,7 +156,11 @@ export function ActivarCaptura({
             >
               {ETIQUETA_NO_DISPONIBLE}
             </Texto>
-            <Texto variante="cuerpo" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <Texto
+              variante="cuerpo"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
               {CUERPO_NO_DISPONIBLE}
             </Texto>
           </Tarjeta>

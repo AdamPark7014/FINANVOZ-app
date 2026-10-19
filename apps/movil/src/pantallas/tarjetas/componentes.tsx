@@ -215,10 +215,7 @@ export function PreguntaLiquidarMeses({
             alPresionar={() => {
               try {
                 const l = liquidarMsi(ctx, p.planId);
-                avisarRegistro(
-                  mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)),
-                  l.deshacer,
-                );
+                avisarRegistro(mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)), l.deshacer);
                 alTerminar?.();
               } catch (e) {
                 setError(mensajeError(e));

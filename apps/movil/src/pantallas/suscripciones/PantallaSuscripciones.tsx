@@ -10,7 +10,17 @@ import {
   type SuscripcionVista,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, EstadoVacio, OBJETIVO_TACTIL_MIN, Pantalla, Tarjeta, Texto, useTema } from '../../ui';
+import {
+  Boton,
+  CampoTexto,
+  espacio,
+  EstadoVacio,
+  OBJETIVO_TACTIL_MIN,
+  Pantalla,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
 import { mensajeError } from '../principal/textos';
 import {
   AYUDA_NOMBRE,
@@ -160,8 +170,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
 function SeccionInactivas({ textoInactivas, cantidad }: { textoInactivas: string; cantidad: number }) {
   const { c } = useTema();
   const [abierta, setAbierta] = useState(true);
-  const tituloVisible =
-    cantidad === 1 ? TITULO_INACTIVAS : `${TITULO_INACTIVAS} (${cantidad})`;
+  const tituloVisible = cantidad === 1 ? TITULO_INACTIVAS : `${TITULO_INACTIVAS} (${cantidad})`;
   return (
     <Tarjeta testID="suscripciones-inactivas-seccion">
       <Pressable
@@ -194,10 +203,7 @@ function SeccionInactivas({ textoInactivas, cantidad }: { textoInactivas: string
         </Texto>
       </Pressable>
       {abierta ? (
-        <View
-          accessibilityLiveRegion="polite"
-          importantForAccessibility="yes"
-        >
+        <View accessibilityLiveRegion="polite" importantForAccessibility="yes">
           <Texto
             variante="secundario"
             tono="secundario"
@@ -235,106 +241,106 @@ function Fila({
     setEditandoNombre(false);
   };
   return (
-    <View testID={id} {...({ accessibilityRole: 'listitem' } as ViewProps)}>
-    <Tarjeta>
-      <View style={{ gap: espacio.xxs }}>
-        {editandoNombre ? (
-          <CampoTexto
-            etiqueta={ETIQUETA_NOMBRE}
-            valor={nombre}
-            alCambiar={setNombre}
-            testID={`${id}-nombre`}
-            alEnviar={guardarNombre}
-            ayuda={AYUDA_NOMBRE}
-          />
-        ) : (
-          <Texto variante="cuerpoFuerte" testID={`${id}-nombre`} accessibilityRole="header">
-            {s.nombre}
-          </Texto>
-        )}
-        {!editandoNombre ? (
-          <Boton
-            testID={`${id}-editar-nombre`}
-            etiqueta={ETIQUETA_EDITAR_NOMBRE}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={() => setEditandoNombre(true)}
-            pista={PISTA_EDITAR_NOMBRE}
-          />
-        ) : (
-          <Boton
-            testID={`${id}-guardar-nombre`}
-            etiqueta={ETIQUETA_GUARDAR_NOMBRE}
-            variante="secundario"
-            alPresionar={guardarNombre}
-            pista={PISTA_GUARDAR_NOMBRE}
-          />
-        )}
-        <Texto
-          variante="cuerpo"
-          testID={`${id}-monto`}
-          accessibilityLabel={etiquetaAccesibleMontoSuscripcion(s.textoMonto, s.textoAntes)}
-        >
-          {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
-        </Texto>
-        {s.textoProximo ? (
+    <View testID={id} role="listitem">
+      <Tarjeta>
+        <View style={{ gap: espacio.xxs }}>
+          {editandoNombre ? (
+            <CampoTexto
+              etiqueta={ETIQUETA_NOMBRE}
+              valor={nombre}
+              alCambiar={setNombre}
+              testID={`${id}-nombre`}
+              alEnviar={guardarNombre}
+              ayuda={AYUDA_NOMBRE}
+            />
+          ) : (
+            <Texto variante="cuerpoFuerte" testID={`${id}-nombre`} accessibilityRole="header">
+              {s.nombre}
+            </Texto>
+          )}
+          {!editandoNombre ? (
+            <Boton
+              testID={`${id}-editar-nombre`}
+              etiqueta={ETIQUETA_EDITAR_NOMBRE}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={() => setEditandoNombre(true)}
+              pista={PISTA_EDITAR_NOMBRE}
+            />
+          ) : (
+            <Boton
+              testID={`${id}-guardar-nombre`}
+              etiqueta={ETIQUETA_GUARDAR_NOMBRE}
+              variante="secundario"
+              alPresionar={guardarNombre}
+              pista={PISTA_GUARDAR_NOMBRE}
+            />
+          )}
           <Texto
-            variante="secundario"
-            tono="secundario"
-            testID={`${id}-proximo`}
-            accessibilityLabel={etiquetaAccesibleProximoSuscripcion(s.textoProximo)}
+            variante="cuerpo"
+            testID={`${id}-monto`}
+            accessibilityLabel={etiquetaAccesibleMontoSuscripcion(s.textoMonto, s.textoAntes)}
           >
-            {s.textoProximo}
+            {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
           </Texto>
-        ) : null}
-      </View>
-      {s.compromiso ? (
-        <View style={{ gap: espacio.xs }}>
-          <Texto
-            variante="secundario"
-            tono="acento"
-            testID={`${id}-apartada`}
-            accessibilityLabel={etiquetaAccesibleHoyApartaSuscripcion(s.nombre)}
-          >
-            {TEXTO_HOY_APARTA}
-          </Texto>
-          <Boton
-            testID={`${id}-cancelada`}
-            etiqueta={ETIQUETA_CANCELADA}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={() => alHacer('cancelada')}
-            pista={PISTA_CANCELADA}
-          />
+          {s.textoProximo ? (
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              testID={`${id}-proximo`}
+              accessibilityLabel={etiquetaAccesibleProximoSuscripcion(s.textoProximo)}
+            >
+              {s.textoProximo}
+            </Texto>
+          ) : null}
         </View>
-      ) : (
-        <View style={{ gap: espacio.xs }}>
-          <Boton
-            testID={`${id}-compromiso`}
-            etiqueta={ETIQUETA_COMPROMISO}
-            variante="secundario"
-            alPresionar={() => alHacer('compromiso')}
-            pista={PISTA_COMPROMISO}
-          />
-          <Boton
-            testID={`${id}-cancelada`}
-            etiqueta={ETIQUETA_CANCELADA}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={() => alHacer('cancelada')}
-            pista={PISTA_CANCELADA}
-          />
-          <Boton
-            testID={`${id}-no-es`}
-            etiqueta={ETIQUETA_NO_ES}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={() => alHacer('no_es')}
-            pista={PISTA_NO_ES}
-          />
-        </View>
-      )}
-    </Tarjeta>
+        {s.compromiso ? (
+          <View style={{ gap: espacio.xs }}>
+            <Texto
+              variante="secundario"
+              tono="acento"
+              testID={`${id}-apartada`}
+              accessibilityLabel={etiquetaAccesibleHoyApartaSuscripcion(s.nombre)}
+            >
+              {TEXTO_HOY_APARTA}
+            </Texto>
+            <Boton
+              testID={`${id}-cancelada`}
+              etiqueta={ETIQUETA_CANCELADA}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={() => alHacer('cancelada')}
+              pista={PISTA_CANCELADA}
+            />
+          </View>
+        ) : (
+          <View style={{ gap: espacio.xs }}>
+            <Boton
+              testID={`${id}-compromiso`}
+              etiqueta={ETIQUETA_COMPROMISO}
+              variante="secundario"
+              alPresionar={() => alHacer('compromiso')}
+              pista={PISTA_COMPROMISO}
+            />
+            <Boton
+              testID={`${id}-cancelada`}
+              etiqueta={ETIQUETA_CANCELADA}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={() => alHacer('cancelada')}
+              pista={PISTA_CANCELADA}
+            />
+            <Boton
+              testID={`${id}-no-es`}
+              etiqueta={ETIQUETA_NO_ES}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={() => alHacer('no_es')}
+              pista={PISTA_NO_ES}
+            />
+          </View>
+        )}
+      </Tarjeta>
     </View>
   );
 }

@@ -55,7 +55,11 @@ const propios = (enviados: EnvioAnalitica[]) =>
     Object.fromEntries(Object.entries(e.propiedades).filter(([k]) => !k.startsWith('$'))),
   ]);
 
-function conAnalitica(ctx: Contexto, ui: ReactNode, nube: ReturnType<typeof nubeFalsa>['nube'] | null = null) {
+function conAnalitica(
+  ctx: Contexto,
+  ui: ReactNode,
+  nube: ReturnType<typeof nubeFalsa>['nube'] | null = null,
+) {
   const enviados: EnvioAnalitica[] = [];
   const analitica = crearAnalitica({
     transporte: async (e) => {
@@ -64,13 +68,7 @@ function conAnalitica(ctx: Contexto, ui: ReactNode, nube: ReturnType<typeof nube
     aleatorio: (n) => new Uint8Array(randomBytes(n)),
     bancosPermitidos: new Set(),
   });
-  renderConSesion(
-    ctx,
-    <ProveedorAnalitica analitica={analitica}>
-      {ui}
-    </ProveedorAnalitica>,
-    nube,
-  );
+  renderConSesion(ctx, <ProveedorAnalitica analitica={analitica}>{ui}</ProveedorAnalitica>, nube);
   return enviados;
 }
 

@@ -67,7 +67,11 @@ export function Chip({
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityLabel={etiquetaChipHablada(etiqueta, etiquetaAccesible)}
       accessibilityHint={pista ?? pistaPorOmision}
-      accessibilityState={multiple ? { checked: seleccionado, disabled: deshabilitado } : { selected: seleccionado, disabled: deshabilitado }}
+      accessibilityState={
+        multiple
+          ? { checked: seleccionado, disabled: deshabilitado }
+          : { selected: seleccionado, disabled: deshabilitado }
+      }
       hitSlop={hitSlopTactil}
       style={({ pressed }) => ({
         minHeight: OBJETIVO_TACTIL_MIN,

@@ -99,7 +99,11 @@ function serializar(r: RespuestaConsulta): string {
 const filtroDe = (respuestas: readonly RespuestaConsulta[]): FiltroMovimientos =>
   respuestas.find((r) => Object.keys(r.filtro).length > 0)?.filtro ?? {};
 
-function emitirModoExplicar(opciones: OpcionesExplicar, resultado: 'explicacion' | 'plantilla', vueltas: number) {
+function emitirModoExplicar(
+  opciones: OpcionesExplicar,
+  resultado: 'explicacion' | 'plantilla',
+  vueltas: number,
+) {
   opciones.registrarEvento?.({
     nombre: 'modo_explicar',
     propiedades: { resultado, vueltas },

@@ -76,9 +76,7 @@ describe('transaccionesHistorial (E8.2 · pendiente 113)', () => {
     expect(porFecha('2026-10-19')).toEqual([
       { fecha: '2026-10-19', tipo: 'cuenta_dividida', monto_gasto: 60_000 },
     ]);
-    expect(porFecha('2026-10-20')).toEqual([
-      { fecha: '2026-10-20', tipo: 'reembolso', monto_gasto: -3_000 },
-    ]);
+    expect(porFecha('2026-10-20')).toEqual([{ fecha: '2026-10-20', tipo: 'reembolso', monto_gasto: -3_000 }]);
 
     const cubre = txs.find((t) => t.cubre_ocurrencia);
     expect(cubre?.fecha).toBe('2026-10-13');

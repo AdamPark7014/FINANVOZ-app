@@ -100,16 +100,16 @@ export function TarjetaConfirmarMsi({
             const preguntaTarjeta = preguntaTarjetaConfirmarMsi(faltaTarjeta);
             return (
               <>
-          <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaTarjeta}
-          </Texto>
-          <GrupoChips
-            opciones={faltaTarjeta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
-            valor={tarjeta}
-            alCambiar={setTarjeta}
-            prefijoTestID="msi-tarjeta"
-            etiqueta={preguntaTarjeta}
-          />
+                <Texto variante="secundario" tono="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+                  {preguntaTarjeta}
+                </Texto>
+                <GrupoChips
+                  opciones={faltaTarjeta.candidatas.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+                  valor={tarjeta}
+                  alCambiar={setTarjeta}
+                  prefijoTestID="msi-tarjeta"
+                  etiqueta={preguntaTarjeta}
+                />
               </>
             );
           })()}
@@ -145,12 +145,7 @@ export function TarjetaConfirmarMsi({
         deshabilitado={!completo}
         testID="boton-guardar-msi"
       />
-      <Boton
-        etiqueta={BTN_CANCELAR}
-        variante="texto"
-        alPresionar={alCancelar}
-        testID="boton-cancelar-msi"
-      />
+      <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alCancelar} testID="boton-cancelar-msi" />
     </Tarjeta>
   );
 }

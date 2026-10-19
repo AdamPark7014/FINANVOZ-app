@@ -26,7 +26,7 @@ export interface Contexto {
    * Catálogo semilla de suscripciones para E14 (M10). Por omisión, el de `07 §6`; las pruebas de CA-M10-01 fijan
    * el del vector E14-01 (vacío).
    */
-  readonly catalogoSuscripciones?: readonly string[];
+  readonly catalogoSuscripciones?: readonly string[] | undefined;
   /**
    * Contenido de `config/fiscal/<año>.json` por ejercicio (M12). Por omisión, los archivos del repositorio
    * (`servicios/config-fiscal.ts`); las pruebas de CA-M12-03 fijan uno armado con los parámetros sintéticos de

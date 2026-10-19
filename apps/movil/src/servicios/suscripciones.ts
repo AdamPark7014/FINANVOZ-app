@@ -267,7 +267,7 @@ function borrarAumentosPendientes(ctx: Contexto): void {
 function quitarAumentoPendiente(ctx: Contexto, comercio: string): void {
   const mapa = leerAumentosPendientes(ctx);
   if (!(comercio in mapa)) return;
-  const { [comercio]: _, ...resto } = mapa;
+  const resto = Object.fromEntries(Object.entries(mapa).filter(([clave]) => clave !== comercio));
   guardarAumentosPendientes(ctx, resto);
 }
 

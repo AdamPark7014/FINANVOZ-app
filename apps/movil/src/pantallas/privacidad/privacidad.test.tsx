@@ -171,7 +171,7 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
       ),
     ).toBeTruthy();
     expect(screen.getByText(/no mueve dinero, no ofrece crédito/)).toBeTruthy();
-    expect(screen.getByText(/gerencia@nexara\.com\.mx/)).toBeTruthy();
+    expect(screen.getByText(/gerencia@nexara\.com\.mx/, { includeHiddenElements: false })).toBeTruthy();
 
     r.unmount();
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
@@ -186,10 +186,7 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
       'accessibilityHint',
       PISTA_EXPORTAR_JSON,
     );
-    expect(screen.getByTestId('privacidad-exportar-csv')).toHaveProp(
-      'accessibilityHint',
-      PISTA_EXPORTAR_CSV,
-    );
+    expect(screen.getByTestId('privacidad-exportar-csv')).toHaveProp('accessibilityHint', PISTA_EXPORTAR_CSV);
     expect(screen.getByTestId('privacidad-aviso')).toHaveProp('accessibilityHint', PISTA_LEER_AVISO);
     expect(screen.getByTestId('privacidad-terminos')).toHaveProp('accessibilityHint', PISTA_LEER_TERMINOS);
     expect(screen.getByTestId('privacidad-borrar-iniciar')).toHaveProp(

@@ -51,8 +51,10 @@ export function compararVersionAviso(a: string, b: string): number {
   const pb = partes(b);
   if (!pa || !pb) return a.localeCompare(b);
   for (let i = 0; i < 3; i++) {
-    if (pa[i]! < pb[i]!) return -1;
-    if (pa[i]! > pb[i]!) return 1;
+    const x = pa[i] ?? 0;
+    const y = pb[i] ?? 0;
+    if (x < y) return -1;
+    if (x > y) return 1;
   }
   return 0;
 }

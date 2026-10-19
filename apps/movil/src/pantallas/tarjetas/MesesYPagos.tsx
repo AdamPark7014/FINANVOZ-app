@@ -45,6 +45,7 @@ import {
   BTN_AGREGAR_PAGO_PLANEADO,
   BTN_CANCELAR,
   BTN_GUARDAR_PAGO_PLANEADO,
+  BTN_QUITAR_PAGO_PLANEADO,
   BTN_LIQUIDAR_MESES,
   BTN_SI_LIQUIDAR,
   ERROR_DIA_PAGO_PLANEADO,
@@ -69,9 +70,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
       <View
         accessible={activo}
         accessibilityLabel={
-          activo
-            ? etiquetaAccesiblePlanMsi(p.descripcion, cuota, p.cuotasRestantes, p.meses)
-            : undefined
+          activo ? etiquetaAccesiblePlanMsi(p.descripcion, cuota, p.cuotasRestantes, p.meses) : undefined
         }
         style={{ gap: espacio.xxs }}
       >
@@ -114,10 +113,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
             alPresionar={() => {
               try {
                 const l = liquidarMsi(ctx, p.id);
-                avisarRegistro(
-                  mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)),
-                  l.deshacer,
-                );
+                avisarRegistro(mensajeLiquidacionPlan(p.descripcion, formatearCentavos(l.monto)), l.deshacer);
               } catch (e) {
                 setError(mensajeError(e));
               }
@@ -166,11 +162,7 @@ export function CompromisoMeses({ meses }: { meses: readonly MesCompromiso[] }) 
   if (!meses.some((m) => m.monto > 0)) return null;
   const mayor = Math.max(...meses.map((m) => m.monto));
   return (
-    <Seccion
-      titulo={TITULO_COMPROMISO_MSI}
-      subtitulo={SUBTITULO_COMPROMISO_MSI}
-      testID="compromiso-12-meses"
-    >
+    <Seccion titulo={TITULO_COMPROMISO_MSI} subtitulo={SUBTITULO_COMPROMISO_MSI} testID="compromiso-12-meses">
       {meses.map((m) => {
         const etiqueta = etiquetaMes(m.mes);
         return (
@@ -324,11 +316,7 @@ function AgregarPagoPlaneado({ tarjetaId, alTerminar }: { tarjetaId: string; alT
           {error}
         </Texto>
       ) : null}
-      <Boton
-        etiqueta={BTN_GUARDAR_PAGO_PLANEADO}
-        alPresionar={guardar}
-        testID="pago-planeado-guardar"
-      />
+      <Boton etiqueta={BTN_GUARDAR_PAGO_PLANEADO} alPresionar={guardar} testID="pago-planeado-guardar" />
       <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
     </View>
   );

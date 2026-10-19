@@ -114,7 +114,12 @@ function CasillaGastoArqueo({
           </Texto>
         ) : null}
       </View>
-      <Texto variante="cuerpo" style={{ flex: 1 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Texto
+        variante="cuerpo"
+        style={{ flex: 1 }}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         {etiqueta}
       </Texto>
     </Pressable>
@@ -313,7 +318,11 @@ function Arqueo({
           </Texto>
           <GrupoChips
             opciones={[
-              { valor: 'exacto', etiqueta: formatearCentavos(esperado), etiquetaAccesible: etiquetaChipExacto(esperado) },
+              {
+                valor: 'exacto',
+                etiqueta: formatearCentavos(esperado),
+                etiquetaAccesible: etiquetaChipExacto(esperado),
+              },
               { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
             ]}
             valor={otra ? 'otra' : null}
@@ -395,11 +404,7 @@ function Faltante({
   const suma = montos.reduce<number>((s, m) => s + (m ?? 0), 0);
   return (
     <View style={{ gap: espacio.s }} testID="arqueo-faltante" accessibilityLiveRegion="polite">
-      <Texto
-        variante="subtitulo"
-        testID="arqueo-faltante-titulo"
-        accessibilityHint={PISTA_GRUPO_PROPUESTA}
-      >
+      <Texto variante="subtitulo" testID="arqueo-faltante-titulo" accessibilityHint={PISTA_GRUPO_PROPUESTA}>
         {textoFaltante(calculo.hueco)}
       </Texto>
       <Tarjeta accionesAnidadas>

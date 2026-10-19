@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import {
-  archivarTanda,
-  detalleTanda,
-  editarTanda,
-  listarCuentas,
-  type DetalleTanda,
-} from '../../servicios';
+import { archivarTanda, detalleTanda, editarTanda, listarCuentas, type DetalleTanda } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Chips, MensajeError } from '../onboarding/componentes';
@@ -200,51 +194,43 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
         <View accessibilityRole="list" style={{ gap: espacio.s }}>
-        {d.rondas.map((r) => (
-          <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
-            <View
-              accessible
-              accessibilityLabel={etiquetaAccesibleRondaTanda(r, !d.activa)}
-              style={{ gap: espacio.xxs }}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+          {d.rondas.map((r) => (
+            <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
+              <View
+                accessible
+                accessibilityLabel={etiquetaAccesibleRondaTanda(r, !d.activa)}
+                style={{ gap: espacio.xxs }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+                  <Texto
+                    variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'}
+                    style={{ flex: 1 }}
+                    importantForAccessibility="no"
+                  >
+                    {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
+                  </Texto>
+                  <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
+                    {etiquetaEstadoRonda(r, !d.activa)}
+                  </Texto>
+                </View>
                 <Texto
-                  variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'}
-                  style={{ flex: 1 }}
+                  variante="secundario"
+                  tono="secundario"
+                  testID={`tanda-ronda-${r.t}-riesgo`}
                   importantForAccessibility="no"
                 >
-                  {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
-                </Texto>
-                <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
-                  {etiquetaEstadoRonda(r, !d.activa)}
+                  {textoDespuesRondaRiesgo(r.enRiesgo)}
                 </Texto>
               </View>
-              <Texto
-                variante="secundario"
-                tono="secundario"
-                testID={`tanda-ronda-${r.t}-riesgo`}
-                importantForAccessibility="no"
-              >
-                {textoDespuesRondaRiesgo(r.enRiesgo)}
-              </Texto>
-            </View>
-          </Tarjeta>
-        ))}
+            </Tarjeta>
+          ))}
         </View>
       </Seccion>
     </Pantalla>
   );
 }
 
-function Ajustes({
-  tandaId,
-  d,
-  alArchivar,
-}: {
-  tandaId: string;
-  d: DetalleTanda;
-  alArchivar: () => void;
-}) {
+function Ajustes({ tandaId, d, alArchivar }: { tandaId: string; d: DetalleTanda; alArchivar: () => void }) {
   const { ctx, refrescar } = useSesion();
   const cuentas = useVista((c) => listarCuentas(c).tienes.filter((x) => x.subtipo !== 'ahorro'));
   const [editando, setEditando] = useState(false);

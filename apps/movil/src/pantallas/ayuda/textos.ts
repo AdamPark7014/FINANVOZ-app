@@ -38,8 +38,7 @@ export const ICONO_PREGUNTA_ABIERTA = '−';
  * como `SECCION_AYUDA`, `TEXTO_AYUDA` y `BTN_AYUDA` (una sola fuente de redacción).
  */
 export const SECCION_AJUSTES = TITULO;
-export const TEXTO_CARD_AJUSTES =
-  'Respuestas a las dudas más comunes y nuestro correo de contacto.';
+export const TEXTO_CARD_AJUSTES = 'Respuestas a las dudas más comunes y nuestro correo de contacto.';
 export const BTN_ABRIR_DESDE_AJUSTES = 'Ver preguntas frecuentes';
 
 /** Alias con los nombres de Ajustes; `ajustes/textos.ts` reexporta desde aquí. */

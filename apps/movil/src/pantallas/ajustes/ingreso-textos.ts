@@ -1,6 +1,6 @@
 import type { Centavos, DiaSemana, PlainDate, Regla } from '@cartera/core';
 import { etiquetaFecha } from '../../servicios';
-import { formatearCentavos } from '../../ui';
+import { formatearCentavos } from '../../ui/formato';
 import { OPCIONES_DIA_SEMANA } from '../onboarding/ingreso';
 
 /**
@@ -15,8 +15,7 @@ export const PISTA_CAMBIAR_INGRESO = 'Abre el formulario para cambiar cuánto y 
 export const PISTA_CONFIGURAR_INGRESO = 'Abre el formulario para decir cuánto y cada cuándo te pagan';
 
 export const TITULO_EDITAR = 'Tu ingreso';
-export const INTRO_EDITAR =
-  'Con esto calculo cuánto puedes gastar cada día hasta tu próximo pago.';
+export const INTRO_EDITAR = 'Con esto calculo cuánto puedes gastar cada día hasta tu próximo pago.';
 
 export const ETIQUETA_GUARDAR = 'Guardar';
 export const PISTA_GUARDAR = 'Recalculo cuánto puedes gastar con este ingreso';

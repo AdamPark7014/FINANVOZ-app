@@ -12,7 +12,6 @@ import {
   listarTandas,
 } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
-import { formatearCentavos } from '../../ui';
 import { abrirPruebaPantalla, golden, vector } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaHoy } from '../principal/PantallaHoy';
@@ -109,9 +108,13 @@ const entradaDe = (v: VectorE11) => ({
 
 describe('Tandas (02 §18)', () => {
   it('la UI fija vive en textos.ts sin exclamaciones', () => {
-    const ui = [TITULO_TANDAS, TEXTO_TANDAS_VACIO, PREGUNTA_YA_DISTE, PREGUNTA_HOY_COBRO, TEXTO_NO_ES_INGRESO].join(
-      '\n',
-    );
+    const ui = [
+      TITULO_TANDAS,
+      TEXTO_TANDAS_VACIO,
+      PREGUNTA_YA_DISTE,
+      PREGUNTA_HOY_COBRO,
+      TEXTO_NO_ES_INGRESO,
+    ].join('\n');
     expect(ui).not.toMatch(/[!¡]/);
   });
 
@@ -136,10 +139,16 @@ describe('Tandas (02 §18)', () => {
       'accessibilityRole',
       'header',
     );
-    expect(screen.getByTestId('tanda-editar-abrir')).toHaveProp('accessibilityHint', PISTA_EDITAR_NOMBRE_CUENTA);
+    expect(screen.getByTestId('tanda-editar-abrir')).toHaveProp(
+      'accessibilityHint',
+      PISTA_EDITAR_NOMBRE_CUENTA,
+    );
     expect(screen.getByTestId('tanda-archivar-abrir')).toHaveProp('accessibilityHint', PISTA_ARCHIVAR_TANDA);
     fireEvent.press(screen.getByTestId('tanda-me-toco'));
-    expect(screen.getByTestId('tanda-me-toco-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_COBRO);
+    expect(screen.getByTestId('tanda-me-toco-cancelar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_COBRO,
+    );
   });
 
   it('calendario de rondas: cada fila tiene etiqueta TalkBack', () => {
@@ -167,7 +176,10 @@ describe('Tandas (02 §18)', () => {
     const p = preparar('2026-10-16');
     const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
-    expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp('accessibilityHint', PISTA_VER_CALENDARIO);
+    expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_VER_CALENDARIO,
+    );
   });
 
   it('lista de tandas: filas con etiqueta TalkBack y role list', () => {
@@ -202,13 +214,17 @@ describe('Tandas (02 §18)', () => {
     crearTanda(p.ctx, entradaDe(v));
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     const tarjeta = screen.getByTestId('tarjeta-accion-0');
-    expect(within(tarjeta).getByLabelText(etiquetaAccesibleTarjetaHoyAportacion({
-      pregunta: PREGUNTA_YA_DISTE,
-      nombre: 'Tanda de la oficina',
-      monto: 50_000,
-      cuando: 'hoy',
-      etiquetaFecha: 'vie 16',
-    }))).toBeTruthy();
+    expect(
+      within(tarjeta).getByLabelText(
+        etiquetaAccesibleTarjetaHoyAportacion({
+          pregunta: PREGUNTA_YA_DISTE,
+          nombre: 'Tanda de la oficina',
+          monto: 50_000,
+          cuando: 'hoy',
+          etiquetaFecha: 'vie 16',
+        }),
+      ),
+    ).toBeTruthy();
   });
 
   it('Tarjeta de Hoy "Ya la di" tiene pista TalkBack', () => {
@@ -232,7 +248,10 @@ describe('Tandas (02 §18)', () => {
       .getAllByTestId(/^tarjeta-accion-\d$/)
       .find((n) => within(n).queryByText(PREGUNTA_HOY_COBRO))?.props.testID as string;
     expect(screen.getByTestId(`${testID}-me-toco`)).toHaveProp('accessibilityHint', PISTA_ME_TOCO);
-    expect(screen.getByTestId(`${testID}-todavia-no`)).toHaveProp('accessibilityHint', PISTA_TODAVIA_NO_COBRO);
+    expect(screen.getByTestId(`${testID}-todavia-no`)).toHaveProp(
+      'accessibilityHint',
+      PISTA_TODAVIA_NO_COBRO,
+    );
   });
 
   it('sin tandas lo explica y deja crear una nueva', () => {
@@ -395,7 +414,10 @@ describe('Tandas (02 §18)', () => {
 
     fireEvent.press(screen.getByTestId('tanda-editar-abrir'));
     expect(screen.getByTestId('tanda-editar-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_CAMBIOS);
-    expect(screen.getByTestId('tanda-editar-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_EDICION);
+    expect(screen.getByTestId('tanda-editar-cancelar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_EDICION,
+    );
     fireEvent.changeText(screen.getByTestId('tanda-editar-nombre'), 'Tanda vecinos');
     fireEvent.press(screen.getByTestId(`tanda-editar-cuenta-${p.efectivo}`));
     fireEvent.press(screen.getByTestId('tanda-editar-guardar'));
@@ -403,7 +425,10 @@ describe('Tandas (02 §18)', () => {
     expect(detalleTanda(p.ctx, tandaId).cuentaOrigenId).toBe(p.efectivo);
 
     fireEvent.press(screen.getByTestId('tanda-archivar-abrir'));
-    expect(screen.getByTestId('tanda-archivar-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_ARCHIVAR);
+    expect(screen.getByTestId('tanda-archivar-cancelar')).toHaveProp(
+      'accessibilityHint',
+      PISTA_CANCELAR_ARCHIVAR,
+    );
     expect(screen.getByTestId('tanda-archivar-confirmar')).toHaveProp(
       'accessibilityHint',
       PISTA_CONFIRMAR_ARCHIVAR,
@@ -414,7 +439,10 @@ describe('Tandas (02 §18)', () => {
     vista.unmount();
 
     renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
-    expect(screen.getByTestId('tanda-archivada')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_TANDA_ARCHIVADA);
+    expect(screen.getByTestId('tanda-archivada')).toHaveProp(
+      'accessibilityLabel',
+      ACCESIBILIDAD_TANDA_ARCHIVADA,
+    );
     expect(screen.getByTestId('tanda-archivada')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.queryByTestId('tanda-ya-la-di')).toBeNull();
   });
@@ -454,31 +482,37 @@ describe('copy centralizado (textos.ts)', () => {
     expect(ACCESIBILIDAD_TANDA_NO_ENCONTRADA).toMatch(/lista de tandas/i);
     expect(ACCESIBILIDAD_TANDA_ARCHIVADA).toMatch(/aportaciones futuras/i);
     expect(PISTA_GUARDAR_TANDA).toMatch(/aportación/i);
-    expect(etiquetaAccesibleRondaTanda(
-      {
-        t: 4,
-        fecha: '2026-11-06',
-        etiqueta: 'vie 6',
-        esCobro: true,
-        estado: 'pendiente',
-        enRiesgo: 150_000,
-        porAportar: 450_000,
-      },
-      false,
-    )).toMatch(/tu turno/i);
-    expect(etiquetaAccesibleTandaEnLista({
-      nombre: 'Oficina',
-      aportacion: 50_000,
-      proxima: { etiqueta: 'vie 16' },
-      etiquetaCobro: 'vie 6',
-      enRiesgo: 0,
-    })).not.toMatch(/\$/);
-    expect(etiquetaAccesibleTextoYaEmpezo({
-      aportacionesHechas: 6,
-      yaCobraste: true,
-      saldoInicial: -200_000,
-      faltan: 4,
-      porAportar: 200_000,
-    })).toMatch(/pesos/i);
+    expect(
+      etiquetaAccesibleRondaTanda(
+        {
+          t: 4,
+          fecha: '2026-11-06',
+          etiqueta: 'vie 6',
+          esCobro: true,
+          estado: 'pendiente',
+          enRiesgo: 150_000,
+          porAportar: 450_000,
+        },
+        false,
+      ),
+    ).toMatch(/tu turno/i);
+    expect(
+      etiquetaAccesibleTandaEnLista({
+        nombre: 'Oficina',
+        aportacion: 50_000,
+        proxima: { etiqueta: 'vie 16' },
+        etiquetaCobro: 'vie 6',
+        enRiesgo: 0,
+      }),
+    ).not.toMatch(/\$/);
+    expect(
+      etiquetaAccesibleTextoYaEmpezo({
+        aportacionesHechas: 6,
+        yaCobraste: true,
+        saldoInicial: -200_000,
+        faltan: 4,
+        porAportar: 200_000,
+      }),
+    ).toMatch(/pesos/i);
   });
 });

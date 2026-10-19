@@ -31,8 +31,7 @@ export const ESTADO_NO_DISPONIBLE = 'No disponible en este teléfono.';
 /** TalkBack cuando la captura está apagada (visible: {@link ESTADO_APAGADA}). */
 export const ETIQUETA_CAPTURA_APAGADA = 'Captura automática apagada';
 /** TalkBack sin módulo nativo (visible: {@link ESTADO_NO_DISPONIBLE}). */
-export const ETIQUETA_CAPTURA_NO_DISPONIBLE =
-  'Captura automática no disponible en este teléfono';
+export const ETIQUETA_CAPTURA_NO_DISPONIBLE = 'Captura automática no disponible en este teléfono';
 
 const SIN_APPS_EN_LISTA = 'Activa: aún no hay apps de banco en la lista.';
 
@@ -46,9 +45,6 @@ export function textoCapturaActiva(cantidadApps: number): string {
 /** TalkBack: el conteo de apps en palabras (`02 §15`). */
 export function etiquetaCapturaActiva(cantidadApps: number): string {
   if (cantidadApps === 0) return SIN_APPS_EN_LISTA;
-  const apps =
-    cantidadApps === 1
-      ? 'una app de banco'
-      : `${enteroEnPalabras(cantidadApps)} apps de banco`;
+  const apps = cantidadApps === 1 ? 'una app de banco' : `${enteroEnPalabras(cantidadApps)} apps de banco`;
   return `Activa: leo los avisos de ${apps}.`;
 }

@@ -11,14 +11,11 @@ export const ETIQUETA_PREVIA = 'Vista previa';
 export const PISTA_PREVIA = 'Cifras de ejemplo; no muestra tu saldo real.';
 
 /** TalkBack cuando la previa muestra «Toca para ver tu día» (montos ocultos). */
-export const PISTA_PREVIA_OCULTA =
-  'Texto de ejemplo con montos ocultos; no muestra tu saldo real.';
+export const PISTA_PREVIA_OCULTA = 'Texto de ejemplo con montos ocultos; no muestra tu saldo real.';
 
 export const ETIQUETA_OCULTAR = 'Ocultar montos';
 
-export const DESC_OCULTAR =
-  'En el widget verás “Toca para ver tu día” en lugar del monto.';
+export const DESC_OCULTAR = 'En el widget verás “Toca para ver tu día” en lugar del monto.';
 
 /** TalkBack en «Ocultar montos»: acción inmediata, sin repetir la descripción visible. */
-export const PISTA_OCULTAR_MONTOS =
-  'Actualiza la vista previa y el widget del inicio al instante.';
+export const PISTA_OCULTAR_MONTOS = 'Actualiza la vista previa y el widget del inicio al instante.';

@@ -1,5 +1,5 @@
 import type { Centavos } from '@cartera/core';
-import { formatearCentavos } from '../../ui';
+import { formatearCentavos } from '../../ui/formato';
 
 /** Redacción de cuentas divididas, cobros y personas (`02 §17`, `02 §14`): solo presentación. */
 
@@ -28,8 +28,7 @@ export const PISTA_QUITAR_RECORDATORIO = 'Cancela el aviso que programaste para 
 
 export const TITULO_MOVIMIENTOS = 'Movimientos';
 export const TITULO_PEDIR_DATOS_COBRO = '¿A dónde te pagan?';
-export const AYUDA_PEDIR_DATOS_COBRO =
-  'Para cobrar, primero dime tus datos. Solo te los pido una vez.';
+export const AYUDA_PEDIR_DATOS_COBRO = 'Para cobrar, primero dime tus datos. Solo te los pido una vez.';
 export const TITULO_YA_ME_PAGO = '¿Cuánto te pagó?';
 export const TITULO_RECORDATORIO_COBRO = '¿Te recuerdo cobrar?';
 

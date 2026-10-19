@@ -14,7 +14,16 @@ import {
   type ResultadoTexto,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Cifra, espacio, EstadoVacio, formatearCentavos, Texto } from '../../ui';
+import {
+  Boton,
+  CampoMonto,
+  CampoTexto,
+  Cifra,
+  espacio,
+  EstadoVacio,
+  formatearCentavos,
+  Texto,
+} from '../../ui';
 import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {

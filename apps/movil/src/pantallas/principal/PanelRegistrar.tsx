@@ -217,9 +217,7 @@ export function PanelRegistrar({
           setAvisoDeducible(r.movimientos.some((m) => m.avisoDeducible));
           avisarRegistro(mensajeRegistrado(r.movimientos), {
             deshacer: r.deshacer,
-            ...(r.movimientos[0]?.transaccionId
-              ? { transaccionId: r.movimientos[0].transaccionId }
-              : {}),
+            ...(r.movimientos[0]?.transaccionId ? { transaccionId: r.movimientos[0].transaccionId } : {}),
           });
           return;
         case 'corregido':
@@ -264,10 +262,10 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
-          avisarRegistro(
-            mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal),
-            { deshacer: r.deshacer, transaccionId: r.registro.transaccionId },
-          );
+          avisarRegistro(mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal), {
+            deshacer: r.deshacer,
+            transaccionId: r.registro.transaccionId,
+          });
           return;
         case 'registrado_tanda':
           terminarRevision();

@@ -88,7 +88,6 @@ export function PreviaWidget({
             accessibilityElementsHidden
             importantForAccessibility="no"
             style={[estilos.titulo, { color: c.texto }]}
-            numberOfLines={2}
           >
             {vista.texto}
           </Text>

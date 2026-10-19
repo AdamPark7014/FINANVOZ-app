@@ -31,9 +31,7 @@ describe('textos de suscripciones (02 §20)', () => {
     expect(etiquetaAccesibleInactivasEncabezado(3)).toBe('Ya no se cobran, 3 suscripciones');
     const detalle = 'Ya no se cobran: Disney Plus (último cargo 20 jul)';
     expect(etiquetaAccesibleInactivasBoton(1, detalle, false)).toContain('Disney Plus');
-    expect(etiquetaAccesibleInactivasBoton(1, detalle, true)).toBe(
-      etiquetaAccesibleInactivasEncabezado(1),
-    );
+    expect(etiquetaAccesibleInactivasBoton(1, detalle, true)).toBe(etiquetaAccesibleInactivasEncabezado(1));
     expect(etiquetaAccesibleInactivasDetalle(detalle)).toBe(detalle);
   });
 

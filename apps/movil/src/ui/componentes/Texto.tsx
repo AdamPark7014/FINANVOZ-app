@@ -9,7 +9,7 @@ export type TonoTexto = 'normal' | 'secundario' | 'acento' | 'faltante';
 export interface TextoProps extends Omit<TextProps, 'style'> {
   /** Tip: montos con `Cifra`; `titulo`/`subtitulo` encabezados; `cuerpo` por defecto; `secundario`/`pequeno`/`etiqueta` apoyo. */
   variante?: VarianteTexto;
-  tono?: TonoTexto;
+  tono?: TonoTexto | undefined;
   alinear?: TextStyle['textAlign'];
   style?: StyleProp<TextStyle>;
   children: ReactNode;

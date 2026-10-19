@@ -4,13 +4,11 @@ import type { ResultadoExtraccionPdf } from '../../captura/puente';
 import {
   ajustarSaldoConEstado,
   analizarEstadoCuentaPdf,
-  etiquetaDiaMes,
   guardarEstadoCuenta,
   type AnalisisEstadoCuenta,
   type LecturaEstadoCuenta,
   type PropuestaConciliacionEstado,
   type RenglonDudoso,
-  type RenglonEstado,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, Cifra, espacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
@@ -348,9 +346,7 @@ function Lectura({
         <Aviso texto={mensajeNoReconocido(lectura.bancos)} alSalir={alSalir} testID="estado-no-reconocido" />
       );
     case 'incompleto':
-      return (
-        <Aviso texto={mensajeIncompleto(lectura.banco)} alSalir={alSalir} testID="estado-incompleto" />
-      );
+      return <Aviso texto={mensajeIncompleto(lectura.banco)} alSalir={alSalir} testID="estado-incompleto" />;
     case 'sin_tarjetas':
       return (
         <Aviso texto={mensajeSinTarjetas(lectura.banco)} alSalir={alSalir} testID="estado-sin-tarjetas" />
@@ -549,31 +545,31 @@ function Dudoso({
     d.existente.monto,
   );
   return (
-    <View accessibilityRole="listitem">
+    <View role="listitem">
       <Tarjeta testID={`estado-dudoso-${d.indice}`} accionesAnidadas>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <Texto variante="cuerpo" style={{ flex: 1 }}>
-          {lineaEncabezadoDudoso(d.descripcion, d.fecha)}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+          <Texto variante="cuerpo" style={{ flex: 1 }}>
+            {lineaEncabezadoDudoso(d.descripcion, d.fecha)}
+          </Texto>
+          <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
+        </View>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          accessibilityLabel={etiquetaHablada(preguntaExistente)}
+        >
+          {preguntaExistente}
         </Texto>
-        <Cifra centavos={d.monto} tamano="secundario" contexto={d.descripcion} />
-      </View>
-      <Texto
-        variante="secundario"
-        tono="secundario"
-        accessibilityLabel={etiquetaHablada(preguntaExistente)}
-      >
-        {preguntaExistente}
-      </Texto>
-      <Chips
-        etiqueta={etiquetaChipsDudoso(d.descripcion)}
-        opciones={[
-          { valor: 'mismo', etiqueta: CHIP_MISMO },
-          { valor: 'otro', etiqueta: CHIP_OTRO },
-        ]}
-        valor={valor}
-        alCambiar={alCambiar}
-        testID={`estado-dudoso-${d.indice}`}
-      />
+        <Chips
+          etiqueta={etiquetaChipsDudoso(d.descripcion)}
+          opciones={[
+            { valor: 'mismo', etiqueta: CHIP_MISMO },
+            { valor: 'otro', etiqueta: CHIP_OTRO },
+          ]}
+          valor={valor}
+          alCambiar={alCambiar}
+          testID={`estado-dudoso-${d.indice}`}
+        />
       </Tarjeta>
     </View>
   );

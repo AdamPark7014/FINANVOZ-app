@@ -66,7 +66,13 @@ describe('ProbabilidadHoy · TalkBack', () => {
     activarPlus(p.ctx);
     const efectivo = p.e.cuentas['efectivo'] as string;
     for (let f: PlainDate = '2026-10-11'; f < '2026-11-25'; f = sumarDias(f, 1)) {
-      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
+      registrarMovimiento(p.ctx, {
+        tipo: 'gasto',
+        categoria: 'antojos',
+        origenId: efectivo,
+        monto: 3_000,
+        fecha: f,
+      });
     }
     p.reloj.fijar('2026-10-31');
     montar(
@@ -85,7 +91,13 @@ describe('ProbabilidadHoy · TalkBack', () => {
     activarPlus(p.ctx);
     const efectivo = p.e.cuentas['efectivo'] as string;
     for (let f: PlainDate = '2026-10-11'; f < '2026-10-24'; f = sumarDias(f, 1)) {
-      registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'antojos', origenId: efectivo, monto: 3_000, fecha: f });
+      registrarMovimiento(p.ctx, {
+        tipo: 'gasto',
+        categoria: 'antojos',
+        origenId: efectivo,
+        monto: 3_000,
+        fecha: f,
+      });
     }
     p.reloj.fijar('2026-10-24');
     montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
@@ -97,7 +109,10 @@ describe('ProbabilidadHoy · TalkBack', () => {
     montar(p.ctx, <ProbabilidadHoy hora={() => '10:00'} />);
     const texto = screen.getByTestId('probabilidad-texto').props.children as string;
     expect(screen.getByTestId('probabilidad-barra').props.accessibilityLabel).toBe(
-      etiquetaAccesibleProbabilidad(texto, screen.queryByTestId('probabilidad-etiqueta')?.props.children ?? null),
+      etiquetaAccesibleProbabilidad(
+        texto,
+        screen.queryByTestId('probabilidad-etiqueta')?.props.children ?? null,
+      ),
     );
     expect(screen.getByTestId('probabilidad-texto')).toHaveProp('importantForAccessibility', 'no');
   });
@@ -140,8 +155,14 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <SeccionAvisos />, notificacionesEnMemoria('sin_preguntar'));
     await screen.findByTestId('ajustes-avisos-permitir');
-    expect(screen.getByTestId('ajustes-avisos-permitir')).toHaveProp('accessibilityHint', PISTA_PERMITIR_AVISOS);
-    expect(screen.getByTestId('ajustes-guardar-horario')).toHaveProp('accessibilityHint', PISTA_GUARDAR_HORARIO);
+    expect(screen.getByTestId('ajustes-avisos-permitir')).toHaveProp(
+      'accessibilityHint',
+      PISTA_PERMITIR_AVISOS,
+    );
+    expect(screen.getByTestId('ajustes-guardar-horario')).toHaveProp(
+      'accessibilityHint',
+      PISTA_GUARDAR_HORARIO,
+    );
     expect(screen.getByTestId('ajustes-avisos-horario-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(ETIQUETA_HORARIO_SILENCIOSO)).toBeTruthy();
   });

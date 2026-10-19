@@ -75,11 +75,10 @@ describe('accesibilidad en pantalla respaldo', () => {
   it('volver y acciones del archivo tienen rol y etiqueta hablada', () => {
     const p = crearSesionPrueba('2026-10-11');
     const r = crearRespaldoPrueba();
-    montar(
-      p.ctx,
-      <PantallaRespaldo alVolver={jest.fn()} alRestaurar={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <PantallaRespaldo alVolver={jest.fn()} alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_VOLVER);
     expect(screen.getByTestId('respaldo-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
@@ -106,11 +105,10 @@ describe('accesibilidad en pantalla respaldo', () => {
     const r = crearRespaldoPrueba();
     const contrasena = 'mi frase de respaldo segura';
     await fijarContrasenaRespaldo(r.deps, contrasena, contrasena);
-    montar(
-      p.ctx,
-      <TarjetaRespaldo alRestaurar={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <TarjetaRespaldo alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     expect(screen.getByTestId('privacidad-respaldo-exportar')).toHaveProp(
       'accessibilityHint',
       PISTA_EXPORTAR_ARCHIVO,
@@ -121,11 +119,10 @@ describe('accesibilidad en pantalla respaldo', () => {
   it('formulario contraseña: aviso alert y pistas TalkBack en guardar y cancelar', () => {
     const p = crearSesionPrueba('2026-10-11');
     const r = crearRespaldoPrueba();
-    montar(
-      p.ctx,
-      <TarjetaRespaldo alRestaurar={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <TarjetaRespaldo alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     fireEvent.press(screen.getByTestId('privacidad-respaldo-crear'));
     expect(screen.getByTestId('respaldo-aviso-contrasena')).toHaveProp('accessibilityRole', 'alert');
     expect(screen.getByTestId('respaldo-contrasena-guardar')).toHaveProp(
@@ -142,11 +139,10 @@ describe('accesibilidad en pantalla respaldo', () => {
   it('TarjetaRespaldo muestra copy centralizado antes de crear contraseña', () => {
     const p = crearSesionPrueba('2026-10-11');
     const r = crearRespaldoPrueba();
-    montar(
-      p.ctx,
-      <TarjetaRespaldo alRestaurar={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <TarjetaRespaldo alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     expect(screen.getByTestId('privacidad-respaldo-titulo')).toHaveTextContent(SUBTITULO_ARCHIVO);
     expect(screen.getByTestId('privacidad-respaldo-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(DESCRIPCION_ARCHIVO)).toBeTruthy();
@@ -158,11 +154,10 @@ describe('accesibilidad en pantalla respaldo', () => {
     const r = crearRespaldoPrueba();
     const contrasena = 'mi frase de respaldo segura';
     await fijarContrasenaRespaldo(r.deps, contrasena, contrasena);
-    montar(
-      p.ctx,
-      <TarjetaRespaldo alRestaurar={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <TarjetaRespaldo alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     expect(screen.getByTestId('privacidad-respaldo-cambiar')).toHaveProp(
       'accessibilityHint',
       PISTA_CAMBIAR_CONTRASENA,
@@ -173,11 +168,10 @@ describe('accesibilidad en pantalla respaldo', () => {
   it('Restaurar: volver y elegir archivo tienen pista TalkBack', () => {
     const p = crearSesionPrueba('2026-10-11');
     const r = crearRespaldoPrueba();
-    montar(
-      p.ctx,
-      <Restaurar alVolver={jest.fn()} />,
-      { borrarTodo: async () => {}, respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} } },
-    );
+    montar(p.ctx, <Restaurar alVolver={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
     expect(screen.getByTestId('restaurar-volver')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('restaurar-volver')).toHaveProp(
       'accessibilityLabel',

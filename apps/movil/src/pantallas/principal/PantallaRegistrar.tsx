@@ -70,10 +70,7 @@ export function PantallaRegistrar({
       <Texto variante="subtitulo" testID="registrar-formulario-titulo" accessibilityRole="header">
         O llena los datos
       </Texto>
-      <FormularioMovimiento
-        alGuardar={alCerrar}
-        {...(alVerMovimiento ? { alVerMovimiento } : {})}
-      />
+      <FormularioMovimiento alGuardar={alCerrar} {...(alVerMovimiento ? { alVerMovimiento } : {})} />
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>
   );

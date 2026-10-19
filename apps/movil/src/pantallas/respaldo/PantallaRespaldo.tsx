@@ -201,12 +201,7 @@ function TarjetaNube({
         {vista.textoUltimo}
       </Texto>
       {vista.pendiente ? (
-        <Texto
-          variante="secundario"
-          tono="faltante"
-          testID="respaldo-pendiente"
-          accessibilityRole="alert"
-        >
+        <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente" accessibilityRole="alert">
           {AVISO_PENDIENTE}
         </Texto>
       ) : null}
@@ -227,7 +222,9 @@ function TarjetaNube({
       ) : !conContrasena && deps ? (
         <>
           <Texto variante="secundario" tono="secundario">
-            {cuenta.tipo === 'con_correo' ? textoCrearContrasenaTrasCorreo(cuenta.correo) : TEXTO_ACTIVAR_NUBE}
+            {cuenta.tipo === 'con_correo'
+              ? textoCrearContrasenaTrasCorreo(cuenta.correo)
+              : TEXTO_ACTIVAR_NUBE}
           </Texto>
           <FormularioContrasena
             deps={deps}

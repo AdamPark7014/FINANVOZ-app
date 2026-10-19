@@ -1,9 +1,4 @@
-import {
-  PISTA_OCULTAR_MONTOS,
-  PISTA_PREVIA,
-  PISTA_PREVIA_OCULTA,
-  TEXTO_INSTRUCCION,
-} from './widget-textos';
+import { PISTA_OCULTAR_MONTOS, PISTA_PREVIA, PISTA_PREVIA_OCULTA, TEXTO_INSTRUCCION } from './widget-textos';
 
 describe('widget-textos (TalkBack, 02 §21)', () => {
   it('instrucciones usan tuteo (imperativo)', () => {

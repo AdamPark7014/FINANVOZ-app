@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
-import {
-  exportarCsv,
-  exportarJson,
-  fijarEstadisticas,
-  obtenerCentroPrivacidad,
-} from '../../servicios';
+import { exportarCsv, exportarJson, fijarEstadisticas, obtenerCentroPrivacidad } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
 import { compartirArchivo } from '../ajustes/compartir';
@@ -224,11 +219,7 @@ export function CentroPrivacidad({
             {textoConsentimiento(vista.consentimiento.version, vista.consentimiento.fecha)}
           </Texto>
         ) : (
-          <Texto
-            variante="secundario"
-            tono="secundario"
-            testID="privacidad-sin-consentimiento"
-          >
+          <Texto variante="secundario" tono="secundario" testID="privacidad-sin-consentimiento">
             {TEXTO_SIN_CONSENTIMIENTO}
           </Texto>
         )}
@@ -296,11 +287,7 @@ export function CentroPrivacidad({
           pista={PISTA_LEER_TERMINOS}
           alPresionar={alLeerTerminos}
         />
-        <Texto
-          variante="secundario"
-          tono="secundario"
-          accessibilityLabel={etiquetaAccesibleDerechosArco()}
-        >
+        <Texto variante="secundario" tono="secundario" accessibilityLabel={etiquetaAccesibleDerechosArco()}>
           {textoDerechosArco()}
         </Texto>
         {mensaje ? (

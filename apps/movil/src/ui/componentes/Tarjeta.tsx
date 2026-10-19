@@ -39,8 +39,7 @@ export function Tarjeta({
     gap: espacio.s,
   };
   const ripple = { color: c.borde, borderless: false };
-  const estadoAccesible =
-    expandida === undefined ? undefined : ({ expanded: expandida } as const);
+  const estadoAccesible = expandida === undefined ? undefined : ({ expanded: expandida } as const);
 
   if (!alPresionar) {
     return (
@@ -52,17 +51,14 @@ export function Tarjeta({
 
   if (accionesAnidadas) {
     return (
-      <View
-        testID={testID}
-        style={[base, { minHeight: OBJETIVO_TACTIL_MIN, position: 'relative' }, style]}
-      >
+      <View testID={testID} style={[base, { minHeight: OBJETIVO_TACTIL_MIN, position: 'relative' }, style]}>
         <Pressable
           onPress={alPresionar}
           accessible={false}
           importantForAccessibility="no"
           android_ripple={ripple}
           style={({ pressed }) => [
-            StyleSheet.absoluteFillObject,
+            StyleSheet.absoluteFill,
             { borderRadius: radio.l },
             pressed ? { backgroundColor: c.superficieAlterna } : null,
           ]}

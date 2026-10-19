@@ -72,7 +72,9 @@ describe('tarea de captura en segundo plano (pendiente 16)', () => {
     const pub = publicadorEnMemoria();
     const puente = puenteVacio();
     const cerrar = jest.fn();
-    const abrir = jest.fn((): Sesion => ({ ctx: p.ctx, base: { db: p.ctx.db, cerrar } }) as unknown as Sesion);
+    const abrir = jest.fn(
+      (): Sesion => ({ ctx: p.ctx, base: { db: p.ctx.db, cerrar } }) as unknown as Sesion,
+    );
     expect(
       await procesarCapturaEnSegundoPlano(abrir, () => ({
         puente,

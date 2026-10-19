@@ -3,11 +3,7 @@ import { validarEvento, type EventoAnalitica } from '../analitica/eventos';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { fijarEstadisticas } from '../privacidad/estadisticas';
 import { abrirPrueba, escenario } from './__pruebas__/base';
-import {
-  aplicarCorreccion,
-  camposCorreccionAnalitica,
-  enlaceAnaliticaCorreccion,
-} from './correcciones';
+import { aplicarCorreccion, camposCorreccionAnalitica, enlaceAnaliticaCorreccion } from './correcciones';
 import { registrarMovimiento } from './formulario';
 import { cargarEscenario } from './semilla';
 

@@ -8,15 +8,7 @@ import {
   type CuentaDebes,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import {
-  Boton,
-  Cifra,
-  espacio,
-  Interruptor,
-  Pantalla,
-  Tarjeta,
-  Texto,
-} from '../../ui';
+import { Boton, Cifra, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
 import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
@@ -157,7 +149,7 @@ export function PantallaCuentas({
           <View accessibilityRole="list" testID="seccion-debes-lista" style={{ gap: espacio.s }}>
             {v.debes.map((d) =>
               d.tipo === 'tarjeta' ? (
-                <View key={d.id} accessibilityRole="listitem">
+                <View key={d.id} role="listitem">
                   <TarjetaCreditoLista
                     d={d}
                     t={tarjetas.find((t) => t.id === d.id) ?? null}
@@ -165,7 +157,7 @@ export function PantallaCuentas({
                   />
                 </View>
               ) : (
-                <View key={d.id} accessibilityRole="listitem">
+                <View key={d.id} role="listitem">
                   <PersonaDebes d={d} {...(alAbrirPersona ? { alAbrirPersona } : {})} />
                 </View>
               ),
@@ -347,7 +339,7 @@ function Fila({
   accion?: { etiqueta: string; etiquetaAccesible?: string; pista?: string; alPresionar: () => void };
 }) {
   return (
-    <View accessibilityRole="listitem" {...(testID ? { testID } : {})}>
+    <View role="listitem" {...(testID ? { testID } : {})}>
       <Tarjeta>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
           <View
@@ -368,17 +360,17 @@ function Fila({
             {...(testID ? { testID: `${testID}-saldo` } : {})}
           />
         </View>
-      {accion ? (
-        <Boton
-          etiqueta={accion.etiqueta}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={accion.alPresionar}
-          {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
-          {...(accion.pista ? { pista: accion.pista } : {})}
-          {...(testID ? { testID: `${testID}-accion` } : {})}
-        />
-      ) : null}
+        {accion ? (
+          <Boton
+            etiqueta={accion.etiqueta}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={accion.alPresionar}
+            {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
+            {...(accion.pista ? { pista: accion.pista } : {})}
+            {...(testID ? { testID: `${testID}-accion` } : {})}
+          />
+        ) : null}
       </Tarjeta>
     </View>
   );
@@ -406,11 +398,7 @@ function PersonaDebes({
             Le debes
           </Texto>
         </View>
-        <Cifra
-          centavos={d.saldo}
-          contexto={contextoSaldoLeDebes(d.nombre)}
-          testID={`cuenta-${d.id}-saldo`}
-        />
+        <Cifra centavos={d.saldo} contexto={contextoSaldoLeDebes(d.nombre)} testID={`cuenta-${d.id}-saldo`} />
       </View>
       {alAbrirPersona ? (
         <Boton

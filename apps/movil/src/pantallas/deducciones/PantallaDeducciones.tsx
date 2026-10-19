@@ -159,11 +159,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <Texto
-        variante="titulo"
-        testID="deducciones-titulo-pantalla"
-        accessibilityRole="header"
-      >
+      <Texto variante="titulo" testID="deducciones-titulo-pantalla" accessibilityRole="header">
         {tituloPantallaDeducciones(v.ejercicio)}
       </Texto>
       {v.ejercicios.length > 1 ? (
@@ -443,7 +439,7 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
         accessible
         accessibilityLabel={etiquetaAccesibleFactura(
           f.emisor,
-          [f.textoFecha, f.textoTotal, f.tipo],
+          [f.textoFecha, f.textoTotal, f.tipo ?? ''],
           estado,
         )}
         style={{ gap: espacio.xxs }}
@@ -650,12 +646,7 @@ export function ImportarCompartidas({
         {TITULO_IMPORTAR_COMPARTIDAS}
       </Texto>
       {estado.tipo === 'leyendo' ? (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
-          testID="importar-leyendo"
-          accessibilityLiveRegion="polite"
-        >
+        <Texto variante="cuerpo" tono="secundario" testID="importar-leyendo" accessibilityLiveRegion="polite">
           {TEXTO_IMPORTAR_LEYENDO}
         </Texto>
       ) : null}

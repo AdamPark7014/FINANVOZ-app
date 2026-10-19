@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import {
   anularMovimiento,
@@ -110,10 +110,12 @@ export function PantallaMovimientos({
   );
   const mostrar = useMostrarAviso();
   const [abierto, setAbierto] = useState<string | null>(detalleInicial);
-
-  useEffect(() => {
+  // Al llegar otro detalle por la ruta, se abre (ajuste en render, sin efecto).
+  const [detallePrevio, setDetallePrevio] = useState(detalleInicial);
+  if (detalleInicial !== detallePrevio) {
+    setDetallePrevio(detalleInicial);
     if (detalleInicial) setAbierto(detalleInicial);
-  }, [detalleInicial]);
+  }
 
   return (
     <Pantalla testID="pantalla-movimientos">
@@ -228,13 +230,9 @@ export function PantallaMovimientos({
           >
             {d.etiqueta}
           </Texto>
-          <View
-            accessibilityRole="list"
-            testID={`movimientos-lista-${d.fecha}`}
-            style={{ gap: espacio.s }}
-          >
+          <View accessibilityRole="list" testID={`movimientos-lista-${d.fecha}`} style={{ gap: espacio.s }}>
             {d.movimientos.map((m) => (
-              <View key={m.id} accessibilityRole="listitem" testID={`movimiento-fila-${m.id}`}>
+              <View key={m.id} role="listitem" testID={`movimiento-fila-${m.id}`}>
                 <FilaMovimiento
                   m={m}
                   abierto={abierto === m.id}

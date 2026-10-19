@@ -210,9 +210,7 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
       fc.dictionary(fc.constantFrom(...claves), valor),
     );
     /** Mezcla casos válidos de la lista blanca: evita corridas donde el fuzz solo descarta (flake ~1–2 % con 500 runs). */
-    const entradaValida = fc.constantFrom(
-      ...VALIDOS.map((e) => [e.nombre, e.propiedades] as const),
-    );
+    const entradaValida = fc.constantFrom(...VALIDOS.map((e) => [e.nombre, e.propiedades] as const));
     let enviosEnPropiedad = 0;
     fc.assert(
       fc.property(
@@ -228,7 +226,10 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
             const permitidas = new Set([...Object.keys(forma.shape), ...Object.keys(PROPIEDADES_TECNICAS)]);
             for (const k of Object.keys(enviado.propiedades)) expect(permitidas).toContain(k);
             // Solo payload del evento (no UUID ni instante: subcadenas hex pueden coincidir con dígitos de ejemplo).
-            const json = JSON.stringify({ evento: enviado.evento, propiedades: enviado.propiedades }).toLowerCase();
+            const json = JSON.stringify({
+              evento: enviado.evento,
+              propiedades: enviado.propiedades,
+            }).toLowerCase();
             for (const s of SENSIBLES) expect(json).not.toContain(s.toLowerCase());
             // Ningún número con forma de monto: solo pasos y conteos chicos (la versión de plantillas, ≤ 999).
             for (const [k, v] of Object.entries(enviado.propiedades)) {
@@ -277,7 +278,7 @@ describe('analítica con opt-in (03 §8, RNF-05)', () => {
     }
     expect(
       validarEvento(
-        { nombre: 'correccion', propiedades: { campo: camposCorreccionAnalitica({ monto: 1 })[0]! } },
+        { nombre: 'correccion', propiedades: { campo: camposCorreccionAnalitica({ monto: 1 })[0] ?? '' } },
         BANCOS,
       ),
     ).toEqual({ nombre: 'correccion', propiedades: { campo: 'monto' } });

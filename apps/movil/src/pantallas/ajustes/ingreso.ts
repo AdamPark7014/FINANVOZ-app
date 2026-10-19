@@ -1,4 +1,4 @@
-import type { Centavos, ModoFinDeSemana, PlainDate } from '@cartera/core';
+import type { Centavos, DiaSemana, ModoFinDeSemana, PlainDate } from '@cartera/core';
 import { proximoPago, type VistaAjustes } from '../../servicios';
 import { type FinDeSemana, type Frecuencia } from '../onboarding/ingreso';
 import {

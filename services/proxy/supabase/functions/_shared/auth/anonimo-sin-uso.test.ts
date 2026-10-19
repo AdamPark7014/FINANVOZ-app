@@ -43,29 +43,30 @@ describe('evaluarCandidatoAnonimo', () => {
   });
 
   it('rechaza no anónimo, respaldo, Plus vigente y grupo activo', () => {
-    expect(evaluarCandidatoAnonimo(base({ esAnonimo: false }), umbral, ahora).motivo).toBe(
-      'no_anonimo',
-    );
-    expect(evaluarCandidatoAnonimo(base({ correoConfirmado: true }), umbral, ahora).motivo).toBe(
-      'correo_respaldo',
-    );
-    expect(evaluarCandidatoAnonimo(base({ tieneObjetosRespaldo: true }), umbral, ahora).motivo).toBe(
-      'respaldo_nube',
-    );
-    expect(
-      evaluarCandidatoAnonimo(base({ plan: 'plus', vigenteHasta: null }), umbral, ahora).motivo,
-    ).toBe('plus_vigente');
-    expect(
-      evaluarCandidatoAnonimo(base({ enGrupoCompartidoActivo: true }), umbral, ahora).motivo,
-    ).toBe('grupo_compartido');
+    expect(evaluarCandidatoAnonimo(base({ esAnonimo: false }), umbral, ahora)).toEqual({
+      candidato: false,
+      motivo: 'no_anonimo',
+    });
+    expect(evaluarCandidatoAnonimo(base({ correoConfirmado: true }), umbral, ahora)).toEqual({
+      candidato: false,
+      motivo: 'correo_respaldo',
+    });
+    expect(evaluarCandidatoAnonimo(base({ tieneObjetosRespaldo: true }), umbral, ahora)).toEqual({
+      candidato: false,
+      motivo: 'respaldo_nube',
+    });
+    expect(evaluarCandidatoAnonimo(base({ plan: 'plus', vigenteHasta: null }), umbral, ahora)).toEqual({
+      candidato: false,
+      motivo: 'plus_vigente',
+    });
+    expect(evaluarCandidatoAnonimo(base({ enGrupoCompartidoActivo: true }), umbral, ahora)).toEqual({
+      candidato: false,
+      motivo: 'grupo_compartido',
+    });
   });
 
   it('actividad reciente excluye aunque sea anónimo', () => {
-    const r = evaluarCandidatoAnonimo(
-      base({ ultimaActividad: '2026-06-10T00:00:00.000Z' }),
-      umbral,
-      ahora,
-    );
+    const r = evaluarCandidatoAnonimo(base({ ultimaActividad: '2026-06-10T00:00:00.000Z' }), umbral, ahora);
     expect(r).toEqual({ candidato: false, motivo: 'activo_reciente' });
   });
 });

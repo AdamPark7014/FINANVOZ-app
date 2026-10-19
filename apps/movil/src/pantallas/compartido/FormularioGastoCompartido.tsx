@@ -118,8 +118,7 @@ export function FormularioGastoCompartido({
   const guardar = () => {
     if (total === null || total <= 0) return setError(ERROR_MONTO_GASTO);
     const miParteBp = miParteBpAlGuardar();
-    if (categoria === null || quien === null || miParteBp === null)
-      return setError(ERROR_CAMPOS_GASTO);
+    if (categoria === null || quien === null || miParteBp === null) return setError(ERROR_CAMPOS_GASTO);
     try {
       agregarGastoCompartido(ctx, deps, grupoId, {
         total,
@@ -139,11 +138,7 @@ export function FormularioGastoCompartido({
 
   return (
     <Tarjeta testID="formulario-gasto-compartido">
-      <Texto
-        variante="subtitulo"
-        testID="compartido-formulario-titulo"
-        accessibilityRole="header"
-      >
+      <Texto variante="subtitulo" testID="compartido-formulario-titulo" accessibilityRole="header">
         {prellenado ? TITULO_REVISAR_GASTO : TITULO_AGREGAR_GASTO}
       </Texto>
       {prellenado && total !== null && total > 0 ? (

@@ -8,4 +8,5 @@ module.exports = {
   // Las pruebas de pantallas abren una base SQLite real, migran y cargan semillas: en los runners de CI un
   // flujo completo (registrar, corregir, revisar historial) rebasa los 5 s por defecto de jest.
   testTimeout: 30000,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };
