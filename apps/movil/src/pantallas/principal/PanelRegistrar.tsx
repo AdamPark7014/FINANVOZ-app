@@ -122,6 +122,7 @@ export function PanelRegistrar({
   abiertoAlInicio = false,
   fraseRevision,
   fijo = false,
+  dictarAlAbrir = false,
 }: {
   /** "Ver movimientos" de una consulta (`06 §6`): abre Movimientos con su filtro. */
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
@@ -140,6 +141,8 @@ export function PanelRegistrar({
   fraseRevision?: string;
   /** Al pie de Hoy: "Hablar" y "Escribir" siempre abajo; las respuestas encima, en un área desplazable. */
   fijo?: boolean;
+  /** Desde el micrófono del widget: empieza a escuchar al abrir. */
+  dictarAlAbrir?: boolean;
 }) {
   const { ctx, refrescar, nube } = useSesion();
   const { c } = useTema();
@@ -462,6 +465,11 @@ export function PanelRegistrar({
     return iniciarDictado();
   }, [iniciarDictado]);
   const boton = useBotonHablar({ escuchando, iniciar: iniciarHablar, detener: dictado.detener });
+  useEffect(() => {
+    if (dictarAlAbrir) void iniciarHablar();
+    // Solo al montar: el widget abre la pantalla una vez por toque.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const errorVoz =
     dictado.estado === 'sin_permiso'
       ? MENSAJES_DICTADO.sin_permiso

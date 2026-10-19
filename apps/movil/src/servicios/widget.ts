@@ -14,6 +14,8 @@ import { escribirAjuste, leerAjuste } from './preferencias';
 
 /** Tocar el widget abre la app en "/" (Inicio decide onboarding o Hoy). */
 export const ENLACE_WIDGET = 'finanvoz:///';
+/** Micrófono del widget: abre Registrar y empieza a escuchar de una vez. */
+export const ENLACE_DICTAR_WIDGET = 'finanvoz:///registrar?dictar=1';
 
 export interface VistaWidget {
   /** `cifra`: "Hoy puedes $214 · 4 días"; `oculto`: "Ocultar montos"; `mensaje`: sin cifra (sin ingreso, sin datos). */

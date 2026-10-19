@@ -1,10 +1,11 @@
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as Speech from 'expo-speech';
 import { AccessibilityInfo } from 'react-native';
 import { fijarVozRespuesta } from '../../servicios';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { conEscenario } from './__pruebas__/base';
 import { PantallaHoy } from './PantallaHoy';
+import { PantallaRegistrar } from './PantallaRegistrar';
 
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn() }));
 
@@ -61,5 +62,25 @@ describe('Finanvoz te contesta en voz', () => {
     lector = true;
     await dictar('coca 30 en efectivo');
     expect(Speech.speak).not.toHaveBeenCalled();
+  });
+});
+
+describe('Micrófono del widget', () => {
+  it('Registrar abierta con dictarAlAbrir empieza a escuchar sin tocar nada', async () => {
+    const p = conEscenario('e4-01');
+    const { motor } = crearMotorFalso();
+    renderConSesion(p.ctx, <PantallaRegistrar alCerrar={jest.fn()} motor={motor} dictarAlAbrir />);
+    await waitFor(() => expect(motor.iniciar).toHaveBeenCalledTimes(1));
+    expect(screen.getByTestId('boton-hablar').props.accessibilityLabel).toBe(
+      'Escuchando. Toca para terminar',
+    );
+  });
+
+  it('sin dictarAlAbrir no escucha solo', async () => {
+    const p = conEscenario('e4-01');
+    const { motor } = crearMotorFalso();
+    renderConSesion(p.ctx, <PantallaRegistrar alCerrar={jest.fn()} motor={motor} />);
+    await act(async () => {});
+    expect(motor.iniciar).not.toHaveBeenCalled();
   });
 });
