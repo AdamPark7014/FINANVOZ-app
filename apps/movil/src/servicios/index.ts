@@ -55,6 +55,7 @@ export {
   type AjustesWidget,
   type VistaWidget,
 } from './widget';
+export { fijarVozRespuesta, obtenerVozRespuesta, type AjustesVozRespuesta } from './voz-respuesta';
 export {
   aplicarEleccion,
   confirmarCompraMsi,

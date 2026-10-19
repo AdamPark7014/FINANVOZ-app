@@ -6,7 +6,9 @@ import {
   descartarPorInterpretar,
   explicar,
   mensajeError,
+  obtenerHoy,
   obtenerPlan,
+  obtenerVozRespuesta,
   registrarTexto,
   registrarTextoLocal,
   revisarPorInterpretar,
@@ -31,7 +33,10 @@ import {
   useTema,
 } from '../../ui';
 import {
+  callarVoz,
+  decirEnVoz,
   ETIQUETA_ESCUCHANDO,
+  fraseRespuestaVoz,
   MENSAJES_DICTADO,
   mensajeEstoOi,
   PISTA_ESCUCHANDO,
@@ -142,6 +147,7 @@ export function PanelRegistrar({
   const avisarRegistro = useAvisoRegistro(alVerMovimiento);
   const esperando = useVista(contarEsperandoConexion);
   const plan = useVista(obtenerPlan).plan;
+  const vozActiva = useVista(obtenerVozRespuesta).activa;
   const [escribiendo, setEscribiendo] = useState(abiertoAlInicio);
   const [texto, setTexto] = useState('');
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -202,10 +208,31 @@ export function PanelRegistrar({
     setMensaje(porQue === MENSAJE_NO_ENTENDI ? mensajeEstoOi(oido) : porQue);
   }, []);
 
+  /** Respuesta en voz tras dictar: el mensaje y cuánto puedes gastar hoy (con la cifra ya recalculada). */
+  const contestar = useCallback(
+    (mensaje: string, conHoyPuedes: boolean) => {
+      if (!vozActiva) return;
+      let hoyPuedes: number | null = null;
+      if (conHoyPuedes) {
+        try {
+          hoyPuedes = obtenerHoy(ctx).hoyPuedesCentavos;
+        } catch {
+          hoyPuedes = null;
+        }
+      }
+      decirEnVoz(fraseRespuestaVoz(mensaje, hoyPuedes));
+    },
+    [ctx, vozActiva],
+  );
+
   const mostrar = useCallback(
     (r: ResultadoTexto, origen: OrigenDictado) => {
       const oido = dictadoEnCurso.current;
       dictadoEnCurso.current = null;
+      const avisar = (mensaje: string, extra?: Parameters<typeof avisarRegistro>[1]) => {
+        avisarRegistro(mensaje, extra);
+        if (origen === 'voz') contestar(mensaje, true);
+      };
       setTarjeta(null);
       setRespuesta(null);
       setExplicacion(null);
@@ -215,7 +242,7 @@ export function PanelRegistrar({
           setTexto('');
           contarRegistro(origen);
           setAvisoDeducible(r.movimientos.some((m) => m.avisoDeducible));
-          avisarRegistro(mensajeRegistrado(r.movimientos), {
+          avisar(mensajeRegistrado(r.movimientos), {
             deshacer: r.deshacer,
             ...(r.movimientos[0]?.transaccionId ? { transaccionId: r.movimientos[0].transaccionId } : {}),
           });
@@ -223,7 +250,7 @@ export function PanelRegistrar({
         case 'corregido':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeCorregido(r.antes, r.despues), {
+          avisar(mensajeCorregido(r.antes, r.despues), {
             deshacer: r.deshacer,
             transaccionId: r.despues.transaccionId,
           });
@@ -231,7 +258,7 @@ export function PanelRegistrar({
         case 'anulado':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeAnulado(r.movimiento), {
+          avisar(mensajeAnulado(r.movimiento), {
             deshacer: r.deshacer,
             transaccionId: r.movimiento.transaccionId,
           });
@@ -239,12 +266,12 @@ export function PanelRegistrar({
         case 'configurado':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeConfigurado(r.compromiso), r.compromiso.deshacer);
+          avisar(mensajeConfigurado(r.compromiso), r.compromiso.deshacer);
           return;
         case 'pasar_a_meses':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajePasarAMeses(r.movimiento, r.meses), {
+          avisar(mensajePasarAMeses(r.movimiento, r.meses), {
             deshacer: r.deshacer,
             transaccionId: r.movimiento.transaccionId,
           });
@@ -253,7 +280,7 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
-          avisarRegistro(mensajeCompraMsi(r.compra), {
+          avisar(mensajeCompraMsi(r.compra), {
             deshacer: r.deshacer,
             transaccionId: r.compra.transaccionId,
           });
@@ -262,7 +289,7 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
-          avisarRegistro(mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal), {
+          avisar(mensajeCuentaDividida(r.descripcion, r.total, r.registro.reparto.porCobrarTotal), {
             deshacer: r.deshacer,
             transaccionId: r.registro.transaccionId,
           });
@@ -271,18 +298,15 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           contarRegistro(origen);
-          avisarRegistro(
-            r.tipo === 'cobro_tanda' ? mensajeCobro(r.movimiento) : mensajeAportacion(r.movimiento),
-            {
-              deshacer: r.movimiento.deshacer,
-              transaccionId: r.movimiento.transaccionId,
-            },
-          );
+          avisar(r.tipo === 'cobro_tanda' ? mensajeCobro(r.movimiento) : mensajeAportacion(r.movimiento), {
+            deshacer: r.movimiento.deshacer,
+            transaccionId: r.movimiento.transaccionId,
+          });
           return;
         case 'tarjeta_configurada':
           terminarRevision();
           setTexto('');
-          avisarRegistro(mensajeTarjetaConfigurada(r.tarjeta, r.editada), r.deshacer ?? undefined);
+          avisar(mensajeTarjetaConfigurada(r.tarjeta, r.editada), r.deshacer ?? undefined);
           return;
         case 'confirmar':
         case 'elegir':
@@ -309,6 +333,7 @@ export function PanelRegistrar({
           terminarRevision();
           setTexto('');
           setRespuesta(r.respuesta);
+          if (origen === 'voz') contestar(r.respuesta.texto, false);
           return;
         case 'explicar':
           terminarRevision();
@@ -362,6 +387,7 @@ export function PanelRegistrar({
       avisarNoEntendi,
       avisarRegistro,
       contarRegistro,
+      contestar,
       ctx,
       nube,
       plan,
@@ -430,7 +456,12 @@ export function PanelRegistrar({
     alTerminar: (t) => enviar(t, 'voz'),
   });
   const escuchando = dictado.estado === 'escuchando' || dictado.estado === 'procesando';
-  const boton = useBotonHablar({ escuchando, iniciar: dictado.iniciar, detener: dictado.detener });
+  const { iniciar: iniciarDictado } = dictado;
+  const iniciarHablar = useCallback(() => {
+    callarVoz();
+    return iniciarDictado();
+  }, [iniciarDictado]);
+  const boton = useBotonHablar({ escuchando, iniciar: iniciarHablar, detener: dictado.detener });
   const errorVoz =
     dictado.estado === 'sin_permiso'
       ? MENSAJES_DICTADO.sin_permiso

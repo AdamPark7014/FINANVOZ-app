@@ -36,6 +36,7 @@ import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionColchon } from '../src/pantallas/ajustes/SeccionColchon';
 import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
 import { SeccionIngreso } from '../src/pantallas/ajustes/SeccionIngreso';
+import { SeccionVoz } from '../src/pantallas/ajustes/SeccionVoz';
 import { SeccionWidget } from '../src/pantallas/ajustes/SeccionWidget';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
@@ -114,6 +115,7 @@ export default function Ajustes() {
         />
       </Tarjeta>
 
+      <SeccionVoz />
       <SeccionAvisos />
       <SeccionCaptura />
       <SeccionWidget />
