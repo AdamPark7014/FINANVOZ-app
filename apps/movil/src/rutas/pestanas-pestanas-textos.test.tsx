@@ -1,4 +1,4 @@
-import { barraPestanas } from '../../src/ui';
+import { barraPestanas } from '../ui';
 import {
   ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA,
   ETIQUETA_ACCESIBILIDAD_PESTANA,
@@ -8,7 +8,7 @@ import {
   TEST_ID_PANTALLA_PESTANA,
   TEST_ID_PANTALLA_REGISTRAR,
   testIdBotonPestana,
-} from './pestanas-textos';
+} from '../../app/(tabs)/pestanas-textos';
 
 describe('pestanas-textos', () => {
   it('alinea rutas visibles con barraPestanas, botones y contenedores', () => {

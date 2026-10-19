@@ -1,13 +1,13 @@
 import { renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
-import { barraPestanas } from '../../src/ui';
-import LayoutPestanas, { ETIQUETA_ACCESIBILIDAD_PESTANA } from './_layout';
+import { barraPestanas } from '../ui';
+import LayoutPestanas, { ETIQUETA_ACCESIBILIDAD_PESTANA } from '../../app/(tabs)/_layout';
 import {
   ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA,
   ROL_ACCESIBILIDAD_BOTON_PESTANA,
   TEST_ID_PANTALLA_REGISTRAR,
   testIdBotonPestana,
-} from './pestanas-textos';
+} from '../../app/(tabs)/pestanas-textos';
 
 const RUTAS = {
   '(tabs)/_layout': LayoutPestanas,

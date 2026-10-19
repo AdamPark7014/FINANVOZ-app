@@ -1,16 +1,16 @@
 import { screen } from '@testing-library/react-native';
-import { aceptarConsentimiento, agregarCuenta } from '../../src/servicios';
-import { renderConSesion } from '../../src/pantallas/principal/__pruebas__/arnes';
-import { abrirPruebaPantalla } from '../../src/pantallas/principal/__pruebas__/base';
-import Hoy from './hoy';
-import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from './pestanas-textos';
+import { aceptarConsentimiento, agregarCuenta } from '../servicios';
+import { renderConSesion } from '../pantallas/principal/__pruebas__/arnes';
+import { abrirPruebaPantalla } from '../pantallas/principal/__pruebas__/base';
+import Hoy from '../../app/(tabs)/hoy';
+import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from '../../app/(tabs)/pestanas-textos';
 import {
   PISTA_CONFIGURAR_INGRESO_HOY,
   SUBTITULO_SIN_INGRESO,
   TEST_ID_HOY_SIN_INGRESO,
   TEST_ID_TAB_HOY,
   TITULO_SIN_INGRESO,
-} from './hoy-textos';
+} from '../../app/(tabs)/hoy-textos';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -20,7 +20,7 @@ jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(),
 }));
 
-jest.mock('../../src/compartido/expo', () => ({
+jest.mock('../compartido/expo', () => ({
   dependenciasCompartidoExpo: () => ({
     cripto: { generarClave: jest.fn(), cifrar: jest.fn(), descifrar: jest.fn() },
     almacen: { leer: jest.fn(), escribir: jest.fn(), borrar: jest.fn() },
