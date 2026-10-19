@@ -10,3 +10,4 @@ export {
   type ControlHablar,
 } from './useBotonHablar';
 export * from './textos';
+export { callarVoz, decirEnVoz, fraseRespuestaVoz } from './respuesta';
