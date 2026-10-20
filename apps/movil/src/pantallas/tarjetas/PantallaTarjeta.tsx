@@ -173,7 +173,7 @@ function Detalle({
         />
       )}
 
-      <SeccionMeses planes={d.planes} />
+      <SeccionMeses tarjetaId={d.id} planes={d.planes} />
       {/* Plus (`02 §8`): en Gratis los meses siguen en "Meses sin intereses"; solo se oculta el calendario. */}
       {plus.compromisoMsi12Meses ? (
         <CompromisoMeses meses={d.compromiso12Meses} />

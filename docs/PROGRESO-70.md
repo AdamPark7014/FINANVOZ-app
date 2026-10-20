@@ -91,7 +91,7 @@ Sin 11–12: no hay lista de espera real, no hay validación de demanda M0, y M3
 
 | Ítem | Hito | Nota |
 |---|---|---|
-| UI «Agregar meses que ya tenía» en tarjeta existente | M4 | Decisión 2026-10-12; hoy solo en alta O4 |
+| ~~UI «Agregar meses que ya tenía» en tarjeta existente~~ | M4 | Hecho 2026-10-19 (`agregarMsiQueYaTenia`) |
 | `reales.json` + ejemplos cuando Adam/probadores entreguen notificaciones | M5 | Motor listo; pendiente **3** |
 | Analizadores PDF reales | M15 | pendiente **122** |
 | Pendientes **123**, **128** (MSI/corte PDF), **124** (vigilancia PdfBox) | M15 | |

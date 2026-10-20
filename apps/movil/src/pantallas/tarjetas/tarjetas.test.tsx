@@ -538,6 +538,31 @@ describe('Tarjetas', () => {
     expect(obtenerHoy(p.ctx).hoyPuedesCentavos).toBeLessThanOrEqual(antes);
   });
 
+  it('M4 · "Agregar meses que ya tenía" en el detalle: valida, guarda el plan y "Sí, ya lo incluye" baja la deuda', () => {
+    const p = e510();
+    const antes = detalleTarjeta(p.ctx, p.oro);
+    montar(p.ctx, <PantallaTarjeta tarjetaId={p.oro} alVolver={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('tarjeta-agregar-meses-previos'));
+    fireEvent.press(screen.getByTestId('meses-previos-guardar'));
+    expect(screen.getByTestId('meses-previos-error')).toHaveTextContent(
+      'En cada compra a meses escribe la mensualidad y cuántas te faltan (1 a 48).',
+    );
+    fireEvent.changeText(screen.getByTestId('meses-previos-mensualidad-0'), '500');
+    fireEvent.changeText(screen.getByTestId('meses-previos-restantes-0'), '4');
+    fireEvent.press(screen.getByTestId('meses-previos-guardar'));
+    expect(screen.getByTestId('meses-previos-error')).toHaveTextContent(
+      'Dime si lo que debes ya incluye esos meses.',
+    );
+    fireEvent.press(screen.getByTestId('meses-previos-incluye-si'));
+    fireEvent.press(screen.getByTestId('meses-previos-guardar'));
+    expect(screen.queryByTestId('tarjeta-meses-previos')).toBeNull();
+    expect(within(screen.getByTestId('aviso')).getByText('Agregué esa compra a meses.')).toBeTruthy();
+    const despues = detalleTarjeta(p.ctx, p.oro);
+    expect(despues.planes).toHaveLength(antes.planes.length + 1);
+    expect(despues.msiPorPagar).toBe(antes.msiPorPagar + 200_000);
+    expect(despues.saldoRevolvente + 0).toBe(Math.max(0, antes.saldoRevolvente - 200_000)); // + 0: el libro da −0
+  });
+
   it('Liquidar meses desde el detalle pide confirmación', () => {
     const p = e510();
     const tele = registrarCompraMsi(p.ctx, {

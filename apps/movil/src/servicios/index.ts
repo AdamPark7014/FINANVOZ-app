@@ -22,6 +22,7 @@ export {
   agregarCuenta,
   agregarEfectivo,
   agregarPagoFijo,
+  agregarMsiQueYaTenia,
   agregarTarjetaCredito,
   configurarIngreso,
   configurarIngresoVariable,
@@ -31,7 +32,9 @@ export {
   type EntradaCuenta,
   type EntradaIngreso,
   type EntradaPagoFijo,
+  type EntradaMsiQueYaTenia,
   type EntradaTarjeta,
+  type MsiAgregados,
   type TarjetaCreada,
 } from './onboarding';
 export {

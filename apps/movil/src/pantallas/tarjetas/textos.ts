@@ -368,3 +368,16 @@ export function etiquetaAccesiblePlanMsi(
 ): string {
   return `${descripcion}, ${cuota} al mes, faltan ${restantes} de ${meses}`;
 }
+
+// ——— Agregar meses que ya tenía (`02 §8`) ———
+
+export const BTN_AGREGAR_MESES_PREVIOS = 'Agregar meses que ya tenía';
+export const BTN_GUARDAR_MESES_PREVIOS = 'Guardar meses';
+export const PREGUNTA_SALDO_INCLUYE_MSI =
+  '¿Lo que debes en esta tarjeta en la app ya incluye lo que te falta de esos meses?';
+export const ERROR_FILAS_MSI = 'En cada compra a meses escribe la mensualidad y cuántas te faltan (1 a 48).';
+export const ERROR_INCLUYE_MSI = 'Dime si lo que debes ya incluye esos meses.';
+
+export function mensajeMesesAgregados(n: number): string {
+  return n === 1 ? 'Agregué esa compra a meses.' : `Agregué esas ${n} compras a meses.`;
+}

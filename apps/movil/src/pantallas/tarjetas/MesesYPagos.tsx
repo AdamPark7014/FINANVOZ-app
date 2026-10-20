@@ -2,6 +2,7 @@ import type { Centavos, Regla } from '@cartera/core';
 import { useState } from 'react';
 import { View } from 'react-native';
 import {
+  agregarMsiQueYaTenia,
   agregarPagoPlaneado,
   etiquetaDiaMes,
   liquidarMsi,
@@ -25,7 +26,7 @@ import {
   Texto,
 } from '../../ui';
 import { Chips } from '../onboarding/componentes';
-import { leerDiaMes } from '../onboarding/ingreso';
+import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
 import { mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
@@ -53,6 +54,14 @@ import {
   mensajePagoPlaneadoApartado,
   textoConfirmarLiquidar,
   VACIO_MSI_TARJETA,
+  AVISO_NO_SE_INCLUYE_MSI,
+  BTN_AGREGAR_MESES_PREVIOS,
+  BTN_GUARDAR_MESES_PREVIOS,
+  ERROR_FILAS_MSI,
+  ERROR_INCLUYE_MSI,
+  etiquetaAvisoNoSeIncluyeMsi,
+  mensajeMesesAgregados,
+  PREGUNTA_SALDO_INCLUYE_MSI,
 } from './textos';
 
 // ——— Meses sin intereses ———
@@ -140,7 +149,136 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
   );
 }
 
-export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
+type Incluye = 'si' | 'no' | 'no_se';
+
+const OPCIONES_INCLUYE: readonly { valor: Incluye; etiqueta: string }[] = [
+  { valor: 'si', etiqueta: 'Sí, ya lo incluye' },
+  { valor: 'no', etiqueta: 'No' },
+  { valor: 'no_se', etiqueta: 'No sé' },
+];
+
+interface FilaMsi {
+  clave: number;
+  mensualidad: Centavos | null;
+  restantes: string;
+}
+
+/**
+ * "Agregar meses que ya tenía" (`02 §8`): las compras a meses que no diste al agregar la tarjeta. Mismas preguntas
+ * que O4 (`02 §3.1`): mensualidad, cuántas faltan y si lo que debes ya las incluye.
+ */
+function AgregarMesesPrevios({ tarjetaId, alTerminar }: { tarjetaId: string; alTerminar: () => void }) {
+  const { ctx, refrescar } = useSesion();
+  const mostrar = useMostrarAviso();
+  const [filas, setFilas] = useState<FilaMsi[]>([{ clave: 0, mensualidad: null, restantes: '' }]);
+  const [incluye, setIncluye] = useState<Incluye | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const cambiarFila = (clave: number, cambio: Partial<FilaMsi>) =>
+    setFilas((fs) => fs.map((f) => (f.clave === clave ? { ...f, ...cambio } : f)));
+
+  const guardar = () => {
+    const msiPrevios: { mensualidad: number; restantes: number }[] = [];
+    for (const f of filas) {
+      const restantes = leerEntero(f.restantes, 1, 48);
+      if (f.mensualidad === null || f.mensualidad <= 0 || restantes === null) {
+        setError(ERROR_FILAS_MSI);
+        return;
+      }
+      msiPrevios.push({ mensualidad: f.mensualidad, restantes });
+    }
+    if (incluye === null) {
+      setError(ERROR_INCLUYE_MSI);
+      return;
+    }
+    try {
+      agregarMsiQueYaTenia(ctx, tarjetaId, { msiPrevios, saldoIncluyeMsi: incluye });
+    } catch (e) {
+      setError(mensajeError(e));
+      return;
+    }
+    refrescar();
+    mostrar({ mensaje: mensajeMesesAgregados(msiPrevios.length) });
+    alTerminar();
+  };
+
+  return (
+    <Tarjeta testID="tarjeta-meses-previos">
+      <View style={{ gap: espacio.m }}>
+        <Texto variante="secundario" tono="secundario">
+          No cuentan como gasto nuevo: solo apartamos cada mensualidad cuando toca.
+        </Texto>
+        {filas.map((f, i) => (
+          <View key={f.clave} style={{ gap: espacio.s }} testID={`meses-previos-fila-${i}`}>
+            <Texto variante="etiqueta">{`Compra ${i + 1}`}</Texto>
+            <CampoMonto
+              testID={`meses-previos-mensualidad-${i}`}
+              etiqueta="Mensualidad"
+              alCambiar={(m) => cambiarFila(f.clave, { mensualidad: m })}
+            />
+            <CampoTexto
+              testID={`meses-previos-restantes-${i}`}
+              etiqueta="¿Cuántas te faltan?"
+              ejemplo="6"
+              teclado="number-pad"
+              valor={f.restantes}
+              alCambiar={(t) => cambiarFila(f.clave, { restantes: t })}
+            />
+            {filas.length > 1 ? (
+              <Boton
+                variante="texto"
+                ancho="contenido"
+                etiqueta="Quitar"
+                etiquetaAccesible={`Quitar compra ${i + 1}`}
+                alPresionar={() => setFilas((fs) => fs.filter((x) => x.clave !== f.clave))}
+              />
+            ) : null}
+          </View>
+        ))}
+        <Boton
+          testID="meses-previos-otra"
+          variante="secundario"
+          etiqueta="Agregar otra compra a meses sin intereses"
+          alPresionar={() =>
+            setFilas((fs) => [
+              ...fs,
+              { clave: (fs[fs.length - 1]?.clave ?? 0) + 1, mensualidad: null, restantes: '' },
+            ])
+          }
+        />
+        <Chips
+          testID="meses-previos-incluye"
+          etiqueta={PREGUNTA_SALDO_INCLUYE_MSI}
+          opciones={OPCIONES_INCLUYE}
+          valor={incluye}
+          alCambiar={setIncluye}
+        />
+        {incluye === 'no_se' ? (
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            testID="meses-previos-no-se-ayuda"
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
+            importantForAccessibility="yes"
+            accessibilityLabel={etiquetaAvisoNoSeIncluyeMsi()}
+          >
+            {AVISO_NO_SE_INCLUYE_MSI}
+          </Texto>
+        ) : null}
+        {error ? (
+          <Texto variante="secundario" tono="faltante" accessibilityRole="alert" testID="meses-previos-error">
+            {error}
+          </Texto>
+        ) : null}
+        <Boton testID="meses-previos-guardar" etiqueta={BTN_GUARDAR_MESES_PREVIOS} alPresionar={guardar} />
+        <Boton etiqueta={BTN_CANCELAR} variante="texto" alPresionar={alTerminar} />
+      </View>
+    </Tarjeta>
+  );
+}
+
+export function SeccionMeses({ tarjetaId, planes }: { tarjetaId: string; planes: readonly PlanMsiVista[] }) {
+  const [agregando, setAgregando] = useState(false);
   return (
     <Seccion titulo={TITULO_MESES_SIN_INTERESES} testID="tarjeta-meses">
       {planes.length === 0 ? (
@@ -153,6 +291,17 @@ export function SeccionMeses({ planes }: { planes: readonly PlanMsiVista[] }) {
       {planes.map((p) => (
         <FilaPlan key={p.id} p={p} />
       ))}
+      {agregando ? (
+        <AgregarMesesPrevios tarjetaId={tarjetaId} alTerminar={() => setAgregando(false)} />
+      ) : (
+        <Boton
+          testID="tarjeta-agregar-meses-previos"
+          variante="secundario"
+          ancho="contenido"
+          etiqueta={BTN_AGREGAR_MESES_PREVIOS}
+          alPresionar={() => setAgregando(true)}
+        />
+      )}
     </Seccion>
   );
 }

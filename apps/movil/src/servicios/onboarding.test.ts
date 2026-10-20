@@ -9,6 +9,7 @@ import { listarMovimientos } from './movimientos';
 import {
   agregarCuenta,
   agregarEfectivo,
+  agregarMsiQueYaTenia,
   agregarPagoFijo,
   agregarTarjetaCredito,
   configurarIngreso,
@@ -137,6 +138,73 @@ describe('onboarding', () => {
         msiPrevios: [{ mensualidad: 100, restantes: 2 }],
       }),
     ).toThrow(expect.objectContaining({ codigo: 'tarjeta_invalida' }));
+  });
+
+  it('M4 · "Agregar meses que ya tenía" en una tarjeta existente sigue las mismas reglas que O4 (E6-06)', () => {
+    const v = vector<VectorE606>('E6-06');
+    const fixture = tarjetaFixture<TarjetaFixture>(v.tarjeta);
+    const p = abrirPrueba(v.hoy);
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const total = v.mensualidad * v.restantes;
+    const msi = [{ mensualidad: v.mensualidad, restantes: v.restantes }];
+
+    // "Sí, ya lo incluye": la deuda revolvente baja lo que falta de los meses y las cuotas quedan igual que en O4.
+    const si = agregarTarjetaCredito(p.ctx, {
+      nombre: 'Oro',
+      ...tarjetaDe(fixture),
+      saldo: total + fixture.saldo_revolvente,
+    });
+    const r = agregarMsiQueYaTenia(p.ctx, si.cuentaId, { msiPrevios: msi, saldoIncluyeMsi: 'si' });
+    expect(r.planes).toHaveLength(1);
+    expect(r.saldoRevolvente).toBe(fixture.saldo_revolvente);
+    expect(p.ctx.libro.saldo(si.cuentaId)).toBe(-fixture.saldo_revolvente);
+    expect(listarCuentas(p.ctx).debes.find((d) => d.id === si.cuentaId)).toMatchObject({
+      saldo: fixture.saldo_revolvente,
+      meses: v.esperado.saldo_msi,
+    });
+    expect(
+      cuotasMsiPendientes(p.ctx, si.cuentaId).map(({ n, monto, corte, limite }) => ({
+        n,
+        monto,
+        corte,
+        limite,
+      })),
+    ).toEqual(v.esperado.cuotas);
+    // No es gasto: solo queda el ajuste neutro que saca los meses de la deuda revolvente.
+    expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos.map((m) => [m.tipo, m.sentido]))).toEqual([
+      ['conciliacion', 'neutro'],
+    ]);
+    expect(obtenerHoy(p.ctx).avisos).toEqual([]);
+
+    // Nunca deja saldo a favor: si la deuda era menor que los meses, solo baja hasta cero.
+    const corta = agregarTarjetaCredito(p.ctx, { nombre: 'Corta', ...tarjetaDe(fixture), saldo: 100 });
+    expect(
+      agregarMsiQueYaTenia(p.ctx, corta.cuentaId, { msiPrevios: msi, saldoIncluyeMsi: 'si' }).saldoRevolvente,
+    ).toBe(0);
+    expect(p.ctx.libro.saldo(corta.cuentaId)).toBe(0);
+
+    // "No sé": la deuda no baja (puede contar de más, nunca de menos) y Hoy avisa una vez.
+    const nose = agregarTarjetaCredito(p.ctx, {
+      nombre: 'Azul',
+      ...tarjetaDe(fixture),
+      saldo: fixture.saldo_revolvente,
+    });
+    expect(
+      agregarMsiQueYaTenia(p.ctx, nose.cuentaId, { msiPrevios: msi, saldoIncluyeMsi: 'no_se' })
+        .saldoRevolvente,
+    ).toBe(fixture.saldo_revolvente);
+    expect(obtenerHoy(p.ctx).avisos.map((a) => a.texto)).toEqual([
+      'Puede que esté contando dos veces tus meses de la Azul. Compáralo con tu próximo estado de cuenta.',
+    ]);
+
+    // Sin meses o con una tarjeta que no existe no registra nada.
+    expect(() =>
+      agregarMsiQueYaTenia(p.ctx, nose.cuentaId, { msiPrevios: [], saldoIncluyeMsi: 'no' }),
+    ).toThrow(expect.objectContaining({ codigo: 'msi_invalido' }));
+    expect(() =>
+      agregarMsiQueYaTenia(p.ctx, 'no-existe', { msiPrevios: msi, saldoIncluyeMsi: 'no' }),
+    ).toThrow(expect.objectContaining({ codigo: 'tarjeta_inexistente' }));
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
   it('O1–O7 completo: ingreso, cuentas, tarjeta, pagos fijos y colchón dejan Hoy listo', () => {
