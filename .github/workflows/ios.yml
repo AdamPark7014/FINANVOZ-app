@@ -1,0 +1,88 @@
+name: iOS simulador
+
+# Compila la app para el simulador de iPhone en los constructores de Mac de GitHub (macOS 26 arm64 con
+# Xcode 26; gratis mientras el repositorio sea público). Sin firma de Apple: todavía no hay cuenta de
+# desarrollador (M14 · iPhone v2), así que el resultado no se instala en un iPhone físico pero prueba que
+# todo el código nativo y el bundle de Metro compilan en iOS. El `.app` se instala en un simulador con
+# `xcrun simctl install booted Finanvoz.app`. Las llaves de proveedores nunca entran aquí: el modo nube
+# queda apagado, igual que en apk.yml.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore: ['docs/**', '**/*.md']
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  simulador:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Xcode más reciente de la imagen
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)"
+          xcodebuild -version
+          pod --version
+      - run: pnpm install --frozen-lockfile
+      - name: Proyecto nativo (expo prebuild)
+        working-directory: apps/movil
+        run: pnpm exec expo prebuild --platform ios --no-install --clean
+      - name: Caché de CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/movil/ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'apps/movil/app.json') }}
+          restore-keys: pods-${{ runner.os }}-
+      - name: pod install
+        working-directory: apps/movil/ios
+        run: pod install
+      - name: Compilar para el simulador (Release)
+        working-directory: apps/movil/ios
+        env:
+          NODE_ENV: production
+          # Sin cuenta de Sentry todavía (pendiente de Adam): no se suben símbolos ni source maps.
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
+          RCT_NO_LAUNCH_PACKAGER: '1'
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace Finanvoz.xcworkspace \
+            -scheme Finanvoz \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee xcodebuild.log | xcbeautify --quiet
+      - name: Empaquetar Finanvoz.app
+        working-directory: apps/movil/ios/build/Build/Products/Release-iphonesimulator
+        run: ditto -c -k --keepParent Finanvoz.app finanvoz-ios-simulador.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finanvoz-ios-simulador
+          path: apps/movil/ios/build/Build/Products/Release-iphonesimulator/finanvoz-ios-simulador.zip
+          retention-days: 14
+      - name: Registro completo de Xcode (solo si falla)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: apps/movil/ios/xcodebuild.log
+          retention-days: 7

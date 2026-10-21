@@ -7,6 +7,7 @@ export default tseslint.config(
   {
     ignores: [
       '.claude/**',
+      '.ai/**',
       '**/dist/**',
       '**/coverage/**',
       '**/node_modules/**',

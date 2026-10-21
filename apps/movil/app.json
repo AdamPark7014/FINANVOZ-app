@@ -8,6 +8,14 @@
     "icon": "./assets/icono.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.finanvoz.app",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
     "android": {
       "package": "com.finanvoz.app",
       "allowBackup": false,
