@@ -22,6 +22,7 @@ export {
   agregarCuenta,
   agregarEfectivo,
   agregarPagoFijo,
+  quitarPagoFijo,
   agregarMsiQueYaTenia,
   agregarTarjetaCredito,
   configurarIngreso,

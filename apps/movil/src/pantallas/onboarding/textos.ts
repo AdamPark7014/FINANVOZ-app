@@ -87,9 +87,52 @@ export const BTN_AGREGAR_DEBITO_BILLETERA = 'Agregar débito o billetera';
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 
 /** O5 · Pagos fijos */
-export const TITULO_PAGOS_FIJOS = '¿Qué pagos tienes cada mes?';
-export const AYUDA_PAGOS_FIJOS = 'Toca los que tengas. Los apartamos antes de decirte cuánto puedes gastar.';
-export const ERROR_PAGO_FIJO_INCOMPLETO = 'Escribe cuánto pagas y qué día del mes (1 a 31).';
+export const TITULO_PAGOS_FIJOS = '¿Qué pagos fijos tienes?';
+export const AYUDA_PAGOS_FIJOS =
+  'Toca los que tengas o agrega otro. Los apartamos antes de decirte cuánto puedes gastar.';
+export const ERROR_PAGO_FIJO_INCOMPLETO = 'Escribe cuánto pagas y cuándo lo pagas.';
+export const CHIP_PAGO_OTRO = 'Otro';
+export const ETIQUETA_PAGO_NOMBRE = '¿Cómo le llamas?';
+export const EJEMPLO_PAGO_NOMBRE = 'Netflix, colegiatura, seguro del coche';
+export const ERROR_PAGO_NOMBRE = 'Escribe cómo le llamas a este pago.';
+export const ETIQUETA_PAGO_FRECUENCIA = '¿Cada cuándo lo pagas?';
+export const ETIQUETA_PAGO_DIA_SEMANA = '¿Qué día de la semana?';
+export const ETIQUETA_PAGO_MES = '¿En qué mes?';
+export const CASILLA_PAGO_VARIABLE = 'El monto cambia cada vez, como un recibo';
+export const BTN_PAGO_MAS_OPCIONES = 'Más opciones';
+export const BTN_PAGO_MENOS_OPCIONES = 'Menos opciones';
+export const PISTA_PAGO_MAS_OPCIONES = 'Muestra de dónde sale el pago y cuántos pagos te faltan';
+export const PISTA_PAGO_MENOS_OPCIONES = 'Oculta las opciones extra del pago';
+export const ETIQUETA_PAGO_CUENTA = '¿De dónde sale?';
+export const CHIP_PAGO_CUENTA_DESPUES = 'Lo decido después';
+export const ETIQUETA_PAGO_RESTANTES = '¿Cuántos pagos te faltan?';
+export const AYUDA_PAGO_RESTANTES =
+  'Déjalo vacío si no tiene fin. Sirve para una tanda, un plan o un préstamo.';
+export const ERROR_PAGO_RESTANTES = 'Los pagos que faltan van de 1 a 999, o deja el campo vacío.';
+export const BTN_PAGO_QUITAR = 'Quitar';
+export const TEXTO_PAGOS_SUMAN = 'Al mes suman';
+
+export function pistaQuitarPago(concepto: string): string {
+  return `Quita ${concepto} de tus pagos fijos`;
+}
+
+export function etiquetaPagosSuman(montoEnPalabras: string): string {
+  return `${TEXTO_PAGOS_SUMAN} ${montoEnPalabras}`;
+}
+
+/** TalkBack: una fila de la lista de pagos agregados, con todo lo que se ve. */
+export function etiquetaFilaPago(p: {
+  concepto: string;
+  regla: string;
+  montoEnPalabras: string;
+  cuenta?: string | null;
+  fin?: string | null;
+}): string {
+  const partes = [p.concepto, p.regla, p.montoEnPalabras];
+  if (p.cuenta) partes.push(`sale de ${p.cuenta}`);
+  if (p.fin) partes.push(`termina el ${p.fin}`);
+  return partes.join(', ');
+}
 export const ETIQUETA_PAGO_MONTO_FIJO = '¿Cuánto pagas?';
 export const ETIQUETA_PAGO_MONTO_VARIABLE = '¿Cuánto pagas más o menos?';
 export const AYUDA_PAGO_VARIABLE = 'Cambia cada vez: pon lo de un recibo normal y lo ajustas cuando llegue.';

@@ -317,6 +317,51 @@ describe('onboarding', () => {
     expect(screen.getByTestId(/^onb-pago-agregado-/).props.accessibilityLabel).toMatch(/pesos/);
   });
 
+  it('O5 · «Otro» cada semana con fin por pagos restantes: fila con detalle, total mensual y quitar', () => {
+    aceptarConsentimiento(s.ctx, { datosFinancieros: true });
+    abrir('/onboarding/pagos-fijos');
+    tocar('onb-pago-otro');
+    escribir('onb-pago-nombre', 'Clases de inglés');
+    tocar('onb-pago-frecuencia-semanal');
+    tocar('onb-pago-dia-semana-2');
+    escribir('onb-pago-monto', '300');
+    tocar('onb-pago-mas-opciones');
+    escribir('onb-pago-restantes', '4');
+    tocar('onb-pago-agregar');
+    const lista = screen.getByTestId('onb-pagos-lista');
+    expect(lista).toHaveTextContent(/Clases de inglés/);
+    expect(lista).toHaveTextContent(/cada martes/);
+    expect(lista).toHaveTextContent(/hasta /);
+    // 300 a la semana → 52/12 → $1,300.00 al mes (hacia arriba, regla 12).
+    expect(screen.getByTestId('onb-pagos-total')).toHaveTextContent(/1,300/);
+    expect(screen.getByTestId('onb-pagos-total').props.accessibilityLabel).toMatch(/Al mes suman/);
+    expect(screen.getByTestId(/^onb-pago-agregado-/).props.accessibilityLabel).toMatch(/termina el/);
+    expect(screen.getByTestId('onb-pagos-continuar')).toHaveProp('accessibilityHint', PISTA_PAGOS_CONTINUAR);
+
+    const id = String(screen.getByTestId(/^onb-pago-agregado-/).props.testID).replace(
+      'onb-pago-agregado-',
+      '',
+    );
+    tocar(`onb-pago-quitar-${id}`);
+    expect(screen.queryByTestId('onb-pagos-lista')).toBeNull();
+    expect(screen.getByTestId('onb-pagos-continuar')).toHaveProp('accessibilityHint', PISTA_PAGOS_SALTAR);
+  });
+
+  it('O5 · sin nombre no agrega; cada mes exige el día', () => {
+    aceptarConsentimiento(s.ctx, { datosFinancieros: true });
+    abrir('/onboarding/pagos-fijos');
+    tocar('onb-pago-otro');
+    escribir('onb-pago-monto', '100');
+    escribir('onb-pago-dia', '5');
+    tocar('onb-pago-agregar');
+    expect(screen.getByTestId('error-formulario')).toHaveTextContent(/cómo le llamas/);
+    escribir('onb-pago-nombre', 'Seguro');
+    escribir('onb-pago-dia', '');
+    tocar('onb-pago-agregar');
+    expect(screen.getByTestId('error-formulario')).toHaveTextContent(/cuándo lo pagas/);
+    expect(screen.queryByTestId('onb-pagos-lista')).toBeNull();
+  });
+
   it('con el onboarding completo, "/" lleva a Hoy', () => {
     aceptarConsentimiento(s.ctx, { datosFinancieros: true });
     const r = abrir('/onboarding/colchon');

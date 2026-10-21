@@ -21,7 +21,7 @@ import { marcarIngresoVariable } from './ajustes';
 import { crearAvisoMsiDoble } from './avisos';
 import { idCategoriaDe, insertarCuenta } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
-import { insertarProgramado, validarRegla } from './programados';
+import { desactivarProgramado, insertarProgramado, validarRegla } from './programados';
 import { tarjetaPorId } from './tarjetas';
 
 const { programado, tarjeta, planMsi } = esquema;
@@ -351,11 +351,12 @@ export function agregarMsiQueYaTenia(
 
 // ——— O5 · Pagos fijos ———
 
-/** Chips de O5 (`02 §3`): luz, agua (y gas) son de monto variable. La tanda formal llega en M8. */
+/** Chips de O5 (`02 §3`): luz, agua y gas son de monto variable. La tanda formal llega en M8. */
 export const PAGOS_FIJOS_SUGERIDOS = [
   { clave: 'renta', concepto: 'renta', categoria: 'vivienda', variable: false },
   { clave: 'luz', concepto: 'luz', categoria: 'servicios', variable: true },
   { clave: 'agua', concepto: 'agua', categoria: 'servicios', variable: true },
+  { clave: 'gas', concepto: 'gas', categoria: 'servicios', variable: true },
   { clave: 'internet', concepto: 'internet', categoria: 'servicios', variable: false },
   { clave: 'celular', concepto: 'celular', categoria: 'servicios', variable: false },
   { clave: 'gimnasio', concepto: 'gimnasio', categoria: 'deporte', variable: false },
@@ -391,4 +392,10 @@ export function agregarPagoFijo(ctx: Contexto, entrada: EntradaPagoFijo): string
       variable: e.variable,
     }),
   );
+}
+
+/** O5: quita un pago fijo recién agregado (lo desactiva; sus ocurrencias dejan de apartarse en E4). */
+export function quitarPagoFijo(ctx: Contexto, programadoId: string): void {
+  exigirConsentimiento(ctx);
+  enTransaccion(ctx, () => desactivarProgramado(ctx, programadoId));
 }

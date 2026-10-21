@@ -18,14 +18,14 @@
 - `apk.yml` gana el input `arquitecturas`; el APK x86_64 (corrida 39659887043) corre en el emulador `nexara_phone`
   (el de cada push es solo arm64 y se cierra al arrancar en x86).
 - Verificado: lint, typecheck, vitest plugins 9/9 y tienda 21/21, jest seguridad 10/10 con el `app.json` nuevo.
+- **O5 · Pagos fijos más completo** (pedido de Adam al verlo en el emulador): nombre editable, chip «Otro», cada
+  mes/quincena/semana/año, «el monto cambia cada vez» para cualquier pago (gas entra al catálogo), «Más opciones»
+  con cuenta de salida y «¿Cuántos pagos te faltan?» (→ `hasta`), «Quitar» (`quitarPagoFijo`) y «Al mes suman».
+  Lógica pura en `pantallas/onboarding/pagos-fijos.ts` (10 pruebas Vitest), pantalla en
+  `app/onboarding/pagos-fijos.tsx`, jest onboarding 11/11, `02 §3` O5 y ESTADO actualizados.
 
 ## A medias — CUIDADO
 
-- **O5 · Pagos fijos: personalización del formulario** (pedido de Adam 21-10): nombre propio editable, chip
-  «Otro», frecuencia (mes/quincena/semana/año), «cambia cada vez» para cualquier pago, cuenta de salida, fin por
-  número de pagos, quitar de la lista y total mensual. Si ves cambios sin commitear en
-  `apps/movil/app/onboarding/pagos-fijos.tsx`, `src/pantallas/onboarding/pagos-fijos.ts`, `textos.ts`,
-  `servicios/onboarding.ts` o `docs/02-UX.md` §3, son de ese trabajo: `relevo.ps1 salvar`, no pisar.
 - **Adam:** correr `pwsh -File scripts\subir-secretos-ios.ps1` y `pwsh -File scripts\subir-secretos-android.ps1`;
   crear «Finanvoz» en App Store Connect (`com.finanvoz.app`, SKU `FINANVOZ-IOS`) y en Play Console; respaldar la
   llave de subida fuera de la PC. Después: Actions → «iOS · TestFlight» y «Android · Play».
@@ -36,7 +36,7 @@
 
 ## Siguiente paso
 
-1. Terminar O5 (arriba), APK x86_64 nuevo y verlo en el emulador; commit con pruebas.
+1. APK x86_64 nuevo con el O5 (Actions → «APK Android» → `arquitecturas=x86_64`) y verlo en el emulador.
 2. Adam — secretos + apps en consolas; primera corrida de TestFlight y de Play (prueba interna).
 3. Adam — M0 antes del 6 nov; cuentas Expo/RevenueCat/PostHog; contador; abogado; pruebas en teléfono.
 
