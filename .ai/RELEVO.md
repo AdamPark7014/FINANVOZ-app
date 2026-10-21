@@ -23,18 +23,17 @@
 
 ## A medias — CUIDADO
 
-- Corrida 1 del workflow iOS (39636154250, 36 min): prebuild, `pod install`, compilación nativa y bundle de Metro
-  **pasaron** en Xcode 26 con `node_modules` de pnpm. Falló solo la fase «Upload Debug Symbols to Sentry»:
-  `sentry-xcode-debug-files.sh` resuelve `@sentry/cli` con `set -e` antes de mirar `SENTRY_DISABLE_AUTO_UPLOAD`, y
-  con pnpm ese paquete no está en `node_modules/@sentry/cli`. Arreglo: paso que exporta `SENTRY_CLI_EXECUTABLE`
-  resuelto vía `@sentry/react-native` (ambos scripts se saltan la búsqueda si viene puesto). Corrida 2 pendiente de
-  verificar; si vuelve a fallar, el registro completo queda en el artefacto `xcodebuild-log`.
+- Workflow iOS **verificado en verde** (corrida 2, 39642147532, commit 1f559a5): prebuild, `pod install`, compilación
+  nativa, bundle de Metro y fase de Sentry pasan en Xcode 26 con `node_modules` de pnpm. Artefacto
+  `finanvoz-ios-simulador` (zip con `Finanvoz.app`) descargable 14 días desde Actions. La corrida 1 (39636154250) cayó
+  solo en «Upload Debug Symbols to Sentry» porque `sentry-xcode-debug-files.sh` resuelve `@sentry/cli` con `set -e`
+  antes de mirar `SENTRY_DISABLE_AUTO_UPLOAD`; con `SENTRY_CLI_EXECUTABLE` exportado ya no lo busca.
 - El `.app` del simulador no sirve para un iPhone físico: eso exige cuenta de Apple (M14, Adam).
 - M0 / EAS: Adam.
 
 ## Siguiente paso
 
-1. Revisar la corrida «iOS simulador» en Actions; corregir el workflow si algo no compila en Xcode 26.
+1. Probar `Finanvoz.app` en un simulador (quien tenga Mac): descargar el artefacto, `unzip`, `xcrun simctl install booted Finanvoz.app`.
 2. Adam — M0 (pendientes 11 y 12: Supabase + `finanvoz.com`), antes del 6 nov.
 3. Adam — cuentas Expo/Play/RevenueCat/PostHog, contador (`config/fiscal/2026.json`), abogado, pruebas en teléfono.
 4. Código que queda: plantillas y analizadores PDF con datos reales de probadores; iPhone (v2, ya con builder).
