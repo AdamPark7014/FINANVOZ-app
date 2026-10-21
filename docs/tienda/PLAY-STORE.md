@@ -71,7 +71,7 @@ Play Console → **Crear app**:
 | Campo | Valor |
 | --- | --- |
 | Nombre | **Finanvoz** (en la ficha se cambia por `titulo.txt`: «Finanvoz: gastos y tarjetas») |
-| Idioma predeterminado | Español (México) – es-MX |
+| Idioma predeterminado | Español (Latinoamérica) – es-419 (el selector de Play no trae es-MX; la ficha sí puede llevar traducción es-MX) |
 | App o juego | App |
 | Gratis o pagada | Gratis (no se puede cambiar a pagada después; Plus sería suscripción dentro de la app) |
 | Declaraciones | Políticas del programa para desarrolladores y leyes de exportación de EE. UU.: aceptar |
@@ -208,7 +208,7 @@ revisión legal → 5. Prueba cerrada → 6. Producción escalonada (10 % → 10
 | # | Qué | Quién | Bloquea |
 | --- | --- | --- | --- |
 | 1 | Generar la llave de subida con `scripts\crear-llave-android.ps1` (una vez), guardar una copia fuera de la PC y cargar los secretos con `scripts\subir-secretos-android.ps1` | Adam (llave y custodia) | §1, §3 |
-| 2 | Crear la app en Play Console (§2) | Adam | Todo lo demás |
+| 2 | ~~Crear la app en Play Console (§2)~~ **Hecha el 21-10-2026** con la cuenta NEXARA (Claude in Chrome, con el sí de Adam): app «Finanvoz», paquete `com.finanvoz.app`, id de Play Console `4974369200915032127`, idioma predeterminado **Español (Latinoamérica) – es-419** (Play no ofrece es-MX como idioma predeterminado), Aplicación, Sin coste, declaraciones aceptadas, «protección automática» del instalador dejada como viene | — | — |
 | 3 | Primera subida a prueba interna y probadores (§3) | Adam | Pruebas en el teléfono, despliegue escalonado |
 | 4 | Dominio y páginas públicas (`finanvoz.com`, aviso, eliminación de datos) y revisión legal del aviso (pendientes 4, 12, 26, 103) | Adam + abogado | Ficha pública, prueba cerrada y producción. **No** la prueba interna |
 | 5 | Ficha: textos (§4, pendiente 101), correo de contacto, ícono 512, gráfico 1024×500, capturas (pendiente 102) | Adam (+ Claude por Remote Control para capturas) | Producción |

@@ -26,9 +26,15 @@
 
 ## A medias — CUIDADO
 
+- **Play Console: app «Finanvoz» creada el 21-10** (id 4974369200915032127, cuenta NEXARA, es-419) con el sí de Adam;
+  sin AAB todavía. **App Store Connect**: Chrome sin sesión; Adam entra y luego se crea la app (`com.finanvoz.app`,
+  SKU `FINANVOZ-IOS`).
 - **Adam:** correr `pwsh -File scripts\subir-secretos-ios.ps1` y `pwsh -File scripts\subir-secretos-android.ps1`;
-  crear «Finanvoz» en App Store Connect (`com.finanvoz.app`, SKU `FINANVOZ-IOS`) y en Play Console; respaldar la
-  llave de subida fuera de la PC. Después: Actions → «iOS · TestFlight» y «Android · Play».
+  respaldar la llave de subida fuera de la PC. Después: Actions → «iOS · TestFlight» y «Android · Play», y subir el
+  AAB a prueba interna.
+- Intérprete local (nivel 0): `pnpm eval:nlu --nivel reglas` cubre 25 de 155 casos del golden set con precisión
+  100 %; el resto depende de la nube (sin Supabase ni llaves). Adam pidió «haz más inteligente la app»: propuesta
+  pendiente de su elección (ver conversación / siguiente RELEVO).
 - Build de iPhone: Ajustes → Plan dice «Administrar en Google Play» / «Restaurar compras» → ocultar en iOS antes de
   enviar a Apple (2.3.10). Es cambio de código pendiente.
 - M0 / dominio `finanvoz.com` / aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa, no la
