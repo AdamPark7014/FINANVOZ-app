@@ -2,6 +2,11 @@
 
 Borradores de la ficha en español de México para Play Console. **Todavía no se suben**: la ficha, las capturas, el video y la revisión legal son pendientes de Adam (`docs/ESTADO.md` → Pendientes, desde el 101).
 
+| Documento | Para qué |
+|---|---|
+| [`IOS-APP-STORE.md`](IOS-APP-STORE.md) | App Store Connect: alta de la app, secretos y flujo «iOS · TestFlight», información de la app, etiqueta de privacidad, versión 1.0.0 con los textos de `ios/`, notas para la revisión, pendientes |
+| [`PLAY-STORE.md`](PLAY-STORE.md) | Play Console: llave de subida y AAB, alta, prueba interna, ficha con los `.txt` de esta carpeta, «Contenido de la app» (seguridad de los datos, funciones financieras, divulgación destacada), pendientes |
+
 | Archivo | Campo de Play Console | Límite |
 |---|---|---|
 | `titulo.txt` | Nombre de la app | 30 caracteres |
@@ -9,8 +14,13 @@ Borradores de la ficha en español de México para Play Console. **Todavía no s
 | `descripcion-completa.txt` | Descripción completa | 4,000 caracteres |
 | `notas-version-1.0.0.txt` | Novedades de la versión 1.0.0 | 500 caracteres |
 | `capturas.md` | Capturas de teléfono, gráfico de funciones y video | 2 a 8 capturas |
+| `ios/subtitulo.txt` | App Store Connect: Subtítulo | 30 caracteres |
+| `ios/texto-promocional.txt` | App Store Connect: Texto promocional | 170 caracteres |
+| `ios/descripcion.txt` | App Store Connect: Descripción (sin Android, Google Play, widget, Plus ni proveedor de IA mientras la build no los tenga) | 4,000 caracteres |
+| `ios/palabras-clave.txt` | App Store Connect: Palabras clave (separadas por coma, sin espacios) | 100 caracteres |
+| `ios/notas-revision.txt` | App Store Connect: Información de revisión → Notas (en inglés) | 4,000 caracteres |
 
-Los archivos `.txt` son el texto exacto que se pega en la consola (sin el salto de línea final). `apps/movil/src/tienda.test.ts` (corre con `pnpm test`) los mide en caracteres Unicode contra los límites de Play y revisa las reglas de abajo.
+Los archivos `.txt` son el texto exacto que se pega en la consola (sin el salto de línea final). `apps/movil/src/tienda.test.ts` (corre con `pnpm test`) los mide en caracteres Unicode contra los límites de Play y de App Store Connect y revisa las reglas de abajo.
 
 ## Reglas del texto
 

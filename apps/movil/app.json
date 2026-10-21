@@ -10,6 +10,9 @@
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.finanvoz.app",
+      "appleTeamId": "AHNW9K8745",
+      "icon": "./assets/icono-ios.png",
+      "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -18,6 +21,7 @@
     },
     "android": {
       "package": "com.finanvoz.app",
+      "versionCode": 1,
       "allowBackup": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-primer-plano.png",
@@ -114,7 +118,8 @@
             }
           ]
         }
-      ]
+      ],
+      "./plugins/con-firma-android.js"
     ],
     "experiments": {
       "typedRoutes": true

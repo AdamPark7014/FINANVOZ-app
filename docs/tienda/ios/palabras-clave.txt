@@ -1,0 +1,1 @@
+gastos,quincena,tarjetas,meses,intereses,efectivo,presupuesto,voz,dinero,deudas,tandas,corte,msi

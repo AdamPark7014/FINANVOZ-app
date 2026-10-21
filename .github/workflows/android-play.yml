@@ -1,0 +1,140 @@
+name: Android · Play
+
+# Android App Bundle (.aab) firmado con la llave de SUBIDA de Google Play de Finanvoz (Play App Signing
+# guarda la llave final de la app). Misma base que apk.yml; la diferencia es que el prebuild recibe las
+# variables FINANVOZ_KEYSTORE_* y el config plugin apps/movil/plugins/con-firma-android.js hace que Gradle
+# firme `release` con esa llave. La llave vive en los secretos del repositorio (los carga
+# scripts/subir-secretos-android.ps1) y en %USERPROFILE%\Documents\LLAVES-ANDROID\FINANVOZ de Adam; nunca
+# en el repositorio ni en los registros. Solo a mano: cada subida a Play necesita un versionCode nuevo
+# (Play no repite ninguno, ni los de bundles descartados). Las llaves de proveedores siguen fuera: modo nube apagado.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión visible (versionName), p. ej. 1.0.0'
+        required: true
+        default: '1.0.0'
+        type: string
+      build:
+        description: 'versionCode (entero creciente). Vacío = número de esta corrida (github.run_number)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: android-play-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      # app.config.ts los vuelca en `version` y `android.versionCode` al hacer prebuild.
+      APP_VERSION: ${{ inputs.version }}
+      APP_BUILD_NUMBER: ${{ inputs.build != '' && inputs.build || github.run_number }}
+      # Alias y contraseñas de la llave de subida en el entorno del job: el plugin los exige en el prebuild y
+      # Gradle los lee con System.getenv al firmar. La ruta del .jks la fija el paso «Llave de subida».
+      FINANVOZ_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      FINANVOZ_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      FINANVOZ_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - name: Comprobar secretos y versión
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          faltan=()
+          [ -n "$ANDROID_UPLOAD_KEYSTORE_BASE64" ] || faltan+=(ANDROID_UPLOAD_KEYSTORE_BASE64)
+          [ -n "$FINANVOZ_KEYSTORE_PASSWORD" ] || faltan+=(ANDROID_KEYSTORE_PASSWORD)
+          [ -n "$FINANVOZ_KEY_ALIAS" ] || faltan+=(ANDROID_KEY_ALIAS)
+          [ -n "$FINANVOZ_KEY_PASSWORD" ] || faltan+=(ANDROID_KEY_PASSWORD)
+          if [ "${#faltan[@]}" -gt 0 ]; then
+            echo "::error::Faltan los secretos ${faltan[*]} en el repositorio. Cárgalos con scripts/subir-secretos-android.ps1 (la llave la crea scripts/crear-llave-android.ps1)."
+            exit 1
+          fi
+          if ! [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::La versión «$APP_VERSION» no tiene la forma MAYOR.MENOR.PARCHE."
+            exit 1
+          fi
+          if ! [[ "$APP_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::El versionCode «$APP_BUILD_NUMBER» debe ser un entero positivo."
+            exit 1
+          fi
+          echo "versionName=$APP_VERSION versionCode=$APP_BUILD_NUMBER"
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: pnpm install --frozen-lockfile
+      - name: Llave de subida (archivo temporal del job)
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          umask 177
+          ruta="$RUNNER_TEMP/finanvoz-upload.jks"
+          printf '%s' "$ANDROID_UPLOAD_KEYSTORE_BASE64" | tr -d '\r\n' | base64 -d > "$ruta"
+          test -s "$ruta" || { echo '::error::El keystore decodificado quedó vacío.'; exit 1; }
+          # Que la llave abra con el alias y las contraseñas de los secretos antes de gastar media hora compilando.
+          # Las contraseñas viajan a keytool por variable de entorno (-storepass:env), no en la línea de comandos.
+          keytool -list -keystore "$ruta" -storepass:env FINANVOZ_KEYSTORE_PASSWORD -alias "$FINANVOZ_KEY_ALIAS" > /dev/null
+          echo "FINANVOZ_KEYSTORE_PATH=$ruta" >> "$GITHUB_ENV"
+      - name: Proyecto nativo (expo prebuild con la firma de release)
+        working-directory: apps/movil
+        run: |
+          pnpm exec expo prebuild --platform android --no-install --clean
+          if ! grep -q 'signingConfig signingConfigs.release' android/app/build.gradle; then
+            echo '::error::El plugin con-firma-android no inyectó la firma en android/app/build.gradle.'
+            exit 1
+          fi
+          grep -n -E 'versionCode|versionName' android/app/build.gradle
+      - name: Compilar AAB de release (bundleRelease)
+        working-directory: apps/movil/android
+        env:
+          # Solo en este paso: con NODE_ENV=production global, pnpm install omitiría las devDependencies.
+          NODE_ENV: production
+          # Sin cuenta de Sentry todavía (pendiente de Adam): no se suben source maps.
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
+        run: ./gradlew bundleRelease --no-daemon
+      - name: Verificar que el AAB va firmado con la llave de subida (no con la de debug)
+        working-directory: apps/movil/android
+        run: |
+          huella() { grep -m1 -oE 'SHA256: *([0-9A-F]{2}:){31}[0-9A-F]{2}' | sed 's/SHA256: *//'; }
+          aab=app/build/outputs/bundle/release/app-release.aab
+          test -f "$aab" || { echo "::error::No se generó $aab"; exit 1; }
+          h_aab=$(keytool -printcert -jarfile "$aab" | huella)
+          h_subida=$(keytool -list -v -keystore "$FINANVOZ_KEYSTORE_PATH" -storepass:env FINANVOZ_KEYSTORE_PASSWORD -alias "$FINANVOZ_KEY_ALIAS" | huella)
+          h_debug=$(keytool -list -v -keystore app/debug.keystore -storepass android -alias androiddebugkey | huella)
+          echo "AAB:    ${h_aab:-sin firma}"
+          echo "Subida: $h_subida"
+          echo "Debug:  $h_debug"
+          [ -n "$h_aab" ] || { echo '::error::El AAB no está firmado.'; exit 1; }
+          [ -n "$h_subida" ] || { echo '::error::No se pudo leer la huella de la llave de subida.'; exit 1; }
+          [ "$h_aab" != "$h_debug" ] || { echo '::error::El AAB está firmado con la llave de DEBUG; Play lo rechazaría.'; exit 1; }
+          [ "$h_aab" = "$h_subida" ] || { echo '::error::La firma del AAB no coincide con la llave de subida.'; exit 1; }
+          {
+            echo '## Finanvoz · AAB listo para Play'
+            echo "- versionName: \`$APP_VERSION\` · versionCode: \`$APP_BUILD_NUMBER\`"
+            echo "- Certificado de la llave de subida (SHA-256): \`$h_aab\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finanvoz-aab
+          # mapping.txt solo existe con R8 activo (android.enableMinifyInReleaseBuilds); el .aab siempre.
+          path: |
+            apps/movil/android/app/build/outputs/bundle/release/app-release.aab
+            apps/movil/android/app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: error
+          retention-days: 14
+      - name: Borrar la llave temporal
+        if: always()
+        run: rm -f "$RUNNER_TEMP/finanvoz-upload.jks"

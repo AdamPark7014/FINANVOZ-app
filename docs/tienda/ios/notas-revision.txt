@@ -1,0 +1,25 @@
+Finanvoz is a personal finance app for Mexico (Spanish only). The user records expenses by voice or text and the app tells them how much they can spend today until their next paycheck, keeping track of cash, debit accounts, credit cards (statement cut-off day, payment due date, payment to avoid interest) and interest-free monthly installments ("meses sin intereses"). Everything runs on the device.
+
+NO ACCOUNT NEEDED
+There is no sign-in, no sign-up and no server account. First launch: "Empezar" -> privacy consent (tick the checkbox about financial data, then "Aceptar y continuar") -> a 7-step setup (when you get paid, what you pay with, fixed monthly payments, a step about automatic capture that on iPhone only shows "No disponible en este teléfono", and a cash cushion). Every step can be skipped with "Saltar por ahora" / "Continuar" / "Sin colchón por ahora". The app then opens the Hoy (Today) tab.
+
+HOW TO TEST VOICE ENTRY
+On the Hoy tab (or the Registrar tab), press and hold "Hablar", say in Spanish "tacos ochenta en efectivo" (tacos, 80 pesos, paid in cash) and release. The app shows "Registré: ..." with "Deshacer" (undo), speaks the result aloud and updates "Hoy puedes". The same phrase can be typed with "Escribir". Speech-to-text uses the iPhone's system speech recognition (microphone and speech recognition permissions are requested the first time; on-device recognition is used when the device supports it). The interpretation of the phrase uses rules that run on the device; phrases the rules do not understand are kept in the "Por revisar" list for the user to confirm. Nothing is sent to our servers.
+
+THIS BUILD
+- No in-app purchases and no subscriptions. Ajustes > Plan describes a future optional tier ("Finanvoz Plus") but says "Las suscripciones todavía no están disponibles en esta versión": nothing can be bought and nothing is locked behind a payment.
+- No backend, no analytics and no AI provider are configured: the app does not need a network connection for any of its features.
+- Data is stored encrypted on the device (SQLCipher). Ajustes > Privacidad lets the user export all data (JSON and CSV) and delete everything ("Borrar todos mis datos", confirmed by typing BORRAR).
+- Ajustes > Respaldo exports an encrypted backup file (.cartera) protected with a password chosen by the user; it can be restored on another phone from the welcome screen.
+
+PERMISSIONS
+Microphone and speech recognition: only while the user holds "Hablar". Face ID / Touch ID: only if the user turns on app lock in Ajustes. Notifications: optional local reminders for card cut-off and due dates. Camera: only to scan a QR code in "Gastos compartidos" (shared expenses between two phones); no photos are taken or stored, and sharing needs the cloud mode, which is off in this build. No location, no contacts, no photo library, no background modes.
+
+ENCRYPTION
+Only standard encryption of local data and HTTPS (ITSAppUsesNonExemptEncryption = NO).
+
+NOT A FINANCIAL SERVICE
+Finanvoz does not move money, offer credit, connect to bank accounts or give investment advice. All figures are estimates computed from the data the user enters, and the app says so in "Acerca de" and in the App Store description.
+
+CONTACT
+NEXARA (NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V.), gerencia@nexara.com.mx.

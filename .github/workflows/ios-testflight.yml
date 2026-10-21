@@ -1,0 +1,301 @@
+name: iOS · TestFlight
+
+# Archiva, firma y sube Finanvoz a TestFlight desde la cuenta de NEXARA (equipo AHNW9K8745), sin Mac, en los
+# constructores de GitHub (gratis mientras el repositorio sea público). Copiado del esquema de ARTA-app y
+# NEXARA-app (ios-testflight.yml) y adaptado a Expo: el proyecto Xcode lo genera `expo prebuild`, el perfil lo
+# crea scripts/asc_signing.py con la llave de App Store Connect y la firma manual se pasa a xcodebuild.
+#
+# Secretos del repositorio (los carga scripts/subir-secretos-ios.ps1; son los mismos de NEXARA y ARTA):
+#   APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_PRIVATE_KEY
+#     (llave de API con rol Admin o App Manager)
+#   Certificado de distribución del equipo, una de dos formas:
+#     BUILD_CERTIFICATE_BASE64 (.p12 en base64) + P12_PASSWORD
+#     o CERTIFICATE_PRIVATE_KEY (PEM) + DISTRIBUTION_CERT_CER_BASE64 (.cer en base64)
+# Antes de la primera subida, la app «Finanvoz» con bundle com.finanvoz.app tiene que existir en App Store
+# Connect (se crea a mano; ver docs/tienda/IOS-APP-STORE.md). Las llaves de proveedores nunca entran aquí: el
+# modo nube queda apagado, como en apk.yml. El repositorio es público: este flujo solo corre a mano
+# (workflow_dispatch) y los secretos nunca llegan a corridas de forks.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión de App Store (CFBundleShortVersionString)'
+        required: true
+        default: '1.0.0'
+      build:
+        description: 'Número de build (CFBundleVersion). Vacío = número de ejecución del flujo'
+        required: false
+        default: ''
+      upload:
+        description: 'Subir a TestFlight (desmarca para solo archivar y firmar; el IPA queda como artefacto)'
+        type: boolean
+        required: true
+        default: true
+
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  testflight:
+    name: Archivar, firmar y subir
+    runs-on: macos-latest
+    timeout-minutes: 90
+    env:
+      TEAM_ID: AHNW9K8745
+      APP_BUNDLE_ID: com.finanvoz.app
+      APP_VERSION: ${{ inputs.version }}
+      APP_BUILD_NUMBER: ${{ inputs.build || github.run_number }}
+      IOS_DIR: ${{ github.workspace }}/apps/movil/ios
+      ARCHIVE_PATH: ${{ github.workspace }}/build/Finanvoz.xcarchive
+      EXPORT_DIR: ${{ github.workspace }}/build/export
+      ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
+      DISTRIBUTION_CERT_CER_BASE64: ${{ secrets.DISTRIBUTION_CERT_CER_BASE64 }}
+      BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+      P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Comprobar secretos
+        run: |
+          set -euo pipefail
+          miss=()
+          [ -n "$ASC_KEY_ID" ] || miss+=(APP_STORE_CONNECT_KEY_ID)
+          [ -n "$ASC_ISSUER_ID" ] || miss+=(APP_STORE_CONNECT_ISSUER_ID)
+          [ -n "$ASC_PRIVATE_KEY" ] || miss+=(APP_STORE_CONNECT_PRIVATE_KEY)
+          if [ -z "$CERTIFICATE_PRIVATE_KEY$DISTRIBUTION_CERT_CER_BASE64" ] && [ -z "$BUILD_CERTIFICATE_BASE64" ]; then
+            miss+=("CERTIFICATE_PRIVATE_KEY+DISTRIBUTION_CERT_CER_BASE64 o BUILD_CERTIFICATE_BASE64+P12_PASSWORD")
+          fi
+          if [ ${#miss[@]} -gt 0 ]; then
+            printf '::error::Faltan secretos del repo: %s (cárgalos con scripts/subir-secretos-ios.ps1)\n' "${miss[*]}"; exit 1
+          fi
+
+      # App Store Connect rechaza binarios compilados con un SDK anterior a iOS 26 (lección de ARTA). Se elige la
+      # Xcode estable más nueva de la imagen y se corta aquí, en el primer minuto, si no alcanza.
+      - name: Xcode estable con SDK de iOS 26 o mayor
+        run: |
+          set -euo pipefail
+          for X in $(ls -d /Applications/Xcode_*.app | sort -V -r); do
+            case "$X" in *[Bb]eta*) continue ;; esac
+            sudo xcode-select -s "$X"; break
+          done
+          SDK="$(xcrun --sdk iphoneos --show-sdk-version)"
+          echo "Xcode: $(xcode-select -p) · SDK iPhoneOS $SDK"
+          [ "${SDK%%.*}" -ge 26 ] || { echo "::error::No hay Xcode estable con SDK de iOS 26 o mayor (hay $SDK)."; exit 1; }
+          xcodebuild -version
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Proyecto nativo (expo prebuild) con versión y build de tienda
+        working-directory: apps/movil
+        run: |
+          echo "Versión $APP_VERSION · build $APP_BUILD_NUMBER"
+          pnpm exec expo prebuild --platform ios --no-install --clean
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' ios/Finanvoz/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' ios/Finanvoz/Info.plist
+
+      # Apple rechaza el icono de 1024 con canal alfa (ITMS-90717). `ios.icon` apunta a assets/icono-ios.png (RGB).
+      - name: Icono de App Store sin transparencia
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in "$IOS_DIR"/Finanvoz/Images.xcassets/AppIcon.appiconset/*.png; do
+            a="$(sips -g hasAlpha "$f" | awk -F': ' '/hasAlpha/ {print $2}')"
+            w="$(sips -g pixelWidth "$f" | awk -F': ' '/pixelWidth/ {print $2}')"
+            echo "$(basename "$f") ${w}px hasAlpha: ${a:-desconocido}"
+            [ "$a" = "no" ] || fail=1
+          done
+          [ $fail -eq 0 ] || { echo "::error::El icono tiene canal alfa: App Store lo rechaza (ITMS-90717). Revisa assets/icono-ios.png."; exit 1; }
+
+      # El manifiesto de privacidad lo exige Apple desde 2024; Expo lo genera en el prebuild. Un plist roto se
+      # descubre aquí y no en el correo de rechazo.
+      - name: Plists y manifiesto de privacidad válidos
+        run: |
+          set -euo pipefail
+          /usr/bin/plutil -lint "$IOS_DIR/Finanvoz/Info.plist"
+          test -f "$IOS_DIR/Finanvoz/PrivacyInfo.xcprivacy" || { echo "::error::Falta PrivacyInfo.xcprivacy (expo prebuild debía generarlo)."; exit 1; }
+          /usr/bin/plutil -lint "$IOS_DIR/Finanvoz/PrivacyInfo.xcprivacy"
+          echo "ITSAppUsesNonExemptEncryption: $(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$IOS_DIR/Finanvoz/Info.plist")"
+          echo "Entitlements:"
+          cat "$IOS_DIR"/Finanvoz/*.entitlements 2>/dev/null || echo "(sin archivo de entitlements)"
+
+      - name: Caché de CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/movil/ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'apps/movil/app.json') }}
+          restore-keys: pods-${{ runner.os }}-
+      - name: pod install
+        working-directory: apps/movil/ios
+        run: pod install
+
+      - name: sentry-cli para los scripts de Xcode
+        # Con pnpm, @sentry/cli no cuelga de node_modules/@sentry/cli y el script de símbolos de Sentry
+        # (set -e) muere al resolverlo aunque la subida esté apagada. Con SENTRY_CLI_EXECUTABLE puesto ni lo busca.
+        working-directory: apps/movil
+        run: |
+          CLI=$(node --print "const p=require('path');p.join(p.dirname(require.resolve('@sentry/cli/package.json',{paths:[p.dirname(require.resolve('@sentry/react-native/package.json'))]})),'bin','sentry-cli')")
+          test -f "$CLI"
+          echo "SENTRY_CLI_EXECUTABLE=$CLI" >> "$GITHUB_ENV"
+
+      - name: Llave de App Store Connect
+        run: |
+          set -euo pipefail
+          KEY_PATH="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          umask 177
+          printf '%s' "$ASC_PRIVATE_KEY" > "$KEY_PATH"
+          echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+          echo "API_PRIVATE_KEYS_DIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+
+      - name: Certificado de distribución al llavero
+        run: |
+          set -euo pipefail
+          KEYCHAIN="$RUNNER_TEMP/codesign.keychain-db"
+          KC_PASS="$(openssl rand -hex 12)"
+          security create-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+          security default-keychain -s "$KEYCHAIN"
+          CERT_DER="$RUNNER_TEMP/dist.cer"
+          if [ -n "${CERTIFICATE_PRIVATE_KEY:-}" ] && [ -n "${DISTRIBUTION_CERT_CER_BASE64:-}" ]; then
+            printf '%s' "$CERTIFICATE_PRIVATE_KEY" > "$RUNNER_TEMP/dist.key.pem"
+            echo "$DISTRIBUTION_CERT_CER_BASE64" | base64 --decode > "$CERT_DER"
+            openssl x509 -inform DER -in "$CERT_DER" -out "$RUNNER_TEMP/dist.pem"
+            P12="$RUNNER_TEMP/dist.p12"
+            P12_PASS="$(openssl rand -hex 16)"
+            (openssl pkcs12 -export -inkey "$RUNNER_TEMP/dist.key.pem" -in "$RUNNER_TEMP/dist.pem" \
+              -out "$P12" -passout pass:"$P12_PASS" \
+              -macalg sha1 -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES) || \
+            (openssl pkcs12 -export -legacy -inkey "$RUNNER_TEMP/dist.key.pem" -in "$RUNNER_TEMP/dist.pem" \
+              -out "$P12" -passout pass:"$P12_PASS")
+          else
+            P12="$RUNNER_TEMP/dist.p12"
+            P12_PASS="$P12_PASSWORD"
+            echo "$BUILD_CERTIFICATE_BASE64" | base64 --decode > "$P12"
+            (openssl pkcs12 -in "$P12" -clcerts -nokeys -passin pass:"$P12_PASS" 2>/dev/null || \
+             openssl pkcs12 -legacy -in "$P12" -clcerts -nokeys -passin pass:"$P12_PASS") \
+              | openssl x509 -outform DER -out "$CERT_DER"
+          fi
+          security import "$P12" -k "$KEYCHAIN" -P "$P12_PASS" -A -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -k "$KC_PASS" "$KEYCHAIN" >/dev/null
+          security find-identity -v -p codesigning
+          echo "CERT_DER_BASE64=$(base64 < "$CERT_DER" | tr -d '\n')" >> "$GITHUB_ENV"
+          echo "KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+
+      - name: Bundle id, capacidades y perfil (App Store Connect)
+        run: python3 "$GITHUB_WORKSPACE/scripts/asc_signing.py"
+
+      - name: Archivar (Release, dispositivo, firma manual)
+        working-directory: apps/movil/ios
+        env:
+          NODE_ENV: production
+          # Sin cuenta de Sentry todavía (pendiente de Adam): no se suben símbolos ni source maps.
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
+          RCT_NO_LAUNCH_PACKAGER: '1'
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -workspace Finanvoz.xcworkspace \
+            -scheme Finanvoz \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$APP_PROFILE_NAME" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee "$RUNNER_TEMP/archive.log" | xcbeautify --quiet
+
+      - name: Comprobar el archivo
+        run: |
+          set -euo pipefail
+          APP="$ARCHIVE_PATH/Products/Applications/Finanvoz.app"
+          test -d "$APP" || { echo "::error::No existe $APP"; exit 1; }
+          test -f "$APP/PrivacyInfo.xcprivacy" || { echo "::error::Falta PrivacyInfo.xcprivacy en la app"; exit 1; }
+          echo "Versión: $(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$APP/Info.plist") ($(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$APP/Info.plist"))"
+          # Solo iPhone (supportsTablet: false): si el binario declara iPad (2), Apple lo revisa en iPad.
+          FAMILY="$(/usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily' "$APP/Info.plist" || true)"
+          echo "UIDeviceFamily: $(echo "$FAMILY" | tr -s ' \n' ' ')"
+          if grep -qw 2 <<<"$FAMILY"; then
+            echo "::error::El binario declara iPad (UIDeviceFamily 2). Finanvoz es solo iPhone: revisa supportsTablet en app.json."; exit 1
+          fi
+          codesign -d --entitlements :- "$APP" 2>/dev/null | head -n 40
+
+      - name: Opciones de exportación
+        run: |
+          set -euo pipefail
+          DEST=export
+          if [ "${{ inputs.upload }}" = "true" ]; then DEST=upload; fi
+          {
+            echo '<?xml version="1.0" encoding="UTF-8"?>'
+            echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
+            echo '<plist version="1.0"><dict>'
+            echo '  <key>method</key><string>app-store-connect</string>'
+            echo "  <key>destination</key><string>${DEST}</string>"
+            echo '  <key>signingStyle</key><string>manual</string>'
+            echo "  <key>teamID</key><string>${TEAM_ID}</string>"
+            echo '  <key>provisioningProfiles</key><dict>'
+            echo "    <key>${APP_BUNDLE_ID}</key><string>${APP_PROFILE_NAME}</string>"
+            echo '  </dict>'
+            echo '  <key>uploadSymbols</key><true/>'
+            echo '  <key>manageAppVersionAndBuildNumber</key><false/>'
+            echo '</dict></plist>'
+          } > "$RUNNER_TEMP/ExportOptions.plist"
+          /usr/bin/plutil -lint "$RUNNER_TEMP/ExportOptions.plist"
+          cat "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: Exportar y subir a TestFlight
+        run: |
+          set -o pipefail
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$EXPORT_DIR" \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/export.log"
+          status=${PIPESTATUS[0]}
+          ls -lah "$EXPORT_DIR" 2>/dev/null || true
+          if [ $status -ne 0 ]; then
+            grep -E "error|Error" "$RUNNER_TEMP/export.log" | tail -n 40
+            exit $status
+          fi
+          if [ "${{ inputs.upload }}" = "true" ]; then
+            echo "Subida entregada a App Store Connect: versión ${APP_VERSION} (${APP_BUILD_NUMBER}). Aparece en TestFlight tras el procesado de Apple."
+          fi
+
+      - name: Guardar logs si falló
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-testflight-logs
+          path: |
+            ${{ runner.temp }}/archive.log
+            ${{ runner.temp }}/export.log
+          retention-days: 7
+
+      - name: Guardar el IPA (solo compilar)
+        if: success() && inputs.upload == false
+        uses: actions/upload-artifact@v4
+        with:
+          name: finanvoz-ipa
+          path: ${{ github.workspace }}/build/export/*.ipa
+          retention-days: 14

@@ -124,7 +124,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['apps/movil/*.config.js', 'apps/movil/babel.config.js'],
+    files: ['apps/movil/*.config.js', 'apps/movil/babel.config.js', 'apps/movil/plugins/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { ...globals.node } },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },

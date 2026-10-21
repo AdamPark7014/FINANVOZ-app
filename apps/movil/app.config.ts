@@ -44,9 +44,27 @@ function llenarExtra(): Record<string, unknown> {
   return extra;
 }
 
+/**
+ * Versión y número de build de la tienda (sentada 8, pendiente 109). Por omisión los de `app.json`; los flujos
+ * «iOS · TestFlight» y «Android · Play» los pasan por variable para no commitear un número por cada subida:
+ *   APP_VERSION       → `version` (CFBundleShortVersionString / versionName), p. ej. 1.0.0
+ *   APP_BUILD_NUMBER  → `ios.buildNumber` y `android.versionCode` (entero creciente; Play nunca repite uno)
+ */
+function versionDeTienda(): Pick<ExpoConfig, 'version' | 'ios' | 'android'> {
+  const version = cadena(process.env.APP_VERSION) ?? base.version;
+  const build = cadena(process.env.APP_BUILD_NUMBER);
+  const versionCode = build && /^\d+$/.test(build) ? Number(build) : base.android?.versionCode;
+  return {
+    version,
+    ios: { ...base.ios, buildNumber: build ?? base.ios?.buildNumber },
+    android: { ...base.android, versionCode },
+  };
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...base,
   ...config,
+  ...versionDeTienda(),
   extra: {
     ...(typeof base.extra === 'object' && base.extra !== null ? base.extra : {}),
     ...(typeof config.extra === 'object' && config.extra !== null ? config.extra : {}),
