@@ -1,6 +1,7 @@
 // M7 · planes en la UI: pantalla del plan con la tienda en memoria, candados de Plus, CA-M7-02 (mensaje al agotar
 // las interpretaciones del mes) y CA-M7-07 (al terminar la prueba sin pagar todo sigue visible y editable).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 import type { ReactNode } from 'react';
 import {
   listarMovimientos,
@@ -88,6 +89,27 @@ async function escribir(frase: string) {
 }
 
 describe('pantalla del plan', () => {
+  it('iPhone (M14): sin ofertas, sin restaurar y sin nombrar tiendas; solo explica que Plus no está aún', async () => {
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    try {
+      const p = e510();
+      const tienda = crearComprasEnMemoria({ ahora: () => T0 });
+      montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: tienda });
+      await act(async () => {
+        await tienda.ofertas();
+      });
+      expect(screen.getByTestId(ID.soloIos)).toHaveTextContent(/Plus todavía no está en iPhone/);
+      expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
+      expect(screen.queryByTestId(ID.oferta('anual'))).toBeNull();
+      expect(screen.queryByTestId(ID.restaurar)).toBeNull();
+      expect(screen.queryByTestId(ID.administrar)).toBeNull();
+      expect(screen.queryByText(/Google Play|Android|App Store/)).toBeNull();
+      expect(screen.getByTestId(ID.volver)).toHaveProp('accessibilityHint', PISTA_VOLVER);
+    } finally {
+      plataforma.restore();
+    }
+  });
+
   it('Volver anuncia pista para cerrar la pantalla', () => {
     const p = e510();
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />);

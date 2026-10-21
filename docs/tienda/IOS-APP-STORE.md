@@ -187,6 +187,6 @@ precio, periodo, prueba y forma de cancelar visibles antes de comprar).
 | 5 | Capturas de iPhone 6.9" (§7) | Adam (+ Claude por Remote Control si hay Mac) | Envío a revisión |
 | 6 | Información de la app, clasificación por edad, etiqueta de privacidad y textos de `ios/` capturados en la consola (§5–§7) | Adam | Envío a revisión |
 | 7 | Disponibilidad por país (§5) | Adam | Envío a revisión |
-| 8 | Ajustes → Plan en iPhone: la pantalla describe Plus y sus textos hablan de Google Play («Administrar en Google Play», «Restaurar compras»). Antes de enviar a revisión, decidir si se oculta en iOS o se cambian los textos (2.3.10 y 2.1); no es cambio de ficha, es de código | Adam decide; Claude Code | Envío a revisión |
+| 8 | Ajustes → Plan en iPhone: la pantalla describe Plus y sus textos hablan de Google Play («Administrar en Google Play» (**resuelto el 21-10**: en iOS la pantalla Plan ya no ofrece compras ni nombra tiendas), «Restaurar compras»). Antes de enviar a revisión, decidir si se oculta en iOS o se cambian los textos (2.3.10 y 2.1); no es cambio de ficha, es de código | Adam decide; Claude Code | Envío a revisión |
 | 9 | Cuando se activen Sentry, PostHog, nube, RevenueCat o respaldo en la nube: etiqueta (§6), descripción, notas y `tienda.test.ts` en el mismo commit | Claude Code + Adam | Cada activación |
 | 10 | Marca «Finanvoz» en IMPI y en las tiendas (pendiente 5) | Adam | Riesgo de 5.2.1 si otro la tiene |

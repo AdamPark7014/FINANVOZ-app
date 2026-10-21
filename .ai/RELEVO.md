@@ -26,6 +26,8 @@
 
 ## A medias — CUIDADO
 
+- **Plan en iPhone sin tienda** (`PantallaPlan` con `Platform.OS === 'ios'`): sin ofertas ni «Restaurar compras» ni
+  nombres de tiendas; jest 12/12. Resuelve el hallazgo 2.3.10 de la ficha de iOS.
 - **Play Console: app «Finanvoz» creada el 21-10** (id 4974369200915032127, cuenta NEXARA, es-419) con el sí de Adam;
   sin AAB todavía. **App Store Connect**: Chrome sin sesión; Adam entra y luego se crea la app (`com.finanvoz.app`,
   SKU `FINANVOZ-IOS`).

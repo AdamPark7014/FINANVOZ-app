@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { obtenerPlan, sincronizarPlan, type EstadoTienda } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
@@ -7,6 +7,7 @@ import type { OfertaPlus } from '../../suscripciones/tipos';
 import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import {
   CARGANDO_OFERTAS,
+  CUERPO_PLAN_IOS,
   etiquetaOferta,
   ETIQUETA_ADMINISTRAR,
   ETIQUETA_INTENTAR,
@@ -41,6 +42,7 @@ import {
   SECCION_AJUSTES,
   SECCION_INCLUYE,
   TITULO_PANTALLA,
+  TITULO_PLAN_IOS,
 } from './textos';
 
 type Ofertas = { tipo: 'cargando' } | { tipo: 'listas'; ofertas: readonly OfertaPlus[] } | { tipo: 'error' };
@@ -115,6 +117,44 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       setOcupado(null);
     }
   };
+
+  // iPhone: sin compras ni tienda en esta versión (M14). Solo se explica, sin nombrar tiendas ni precios.
+  if (Platform.OS === 'ios') {
+    return (
+      <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
+        <Boton
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+          testID={ID.volver}
+        />
+        <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
+          {TITULO_PANTALLA}
+        </Texto>
+        <Tarjeta testID={ID.soloIos}>
+          <Texto variante="subtitulo">{TITULO_PLAN_IOS}</Texto>
+          <Texto variante="cuerpo" tono="secundario">
+            {CUERPO_PLAN_IOS}
+          </Texto>
+        </Tarjeta>
+        <Tarjeta testID={ID.incluye}>
+          <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
+          <View accessibilityRole="list" style={{ gap: espacio.xs }}>
+            {INCLUYE_PLUS.map((t) => (
+              <Texto
+                key={t}
+                variante="cuerpo"
+                role="listitem"
+                accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
+              >{`• ${t}`}</Texto>
+            ))}
+          </View>
+        </Tarjeta>
+      </Pantalla>
+    );
+  }
 
   return (
     <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>

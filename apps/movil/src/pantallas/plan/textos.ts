@@ -37,9 +37,18 @@ export const ID = {
   ajustesPlanVer: 'ajustes-plan-ver',
   puertaPlus: 'puerta-plus',
   puertaPlusConocer: 'puerta-plus-conocer',
+  soloIos: 'plan-solo-ios',
 } as const;
 
 export const TITULO_PANTALLA = 'Finanvoz Plus';
+
+/**
+ * iPhone (M14): esta versión no tiene compras ni tienda, y Apple no admite mencionar otras plataformas ni ofrecer
+ * compras que no existen (2.3.10, 3.1.1). Nada de tiendas ni precios en estos dos textos.
+ */
+export const TITULO_PLAN_IOS = 'Plus todavía no está en iPhone';
+export const CUERPO_PLAN_IOS =
+  'Por ahora Finanvoz en iPhone incluye todo lo de la versión Gratis, sin cobros. Cuando Plus esté disponible aquí, lo verás en esta pantalla.';
 export const SECCION_INCLUYE = 'Plus incluye';
 export const SECCION_AJUSTES = 'Plan';
 export const ETIQUETA_VOLVER = 'Volver';
