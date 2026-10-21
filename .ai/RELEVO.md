@@ -23,10 +23,12 @@
 
 ## A medias — CUIDADO
 
-- El workflow iOS se escribió a ciegas (no hay Mac aquí): la primera corrida en GitHub es la prueba real. Si
-  falla, el registro completo queda en el artefacto `xcodebuild-log`. Sospechosos por orden: CocoaPods con
-  `node_modules` de pnpm (enlaces simbólicos), `react-native-quick-crypto`/Nitro en Xcode 26, SQLCipher de
-  `expo-sqlite`, fase «Bundle React Native code» de Sentry sin `sentry.properties`.
+- Corrida 1 del workflow iOS (39636154250, 36 min): prebuild, `pod install`, compilación nativa y bundle de Metro
+  **pasaron** en Xcode 26 con `node_modules` de pnpm. Falló solo la fase «Upload Debug Symbols to Sentry»:
+  `sentry-xcode-debug-files.sh` resuelve `@sentry/cli` con `set -e` antes de mirar `SENTRY_DISABLE_AUTO_UPLOAD`, y
+  con pnpm ese paquete no está en `node_modules/@sentry/cli`. Arreglo: paso que exporta `SENTRY_CLI_EXECUTABLE`
+  resuelto vía `@sentry/react-native` (ambos scripts se saltan la búsqueda si viene puesto). Corrida 2 pendiente de
+  verificar; si vuelve a fallar, el registro completo queda en el artefacto `xcodebuild-log`.
 - El `.app` del simulador no sirve para un iPhone físico: eso exige cuenta de Apple (M14, Adam).
 - M0 / EAS: Adam.
 

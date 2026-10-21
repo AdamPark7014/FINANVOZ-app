@@ -51,6 +51,14 @@ jobs:
       - name: pod install
         working-directory: apps/movil/ios
         run: pod install
+      - name: sentry-cli para los scripts de Xcode
+        # Con pnpm, @sentry/cli no cuelga de node_modules/@sentry/cli y el script de símbolos de Sentry
+        # (set -e) muere al resolverlo aunque la subida esté apagada. Con SENTRY_CLI_EXECUTABLE puesto ni lo busca.
+        working-directory: apps/movil
+        run: |
+          CLI=$(node --print "const p=require('path');p.join(p.dirname(require.resolve('@sentry/cli/package.json',{paths:[p.dirname(require.resolve('@sentry/react-native/package.json'))]})),'bin','sentry-cli')")
+          test -f "$CLI"
+          echo "SENTRY_CLI_EXECUTABLE=$CLI" >> "$GITHUB_ENV"
       - name: Compilar para el simulador (Release)
         working-directory: apps/movil/ios
         env:
