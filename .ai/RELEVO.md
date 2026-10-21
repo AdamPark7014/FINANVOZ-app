@@ -26,6 +26,12 @@
 
 ## A medias — CUIDADO
 
+- **Dos agentes de Claude quedaron trabajando al cortarse la sesión por límite de uso (21-10, ~14:20):** uno amplía el
+  nivel 0 del intérprete (`packages/nlu/src/reglas`, pruebas, `docs/06-NLU.md` §9, banderas `reglas` en
+  `fixtures/nlu/golden.jsonl`, fila en ESTADO) y otro construye «Observaciones» en Hoy
+  (`apps/movil/src/servicios/observaciones.ts` + test, `pantallas/principal/Observaciones.tsx`, textos, `docs/02-UX.md`
+  §4.3, fila en ESTADO). **Si hay archivos sin commitear ahí, son suyos: `relevo.ps1 salvar`, revisar con
+  `pnpm eval:nlu --nivel reglas` (debe seguir en precisión 100 %), vitest, jest y lint, y commitear por separado.**
 - **Plan en iPhone sin tienda** (`PantallaPlan` con `Platform.OS === 'ios'`): sin ofertas ni «Restaurar compras» ni
   nombres de tiendas; jest 12/12. Resuelve el hallazgo 2.3.10 de la ficha de iOS.
 - **Play Console: app «Finanvoz» creada el 21-10** (id 4974369200915032127, cuenta NEXARA, es-419) con el sí de Adam;
