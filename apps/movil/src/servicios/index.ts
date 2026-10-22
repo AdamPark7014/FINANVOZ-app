@@ -559,3 +559,17 @@ export {
   type ResultadoGuardarEstado,
   type TarjetaEstado,
 } from './estados-cuenta';
+export {
+  cambiarMontoPagoFijo,
+  corregirSaldoCuenta,
+  detalleCuentaPropia,
+  detallePagoFijo,
+  listarPagosFijos,
+  quitarPagoFijoActivo,
+  type DetalleCuentaPropia,
+  type OrigenCompromiso,
+  type PagoFijoVista,
+  type SaldoCuentaCorregido,
+} from './cuentas-propias';
+export { leerMontoDictado } from './voz-campos';
+export { registrarRespaldoArchivo, TEXTO_SIN_RESPALDOS, TEXTO_SIN_RESPALDOS_NUBE } from './respaldo-nube';

@@ -87,9 +87,14 @@ export function clasificarErrorMotor(codigo: CodigoErrorMotor): ErrorDictado | '
   }
 }
 
+/** Claves de los mensajes del dictado; iOS pide dos permisos (micrófono y reconocimiento de voz). */
+export type ClaveMensajeDictado = ErrorDictado | 'sin_permiso' | 'sin_permiso_ios';
+
 /** Copy para la UI (02-UX §14: qué pasó + qué hacer; la voz nunca es la única vía). */
-export const MENSAJES_DICTADO: Record<ErrorDictado | 'sin_permiso', string> = {
+export const MENSAJES_DICTADO: Record<ClaveMensajeDictado, string> = {
   sin_permiso: 'Para dictar, permite el micrófono en los ajustes del teléfono. También puedes escribirlo.',
+  sin_permiso_ios:
+    'Para dictar, permite el micrófono y el reconocimiento de voz en Ajustes. También puedes escribirlo.',
   no_disponible: 'Tu teléfono no tiene dictado disponible. Escríbelo y lo registro igual.',
   sin_voz: 'No te escuché. Toca para hablar y di tu gasto, o escríbelo.',
   red: 'El dictado necesita internet en este teléfono. Escríbelo o inténtalo de nuevo.',

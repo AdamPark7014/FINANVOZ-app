@@ -118,6 +118,29 @@ describe('useDictado', () => {
     expect(alTerminar).not.toHaveBeenCalled();
   });
 
+  it('tras callar a otro micrófono, ignora su "abortado" y su "fin" hasta que este dictado arranca', async () => {
+    const { motor, emitir } = crearMotorFalso();
+    const alTerminar = jest.fn();
+    const { result } = renderHook(() => useDictado({ motor, alTerminar }));
+    await act(() => result.current.iniciar({ descartarRestos: true }));
+    emitir({ tipo: 'error', codigo: 'aborted' });
+    emitir({ tipo: 'fin' });
+    expect(result.current.estado).toBe('escuchando');
+
+    emitir({ tipo: 'inicio' });
+    emitir({ tipo: 'resultado', texto: 'quinientos', final: true });
+    expect(alTerminar).toHaveBeenCalledWith('quinientos');
+    expect(result.current.estado).toBe('inactivo');
+  });
+
+  it('sin descartarRestos, un "abortado" ajeno sí corta (comportamiento de siempre)', async () => {
+    const { motor, emitir } = crearMotorFalso();
+    const { result } = renderHook(() => useDictado({ motor }));
+    await act(() => result.current.iniciar());
+    emitir({ tipo: 'error', codigo: 'aborted' });
+    expect(result.current.estado).toBe('inactivo');
+  });
+
   it('al desmontar mientras escucha, aborta', async () => {
     const { motor } = crearMotorFalso();
     const { result, unmount } = renderHook(() => useDictado({ motor }));

@@ -12,9 +12,17 @@ export interface OpcionesDictado {
   alTerminar?: (transcripcion: string) => void;
 }
 
+export interface OpcionesInicio {
+  /**
+   * Otro micrófono de la pantalla acaba de abortar el reconocedor compartido: su "abortado" y su "fin" pueden
+   * llegar ya empezado este dictado. Se ignoran hasta que este dictado arranque ('inicio' o un resultado).
+   */
+  descartarRestos?: boolean;
+}
+
 export interface Dictado extends EstadoDictado {
   /** Pide permiso si hace falta y empieza a escuchar (al mantener presionado). */
-  iniciar: () => Promise<void>;
+  iniciar: (opciones?: OpcionesInicio) => Promise<void>;
   /** Deja de escuchar y espera el resultado final (al soltar). */
   detener: () => void;
   /** Descarta lo dictado. */
@@ -35,7 +43,13 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
   }, [alTerminar]);
 
   // Estado mutable del dictado en curso; solo se lee en manejadores, nunca durante el render.
-  const sesion = useRef({ activa: false, parcial: '', opciones: null as OpcionesMotor | null });
+  const sesion = useRef({
+    activa: false,
+    parcial: '',
+    opciones: null as OpcionesMotor | null,
+    /** Ignorar "abortado" y "fin" de otro dictado hasta que este arranque (`OpcionesInicio`). */
+    esperaInicio: false,
+  });
 
   useEffect(() => {
     const terminar = (texto: string) => {
@@ -49,8 +63,10 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
       if (!s.activa) return;
       switch (e.tipo) {
         case 'inicio':
+          s.esperaInicio = false;
           return;
         case 'resultado':
+          s.esperaInicio = false;
           if (e.final) return terminar(e.texto);
           s.parcial = e.texto;
           return despachar({ tipo: 'parcial', texto: e.texto });
@@ -58,8 +74,10 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
           s.activa = false;
           return despachar({ tipo: 'error', error: 'sin_voz' });
         case 'fin':
+          if (s.esperaInicio) return;
           return terminar(s.parcial);
         case 'error': {
+          if (s.esperaInicio && e.codigo === 'aborted') return;
           const o = s.opciones;
           if (
             o?.enDispositivo &&
@@ -88,26 +106,29 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
     };
   }, [motor]);
 
-  const iniciar = useCallback(async () => {
-    if (sesion.current.activa) return;
-    if (!motor.disponible()) {
-      despachar({ tipo: 'error', error: 'no_disponible' });
-      return;
-    }
-    const concedido = await motor.solicitarPermiso();
-    if (!concedido) {
-      despachar({ tipo: 'sin_permiso' });
-      return;
-    }
-    const opciones: OpcionesMotor = {
-      idioma: IDIOMA_DICTADO,
-      resultadosParciales: true,
-      enDispositivo: motor.soportaEnDispositivo(),
-    };
-    Object.assign(sesion.current, { activa: true, parcial: '', opciones });
-    despachar({ tipo: 'escuchar' });
-    motor.iniciar(opciones);
-  }, [motor]);
+  const iniciar = useCallback(
+    async ({ descartarRestos = false }: OpcionesInicio = {}) => {
+      if (sesion.current.activa) return;
+      if (!motor.disponible()) {
+        despachar({ tipo: 'error', error: 'no_disponible' });
+        return;
+      }
+      const concedido = await motor.solicitarPermiso();
+      if (!concedido) {
+        despachar({ tipo: 'sin_permiso' });
+        return;
+      }
+      const opciones: OpcionesMotor = {
+        idioma: IDIOMA_DICTADO,
+        resultadosParciales: true,
+        enDispositivo: motor.soportaEnDispositivo(),
+      };
+      Object.assign(sesion.current, { activa: true, parcial: '', opciones, esperaInicio: descartarRestos });
+      despachar({ tipo: 'escuchar' });
+      motor.iniciar(opciones);
+    },
+    [motor],
+  );
 
   const detener = useCallback(() => {
     if (!sesion.current.activa) return;

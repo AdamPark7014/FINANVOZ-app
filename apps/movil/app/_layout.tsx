@@ -27,6 +27,7 @@ import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import {
   cargarEscenario,
+  leerMontoDictado,
   mensajeRestaurado,
   obtenerBloqueo,
   relojFijo,
@@ -36,7 +37,8 @@ import { abrirSesion, borrarTodoApp, restaurarSesion, type Sesion } from '../src
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
 import { ProveedorSesion, useVista } from '../src/sesion/ProveedorSesion';
-import { Aviso, Boton, Pantalla, Texto, useTema } from '../src/ui';
+import { Aviso, Boton, etiquetaHablada, Pantalla, Texto, useAnunciar, useTema } from '../src/ui';
+import { motorExpo, ProveedorDictado } from '../src/voz';
 
 iniciarSentry();
 
@@ -150,20 +152,23 @@ export default function Raiz() {
 
   return (
     <ProveedorControlApp control={control}>
-      {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
-      <ProveedorNotificaciones notificaciones={notificaciones}>
-        <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
-          <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
-            <ProveedorAnalitica analitica={analitica}>
-              <AppProtegida
-                reiniciada={estado.generacion > 0}
-                evidencia={evidencia}
-                avisoInicial={estado.aviso ?? null}
-              />
-            </ProveedorAnalitica>
-          </ProveedorPlan>
-        </ProveedorSesion>
-      </ProveedorNotificaciones>
+      {/* Un solo reconocedor para toda la app: un micrófono a la vez y la cifra dicha en los campos de dinero. */}
+      <ProveedorDictado motor={motorExpo} leerMonto={leerMontoDictado}>
+        {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
+        <ProveedorNotificaciones notificaciones={notificaciones}>
+          <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
+            <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
+              <ProveedorAnalitica analitica={analitica}>
+                <AppProtegida
+                  reiniciada={estado.generacion > 0}
+                  evidencia={evidencia}
+                  avisoInicial={estado.aviso ?? null}
+                />
+              </ProveedorAnalitica>
+            </ProveedorPlan>
+          </ProveedorSesion>
+        </ProveedorNotificaciones>
+      </ProveedorDictado>
     </ProveedorControlApp>
   );
 }
@@ -184,6 +189,8 @@ function AppProtegida({
 }) {
   const { esquema } = useTema();
   const [aviso, setAviso] = useState(avisoInicial);
+  // "Listo: recuperé …": TalkBack lo lee por la región viva del aviso; VoiceOver necesita el anuncio.
+  useAnunciar(aviso ? etiquetaHablada(aviso) : null);
   // Tras borrar todo (o cargar un escenario) la navegación vuelve al inicio, que decide onboarding o Hoy.
   useEffect(() => {
     if (reiniciada) router.replace('/');

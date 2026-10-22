@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   contarEsperandoConexion,
@@ -23,29 +23,26 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
   Boton,
+  BotonMicrofono,
   CampoTexto,
   espacio,
-  OBJETIVO_TACTIL_MIN,
-  radio,
+  etiquetaHablada,
   Tarjeta,
   Texto,
-  tipo,
-  useTema,
+  useAnunciar,
 } from '../../ui';
 import {
-  callarVoz,
+  abrirAjustesDictado,
+  BTN_ABRIR_AJUSTES_DICTADO,
   decirEnVoz,
   ETIQUETA_ESCUCHANDO,
   fraseRespuestaVoz,
-  MENSAJES_DICTADO,
   mensajeEstoOi,
-  PISTA_ESCUCHANDO,
+  PISTA_ABRIR_AJUSTES_DICTADO,
   PISTA_HABLAR,
   TEXTO_HABLAR,
   TEXTO_TE_ESCUCHO,
-  TEXTO_TERMINAR,
-  useBotonHablar,
-  useDictado,
+  useMicrofono,
   type MotorDictado,
 } from '../../voz';
 import { TarjetaConfirmarCompartido } from '../compartido/TarjetaConfirmarCompartido';
@@ -145,7 +142,6 @@ export function PanelRegistrar({
   dictarAlAbrir?: boolean;
 }) {
   const { ctx, refrescar, nube } = useSesion();
-  const { c } = useTema();
   const { height: altoVentana } = useWindowDimensions();
   const avisarRegistro = useAvisoRegistro(alVerMovimiento);
   const esperando = useVista(contarEsperandoConexion);
@@ -454,28 +450,21 @@ export function PanelRegistrar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fraseRevision]);
 
-  const dictado = useDictado({
+  // Al empezar calla la respuesta en voz y cualquier otro micrófono de la pantalla (`ProveedorDictado`).
+  const microfono = useMicrofono({
     ...(motor ? { motor } : {}),
     alTerminar: (t) => enviar(t, 'voz'),
   });
-  const escuchando = dictado.estado === 'escuchando' || dictado.estado === 'procesando';
-  const { iniciar: iniciarDictado } = dictado;
-  const iniciarHablar = useCallback(() => {
-    callarVoz();
-    return iniciarDictado();
-  }, [iniciarDictado]);
-  const boton = useBotonHablar({ escuchando, iniciar: iniciarHablar, detener: dictado.detener });
+  const { escuchando, iniciar: iniciarHablar } = microfono;
   useEffect(() => {
     if (dictarAlAbrir) void iniciarHablar();
     // Solo al montar: el widget abre la pantalla una vez por toque.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const errorVoz =
-    dictado.estado === 'sin_permiso'
-      ? MENSAJES_DICTADO.sin_permiso
-      : dictado.error
-        ? MENSAJES_DICTADO[dictado.error]
-        : null;
+  const errorVoz = microfono.aviso;
+  // VoiceOver no lee las regiones vivas: en iPhone se anuncian el error del dictado y la respuesta escrita.
+  useAnunciar(errorVoz);
+  useAnunciar(mensaje ? etiquetaHablada(mensaje) : null);
 
   const respuestas = (
     <>
@@ -628,10 +617,10 @@ export function PanelRegistrar({
         <Texto
           variante="cuerpo"
           accessibilityLiveRegion="polite"
-          accessibilityLabel={dictado.parcial === '' ? ETIQUETA_ESCUCHANDO : undefined}
+          accessibilityLabel={microfono.parcial === '' ? ETIQUETA_ESCUCHANDO : undefined}
           testID="transcripcion-en-vivo"
         >
-          {dictado.parcial === '' ? TEXTO_TE_ESCUCHO : dictado.parcial}
+          {microfono.parcial === '' ? TEXTO_TE_ESCUCHO : microfono.parcial}
         </Texto>
       ) : null}
       {errorVoz ? (
@@ -643,6 +632,16 @@ export function PanelRegistrar({
         >
           {errorVoz}
         </Texto>
+      ) : null}
+      {microfono.sinPermiso ? (
+        <Boton
+          etiqueta={BTN_ABRIR_AJUSTES_DICTADO}
+          variante="texto"
+          ancho="contenido"
+          pista={PISTA_ABRIR_AJUSTES_DICTADO}
+          alPresionar={abrirAjustesDictado}
+          testID="boton-abrir-ajustes-dictado"
+        />
       ) : null}
       {interpretando ? (
         <Texto
@@ -696,37 +695,16 @@ export function PanelRegistrar({
 
   const controles = (
     <View style={{ flexDirection: 'row', gap: espacio.s, alignItems: 'center' }}>
-      <Pressable
+      <BotonMicrofono
+        forma="boton"
         testID="boton-hablar"
-        onPressIn={boton.alPresionarDentro}
-        onPressOut={boton.alSoltar}
-        accessibilityActions={boton.accionesAccesibles}
-        onAccessibilityAction={boton.alAccionAccesible}
-        accessibilityRole="button"
-        accessibilityLabel={escuchando ? ETIQUETA_ESCUCHANDO : TEXTO_HABLAR}
-        accessibilityHint={escuchando ? PISTA_ESCUCHANDO : PISTA_HABLAR}
-        style={({ pressed }) => ({
-          flex: 1,
-          minHeight: OBJETIVO_TACTIL_MIN + espacio.s,
-          borderRadius: radio.pastilla,
-          backgroundColor: c.acento,
-          opacity: pressed ? 0.85 : 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: espacio.s,
-          paddingHorizontal: espacio.l,
-        })}
-      >
-        <Microfono color={c.sobreAcento} />
-        <Texto
-          style={[tipo.etiqueta, { fontSize: 16, color: c.sobreAcento }]}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {escuchando ? TEXTO_TERMINAR : TEXTO_HABLAR}
-        </Texto>
-      </Pressable>
+        escuchando={escuchando}
+        boton={microfono.boton}
+        etiqueta={TEXTO_HABLAR}
+        pista={PISTA_HABLAR}
+        texto={TEXTO_HABLAR}
+        style={{ flex: 1 }}
+      />
       <Boton
         etiqueta="Escribir"
         variante="secundario"
@@ -799,32 +777,6 @@ export function PanelRegistrar({
       {respuestas}
       {controles}
       {extras}
-    </View>
-  );
-}
-
-/** Ícono de micrófono dibujado con vistas (sin dependencias de íconos). */
-function Microfono({ color }: { color: string }) {
-  return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-      style={{ alignItems: 'center' }}
-    >
-      <View style={{ width: 10, height: 15, borderRadius: 5, backgroundColor: color }} />
-      <View
-        style={{
-          width: 16,
-          height: 8,
-          marginTop: -4,
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8,
-          borderWidth: 2,
-          borderTopWidth: 0,
-          borderColor: color,
-        }}
-      />
-      <View style={{ width: 2, height: 3, backgroundColor: color }} />
     </View>
   );
 }

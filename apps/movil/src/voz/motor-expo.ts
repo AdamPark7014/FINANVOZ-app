@@ -1,5 +1,5 @@
 import { requireOptionalNativeModule } from 'expo';
-import type { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
+import type { ExpoSpeechRecognitionModule, SetCategoryOptions } from 'expo-speech-recognition';
 import type { CodigoErrorMotor, MotorDictado } from './motor';
 
 type ModuloNativo = typeof ExpoSpeechRecognitionModule;
@@ -16,6 +16,18 @@ function modulo(): ModuloNativo | null {
   }
   return cache;
 }
+
+/**
+ * Sesión de audio de iPhone mientras se dicta. La de omisión de expo-speech-recognition usa el modo
+ * `measurement`, que apaga el procesamiento de salida, y su `reset()` no la desactiva al terminar: la respuesta
+ * en voz salía muy baja. Con `default` (y la bocina por omisión) lo que se dice después se oye normal.
+ * Android lo ignora. Pendiente de probar en un iPhone real (TestFlight).
+ */
+export const CATEGORIA_AUDIO_IOS: Readonly<SetCategoryOptions> = {
+  category: 'playAndRecord',
+  categoryOptions: ['defaultToSpeaker', 'allowBluetooth'],
+  mode: 'default',
+};
 
 /** Reconocedor real sobre expo-speech-recognition. */
 export const motorExpo: MotorDictado = {
@@ -40,6 +52,7 @@ export const motorExpo: MotorDictado = {
       continuous: false,
       addsPunctuation: false,
       maxAlternatives: 1,
+      iosCategory: { ...CATEGORIA_AUDIO_IOS, categoryOptions: [...CATEGORIA_AUDIO_IOS.categoryOptions] },
     });
   },
   detener() {

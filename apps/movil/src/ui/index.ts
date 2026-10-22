@@ -16,8 +16,15 @@ export { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE, type OpcionChip } from './c
 export { Tarjeta, type TarjetaProps } from './componentes/Tarjeta';
 export { Cifra, type CifraProps } from './componentes/Cifra';
 export { Interruptor, type InterruptorProps } from './componentes/Interruptor';
-export { CampoTexto, type CampoTextoProps } from './componentes/CampoTexto';
+export {
+  CampoTexto,
+  PISTA_CERRAR_TECLADO,
+  TEXTO_CERRAR_TECLADO,
+  type CampoTextoProps,
+} from './componentes/CampoTexto';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
+export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
+export { anunciar, useAnunciar } from './anunciar';
 export { EstadoVacio } from './componentes/EstadoVacio';
 export { Barra, type BarraProps } from './componentes/Barra';
 export { Aviso, useAviso, type AccionAviso, type AvisoProps, type DatosAviso } from './componentes/Aviso';

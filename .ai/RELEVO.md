@@ -6,6 +6,12 @@
 
 ## Hecho en este turno
 
+- **Voz compartida y teclado de iPhone (V-B)**: `ProveedorDictado` único en `_layout.tsx` (un micrófono a la vez, ignora
+  el «abortado/fin» del anterior), `useMicrofono`, `BotonMicrofono` (ícono 48 dp o pastilla «Dímelo»), motor falso
+  compartido en `voz/__pruebas__`; `CampoMonto` con `dictable`/`admiteCero` (entendido, aproximado, $0, error, «Abrir
+  Ajustes» si niegan permiso); `Pantalla`/`CampoTexto`: `KeyboardAvoidingView` en pies fijos, scroll que sigue al
+  teclado, barra «Listo» sobre teclados numéricos; audio iOS `playAndRecord`+`defaultToSpeaker` y `decirEnVoz` con
+  sesión propia; `ui/anunciar.ts` para VoiceOver. jest ui+voz 81/81, vitest 25/25. **Sin probar en iPhone real.**
 - **Plus de prueba sin tienda (B-2a, decisión 1 del plan)**: `EXPO_PUBLIC_PLUS_SIN_TIENDA='1'` + sin tienda →
   `extra.plusSinTienda` (siempre booleano desde `app.config.ts`), `ProveedorPlan` lo marca en memoria (nada en la
   base), `suscripciones/build.ts` lo lee; pantalla Plan «Plus de prueba» sin tiendas, candado solo texto y `PuertaPlus`
