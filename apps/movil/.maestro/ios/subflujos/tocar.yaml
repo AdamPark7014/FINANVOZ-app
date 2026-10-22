@@ -1,0 +1,14 @@
+# Toca un elemento con el teclado cerrado para que nunca caiga sobre una tecla. Variables: ANCLA, ID.
+appId: com.finanvoz.app
+name: Subflujo · tocar sin teclado encima
+---
+- runFlow:
+    file: cerrar-teclado.yaml
+    env:
+      ANCLA: ${ANCLA}
+- scrollUntilVisible:
+    element:
+      id: ${ID}
+    timeout: 15000
+- tapOn:
+    id: ${ID}

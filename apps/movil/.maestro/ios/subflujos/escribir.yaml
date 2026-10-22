@@ -1,0 +1,11 @@
+# Toca un campo con el teclado cerrado y escribe (solo ASCII). Variables: ANCLA, CAMPO, TEXTO.
+appId: com.finanvoz.app
+name: Subflujo · escribir en un campo
+---
+- runFlow:
+    file: tocar.yaml
+    env:
+      ANCLA: ${ANCLA}
+      ID: ${CAMPO}
+- runFlow: intro-teclado.yaml
+- inputText: ${TEXTO}

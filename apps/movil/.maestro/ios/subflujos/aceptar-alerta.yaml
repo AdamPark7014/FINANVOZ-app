@@ -1,0 +1,10 @@
+# Acepta el aviso de permiso que pinta iOS. El texto se compara completo: «Permitir» no coincide con «No permitir».
+appId: com.finanvoz.app
+name: Subflujo · aceptar aviso del sistema
+---
+- extendedWaitUntil:
+    visible:
+      text: '(Permitir|Allow|OK)'
+    timeout: 10000
+- tapOn:
+    text: '(Permitir|Allow|OK)'

@@ -6,6 +6,11 @@
 
 ## Hecho en este turno
 
+- **Plan mega robusto** (`docs/PLAN-MEJORA-2026-10.md`): diagnóstico, Olas 1–7 y carril T con dueño por archivo, 6
+  decisiones de Adam. **Flujos Maestro de iPhone** (`apps/movil/.maestro/ios`: 01–08 + `subflujos/`, ids en vez de
+  textos, etiquetas `ios/recorrido/capturas/bug-conocido/voz`) y `ios-maestro.yml` (corre tras «iOS simulador» con el
+  artifact, simulador es-MX, excluye `bug-conocido,voz`). `apps/movil/.gitignore` ya no ignora `.maestro/ios/`.
+
 - **Constructores de Mac (iOS simulador) verificados** (corrida 39642147532): `ios.yml` compila `Finanvoz.app` sin
   firma en macOS 26; corrección de Sentry con pnpm (`SENTRY_CLI_EXECUTABLE`). Detalle en `docs/ESTADO.md` 21-10.
 - **Camino a tiendas con la cuenta de NEXARA (como ARTA):** `ios-testflight.yml` + `scripts/asc_signing.py` +
@@ -36,6 +41,13 @@
   quincena») sigue en la nube.
 
 ## A medias — CUIDADO
+
+- **Ocho agentes en vuelo el 22-10 (tarde), nada commiteado de ellos**: V-A (`packages/nlu` montos y pasos), V-B
+  (`src/voz`, `src/ui` teclado iOS), B-1 (`pantallas/principal`, movimientos), B-2a (plan, suscripciones,
+  `ios-testflight.yml`), B-2b (cuentas, ajustes, privacidad), B-3 (tarjetas, tandas, compartido), T-1
+  (`docs/tienda`, `scripts/tienda`, `apps/calculadora`, workflows nuevos de capturas), D-1
+  (`docs/diseno/mockups-asistente.html`). Si entras y hay archivos sin commitear en esas rutas, son suyos: `salvar`,
+  no pisar. El coordinador verifica (typecheck, lint, vitest, jest por carpeta, eval 100 %) y commitea por paquete.
 
 - Verificación final del 21-10: typecheck, lint, eval nivel 0 (128/128, 100 %), vitest 2460/2461 y jest 505/506 → las dos
   fallas eran `rendimiento.test.ts` (RNF-01, tiempos de E8 en Node: ~109 ms contra el umbral de 100 con Ollama y

@@ -3,3 +3,5 @@ android/
 ios/
 dist/
 web-build/
+# el ios/ de arriba es el proyecto nativo; los flujos de Maestro de iPhone sí van a git
+!/.maestro/ios/

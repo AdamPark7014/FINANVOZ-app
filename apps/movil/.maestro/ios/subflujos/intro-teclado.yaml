@@ -1,0 +1,14 @@
+# La primera vez que sale el teclado en un simulador nuevo, iOS muestra la presentación de «deslizar para escribir».
+# Maestro solo la cierra en inglés y dentro de hideKeyboard; aquí se cierra también en español.
+appId: com.finanvoz.app
+name: Subflujo · cerrar la presentación del teclado
+---
+- runFlow:
+    when:
+      visible:
+        text: '.*([Dd]esliz|sliding).*'
+    commands:
+      - tapOn:
+          text: '(Continuar|Continue)'
+          below:
+            text: '.*([Dd]esliz|sliding).*'

@@ -1,0 +1,144 @@
+appId: com.finanvoz.app
+name: iOS · 04 Cuentas
+tags:
+  - ios
+  - recorrido
+  - capturas
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- takeScreenshot: cuentas
+# «Contar mi efectivo» (en iOS la etiqueta es «Contar mi efectivo en Efectivo»)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: 'cuenta-.*-accion' } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-arqueo
+    timeout: 10000
+- takeScreenshot: arqueo
+- tapOn:
+    id: boton-cerrar-arqueo
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Agregar tarjeta
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-agregar-tarjeta } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-tarjeta-nueva
+    timeout: 10000
+- takeScreenshot: tarjeta-nueva
+- scrollUntilVisible:
+    element:
+      id: tarjeta-cancelar
+- tapOn:
+    id: tarjeta-cancelar
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Tandas
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-tandas } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-tandas
+    timeout: 10000
+- takeScreenshot: tandas
+- tapOn:
+    id: tandas-volver
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Gastos compartidos (sin servidor en esta build: debe decir por qué)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-compartidos } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-compartidos
+    timeout: 10000
+- takeScreenshot: compartidos
+- runFlow:
+    when:
+      visible:
+        id: compartidos-escanear
+    commands:
+      - tapOn:
+          id: compartidos-escanear
+      - runFlow:
+          {
+            file: subflujos/escribir.yaml,
+            env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
+          }
+      - runFlow:
+          { file: subflujos/tocar.yaml, env: { ANCLA: compartidos-titulo, ID: compartidos-abrir-escaner } }
+      - extendedWaitUntil:
+          visible:
+            id: escaner-qr
+          timeout: 10000
+      - takeScreenshot: compartidos-escaner
+      - tapOn:
+          id: escaner-cancelar
+- runFlow:
+    when:
+      visible:
+        id: compartidos-crear
+    commands:
+      - tapOn:
+          id: compartidos-crear
+      - runFlow:
+          {
+            file: subflujos/escribir.yaml,
+            env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
+          }
+      - runFlow:
+          { file: subflujos/tocar.yaml, env: { ANCLA: compartidos-titulo, ID: compartidos-crear-codigo } }
+      - extendedWaitUntil:
+          visible:
+            id: '(error-formulario|compartidos-qr)'
+          timeout: 20000
+      - takeScreenshot: compartidos-crear
+- tapOn:
+    id: compartidos-volver
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible:
+        id: pantalla-compartidos
+    commands:
+      - tapOn:
+          id: compartidos-volver
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Suscripciones
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-suscripciones } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-suscripciones
+    timeout: 10000
+- takeScreenshot: suscripciones
+- tapOn:
+    id: suscripciones-volver
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Deducciones (Gratis en iPhone: puerta de Plus)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-deducciones } }
+- extendedWaitUntil:
+    visible:
+      id: '(puerta-plus|pantalla-deducciones)'
+    timeout: 10000
+- takeScreenshot: deducciones
+- tapOn:
+    id: '(plan-volver|deducciones-volver)'
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000

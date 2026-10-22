@@ -1,0 +1,186 @@
+appId: com.finanvoz.app
+name: iOS · 03 Ajustes
+tags:
+  - ios
+  - recorrido
+  - capturas
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- tapOn:
+    id: boton-ajustes
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+- takeScreenshot: ajustes
+# Ingreso
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-cambiar-ingreso } }
+- extendedWaitUntil:
+    visible:
+      id: editar-ingreso
+    timeout: 10000
+- takeScreenshot: ajustes-ingreso
+- tapOn:
+    id: editar-ingreso-volver
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Colchón
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-cambiar-colchon } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-colchon-monto
+    timeout: 5000
+- takeScreenshot: ajustes-colchon
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-colchon-cancelar } }
+# Interruptores (el bloqueo no se toca: pediría Face ID)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-multitarea } }
+- tapOn:
+    id: ajustes-multitarea
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-voz-contestar } }
+- tapOn:
+    id: ajustes-voz-contestar
+# Avisos: «Permitir avisos» saca el aviso de iOS
+- scrollUntilVisible:
+    element:
+      id: ajustes-aviso-corte
+- takeScreenshot: ajustes-avisos
+- runFlow:
+    when:
+      visible:
+        id: ajustes-avisos-permitir
+    commands:
+      - tapOn:
+          id: ajustes-avisos-permitir
+      - runFlow: subflujos/aceptar-alerta.yaml
+      - extendedWaitUntil:
+          notVisible:
+            id: ajustes-avisos-permitir
+          timeout: 10000
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-guardar-horario } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-avisos-mensaje
+    timeout: 5000
+# Captura y widget: en iPhone no ofrecen nada
+- scrollUntilVisible:
+    element:
+      id: ajustes-captura-estado
+- assertNotVisible:
+    id: ajustes-captura-activar
+- assertNotVisible:
+    id: ajustes-widget
+- takeScreenshot: ajustes-captura-iphone
+# Respaldo → Restaurar → Volver
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-respaldo } }
+- extendedWaitUntil:
+    visible:
+      id: respaldo
+    timeout: 10000
+- takeScreenshot: respaldo
+- scrollUntilVisible:
+    element:
+      id: privacidad-respaldo-restaurar
+- tapOn:
+    id: privacidad-respaldo-restaurar
+- extendedWaitUntil:
+    visible:
+      id: restaurar
+    timeout: 10000
+- takeScreenshot: restaurar
+- tapOn:
+    id: restaurar-volver
+- extendedWaitUntil:
+    visible:
+      id: respaldo
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: respaldo-volver
+    direction: UP
+- tapOn:
+    id: respaldo-volver
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Datos de cobro
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: boton-editar-datos-cobro } }
+- extendedWaitUntil:
+    visible:
+      id: formulario-datos-cobro
+    timeout: 5000
+- takeScreenshot: ajustes-datos-cobro
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: boton-cancelar-datos-cobro } }
+# Plan
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-plan-ver } }
+- extendedWaitUntil:
+    visible:
+      id: pantalla-plan
+    timeout: 10000
+- assertVisible:
+    id: '(plan-solo-ios|plan-plus-de-prueba)'
+- takeScreenshot: plan
+- tapOn:
+    id: plan-volver
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Ayuda y Términos
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-ayuda } }
+- extendedWaitUntil:
+    visible:
+      id: ayuda
+    timeout: 10000
+- takeScreenshot: ayuda
+- tapOn:
+    id: ayuda-volver
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-terminos } }
+- extendedWaitUntil:
+    visible:
+      id: terminos
+    timeout: 10000
+- takeScreenshot: terminos
+- tapOn:
+    id: terminos-volver
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Privacidad y «Revisar permisos en tu teléfono» (sale a Ajustes de iOS; va al final)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-privacidad } }
+- extendedWaitUntil:
+    visible:
+      id: privacidad
+    timeout: 10000
+- takeScreenshot: privacidad
+- scrollUntilVisible:
+    element:
+      id: privacidad-ajustes-telefono
+- tapOn:
+    id: privacidad-ajustes-telefono
+- extendedWaitUntil:
+    notVisible:
+      id: privacidad-ajustes-telefono
+    timeout: 10000
+- takeScreenshot: ajustes-de-ios
+- openLink:
+    link: 'finanvoz://privacidad'
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: privacidad
+    timeout: 15000
+    optional: true

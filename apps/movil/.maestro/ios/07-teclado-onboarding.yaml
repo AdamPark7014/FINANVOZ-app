@@ -1,0 +1,50 @@
+# Toca «Continuar» del onboarding con el teclado numérico abierto. Fallaba en la 1.0.0 (3); con la Ola 1 debe pasar.
+appId: com.finanvoz.app
+name: iOS · 07 Teclado no tapa «Continuar» del onboarding
+tags:
+  - ios
+  - bug-conocido
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+      notifications: unset
+    arguments:
+      AppleLanguages: '(es-MX)'
+      AppleLocale: es_MX
+- extendedWaitUntil:
+    visible:
+      id: onb-bienvenida
+    timeout: 60000
+- tapOn:
+    id: onb-empezar
+- extendedWaitUntil:
+    visible:
+      id: onb-consentimiento
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: onb-casilla-datos
+- tapOn:
+    id: onb-casilla-datos
+- tapOn:
+    id: onb-aceptar
+- extendedWaitUntil:
+    visible:
+      id: onb-ingreso
+    timeout: 10000
+- tapOn:
+    id: onb-frecuencia-quincena
+- tapOn:
+    id: onb-ingreso-monto
+- runFlow: subflujos/intro-teclado.yaml
+- inputText: '13000'
+- takeScreenshot: ingreso-teclado-numerico
+- tapOn:
+    id: onb-ingreso-continuar
+- extendedWaitUntil:
+    visible:
+      id: onb-cuentas
+    timeout: 10000

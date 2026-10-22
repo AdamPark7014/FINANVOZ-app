@@ -1,0 +1,98 @@
+# Recién instalada → Hoy por el camino corto: quincena de $13,000, efectivo $600, sin pagos fijos, colchón sugerido.
+appId: com.finanvoz.app
+name: Subflujo · onboarding rápido
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true # la llave de SQLCipher vive en el llavero
+    permissions:
+      all: allow
+      notifications: unset # en español el aviso dice «Permitir»: Maestro solo toca «Allow»
+    arguments:
+      AppleLanguages: '(es-MX)'
+      AppleLocale: es_MX
+- extendedWaitUntil:
+    visible:
+      id: onb-bienvenida
+    timeout: 60000
+- takeScreenshot: o1-bienvenida
+- tapOn:
+    id: onb-empezar
+- extendedWaitUntil:
+    visible:
+      id: onb-consentimiento
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: onb-casilla-datos
+- tapOn:
+    id: onb-casilla-datos
+- takeScreenshot: o2-consentimiento
+- tapOn:
+    id: onb-aceptar
+- extendedWaitUntil:
+    visible:
+      id: onb-ingreso
+    timeout: 10000
+- tapOn:
+    id: onb-frecuencia-quincena
+- runFlow:
+    file: escribir.yaml
+    env: { ANCLA: onb-titulo-paso, CAMPO: onb-ingreso-monto, TEXTO: '13000' }
+- runFlow:
+    file: cerrar-teclado.yaml
+    env: { ANCLA: onb-titulo-paso }
+- takeScreenshot: o3-ingreso
+- tapOn:
+    id: onb-ingreso-continuar
+- extendedWaitUntil:
+    visible:
+      id: onb-cuentas
+    timeout: 10000
+- runFlow:
+    file: escribir.yaml
+    env: { ANCLA: onb-titulo-paso, CAMPO: onb-efectivo, TEXTO: '600' }
+- runFlow:
+    file: cerrar-teclado.yaml
+    env: { ANCLA: onb-titulo-paso }
+- takeScreenshot: o4-cuentas
+- tapOn:
+    id: onb-cuentas-continuar
+- extendedWaitUntil:
+    visible:
+      id: onb-pagos-fijos
+    timeout: 10000
+- takeScreenshot: o5-pagos-fijos
+- tapOn:
+    id: onb-pagos-continuar
+# O6 solo existe mientras el iPhone no lo salte (Ola 3)
+- extendedWaitUntil:
+    visible:
+      id: '(onb-captura-pronto|onb-colchon)'
+    timeout: 10000
+- runFlow:
+    when:
+      visible:
+        id: onb-captura-pronto
+    commands:
+      - takeScreenshot: o6-captura-iphone
+      - tapOn:
+          id: onb-captura-continuar
+- extendedWaitUntil:
+    visible:
+      id: onb-colchon
+    timeout: 10000
+- takeScreenshot: o7-colchon
+- tapOn:
+    id: onb-ver-mi-dia
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 15000
+- runFlow:
+    when:
+      visible:
+        id: boton-aviso-entendido
+    commands:
+      - tapOn:
+          id: boton-aviso-entendido

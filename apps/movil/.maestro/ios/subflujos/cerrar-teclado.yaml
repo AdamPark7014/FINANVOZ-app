@@ -1,0 +1,13 @@
+# Cierra el teclado de iOS tocando un elemento fijo de arriba (título o fecha; nunca un campo ni un botón).
+# hideKeyboard de Maestro en iOS solo desliza en el centro y no cierra nada aquí; un toque dentro del ScrollView sí
+# (keyboardShouldPersistTaps="handled"). Variables: ANCLA.
+appId: com.finanvoz.app
+name: Subflujo · cerrar el teclado
+---
+- scrollUntilVisible:
+    element:
+      id: ${ANCLA}
+    direction: UP
+    timeout: 10000
+- tapOn:
+    id: ${ANCLA}

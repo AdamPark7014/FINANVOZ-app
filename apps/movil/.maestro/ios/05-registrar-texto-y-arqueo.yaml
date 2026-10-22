@@ -1,0 +1,53 @@
+# CA-M2-02 en iPhone: «coca 25 en efectivo» por texto, movimiento, saldo $575, arqueo exacto y «Deshacer».
+appId: com.finanvoz.app
+name: iOS · 05 Registrar por texto y arqueo
+tags:
+  - ios
+  - recorrido
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+# El campo ya tiene el foco: se escribe sin tocarlo y se cierra el teclado con la fecha
+- tapOn:
+    id: boton-escribir
+- extendedWaitUntil:
+    visible:
+      id: campo-registrar
+    timeout: 5000
+- runFlow: subflujos/intro-teclado.yaml
+- inputText: 'coca 25 en efectivo'
+- runFlow:
+    file: subflujos/cerrar-teclado.yaml
+    env: { ANCLA: hoy-fecha }
+- tapOn:
+    id: boton-enviar-registro
+- extendedWaitUntil:
+    visible:
+      id: aviso
+    timeout: 10000
+- takeScreenshot: hoy-registrado
+# Movimientos: la fila abre su detalle
+- tapOn:
+    id: pestana-movimientos
+- extendedWaitUntil:
+    visible:
+      id: 'movimiento-fila-.*'
+    timeout: 10000
+- takeScreenshot: movimientos
+- tapOn:
+    id: 'movimiento-fila-.*'
+- extendedWaitUntil:
+    visible:
+      id: 'detalle-.*'
+    timeout: 5000
+- takeScreenshot: movimiento-detalle
+# Cuentas: $600 − $25 = $575 (VoiceOver lo lee en palabras)
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: seccion-tienes
+    timeout: 10000
+- assertVisible:
+    id: 'cuenta-.*-saldo'
+    text: '.*(\$575|quinientos setenta y cinco pesos).*'
+- takeScreenshot: cuentas-575

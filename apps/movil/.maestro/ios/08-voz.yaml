@@ -1,0 +1,21 @@
+# El botón de voz responde: escucha o explica por qué no. No bloquea: el simulador del runner no tiene micrófono real.
+appId: com.finanvoz.app
+name: iOS · 08 El botón de voz responde
+tags:
+  - ios
+  - voz
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- tapOn:
+    id: boton-hablar
+- runFlow:
+    when:
+      visible:
+        text: '(Permitir|Allow|OK)'
+    file: subflujos/aceptar-alerta.yaml
+- runFlow:
+    when:
+      visible:
+        text: '(Permitir|Allow|OK)'
+    file: subflujos/aceptar-alerta.yaml
+- takeScreenshot: hoy-voz

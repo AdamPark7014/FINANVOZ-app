@@ -1,0 +1,265 @@
+# CA-M2-01 / CA-M14-03 · Onboarding O1–O7 completo en iPhone (versión iOS de ../onboarding.yaml): BBVA, tarjeta Oro
+# con meses «No sé», renta, permiso de avisos del sistema y cada botón del detalle de la tarjeta.
+appId: com.finanvoz.app
+name: iOS · 01 Onboarding completo y tarjeta
+tags:
+  - ios
+  - recorrido
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+      notifications: unset
+    arguments:
+      AppleLanguages: '(es-MX)'
+      AppleLocale: es_MX
+- extendedWaitUntil:
+    visible:
+      id: onb-bienvenida
+    timeout: 60000
+- takeScreenshot: o1-bienvenida
+- tapOn:
+    id: onb-empezar
+# O2 · sin la casilla obligatoria no avanza
+- extendedWaitUntil:
+    visible:
+      id: onb-consentimiento
+    timeout: 10000
+- tapOn:
+    id: onb-aceptar
+- assertVisible:
+    id: onb-consentimiento
+- scrollUntilVisible:
+    element:
+      id: onb-casilla-datos
+- tapOn:
+    id: onb-casilla-datos
+- takeScreenshot: o2-consentimiento
+- tapOn:
+    id: onb-aceptar
+# O3
+- extendedWaitUntil:
+    visible:
+      id: onb-ingreso
+    timeout: 10000
+- tapOn:
+    id: onb-frecuencia-quincena
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: onb-ingreso-monto, TEXTO: '13000' },
+    }
+- runFlow: { file: subflujos/cerrar-teclado.yaml, env: { ANCLA: onb-titulo-paso } }
+- scrollUntilVisible:
+    element:
+      id: onb-proximo-pago
+- takeScreenshot: o3-ingreso
+- tapOn:
+    id: onb-ingreso-continuar
+# O4 · efectivo, BBVA y tarjeta Oro
+- extendedWaitUntil:
+    visible:
+      id: onb-cuentas
+    timeout: 10000
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: onb-efectivo, TEXTO: '600' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-agregar-cuenta } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-cuenta-tipo-debito } }
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: onb-cuenta-nombre, TEXTO: 'BBVA' },
+    }
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: onb-cuenta-saldo, TEXTO: '4200' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-cuenta-agregar } }
+- assertVisible: 'BBVA'
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-agregar-tarjeta } }
+- extendedWaitUntil:
+    visible:
+      id: onb-tarjeta
+    timeout: 10000
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-nombre, TEXTO: 'Oro' } }
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-ultimos4, TEXTO: '8812' } }
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-corte, TEXTO: '28' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: tarjeta-modo-limite-dias } }
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-limite-pago, TEXTO: '20' },
+    }
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-limite-credito, TEXTO: '30000' },
+    }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: tarjeta-completa-si } }
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-saldo, TEXTO: '8000' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: tarjeta-msi-si } }
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-msi-mensualidad-0, TEXTO: '500' },
+    }
+- runFlow:
+    {
+      file: subflujos/escribir.yaml,
+      env: { ANCLA: onb-titulo-paso, CAMPO: tarjeta-msi-restantes-0, TEXTO: '6' },
+    }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: tarjeta-incluye-no_se } }
+- scrollUntilVisible:
+    element:
+      id: tarjeta-no-se-ayuda
+- takeScreenshot: o4-tarjeta
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: tarjeta-guardar } }
+- extendedWaitUntil:
+    visible:
+      id: onb-cuentas
+    timeout: 10000
+- assertVisible: 'Oro'
+- takeScreenshot: o4-cuentas-lista
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-cuentas-continuar } }
+# O5 · renta $4,500 el día 1
+- extendedWaitUntil:
+    visible:
+      id: onb-pagos-fijos
+    timeout: 10000
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-pago-renta } }
+- runFlow: { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: onb-pago-dia, TEXTO: '1' } }
+- runFlow:
+    { file: subflujos/escribir.yaml, env: { ANCLA: onb-titulo-paso, CAMPO: onb-pago-monto, TEXTO: '4500' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-pago-agregar } }
+- extendedWaitUntil:
+    visible:
+      id: onb-pagos-lista
+    timeout: 5000
+- takeScreenshot: o5-pagos
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: onb-titulo-paso, ID: onb-pagos-continuar } }
+# O6 · iPhone sin captura (se salta solo cuando Ola 3 lo quite)
+- extendedWaitUntil:
+    visible:
+      id: '(onb-captura-pronto|onb-colchon)'
+    timeout: 10000
+- runFlow:
+    when:
+      visible:
+        id: onb-captura-pronto
+    commands:
+      - assertVisible: 'No disponible en este teléfono.*'
+      - takeScreenshot: o6-captura-iphone
+      - tapOn:
+          id: onb-captura-continuar
+# O7 · colchón sugerido $1,300 (la ayuda está oculta en iOS; se lee el valor del campo)
+- extendedWaitUntil:
+    visible:
+      id: onb-colchon
+    timeout: 10000
+- assertVisible:
+    id: onb-colchon-monto
+    text: '1,300(\.00)?'
+- takeScreenshot: o7-colchon
+- tapOn:
+    id: onb-ver-mi-dia
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 15000
+- runFlow:
+    when:
+      visible:
+        id: boton-aviso-entendido
+    commands:
+      - tapOn:
+          id: boton-aviso-entendido
+- takeScreenshot: hoy
+# Permiso de avisos de iOS desde la invitación (hay tarjeta)
+- scrollUntilVisible:
+    element:
+      id: invitacion-avisos-si
+- tapOn:
+    id: invitacion-avisos-si
+- runFlow: subflujos/aceptar-alerta.yaml
+- assertNotVisible:
+    text: '(Permitir|Allow)'
+- takeScreenshot: hoy-avisos-permitidos
+# Detalle de la tarjeta Oro: cada botón abre su panel y «Cancelar» lo cierra
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: 'cuenta-[0-9a-f-]{36}'
+      childOf:
+        id: seccion-debes-lista
+- tapOn:
+    id: 'cuenta-[0-9a-f-]{36}'
+    childOf:
+      id: seccion-debes-lista
+- extendedWaitUntil:
+    visible:
+      id: pantalla-tarjeta
+    timeout: 10000
+- assertVisible:
+    id: tarjeta-nombre
+    text: 'Oro'
+- assertNotVisible:
+    id: tarjeta-leer-pdf # iPhone: el PDF solo existe en Android
+- takeScreenshot: tarjeta-oro
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: tarjeta-pagar } }
+- extendedWaitUntil:
+    visible:
+      id: pagar
+    timeout: 5000
+- takeScreenshot: tarjeta-pagar
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: pagar-cancelar } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: tarjeta-editar } }
+- extendedWaitUntil:
+    visible:
+      id: editar-tarjeta
+    timeout: 5000
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: editar-cancelar } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: tarjeta-corregir } }
+- extendedWaitUntil:
+    visible:
+      id: corregir-saldo
+    timeout: 5000
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: corregir-cancelar } }
+- scrollUntilVisible:
+    element:
+      id: tarjeta-movimientos
+- runFlow:
+    when:
+      visible:
+        id: candado-compromiso-12-meses
+    commands:
+      - tapOn:
+          id: candado-compromiso-12-meses
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-plan
+          timeout: 10000
+      - tapOn:
+          id: plan-volver
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-tarjeta
+          timeout: 10000
+- scrollUntilVisible:
+    element:
+      id: tarjeta-volver
+    direction: UP
+- tapOn:
+    id: tarjeta-volver
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000

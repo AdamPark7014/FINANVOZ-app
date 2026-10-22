@@ -1,0 +1,24 @@
+# Toca «Registrar» SIN cerrar el teclado, como lo haría Adam. Fallaba en la 1.0.0 (3) porque el toque caía en el
+# teclado; con el arreglo de teclado de la Ola 1 debe pasar. Cuando pase en verde, quitar la etiqueta bug-conocido.
+appId: com.finanvoz.app
+name: iOS · 06 Teclado no tapa «Registrar» en Hoy
+tags:
+  - ios
+  - bug-conocido
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- tapOn:
+    id: boton-escribir
+- extendedWaitUntil:
+    visible:
+      id: campo-registrar
+    timeout: 5000
+- runFlow: subflujos/intro-teclado.yaml
+- inputText: 'coca 25 en efectivo'
+- takeScreenshot: hoy-teclado-abierto
+- tapOn:
+    id: boton-enviar-registro
+- extendedWaitUntil:
+    visible:
+      id: aviso
+    timeout: 10000

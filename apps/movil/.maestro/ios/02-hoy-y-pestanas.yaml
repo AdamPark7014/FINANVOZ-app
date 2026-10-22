@@ -1,0 +1,124 @@
+# Hoy y las pestañas en iPhone: desglose, candados de Plus, «¿Me alcanza?», Escribir, Registrar y cada pestaña.
+# Falla si un botón no lleva a ningún lado (cada toque espera la pantalla destino).
+appId: com.finanvoz.app
+name: iOS · 02 Hoy y pestañas
+tags:
+  - ios
+  - recorrido
+  - capturas
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- takeScreenshot: hoy
+# Desglose abre y cierra
+- tapOn:
+    id: boton-desglose
+- extendedWaitUntil:
+    visible:
+      id: desglose
+    timeout: 5000
+- takeScreenshot: hoy-desglose
+- tapOn:
+    id: boton-desglose
+- extendedWaitUntil:
+    notVisible:
+      id: desglose
+    timeout: 5000
+# Candado de probabilidad → Plan (solo si la build es Gratis)
+- runFlow:
+    when:
+      visible:
+        id: candado-probabilidad
+    commands:
+      - tapOn:
+          id: candado-probabilidad
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-plan
+          timeout: 10000
+      - takeScreenshot: plan-iphone
+      - tapOn:
+          id: plan-volver
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-hoy
+          timeout: 10000
+# ¿Me alcanza? → puerta de Plus o pantalla
+- scrollUntilVisible:
+    element:
+      id: boton-me-alcanza
+- tapOn:
+    id: boton-me-alcanza
+- extendedWaitUntil:
+    visible:
+      id: '(puerta-plus|pantalla-me-alcanza)'
+    timeout: 10000
+- takeScreenshot: me-alcanza
+- runFlow:
+    when:
+      visible:
+        id: puerta-plus-conocer
+    commands:
+      - tapOn:
+          id: puerta-plus-conocer
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-plan
+          timeout: 10000
+      - tapOn:
+          id: plan-volver
+      - extendedWaitUntil:
+          visible:
+            id: puerta-plus
+          timeout: 10000
+- tapOn:
+    id: '(plan-volver|boton-cerrar-me-alcanza)'
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 10000
+# Escribir y «Registrar con formulario»
+- tapOn:
+    id: boton-escribir
+- extendedWaitUntil:
+    visible:
+      id: campo-registrar
+    timeout: 5000
+- takeScreenshot: hoy-escribir-con-teclado
+- runFlow:
+    file: subflujos/cerrar-teclado.yaml
+    env: { ANCLA: hoy-fecha }
+- takeScreenshot: hoy-escribir-sin-teclado
+- tapOn:
+    id: boton-formulario
+- extendedWaitUntil:
+    visible:
+      id: pantalla-registrar
+    timeout: 10000
+- takeScreenshot: registrar
+- tapOn:
+    id: boton-cerrar-registrar
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 10000
+# Pestañas
+- tapOn:
+    id: pestana-movimientos
+- extendedWaitUntil:
+    visible:
+      id: pantalla-movimientos
+    timeout: 10000
+- takeScreenshot: movimientos-vacio
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- takeScreenshot: cuentas
+- tapOn:
+    id: pestana-hoy
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 10000
