@@ -5,12 +5,11 @@ GitHub Actions (`.github/workflows/ios-testflight.yml`), copiado del esquema de 
 Lee primero las reglas del texto y la tabla de privacidad de [`README.md`](README.md) y `docs/08-CUMPLIMIENTO.md`
 §1, §3 y §4. Los textos que se pegan en la consola están en [`ios/`](ios/) y los mide `apps/movil/src/tienda.test.ts`.
 
-**Estado al 21-10-2026.** En App Store Connect no hay nada todavía: la app no está creada (§2), los secretos no
-están cargados (§3) y no hay ninguna build (§4). En el repositorio ya está todo lo que no depende de Adam: el
-flujo «iOS · TestFlight», `scripts/asc_signing.py`, `scripts/subir-secretos-ios.ps1`, `app.json` con
-`ios.bundleIdentifier com.finanvoz.app`, `appleTeamId AHNW9K8745`, `supportsTablet false`, `buildNumber 1`,
-el ícono de App Store sin canal alfa (`apps/movil/assets/icono-ios.png`) y los cinco textos de `ios/`. Lo que
-falta, y de quién es, está en §8.
+**Estado al 22-10-2026.** La app existe en App Store Connect (Apple ID 6825850016), los secretos están cargados
+(§3), la build 1.0.0 (4) está procesada en TestFlight (§4) y la ficha de la versión 1.0.0 ya está capturada por API
+(§5 y §7: textos, categorías, clasificación por edad, URL del aviso y de soporte) con `scripts/tienda/asc-ficha.py`.
+Falta el lote de capturas de iPhone (el pipeline está, §7), la etiqueta de privacidad y la disponibilidad por país en
+la consola, y el envío a revisión. Quién hace cada cosa: §8.
 
 ## 0. Qué lleva la build de tienda (1.0.0)
 
@@ -62,7 +61,7 @@ La app de NEXARA (`6814597698`) y la de ARTA (`6819117925`) viven en el mismo eq
 **Cargados el 22-10-2026.** Para repetirlo:
 
 ```powershell
-pwsh -File scripts\subir-secretos-ios.ps1 -IssuerId fe0d58b2-b9ab-4d7c-aecb-e8cbe30af200
+pwsh -File scripts\subir-secretos-ios.ps1 -IssuerId (Get-Content C:\dev\secrets\arta-ios\issuer-id.txt)
 ```
 
 Reusa el certificado de distribución del equipo (vence el 5-10-2027) y la llave de App Store Connect
@@ -113,7 +112,7 @@ aparece en App Store Connect → TestFlight unos 15 min después de «Subida ent
 | Categoría principal | Finanzas |
 | Categoría secundaria | Productividad |
 | Derechos de contenido | No contiene contenido de terceros |
-| URL del aviso de privacidad | **Pendiente**: `finanvoz.com/aviso-privacidad` (dominio y página son de la sentada 1 de `docs/LANZAMIENTO.md`; el texto es el de `src/pantallas/onboarding/aviso.ts`, sujeto a la revisión legal del pendiente 26). Sin ella no se puede enviar a revisión ni abrir la prueba externa; la prueba interna no la necesita |
+| URL del aviso de privacidad | **Capturada por API**: `https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html` (GitHub Pages del repositorio público, publicada por «Publicar calculadora»; texto de `apps/calculadora/src/aviso-app.ts`, el mismo de `src/pantallas/onboarding/aviso.ts`). Provisional hasta `finanvoz.com/aviso-privacidad` (sentada 1 de `docs/LANZAMIENTO.md`): cambiarla es volver a correr `asc-ficha.py --aviso-url …`. La revisión legal (pendiente 26) sigue pendiente y no la bloquea |
 | Copyright | `2026 NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V.` |
 | Precio | Gratis (país base México) |
 | Disponibilidad | Decisión de Adam: la app está en español de México y modela quincena, MSI y bancos mexicanos. Propuesta: solo México en la 1.0.0; abrir más países es un cambio de ficha, no de código |
@@ -165,19 +164,19 @@ aplica las mismas reglas que a los de Play (sin exclamaciones, emojis ni precios
 | Descripción | `ios/descripcion.txt` | 4,000 | Parte de `descripcion-completa.txt` de Play, sin captura automática, widget, Plus ni proveedor de IA, y con «iPhone», Face ID y la respuesta en voz |
 | Palabras clave | `ios/palabras-clave.txt` | 100 | Separadas por coma sin espacios; sin el nombre ni la categoría (Apple ya los indexa) |
 | Novedades | — | 4,000 | Apple no lo exige en la primera versión. No reutilizar `notas-version-1.0.0.txt` de Play: menciona captura automática, widget y Plus |
-| URL de soporte | — | obligatoria | **Pendiente**: página en `finanvoz.com` (sentada 1). Mientras no exista, la versión no se puede enviar a revisión. Dentro de la app, Ajustes › Ayuda ya tiene las 10 preguntas y `gerencia@nexara.com.mx` |
+| URL de soporte | — | obligatoria | **Capturada por API**: `https://adampark7014.github.io/FINANVOZ-app/soporte.html` (las 10 preguntas de Ajustes › Ayuda, copiadas de `apps/movil/src/pantallas/ayuda/textos.ts` con sus variantes de iPhone, y `gerencia@nexara.com.mx`). Provisional hasta `finanvoz.com` |
 | URL de marketing | — | opcional | `finanvoz.com` cuando exista; no inventar otra |
 | Aviso de privacidad | — | obligatoria | Ver §5 |
 
 **Capturas**: solo iPhone, porque la app es solo iPhone. Obligatorias las de **6.9" (1320×2868)**; Apple las
-escala a los tamaños menores. **Deben ser de iPhone**: NEXARA fue rechazada por subir capturas de Android, y las
-de `capturas.md` (1080×1920) son de Android y no sirven aquí. No hay flujo de capturas (`ios-screenshots.yml`
-con UITests como en NEXARA) y los escenarios semilla de `fixtures/escenarios` solo existen en builds de
-desarrollo (`__DEV__`), no en la de TestFlight. Opciones, a decidir con Adam: (a) Mac con simulador iPhone 16
-Pro Max y build de desarrollo (`expo run:ios`, escenario `e4-01` con `pnpm --filter movil semilla e4-01`), o
-(b) iPhone físico con la build de TestFlight y datos capturados a mano siguiendo `capturas.md` (Hoy con el
-desglose, registrar por voz, arqueo, tarjeta con meses, privacidad, tema oscuro; sin las de captura automática
-ni «¿Me alcanza?», que no están en esta build). Sin marcos ni texto encima que prometa resultados.
+escala a los tamaños menores. **Deben ser de iPhone**: NEXARA fue rechazada por subir capturas de Android. El
+pipeline está en [`capturas.md`](capturas.md): el flujo **«iOS · Capturas de tienda»** (`ios-capturas.yml`) toma el
+`Finanvoz.app` de «iOS simulador», lo corre con Maestro en un iPhone 16 Pro Max en es-MX (claro y oscuro) y deja los
+PNG crudos y los enmarcados (`scripts/tienda/enmarcar.py`, titulares cortos, degradado de marca); el lote final se
+copia a `docs/tienda/capturas/ios-6.9/` y `py -3 scripts/tienda/asc-ficha.py` lo sube al set `APP_IPHONE_67` (el
+que Apple usa para 6.7" y 6.9"; probado: una imagen de 1320×2868 llega a `COMPLETE`). Las pantallas: Hoy con el
+desglose, el movimiento registrado, arqueo, la tarjeta Oro, privacidad y Hoy en oscuro; sin captura automática ni
+«¿Me alcanza?», que no están en esta build. Sin marcos de teléfono ni texto que prometa resultados.
 
 **Información para la revisión**: «Se requiere iniciar sesión: **No**» (no hay cuenta). Contacto: Adam, los
 mismos datos que NEXARA y ARTA en App Store Connect. Adjuntos: ninguno (Finanvoz es marca propia de NEXARA;
@@ -192,12 +191,12 @@ precio, periodo, prueba y forma de cancelar visibles antes de comprar).
 | # | Qué | Quién | Bloquea |
 | --- | --- | --- | --- |
 | 1 | ~~Crear la app en App Store Connect (§2)~~ **Hecha el 22-10-2026** con la cuenta NEXARA (Claude in Chrome, con el sí de Adam): App ID `com.finanvoz.app` registrado en Certificates, Identifiers & Profiles (equipo AHNW9K8745, Push Notifications activo) y app «Finanvoz» creada (Apple ID **6825850016**, iOS, Español (México), SKU `FINANVOZ-IOS`, acceso ilimitado). Falta llenar §5–§7 en la consola | — | — |
-| 2 | Cargar los secretos con `scripts\subir-secretos-ios.ps1` (§3); confirmar que la llave de ASC tiene rol Admin | Adam (con `gh`) | §4 |
-| 3 | Primera corrida de «iOS · TestFlight» con `upload` marcado y prueba interna en un iPhone del equipo | Adam lanza; Claude revisa la corrida | Capturas, prueba externa |
-| 4 | Dominio `finanvoz.com` y páginas públicas: aviso de privacidad y soporte (sentada 1 de `LANZAMIENTO.md`, pendientes 12 y 26); revisión legal del aviso (pendientes 4, 26 y 103) | Adam + abogado | Prueba externa, envío a revisión y ficha pública. **No** bloquea la prueba interna |
-| 5 | Capturas de iPhone 6.9" (§7) | Adam (+ Claude por Remote Control si hay Mac) | Envío a revisión |
-| 6 | Información de la app, clasificación por edad, etiqueta de privacidad y textos de `ios/` capturados en la consola (§5–§7) | Adam | Envío a revisión |
-| 7 | Disponibilidad por país (§5) | Adam | Envío a revisión |
+| 2 | ~~Cargar los secretos con `scripts\subir-secretos-ios.ps1` (§3)~~ **Hecho el 22-10-2026** (la llave «GitHub Actions ARTA», rol Gestor de apps, alcanza para perfiles, TestFlight y la ficha) | — | — |
+| 3 | ~~Primera corrida de «iOS · TestFlight»~~ **Hecha**: builds 1.0.0 (3) y (4) válidas en TestFlight (§4). Falta agregar a Adam como tester en la consola | Claude (consola, con el sí de Adam) | Prueba interna |
+| 4 | Páginas públicas: **aviso y soporte publicados en GitHub Pages** (`https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html`, `…/soporte.html`; flujo «Publicar calculadora», `destino: github-pages`) y ya capturados en la ficha por API. Siguen pendientes el dominio `finanvoz.com` (sentada 1; al tenerlo, `asc-ficha.py --aviso-url … --soporte-url …`) y la revisión legal del aviso (pendientes 4, 26 y 103) | Dominio y abogado: Adam | La revisión legal no bloquea técnicamente el envío; es decisión de Adam enviar sin ella |
+| 5 | Capturas de iPhone 6.9" (§7): pipeline listo (`ios-capturas.yml` + `enmarcar.py` + `asc-ficha.py`). Falta correr el flujo cuando la UI quede quieta, copiar el lote a `docs/tienda/capturas/ios-6.9/` y correr `asc-ficha.py` | Claude Code (coordinador) | Envío a revisión |
+| 6 | ~~Información de la app, clasificación por edad y textos de `ios/` en la consola~~ **Hecho por API el 22-10-2026** (`scripts/tienda/asc-ficha.py`): versión `1.0` renombrada a **1.0.0** (`ad0a51af-823d-44e3-8adc-8072f1f7c1bc`), appInfo `3fda318f-…` con Finanzas / Productividad, localización es-MX de la app `687e24a3-…` (nombre, subtítulo, URL del aviso), clasificación por edad todo NONE/false (4+), localización es-MX de la versión `524ada1e-…` (descripción, palabras clave, texto promocional, URL de soporte, sin URL de marketing ni novedades), set de capturas `APP_IPHONE_67` `9ef5e0b6-…` vacío. **Falta en la consola**: la etiqueta de privacidad (§6, «no recopila datos»), el copyright `2026 NEW ENGINEERING EXPERTISE AND RESOURCE ADVANCEMENT S.A. DE C.V.` si no lo tomó de la cuenta, elegir la build (o `asc-ficha.py --build 4`) y la información de contacto para la revisión | Claude (consola, con el sí de Adam) | Envío a revisión |
+| 7 | Disponibilidad por país (§5): propuesta solo México | Adam decide; Claude lo marca en la consola | Envío a revisión |
 | 8 | Ajustes → Plan en iPhone: la pantalla describe Plus y sus textos hablan de Google Play («Administrar en Google Play» (**resuelto el 21-10**: en iOS la pantalla Plan ya no ofrece compras ni nombra tiendas), «Restaurar compras»). Antes de enviar a revisión, decidir si se oculta en iOS o se cambian los textos (2.3.10 y 2.1); no es cambio de ficha, es de código | Adam decide; Claude Code | Envío a revisión |
 | 9 | Cuando se activen Sentry, PostHog, nube, RevenueCat o respaldo en la nube: etiqueta (§6), descripción, notas y `tienda.test.ts` en el mismo commit | Claude Code + Adam | Cada activación |
 | 10 | Marca «Finanvoz» en IMPI y en las tiendas (pendiente 5) | Adam | Riesgo de 5.2.1 si otro la tiene |

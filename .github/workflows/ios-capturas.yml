@@ -1,0 +1,208 @@
+name: iOS · Capturas de tienda
+
+# Capturas de iPhone 6.9" (1320 × 2868) para App Store Connect, con Maestro sobre el mismo Finanvoz.app (Release,
+# sin firma) que compila «iOS simulador» (ios.yml): no compila, baja su artefacto. Simulador iPhone 16 Pro Max en
+# es-MX, tema claro y después oscuro; corre los flujos de apps/movil/.maestro/ios con la etiqueta `capturas` (y los
+# del recorrido, que dejan la tarjeta Oro y el movimiento registrado). Sube los PNG crudos (`maestro-capturas`) y los
+# enmarcados con scripts/tienda/enmarcar.py (`capturas-enmarcadas-ios`); el lote final se copia a
+# docs/tienda/capturas/ios-6.9 y lo sube scripts/tienda/asc-ficha.py. Sin secretos. Montaje del simulador copiado
+# de ios-maestro.yml.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Corrida de «iOS simulador» cuyo .app se usa (vacío = la última verde de main)'
+        required: false
+        default: ''
+      etiquetas:
+        description: 'Etiquetas de Maestro para el lote claro (coma)'
+        required: false
+        default: 'capturas,recorrido'
+      oscuro:
+        description: 'Repetir los flujos `capturas` en modo oscuro'
+        type: boolean
+        default: true
+
+concurrency:
+  group: ios-capturas-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read # bajar el artefacto de otra corrida y listar corridas
+
+jobs:
+  capturas:
+    name: Capturas en iPhone 16 Pro Max
+    runs-on: macos-latest
+    timeout-minutes: 75
+    env:
+      APP_ID: com.finanvoz.app
+      MAESTRO_VERSION: '2.11.0'
+      MAESTRO_CLI_NO_ANALYTICS: '1'
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
+      FLUJOS: ${{ github.workspace }}/apps/movil/.maestro
+      SALIDA: ${{ github.workspace }}/maestro-capturas
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Elegir el .app
+        id: origen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_PEDIDO: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          RUN="${RUN_PEDIDO:-}"
+          if [ -z "$RUN" ]; then
+            RUN="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow ios.yml --branch main --status success \
+                   --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+          fi
+          [ -n "$RUN" ] || { echo "::error::No hay corrida verde de «iOS simulador» en main: córrela primero."; exit 1; }
+          echo "Uso el .app de https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN"
+          echo "run_id=$RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Bajar Finanvoz.app
+        uses: actions/download-artifact@v4
+        with:
+          name: finanvoz-ios-simulador
+          run-id: ${{ steps.origen.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/app
+
+      - name: Descomprimir y revisar el .app
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/app"
+          ditto -x -k finanvoz-ios-simulador.zip .
+          APP="$RUNNER_TEMP/app/Finanvoz.app"
+          PL="$APP/Info.plist"
+          [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$PL")" = "$APP_ID" ]
+          echo "Versión $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PL") ($(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PL"))"
+          echo "APP_PATH=$APP" >> "$GITHUB_ENV"
+
+      - name: Xcode estable más nueva de la imagen
+        run: |
+          set -euo pipefail
+          for X in $(ls -d /Applications/Xcode_*.app | sort -V -r); do
+            case "$X" in *[Bb]eta*) continue ;; esac
+            sudo xcode-select -s "$X"; break
+          done
+          xcodebuild -version
+          xcrun simctl list runtimes available
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Maestro
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
+
+      - name: Hora de México (el simulador usa la del Mac)
+        run: sudo systemsetup -settimezone America/Mexico_City
+
+      - name: Crear el iPhone 16 Pro Max en español y arrancarlo
+        run: |
+          set -euo pipefail
+          defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
+          RUNTIMES="$(xcrun simctl list runtimes available -j)"
+          RUNTIME="$(jq -r '[.runtimes[] | select(.platform == "iOS")]
+                            | sort_by(.version | split(".") | map(tonumber)) | last | .identifier // empty' <<<"$RUNTIMES")"
+          # 6.9": iPhone 16 Pro Max (1320 × 2868); si la imagen ya no lo trae, el 17 Pro Max mide lo mismo.
+          TIPO="$(jq -r --arg r "$RUNTIME" '
+                   [.runtimes[] | select(.identifier == $r) | .supportedDeviceTypes[]] as $t
+                   | ([$t[] | select(.name == "iPhone 16 Pro Max")] + [$t[] | select(.name == "iPhone 17 Pro Max")]
+                      + [$t[] | select(.name | test("Pro Max$"))]) | first | .identifier // empty' <<<"$RUNTIMES")"
+          [ -n "$RUNTIME" ] && [ -n "$TIPO" ] || { echo "::error::No encontré runtime o un iPhone Pro Max"; exit 1; }
+          echo "Runtime $RUNTIME · modelo $TIPO"
+          UDID="$(xcrun simctl create "Finanvoz capturas" "$TIPO" "$RUNTIME")"
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl spawn "$UDID" defaults write -g AppleLanguages -array es-MX es
+          xcrun simctl spawn "$UDID" defaults write -g AppleLocale -string es_MX
+          xcrun simctl spawn "$UDID" defaults write com.apple.Preferences KeyboardAutocorrection -bool false || true
+          xcrun simctl spawn "$UDID" defaults write com.apple.Preferences KeyboardPrediction -bool false || true
+          xcrun simctl shutdown "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          # Barra de estado de `docs/tienda/capturas.md`: 10:00, batería y señal llenas.
+          xcrun simctl status_bar "$UDID" override --time 10:00 --batteryState charged --batteryLevel 100 \
+            --cellularBars 4 --wifiBars 3 || true
+          xcrun simctl ui "$UDID" appearance light
+          xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/tamano.png"
+          python3 -c "import struct,sys; d=open(sys.argv[1],'rb').read(24); print('Pantalla', struct.unpack('>II', d[16:24]))" "$RUNNER_TEMP/tamano.png"
+
+      - name: Instalar la app y conceder el micrófono
+        run: |
+          set -euo pipefail
+          xcrun simctl install "$UDID" "$APP_PATH"
+          xcrun simctl privacy "$UDID" grant microphone "$APP_ID"
+          mkdir -p "$SALIDA/claro" "$SALIDA/oscuro"
+
+      - name: Lote claro
+        env:
+          ETIQUETAS: ${{ inputs.etiquetas || 'capturas,recorrido' }}
+        run: |
+          set -o pipefail
+          cd "$SALIDA/claro"
+          maestro --device "$UDID" test \
+            --include-tags "$ETIQUETAS" --exclude-tags "bug-conocido,voz" \
+            --format junit --output "$SALIDA/junit-claro.xml" \
+            --test-output-dir "$SALIDA/claro-fallos" --debug-output "$SALIDA/claro-registro" \
+            "$FLUJOS/ios" 2>&1 | tee "$SALIDA/maestro-claro.log"
+          ls -1 "$SALIDA/claro"/*.png
+
+      - name: Lote oscuro (no bloquea)
+        if: ${{ !cancelled() && inputs.oscuro }}
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          xcrun simctl ui "$UDID" appearance dark
+          cd "$SALIDA/oscuro"
+          maestro --device "$UDID" test --include-tags capturas --exclude-tags "bug-conocido,voz" \
+            --format junit --output "$SALIDA/junit-oscuro.xml" \
+            --test-output-dir "$SALIDA/oscuro-fallos" --debug-output "$SALIDA/oscuro-registro" \
+            "$FLUJOS/ios" 2>&1 | tee "$SALIDA/maestro-oscuro.log"
+          xcrun simctl ui "$UDID" appearance light
+          ls -1 "$SALIDA/oscuro"/*.png
+
+      - uses: actions/setup-python@v5
+        if: ${{ !cancelled() }}
+        with:
+          python-version: '3.12'
+
+      - name: Enmarcar para la tienda
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pillow
+          python3 scripts/tienda/enmarcar.py --plataforma ios-6.9 --entrada "$SALIDA" --salida "$GITHUB_WORKSPACE/capturas-enmarcadas-ios"
+          {
+            echo "## Capturas de iPhone 6.9\""
+            echo
+            echo "| Captura | Origen |"
+            echo "|---|---|"
+            for f in "$GITHUB_WORKSPACE"/capturas-enmarcadas-ios/*.png; do echo "| $(basename "$f") | enmarcada |"; done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Subir capturas crudas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-capturas
+          path: maestro-capturas
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Subir capturas enmarcadas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-enmarcadas-ios
+          path: capturas-enmarcadas-ios
+          retention-days: 30
+          if-no-files-found: warn

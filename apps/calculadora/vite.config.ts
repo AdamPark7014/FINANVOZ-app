@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         index: fileURLToPath(new URL('./index.html', import.meta.url)),
         aviso: fileURLToPath(new URL('./aviso-de-privacidad.html', import.meta.url)),
+        soporte: fileURLToPath(new URL('./soporte.html', import.meta.url)),
       },
     },
   },

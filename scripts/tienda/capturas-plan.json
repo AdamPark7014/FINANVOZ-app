@@ -1,0 +1,27 @@
+{
+  "_": "Orden y titulares de las capturas de tienda (es-MX, tuteo, sin exclamaciones ni promesas). `archivos`: nombres de takeScreenshot de los flujos Maestro, por prioridad (gana el primero que exista). `tema`: subcarpeta claro/oscuro de la salida del flujo. Lo lee scripts/tienda/enmarcar.py.",
+  "ios-6.9": {
+    "ancho": 1320,
+    "alto": 2868,
+    "capturas": [
+      { "nombre": "01-hoy", "archivos": ["hoy-desglose", "hoy"], "titulo": "Cuánto puedes gastar hoy" },
+      { "nombre": "02-registrado", "archivos": ["hoy-registrado", "hoy-escribir-sin-teclado"], "titulo": "Dilo y queda registrado" },
+      { "nombre": "03-arqueo", "archivos": ["arqueo"], "titulo": "Tu efectivo, contado" },
+      { "nombre": "04-tarjeta", "archivos": ["tarjeta-oro", "tarjeta-nueva"], "titulo": "Tarjetas y meses sin sorpresas" },
+      { "nombre": "05-privacidad", "archivos": ["privacidad"], "titulo": "Lo que sale de tu teléfono, claro" },
+      { "nombre": "06-hoy-oscuro", "archivos": ["hoy-desglose", "hoy"], "titulo": "Cuánto puedes gastar hoy", "tema": "oscuro" }
+    ]
+  },
+  "android-telefono": {
+    "ancho": 1080,
+    "alto": 1920,
+    "capturas": [
+      { "nombre": "01-hoy", "archivos": ["hoy-desglose", "hoy"], "titulo": "Cuánto puedes gastar hoy" },
+      { "nombre": "02-registrado", "archivos": ["hoy-registrado"], "titulo": "Dilo y queda registrado" },
+      { "nombre": "03-arqueo", "archivos": ["arqueo"], "titulo": "Tu efectivo, contado" },
+      { "nombre": "04-tarjeta", "archivos": ["tarjeta-oro", "tarjeta-nueva", "cuentas"], "titulo": "Tarjetas y meses sin sorpresas" },
+      { "nombre": "05-privacidad", "archivos": ["privacidad"], "titulo": "Lo que sale de tu teléfono, claro" },
+      { "nombre": "06-hoy-oscuro", "archivos": ["hoy-desglose", "hoy"], "titulo": "Cuánto puedes gastar hoy", "tema": "oscuro" }
+    ]
+  }
+}

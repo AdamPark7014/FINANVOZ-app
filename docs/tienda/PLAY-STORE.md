@@ -5,13 +5,17 @@ Cuenta de desarrollador: **NEXARA** (la misma de `mx.nexara.mobile.nativeapp` y 
 y la tabla de privacidad de [`README.md`](README.md) y `docs/08-CUMPLIMIENTO.md` §3 (divulgación destacada §3.1,
 Data safety §3.2, declaraciones §3.3).
 
-**Estado al 21-10-2026.** En Play Console no hay nada todavía: la app no está creada, no hay AAB subido y la
-ficha, las capturas, el video, Data safety y la revisión legal siguen como pendientes de Adam (`docs/ESTADO.md`
-→ Pendientes 24, 25, 101–104, 109, 111 y 112). En el repositorio están los textos de la ficha (`titulo.txt`,
-`descripcion-corta.txt`, `descripcion-completa.txt`, `notas-version-1.0.0.txt`), el plan de capturas
-(`capturas.md`), `app.json` con `android.package com.finanvoz.app` y `versionCode 1`, `app.config.ts` que toma
-versión y build de `APP_VERSION` / `APP_BUILD_NUMBER`, el flujo «Android · Play» con sus scripts (§1) y
-`apps/movil/eas.json` con el perfil `production` (app-bundle).
+**Estado al 22-10-2026.** La app existe en Play Console (§8) y la versión 1 (1.0.0) está en prueba interna. La
+ficha está **lista en archivos** para capturarla por navegador (no hay cuenta de servicio de Play): campo por campo
+en [`play/ficha.md`](play/ficha.md), Seguridad de los datos en [`play/data-safety.md`](play/data-safety.md), las
+demás declaraciones en [`play/contenido-de-la-app.md`](play/contenido-de-la-app.md), ícono 512 y gráfico 1024×500 en
+`assets/marca/`, aviso de privacidad y soporte publicados en GitHub Pages y el pipeline de capturas en
+[`capturas.md`](capturas.md). Siguen siendo de Adam el video de la divulgación destacada (pendiente 25) y la revisión
+legal del aviso (pendientes 4, 26, 103). En el repositorio están además los textos (`titulo.txt`,
+`descripcion-corta.txt`, `descripcion-completa.txt`, `notas-version-1.0.0.txt`), `app.json` con
+`android.package com.finanvoz.app` y `versionCode 1`, `app.config.ts` que toma versión y build de `APP_VERSION` /
+`APP_BUILD_NUMBER`, el flujo «Android · Play» con sus scripts (§1) y `apps/movil/eas.json` con el perfil
+`production` (app-bundle).
 
 ## 0. Qué lleva la build de tienda (1.0.0)
 
@@ -98,15 +102,15 @@ permisos del manifiesto, `strings` sin secretos (pendiente 112).
 | Descripción breve (≤80) | `descripcion-corta.txt` |
 | Descripción completa (≤4,000) | `descripcion-completa.txt` (ver la nota de abajo sobre Plus) |
 | Novedades (≤500) | `notas-version-1.0.0.txt` |
-| Ícono 512×512 | Pendiente: exportar desde `assets/marca` (PNG de 32 bits, sin transparencia en el fondo) |
-| Gráfico de funciones 1024×500 | Pendiente, según `capturas.md` («Cuánto puedes gastar hoy», sin capturas encimadas ni precios) |
-| Capturas de teléfono | 2 a 8, PNG 1080×1920, de un Android con los escenarios semilla (`capturas.md`, pendiente 102). Las de Plus («¿Me alcanza?») no van hasta que Plus esté activo |
-| Video de la ficha | Opcional (YouTube); distinto del video de revisión de §5.9 |
+| Ícono 512×512 | `assets/marca/icono-512.png` (PNG de 32 bits a sangre, alfa opaco; `scripts/tienda/iconos-tienda.py`) |
+| Gráfico de funciones 1024×500 | `assets/marca/grafico-funciones-1024x500.png` («Cuánto puedes gastar hoy», sin capturas encimadas ni precios; `scripts/tienda/grafico-funciones.py`) |
+| Capturas de teléfono | 2 a 8, PNG 1080×1920 enmarcadas, en `docs/tienda/capturas/android-telefono/` (flujo «Android · Capturas de tienda» + `enmarcar.py`, `capturas.md`). Las de Plus («¿Me alcanza?») y la captura automática no van hasta que estén en la build |
+| Video de la ficha | Opcional (YouTube); distinto del video de revisión de §5.9. No hay |
 | Categoría | Finanzas |
 | Etiquetas | Finanzas personales, Presupuesto (las que ofrezca la consola) |
-| Correo de contacto | **Pendiente de Adam** (el pendiente 101 propone `gerencia@nexara.com.mx`, el mismo del aviso y de Ajustes › Ayuda); Play lo muestra en la ficha |
-| Sitio web | Pendiente: `finanvoz.com` (sentada 1) |
-| Política de privacidad | Pendiente: `finanvoz.com/aviso-privacidad` (§5.1) |
+| Correo de contacto | `gerencia@nexara.com.mx` (el del aviso y de Ajustes › Ayuda, pendiente 101 resuelto); Play lo muestra en la ficha |
+| Sitio web | `https://adampark7014.github.io/FINANVOZ-app/` (GitHub Pages del repositorio, provisional hasta `finanvoz.com`, sentada 1) |
+| Política de privacidad | `https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html` (§5.1) |
 
 **Sobre `descripcion-completa.txt` y `notas-version-1.0.0.txt`**: describen la app completa, con el párrafo
 PLUS («Prueba gratis de 14 días. El cobro lo hace Google Play…») y la viñeta de Plus en las novedades. La build
@@ -118,11 +122,12 @@ ciertas para la app completa; con la nube apagada no sale nada, así que no cont
 ## 5. Contenido de la app (declaraciones obligatorias)
 
 ### 5.1 Política de privacidad
-URL pública **pendiente** (`finanvoz.com/aviso-privacidad`, tercera entrada de Vite en `apps/calculadora` con
-el texto de `src/pantallas/onboarding/aviso.ts`; sentada 0 y 1 de `LANZAMIENTO.md`, pendientes 12 y 26) y
-revisión legal del aviso **pendiente** (abogado, pendientes 4, 26 y 103). Bloquea la ficha pública, la prueba
-cerrada con ficha y producción; **no** bloquea la prueba interna. Dentro de la app ya se lee en O2 y en
-Ajustes › Privacidad.
+URL pública: `https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html` (entrada `aviso` de Vite en
+`apps/calculadora`, texto de `src/aviso-app.ts` alineado con `src/pantallas/onboarding/aviso.ts`; la publica el
+flujo «Publicar calculadora» con `destino: github-pages`). Provisional hasta `finanvoz.com/aviso-privacidad`
+(sentada 1 de `LANZAMIENTO.md`, pendiente 12). La revisión legal del aviso sigue **pendiente** (abogado, pendientes 4,
+26 y 103): no bloquea técnicamente la ficha, pero es decisión de Adam publicar sin ella. Dentro de la app ya se lee
+en O2 y en Ajustes › Privacidad. La página de soporte (`…/soporte.html`) lleva las 10 preguntas de Ajustes › Ayuda.
 
 ### 5.2 Anuncios
 No contiene anuncios.
@@ -145,12 +150,17 @@ rehacer el cuestionario). Resultado esperado: «Para todos» / 3+.
 
 ### 5.6 Otras declaraciones
 Noticias: no. Apps gubernamentales: **no**. Salud: no es app de salud (las deducciones de M12 leen CFDI de
-gastos médicos, pero la app no trata datos de salud). COVID-19: no. Servicio en primer plano: no (la captura es
-un servicio de escucha de notificaciones, no un servicio en primer plano; si el manifiesto final trajera
-`FOREGROUND_SERVICE`, declararlo). Permisos con formulario propio (SMS, registro de llamadas, ubicación en
-segundo plano, todos los archivos, accesibilidad): ninguno.
+gastos médicos, pero la app no trata datos de salud). COVID-19: no. Servicio en primer plano: la app no inicia ninguno (la captura es
+un servicio de escucha de notificaciones). El manifiesto final sí trae `FOREGROUND_SERVICE` **sin tipo** (lo
+arrastra una dependencia; comprobado con `aapt dump permissions` en el APK de la corrida 39848463124, junto con
+`com.android.vending.BILLING` del SDK de RevenueCat y sin `AD_ID`): Play solo exige la declaración con permisos
+`FOREGROUND_SERVICE_<TIPO>`, así que no debería pedirla; detalle en `play/contenido-de-la-app.md`. Permisos con
+formulario propio (SMS, registro de llamadas, ubicación en segundo plano, todos los archivos, accesibilidad):
+ninguno.
 
 ### 5.7 Seguridad de los datos (Data safety, `08 §3.2`)
+
+Pregunta por pregunta, tal cual las hace la consola: [`play/data-safety.md`](play/data-safety.md).
 
 Para la build 1.0.0 **sin nube, Sentry ni PostHog**: ¿Recopila o comparte datos? **Recopila: No · Comparte:
 No**. Nada sale del teléfono: movimientos, saldos y cuentas se procesan en el dispositivo; el texto de las
@@ -210,9 +220,9 @@ revisión legal → 5. Prueba cerrada → 6. Producción escalonada (10 % → 10
 | 1 | ~~Generar la llave de subida y cargar los secretos~~ **Hecho**: llave creada el 21-10 y secretos `ANDROID_*` cargados el 22-10 con `scripts\subir-secretos-android.ps1`. **Falta solo guardar una copia de `Documents\LLAVES-ANDROID\FINANVOZ` fuera de la PC** (si se pierde, la app no se puede actualizar) | Adam (custodia) | — |
 | 2 | ~~Crear la app en Play Console (§2)~~ **Hecha el 21-10-2026** con la cuenta NEXARA (Claude in Chrome, con el sí de Adam): app «Finanvoz», paquete `com.finanvoz.app`, id de Play Console `4974369200915032127`, idioma predeterminado **Español (Latinoamérica) – es-419** (Play no ofrece es-MX como idioma predeterminado), Aplicación, Sin coste, declaraciones aceptadas, «protección automática» del instalador dejada como viene | — | — |
 | 3 | ~~Primera subida a prueba interna y probadores (§3)~~ **Publicada el 22-10-2026**: versión **1 (1.0.0)** «Disponible para testers internos» (AAB de la corrida 39812387570 subido a mano por Adam; descarga de 46.4 MB, API 24+, SDK objetivo 36). Testers: lista **«Equipo Finanvoz»** (solo ad.pozo.ont@gmail.com; la lista «Plantilla nexara» de la cuenta no se usa). Enlace para unirse: https://play.google.com/apps/internaltest/4700319243165565858 . Mientras la app no pase la primera revisión, los testers ven el nombre temporal «com.finanvoz.app (unreviewed)». Única advertencia: sin archivo de desofuscación (la build no usa R8) | — | — |
-| 4 | Dominio y páginas públicas (`finanvoz.com`, aviso, eliminación de datos) y revisión legal del aviso (pendientes 4, 12, 26, 103) | Adam + abogado | Ficha pública, prueba cerrada y producción. **No** la prueba interna |
-| 5 | Ficha: textos (§4, pendiente 101), correo de contacto, ícono 512, gráfico 1024×500, capturas (pendiente 102) | Adam (+ Claude por Remote Control para capturas) | Producción |
-| 6 | Data safety (§5.7, pendientes 24 y 111) y declaración de funciones financieras (§5.8) | Adam | Producción |
+| 4 | Páginas públicas: **aviso y soporte en GitHub Pages** (`https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html`, `…/soporte.html`; flujo «Publicar calculadora»). Siguen pendientes el dominio `finanvoz.com` (pendiente 12; al tenerlo se cambian las URLs en la ficha) y la revisión legal del aviso (pendientes 4, 26, 103) | Dominio y abogado: Adam | Decisión de Adam: publicar la ficha con el aviso sin revisión legal o esperar |
+| 5 | Ficha **lista en archivos** (`play/ficha.md`): textos de §4, correo `gerencia@nexara.com.mx`, `assets/marca/icono-512.png`, `assets/marca/grafico-funciones-1024x500.png`, capturas por el flujo «Android · Capturas de tienda» → `docs/tienda/capturas/android-telefono/`. **Falta capturarla en la consola por navegador** (sin cuenta de servicio) y decidir el párrafo PLUS (fila 8) | Coordinador (navegador, cuenta NEXARA; a Adam solo el inicio de sesión) | Producción |
+| 6 | Data safety y declaraciones **contestadas en archivos** (`play/data-safety.md`, `play/contenido-de-la-app.md`; pendientes 24 y 111). Falta marcarlas en la consola | Coordinador (navegador) | Producción |
 | 7 | Video de la divulgación destacada (§5.9, pendiente 25) | Adam | Revisión de producción |
 | 8 | Decidir si el párrafo PLUS y la viñeta de Plus salen de la ficha hasta que RevenueCat esté activo (§4) | Adam | Ficha |
 | 9 | Versión 1.0.0 al cortar producción (pendiente 109); `versionCode` creciente por subida | Claude Code + Adam | Producción |

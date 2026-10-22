@@ -28,6 +28,7 @@ export function App() {
       </main>
       <footer className="pie">
         <a href="./aviso-de-privacidad.html">Aviso de privacidad</a>
+        <a href="./soporte.html">Ayuda y soporte</a>
         <span>
           {MARCA} no es una institución financiera ni asesor de inversiones. Las cifras son estimaciones y no
           garantizan resultados.

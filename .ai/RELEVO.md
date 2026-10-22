@@ -6,13 +6,16 @@
 
 ## Hecho en este turno
 
+- **Ficha de tiendas (T-1)**: ícono 512 (Play, opaco) y 1024 (App Store, sin alfa) con `scripts/tienda/iconos-tienda.py`, gráfico 1024×500 (`grafico-funciones.py`), páginas públicas en GitHub Pages (`publicar-calculadora.yml` con destino `github-pages`: aviso, soporte con las 10 preguntas de Ayuda, índice), flujos `ios-capturas.yml` (iPhone 16 Pro Max 6.9") y `android-capturas.yml` (Pixel 7) + `enmarcar.py`, `docs/tienda/play/` (ficha, Data safety, contenido) y **App Store Connect por API** (`asc-ficha.py`): versión 1.0.0, FINANCE/PRODUCTIVITY, edad, textos es-MX, URLs de Pages, set de capturas APP_IPHONE_67 listo y vacío. El Issuer ID se lee de `C:\dev\secrets\arta-ios\issuer-id.txt`.
+- **Ola 7 decidida y diseñada**: mockups (`docs/diseno/mockups-asistente.html`), elección de Adam (Hoy A + R1 + 4 pestañas + «Sí» directo en ingreso y colchón + barra) y diseño técnico `docs/diseno/OLA-7-ASISTENTE.md`.
+- Rama `claude/project-thread-lief9t` borrada en origen (2 commits previos a #24–#31, ya superados: c29b72f, 11bbe4a; recuperables por SHA).
 - **PR #29–#31 integrados (el hilo de la nube siguió tras la orden de Adam)**: #30 (saldo dicho) cede a la vía única
   (`confirmar_ajuste` + `TarjetaConfirmarAjuste`, que toma su texto de ayuda «Si falta algún movimiento…»); se borran
   `ajustes-dichos.ts`, `TarjetaConfirmarSaldo.tsx` y `hoy-ola3.test.tsx`; prueba nueva K04 en `ajustes-dichos.test.tsx`.
   #29 (Hoy con cifra destacada y primer uso) cede a la Hoy de B-1 porque la Ola 7 la reemplaza; quedan `primerUso`
   en `VistaHoy` y los textos `TITULO_PRIMER_USO`/`TEXTO_PRIMER_USO` para el estado vacío del asistente. #31 (Ajustes en
   cuatro grupos) se queda, con `SeccionBloqueo` de B-2b. Issuer ID de App Store Connect fuera del repo
-  (`C:\dev\secretsrta-ios\issuer-id.txt`). jest 79 suites 651/651, vitest 2723/2725 (2 del proxy por tiempo
+  (`C:\dev\secrets\arta-ios\issuer-id.txt`). jest 79 suites 651/651, vitest 2723/2725 (2 del proxy por tiempo
   bajo carga; solas 20/20), eval reglas 135/135, pasos 88/88, typecheck y eslint limpios.
 - **PR #28 integrado (colchón e ingreso dichos desde Hoy)**: queda una sola vía en `servicios/registrar.ts`
   (`aplicarAjuste`): colchón al momento con Deshacer (`colchon_configurado`, token `k:<anterior>` en

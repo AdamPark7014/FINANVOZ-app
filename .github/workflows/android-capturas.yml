@@ -1,0 +1,172 @@
+name: Android · Capturas de tienda
+
+# Capturas de teléfono para Google Play (1080 × 2400 crudas → 1080 × 1920 enmarcadas) con Maestro en un emulador
+# Pixel 7 API 34 (x86_64, KVM) en es-MX, tema claro y oscuro. El APK x86_64 se compila aquí (igual que apk.yml con
+# `arquitecturas: x86_64`) o se toma de una corrida de «APK Android» con `run_id`. Flujo:
+# scripts/tienda/maestro/android-capturas.yaml (parte del onboarding de apps/movil/.maestro) más cualquier flujo de
+# apps/movil/.maestro/*.yaml que tenga takeScreenshot. Sube `maestro-capturas-android` (crudas) y
+# `capturas-enmarcadas-android` (scripts/tienda/enmarcar.py); el lote final se copia a
+# docs/tienda/capturas/android-telefono. Sin secretos: modo nube apagado.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Corrida de «APK Android» construida con arquitecturas=x86_64 (vacío = compilar aquí)'
+        required: false
+        default: ''
+
+concurrency:
+  group: android-capturas-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  apk:
+    name: APK x86_64
+    if: ${{ inputs.run_id == '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: pnpm install --frozen-lockfile
+      - name: Proyecto nativo (expo prebuild)
+        working-directory: apps/movil
+        run: pnpm exec expo prebuild --platform android --no-install --clean
+      - name: Compilar APK de release (x86_64)
+        working-directory: apps/movil/android
+        env:
+          NODE_ENV: production
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finanvoz-apk-x86_64
+          path: apps/movil/android/app/build/outputs/apk/release/*.apk
+          retention-days: 7
+
+  capturas:
+    name: Capturas en Pixel 7 (API 34)
+    needs: apk
+    if: ${{ !cancelled() && (needs.apk.result == 'success' || needs.apk.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SALIDA: ${{ github.workspace }}/maestro-capturas-android
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bajar el APK compilado aquí
+        if: ${{ inputs.run_id == '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: finanvoz-apk-x86_64
+          path: ${{ runner.temp }}/apk
+
+      - name: Bajar el APK de «APK Android»
+        if: ${{ inputs.run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: finanvoz-apk
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/apk
+
+      - name: Revisar el APK (debe traer lib/x86_64)
+        run: |
+          set -euo pipefail
+          APK="$(ls "$RUNNER_TEMP"/apk/*.apk | head -n 1)"
+          unzip -l "$APK" | grep -q 'lib/x86_64/' || { echo "::error::El APK no trae lib/x86_64: corre «APK Android» con arquitecturas=x86_64 o deja run_id vacío"; exit 1; }
+          echo "APK=$APK" >> "$GITHUB_ENV"
+
+      - name: KVM para el emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Maestro
+        env:
+          MAESTRO_VERSION: '2.11.0'
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pillow para enmarcar
+        run: python3 -m pip install --quiet pillow
+
+      - name: Emulador Pixel 7 y capturas
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          emulator-boot-timeout: 900
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -timezone America/Mexico_City
+          script: |
+            export MAESTRO_CLI_NO_ANALYTICS=1
+            # Flujos de la app que ya toman capturas, si los hay (los de la raíz de .maestro son los de Android).
+            EXTRA="$(grep -l takeScreenshot apps/movil/.maestro/*.yaml 2>/dev/null || true)"
+            APK="$APK" SALIDA="$SALIDA" bash scripts/tienda/capturas-android.sh
+            if [ -n "$EXTRA" ]; then
+              mkdir -p "$SALIDA/claro"
+              adb shell cmd uimode night no
+              for f in $EXTRA; do
+                (cd "$SALIDA/claro" && maestro test "$GITHUB_WORKSPACE/$f") || echo "AVISO: $f falló (no bloquea)"
+              done
+            fi
+
+      - name: Enmarcar para la tienda
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          python3 scripts/tienda/enmarcar.py --plataforma android-telefono --entrada "$SALIDA" --salida "$GITHUB_WORKSPACE/capturas-enmarcadas-android"
+          {
+            echo "## Capturas de Android"
+            echo
+            for f in "$GITHUB_WORKSPACE"/capturas-enmarcadas-android/*.png; do echo "- $(basename "$f")"; done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Subir capturas crudas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-capturas-android
+          path: maestro-capturas-android
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Subir capturas enmarcadas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-enmarcadas-android
+          path: capturas-enmarcadas-android
+          retention-days: 30
+          if-no-files-found: warn

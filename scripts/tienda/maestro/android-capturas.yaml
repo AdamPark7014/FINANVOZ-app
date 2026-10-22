@@ -1,0 +1,134 @@
+# Capturas de tienda en Android (Play, `docs/tienda/capturas.md`): parte del onboarding completo de la app
+# (BBVA, tarjeta Oro con meses, renta) y toma las pantallas de la ficha. Lo corre `capturas-android.sh` en claro y
+# en oscuro; los PNG quedan en la carpeta desde la que se lanza Maestro. Los ids son los mismos que usan los flujos
+# de `apps/movil/.maestro` (este archivo vive aquí para no tocar los de la app).
+#   maestro test scripts/tienda/maestro/android-capturas.yaml
+appId: com.finanvoz.app
+name: Capturas de tienda (Android)
+tags:
+  - capturas
+---
+# Calentamiento: el primer arranque en un emulador recién creado (o con traducción ARM) tarda más de los 20 s que
+# espera onboarding.yaml; aquí se le da hasta 90 s y después el onboarding vuelve a lanzarla limpia.
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: onb-bienvenida
+    timeout: 90000
+- runFlow: ../../../apps/movil/.maestro/onboarding.yaml
+- takeScreenshot: hoy
+# Desglose de «hoy puedes»
+- runFlow:
+    when:
+      visible:
+        id: boton-desglose
+    commands:
+      - tapOn:
+          id: boton-desglose
+      - extendedWaitUntil:
+          visible:
+            id: desglose
+          timeout: 5000
+      - takeScreenshot: hoy-desglose
+      - tapOn:
+          id: boton-desglose
+# «coca 25 en efectivo» por texto → aviso «Registré: … Deshacer»
+- tapOn:
+    id: boton-escribir
+- extendedWaitUntil:
+    visible:
+      id: campo-registrar
+    timeout: 5000
+- tapOn:
+    id: campo-registrar
+- inputText: 'coca 25 en efectivo'
+- hideKeyboard
+- tapOn:
+    id: boton-enviar-registro
+- extendedWaitUntil:
+    visible:
+      id: aviso
+    timeout: 10000
+- takeScreenshot: hoy-registrado
+# Movimientos
+- tapOn:
+    id: pestana-movimientos
+- extendedWaitUntil:
+    visible:
+      id: pantalla-movimientos
+    timeout: 10000
+- takeScreenshot: movimientos
+# Cuentas, la tarjeta Oro y el arqueo
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- takeScreenshot: cuentas
+- runFlow:
+    when:
+      visible:
+        id: seccion-debes-lista
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: 'cuenta-[0-9a-f-]{36}'
+            childOf:
+              id: seccion-debes-lista
+      - tapOn:
+          id: 'cuenta-[0-9a-f-]{36}'
+          childOf:
+            id: seccion-debes-lista
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-tarjeta
+          timeout: 10000
+      - takeScreenshot: tarjeta-oro
+      - back
+      - extendedWaitUntil:
+          visible:
+            id: pantalla-cuentas
+          timeout: 10000
+- scrollUntilVisible:
+    element:
+      text: 'Contar mi efectivo'
+    direction: UP
+- scrollUntilVisible:
+    element:
+      text: 'Contar mi efectivo'
+- tapOn:
+    text: 'Contar mi efectivo'
+- extendedWaitUntil:
+    visible:
+      id: pantalla-arqueo
+    timeout: 10000
+- takeScreenshot: arqueo
+- back
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+# Ajustes → Privacidad
+- scrollUntilVisible:
+    element:
+      id: boton-ajustes
+    direction: UP
+- tapOn:
+    id: boton-ajustes
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+- takeScreenshot: ajustes
+- scrollUntilVisible:
+    element:
+      id: ajustes-privacidad
+- tapOn:
+    id: ajustes-privacidad
+- extendedWaitUntil:
+    visible:
+      id: privacidad
+    timeout: 10000
+- takeScreenshot: privacidad

@@ -25,7 +25,7 @@
     (scripts/asc_signing.py).
 
 .EJEMPLO
-    pwsh -File scripts\subir-secretos-ios.ps1 -IssuerId fe0d58b2-b9ab-4d7c-aecb-e8cbe30af200
+    pwsh -File scripts\subir-secretos-ios.ps1 -IssuerId (Get-Content C:\dev\secrets\arta-ios\issuer-id.txt)
 #>
 [CmdletBinding()]
 param(

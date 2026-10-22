@@ -1,11 +1,26 @@
 # Ficha de Google Play (borrador de M13)
 
-Borradores de la ficha en español de México para Play Console. **Todavía no se suben**: la ficha, las capturas, el video y la revisión legal son pendientes de Adam (`docs/ESTADO.md` → Pendientes, desde el 101).
+La ficha en español de México de las dos tiendas. **App Store Connect ya tiene los textos, la categoría, la
+clasificación por edad y las URLs**, subidos por API con `scripts/tienda/asc-ficha.py` (estado en
+[`IOS-APP-STORE.md`](IOS-APP-STORE.md) §8); las capturas de iPhone las sube el mismo script cuando el lote esté en
+`capturas/ios-6.9/`. **Play se captura por navegador** con [`play/ficha.md`](play/ficha.md) (no hay cuenta de
+servicio). El video de la divulgación destacada y la revisión legal del aviso siguen siendo de Adam
+(`docs/ESTADO.md` → Pendientes 25, 26 y 103).
 
 | Documento | Para qué |
 |---|---|
 | [`IOS-APP-STORE.md`](IOS-APP-STORE.md) | App Store Connect: alta de la app, secretos y flujo «iOS · TestFlight», información de la app, etiqueta de privacidad, versión 1.0.0 con los textos de `ios/`, notas para la revisión, pendientes |
 | [`PLAY-STORE.md`](PLAY-STORE.md) | Play Console: llave de subida y AAB, alta, prueba interna, ficha con los `.txt` de esta carpeta, «Contenido de la app» (seguridad de los datos, funciones financieras, divulgación destacada), pendientes |
+| [`play/ficha.md`](play/ficha.md) | Play Console, campo por campo: qué archivo o valor va en cada uno (ícono, gráfico, capturas, correo, sitio, política, categoría) |
+| [`play/data-safety.md`](play/data-safety.md) | Seguridad de los datos, pregunta por pregunta como la hace la consola, y qué cambia al activar cada servicio |
+| [`play/contenido-de-la-app.md`](play/contenido-de-la-app.md) | Las demás declaraciones de «Contenido de la app» (anuncios, acceso, IARC, público, financieras, ID de publicidad…) |
+| [`capturas.md`](capturas.md) | El pipeline de capturas (flujos `ios-capturas.yml` y `android-capturas.yml`, `enmarcar.py`, plan y titulares), el gráfico y el video |
+| `capturas/ios-6.9/`, `capturas/android-telefono/` | El lote final enmarcado (1320 × 2868 y 1080 × 1920) que se sube a cada tienda |
+| `scripts/tienda/` | `asc-ficha.py` (ficha de iOS por API), `iconos-tienda.py`, `grafico-funciones.py`, `enmarcar.py`, `capturas-android.sh` y el flujo Maestro de Android |
+
+Páginas públicas que exigen las tiendas (aviso de privacidad y soporte): GitHub Pages del repositorio,
+`https://adampark7014.github.io/FINANVOZ-app/aviso-de-privacidad.html` y `…/soporte.html`, publicadas por el flujo
+«Publicar calculadora» (`destino: github-pages`). Provisionales hasta que exista `finanvoz.com`.
 
 | Archivo | Campo de Play Console | Límite |
 |---|---|---|
@@ -13,7 +28,8 @@ Borradores de la ficha en español de México para Play Console. **Todavía no s
 | `descripcion-corta.txt` | Descripción breve | 80 caracteres |
 | `descripcion-completa.txt` | Descripción completa | 4,000 caracteres |
 | `notas-version-1.0.0.txt` | Novedades de la versión 1.0.0 | 500 caracteres |
-| `capturas.md` | Capturas de teléfono, gráfico de funciones y video | 2 a 8 capturas |
+| `capturas/android-telefono/*.png` | Capturas de teléfono (1080 × 1920) | 2 a 8 capturas |
+| `capturas/ios-6.9/*.png` | App Store Connect: capturas de iPhone 6.9" (1320 × 2868) | 1 a 10 capturas |
 | `ios/subtitulo.txt` | App Store Connect: Subtítulo | 30 caracteres |
 | `ios/texto-promocional.txt` | App Store Connect: Texto promocional | 170 caracteres |
 | `ios/descripcion.txt` | App Store Connect: Descripción (sin Android, Google Play, widget, Plus ni proveedor de IA mientras la build no los tenga) | 4,000 caracteres |
