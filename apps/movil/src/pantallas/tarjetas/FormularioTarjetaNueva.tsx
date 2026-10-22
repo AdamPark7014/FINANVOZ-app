@@ -52,10 +52,13 @@ function nombreSugerido(alias: string | null): string {
 export function useFormularioTarjeta({
   prellenado,
   alGuardar,
+  errorAparte = false,
 }: {
   prellenado?: TarjetaPorAgregar | null;
   alGuardar: (t: TarjetaCreada) => void;
-}): { campos: ReactNode; guardar: () => void } {
+  /** `true` si la pantalla muestra `error` junto a su botón fijo (al fondo del formulario no se ve al tocar). */
+  errorAparte?: boolean;
+}): { campos: ReactNode; guardar: () => void; error: string | null } {
   const { ctx, refrescar } = useSesion();
   const [nombre, setNombre] = useState(nombreSugerido(prellenado?.alias ?? null));
   const [ultimos4, setUltimos4] = useState('');
@@ -273,11 +276,11 @@ export function useFormularioTarjeta({
           ) : null}
         </>
       ) : null}
-      <MensajeError texto={error} />
+      {errorAparte ? null : <MensajeError texto={error} />}
     </>
   );
 
-  return { campos, guardar };
+  return { campos, guardar, error };
 }
 
 /** El formulario completo con sus botones, para usarlo dentro de una pantalla o de una tarjeta. */

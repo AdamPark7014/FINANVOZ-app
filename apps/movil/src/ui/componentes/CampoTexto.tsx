@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import {
+  InputAccessoryView,
+  Keyboard,
+  Platform,
+  Pressable,
   TextInput,
   View,
   type AccessibilityState,
@@ -31,6 +35,14 @@ export interface CampoTextoProps {
   testID?: string;
 }
 
+/** Teclados de iOS sin tecla de retorno: sin la barra «Listo» no hay forma visible de cerrarlos. */
+const TECLADOS_SIN_RETORNO: readonly KeyboardTypeOptions[] = [
+  'decimal-pad',
+  'number-pad',
+  'numeric',
+  'phone-pad',
+];
+
 export function CampoTexto({
   etiqueta,
   valor,
@@ -49,6 +61,8 @@ export function CampoTexto({
   const { c } = useTema();
   const [enfocado, setEnfocado] = useState(false);
   const conError = Boolean(error);
+  const idBarra = `listo-${useId().replace(/:/g, '')}`;
+  const conBarraListo = Platform.OS === 'ios' && TECLADOS_SIN_RETORNO.includes(teclado);
   return (
     <View style={{ gap: espacio.xs }}>
       <Texto variante="etiqueta" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -65,6 +79,7 @@ export function CampoTexto({
         onSubmitEditing={alEnviar}
         onFocus={() => setEnfocado(true)}
         onBlur={() => setEnfocado(false)}
+        inputAccessoryViewID={conBarraListo ? idBarra : undefined}
         editable={!deshabilitado}
         accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
         accessibilityHint={error ?? ayuda}
@@ -103,6 +118,36 @@ export function CampoTexto({
         >
           {ayuda}
         </Texto>
+      ) : null}
+      {conBarraListo ? (
+        <InputAccessoryView nativeID={idBarra}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              backgroundColor: c.superficie,
+              borderTopWidth: 1,
+              borderTopColor: c.borde,
+              paddingHorizontal: espacio.m,
+            }}
+          >
+            <Pressable
+              onPress={() => Keyboard.dismiss()}
+              accessibilityRole="button"
+              accessibilityLabel="Listo, cerrar teclado"
+              hitSlop={espacio.s}
+              style={{
+                minHeight: OBJETIVO_TACTIL_MIN,
+                justifyContent: 'center',
+                paddingHorizontal: espacio.s,
+              }}
+            >
+              <Texto variante="cuerpo" tono="acento">
+                Listo
+              </Texto>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
       ) : null}
     </View>
   );

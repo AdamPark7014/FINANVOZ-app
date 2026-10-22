@@ -92,7 +92,9 @@ export const MENSAJE_POR_INTERPRETAR =
 
 /** Por qué quedó guardada la frase (`02 §5`, punto 8). */
 export const MENSAJE_GUARDADA: Record<MotivoPorInterpretar, string> = {
-  sin_nube: MENSAJE_POR_INTERPRETAR,
+  // Sin intérprete en la nube configurado no tiene caso prometer internet (build sin Supabase).
+  sin_nube:
+    'Esa frase todavía no la entiendo. Prueba algo como «tacos 80 en efectivo» o llena los datos en Registrar. La guardé en Movimientos, en Por revisar.',
   sin_red: MENSAJE_POR_INTERPRETAR,
   limite: MENSAJE_LIMITE_NUBE,
   error: 'No pude interpretarla en este momento. La guardé y lo intento de nuevo más tarde.',

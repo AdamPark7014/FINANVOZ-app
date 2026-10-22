@@ -1,4 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
+import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
+import { crearComprasEnMemoria } from '../../suscripciones/memoria';
 import type { ReactNode } from 'react';
 import { AccessibilityInfo } from 'react-native';
 import {
@@ -631,7 +633,12 @@ describe('¿Me alcanza?', () => {
     const alAbrirMeAlcanza = jest.fn();
     montar(
       p.ctx,
-      <PantallaHoy navegacion={{ ...navegacionFalsa(), alAbrirMeAlcanza }} motor={crearMotorFalso().motor} />,
+      <ProveedorPlan compras={crearComprasEnMemoria()}>
+        <PantallaHoy
+          navegacion={{ ...navegacionFalsa(), alAbrirMeAlcanza }}
+          motor={crearMotorFalso().motor}
+        />
+      </ProveedorPlan>,
       { nube: nube.nube },
     );
     // El botón de Hoy abre el formulario vacío.

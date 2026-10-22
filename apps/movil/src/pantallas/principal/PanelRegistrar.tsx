@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   contarEsperandoConexion,
@@ -643,6 +643,17 @@ export function PanelRegistrar({
         >
           {errorVoz}
         </Texto>
+      ) : null}
+      {dictado.estado === 'sin_permiso' ? (
+        // El sistema ya no vuelve a preguntar: sin este botón no hay salida (iOS lo recuerda para siempre).
+        <Boton
+          etiqueta="Abrir ajustes"
+          variante="texto"
+          ancho="contenido"
+          pista="Abre los ajustes del teléfono para permitir el micrófono"
+          alPresionar={() => void Linking.openSettings().catch(() => {})}
+          testID="voz-abrir-ajustes"
+        />
       ) : null}
       {interpretando ? (
         <Texto

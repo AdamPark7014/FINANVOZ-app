@@ -1,7 +1,12 @@
 import type { Centavos } from '@cartera/core';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
+import {
+  ERROR_GUARDAR,
+  MensajeError,
+  PASOS_VISIBLES_ONB,
+  PasoOnboarding,
+} from '../../src/pantallas/onboarding/componentes';
 import { sugerenciaMontoColchon10 } from '../../src/pantallas/ajustes/colchon-textos';
 import {
   AYUDA_COLCHON_ONB,
@@ -40,7 +45,7 @@ export default function Colchon() {
   return (
     <PasoOnboarding
       testID="onb-colchon"
-      paso={7}
+      paso={PASOS_VISIBLES_ONB}
       titulo={TITULO_COLCHON}
       ayuda={AYUDA_COLCHON_ONB}
       tip={TIP_COLCHON_SIN_POR_AHORA}

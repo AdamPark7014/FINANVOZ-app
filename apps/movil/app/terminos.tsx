@@ -22,7 +22,7 @@ export default function Terminos() {
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         pista={PISTA_VOLVER}
-        alPresionar={() => router.back()}
+        alPresionar={() => (router.canGoBack() ? router.back() : router.replace('/'))}
       />
       <Texto testID="terminos-titulo" variante="titulo" accessibilityRole="header">
         {TITULO_TERMINOS}

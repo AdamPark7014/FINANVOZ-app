@@ -98,6 +98,12 @@ export default function Ingreso() {
       tip={TIP_INGRESO_SALTAR}
       pie={
         <>
+          {completo ? null : (
+            // Un botón gris sin razón parece roto: se dice qué falta.
+            <Texto variante="secundario" tono="secundario" testID="onb-ingreso-falta">
+              {PISTA_COMPLETAR_INGRESO}
+            </Texto>
+          )}
           <Boton
             testID="onb-ingreso-continuar"
             etiqueta={BTN_ONB_CONTINUAR}

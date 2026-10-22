@@ -22,7 +22,7 @@ export default function AvisoPrivacidad() {
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         pista={PISTA_VOLVER}
-        alPresionar={() => router.back()}
+        alPresionar={() => (router.canGoBack() ? router.back() : router.replace('/'))}
       />
       <Texto variante="titulo">{TITULO_AVISO_PRIVACIDAD}</Texto>
       <Texto variante="secundario" tono="secundario">

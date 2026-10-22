@@ -106,7 +106,7 @@ export const DESC_ESTADISTICAS =
 
 export const SECCION_PERMISOS = 'Permisos del teléfono';
 export const BTN_PERMISOS_TELEFONO = 'Revisar permisos en tu teléfono';
-export const PISTA_PERMISOS_TELEFONO = 'Abre los ajustes de Finanvoz en Android';
+export const PISTA_PERMISOS_TELEFONO = 'Abre los ajustes de Finanvoz en tu teléfono';
 
 export const PERMISOS: readonly { readonly nombre: string; readonly para: string }[] = [
   { nombre: 'Micrófono', para: 'Para registrar hablando. Solo escucha mientras mantienes el botón.' },

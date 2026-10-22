@@ -42,6 +42,11 @@ jest.mock('../../servicios/sesion', () => ({
   }),
   borrarTodoApp: jest.fn(async () => {}),
 }));
+jest.mock('expo-local-authentication', () => ({
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
+  getEnrolledLevelAsync: jest.fn(async () => 3),
+  authenticateAsync: jest.fn(async () => ({ success: true })),
+}));
 jest.mock('expo-screen-capture', () => ({
   preventScreenCaptureAsync: jest.fn(async () => {}),
   allowScreenCaptureAsync: jest.fn(async () => {}),
@@ -119,7 +124,7 @@ describe('ajustes', () => {
     mockPreparar = conDatos;
   });
 
-  it('bloqueo y ocultar en multitarea se guardan', () => {
+  it('bloqueo y ocultar en multitarea se guardan', async () => {
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
     const ctx = ctxInicial();
     fireEvent.press(screen.getByTestId('ajustes-multitarea'));
@@ -129,7 +134,17 @@ describe('ajustes', () => {
       disabled: false,
     });
     fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
-    expect(obtenerBloqueo(ctx).activo).toBe(true);
+    await waitFor(() => expect(obtenerBloqueo(ctx).activo).toBe(true));
+  });
+
+  it('no activa el bloqueo en un teléfono sin código', async () => {
+    const auth = jest.requireMock('expo-local-authentication');
+    auth.getEnrolledLevelAsync.mockResolvedValueOnce(0);
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
+    await waitFor(() => expect(auth.getEnrolledLevelAsync).toHaveBeenCalled());
+    await act(async () => {});
+    expect(obtenerBloqueo(ctxInicial()).activo).toBe(false);
   });
 
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {

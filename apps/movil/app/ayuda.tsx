@@ -7,7 +7,7 @@ export default function Ayuda() {
   const router = useRouter();
   return (
     <Pantalla testID="ayuda" bordes={['top', 'left', 'right', 'bottom']}>
-      <PantallaAyuda alVolver={() => router.back()} />
+      <PantallaAyuda alVolver={() => (router.canGoBack() ? router.back() : router.replace('/ajustes'))} />
     </Pantalla>
   );
 }

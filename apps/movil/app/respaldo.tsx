@@ -7,7 +7,10 @@ export default function Respaldo() {
   const router = useRouter();
   return (
     <Pantalla testID="respaldo" bordes={['top', 'left', 'right', 'bottom']}>
-      <PantallaRespaldo alVolver={() => router.back()} alRestaurar={() => router.push('/restaurar')} />
+      <PantallaRespaldo
+        alVolver={() => (router.canGoBack() ? router.back() : router.replace('/ajustes'))}
+        alRestaurar={() => router.push('/restaurar')}
+      />
     </Pantalla>
   );
 }

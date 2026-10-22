@@ -1,4 +1,6 @@
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
+import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
+import { crearComprasEnMemoria } from '../../suscripciones/memoria';
 import type { PlainDate, Regla } from '@cartera/core';
 import {
   aceptarConsentimiento,
@@ -103,13 +105,27 @@ describe('Hoy', () => {
   it('CTAs traen accessibilityHint para TalkBack (`02 §15`)', () => {
     const p = conEscenario('e4-01');
     const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
-    renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
+    renderConSesion(
+      p.ctx,
+      <ProveedorPlan compras={crearComprasEnMemoria()}>
+        <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />
+      </ProveedorPlan>,
+    );
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_DESGLOSE);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: false });
     expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
     fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_OCULTAR_DESGLOSE);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: true });
+    p.cerrar();
+  });
+
+  it('sin tienda (iPhone) no anuncia «¿Me alcanza?» ni el candado de Plus', () => {
+    const p = conEscenario('e4-01');
+    const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
+    renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
+    expect(screen.queryByTestId('boton-me-alcanza')).toBeNull();
+    expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
     p.cerrar();
   });
 
@@ -358,7 +374,7 @@ describe('Registrar', () => {
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     await screen.findByTestId('mensaje-registro');
-    expect(textoDe('mensaje-registro')).toMatch(/^Lo guardé; lo interpreto cuando tengas internet\./);
+    expect(textoDe('mensaje-registro')).toMatch(/^Esa frase todavía no la entiendo\./);
     expect(screen.getByText('«ayer fui al súper con mi prima y pagó ella»')).toBeTruthy();
     expect(screen.getByText('Tienes 1 frase por revisar.')).toBeTruthy();
   });

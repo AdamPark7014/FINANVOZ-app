@@ -9,6 +9,7 @@ import {
   enlaceCorreoAyuda,
   PantallaAyuda,
   PREGUNTAS_FRECUENTES,
+  PREGUNTAS_FRECUENTES_IOS,
 } from './index';
 import {
   ACCESIBILIDAD_ESCRIBIR_CORREO,
@@ -66,6 +67,14 @@ describe('contenido de la ayuda', () => {
     const prohibidas =
       /[!¡]|por favor|exitosamente|\bpasivos?\b|\bactivos?\b|\basientos?\b|transacci[oó]n|d[eé]bito contable|cr[eé]dito contable/i;
     for (const p of PREGUNTAS_FRECUENTES) expect(todoElTexto(p)).not.toMatch(prohibidas);
+  });
+
+  it('en iPhone cambian solo las respuestas que hablan de Android o de Google Play', () => {
+    expect(PREGUNTAS_FRECUENTES_IOS.map((p) => p.id)).toEqual(TEMAS);
+    for (const p of PREGUNTAS_FRECUENTES_IOS) {
+      expect(todoElTexto(p)).not.toMatch(/Android|Google Play|huella|[!¡]/);
+      expect(todoElTexto(p)).not.toMatch(/\busted\b|\bsus? datos\b/i);
+    }
   });
 
   it('tutea: no usa "usted" ni formas de "su"', () => {

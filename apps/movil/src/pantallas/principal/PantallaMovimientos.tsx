@@ -170,6 +170,16 @@ export function PantallaMovimientos({
                   pista={PISTA_REVISAR_FRASE}
                   testID={`revisar-${f.id}`}
                 />
+              ) : alRegistrar ? (
+                // Sin intérprete disponible la frase no se resuelve sola: que pueda llenarla a mano.
+                <Boton
+                  etiqueta="Llenar los datos"
+                  variante="secundario"
+                  ancho="contenido"
+                  alPresionar={alRegistrar}
+                  pista={PISTA_REGISTRAR_MOVIMIENTO}
+                  testID={`llenar-${f.id}`}
+                />
               ) : null}
               <Boton
                 etiqueta="Descartar"

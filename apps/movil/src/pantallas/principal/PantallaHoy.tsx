@@ -15,6 +15,7 @@ import {
   type VistaHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
+import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import {
   Boton,
   Cifra,
@@ -87,6 +88,8 @@ export function PantallaHoy({
   const vista = useVista(obtenerHoy);
   const observaciones = useVista(obtenerObservaciones);
   const plus = useVista(funcionesPlan);
+  // Sin tienda (iPhone por ahora) no se anuncia lo que no se puede contratar.
+  const contratable = usePlanTienda().compras !== null;
   const [verDesglose, setVerDesglose] = useState(false);
   // "Hablar" y "Escribir" van fijos al pie (sobre las pestañas): el aviso de "Deshacer" sube para no taparlos.
   const [altoPie, setAltoPie] = useState(0);
@@ -120,9 +123,9 @@ export function PantallaHoy({
           {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad. */}
           {plus.probabilidad ? (
             <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
-          ) : (
+          ) : contratable ? (
             <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
-          )}
+          ) : null}
           <BotonDesglose
             expandido={verDesglose}
             etiqueta={
@@ -193,7 +196,7 @@ export function PantallaHoy({
         </Tarjeta>
       ) : null}
       <InvitacionAvisos />
-      {navegacion.alAbrirMeAlcanza ? (
+      {navegacion.alAbrirMeAlcanza && (plus.meAlcanza || contratable) ? (
         <Boton
           etiqueta="¿Me alcanza?"
           variante="secundario"

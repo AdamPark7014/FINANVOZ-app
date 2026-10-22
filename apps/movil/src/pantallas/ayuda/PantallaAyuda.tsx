@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Linking, Pressable, View } from 'react-native';
+import { Linking, Platform, Pressable, View } from 'react-native';
 import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto, useTema } from '../../ui';
-import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES } from './preguntas';
+import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES, PREGUNTAS_FRECUENTES_IOS } from './preguntas';
 import {
   ACCESIBILIDAD_ESCRIBIR_CORREO,
   ACCESIBILIDAD_VOLVER,
@@ -73,7 +73,7 @@ export function PantallaAyuda({
       </Texto>
 
       <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityRole="list">
-        {PREGUNTAS_FRECUENTES.map((p) => (
+        {(Platform.OS === 'ios' ? PREGUNTAS_FRECUENTES_IOS : PREGUNTAS_FRECUENTES).map((p) => (
           <Pregunta
             key={p.id}
             p={p}
