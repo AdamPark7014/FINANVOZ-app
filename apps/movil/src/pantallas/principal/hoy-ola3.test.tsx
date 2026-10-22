@@ -57,7 +57,11 @@ describe('Hoy · primer uso y cifra destacada', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     agregarEfectivo(p.ctx, 50_000);
-    configurarIngreso(p.ctx, { concepto: 'quincena', monto: 600_000, regla: { tipo: 'quincenal_15_ultimo' } });
+    configurarIngreso(p.ctx, {
+      concepto: 'quincena',
+      monto: 600_000,
+      regla: { tipo: 'quincenal_15_ultimo' },
+    });
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     expect(screen.getByTestId('hoy-primer-uso-texto')).toHaveTextContent(TEXTO_PRIMER_USO);
     escribirEnHoy('coca 25 en efectivo');
