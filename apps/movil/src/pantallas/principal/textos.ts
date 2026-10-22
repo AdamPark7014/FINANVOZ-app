@@ -120,7 +120,7 @@ export const MENSAJE_NO_SOPORTADO: Record<MotivoNoSoportado, string> = {
   tipo_movimiento: 'Todavía no registro ese tipo de movimiento hablando. Usa el formulario.',
   intencion: 'Eso todavía no lo hago. Llega pronto.',
   ajuste:
-    'Eso todavía no lo configuro hablando. Tu ingreso y tu colchón los cambias en Ajustes; tus tarjetas, en Cuentas.',
+    'No encontré esa cuenta, o eso todavía no lo configuro hablando. Tus cuentas y tarjetas están en Cuentas; tu ingreso y tu colchón, en Ajustes.',
   consulta: 'Todavía no sé responder esa pregunta.',
   meses_sin_tarjeta: MENSAJE_MESES_SIN_TARJETA,
   correccion: MENSAJE_CORRECCION_NO_SOPORTADA,
@@ -246,6 +246,24 @@ export const BTN_GUARDAR_INGRESO = 'Cambiar mi ingreso';
 export function mensajeIngresoDicho(monto: number, cuando: string, proximo: string | null): string {
   const siguiente = proximo ? ` Tu próximo pago es el ${proximo}.` : '';
   return `Listo: tu ingreso es ${formatearCentavos(monto)}, ${cuando}.${siguiente}`;
+}
+
+/** «Tengo 4,200 en BBVA»: lo que llevo contra lo que dices. */
+export function tituloConfirmarSaldo(nombre: string): string {
+  return `¿Ajusto ${nombre}?`;
+}
+export const TEXTO_SALDO_LLEVO = 'Yo llevo';
+export const TEXTO_SALDO_DICES = 'Tú dices';
+export const AYUDA_SALDO_DICHO =
+  'Si falta algún movimiento, mejor regístralo. Si no, ajusto la diferencia y no la cuento como gasto ni ingreso.';
+export const BTN_AJUSTAR_SALDO = 'Ajustar';
+
+export function mensajeSaldoAjustado(nombre: string, monto: number): string {
+  return `Listo: en ${nombre} tienes ${formatearCentavos(monto)}.`;
+}
+
+export function mensajeSaldoSinCambio(nombre: string, monto: number): string {
+  return `Ya llevaba ${formatearCentavos(monto)} en ${nombre}. No cambié nada.`;
 }
 
 export function mensajePasarAMeses(m: ResumenTransaccion, meses: number): string {

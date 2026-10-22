@@ -39,7 +39,7 @@ Siguiente build: iOS 1.0.0 (4) y Android versionCode 2.
    (tarjeta «Entendí esto» editable, alta atómica), O5 «pago 4500 de renta cada mes» (día vacío si no se dijo),
    O7 por el micrófono del campo.
 4. **Desde Hoy:** aplicar `ingreso_recurrente`, `saldo_cuenta` y `colchon` que el nivel 0 ya entiende, con tarjeta de
-   confirmación. Hecho para colchón (con Deshacer) e ingreso (con tarjeta); el saldo de cuenta queda pendiente.
+   confirmación. Hecho: colchón (con Deshacer), ingreso y saldo de cuenta (con tarjeta de confirmación).
 5. Permiso al primer toque, «Abrir ajustes» si se niega, micrófono oculto si no hay reconocimiento, cero texto dictado
    en logs (regla 9). Pruebas: tabla + propiedad fast-check de montos en palabras, jest de `CampoMonto` con motor falso.
 

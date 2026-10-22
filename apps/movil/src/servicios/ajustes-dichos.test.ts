@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { fijarColchon, obtenerColchon } from './ajustes';
-import { confirmarIngresoDicho } from './ajustes-dichos';
+import { confirmarIngresoDicho, confirmarSaldoDicho } from './ajustes-dichos';
 import { deshacer } from './deshacer';
-import { configurarIngreso } from './onboarding';
+import { agregarCuenta, configurarIngreso } from './onboarding';
 import { ingresoPrincipal } from './programados';
 import { contarPorInterpretar, registrarTexto, registrarTextoLocal } from './registrar';
 import { abrirPrueba } from './__pruebas__/base';
@@ -56,5 +56,34 @@ describe('colchón e ingreso dichos (nivel 0, sin nube)', () => {
     const r = registrarTextoLocal(p.ctx, 'me pagan 8 mil cada mes el 30', 'voz');
     if (r?.resultado !== 'ingreso_por_confirmar') throw new Error(`llegó ${r?.resultado}`);
     expect(r.propuesta.anterior).toBeNull();
+  });
+});
+
+describe('saldo dicho («tengo 4,200 en BBVA», `04 §6` caso 22)', () => {
+  it('propone el ajuste y solo lo registra al confirmar; Deshacer lo regresa', () => {
+    const p = preparar();
+    const bbva = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 435_000 });
+    const r = registrarTextoLocal(p.ctx, 'tengo 4,200 en BBVA', 'voz');
+    if (r?.resultado !== 'saldo_por_confirmar') throw new Error(`llegó ${r?.resultado}`);
+    expect(r.propuesta).toEqual({ cuentaId: bbva, nombre: 'BBVA', saldoLibro: 435_000, saldoReal: 420_000 });
+    expect(p.ctx.libro.saldo(bbva)).toBe(435_000);
+    const id = confirmarSaldoDicho(p.ctx, r.propuesta);
+    expect(p.ctx.libro.saldo(bbva)).toBe(420_000);
+    if (!id) throw new Error('sin conciliación');
+    deshacer(p.ctx, id);
+    expect(p.ctx.libro.saldo(bbva)).toBe(435_000);
+  });
+
+  it('si ya cuadraba no cambia nada, y el efectivo va al arqueo', () => {
+    const p = preparar();
+    agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 420_000 });
+    agregarCuenta(p.ctx, { subtipo: 'efectivo', nombre: 'Efectivo', saldo: 50_000 });
+    expect(registrarTextoLocal(p.ctx, 'tengo 4,200 en BBVA', 'voz')).toEqual({
+      resultado: 'saldo_sin_cambio',
+      nombre: 'BBVA',
+      monto: 420_000,
+    });
+    const r = registrarTextoLocal(p.ctx, 'tengo 300 en efectivo', 'voz');
+    expect(r?.resultado === 'arqueo' || r === null).toBe(true);
   });
 });
