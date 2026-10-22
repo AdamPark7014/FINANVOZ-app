@@ -43,10 +43,18 @@
   descripción). Al repetir `rendimiento.test.ts` solo pasó.
 - **App Store Connect: app «Finanvoz» creada el 22-10** (Apple ID 6825850016, es-MX, SKU `FINANVOZ-IOS`, acceso
   ilimitado) y App ID `com.finanvoz.app` registrado con Push Notifications en el equipo AHNW9K8745. Falta llenar ficha,
-  privacidad y revisión (§5–§7 de `docs/tienda/IOS-APP-STORE.md`) y la primera build por «iOS · TestFlight».
-- **Adam:** correr `pwsh -File scripts\subir-secretos-ios.ps1` y `pwsh -File scripts\subir-secretos-android.ps1`;
-  respaldar la llave de subida fuera de la PC. Después: Actions → «iOS · TestFlight» y «Android · Play», y subir el
-  AAB a prueba interna.
+  privacidad y revisión (§5–§7 de `docs/tienda/IOS-APP-STORE.md`).
+- **Secretos cargados el 22-10 por Claude** (Adam pidió que corra yo los comandos): los 4 `ANDROID_*` y los 5 de iOS
+  (certificado del equipo + llave PEM de `C:\dev\secrets\arta-ios`, llave ASC `H7VXTV487C`, Issuer ID).
+- **TestFlight: build 1.0.0 (3) válida** (corrida 39821272914; vence 20-01-2027). Grupo interno «Equipo Finanvoz
+  (interno)» creado por la API; **falta agregar a Adam como tester en la consola** (la API responde «Tester(s) cannot
+  be assigned»). Las cargas (1) y (2) fallaron: manifiesto de privacidad y textos de permiso (ITMS-90683), ya
+  corregidos y vigilados por el flujo.
+- **Play: AAB 1.0.0 (código 1) firmado** (corrida 39812387570), copiado a `C:\dev\builds\FINANVOZ\finanvoz-1.0.0-1.aab`
+  y `Documents\FINANVOZ-builds\`. **Falta que Adam lo arrastre** a la versión de prueba interna en borrador de Play
+  Console (la herramienta del navegador solo sube archivos de hasta 10 MB y Play exige la primera subida a mano);
+  luego se llena nombre, notas y testers y se publica en prueba interna. Respaldar `Documents\LLAVES-ANDROID\FINANVOZ`
+  fuera de la PC.
 - Las observaciones de Hoy y el O5 nuevo solo se han visto en pruebas y en el emulador (sin datos de varios días no
   salen observaciones). Falta verlas con un libro real en el teléfono de Adam.
 - M0 / dominio `finanvoz.com` / aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa, no la
@@ -54,8 +62,8 @@
 
 ## Siguiente paso
 
-1. Adam — secretos (`subir-secretos-ios.ps1`, `subir-secretos-android.ps1`); luego primera corrida de TestFlight y
-   de Play (prueba interna).
+1. Adam — arrastrar el AAB a Play Console y agregarse como tester en el grupo interno de TestFlight; Claude termina la
+   versión de prueba interna en Play (nombre, notas, testers, publicar).
 2. Adam — M0 antes del 6 nov; cuentas Expo/RevenueCat/PostHog; contador; abogado; pruebas en teléfono.
 3. Código: los 27 casos del golden set que siguen en `null` (`06 §9.3`) se quedan así a propósito; si Adam quiere
    más cobertura sin nube, conviene crecer el golden set con frases reales antes de inventar reglas.

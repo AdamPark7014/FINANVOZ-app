@@ -76,6 +76,14 @@ llegan a corridas de forks.
 
 ## 4. TestFlight
 
+**Estado al 22-10-2026:** la build **1.0.0 (3)** está procesada y **válida** en TestFlight (vence el 20-01-2027;
+cifrado declarado: no). Las cargas (1) y (2) fallaron: (1) en la validación del flujo, sin manifiesto de privacidad;
+(2) rechazada por Apple con ITMS-90683, sin los textos de micrófono y galería. Grupo interno **«Equipo Finanvoz
+(interno)»** creado por la API, con acceso a todas las builds. **Falta agregar a Adam como tester**: la API con la
+llave de Gestor de apps responde «Tester(s) cannot be assigned», así que se hace en la consola (TestFlight → Equipo
+Finanvoz (interno) → Testers → «+» → Adam Del Pozo Ontiveros, el mismo usuario que en el grupo de ARTA). Después llega la
+invitación a la app TestFlight del iPhone.
+
 GitHub → Actions → **iOS · TestFlight** → Run workflow (rama `main`):
 
 | Input | Valor |
