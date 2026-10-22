@@ -6,6 +6,7 @@ import {
   funcionesPlan,
   marcarAvisoVisto,
   obtenerHoy,
+  obtenerObservaciones,
   type Aviso,
   type ConceptoReservado,
   type ConsultaMeAlcanza,
@@ -36,6 +37,7 @@ import { ACCESIBILIDAD_ABRIR, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { CandadoPlus } from '../plan/CandadoPlus';
 import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { Observaciones } from './Observaciones';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
 import { TarjetasAccion } from './TarjetasAccion';
@@ -83,6 +85,7 @@ export function PantallaHoy({
   bloques?: Omit<OpcionesBloques, 'senal'>;
 }) {
   const vista = useVista(obtenerHoy);
+  const observaciones = useVista(obtenerObservaciones);
   const plus = useVista(funcionesPlan);
   const [verDesglose, setVerDesglose] = useState(false);
   // "Hablar" y "Escribir" van fijos al pie (sobre las pestañas): el aviso de "Deshacer" sube para no taparlos.
@@ -141,6 +144,11 @@ export function PantallaHoy({
           {verDesglose ? <Desglose vista={vista} /> : null}
         </>
       ) : null}
+      {/* "Lo que veo" (`02 §4.3`): bajo el desglose y antes de las tarjetas de acción. */}
+      <Observaciones
+        observaciones={observaciones}
+        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
+      />
       {vista.efectivoMenosPreciso ? (
         <Tarjeta testID="efectivo-menos-preciso">
           <Texto

@@ -230,6 +230,14 @@ export {
 } from './hoy';
 export { marcarAvisoVisto, type Aviso } from './avisos';
 export {
+  marcarObservacionVista,
+  MAX_OBSERVACIONES,
+  observacionesVistas,
+  obtenerObservaciones,
+  type Observacion,
+  type PeriodoObservacion,
+} from './observaciones';
+export {
   aportarTanda,
   archivarTanda,
   cobrarTanda,

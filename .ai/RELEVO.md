@@ -26,12 +26,15 @@
 
 ## A medias — CUIDADO
 
-- **Dos agentes de Claude quedaron trabajando al cortarse la sesión por límite de uso (21-10, ~14:20):** uno amplía el
+- **Un agente de Claude sigue trabajando (21-10, tarde):** amplía el
   nivel 0 del intérprete (`packages/nlu/src/reglas`, pruebas, `docs/06-NLU.md` §9, banderas `reglas` en
-  `fixtures/nlu/golden.jsonl`, fila en ESTADO) y otro construye «Observaciones» en Hoy
-  (`apps/movil/src/servicios/observaciones.ts` + test, `pantallas/principal/Observaciones.tsx`, textos, `docs/02-UX.md`
-  §4.3, fila en ESTADO). **Si hay archivos sin commitear ahí, son suyos: `relevo.ps1 salvar`, revisar con
-  `pnpm eval:nlu --nivel reglas` (debe seguir en precisión 100 %), vitest, jest y lint, y commitear por separado.**
+  `fixtures/nlu/golden.jsonl`, fila en ESTADO). **Si hay archivos sin commitear ahí, son suyos: `relevo.ps1 salvar`,
+  revisar con `pnpm eval:nlu --nivel reglas` (debe seguir en precisión 100 %), vitest, typecheck y lint, y commitear.**
+- **Observaciones en Hoy («Lo que veo»)** (pedido «haz más inteligente la app»): comparativa por categoría vs periodo
+  anterior, gasto fuera de lo normal, posible cargo doble, ritmo del periodo y suscripciones del mes; máximo 2,
+  «Ya lo vi» en `ajuste observaciones_vistas`, «Ver movimientos» con filtro. `servicios/observaciones.ts` (21 pruebas),
+  `pantallas/principal/Observaciones.tsx`, textos con prueba de palabras prohibidas; jest Hoy 81/81, accesibilidad
+  6/6, typecheck y lint en verde. `02 §4.3` nuevo y fila en ESTADO. Nunca consejos (`08 §1`).
 - **Plan en iPhone sin tienda** (`PantallaPlan` con `Platform.OS === 'ios'`): sin ofertas ni «Restaurar compras» ni
   nombres de tiendas; jest 12/12. Resuelve el hallazgo 2.3.10 de la ficha de iOS.
 - **Play Console: app «Finanvoz» creada el 21-10** (id 4974369200915032127, cuenta NEXARA, es-419) con el sí de Adam;
