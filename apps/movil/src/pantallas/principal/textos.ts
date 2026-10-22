@@ -81,6 +81,10 @@ export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 /** TalkBack en Debes (`02 §11`, `02 §15`). */
 export const PISTA_AGREGAR_TARJETA_CREDITO = 'Abre el formulario para registrar una tarjeta de crédito';
+/** Hoy sin ningún movimiento todavía: cómo se dicta el primero. */
+export const TITULO_PRIMER_USO = 'Dime tu primer gasto';
+export const TEXTO_PRIMER_USO =
+  'Toca el botón del micrófono y di algo como «tacos 80 en efectivo». Lo anoto al momento y la cifra de arriba se ajusta.';
 /** Tienes en Cuentas: débito, billetera o ahorro después del onboarding (`02 §11`). */
 export const BTN_AGREGAR_CUENTA = 'Agregar cuenta';
 export const PISTA_AGREGAR_CUENTA =

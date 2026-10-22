@@ -46,7 +46,7 @@ Siguiente build: iOS 1.0.0 (4) y Android versionCode 2.
 ## Ola 3 · Más intuitiva (sigue `02 §16`; cada desvío se registra en ESTADO)
 
 1. **Hoy con jerarquía:** cifra en un bloque destacado y tocable, desglose abierto en 4 filas, acciones antes que
-   observaciones, Plus y «¿Me alcanza?» abajo.
+   observaciones, Plus y «¿Me alcanza?» abajo. Hecho (el desglose sigue cerrado al abrir; tocar la cifra lo abre).
 2. **Registrar como hoja modal** (`presentation: 'modal'`), con «Hablar · Escribir · Formulario» y fecha Hoy/Ayer.
 3. **Barra de navegación nativa** (título grande y chevron en iOS), sin «Volver» dentro del contenido.
 4. **«Agregar» en Cuentas** (débito, billetera, ahorro, pago fijo) fuera del onboarding: hoy en iPhone no se puede. Hecho.
