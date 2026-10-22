@@ -5,7 +5,12 @@ import { ingresoPrincipal } from '../../servicios/programados';
 import { conEscenario } from './__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaHoy } from './PantallaHoy';
-import { AYUDA_SALDO_DICHO, BTN_GUARDAR_INGRESO, mensajeColchonDicho, TITULO_CONFIRMAR_INGRESO } from './textos';
+import {
+  AYUDA_SALDO_DICHO,
+  BTN_GUARDAR_INGRESO,
+  mensajeColchonDicho,
+  TITULO_CONFIRMAR_INGRESO,
+} from './textos';
 
 function escribirEnHoy(frase: string) {
   fireEvent.press(screen.getByTestId('boton-escribir'));
