@@ -4,6 +4,7 @@ export {
   CORREO_AYUDA,
   enlaceCorreoAyuda,
   PREGUNTAS_FRECUENTES,
+  PREGUNTAS_FRECUENTES_IOS,
   type PreguntaFrecuente,
 } from './preguntas';
 export {

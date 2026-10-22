@@ -12,6 +12,7 @@ import {
   type PuertoNotificaciones,
 } from '../../servicios';
 import { sincronizarAvisosOcurrencias } from '../../servicios/avisos-ocurrencias';
+import { useControlAppOpcional } from '../../sesion/ControlApp';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 
 /** Permiso de avisos del teléfono en palabras de la app. */
@@ -123,6 +124,8 @@ export function notificacionesEnMemoria(inicial: PermisoAvisos = 'concedido') {
 export function SincronizarAvisosTarjetas({ hora = horaDispositivo }: { hora?: () => string }) {
   const { ctx, version } = useSesion();
   const notificaciones = useNotificaciones();
+  // `null` = la build no trae respaldo en la nube; ausente (pruebas sueltas) se trata como disponible.
+  const conNube = useControlAppOpcional()?.respaldo?.nube !== null;
   const estado = useRef<{ corriendo: boolean; pendiente: boolean }>({ corriendo: false, pendiente: false });
 
   useEffect(() => {
@@ -141,7 +144,7 @@ export function SincronizarAvisosTarjetas({ hora = horaDispositivo }: { hora?: (
           // Recordatorios de cobro (RF-PER-03): se cancelan solos cuando la persona ya te pagó.
           await sincronizarRecordatoriosCobro(ctx, notificaciones.puerto, hora());
           // "Respaldo pendiente" (M9): a los 14 días sin respaldo y uno por semana; un respaldo nuevo lo recorre.
-          await sincronizarAvisoRespaldo(ctx, notificaciones.puerto, hora());
+          await sincronizarAvisoRespaldo(ctx, notificaciones.puerto, hora(), { conNube });
           // Aportación de tanda, compromiso sin cubrir e ingreso que no llegó: se cancelan al resolverse.
           await sincronizarAvisosOcurrencias(ctx, notificaciones.puerto, hora());
         } while (estado.current.pendiente);
@@ -152,7 +155,7 @@ export function SincronizarAvisosTarjetas({ hora = horaDispositivo }: { hora?: (
       }
     };
     void correr();
-  }, [ctx, version, notificaciones, hora]);
+  }, [ctx, version, notificaciones, hora, conNube]);
 
   // Montado aquí porque este componente ya vive en la raíz, dentro de la sesión y junto a la navegación.
   return <AbrirAvisoTocado />;

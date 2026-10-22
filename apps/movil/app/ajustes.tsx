@@ -40,6 +40,7 @@ import { SeccionVoz } from '../src/pantallas/ajustes/SeccionVoz';
 import { SeccionWidget } from '../src/pantallas/ajustes/SeccionWidget';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
+import { autenticadorExpo, MENSAJES_AUTENTICACION } from '../src/seguridad';
 import { fijarBloqueo, obtenerBloqueo, obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
@@ -74,6 +75,26 @@ export default function Ajustes() {
     }
   };
 
+  /** Activar el bloqueo en un teléfono sin código dejaría fuera a la persona: primero se verifica que es ella. */
+  const activarBloqueo = async () => {
+    try {
+      if (!(await autenticadorExpo.disponible())) {
+        setMensaje(MENSAJES_AUTENTICACION.sin_seguridad);
+        return;
+      }
+      const r = await autenticadorExpo.autenticar();
+      if (!r.exito) {
+        setMensaje(MENSAJES_AUTENTICACION[r.error]);
+        return;
+      }
+    } catch {
+      setMensaje(MENSAJES_AUTENTICACION.fallo);
+      return;
+    }
+    setMensaje(null);
+    cambiarBloqueo({ activo: true });
+  };
+
   const tocarVersion = () => {
     if (!__DEV__ || !control.cargarEscenario) return;
     toques.current += 1;
@@ -88,7 +109,7 @@ export default function Ajustes() {
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         pista={PISTA_VOLVER}
-        alPresionar={() => router.back()}
+        alPresionar={() => (router.canGoBack() ? router.back() : router.replace('/cuentas'))}
       />
       <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
         {TITULO}
@@ -104,7 +125,7 @@ export default function Ajustes() {
           etiqueta={ETIQUETA_BLOQUEO}
           descripcion={DESC_BLOQUEO}
           valor={bloqueo.activo}
-          alCambiar={(activo) => cambiarBloqueo({ activo })}
+          alCambiar={(activo) => (activo ? void activarBloqueo() : cambiarBloqueo({ activo }))}
         />
         <Interruptor
           testID="ajustes-multitarea"
@@ -122,9 +143,16 @@ export default function Ajustes() {
 
       <Tarjeta testID="ajustes-respaldo">
         <Texto variante="subtitulo">{SECCION_RESPALDO}</Texto>
-        <Texto variante="secundario" tono={respaldo.pendiente ? 'faltante' : 'secundario'}>
-          {respaldo.textoUltimo}
-        </Texto>
+        {control.respaldo?.nube === null ? (
+          // Sin respaldo en la nube en esta build: no se reclama lo que no se puede hacer.
+          <Texto variante="secundario" tono="secundario">
+            Guarda una copia cifrada de tus datos en un archivo.
+          </Texto>
+        ) : (
+          <Texto variante="secundario" tono={respaldo.pendiente ? 'faltante' : 'secundario'}>
+            {respaldo.textoUltimo}
+          </Texto>
+        )}
         <Boton
           testID="ajustes-abrir-respaldo"
           variante="secundario"

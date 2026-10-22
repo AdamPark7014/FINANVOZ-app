@@ -195,3 +195,29 @@ export const PREGUNTAS_FRECUENTES: readonly PreguntaFrecuente[] = [
     ],
   },
 ];
+
+/** Lo que cambia en iPhone: sin captura de notificaciones ni compras dentro de la app (todavía). */
+const RESPUESTAS_IOS: Readonly<Record<string, readonly string[]>> = {
+  captura: [
+    'En iPhone todavía no leo los avisos de tu banco: Apple no lo permite. Dicta o escribe tus gastos desde Hoy («tacos 80 en efectivo») y los anoto al momento.',
+    'Lo que no entienda va a Movimientos, en Por revisar, para que lo completes.',
+  ],
+  permisos: [
+    'Micrófono y reconocimiento de voz mientras usas el botón de voz; avisos de cortes y arqueos; Face ID o tu código si activas el bloqueo.',
+    'Ninguno es obligatorio: puedes escribir todo a mano. Los revisas en Ajustes › Privacidad › Revisar permisos en tu teléfono.',
+  ],
+  plus: [
+    `Plus: probabilidad de llegar al pago, «¿Me alcanza?», tarjeta del día, meses a 12 meses, preguntas libres, deducciones y ${INTERPRETACIONES_NUBE_MES.plus} frases al mes en internet (Gratis, ${INTERPRETACIONES_NUBE_MES.gratis}).`,
+    'En iPhone todavía no se puede contratar. Todo lo de Gratis funciona igual: «hoy puedes», voz, cuentas y tarjetas, avisos, arqueo, respaldo y exportar o borrar datos.',
+  ],
+  borrar: [
+    'Ajustes › Privacidad: «Descargar todos mis datos» (gratis) o «Borrar todos mis datos» en este teléfono; confirmas escribiendo BORRAR y no se deshace.',
+    'Respaldo en la nube: Ajustes › Respaldo › Borrar cuenta de respaldo.',
+  ],
+};
+
+/** Las mismas 10 preguntas con las respuestas de iPhone donde cambian. */
+export const PREGUNTAS_FRECUENTES_IOS: readonly PreguntaFrecuente[] = PREGUNTAS_FRECUENTES.map((p) => {
+  const respuesta = RESPUESTAS_IOS[p.id];
+  return respuesta ? { ...p, respuesta } : p;
+});

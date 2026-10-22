@@ -23,7 +23,7 @@ export default function Privacidad() {
         </Texto>
       ) : null}
       <CentroPrivacidad
-        alVolver={() => router.back()}
+        alVolver={() => (router.canGoBack() ? router.back() : router.replace('/ajustes'))}
         alLeerAviso={() => router.push('/aviso-privacidad')}
         alLeerTerminos={() => router.push('/terminos')}
         alBorrarTodo={() => control.borrarTodo()}

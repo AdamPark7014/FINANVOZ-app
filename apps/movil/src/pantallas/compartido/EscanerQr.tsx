@@ -1,6 +1,6 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRef } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { Boton, espacio, Texto } from '../../ui';
 import {
   BTN_CANCELAR,
@@ -59,6 +59,11 @@ export function EscanerQr({
             etiquetaAccesible={INSTRUCCION_PERMISO_CAMARA}
             pista={PISTA_PERMISO_CAMARA}
             alPresionar={() => {
+              // Negado una vez, el sistema ya no muestra el diálogo: se manda a los ajustes del teléfono.
+              if (permiso && !permiso.granted && !permiso.canAskAgain) {
+                void Linking.openSettings().catch(() => {});
+                return;
+              }
               pedirPermiso().catch(() => {});
             }}
           />

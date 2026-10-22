@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Linking, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import {
   AVISO_DEDUCIBLE_EFECTIVO,
   contarEsperandoConexion,
@@ -38,6 +38,7 @@ import {
   ETIQUETA_ESCUCHANDO,
   fraseRespuestaVoz,
   MENSAJES_DICTADO,
+  Microfono,
   mensajeEstoOi,
   PISTA_ESCUCHANDO,
   PISTA_HABLAR,
@@ -644,6 +645,17 @@ export function PanelRegistrar({
           {errorVoz}
         </Texto>
       ) : null}
+      {dictado.estado === 'sin_permiso' ? (
+        // El sistema ya no vuelve a preguntar: sin este botón no hay salida (iOS lo recuerda para siempre).
+        <Boton
+          etiqueta="Abrir ajustes"
+          variante="texto"
+          ancho="contenido"
+          pista="Abre los ajustes del teléfono para permitir el micrófono"
+          alPresionar={() => void Linking.openSettings().catch(() => {})}
+          testID="voz-abrir-ajustes"
+        />
+      ) : null}
       {interpretando ? (
         <Texto
           variante="secundario"
@@ -799,32 +811,6 @@ export function PanelRegistrar({
       {respuestas}
       {controles}
       {extras}
-    </View>
-  );
-}
-
-/** Ícono de micrófono dibujado con vistas (sin dependencias de íconos). */
-function Microfono({ color }: { color: string }) {
-  return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-      style={{ alignItems: 'center' }}
-    >
-      <View style={{ width: 10, height: 15, borderRadius: 5, backgroundColor: color }} />
-      <View
-        style={{
-          width: 16,
-          height: 8,
-          marginTop: -4,
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8,
-          borderWidth: 2,
-          borderTopWidth: 0,
-          borderColor: color,
-        }}
-      />
-      <View style={{ width: 2, height: 3, backgroundColor: color }} />
     </View>
   );
 }

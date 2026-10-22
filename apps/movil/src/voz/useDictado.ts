@@ -1,9 +1,15 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { clasificarErrorMotor, ESTADO_INICIAL, reducirDictado, type EstadoDictado } from './estado';
 import type { EventoMotor, MotorDictado, OpcionesMotor } from './motor';
 import { motorExpo } from './motor-expo';
 
 export const IDIOMA_DICTADO = 'es-MX';
+
+/**
+ * Un solo dictado a la vez en toda la app: el reconocedor es uno y todos los `useDictado` oyen sus eventos. Quien
+ * empieza a escuchar suelta al anterior (p. ej. el micrófono de un campo mientras Hoy escuchaba).
+ */
+let soltarDuenoActual: (() => void) | null = null;
 
 export interface OpcionesDictado {
   /** Reconocedor; por omisión el de expo-speech-recognition. Las pruebas inyectan uno falso. */
@@ -36,6 +42,12 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
 
   // Estado mutable del dictado en curso; solo se lee en manejadores, nunca durante el render.
   const sesion = useRef({ activa: false, parcial: '', opciones: null as OpcionesMotor | null });
+  // Estable por instancia: suelta este dictado sin tocar el reconocedor (quien lo toma lo reinicia).
+  const [soltar] = useState(() => () => {
+    if (!sesion.current.activa) return;
+    sesion.current.activa = false;
+    despachar({ tipo: 'cancelar' });
+  });
 
   useEffect(() => {
     const terminar = (texto: string) => {
@@ -81,12 +93,13 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
     const s = sesion.current;
     return () => {
       cancelar();
+      if (soltarDuenoActual === soltar) soltarDuenoActual = null;
       if (s.activa) {
         s.activa = false;
         motor.abortar();
       }
     };
-  }, [motor]);
+  }, [motor, soltar]);
 
   const iniciar = useCallback(async () => {
     if (sesion.current.activa) return;
@@ -104,10 +117,15 @@ export function useDictado({ motor = motorExpo, alTerminar }: OpcionesDictado = 
       resultadosParciales: true,
       enDispositivo: motor.soportaEnDispositivo(),
     };
+    if (soltarDuenoActual && soltarDuenoActual !== soltar) {
+      soltarDuenoActual();
+      motor.abortar();
+    }
+    soltarDuenoActual = soltar;
     Object.assign(sesion.current, { activa: true, parcial: '', opciones });
     despachar({ tipo: 'escuchar' });
     motor.iniciar(opciones);
-  }, [motor]);
+  }, [motor, soltar]);
 
   const detener = useCallback(() => {
     if (!sesion.current.activa) return;

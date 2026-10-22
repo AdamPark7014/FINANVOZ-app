@@ -7,6 +7,7 @@ import {
   Chips,
   ERROR_GUARDAR,
   MensajeError,
+  OMITIR_CAPTURA_ONB,
   PasoOnboarding,
   type OpcionChip,
 } from '../../src/pantallas/onboarding/componentes';
@@ -211,7 +212,7 @@ export default function PagosFijos() {
           etiqueta={agregados.length > 0 ? BTN_ONB_CONTINUAR : BTN_ONB_SALTAR}
           variante={agregados.length > 0 ? 'primario' : 'secundario'}
           pista={agregados.length > 0 ? PISTA_PAGOS_CONTINUAR : PISTA_PAGOS_SALTAR}
-          alPresionar={() => router.push('/onboarding/captura')}
+          alPresionar={() => router.push(OMITIR_CAPTURA_ONB ? '/onboarding/colchon' : '/onboarding/captura')}
         />
       }
     >

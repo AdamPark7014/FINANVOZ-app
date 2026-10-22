@@ -10,6 +10,8 @@ export {
   type TipoCuenta,
 } from './resolutor';
 export { interpretarReglas } from './reglas';
+export { interpretarMonto } from './reglas/campos';
+export type { LecturaMonto } from './reglas/montos';
 export { compararInterpretacion } from './eval/comparar';
 export * from './cliente';
 export * from './explicar';

@@ -268,13 +268,18 @@ export function planAvisoRespaldo(ctx: Contexto, horaActual: HoraDelDia): AvisoR
   });
 }
 
-/** Deja en el teléfono exactamente los avisos de respaldo pendiente (idempotente). */
+/**
+ * Deja en el teléfono exactamente los avisos de respaldo pendiente (idempotente). Con `conNube: false` (build sin
+ * respaldo en la nube) no hay nada que atender: se quitan los que hubiera.
+ */
 export function sincronizarAvisoRespaldo(
   ctx: Contexto,
   puerto: PuertoNotificaciones,
   horaActual: HoraDelDia,
+  { conNube = true }: { readonly conNube?: boolean } = {},
 ): Promise<ResultadoSincronizacion> {
-  return sincronizarAvisos(puerto, planAvisoRespaldo(ctx, horaActual), PREFIJO_AVISO_RESPALDO);
+  const plan = conNube ? planAvisoRespaldo(ctx, horaActual) : [];
+  return sincronizarAvisos(puerto, plan, PREFIJO_AVISO_RESPALDO);
 }
 
 /** Mensaje de UI para un error del respaldo en la nube o de la cuenta (`02 §14`); nunca lleva datos. */

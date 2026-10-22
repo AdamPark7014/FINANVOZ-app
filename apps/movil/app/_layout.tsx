@@ -23,6 +23,7 @@ import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/Sincron
 import { SincronizarWidget } from '../src/widget/SincronizarWidget';
 import { programarTareaDiaria } from '../src/tareas/programar';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
+import { ProveedorDictadoCampos } from '../src/voz';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import {
@@ -155,11 +156,13 @@ export default function Raiz() {
         <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
           <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
             <ProveedorAnalitica analitica={analitica}>
-              <AppProtegida
-                reiniciada={estado.generacion > 0}
-                evidencia={evidencia}
-                avisoInicial={estado.aviso ?? null}
-              />
+              <ProveedorDictadoCampos>
+                <AppProtegida
+                  reiniciada={estado.generacion > 0}
+                  evidencia={evidencia}
+                  avisoInicial={estado.aviso ?? null}
+                />
+              </ProveedorDictadoCampos>
             </ProveedorAnalitica>
           </ProveedorPlan>
         </ProveedorSesion>

@@ -17,7 +17,19 @@ export { Tarjeta, type TarjetaProps } from './componentes/Tarjeta';
 export { Cifra, type CifraProps } from './componentes/Cifra';
 export { Interruptor, type InterruptorProps } from './componentes/Interruptor';
 export { CampoTexto, type CampoTextoProps } from './componentes/CampoTexto';
-export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
+export {
+  CampoMonto,
+  ERROR_FORMATO_MONTO,
+  textoOidoMonto,
+  type CampoMontoProps,
+} from './componentes/CampoMonto';
+export {
+  ContextoDictadoCampos,
+  useDictadoCampos,
+  type DictadoCampos,
+  type LecturaMontoDictado,
+  type PropsBotonDictarCampo,
+} from './componentes/dictado-campo';
 export { EstadoVacio } from './componentes/EstadoVacio';
 export { Barra, type BarraProps } from './componentes/Barra';
 export { Aviso, useAviso, type AccionAviso, type AvisoProps, type DatosAviso } from './componentes/Aviso';
