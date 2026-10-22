@@ -17,9 +17,13 @@ import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { TarjetaCreditoLista } from '../tarjetas/TarjetaCreditoLista';
 import { EstadoVacio } from './EstadoVacio';
 import {
+  BTN_AGREGAR_CUENTA,
+  BTN_AGREGAR_PAGO_FIJO,
   BTN_AGREGAR_TARJETA_CREDITO,
   BTN_AJUSTES_CUENTAS,
   BTN_AJUSTES_CUENTAS_ACCESIBLE,
+  PISTA_AGREGAR_CUENTA,
+  PISTA_AGREGAR_PAGO_FIJO,
   PISTA_AGREGAR_TARJETA_CREDITO,
   PISTA_COBRAR_DESDE_CUENTAS,
   PISTA_CONTAR_EFECTIVO,
@@ -51,6 +55,8 @@ export function PantallaCuentas({
   alAbrirAjustes,
   alAbrirTarjeta,
   alAgregarTarjeta,
+  alAgregarCuenta,
+  alAgregarPagoFijo,
   alContarEfectivo,
   alAbrirPersona,
   alAbrirTandas,
@@ -63,6 +69,10 @@ export function PantallaCuentas({
   alAbrirPersona?: (personaId: string) => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
   alAgregarTarjeta?: () => void;
+  /** Tienes → «Agregar cuenta» (débito, billetera o ahorro). */
+  alAgregarCuenta?: () => void;
+  /** Compromisos → «Agregar pago fijo». */
+  alAgregarPagoFijo?: () => void;
   /** Cuentas → Efectivo → arqueo (`02 §7`). */
   alContarEfectivo?: (cuentaId: string) => void;
   /** Cuentas → Tandas (`02 §18`). */
@@ -131,6 +141,16 @@ export function PantallaCuentas({
               />
             ))}
           </View>
+        ) : null}
+        {alAgregarCuenta ? (
+          <Boton
+            etiqueta={BTN_AGREGAR_CUENTA}
+            pista={PISTA_AGREGAR_CUENTA}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alAgregarCuenta}
+            testID="boton-agregar-cuenta"
+          />
         ) : null}
       </Seccion>
 
@@ -229,6 +249,16 @@ export function PantallaCuentas({
               />
             ))}
           </View>
+        ) : null}
+        {alAgregarPagoFijo ? (
+          <Boton
+            etiqueta={BTN_AGREGAR_PAGO_FIJO}
+            pista={PISTA_AGREGAR_PAGO_FIJO}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alAgregarPagoFijo}
+            testID="boton-agregar-pago-fijo"
+          />
         ) : null}
       </Seccion>
 
