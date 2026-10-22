@@ -26,6 +26,7 @@ export {
 export {
   ContextoDictadoCampos,
   useDictadoCampos,
+  type AvisoDictadoCampo,
   type DictadoCampos,
   type LecturaMontoDictado,
   type PropsBotonDictarCampo,

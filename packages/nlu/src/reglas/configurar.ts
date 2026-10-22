@@ -11,9 +11,9 @@ import { Lector } from './lector';
 import { leerEntero, leerMonto, leerOrdinal } from './montos';
 import { ARTICULOS, type Tokens, palabraDesc } from './tokens';
 
-type ReglaRecurrente = Exclude<Regla, { tipo: 'unica' }>;
+export type ReglaRecurrente = Exclude<Regla, { tipo: 'unica' }>;
 
-const DIAS: Readonly<Record<string, DiaSemana>> = {
+export const DIAS: Readonly<Record<string, DiaSemana>> = {
   lunes: 1,
   martes: 2,
   miercoles: 3,
@@ -63,7 +63,7 @@ function quincenaDicha(l: Lector): boolean {
  *        | el N de cada mes | los N de cada mes | todos los DIA | el 15 y el último [de cada mes]
  * `null` si no hay regla o le falta el dato (un "cada mes" sin día no se adivina).
  */
-function leerRegla(l: Lector): ReglaRecurrente | null {
+export function leerRegla(l: Lector): ReglaRecurrente | null {
   const inicio = l.marca();
   const diaDeMes = (): number | null => {
     if (l.palabra('primero')) return 1;

@@ -1,5 +1,7 @@
 import { Stack } from 'expo-router';
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { interpretarMonto } from '@cartera/nlu';
+import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import type { ReactNode } from 'react';
 import { Text } from 'react-native';
 import AvisoPrivacidad from '../../../app/aviso-privacidad';
 import Inicio from '../../../app/index';
@@ -31,7 +33,14 @@ import {
   TIP_PAGOS_SALTAR,
 } from './tips';
 import { PISTA_ONBOARDING_RESTAURAR } from '../respaldo/textos';
-import { etiquetaHablada } from '../../ui';
+import {
+  ContextoDictadoCampos,
+  etiquetaHablada,
+  type DictadoCampos,
+  type PropsBotonDictarCampo,
+} from '../../ui';
+import { BotonDictarCampo } from '../../voz/BotonDictarCampo';
+import { crearMotorFalso } from '../principal/__pruebas__/arnes';
 import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
@@ -370,5 +379,55 @@ describe('onboarding', () => {
     expect(obtenerAjustes(s.ctx).colchon).toBe(0);
     r.unmount();
     expect(abrir('/').getPathname()).toBe('/hoy');
+  });
+});
+
+describe('onboarding dictado («O dímelo»)', () => {
+  function abrirConDictado(url: string) {
+    const f = crearMotorFalso();
+    const valor: DictadoCampos = {
+      BotonDictar: (p: PropsBotonDictarCampo) => <BotonDictarCampo {...p} motor={f.motor} />,
+      interpretarMonto,
+    };
+    const Envoltura = ({ children }: { children: ReactNode }) => (
+      <s.Envoltura>
+        <ContextoDictadoCampos.Provider value={valor}>{children}</ContextoDictadoCampos.Provider>
+      </s.Envoltura>
+    );
+    return { r: renderRouter(RUTAS, { initialUrl: url, wrapper: Envoltura }), f };
+  }
+
+  it('O3: «me pagan 8 mil cada viernes» llena frecuencia, día y monto; nada se guarda hasta Continuar', async () => {
+    const { r, f } = abrirConDictado('/');
+    tocar('onb-empezar');
+    tocar('onb-casilla-datos');
+    tocar('onb-aceptar');
+    const antes = conteoTablas();
+    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressIn');
+    await act(async () => {});
+    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressOut');
+    f.emitir({ tipo: 'resultado', texto: 'me pagan 8 mil cada viernes', final: true });
+    expect(screen.getByTestId('onb-ingreso-decir-resultado')).toHaveTextContent(/Revisa los datos/);
+    expect(screen.getByTestId('onb-ingreso-monto').props.value).toBe('8,000');
+    expect(screen.getByTestId('onb-dia-semana-5')).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/vie 16/);
+    expect(conteoTablas()).toEqual(antes);
+    tocar('onb-ingreso-continuar');
+    expect(r.getPathname()).toBe('/onboarding/cuentas');
+  });
+
+  it('O3: lo que no entiende no cambia nada', async () => {
+    const { f } = abrirConDictado('/');
+    tocar('onb-empezar');
+    tocar('onb-casilla-datos');
+    tocar('onb-aceptar');
+    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressIn');
+    await act(async () => {});
+    f.emitir({ tipo: 'resultado', texto: 'no sé cuánto gano', final: true });
+    expect(screen.getByTestId('onb-ingreso-decir-resultado')).toHaveTextContent(/no lo entendí/);
+    expect(screen.getByTestId('onb-ingreso-monto').props.value).toBe('');
   });
 });

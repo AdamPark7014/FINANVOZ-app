@@ -36,6 +36,7 @@ import {
   OPCIONES_FRECUENCIA,
   proximos14Dias,
   reglaDeIngreso,
+  respuestasDeIngresoDicho,
   type FinDeSemana,
   type Frecuencia,
 } from '../../src/pantallas/onboarding/ingreso';
@@ -45,6 +46,8 @@ import {
   etiquetaFecha,
   proximoPago,
 } from '../../src/servicios';
+import { interpretarIngresoDicho } from '@cartera/nlu';
+import { DecirloPaso } from '../../src/pantallas/onboarding/DecirloPaso';
 import { useSesion } from '../../src/sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, etiquetaHablada, Tarjeta, Texto } from '../../src/ui';
 
@@ -59,6 +62,8 @@ export default function Ingreso() {
   const [ancla, setAncla] = useState<PlainDate | null>(null);
   const [diaMesTexto, setDiaMesTexto] = useState('');
   const [monto, setMonto] = useState<Centavos | null>(null);
+  // Sube al dictar el paso: el campo de monto se vuelve a montar con lo dicho.
+  const [versionMonto, setVersionMonto] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const variable = frecuencia === 'varia';
@@ -121,6 +126,19 @@ export default function Ingreso() {
         </>
       }
     >
+      <DecirloPaso
+        testID="onb-ingreso-decir"
+        ejemplo="gano doce mil cada quincena"
+        interpretar={interpretarIngresoDicho}
+        alEntender={(d) => {
+          const r = respuestasDeIngresoDicho(d);
+          if (r.frecuencia) setFrecuencia(r.frecuencia);
+          if (r.diaSemana) setDiaSemana(r.diaSemana);
+          if (r.diaMesTexto) setDiaMesTexto(r.diaMesTexto);
+          setMonto(r.monto);
+          setVersionMonto((v) => v + 1);
+        }}
+      />
       <Chips
         testID="onb-frecuencia"
         opciones={OPCIONES_FRECUENCIA}
@@ -164,6 +182,8 @@ export default function Ingreso() {
             />
           ) : null}
           <CampoMonto
+            key={versionMonto}
+            valorInicial={monto}
             testID="onb-ingreso-monto"
             etiqueta={ETIQUETA_MONTO_INGRESO}
             ayuda={AYUDA_MONTO_INGRESO}

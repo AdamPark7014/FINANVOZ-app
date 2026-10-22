@@ -16,7 +16,8 @@ export function renderConSesion(ctx: Contexto, ui: ReactNode, nube: NivelNube | 
 
 /** Reconocedor falso: las pruebas emiten los eventos del dictado. */
 export function crearMotorFalso() {
-  let oyente: ((e: EventoMotor) => void) | null = null;
+  // Como el módulo nativo: cada `useDictado` montado (panel, campos de monto) se suscribe.
+  const oyentes = new Set<(e: EventoMotor) => void>();
   const motor = {
     disponible: () => true,
     soportaEnDispositivo: () => true,
@@ -25,13 +26,13 @@ export function crearMotorFalso() {
     detener: jest.fn(),
     abortar: jest.fn(),
     suscribir: (f: (e: EventoMotor) => void) => {
-      oyente = f;
+      oyentes.add(f);
       return () => {
-        oyente = null;
+        oyentes.delete(f);
       };
     },
   } satisfies MotorDictado;
-  const emitir = (e: EventoMotor) => act(() => oyente?.(e));
+  const emitir = (e: EventoMotor) => act(() => oyentes.forEach((o) => o(e)));
   return { motor, emitir };
 }
 
