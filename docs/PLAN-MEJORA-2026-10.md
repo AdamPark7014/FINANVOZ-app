@@ -119,9 +119,9 @@ interna de Play; nota a Adam con qué cambió y qué probar.
 | # | Decisión | Propuesta por omisión mientras no conteste |
 |---|---|---|
 | 1 | Plus en iPhone: no hay compras en iOS | Encender las funciones Plus gratis en iOS durante la prueba (TestFlight), y decidir el modelo de cobro antes de la tienda pública |
-| 2 | Maquetas de Hoy (A, B o C) y Registrar (R1 o R2) | No se construye nada visual grande sin su elección |
+| 2 | Maquetas de Hoy (A, B o C) y Registrar (R1 o R2) | **Decidido 22-10:** Hoy A «Conversación» con el micrófono grande de C cuando no hay turnos, Registrar R1 «Entendí» (R2 es lo que abre «Cambiar»), 4 pestañas Asistente · Movimientos · Cuentas · Tú, barra reservado·colchón·libre. Diseño técnico: `docs/diseno/OLA-7-ASISTENTE.md` |
 | 3 | Pagos cada dos meses (luz, agua) | La regla queda sin llenar y se elige a mano; agregar regla `bimestral` en `05 §E3.1` si la aprueba |
-| 4 | En el onboarding por voz, «Sí» llena el formulario o guarda directo | Llena el formulario; guarda directo solo cuentas y pagos fijos completos |
+| 4 | En el onboarding por voz, «Sí» llena el formulario o guarda directo | **Decidido 22-10:** «Sí» guarda directo en ingreso y colchón (la tarjeta «Entendí» es la revisión); cuentas y pagos fijos solo si están completos |
 | 5 | Unificar «Borrar» y «Anular» | «Borrar», como ya lo dice la voz |
 | 6 | Llave de Claude y proyecto de Supabase | Ola 6 |
 
@@ -169,3 +169,5 @@ sobre los mismos archivos es trabajo doble.
 - 22-10 (tarde): Adam detiene el hilo de la nube en FinanVoz; esta sesión integra sus PR y sigue sola con la app.
   La rama `claude/project-thread-lief9t` (2 commits sin PR: jest, rutas de pestañas, onboarding, calculadora) se
   evalúa en el merge y se borra después.
+- 22-10 (tarde): Adam eligió Hoy A + R1 + 4 pestañas + «Sí» directo en ingreso/colchón + barra. Ola 7 arranca al
+  cerrar el merge de M-1; diseño técnico y dueños en `docs/diseno/OLA-7-ASISTENTE.md`.
