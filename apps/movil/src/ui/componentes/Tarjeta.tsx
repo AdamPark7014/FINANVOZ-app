@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTema } from '../tema';
 import { espacio, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
 
@@ -50,23 +50,24 @@ export function Tarjeta({
   }
 
   if (accionesAnidadas) {
+    // El Pressable envuelve al contenido: tocar el texto o la cifra también responde, y los botones de adentro
+    // ganan su propio toque. `accessible={false}` deja que el lector de pantalla llegue a cada botón.
     return (
-      <View testID={testID} style={[base, { minHeight: OBJETIVO_TACTIL_MIN, position: 'relative' }, style]}>
-        <Pressable
-          onPress={alPresionar}
-          accessible={false}
-          importantForAccessibility="no"
-          android_ripple={ripple}
-          style={({ pressed }) => [
-            StyleSheet.absoluteFill,
-            { borderRadius: radio.l },
-            pressed ? { backgroundColor: c.superficieAlterna } : null,
-          ]}
-        />
-        <View pointerEvents="box-none" style={{ gap: espacio.s }}>
-          {children}
-        </View>
-      </View>
+      <Pressable
+        testID={testID}
+        onPress={alPresionar}
+        accessible={false}
+        importantForAccessibility="no"
+        android_ripple={ripple}
+        style={({ pressed }) => [
+          base,
+          { minHeight: OBJETIVO_TACTIL_MIN },
+          style,
+          pressed ? { backgroundColor: c.superficieAlterna } : null,
+        ]}
+      >
+        <View style={{ gap: espacio.s }}>{children}</View>
+      </Pressable>
     );
   }
 

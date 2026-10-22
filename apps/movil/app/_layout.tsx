@@ -23,6 +23,7 @@ import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/Sincron
 import { SincronizarWidget } from '../src/widget/SincronizarWidget';
 import { programarTareaDiaria } from '../src/tareas/programar';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
+import { ProveedorDictadoCampos } from '../src/voz';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import {
@@ -160,11 +161,14 @@ export default function Raiz() {
             {/* Sin tienda no hay nada que comprar: sin `abrirPlan`, Hoy y los candados no ofrecen Plus. */}
             <ProveedorPlan compras={compras} abrirPlan={compras ? abrirPlan : null}>
               <ProveedorAnalitica analitica={analitica}>
-                <AppProtegida
-                  reiniciada={estado.generacion > 0}
-                  evidencia={evidencia}
-                  avisoInicial={estado.aviso ?? null}
-                />
+                {/* Micrófono de cada campo de dinero (`ui/` no conoce el reconocedor): lo arma `voz/`. */}
+                <ProveedorDictadoCampos>
+                  <AppProtegida
+                    reiniciada={estado.generacion > 0}
+                    evidencia={evidencia}
+                    avisoInicial={estado.aviso ?? null}
+                  />
+                </ProveedorDictadoCampos>
               </ProveedorAnalitica>
             </ProveedorPlan>
           </ProveedorSesion>
@@ -234,6 +238,8 @@ function AppProtegida({
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
+          <Stack.Screen name="cuenta-nueva" />
+          <Stack.Screen name="pago-fijo-nuevo" />
           <Stack.Screen name="persona/[id]" />
           <Stack.Screen name="tandas/index" />
           <Stack.Screen name="tandas/[id]" />

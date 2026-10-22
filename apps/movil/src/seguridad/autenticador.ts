@@ -22,7 +22,9 @@ export const MENSAJES_AUTENTICACION: Record<ErrorAutenticacion, string> = {
   cancelado: 'Toca Desbloquear para entrar.',
   demasiados_intentos: 'Hubo muchos intentos. Espera un momento e intenta de nuevo.',
   sin_seguridad:
-    'Tu teléfono no tiene bloqueo de pantalla. Configura un PIN o tu huella en los ajustes del teléfono para entrar.',
+    Platform.OS === 'ios'
+      ? 'Tu iPhone no tiene código. Configúralo en Ajustes › Face ID y código para usar el bloqueo.'
+      : 'Tu teléfono no tiene bloqueo de pantalla. Configura un PIN o tu huella en los ajustes del teléfono para entrar.',
   fallo: 'No pude verificar que eres tú. Intenta de nuevo.',
 };
 

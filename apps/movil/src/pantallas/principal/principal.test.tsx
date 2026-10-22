@@ -123,6 +123,15 @@ describe('Hoy', () => {
     p.cerrar();
   });
 
+  it('sin tienda (iPhone) no anuncia «¿Me alcanza?» ni el candado de Plus', () => {
+    const p = conEscenario('e4-01');
+    const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
+    renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
+    expect(screen.queryByTestId('boton-me-alcanza')).toBeNull();
+    expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
+    p.cerrar();
+  });
+
   it('CA-M2-03 · con la semilla e4-01 muestra $214, "4 días para tu quincena (jue 15)" y el desglose de E4-01', () => {
     const p = conEscenario('e4-01');
     const v = vector<VectorE4>('E4-01');

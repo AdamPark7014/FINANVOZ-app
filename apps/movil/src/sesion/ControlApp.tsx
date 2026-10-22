@@ -42,3 +42,8 @@ export function useControlApp(): ControlApp {
   if (!valor) throw new Error('useControlApp fuera de ProveedorControlApp');
   return valor;
 }
+
+/** Igual que `useControlApp`, pero `null` fuera del proveedor (componentes que también viven en pruebas sueltas). */
+export function useControlAppOpcional(): ControlApp | null {
+  return useContext(ControlContexto);
+}

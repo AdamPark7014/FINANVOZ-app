@@ -22,9 +22,22 @@ export {
   TEXTO_CERRAR_TECLADO,
   type CampoTextoProps,
 } from './componentes/CampoTexto';
-export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
 export { anunciar, useAnunciar } from './anunciar';
+export {
+  CampoMonto,
+  ERROR_FORMATO_MONTO,
+  textoOidoMonto,
+  type CampoMontoProps,
+} from './componentes/CampoMonto';
+export {
+  ContextoDictadoCampos,
+  useDictadoCampos,
+  type AvisoDictadoCampo,
+  type DictadoCampos,
+  type LecturaMontoDictado,
+  type PropsBotonDictarCampo,
+} from './componentes/dictado-campo';
 export { EstadoVacio } from './componentes/EstadoVacio';
 export { Barra, type BarraProps } from './componentes/Barra';
 export { Aviso, useAviso, type AccionAviso, type AvisoProps, type DatosAviso } from './componentes/Aviso';

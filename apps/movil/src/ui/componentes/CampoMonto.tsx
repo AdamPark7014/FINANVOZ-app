@@ -58,6 +58,21 @@ const SIN_VOZ: EstadoVoz = { tipo: 'nada' };
 const sinSigno = (c: Centavos) => formatearCentavos(c, 'auto').replace('$', '');
 
 /**
+ * Lo que se oyó y cómo quedó (del hilo de la nube, PR #24): la voz nunca guarda sola. Se conserva en el merge
+ * mientras conviven las dos implementaciones del micrófono en campos; `mensajeMontoOido` es la que usa el campo.
+ */
+export function textoOidoMonto(
+  transcripcion: string,
+  centavos: Centavos | null,
+  aproximado: boolean,
+): string {
+  if (centavos === null)
+    return `Oí «${transcripcion}». No entendí el monto; dilo así: «mil quinientos» o escríbelo.`;
+  const base = `Oí «${transcripcion}»: ${formatearCentavos(centavos, 'auto')}.`;
+  return aproximado ? `${base} Dijiste un aproximado; pon la cifra exacta si la sabes.` : base;
+}
+
+/**
  * Campo de pesos con teclado numérico; convierte a centavos enteros sin flotantes
  * (`leerPesos`). No valida reglas de negocio: eso lo decide quien lo usa.
  *

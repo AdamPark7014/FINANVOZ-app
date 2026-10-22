@@ -1,4 +1,12 @@
-import { sumarDias, type DiaSemana, type ModoFinDeSemana, type PlainDate, type Regla } from '@cartera/core';
+import {
+  sumarDias,
+  type Centavos,
+  type DiaSemana,
+  type ModoFinDeSemana,
+  type PlainDate,
+  type Regla,
+} from '@cartera/core';
+import type { IngresoDicho } from '@cartera/nlu';
 
 /**
  * Traduce las respuestas de O3 (chips) a la regla de recurrencia que entiende `servicios/`. Es solo el mapeo de
@@ -85,4 +93,29 @@ export function reglaDeIngreso(r: RespuestasIngreso): Regla | null {
 /** Concepto del programado según la frecuencia ("quincena" es el que usan los vectores). */
 export function conceptoIngreso(f: Frecuencia): string {
   return f === 'quincena' ? 'quincena' : f === 'semanal' ? 'semana' : 'sueldo';
+}
+
+/** Lo que llena O3 cuando la persona lo dice («gano doce mil cada quincena»); lo no dicho queda como estaba. */
+export interface IngresoDichoPantalla {
+  frecuencia?: Frecuencia;
+  diaSemana?: DiaSemana;
+  diaMesTexto?: string;
+  monto: Centavos;
+}
+
+export function respuestasDeIngresoDicho(d: IngresoDicho): IngresoDichoPantalla {
+  switch (d.frecuencia) {
+    case null:
+      return { monto: d.monto };
+    case 'semanal':
+      return { frecuencia: 'semanal', monto: d.monto, ...(d.diaSemana ? { diaSemana: d.diaSemana } : {}) };
+    case 'mensual':
+      return {
+        frecuencia: 'mensual',
+        monto: d.monto,
+        ...(d.diaMes ? { diaMesTexto: String(d.diaMes) } : {}),
+      };
+    default:
+      return { frecuencia: d.frecuencia, monto: d.monto };
+  }
 }

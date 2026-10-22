@@ -13,7 +13,7 @@ import { ARTICULOS, type Tokens, palabraDesc } from './tokens';
 
 export type ReglaRecurrente = Exclude<Regla, { tipo: 'unica' }>;
 
-const DIAS: Readonly<Record<string, DiaSemana>> = {
+export const DIAS: Readonly<Record<string, DiaSemana>> = {
   lunes: 1,
   martes: 2,
   miercoles: 3,

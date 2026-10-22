@@ -485,6 +485,32 @@ CERO         := cero [pesos] | nada | ni un peso | ni un varo                   
 
 "como", "más o menos", "aproximadamente" (y las demás marcas de `MONTO`) → `aproximado: true`. Sin `admiteCero`, "0", "cero" y "nada" dan `null`. Todo lo que sobra da `null`: "más de 500", "menos de", "entre 500 y 600", "hasta 500", "500 o 600", dos cifras, "500 al mes", "cada…", un "no" fuera de CERO.
 
+### 9.5 Pasos dictados del onboarding («O dímelo», hilo de la nube PR #25–#26)
+
+Gramáticas de paso del nivel 0 (`packages/nlu/src/reglas/campos.ts`), fuera de `PRODUCCIONES` (no mueven el golden
+set). El monto de un campo suelto es §9.4; estas leen un paso completo del onboarding:
+
+```
+INGRESO_DICHO := [me pagan|me depositan|me cae(n)|cobro|gano|son|es] MONTO [REGLA | FRECUENCIA]
+FRECUENCIA := a la|por|cada quincena | quincenal | cada|a la|por semana [el DIA] | semanal
+            | cada 14 días | cada dos semanas | catorcenal | cada|al|por mes | mensual(es)
+PAGO_DICHO := (pago | tengo que pagar | debo pagar) MONTO (de|del|por) CONCEPTO [REGLA | FRECUENCIA_PAGO]
+            | CONCEPTO (son|es|cuesta|me cuesta|sale en|de) MONTO [REGLA | FRECUENCIA_PAGO]
+            | CONCEPTO MONTO [REGLA | FRECUENCIA_PAGO]                    — CONCEPTO: 1 a 4 palabras, sin artículo
+FRECUENCIA_PAGO := cada|al|por mes | mensual | cada quincena | quincenal | cada semana | semanal | cada|al año | anual
+```
+
+`interpretarPagoFijoDicho` llena el formulario de O5 con un pago a la vez: el concepto elige su chip del
+catálogo («renta», «luz»…) o «Otro» con el nombre dicho; el día que no se dijo queda vacío.
+
+`interpretarIngresoDicho` llena O3 («O dímelo»): `REGLA` es la de §9.2 CONFIGURAR (quincena, semanal con día,
+mensual con día); con `FRECUENCIA` sola el día queda vacío y se elige en pantalla (nunca se adivina).
+
+`MONTO` es la pieza de §9.1. Lo que no se lea completo da `null` y la pantalla no cambia. La voz nunca guarda: llena
+el paso y la persona confirma con Continuar o Agregar (§7). Pendiente de integración (`docs/PLAN-MEJORA-2026-10.md`
+§5): estos dos lectores se unifican con `interpretarPaso` (`reglas/pasos`), que ya cubre ingreso, cuentas, tarjeta,
+pagos fijos, colchón y tanda con golden propio.
+
 ## 10. Prompt del nivel nube (plantilla)
 
 ```

@@ -31,3 +31,5 @@ export {
 } from './useBotonHablar';
 export * from './textos';
 export { callarVoz, decirEnVoz, fraseRespuestaVoz } from './respuesta';
+export { BotonDictarCampo, PISTA_DICTAR_CAMPO } from './BotonDictarCampo';
+export { ProveedorDictadoCampos } from './ProveedorDictadoCampos';

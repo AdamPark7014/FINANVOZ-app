@@ -1,11 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { AccessibilityInfo, findNodeHandle, Pressable, View } from 'react-native';
+import { AccessibilityInfo, findNodeHandle, Platform, Pressable, View } from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
 import {
   anuncioCambioPasoOnboarding,
   etiquetaAyudaPasoOnboarding,
   etiquetaProgresoOnboarding,
+  PASOS_ONBOARDING,
   etiquetaTipOnboarding,
   etiquetaTituloPasoOnboarding,
   PISTA_CASILLA_ONB,
@@ -16,6 +17,10 @@ import {
 } from './textos';
 
 export { ERROR_GUARDAR, PASOS_ONBOARDING } from './textos';
+
+/** En iPhone no hay captura de notificaciones: O6 se omite (`02 §25`) y el onboarding tiene un paso menos. */
+export const OMITIR_CAPTURA_ONB = Platform.OS === 'ios';
+export const PASOS_VISIBLES_ONB = OMITIR_CAPTURA_ONB ? PASOS_ONBOARDING - 1 : PASOS_ONBOARDING;
 
 export interface OpcionChip<T> {
   valor: T;
@@ -152,7 +157,7 @@ export function PasoOnboarding({
   }, [registrarEvento, paso]);
   useEffect(() => {
     let vigente = true;
-    const anuncio = anuncioCambioPasoOnboarding(paso, titulo);
+    const anuncio = anuncioCambioPasoOnboarding(paso, titulo, PASOS_VISIBLES_ONB);
     AccessibilityInfo.isScreenReaderEnabled()
       .then((lector) => {
         if (!vigente || lector !== true) return;
@@ -176,10 +181,10 @@ export function PasoOnboarding({
         tono="secundario"
         testID="onb-progreso"
         accessibilityRole="text"
-        accessibilityLabel={etiquetaProgresoOnboarding(paso)}
+        accessibilityLabel={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
         accessibilityHint={PISTA_PROGRESO_ONB}
       >
-        {textoProgresoOnboarding(paso)}
+        {textoProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
       </Texto>
       <View
         ref={refTitulo}

@@ -6,6 +6,14 @@
 
 ## Hecho en este turno
 
+- **Merge con el hilo de la nube (PR #24–#27)**: teclado de iPhone, `ContextoDictadoCampos`/`BotonDictarCampo`,
+  `reglas/campos.ts`, «O dímelo» en O3 y O5 (`DecirloPaso`), O6 saltado en iPhone, textos por plataforma,
+  `FormularioCuenta`/`FormularioPagoFijo` extraídos del onboarding. Las rutas `/cuenta-nueva` y `/pago-fijo-nuevo` de
+  #27 se descartaron a favor de `/cuentas/nueva` y `/pagos-fijos/nuevo` (B-2b). Conviven aún dos implementaciones de
+  voz en campos, de pasos dictados y de alta de cuenta/pago fijo: se unifican en el siguiente commit
+  (`docs/PLAN-MEJORA-2026-10.md` §5). typecheck del repo limpio, eslint 0 errores, jest 78 suites 648/648, vitest
+  2721/2725 (las 4 son tiempos agotados bajo carga: `exportar.test` y 3 del proxy contra el servidor local; solas
+  28/28), eval reglas 135/135, pasos 88/88.
 - **Cuentas, Ajustes, privacidad, bloqueo y respaldo en iPhone (B-2b)**: «Agregar cuenta» (`/cuentas/nueva`), detalle
   de cuenta con «Corregir saldo» (ajuste de conciliación, caso 22 de `04 §4`) y «Ver movimientos»; «Agregar pago fijo»
   (`/pagos-fijos/nuevo`, mismo formulario del onboarding), lista y detalle de pagos fijos («Cambiar monto», «Quitar»
@@ -92,11 +100,8 @@
 
 ## A medias — CUIDADO
 
-- **ORIGEN SE MOVIÓ (22-10, tarde): PR #24–#26 de un hilo de Claude en la nube** (`claude/project-thread-6edvv8`,
-  fusionados por Adam 14:02–14:37) con el mismo plan (`docs/PLAN-UX-VOZ.md`): teclado iPhone, micrófono en cada
-  `CampoMonto` (`ContextoDictadoCampos`), `reglas/campos.ts`, «O dímelo» en O3 y O5, textos por plataforma. Los
-  commits locales 8fea7c8…c6770f9 **no están subidos**: se integran con `git merge origin/main` según
-  `docs/PLAN-MEJORA-2026-10.md` §5 cuando B-2b y B-3 terminen. No hagas `pull --rebase` con el árbol sucio.
+- **El hilo de la nube siguió publicando tras la orden de Adam**: #28 (e8f5214, «colchón e ingreso dichos desde Hoy
+  sin la nube») entró a origen a las 15:18 y todavía no está fusionado aquí; duplica `confirmar_ajuste` de V-A.
 - **Ocho agentes en vuelo el 22-10 (tarde), nada commiteado de ellos**: V-A (`packages/nlu` montos y pasos), V-B
   (`src/voz`, `src/ui` teclado iOS), B-1 (`pantallas/principal`, movimientos), B-2a (plan, suscripciones,
   `ios-testflight.yml`), B-2b (cuentas, ajustes, privacidad), B-3 (tarjetas, tandas, compartido), T-1
