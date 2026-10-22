@@ -247,6 +247,8 @@ Detalle (M10): las herramientas son `hoy`, `gasto`, `mayores_gastos`, `comparar_
 
 **Corregir y anular:** el objetivo se busca en los últimos 30 días (texto contenido en descripción, comercio o categoría; monto y fecha si vienen; `ultimo` = el más reciente por `registrada_en`). Una coincidencia en las últimas 48 h → se aplica con "Deshacer"; varias → chips para elegir; ninguna → "No encontré ese movimiento".
 
+**Colchón e ingreso dichos** (nivel 0 o nube): `configurar/colchon` se aplica al momento con "Deshacer" (vuelve al colchón anterior). `configurar/ingreso_recurrente` reemplaza el ingreso que define el horizonte, así que nunca se aplica solo: tarjeta «¿Cambio tu ingreso?» con el ingreso de hoy, el nuevo y el próximo pago, y nada cambia hasta «Cambiar mi ingreso». En la cola de la nube, el colchón se aplica y el ingreso queda Por revisar. `saldo_cuenta` sigue sin aplicarse (mensaje que manda a Ajustes y Cuentas).
+
 ## 8. Evaluación
 
 Archivos: `fixtures/nlu/golden.jsonl` (155 casos), `fixtures/nlu/contexto.json`, `fixtures/nlu/esquema.json`.

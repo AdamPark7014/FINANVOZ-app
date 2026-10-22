@@ -116,6 +116,7 @@ export {
   type VersionAnterior,
 } from './correcciones';
 export { deshacer } from './deshacer';
+export { confirmarIngresoDicho, type PropuestaIngreso } from './ajustes-dichos';
 export {
   anularMovimiento,
   MENSAJE_MOVIMIENTO_COMPARTIDO,

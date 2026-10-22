@@ -226,6 +226,24 @@ export function mensajeConfigurado(c: CompromisoConfigurado): string {
   return `Listo: ${c.concepto} ${formatearCentavos(c.monto)}${proximo}.`;
 }
 
+/** «Mi colchón es de 2 mil» ya aplicado (con Deshacer). */
+export function mensajeColchonDicho(monto: number): string {
+  return monto === 0
+    ? 'Listo: ya no aparto colchón.'
+    : `Listo: tu colchón ahora es ${formatearCentavos(monto)}. Ese dinero no lo cuento como libre.`;
+}
+
+/** Tarjeta de «me pagan 8 mil cada quincena»: cambia el ingreso, así que se confirma. */
+export const TITULO_CONFIRMAR_INGRESO = '¿Cambio tu ingreso?';
+export const TEXTO_INGRESO_ANTES = 'Hoy tienes';
+export const TEXTO_INGRESO_DESPUES = 'Quedaría';
+export const BTN_GUARDAR_INGRESO = 'Cambiar mi ingreso';
+
+export function mensajeIngresoDicho(monto: number, cuando: string, proximo: string | null): string {
+  const siguiente = proximo ? ` Tu próximo pago es el ${proximo}.` : '';
+  return `Listo: tu ingreso es ${formatearCentavos(monto)}, ${cuando}.${siguiente}`;
+}
+
 export function mensajePasarAMeses(m: ResumenTransaccion, meses: number): string {
   return `Anoté que ${(m.descripcion ?? 'la compra').toLowerCase()} va a ${meses} meses. Lo verás en tu tarjeta pronto.`;
 }
