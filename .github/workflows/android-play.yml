@@ -6,7 +6,8 @@ name: Android · Play
 # firme `release` con esa llave. La llave vive en los secretos del repositorio (los carga
 # scripts/subir-secretos-android.ps1) y en %USERPROFILE%\Documents\LLAVES-ANDROID\FINANVOZ de Adam; nunca
 # en el repositorio ni en los registros. Solo a mano: cada subida a Play necesita un versionCode nuevo
-# (Play no repite ninguno, ni los de bundles descartados). Las llaves de proveedores siguen fuera: modo nube apagado.
+# (Play no repite ninguno, ni los de bundles descartados). Las llaves de proveedores siguen fuera: la nube solo
+# recibe la URL y la llave pública (anon) de Supabase desde variables de repositorio, apagada mientras estén vacías.
 on:
   workflow_dispatch:
     inputs:
@@ -41,6 +42,13 @@ jobs:
       FINANVOZ_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       FINANVOZ_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       FINANVOZ_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      # Solo builds de prueba; quitar antes de la tienda pública. Sin llave de RevenueCat no hay tienda: con esto,
+      # «Plus de prueba» sin cobro (app.config.ts → extra.plusSinTienda, src/servicios/plan.ts).
+      EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
+      # Nube del intérprete (Ola 6): variables de repositorio (no secretos), vacías mientras no exista el proyecto
+      # de Supabase; app.config.ts ignora las cadenas vacías y la nube queda apagada.
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - name: Comprobar secretos y versión
         env:

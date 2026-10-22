@@ -13,6 +13,11 @@ export type { CodigoLimite } from '@cartera/nlu';
  * Ningún dato depende del plan: todas las vistas de servicios (Hoy, cuentas, movimientos, tarjetas, MSI,
  * exportar) responden igual en Gratis y en Plus. El plan solo decide qué funciones de análisis muestra la UI
  * (`funcionesPlan`) y el cupo del intérprete en la nube, que aplica el proxy.
+ *
+ * «Plus de prueba» (decisión reversible del 22-10-2026, `docs/PLAN-MEJORA-2026-10.md` §3 #1): una build de prueba
+ * sin tienda (TestFlight, prueba interna de Play, APK) construida con `EXPO_PUBLIC_PLUS_SIN_TIENDA=1` libera todas
+ * las funciones de Plus, sin cobro ni vencimiento. No se guarda en la base: lo marca `ProveedorPlan` al abrir cada
+ * sesión (`fijarPlusDePrueba`), así que una build con tienda o sin la variable vuelve sola a lo que diga la tienda.
  */
 
 export type Plan = 'gratis' | 'plus';
@@ -47,6 +52,8 @@ export interface VistaPlan {
   readonly renovara: boolean;
   /** En Gratis, si antes tuvo Plus: terminó la prueba o la suscripción. Para decir "todo sigue aquí". */
   readonly terminoPlus: 'prueba' | 'suscripcion' | null;
+  /** Plus de prueba de una build sin tienda: sin cobro, sin fecha, sin ofertas ni "Restaurar". */
+  readonly plusDePrueba: boolean;
 }
 
 /** Qué funciones de Plus muestra la UI. Los datos nunca se ocultan. */
@@ -86,6 +93,25 @@ type PlanGuardado = z.infer<typeof PlanGuardado>;
 
 const vigente = (vigenteHasta: number | null, ahora: number) => vigenteHasta === null || vigenteHasta > ahora;
 
+/**
+ * Bases abiertas en «Plus de prueba». Por base y no por contexto: los contextos derivados (`{ ...ctx, configFiscal }`)
+ * comparten la misma base. Vive solo en memoria y lo decide la build en cada sesión.
+ */
+const basesPlusDePrueba = new WeakSet<object>();
+
+/**
+ * Lo llama `ProveedorPlan` al abrir la sesión, antes de pintar las pantallas: encendido solo si la build trae
+ * `plusSinTienda` y no tiene tienda. Con tienda (o sin la variable) se apaga y manda lo que dijo la tienda.
+ */
+export function fijarPlusDePrueba(ctx: Contexto, activo: boolean): void {
+  if (activo) basesPlusDePrueba.add(ctx.db);
+  else basesPlusDePrueba.delete(ctx.db);
+}
+
+export function esPlusDePrueba(ctx: Contexto): boolean {
+  return basesPlusDePrueba.has(ctx.db);
+}
+
 /** Guarda lo que dijo la tienda (al abrir la app, al comprar, al restaurar o cuando RevenueCat avisa un cambio). */
 export function sincronizarPlan(ctx: Contexto, estado: EstadoTienda): VistaPlan {
   const previo = leerAjuste(ctx, CLAVE, PlanGuardado);
@@ -110,6 +136,18 @@ export function sincronizarPlan(ctx: Contexto, estado: EstadoTienda): VistaPlan 
 }
 
 export function obtenerPlan(ctx: Contexto): VistaPlan {
+  if (esPlusDePrueba(ctx)) {
+    return {
+      plan: 'plus',
+      enPrueba: true,
+      diasRestantes: null,
+      vigenteHasta: null,
+      fechaFin: null,
+      renovara: false,
+      terminoPlus: null,
+      plusDePrueba: true,
+    };
+  }
   const g = leerAjuste(ctx, CLAVE, PlanGuardado);
   const ahora = ctx.reloj.ahora();
   if (g?.plus && vigente(g.plus.vigente_hasta, ahora)) {
@@ -122,6 +160,7 @@ export function obtenerPlan(ctx: Contexto): VistaPlan {
       fechaFin: g.plus.vigente_hasta === null ? null : (ctx.reloj.fechaDe?.(g.plus.vigente_hasta) ?? null),
       renovara: g.plus.renovara,
       terminoPlus: null,
+      plusDePrueba: false,
     };
   }
   return {
@@ -132,11 +171,13 @@ export function obtenerPlan(ctx: Contexto): VistaPlan {
     fechaFin: null,
     renovara: false,
     terminoPlus: g?.plus ? (g.plus.en_prueba ? 'prueba' : 'suscripcion') : (g?.termino ?? null),
+    plusDePrueba: false,
   };
 }
 
 export function funcionesPlan(ctx: Contexto): FuncionesPlan {
-  const plus = obtenerPlan(ctx).plan === 'plus';
+  const vista = obtenerPlan(ctx);
+  const plus = vista.plan === 'plus';
   return {
     probabilidad: plus,
     tarjetaDelDia: plus,
@@ -145,6 +186,7 @@ export function funcionesPlan(ctx: Contexto): FuncionesPlan {
     consultas: plus,
     explicar: plus,
     deducciones: plus,
-    interpretacionesNubeMes: INTERPRETACIONES_NUBE_MES[plus ? 'plus' : 'gratis'],
+    // El cupo lo aplica el proxy según la tienda, y el proxy no sabe del Plus de prueba: ahí sigue el de Gratis.
+    interpretacionesNubeMes: INTERPRETACIONES_NUBE_MES[plus && !vista.plusDePrueba ? 'plus' : 'gratis'],
   };
 }

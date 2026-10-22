@@ -138,3 +138,7 @@ interna de Play; nota a Adam con qué cambió y qué probar.
   Ágora pasa a su propia sesión con el mismo pedido (fallos, funciones, UX para 18 años, ficha). Flujos Maestro de
   iPhone (`apps/movil/.maestro/ios`, 8 flujos + 6 subflujos) y `ios-maestro.yml` en git; `apps/movil/.gitignore`
   dejaba fuera `.maestro/ios/` por el patrón `ios/`.
+- 22-10 (tarde): B-2a entregado y commiteado (decisión 1 aplicada: modo prueba reversible por variable de build).
+  Quedan para el coordinador: `app/_layout.tsx` debe pasar `abrirPlan` solo si `compras !== null || plusDePrueba`;
+  `PanelRegistrar` y `explicar.ts` dicen «300 frases» por plan `plus` aunque el proxy siga en 30 (mirar `plusDePrueba`
+  o que el proxy reconozca builds de prueba, Ola 6).

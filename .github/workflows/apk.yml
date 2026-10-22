@@ -25,6 +25,10 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      # Solo builds de prueba; quitar antes de la tienda pública. Este APK no tiene tienda: con esto, «Plus de
+      # prueba» sin cobro (app.config.ts → extra.plusSinTienda, src/servicios/plan.ts).
+      EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

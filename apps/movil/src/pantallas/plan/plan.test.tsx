@@ -1,7 +1,7 @@
 // M7 · planes en la UI: pantalla del plan con la tienda en memoria, candados de Plus, CA-M7-02 (mensaje al agotar
 // las interpretaciones del mes) y CA-M7-07 (al terminar la prueba sin pagar todo sigue visible y editable).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Platform } from 'react-native';
+import { Platform, Text } from 'react-native';
 import type { ReactNode } from 'react';
 import {
   listarMovimientos,
@@ -25,10 +25,18 @@ import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { CANDADO_COMPROMISO_12_MESES } from '../tarjetas/textos';
 import { PantallaPlan, PuertaPlus, SeccionPlan } from '.';
 import {
+  DESCRIPCION_PUERTA_PLUS as DESCRIPCION_ME_ALCANZA,
+  INVITACION_PRUEBA_PLUS,
+  TITULO_PUERTA_PLUS as TITULO_ME_ALCANZA,
+} from '../me-alcanza/textos';
+import {
+  etiquetaAccesibilidadCandadoPronto,
   etiquetaAccesibleOfertaDetalle,
   etiquetaAccesibleResumenPlan,
   etiquetaCandadoPlus,
+  etiquetaCandadoPlusPronto,
   etiquetaOferta,
+  FUNCIONES_PLUS,
   ID,
   MENSAJE_ERROR_COMPRA,
   MENSAJE_LIMITE_DIARIO,
@@ -38,6 +46,7 @@ import {
   MENSAJE_OFERTAS_VACIAS,
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
+  NOTA_PLUS_DE_PRUEBA,
   PISTA_ABRIR_PLANES,
   PISTA_ADMINISTRAR,
   PISTA_INTENTAR,
@@ -45,9 +54,12 @@ import {
   PISTA_VER_PLANES,
   PISTA_VOLVER,
   pistaComprarOferta,
+  PUERTA_PLUS_SIN_TIENDA,
   resumenPlan,
+  TEXTO_PLUS_DE_PRUEBA,
   TITULO_PLAN_GRATIS,
   TITULO_PLUS,
+  TITULO_PLUS_DE_PRUEBA,
 } from './textos';
 
 const DIA = 86_400_000;
@@ -63,16 +75,29 @@ const textoDe = (testID: string) => {
 function montar(
   ctx: Contexto,
   ui: ReactNode,
-  o: { compras?: TiendaEnMemoria | null; nube?: NivelNube | null; abrirPlan?: () => void } = {},
+  o: {
+    compras?: TiendaEnMemoria | null;
+    nube?: NivelNube | null;
+    abrirPlan?: () => void;
+    /** `EXPO_PUBLIC_PLUS_SIN_TIENDA=1` en la build. */
+    plusSinTienda?: boolean;
+  } = {},
 ) {
   return render(
     <ProveedorSesion ctx={ctx} nube={o.nube ?? null}>
-      <ProveedorPlan compras={o.compras ?? null} abrirPlan={o.abrirPlan ?? null}>
+      <ProveedorPlan
+        compras={o.compras ?? null}
+        abrirPlan={o.abrirPlan ?? null}
+        plusSinTienda={o.plusSinTienda ?? false}
+      >
         <ProveedorAvisos>{ui}</ProveedorAvisos>
       </ProveedorPlan>
     </ProveedorSesion>,
   );
 }
+
+/** Ninguna tienda, precio ni plataforma en lo que se ve (`02 §12`, App Store 2.3.10 y 3.1.1). */
+const TIENDAS = /Google Play|App Store|Android|iPhone|\$\d/;
 
 function e510() {
   const p = conEscenario('e5-10');
@@ -226,11 +251,14 @@ describe('pantalla del plan', () => {
     expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLUS);
   });
 
-  it('sin tienda (build sin llave): lo dice y la cuenta sigue en Gratis', () => {
+  it('sin tienda (build sin llave): lo dice, la cuenta sigue en Gratis y no habla de cobros ni de Google Play', () => {
     const p = e510();
     montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />);
     expect(screen.getByTestId(ID.sinTienda)).toHaveTextContent(MENSAJE_SIN_TIENDA);
     expect(screen.queryByTestId(ID.restaurar)).toBeNull();
+    expect(screen.queryByTestId(ID.notaTienda)).toBeNull();
+    expect(screen.queryByText(/Google Play/)).toBeNull();
+    expect(textoDe(ID.titulo)).toBe(TITULO_PLAN_GRATIS);
   });
 
   it('ofertas vacías de Google Play lo explican y permiten reintentar', async () => {
@@ -244,23 +272,157 @@ describe('pantalla del plan', () => {
     expect(screen.getByTestId(ID.vacioOfertas)).toHaveProp('accessibilityLiveRegion', 'polite');
   });
 
-  it('¿Me alcanza? en Gratis explica que es de Plus; en Plus abre la pantalla', () => {
+  it('¿Me alcanza? en Gratis explica que es de Plus e invita a probarlo; en Plus abre la pantalla', () => {
     const p = e510();
     const abrirPlan = jest.fn();
+    const tienda = crearComprasEnMemoria({ ahora: () => T0 });
     const ui = (
-      <PuertaPlus funcion="meAlcanza" titulo="¿Me alcanza? es de Plus" descripcion="Pruébalo 14 días gratis.">
-        <></>
+      <PuertaPlus
+        funcion="meAlcanza"
+        titulo={TITULO_ME_ALCANZA}
+        descripcion={DESCRIPCION_ME_ALCANZA}
+        invitacion={INVITACION_PRUEBA_PLUS}
+      >
+        <Text testID="me-alcanza-dentro">dentro</Text>
       </PuertaPlus>
     );
-    const { unmount } = montar(p.ctx, ui, { abrirPlan });
-    expect(screen.getByText('¿Me alcanza? es de Plus')).toBeTruthy();
+    const { unmount } = montar(p.ctx, ui, { abrirPlan, compras: tienda });
+    expect(screen.getByText(TITULO_ME_ALCANZA)).toBeTruthy();
+    expect(screen.getByText(`${DESCRIPCION_ME_ALCANZA} ${INVITACION_PRUEBA_PLUS}`)).toBeTruthy();
+    expect(INVITACION_PRUEBA_PLUS).toBe('Pruébalo 14 días gratis.');
     expect(screen.getByTestId(ID.puertaPlusConocer)).toHaveProp('accessibilityHint', PISTA_ABRIR_PLANES);
+    expect(screen.queryByTestId(ID.puertaPlusPronto)).toBeNull();
     fireEvent.press(screen.getByTestId(ID.puertaPlusConocer));
     expect(abrirPlan).toHaveBeenCalled();
+    expect(screen.queryByTestId('me-alcanza-dentro')).toBeNull();
     unmount();
     activarPlus(p.ctx);
-    montar(p.ctx, ui);
+    montar(p.ctx, ui, { compras: tienda });
     expect(screen.queryByTestId(ID.puertaPlus)).toBeNull();
+    expect(screen.getByTestId('me-alcanza-dentro')).toBeTruthy();
+  });
+});
+
+describe('sin tienda y sin Plus de prueba: ningún candado lleva a un callejón', () => {
+  it('el candado es solo texto, sin botón, aunque haya navegación al plan', () => {
+    const p = e510();
+    const abrirPlan = jest.fn();
+    montar(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />, {
+      abrirPlan,
+    });
+    const candado = screen.getByTestId('candado-probabilidad');
+    expect(screen.getByText(etiquetaCandadoPlusPronto('Ver probabilidad'))).toBeTruthy();
+    expect(screen.queryByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeNull();
+    expect(candado).toHaveProp('accessibilityLabel', etiquetaAccesibilidadCandadoPronto('Ver probabilidad'));
+    expect(candado.props.accessibilityRole).toBeUndefined();
+    expect(candado.props.onPress).toBeUndefined();
+    fireEvent.press(candado);
+    expect(abrirPlan).not.toHaveBeenCalled();
+  });
+
+  it('la puerta de ¿Me alcanza? no ofrece «Conocer Plus» ni la prueba de 14 días; dice que llega pronto y deja volver', () => {
+    const p = e510();
+    const abrirPlan = jest.fn();
+    const alVolver = jest.fn();
+    montar(
+      p.ctx,
+      <PuertaPlus
+        funcion="meAlcanza"
+        titulo={TITULO_ME_ALCANZA}
+        descripcion={DESCRIPCION_ME_ALCANZA}
+        invitacion={INVITACION_PRUEBA_PLUS}
+        alVolver={alVolver}
+      >
+        <></>
+      </PuertaPlus>,
+      { abrirPlan },
+    );
+    expect(screen.getByText(DESCRIPCION_ME_ALCANZA)).toBeTruthy();
+    expect(screen.queryByText(/Pruébalo|14 días/)).toBeNull();
+    expect(screen.queryByTestId(ID.puertaPlusConocer)).toBeNull();
+    expect(screen.getByTestId(ID.puertaPlusPronto)).toHaveTextContent(PUERTA_PLUS_SIN_TIENDA);
+    expect(screen.queryByText(TIENDAS)).toBeNull();
+    fireEvent.press(screen.getByTestId(ID.volver));
+    expect(alVolver).toHaveBeenCalled();
+  });
+});
+
+describe('Plus de prueba (EXPO_PUBLIC_PLUS_SIN_TIENDA=1 y sin tienda)', () => {
+  for (const os of ['android', 'ios'] as const) {
+    it(`${os}: la pantalla del plan lo dice honesto, con lo que incluye; sin ofertas, fecha, restaurar ni tiendas`, async () => {
+      const plataforma = jest.replaceProperty(Platform, 'OS', os);
+      try {
+        const p = e510();
+        montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { plusSinTienda: true, abrirPlan: jest.fn() });
+        expect(obtenerPlan(p.ctx)).toMatchObject({ plan: 'plus', plusDePrueba: true, fechaFin: null });
+        expect(textoDe(ID.titulo)).toBe(TITULO_PLUS_DE_PRUEBA);
+        expect(textoDe(ID.detalle)).toBe(TEXTO_PLUS_DE_PRUEBA);
+        expect(TEXTO_PLUS_DE_PRUEBA).toBe(
+          'Estás usando Finanvoz Plus de prueba. Mientras dure la prueba no hay cobro.',
+        );
+        for (const f of FUNCIONES_PLUS) expect(screen.getByText(`• ${f}`)).toBeTruthy();
+        expect(screen.getByTestId(ID.notaPlusDePrueba)).toHaveTextContent(NOTA_PLUS_DE_PRUEBA);
+        expect(screen.queryByTestId(ID.soloIos)).toBeNull();
+        expect(screen.queryByTestId(ID.sinTienda)).toBeNull();
+        expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
+        expect(screen.queryByTestId(ID.oferta('anual'))).toBeNull();
+        expect(screen.queryByTestId(ID.restaurar)).toBeNull();
+        expect(screen.queryByTestId(ID.administrar)).toBeNull();
+        expect(screen.queryByTestId(ID.notaTienda)).toBeNull();
+        expect(screen.queryByText(/Restaurar|cobro el|empieza el cobro|Se renueva|al mes|al año/)).toBeNull();
+        expect(screen.queryByText(TIENDAS)).toBeNull();
+      } finally {
+        plataforma.restore();
+      }
+    });
+  }
+
+  it('libera Hoy (probabilidad y tarjeta del día), ¿Me alcanza? y Ajustes → Plan dice «Plus de prueba»', () => {
+    const p = e510();
+    const abrirPlan = jest.fn();
+    montar(
+      p.ctx,
+      <>
+        <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />
+        <PuertaPlus funcion="meAlcanza" titulo={TITULO_ME_ALCANZA} descripcion={DESCRIPCION_ME_ALCANZA}>
+          <Text testID="me-alcanza-dentro">dentro</Text>
+        </PuertaPlus>
+        <SeccionPlan alAbrirPlan={abrirPlan} />
+      </>,
+      { plusSinTienda: true, abrirPlan },
+    );
+    expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
+    expect(screen.getByTestId('tarjeta-del-dia')).toBeTruthy();
+    expect(screen.queryByTestId(ID.puertaPlus)).toBeNull();
+    expect(screen.getByTestId('me-alcanza-dentro')).toBeTruthy();
+    expect(textoDe(ID.ajustesPlanTitulo)).toBe(TITULO_PLUS_DE_PRUEBA);
+    expect(textoDe(ID.ajustesPlanDetalle)).toBe(TEXTO_PLUS_DE_PRUEBA);
+  });
+
+  it('con tienda real la variable no cambia nada: Gratis con ofertas, como hoy', async () => {
+    const p = e510();
+    const tienda = crearComprasEnMemoria({ ahora: () => T0 });
+    montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { compras: tienda, plusSinTienda: true });
+    expect(obtenerPlan(p.ctx)).toMatchObject({ plan: 'gratis', plusDePrueba: false });
+    expect(textoDe(ID.titulo)).toBe(TITULO_PLAN_GRATIS);
+    await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
+    expect(screen.getByTestId(ID.restaurar)).toBeTruthy();
+    expect(screen.queryByTestId(ID.plusDePrueba)).toBeNull();
+  });
+
+  it('sin la variable y sin tienda: Gratis (iPhone sigue con «Plus todavía no está en iPhone», sin compras)', () => {
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    try {
+      const p = e510();
+      montar(p.ctx, <PantallaPlan alVolver={jest.fn()} />, { plusSinTienda: false });
+      expect(obtenerPlan(p.ctx)).toMatchObject({ plan: 'gratis', plusDePrueba: false });
+      expect(screen.getByTestId(ID.soloIos)).toHaveTextContent(/Plus todavía no está en iPhone/);
+      expect(screen.queryByTestId(ID.oferta('mensual'))).toBeNull();
+      expect(screen.queryByTestId(ID.restaurar)).toBeNull();
+      expect(screen.queryByTestId(ID.plusDePrueba)).toBeNull();
+    } finally {
+      plataforma.restore();
+    }
   });
 });
 
@@ -319,7 +481,8 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
         <PantallaMovimientos alRegistrar={jest.fn()} alRevisar={jest.fn()} />
         <PantallaTarjeta tarjetaId={oro} alVolver={jest.fn()} />
       </>,
-      { compras: tienda },
+      // Con tienda y pantalla del plan, como en la app: Hoy solo pinta el candado si hay a dónde llevar.
+      { compras: tienda, abrirPlan: jest.fn() },
     );
     await waitFor(() => expect(screen.getByTestId(ID.oferta('mensual'))).toBeTruthy());
     await act(async () => {

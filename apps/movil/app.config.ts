@@ -41,7 +41,16 @@ function llenarExtra(): Record<string, unknown> {
   if (posthogKey) extra.posthogKey = posthogKey;
   if (posthogHost) extra.posthogHost = posthogHost;
 
+  // «Plus de prueba» sin tienda (`src/servicios/plan.ts`): solo builds de prueba (TestFlight, prueba interna de
+  // Play, APK). Siempre booleano y siempre desde aquí, para que `app.json` nunca pueda encenderlo.
+  extra.plusSinTienda = plusSinTienda(process.env.EXPO_PUBLIC_PLUS_SIN_TIENDA);
+
   return extra;
+}
+
+/** Solo `'1'` enciende el Plus de prueba; cualquier otro valor (`'true'`, `'0'`, vacío) lo deja apagado. */
+export function plusSinTienda(entorno: string | undefined): boolean {
+  return cadena(entorno) === '1';
 }
 
 /**
@@ -54,10 +63,12 @@ function versionDeTienda(): Pick<ExpoConfig, 'version' | 'ios' | 'android'> {
   const version = cadena(process.env.APP_VERSION) ?? base.version;
   const build = cadena(process.env.APP_BUILD_NUMBER);
   const versionCode = build && /^\d+$/.test(build) ? Number(build) : base.android?.versionCode;
+  const buildNumber = build ?? base.ios?.buildNumber;
+  // Sin valor, la clave no se escribe (igual que `undefined` al serializar; así lo pide exactOptionalPropertyTypes).
   return {
-    version,
-    ios: { ...base.ios, buildNumber: build ?? base.ios?.buildNumber },
-    android: { ...base.android, versionCode },
+    ...(version !== undefined ? { version } : {}),
+    ios: { ...base.ios, ...(buildNumber !== undefined ? { buildNumber } : {}) },
+    android: { ...base.android, ...(versionCode !== undefined ? { versionCode } : {}) },
   };
 }
 

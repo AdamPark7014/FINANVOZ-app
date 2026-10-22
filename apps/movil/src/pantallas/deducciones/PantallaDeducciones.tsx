@@ -6,6 +6,7 @@ import {
   asignarBeneficiarioLentes,
   confirmarPagoFactura,
   FORMAS_PAGO_CONFIRMADO,
+  funcionesPlan,
   guardarPerfilFiscal,
   importarCfdi,
   marcarFacturaCancelada,
@@ -100,10 +101,13 @@ import {
   DESC_LENTES,
 } from './textos';
 /**
- * Personal → Deducciones (`02 §24`, RF-FIS-01…03, Plus): importar facturas, pedir el perfil fiscal la primera vez,
+ * Personal → Deducciones (`02 §24`, RF-FIS-01…03): importar facturas, pedir el perfil fiscal la primera vez,
  * "Llevas $25,900 deducibles en 2026 (estimación)" por tipo, lo que no es deducible con su motivo, el ISR que
  * podrías ahorrar y, por factura, alumno y nivel de las colegiaturas, lentes y "Ya la pagué". Mientras los
  * parámetros del año no estén validados por un contador, solo lista las facturas y lo dice.
+ *
+ * Importar y ver las facturas es de todos los planes (son datos, `01 §11`); la estimación (perfil fiscal, cifras e
+ * ISR) es de Plus: en Gratis, en su lugar va la tarjeta de Plus.
  */
 export function PantallaDeducciones({
   alVolver,
@@ -112,20 +116,8 @@ export function PantallaDeducciones({
   alVolver: () => void;
   archivos: ArchivosFacturas;
 }) {
-  return (
-    <PuertaPlus
-      funcion="deducciones"
-      titulo={TITULO_PUERTA_PLUS}
-      descripcion={DESCRIPCION_PUERTA_PLUS}
-      alVolver={alVolver}
-    >
-      <Deducciones alVolver={alVolver} archivos={archivos} />
-    </PuertaPlus>
-  );
-}
-
-function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: ArchivosFacturas }) {
   const { ctx, refrescar } = useSesion();
+  const plus = useVista(funcionesPlan).deducciones;
   const [ejercicio, setEjercicio] = useState<number | null>(null);
   // `useVista` relee con este cierre en cada `refrescar()`; al elegir otro año se refresca.
   const v = useVista((c) => obtenerDeducciones(c, ejercicio ?? undefined));
@@ -175,23 +167,30 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         />
       ) : null}
 
-      {pedirPerfil ? (
-        <FormularioPerfil
-          inicial={v.estado === 'sin_perfil' ? null : v.perfil}
-          alGuardar={() => {
-            setEditando(false);
-            refrescar();
-          }}
-          {...(v.estado === 'sin_perfil' ? {} : { alCancelar: () => setEditando(false) })}
-        />
-      ) : null}
+      <PuertaPlus
+        funcion="deducciones"
+        enLinea
+        titulo={TITULO_PUERTA_PLUS}
+        descripcion={DESCRIPCION_PUERTA_PLUS}
+      >
+        {pedirPerfil ? (
+          <FormularioPerfil
+            inicial={v.estado === 'sin_perfil' ? null : v.perfil}
+            alGuardar={() => {
+              setEditando(false);
+              refrescar();
+            }}
+            {...(v.estado === 'sin_perfil' ? {} : { alCancelar: () => setEditando(false) })}
+          />
+        ) : null}
 
-      {v.estado === 'listo' ? <Estimacion v={v} /> : null}
-      {v.estado === 'sin_parametros' ? (
-        <Tarjeta testID="deducciones-sin-parametros">
-          <Texto variante="cuerpo">{v.mensaje}</Texto>
-        </Tarjeta>
-      ) : null}
+        {v.estado === 'listo' ? <Estimacion v={v} /> : null}
+        {v.estado === 'sin_parametros' ? (
+          <Tarjeta testID="deducciones-sin-parametros">
+            <Texto variante="cuerpo">{v.mensaje}</Texto>
+          </Tarjeta>
+        ) : null}
+      </PuertaPlus>
 
       <Boton
         testID="deducciones-importar"
@@ -215,7 +214,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         />
       ) : null}
       {v.facturas.map((f) => (
-        <FilaFactura key={f.uuid} f={f} v={v} />
+        <FilaFactura key={f.uuid} f={f} v={v} plus={plus} />
       ))}
 
       {v.ocultas.length > 0 ? (
@@ -232,7 +231,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
         </View>
       ) : null}
 
-      {v.estado !== 'sin_perfil' && !editando ? (
+      {plus && v.estado !== 'sin_perfil' && !editando ? (
         <Boton
           testID="deducciones-editar-perfil"
           etiqueta={BTN_CAMBIAR_PERFIL}
@@ -242,7 +241,7 @@ function Deducciones({ alVolver, archivos }: { alVolver: () => void; archivos: A
           pista={PISTA_CAMBIAR_PERFIL}
         />
       ) : null}
-      {v.estado === 'listo' || v.estado === 'sin_parametros' ? <AvisoFiscalEstimacion /> : null}
+      {plus && (v.estado === 'listo' || v.estado === 'sin_parametros') ? <AvisoFiscalEstimacion /> : null}
     </Pantalla>
   );
 }
@@ -410,7 +409,8 @@ export function ResultadoImportacionTarjeta({
   );
 }
 
-function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
+/** `plus`: si "Deducible" / "No deducible: …" se muestra; esa clasificación es parte de la estimación de Plus. */
+function FilaFactura({ f, v, plus }: { f: FacturaVista; v: VistaDeducciones; plus: boolean }) {
   const { ctx, refrescar } = useSesion();
   const [error, setError] = useState<string | null>(null);
   const [alumno, setAlumno] = useState(f.alumno ?? '');
@@ -427,8 +427,9 @@ function FilaFactura({ f, v }: { f: FacturaVista; v: VistaDeducciones }) {
   };
   const niveles = v.estado === 'listo' ? v.niveles : [];
   const id = `factura-${f.uuid}`;
-  const estado =
-    f.estado === 'deducible'
+  const estado = !plus
+    ? null
+    : f.estado === 'deducible'
       ? ESTADO_DEDUCIBLE
       : f.estado === 'no_deducible'
         ? `No deducible: ${f.textoMotivo}`

@@ -9,3 +9,21 @@ export function leerLlaveRevenueCat(extra: unknown, entorno: string | undefined)
   const llave = (typeof deExtra === 'string' && deExtra.trim() !== '' ? deExtra : (entorno ?? '')).trim();
   return /^(goog|test)_[A-Za-z0-9]+$/.test(llave) ? llave : null;
 }
+
+/**
+ * `expo.extra.plusSinTienda`: lo pone `app.config.ts` desde `EXPO_PUBLIC_PLUS_SIN_TIENDA` (solo `'1'` lo enciende)
+ * en las builds de prueba (TestFlight, prueba interna de Play, APK). Nunca vive en `app.json`. Solo `true` cuenta.
+ */
+export function leerPlusSinTienda(extra: unknown): boolean {
+  return (
+    extra !== null && typeof extra === 'object' && (extra as Record<string, unknown>).plusSinTienda === true
+  );
+}
+
+/**
+ * «Plus de prueba»: la build lo pide y no tiene tienda (iPhone, o Android sin llave de RevenueCat). Con tienda,
+ * aunque la variable siga puesta, manda la tienda.
+ */
+export function modoPlusDePrueba(o: { plusSinTienda: boolean; hayTienda: boolean }): boolean {
+  return o.plusSinTienda && !o.hayTienda;
+}

@@ -37,7 +37,10 @@ export const ID = {
   ajustesPlanVer: 'ajustes-plan-ver',
   puertaPlus: 'puerta-plus',
   puertaPlusConocer: 'puerta-plus-conocer',
+  puertaPlusPronto: 'puerta-plus-pronto',
   soloIos: 'plan-solo-ios',
+  plusDePrueba: 'plan-plus-de-prueba',
+  notaPlusDePrueba: 'plan-nota-plus-de-prueba',
 } as const;
 
 export const TITULO_PANTALLA = 'Finanvoz Plus';
@@ -62,16 +65,37 @@ export const CARGANDO_OFERTAS = 'Cargando planes…';
 export const NOTA_COMPRA_SIMULADA =
   'Compra simulada: esta build de desarrollo no tiene tienda y no cobra nada.';
 
-/** Solo lo que ya existe en la app; lo que llega en hitos futuros no se promete aquí. */
-export const INCLUYE_PLUS = [
+/** Las funciones de Plus; solo lo que ya existe en la app, lo que llega en hitos futuros no se promete aquí. */
+export const FUNCIONES_PLUS = [
   'Probabilidad de llegar a tu próximo pago sin tocar tu colchón',
   '«¿Me alcanza?»: compara pagar de contado, a meses o esperar',
   'Tarjeta del día: con cuál te conviene pagar hoy',
   'Tus meses sin intereses de los próximos 12 meses',
   'Pregúntame lo que quieras sobre tu dinero y te explico el porqué: cuánto llevas gastado, cuánto debes y qué pagos vienen',
   'Deducciones personales: con tus facturas, cuánto llevas deducible en el año y cuánto ISR podrías ahorrar',
+] as const;
+
+/** Lo que incluye Plus contratado: las funciones y el cupo del intérprete en la nube, que aplica el proxy. */
+export const INCLUYE_PLUS = [
+  ...FUNCIONES_PLUS,
   `${INTERPRETACIONES_NUBE_MES.plus} frases al mes interpretadas en internet (en Gratis, ${INTERPRETACIONES_NUBE_MES.gratis})`,
 ] as const;
+
+/**
+ * «Plus de prueba» (build de prueba sin tienda): sin cobro, sin fecha, sin ofertas y sin nombrar tiendas. El cupo
+ * de frases en internet no se promete: lo aplica el proxy, que no sabe de la prueba.
+ */
+export const TITULO_PLUS_DE_PRUEBA = 'Plus de prueba';
+export const TEXTO_PLUS_DE_PRUEBA =
+  'Estás usando Finanvoz Plus de prueba. Mientras dure la prueba no hay cobro.';
+export const SECCION_INCLUYE_PRUEBA = 'Tu prueba incluye';
+export const NOTA_PLUS_DE_PRUEBA =
+  'Cuando termine la prueba, tu cuenta vuelve a Gratis y no pierdes ningún dato.';
+
+/** Candados y puertas sin tienda ni prueba: nada que contratar todavía, así que no hay botón (`02 §12`). */
+export const SUFIJO_PLUS_PRONTO = ' · Plus, muy pronto';
+export const PUERTA_PLUS_SIN_TIENDA =
+  'Plus todavía no está disponible en esta versión. Cuando lo esté, lo verás aquí.';
 
 export const INCLUYE_GRATIS =
   'Gratis siempre: tu «hoy puedes», captura de notificaciones, registro por voz, cuentas y tarjetas sin límite, avisos, arqueo, descargar y borrar tus datos.';
@@ -79,7 +103,8 @@ export const INCLUYE_GRATIS =
 export const NOTA_TIENDA =
   'El cobro lo hace Google Play. Si cancelas antes de que termine la prueba, no se te cobra. Si no sigues con Plus, tu cuenta vuelve a Gratis y no pierdes ningún dato.';
 
-export const MENSAJE_SIN_TIENDA = 'Las suscripciones todavía no están disponibles en esta versión.';
+export const MENSAJE_SIN_TIENDA =
+  'Plus todavía no se puede contratar en esta versión. Cuando se pueda, lo verás aquí; mientras, todo lo de Gratis funciona igual.';
 export const MENSAJE_ERROR_OFERTAS = 'No pude cargar los planes. Revisa tu internet e intenta de nuevo.';
 export const MENSAJE_OFERTAS_VACIAS =
   'Google Play no devolvió planes por ahora. Revisa tu conexión e intenta de nuevo.';
@@ -105,6 +130,15 @@ export function etiquetaCandadoPlus(texto: string): string {
 
 export function etiquetaAccesibilidadCandado(texto: string): string {
   return `${texto}. Disponible con Plus`;
+}
+
+/** Candado sin tienda: solo texto, sin botón que lleve a una oferta que no existe. */
+export function etiquetaCandadoPlusPronto(texto: string): string {
+  return `${texto}${SUFIJO_PLUS_PRONTO}`;
+}
+
+export function etiquetaAccesibilidadCandadoPronto(texto: string): string {
+  return `${texto}. Llega con Plus; todavía no está disponible en esta versión`;
 }
 
 export const TITULO_PLAN_GRATIS = 'Plan Gratis';
@@ -149,6 +183,7 @@ export function etiquetaAccesibleIncluyeGratis(): string {
 
 /** "Tienes Plus · prueba gratis" y su detalle. */
 export function resumenPlan(v: VistaPlan): { titulo: string; detalle: string | null } {
+  if (v.plusDePrueba) return { titulo: TITULO_PLUS_DE_PRUEBA, detalle: TEXTO_PLUS_DE_PRUEBA };
   if (v.plan === 'plus') {
     const hasta = v.fechaFin ? etiquetaDiaMes(v.fechaFin) : null;
     if (v.enPrueba) {

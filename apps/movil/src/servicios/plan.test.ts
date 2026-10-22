@@ -11,6 +11,8 @@ import { listarMovimientos } from './movimientos';
 import { listarPlanesMsi } from './msi';
 import {
   DIAS_PRUEBA,
+  esPlusDePrueba,
+  fijarPlusDePrueba,
   funcionesPlan,
   obtenerPlan,
   sincronizarPlan,
@@ -39,6 +41,7 @@ describe('plan (RF-PAG-01)', () => {
       fechaFin: null,
       renovara: false,
       terminoPlus: null,
+      plusDePrueba: false,
     });
     expect(funcionesPlan(p.ctx)).toEqual({
       probabilidad: false,
@@ -107,6 +110,89 @@ describe('plan (RF-PAG-01)', () => {
     p.reloj.fijarInstante(T0);
     sincronizarPlan(p.ctx, { plus: { vigenteHasta: T0 - 1, enPrueba: false, renovara: false } });
     expect(obtenerPlan(p.ctx).plan).toBe('gratis');
+  });
+});
+
+describe('Plus de prueba sin tienda (EXPO_PUBLIC_PLUS_SIN_TIENDA, decisión del 22-10-2026)', () => {
+  it('encendido: todas las funciones de Plus, sin cobro, sin fecha y sin vencer', () => {
+    const p = abrirPrueba();
+    p.reloj.fijarInstante(T0);
+    fijarPlusDePrueba(p.ctx, true);
+    expect(obtenerPlan(p.ctx)).toEqual({
+      plan: 'plus',
+      enPrueba: true,
+      diasRestantes: null,
+      vigenteHasta: null,
+      fechaFin: null,
+      renovara: false,
+      terminoPlus: null,
+      plusDePrueba: true,
+    });
+    expect(funcionesPlan(p.ctx)).toEqual({
+      probabilidad: true,
+      tarjetaDelDia: true,
+      meAlcanza: true,
+      compromisoMsi12Meses: true,
+      consultas: true,
+      explicar: true,
+      deducciones: true,
+      // El proxy aplica el cupo según la tienda y no sabe de la prueba: no se promete el de Plus.
+      interpretacionesNubeMes: 30,
+    });
+    // No vence con el tiempo: dura lo que dure la build de prueba.
+    p.reloj.fijarInstante(T0 + 365 * DIA);
+    expect(funcionesPlan(p.ctx).meAlcanza).toBe(true);
+  });
+
+  it('no escribe nada en la base: apagado (build con tienda o sin la variable) todo vuelve a lo de la tienda', () => {
+    const p = abrirPrueba();
+    p.reloj.fijarInstante(T0);
+    fijarPlusDePrueba(p.ctx, true);
+    expect(esPlusDePrueba(p.ctx)).toBe(true);
+    fijarPlusDePrueba(p.ctx, false);
+    expect(esPlusDePrueba(p.ctx)).toBe(false);
+    expect(obtenerPlan(p.ctx)).toMatchObject({ plan: 'gratis', plusDePrueba: false, terminoPlus: null });
+    expect(Object.values(funcionesPlan(p.ctx)).filter((v) => v === true)).toEqual([]);
+    // Con Plus de la tienda, apagado la tienda manda igual que hoy.
+    sincronizarPlan(p.ctx, enPrueba(T0));
+    expect(obtenerPlan(p.ctx)).toMatchObject({
+      plan: 'plus',
+      enPrueba: true,
+      diasRestantes: 14,
+      plusDePrueba: false,
+    });
+  });
+
+  it('es por base: un contexto derivado (`{ ...ctx }`) lo ve y otra base no', () => {
+    const p = abrirPrueba();
+    const otra = abrirPrueba();
+    fijarPlusDePrueba(p.ctx, true);
+    expect(funcionesPlan({ ...p.ctx, configFiscal: {} }).deducciones).toBe(true);
+    expect(funcionesPlan(otra.ctx).deducciones).toBe(false);
+  });
+
+  it('CA-M7-07 sigue igual: al apagarse, los datos siguen visibles y editables y solo se ocultan las funciones', () => {
+    const p = abrirPrueba();
+    const e = cargarEscenario(p.ctx, escenario('e5-10'));
+    p.reloj.fijarInstante(T0);
+    fijarPlusDePrueba(p.ctx, true);
+    const efectivo = e.cuentas['efectivo'] as string;
+    registrarMovimiento(p.ctx, { tipo: 'gasto', categoria: 'super', origenId: efectivo, monto: 9_000 });
+    const enPrueba = {
+      hoy: obtenerHoy(p.ctx),
+      cuentas: listarCuentas(p.ctx),
+      movimientos: listarMovimientos(p.ctx),
+      tarjetas: listarTarjetas(p.ctx),
+    };
+    fijarPlusDePrueba(p.ctx, false);
+    expect({
+      hoy: obtenerHoy(p.ctx),
+      cuentas: listarCuentas(p.ctx),
+      movimientos: listarMovimientos(p.ctx),
+      tarjetas: listarTarjetas(p.ctx),
+    }).toEqual(enPrueba);
+    expect(obtenerPlan(p.ctx).plan).toBe('gratis');
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 });
 

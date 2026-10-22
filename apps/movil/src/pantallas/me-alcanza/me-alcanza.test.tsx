@@ -624,6 +624,8 @@ describe('¿Me alcanza?', () => {
 
   it('"¿me alcanza para unos tenis de 1500?" escrito en Hoy abre "¿Me alcanza?" con la consulta en memoria', async () => {
     const p = e401();
+    // «¿Me alcanza?» es de Plus: sin tienda ni pantalla del plan, Hoy no muestra el botón en Gratis.
+    activarPlus(p.ctx);
     const frase = '¿me alcanza para unos tenis de 1500?';
     const nube = nubeFalsa({
       [frase]: { intencion: 'simular', compra: { precio: 150_000, descripcion: 'unos tenis' } },

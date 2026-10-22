@@ -1,6 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { PantallaMeAlcanza, tomarConsultaPendiente } from '../src/pantallas/me-alcanza';
+import {
+  DESCRIPCION_PUERTA_PLUS,
+  INVITACION_PRUEBA_PLUS,
+  PantallaMeAlcanza,
+  TITULO_PUERTA_PLUS,
+  tomarConsultaPendiente,
+} from '../src/pantallas/me-alcanza';
 import { PuertaPlus } from '../src/pantallas/plan';
 import { ProveedorAvisos } from '../src/pantallas/principal';
 
@@ -12,11 +18,12 @@ export default function MeAlcanza() {
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));
   return (
     <ProveedorAvisos>
-      {/* Plus (`02 §9`): en Gratis, qué hace y cómo probarlo. */}
+      {/* Plus (`02 §9`): en Gratis, qué hace y, solo si hay tienda, cómo probarlo. */}
       <PuertaPlus
         funcion="meAlcanza"
-        titulo="¿Me alcanza? es de Plus"
-        descripcion="Compara pagar de contado, a meses o esperar, y te dice con qué probabilidad llegas a tu próximo pago. Pruébalo 14 días gratis."
+        titulo={TITULO_PUERTA_PLUS}
+        descripcion={DESCRIPCION_PUERTA_PLUS}
+        invitacion={INVITACION_PRUEBA_PLUS}
         alVolver={cerrar}
       >
         <PantallaMeAlcanza

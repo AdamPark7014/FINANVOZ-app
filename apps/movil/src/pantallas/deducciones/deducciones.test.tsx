@@ -297,13 +297,38 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
     expect(screen.getByTestId('deducciones-leyenda')).toHaveTextContent(LEYENDA_ESTIMACION);
   });
 
-  it('en Gratis explica que es de Plus', () => {
+  it('en Gratis importar y ver las facturas es de todos; solo la estimación es de Plus', async () => {
     const ctx = preparar({ plus: false });
-    renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    const archivos = selectorFalso();
+    renderConSesion(ctx, <PantallaDeducciones alVolver={jest.fn()} archivos={archivos} />);
+    // La pantalla abre; en lugar del perfil fiscal y la estimación va la tarjeta de Plus.
+    expect(screen.getByTestId('pantalla-deducciones')).toBeTruthy();
     expect(screen.getByTestId('puerta-plus')).toBeTruthy();
     expect(screen.getByText(TITULO_PUERTA_PLUS)).toBeTruthy();
     expect(screen.getByText(DESCRIPCION_PUERTA_PLUS)).toBeTruthy();
-    expect(screen.queryByTestId('pantalla-deducciones')).toBeNull();
+    expect(screen.queryByTestId('deducciones-perfil')).toBeNull();
+    // Sin tienda en esta prueba: sin botón a una oferta que no existe y sin volver duplicado.
+    expect(screen.queryByTestId('puerta-plus-conocer')).toBeNull();
+    expect(screen.getByTestId('puerta-plus-pronto')).toBeTruthy();
+    expect(screen.queryByTestId('plan-volver')).toBeNull();
+    expect(screen.getByTestId('deducciones-volver')).toBeTruthy();
+
+    await importarDesdePantalla();
+    expect(archivos.elegir).toHaveBeenCalled();
+    expect(textoDe('importacion-resumen')).toBe('Importé 8 facturas; 1 no es versión 4.0');
+    fireEvent.press(screen.getByTestId('importacion-listo'));
+    expect(screen.getByTestId(`factura-${uuidDe('c01_dentista_debito.xml')}`)).toBeTruthy();
+    expect(screen.queryByTestId('deducciones-estimacion')).toBeNull();
+    expect(screen.queryByTestId('deducciones-sin-parametros')).toBeNull();
+    expect(screen.queryByTestId('deducciones-editar-perfil')).toBeNull();
+    expect(screen.queryByText(/deducibles|Deducible|No deducible/)).toBeNull();
+    expect(screen.queryByTestId('deducciones-leyenda')).toBeNull();
+  });
+
+  it('en Plus la pantalla no lleva tarjeta de Plus', () => {
+    renderConSesion(preparar(), <PantallaDeducciones alVolver={jest.fn()} archivos={selectorFalso()} />);
+    expect(screen.queryByTestId('puerta-plus')).toBeNull();
+    expect(screen.getByTestId('deducciones-perfil')).toBeTruthy();
   });
 
   it('Cuentas abre Deducciones', () => {

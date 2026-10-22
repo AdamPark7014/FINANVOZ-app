@@ -10,10 +10,10 @@ export {
 export const ETIQUETA_VOLVER = 'Volver';
 export const PISTA_VOLVER = 'Regresa a Cuentas';
 
-/** Candado Plus al entrar desde Cuentas. */
+/** Tarjeta de Plus en lugar de la estimación (importar y ver tus facturas es de todos los planes). */
 export const TITULO_PUERTA_PLUS = 'Tus deducciones del año';
 export const DESCRIPCION_PUERTA_PLUS =
-  'Con Plus, comparte tus facturas y te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías pagar de menos.';
+  'Con Plus, con tus facturas te digo cuánto llevas deducible en el año, qué no cuenta y por qué, y cuánto ISR podrías pagar de menos.';
 
 export function tituloPantallaDeducciones(ejercicio: number): string {
   return `Deducciones ${ejercicio}`;

@@ -1,8 +1,15 @@
 /** Copy de «¿Me alcanza?» (`02 §9`, `02 §14`: tuteo, qué pasó + qué hacer). */
+import { DIAS_PRUEBA } from '../../servicios/plan';
 
 export { MENSAJE_DATOS_INSUFICIENTES } from '../../servicios/probabilidad';
 
 export const TITULO = '¿Me alcanza?';
+
+/** Puerta de Plus en Gratis (`02 §12`): qué hace y, solo si hay tienda, la invitación a probarlo. */
+export const TITULO_PUERTA_PLUS = '¿Me alcanza? es de Plus';
+export const DESCRIPCION_PUERTA_PLUS =
+  'Compara pagar de contado, a meses o esperar, y te dice con qué probabilidad llegas a tu próximo pago.';
+export const INVITACION_PRUEBA_PLUS = `Pruébalo ${DIAS_PRUEBA} días gratis.`;
 
 export const ETIQUETA_PRECIO = '¿Cuánto cuesta?';
 export const ETIQUETA_DESCRIPCION = '¿Qué es? (opcional)';

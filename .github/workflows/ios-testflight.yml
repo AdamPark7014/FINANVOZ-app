@@ -12,9 +12,10 @@ name: iOS · TestFlight
 #     BUILD_CERTIFICATE_BASE64 (.p12 en base64) + P12_PASSWORD
 #     o CERTIFICATE_PRIVATE_KEY (PEM) + DISTRIBUTION_CERT_CER_BASE64 (.cer en base64)
 # Antes de la primera subida, la app «Finanvoz» con bundle com.finanvoz.app tiene que existir en App Store
-# Connect (se crea a mano; ver docs/tienda/IOS-APP-STORE.md). Las llaves de proveedores nunca entran aquí: el
-# modo nube queda apagado, como en apk.yml. El repositorio es público: este flujo solo corre a mano
-# (workflow_dispatch) y los secretos nunca llegan a corridas de forks.
+# Connect (se crea a mano; ver docs/tienda/IOS-APP-STORE.md). Las llaves de proveedores nunca entran aquí: la
+# nube solo recibe la URL y la llave pública (anon) de Supabase desde variables de repositorio, y queda apagada
+# mientras estén vacías. El repositorio es público: este flujo solo corre a mano (workflow_dispatch) y los
+# secretos nunca llegan a corridas de forks.
 
 on:
   workflow_dispatch:
@@ -60,6 +61,13 @@ jobs:
       DISTRIBUTION_CERT_CER_BASE64: ${{ secrets.DISTRIBUTION_CERT_CER_BASE64 }}
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+      # Solo builds de prueba; quitar antes de la tienda pública. iPhone no tiene tienda: con esto, «Plus de
+      # prueba» sin cobro (app.config.ts → extra.plusSinTienda, src/servicios/plan.ts).
+      EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
+      # Nube del intérprete (Ola 6): variables de repositorio (no secretos), vacías mientras no exista el proyecto
+      # de Supabase; app.config.ts ignora las cadenas vacías y la nube queda apagada.
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

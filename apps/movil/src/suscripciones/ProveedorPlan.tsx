@@ -1,12 +1,20 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import { obtenerPlan, sincronizarPlan, type EstadoTienda } from '../servicios';
+import { fijarPlusDePrueba } from '../servicios/plan';
 import { useSesion } from '../sesion/ProveedorSesion';
+import { modoPlusDePrueba } from './config';
+import { plusSinTiendaDeLaBuild } from './build';
 import { reidentificarCompras } from './reidentificar';
 import type { AdaptadorCompras } from './tipos';
 
 export interface ValorPlan {
-  /** `null` si esta build no tiene tienda (sin llave en producción, Expo Go): la cuenta es Gratis. */
+  /**
+   * `null` si esta build no tiene tienda (iPhone, sin llave en producción, Expo Go): la cuenta es Gratis, salvo en
+   * «Plus de prueba» (`plusDePrueba`).
+   */
   readonly compras: AdaptadorCompras | null;
+  /** Build de prueba sin tienda con `EXPO_PUBLIC_PLUS_SIN_TIENDA=1`: todo Plus, sin cobro ni ofertas. */
+  readonly plusDePrueba: boolean;
   /** Abre la pantalla del plan (candados "· Plus"); `null` si no hay navegación (pruebas de una pantalla). */
   readonly abrirPlan: (() => void) | null;
   /**
@@ -17,23 +25,36 @@ export interface ValorPlan {
 }
 
 const sinTienda = async () => {};
-const PlanContexto = createContext<ValorPlan>({ compras: null, abrirPlan: null, reidentificar: sinTienda });
+const PlanContexto = createContext<ValorPlan>({
+  compras: null,
+  plusDePrueba: false,
+  abrirPlan: null,
+  reidentificar: sinTienda,
+});
 
 /**
  * Tienda y navegación al plan para toda la app. Al montar, y cada vez que la tienda avisa un cambio, guarda el
  * plan en la base (`sincronizarPlan`) y refresca las vistas; asocia las compras al usuario anónimo del proxy.
- * Sin red se queda con lo último guardado (y su vencimiento).
+ * Sin red se queda con lo último guardado (y su vencimiento). Sin tienda y con `plusSinTienda` (por omisión, lo
+ * que diga la build) marca la sesión como «Plus de prueba».
  */
 export function ProveedorPlan({
   compras,
   abrirPlan = null,
+  plusSinTienda = plusSinTiendaDeLaBuild(),
   children,
 }: {
   compras: AdaptadorCompras | null;
   abrirPlan?: (() => void) | null;
+  /** Solo pruebas: fija la variable de la build en vez de leer `extra.plusSinTienda`. */
+  plusSinTienda?: boolean;
   children: ReactNode;
 }) {
   const { ctx, nube, refrescar } = useSesion();
+  const plusDePrueba = modoPlusDePrueba({ plusSinTienda, hayTienda: compras !== null });
+  // En el render y no en un efecto: las pantallas hijas leen `funcionesPlan` en su primer render. Es idempotente y
+  // depende solo de la build, que no cambia con la app abierta.
+  fijarPlusDePrueba(ctx, plusDePrueba);
 
   useEffect(() => {
     if (!compras) return;
@@ -83,7 +104,10 @@ export function ProveedorPlan({
     }
   }, [compras, nube, ctx, refrescar]);
 
-  const valor = useMemo(() => ({ compras, abrirPlan, reidentificar }), [compras, abrirPlan, reidentificar]);
+  const valor = useMemo(
+    () => ({ compras, plusDePrueba, abrirPlan, reidentificar }),
+    [compras, plusDePrueba, abrirPlan, reidentificar],
+  );
   return <PlanContexto.Provider value={valor}>{children}</PlanContexto.Provider>;
 }
 

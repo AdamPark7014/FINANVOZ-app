@@ -6,6 +6,12 @@
 
 ## Hecho en este turno
 
+- **Plus de prueba sin tienda (B-2a, decisión 1 del plan)**: `EXPO_PUBLIC_PLUS_SIN_TIENDA='1'` + sin tienda →
+  `extra.plusSinTienda` (siempre booleano desde `app.config.ts`), `ProveedorPlan` lo marca en memoria (nada en la
+  base), `suscripciones/build.ts` lo lee; pantalla Plan «Plus de prueba» sin tiendas, candado solo texto y `PuertaPlus`
+  sin «Conocer Plus» cuando no hay tienda; «¿Me alcanza?» sin «14 días gratis» sin tienda; deducciones: importar y ver
+  facturas para todos, puerta solo en la estimación. `ios-testflight.yml`, `android-play.yml` y `apk.yml` la encienden
+  (quitarla antes de la tienda pública). vitest 30/30, jest plan/deducciones/me-alcanza 55/55, typecheck limpio.
 - **Plan mega robusto** (`docs/PLAN-MEJORA-2026-10.md`): diagnóstico, Olas 1–7 y carril T con dueño por archivo, 6
   decisiones de Adam. **Flujos Maestro de iPhone** (`apps/movil/.maestro/ios`: 01–08 + `subflujos/`, ids en vez de
   textos, etiquetas `ios/recorrido/capturas/bug-conocido/voz`) y `ios-maestro.yml` (corre tras «iOS simulador» con el

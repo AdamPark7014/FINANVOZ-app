@@ -37,12 +37,15 @@ import {
   MENSAJE_RESTAURADO_SIN_PLUS,
   MENSAJE_SIN_TIENDA,
   NOTA_COMPRA_SIMULADA,
+  NOTA_PLUS_DE_PRUEBA,
   NOTA_TIENDA,
   resumenPlan,
   SECCION_AJUSTES,
   SECCION_INCLUYE,
+  SECCION_INCLUYE_PRUEBA,
   TITULO_PANTALLA,
   TITULO_PLAN_IOS,
+  FUNCIONES_PLUS,
 } from './textos';
 
 type Ofertas = { tipo: 'cargando' } | { tipo: 'listas'; ofertas: readonly OfertaPlus[] } | { tipo: 'error' };
@@ -50,7 +53,8 @@ type Ofertas = { tipo: 'cargando' } | { tipo: 'listas'; ofertas: readonly Oferta
 /**
  * Plan (RF-PAG-01, `01 §11`, `02 §12`): qué incluye Plus, la prueba de 14 días y los precios que da Google Play.
  * Comprar y restaurar pasan por el adaptador de compras; el plan se guarda con `sincronizarPlan` y todas las
- * vistas se refrescan. En Gratis nada se bloquea: aquí solo se ofrece el análisis de Plus.
+ * vistas se refrescan. En Gratis nada se bloquea: aquí solo se ofrece el análisis de Plus. En una build de prueba
+ * sin tienda («Plus de prueba») solo dice que es una prueba sin cobro y lo que incluye.
  */
 export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   const { ctx, refrescar } = useSesion();
@@ -118,7 +122,58 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
     }
   };
 
-  // iPhone: sin compras ni tienda en esta versión (M14). Solo se explica, sin nombrar tiendas ni precios.
+  // «Plus de prueba» (build de prueba sin tienda, en iPhone o Android): todo Plus, sin cobro, sin fecha, sin
+  // ofertas ni "Restaurar", y sin nombrar tiendas ni precios.
+  if (vista.plusDePrueba) {
+    return (
+      <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
+        <Boton
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+          testID={ID.volver}
+        />
+        <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
+          {TITULO_PANTALLA}
+        </Texto>
+        <Tarjeta testID={ID.plusDePrueba}>
+          <Texto
+            variante="subtitulo"
+            testID={ID.titulo}
+            accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
+          >
+            {resumen.titulo}
+          </Texto>
+          {resumen.detalle ? (
+            <Texto variante="cuerpo" tono="secundario" testID={ID.detalle} importantForAccessibility="no">
+              {resumen.detalle}
+            </Texto>
+          ) : null}
+        </Tarjeta>
+        <Tarjeta testID={ID.incluye}>
+          <Texto variante="subtitulo">{SECCION_INCLUYE_PRUEBA}</Texto>
+          <View accessibilityRole="list" style={{ gap: espacio.xs }}>
+            {FUNCIONES_PLUS.map((t) => (
+              <Texto
+                key={t}
+                variante="cuerpo"
+                role="listitem"
+                accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
+              >{`• ${t}`}</Texto>
+            ))}
+          </View>
+        </Tarjeta>
+        <Texto variante="secundario" tono="secundario" testID={ID.notaPlusDePrueba}>
+          {NOTA_PLUS_DE_PRUEBA}
+        </Texto>
+      </Pantalla>
+    );
+  }
+
+  // iPhone: sin compras ni tienda en esta versión (M14). Solo se explica, sin nombrar tiendas ni precios ni
+  // ofrecer compras, aunque una build de desarrollo traiga la tienda simulada.
   if (Platform.OS === 'ios') {
     return (
       <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
@@ -313,20 +368,23 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       ) : null}
 
       {compras ? (
-        <Boton
-          etiqueta={ETIQUETA_RESTAURAR}
-          variante="texto"
-          ancho="contenido"
-          cargando={ocupado === 'restaurar'}
-          deshabilitado={ocupado !== null}
-          alPresionar={() => void restaurar()}
-          pista={PISTA_RESTAURAR}
-          testID={ID.restaurar}
-        />
+        <>
+          <Boton
+            etiqueta={ETIQUETA_RESTAURAR}
+            variante="texto"
+            ancho="contenido"
+            cargando={ocupado === 'restaurar'}
+            deshabilitado={ocupado !== null}
+            alPresionar={() => void restaurar()}
+            pista={PISTA_RESTAURAR}
+            testID={ID.restaurar}
+          />
+          {/* Cobro y cancelación solo cuando hay tienda: sin ella no se puede contratar nada. */}
+          <Texto variante="secundario" tono="secundario" testID={ID.notaTienda}>
+            {NOTA_TIENDA}
+          </Texto>
+        </>
       ) : null}
-      <Texto variante="secundario" tono="secundario" testID={ID.notaTienda}>
-        {NOTA_TIENDA}
-      </Texto>
     </Pantalla>
   );
 }
