@@ -46,15 +46,16 @@
   privacidad y revisión (§5–§7 de `docs/tienda/IOS-APP-STORE.md`).
 - **Secretos cargados el 22-10 por Claude** (Adam pidió que corra yo los comandos): los 4 `ANDROID_*` y los 5 de iOS
   (certificado del equipo + llave PEM de `C:\dev\secrets\arta-ios`, llave ASC `H7VXTV487C`, Issuer ID).
-- **TestFlight: build 1.0.0 (3) válida** (corrida 39821272914; vence 20-01-2027). Grupo interno «Equipo Finanvoz
-  (interno)» creado por la API; **falta agregar a Adam como tester en la consola** (la API responde «Tester(s) cannot
-  be assigned»). Las cargas (1) y (2) fallaron: manifiesto de privacidad y textos de permiso (ITMS-90683), ya
-  corregidos y vigilados por el flujo.
-- **Play: AAB 1.0.0 (código 1) firmado** (corrida 39812387570), copiado a `C:\dev\builds\FINANVOZ\finanvoz-1.0.0-1.aab`
-  y `Documents\FINANVOZ-builds\`. **Falta que Adam lo arrastre** a la versión de prueba interna en borrador de Play
-  Console (la herramienta del navegador solo sube archivos de hasta 10 MB y Play exige la primera subida a mano);
-  luego se llena nombre, notas y testers y se publica en prueba interna. Respaldar `Documents\LLAVES-ANDROID\FINANVOZ`
-  fuera de la PC.
+- **TestFlight: build 1.0.0 (3) válida** (corrida 39821272914; vence 20-01-2027), grupo interno «Equipo Finanvoz
+  (interno)» con Adam (ad.pozo.ont@icloud.com) **invitado** (agregado desde la consola: la API con la llave de Gestor
+  de apps responde «Tester(s) cannot be assigned»). Las cargas (1) y (2) fallaron: manifiesto de privacidad y textos
+  de permiso (ITMS-90683), ya corregidos y vigilados por el flujo.
+- **Play: prueba interna publicada el 22-10** — versión 1 (1.0.0) «Disponible para testers internos», lista de testers
+  «Equipo Finanvoz» (solo ad.pozo.ont@gmail.com), enlace https://play.google.com/apps/internaltest/4700319243165565858 .
+  Los testers ven el nombre temporal «com.finanvoz.app (unreviewed)» hasta la primera revisión. El AAB vive en
+  `C:\dev\builds\FINANVOZ\` y `Documents\FINANVOZ-builds\`. La siguiente subida a Play puede ir por API o a mano: la
+  herramienta de Chrome no sube archivos de más de 10 MB. **Respaldar `Documents\LLAVES-ANDROID\FINANVOZ` fuera de la
+  PC.**
 - Las observaciones de Hoy y el O5 nuevo solo se han visto en pruebas y en el emulador (sin datos de varios días no
   salen observaciones). Falta verlas con un libro real en el teléfono de Adam.
 - M0 / dominio `finanvoz.com` / aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa, no la
@@ -62,8 +63,8 @@
 
 ## Siguiente paso
 
-1. Adam — arrastrar el AAB a Play Console y agregarse como tester en el grupo interno de TestFlight; Claude termina la
-   versión de prueba interna en Play (nombre, notas, testers, publicar).
+1. Adam — instalar desde TestFlight (iPhone) y desde el enlace de prueba interna (Android) y probar en sus teléfonos;
+   lo que encuentre se corrige y se sube como build 4 / código 2.
 2. Adam — M0 antes del 6 nov; cuentas Expo/RevenueCat/PostHog; contador; abogado; pruebas en teléfono.
 3. Código: los 27 casos del golden set que siguen en `null` (`06 §9.3`) se quedan así a propósito; si Adam quiere
    más cobertura sin nube, conviene crecer el golden set con frases reales antes de inventar reglas.
@@ -78,5 +79,5 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; camino tienda ~60 % (pipelines, fichas y apps creadas en Play y App Store Connect; faltan secretos,
+FinanVoz código ~95 %; camino tienda ~70 % (prueba interna publicada en Play y build válida en TestFlight; faltan fichas públicas,
 dominio, legal).
