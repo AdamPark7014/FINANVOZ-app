@@ -5,17 +5,21 @@ import { deshacer, registrarMovimiento } from './formulario';
 import { listarMovimientos } from './movimientos';
 import { agregarCuenta, agregarTarjetaCredito } from './onboarding';
 import type { PlainDate, Regla } from '@cartera/core';
+import { obtenerColchon } from './ajustes';
+import { ingresoPrincipal, programadosActivos } from './programados';
 import {
+  confirmarAjuste,
   confirmarRegistro,
   confirmarTanda,
   contarPorInterpretar,
   descartarPorInterpretar,
   listarPorInterpretar,
   registrarTexto,
+  registrarTextoLocal,
   TOPE_OPTIMISTA,
 } from './registrar';
 import { crearTanda } from './tandas';
-import { abrirPrueba, vector } from './__pruebas__/base';
+import { abrirPrueba, golden, vector } from './__pruebas__/base';
 import { nubeFalsa } from './__pruebas__/nube';
 
 interface VectorE11 {
@@ -130,6 +134,141 @@ describe('registrar por voz o texto', () => {
       resultado: 'consulta',
       respuesta: { plantilla: 'hoy_puedes' },
     });
+  });
+});
+
+describe('configurar desde Hoy con el nivel 0 (K01–K08, sin nube)', () => {
+  it('K02 · el colchón se propone y solo se guarda con "Guardar"', async () => {
+    const p = conCuentas();
+    const r = await registrarTexto(p.ctx, golden('K02').texto, 'voz');
+    if (r.resultado !== 'confirmar_ajuste') throw new Error(r.resultado);
+    expect(r.propuesta).toEqual({ tipo: 'colchon', monto: 50_000, actual: 0 });
+    expect(obtenerColchon(p.ctx)).toBe(0);
+    expect(contarPorInterpretar(p.ctx)).toBe(0);
+    expect(confirmarAjuste(p.ctx, r.propuesta, 'voz')).toEqual({
+      tipo: 'colchon',
+      monto: 50_000,
+      anterior: 0,
+    });
+    expect(obtenerColchon(p.ctx)).toBe(50_000);
+    // V03 · "treinta y un mil" (A0).
+    const v03 = registrarTextoLocal(p.ctx, 'quiero treinta y un mil de colchón', 'voz');
+    expect(v03).toMatchObject({
+      resultado: 'confirmar_ajuste',
+      propuesta: { monto: 3_100_000, actual: 50_000 },
+    });
+  });
+
+  it('K03 y V01 · el ingreso se propone con su próximo pago y "Guardar" lo configura', async () => {
+    const p = conCuentas();
+    const r = await registrarTexto(p.ctx, 'me pagan 8 mil 500 cada quincena', 'voz');
+    if (r.resultado !== 'confirmar_ajuste') throw new Error(r.resultado);
+    expect(r.propuesta).toEqual({
+      tipo: 'ingreso',
+      concepto: 'quincena',
+      monto: 850_000,
+      regla: { tipo: 'quincenal_15_ultimo' },
+      proximoPago: '2026-10-15',
+      anterior: null,
+    });
+    expect(ingresoPrincipal(p.ctx)).toBeNull();
+    confirmarAjuste(p.ctx, r.propuesta, 'voz');
+    expect(ingresoPrincipal(p.ctx)).toMatchObject({ monto: 850_000, regla: { tipo: 'quincenal_15_ultimo' } });
+    // Con un ingreso ya configurado, la propuesta dice cuál reemplaza.
+    expect(registrarTextoLocal(p.ctx, golden('K03').texto, 'voz')).toMatchObject({
+      resultado: 'confirmar_ajuste',
+      propuesta: { tipo: 'ingreso', monto: 800_000, anterior: { concepto: 'quincena', monto: 850_000 } },
+    });
+  });
+
+  it('K04 · el saldo de una cuenta se propone y "Guardar" registra la conciliación por la diferencia', async () => {
+    const p = conCuentas();
+    const r = await registrarTexto(p.ctx, golden('K04').texto, 'voz');
+    if (r.resultado !== 'confirmar_ajuste') throw new Error(r.resultado);
+    expect(r.propuesta).toEqual({
+      tipo: 'saldo_cuenta',
+      monto: 420_000,
+      cuentaId: p.bbva,
+      saldoActual: 359_000,
+      faltaCuenta: null,
+    });
+    expect(p.ctx.libro.saldo(p.bbva)).toBe(359_000);
+    const g = confirmarAjuste(p.ctx, r.propuesta, 'voz');
+    if (g.tipo !== 'saldo_cuenta') throw new Error(g.tipo);
+    expect(p.ctx.libro.saldo(p.bbva)).toBe(420_000);
+    expect(p.ctx.libro.obtener(g.transaccionId as string)).toMatchObject({
+      tipo: 'conciliacion',
+      origen: 'voz',
+    });
+    expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
+    // Mismo saldo: no registra nada.
+    expect(confirmarAjuste(p.ctx, r.propuesta, 'voz')).toMatchObject({ transaccionId: null });
+  });
+
+  it('saldo con varias cuentas de débito y sin alias pide elegir; solo débito o billetera', () => {
+    const p = conCuentas();
+    const banorte = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'Banorte', saldo: 0, alias: ['azul'] });
+    // El nivel 0 no adivina la cuenta: "tengo 500 en la azul" sí la nombra.
+    expect(registrarTextoLocal(p.ctx, 'tengo 500 en la azul', 'texto')).toMatchObject({
+      resultado: 'confirmar_ajuste',
+      propuesta: { tipo: 'saldo_cuenta', cuentaId: banorte, saldoActual: 0 },
+    });
+    // La nube puede mandar el saldo sin alias: con dos cuentas de débito, chips para elegir.
+    const propuesta = {
+      tipo: 'saldo_cuenta' as const,
+      monto: 10_000,
+      cuentaId: null,
+      saldoActual: null,
+      faltaCuenta: null,
+    };
+    expect(() => confirmarAjuste(p.ctx, propuesta, 'texto')).toThrow(
+      expect.objectContaining({ codigo: 'cuenta_invalida' }),
+    );
+    expect(() => confirmarAjuste(p.ctx, propuesta, 'texto', { cuentaId: p.nu })).toThrow(
+      expect.objectContaining({ codigo: 'cuenta_invalida' }),
+    );
+    expect(confirmarAjuste(p.ctx, propuesta, 'texto', { cuentaId: banorte })).toMatchObject({
+      saldo: 10_000,
+    });
+    expect(p.ctx.libro.saldo(banorte)).toBe(10_000);
+  });
+
+  it('K06 · el compromiso se configura al instante con "Deshacer" y el concepto sin artículo', async () => {
+    const p = conCuentas();
+    const r = await registrarTexto(p.ctx, golden('K06').texto, 'voz');
+    if (r.resultado !== 'configurado') throw new Error(r.resultado);
+    expect(r.compromiso).toMatchObject({ concepto: 'Renta', monto: 650_000, proxima: '2026-11-01' });
+    expect(programadosActivos(p.ctx)).toHaveLength(1);
+    expect(contarPorInterpretar(p.ctx)).toBe(0);
+    // K07 (fecha única) y K08 (anual) también se entienden sin nube.
+    expect(registrarTextoLocal(p.ctx, golden('K07').texto, 'voz')).toMatchObject({
+      resultado: 'configurado',
+      compromiso: { concepto: 'Predial', monto: 300_000, proxima: '2026-11-03' },
+    });
+    expect(registrarTextoLocal(p.ctx, golden('K08').texto, 'voz')).toMatchObject({
+      resultado: 'configurado',
+      compromiso: { concepto: 'Seguro del coche', monto: 980_000 },
+    });
+  });
+
+  it('K01 y V05 · el ciclo de la tarjeta se cambia al instante con "Deshacer"', () => {
+    const p = conCuentas();
+    expect(registrarTextoLocal(p.ctx, 'mi Nu corta el 25, pago el 15', 'voz')).toMatchObject({
+      resultado: 'tarjeta_configurada',
+      tarjeta: 'Nu',
+      deshacer: expect.any(String),
+    });
+  });
+
+  it('lo que el nivel 0 deja en null (V08, V09) sigue esperando a la nube', async () => {
+    const p = conCuentas();
+    for (const id of ['V08', 'V09']) {
+      expect(await registrarTexto(p.ctx, golden(id).texto, 'voz'), id).toMatchObject({
+        resultado: 'por_interpretar',
+        motivo: 'sin_nube',
+      });
+    }
+    expect(contarPorInterpretar(p.ctx)).toBe(2);
   });
 });
 

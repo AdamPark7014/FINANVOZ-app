@@ -23,6 +23,35 @@ export function cargarGolden(): CasoGolden[] {
     .map((linea) => JSON.parse(linea) as CasoGolden);
 }
 
+/** Caso de `fixtures/nlu/golden-pasos.jsonl`; `esperado: null` = no hay lectura correcta (debe dar `null`). */
+export interface CasoPaso {
+  id: string;
+  paso: string;
+  texto: string;
+  esperado: Record<string, unknown> | null;
+  reglas?: boolean;
+  nota?: string;
+}
+
+export function cargarGoldenPasos(): CasoPaso[] {
+  return readFileSync(raiz('fixtures/nlu/golden-pasos.jsonl'), 'utf8')
+    .split('\n')
+    .filter((linea) => linea.trim() !== '')
+    .map((linea) => JSON.parse(linea) as CasoPaso);
+}
+
+/** `fixtures/nlu/contexto-onboarding.json`: la persona en el onboarding, sin cuentas todavía. */
+export function cargarContextoOnboarding(): ContextoInterprete {
+  const f = leerJson('fixtures/nlu/contexto-onboarding.json') as ContextoInterprete;
+  return {
+    fecha_referencia: f.fecha_referencia,
+    ...(f.dia_semana !== undefined ? { dia_semana: f.dia_semana } : {}),
+    espacios: f.espacios,
+    cuentas: f.cuentas,
+    contactos: f.contactos ?? [],
+  };
+}
+
 export function cargarEsquemaJson(): Record<string, unknown> {
   return leerJson('fixtures/nlu/esquema.json') as Record<string, unknown>;
 }

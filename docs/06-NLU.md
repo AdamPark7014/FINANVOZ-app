@@ -245,11 +245,13 @@ Detalle (M10): las herramientas son `hoy`, `gasto`, `mayores_gastos`, `comparar_
 
 **Registro optimista con "Deshacer"** cuando se cumplen todas: `intencion = registrar`; cada cuenta resuelta (`cuenta` o `por_asignar`, sin `aproximado`); ningún movimiento `aproximado`; ningún `gasto` con categoría `impuestos` (su confirmación elige el periodo que se paga, `05 §E15`); suma de montos ≤ $5,000. Si no, tarjeta de confirmación.
 
+**Configurar desde Hoy** (nivel 0 o nube, `servicios/registrar.ts`): el ciclo de una tarjeta que ya existe y los compromisos se aplican con "Deshacer"; la tanda abre su formulario prellenado; colchón, ingreso recurrente y saldo de cuenta (K02–K04) devuelven `confirmar_ajuste` y solo "Guardar" (`confirmarAjuste`) los escribe: el colchón con `fijarColchon`, el ingreso con `configurarIngreso` (reemplaza al anterior y la propuesta lo dice) y el saldo como una `conciliacion` por la diferencia (`04 §4` caso 22), solo en cuentas de débito o billetera; si la cuenta no se resolvió, la tarjeta pide elegirla.
+
 **Corregir y anular:** el objetivo se busca en los últimos 30 días (texto contenido en descripción, comercio o categoría; monto y fecha si vienen; `ultimo` = el más reciente por `registrada_en`). Una coincidencia en las últimas 48 h → se aplica con "Deshacer"; varias → chips para elegir; ninguna → "No encontré ese movimiento".
 
 ## 8. Evaluación
 
-Archivos: `fixtures/nlu/golden.jsonl` (155 casos), `fixtures/nlu/contexto.json`, `fixtures/nlu/esquema.json`.
+Archivos: `fixtures/nlu/golden.jsonl` (164 casos), `fixtures/nlu/contexto.json`, `fixtures/nlu/esquema.json`. Los lectores por paso del onboarding tienen su propio golden (§13): `fixtures/nlu/golden-pasos.jsonl` y `fixtures/nlu/contexto-onboarding.json`.
 
 Comparación por caso:
 
@@ -279,6 +281,7 @@ Comandos:
 pnpm eval:nlu --nivel reglas                 # sin red
 pnpm eval:nlu --nivel nube --proveedor X     # requiere proxy local y llave
 pnpm eval:nlu --offline                      # reproduce respuestas grabadas en fixtures/nlu/grabaciones/
+pnpm eval:nlu --pasos                        # lectores por paso del onboarding (§13), sin red
 ```
 
 El reporte incluye, por proveedor y modelo: aciertos por campo, latencia p50/p95, tokens promedio y **costo por caso completo correcto** (costo total ÷ casos correctos). Las grabaciones se actualizan solo con `--grabar`.
@@ -292,10 +295,14 @@ Acepta únicamente estas formas; cualquier otra cosa → `null`. Mayúsculas, ac
 ### 9.1 Piezas comunes
 
 ```
-MONTO     := [APROX] (DIGITOS | DIGITOS mil | DIGITOS k | PALABRAS | PALABRAS mil [PALABRAS] | mil [PALABRAS] | JERGA) [MONEDA] [APROX_FIN]
+MONTO     := [APROX] (DIGITOS | DIGITOS mil [RESTO] | DIGITOS k | PALABRAS | PALABRAS mil [PALABRAS] | mil [PALABRAS] | JERGA)
+             [MONEDA [CENTAVOS]] [APROX_FIN]
 DIGITOS   := [$] dígitos con "," de miles y "." decimal (≤ 2 decimales, ≤ 9 enteros)      "1,250.50" "$96" "1.5k" "8 mil" "1.5 mil"
+RESTO     := (A1) con DIGITOS entero de 1 a 999: 1 a 999 en dígitos sin coma ni decimales, o PALABRAS   "8 mil 500" "8 mil quinientos"
+CENTAVOS  := (A2) con MONEDA = pesos|peso y un monto sin decimales: con N (centavos|centavo), N de 1 a 99   "85 pesos con 50 centavos"
 PALABRAS  := cardinal bien formado: [CENTENA] [DECENA [y UNIDAD] | UNIDAD]                  "ochenta y cinco" "doscientos cincuenta" "veinticinco mil"
              (otra cifra pegada es ambigua: "dos cincuenta" → null; "un"/"una" solos son artículos, no un peso)
+             (A0) tras "DECENA y", "un"/"una" son la unidad solo ante "mil" o la MONEDA: "treinta y un mil", "treinta y un pesos"
 JERGA     := (N | medio) (kilo|kilos|luca|lucas) no seguido de de/del/y                     "un kilo" → 1,000; "medio kilo" → 500; "un kilo de carne" → null
 MONEDA    := pesos | peso | pesitos | varos | varo | baros | baro
 APROX     := como | aprox | aproximadamente | más o menos | unos | unas (solo ante una cifra) → aproximado: true
@@ -420,7 +427,7 @@ DESC_LIBRE := 1 a 3 palabras de letras sin las que DESCARTAN, sin alias ni nombr
 ```
 
 ```
-CONFIGURAR := [PREFIJO] ALIAS_CRED corta el N [y (pago|la pago|se paga|vence) el M | y tengo M días para pagar]        → tarjeta_ciclo
+CONFIGURAR := [PREFIJO] ALIAS_CRED corta el N [(y|,|, y) (pago|la pago|se paga|vence) el M | (y|,|, y) tengo M días para pagar]  → tarjeta_ciclo (D1: la coma vale como "y")
             | quiero [tener] [siempre] MONTO de colchón | [quiero] [un] colchón de MONTO | guárdame MONTO de colchón       → colchon
             | (me pagan|me depositan|cobro|gano) MONTO REGLA_REC                                                          → ingreso_recurrente (sin anual)
             | tengo MONTO en [PREFIJO] ALIAS_DEB                                                                          → saldo_cuenta ("como" → null; crédito → null)
@@ -438,6 +445,7 @@ CONCEPTO   := 1 a 5 palabras (artículos y "de" permitidos) sin las que DESCARTA
 ```
 
 - "cada mes" sin día, "cada semana" sin día o "cada 5" a secas → `null` (no se adivina el día). "la tanda son 500 cada quincena" y "mi sueldo son 8 mil cada quincena" → `null` (DESCARTAN); la tanda tiene su producción y el sueldo es `ingreso_recurrente`.
+- "la renta son 4,500 el día primero" (sin "cada", V09) → `null` en Hoy: puede ser una fecha única. En el paso de pagos fijos (§13) sí es mensual. "me pagan 10 mil brutos cada quincena" (V08) → `null`: lo bruto no es lo que llega.
 
 ```
 CORREGIR  := no [,] [art] DESC_REF CAMBIO | no [,] (fue|fueron|era|es|son) ([de] MONTO | METODO)        → objetivo {ultimo: true}   "no, fueron 80"
@@ -457,9 +465,25 @@ DESC_REF  := [art] 1 a 3 palabras aptas de DESC, sin nombres, alias ni pronombre
 
 - Sin verbo, una DESC desconocida se registraría como gasto; por eso "una devolución de 500", "anoche unas chelas, 340 en efectivo" o "mil quinientos de la tele en efectivo" → `null`. Las frases que esa regla protegía ("tengo 4,200 en BBVA", "me quedan 85 pesos en efectivo") hoy tienen producción propia (`saldo_cuenta`, `ARQUEO`); los falsos positivos de la primera implementación de referencia (cobertura 16/16, precisión 17/17) siguen cubiertos por pruebas.
 - Montos ambiguos ("dos cincuenta"), pesos ("un kilo de carne", "medio kilo de despensa"), fechas futuras o "la semana pasada" al registrar, dos fechas o dos montos en una parte.
+- Montos que el nivel 0 todavía no lee: "millón", "y medio" ("ocho mil y medio"), "N mil M" con otra cifra detrás ("8 mil 500 600") o con decimales en N ("1.5 mil 200"), "un" suelto tras "N mil" y centavos sin "pesos" antes ("85 con 50 centavos").
 - Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6"), "¿me alcanza?" sin monto, las preguntas abiertas (`explicar`) y todo lo fuera de alcance: eso lo decide el nivel 2 o la persona.
 
-Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-21: cobertura 128/128 y precisión 128/128 sobre los 155 casos (antes 25/25 y 27/27). Los 27 casos restantes están en `null` por las razones de §9.3.
+Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-22: cobertura 135/135 y precisión 135/135 sobre los 164 casos (el 2026-10-21, 128/128 sobre 155; antes 25/25 y 27/27). Los 29 casos restantes están en `null` por las razones de §9.3. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V08 y V09 son `reglas: false`. La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
+
+### 9.4 Monto dictado en un campo
+
+`interpretarMonto(texto, { admiteCero })` (`packages/nlu/src/reglas/monto-dictado.ts`, exportada desde `@cartera/nlu`) lee una cifra suelta: lo que se dicta en un campo de monto o cuando la app pregunta "¿Cuánto traes?". Devuelve `{ centavos, aproximado }` o `null`.
+
+```
+MONTO_SUELTO := [PRELUDIO] (MONTO | CERO)                         la frase completa; MONTO incluye A0–A2
+PRELUDIO     := son | es | fueron | fue | serían | da | me da | el arqueo da | conté | me salen | pon | ponle | anota
+              | quiero [guardar|tener] | guarda | guárdame | aparta | traigo | tengo | debo | le debo | me pagan | gano
+              | me prestan | me queda | me quedan | cuesta | me cuesta | me cobran
+CERO         := cero [pesos] | nada | ni un peso | ni un varo                                   solo con admiteCero
+              | no traigo nada | no tengo nada | no debo nada                                   solo con admiteCero, sin preludio
+```
+
+"como", "más o menos", "aproximadamente" (y las demás marcas de `MONTO`) → `aproximado: true`. Sin `admiteCero`, "0", "cero" y "nada" dan `null`. Todo lo que sobra da `null`: "más de 500", "menos de", "entre 500 y 600", "hasta 500", "500 o 600", dos cifras, "500 al mes", "cada…", un "no" fuera de CERO.
 
 ## 10. Prompt del nivel nube (plantilla)
 
@@ -508,3 +532,116 @@ Candidatos iniciales: Claude Haiku 5.5 (`claude-haiku-5-5`), el modelo "Flash" v
 - Una corrección de cuenta agrega el alias dicho a `alias_cuenta`.
 - Una corrección de categoría crea o actualiza `regla_comercio` (con el comercio normalizado o la descripción normalizada).
 - Nada de esto sale del teléfono.
+
+## 13. Lectores por paso
+
+Para que el onboarding (`02 §3`: O3 ingreso, O4 efectivo, cuentas y tarjeta, O5 pagos fijos, O7 colchón) y el alta de una tanda se puedan dictar, el nivel 0 tiene un lector por paso: `interpretarPaso(paso, texto, contexto): LecturaPaso | null` (`packages/nlu/src/pasos/`, exportado desde `@cartera/nlu`). No toca el golden set principal ni lo que entiende Hoy. Ante la duda, `null`: el campo queda como estaba y la persona lo escribe (o, con red, lo intentará la nube, Ola 6 de `PLAN-MEJORA-2026-10`).
+
+```ts
+type Cifra = { monto: Centavos; aproximado: boolean };
+type LecturaPaso =
+  | { paso: 'ingreso'; monto?: Cifra; frecuencia?: 'quincena' | 'semanal' | 'catorcenal' | 'mensual' | 'varia';
+      regla?: ReglaRecurrente; finDeSemana?: 'antes' | 'despues' | 'mismo' }
+  | { paso: 'efectivo'; efectivo: Cifra }
+  | { paso: 'cuentas'; efectivo?: Cifra;
+      cuentas: { nombre: string; institucion?: string; subtipo: 'debito' | 'billetera' | 'ahorro'; saldo: Cifra }[] }
+  | { paso: 'tarjeta'; nombre?: string; ultimos4?: string; diaCorte?: number; diaLimitePago?: number; diasParaPagar?: number;
+      limiteCredito?: Cifra; saldo?: Cifra; modo?: 'totalero' | 'plan'; msiPrevios?: { mensualidad: Centavos; restantes: number }[] }
+  | { paso: 'pagos_fijos'; pagos: { concepto: string; monto: Cifra; frecuencia?: 'mensual' | 'quincenal' | 'semanal' | 'anual';
+      regla?: ReglaRecurrente; cuentaAlias?: string; pagosRestantes?: number; avisos?: 'cada_dos_meses'[] }[] }
+  | { paso: 'colchon'; monto: Cifra }
+  | { paso: 'tanda'; aportacion?: Cifra; frecuencia?: 'semanal' | 'quincenal' | 'catorcenal' | 'mensual';
+      participantes?: number; turno?: number };
+```
+
+Los campos son opcionales a propósito: una lectura puede ser **parcial** ("cada quincena" llena solo la frecuencia de O3) y la pantalla la usa para prellenar. Toda salida se valida con Zod (`EsquemaLecturaPaso`): una lectura sin datos, con la regla que no corresponde a la frecuencia, con día límite y días para pagar a la vez o con un turno mayor que los participantes es `null`.
+
+### 13.1 Cómo interpreta
+
+1. Arma el contexto del paso: las cuentas reales y, en cuentas y tarjeta, el catálogo de instituciones de ese tipo como alias (una institución cuyo alias ya es de una cuenta real no entra: gana la cuenta de la persona).
+2. Llama `interpretarReglas` y, si lo entendido corresponde al paso, lo convierte con `lecturaDesdeInterpretacion(paso, i, contexto)`: ingreso recurrente → ingreso, arqueo → efectivo (o el efectivo de cuentas), saldo de cuenta → cuentas, ciclo de tarjeta → tarjeta, compromiso recurrente personal → pagos fijos, colchón, tanda. Como el ajuste de `configurar` no guarda "como", si la frase lo dijo la cifra del paso sale `aproximado: true`.
+3. Si da `null` o no corresponde, aplica la gramática propia del paso.
+
+Cada gramática consume la frase completa; cada dato va a lo más una vez y uno que no se entiende anula la frase. Las frases con varios datos ("y", coma o ", y" entre ellos) se parten probando **todas** las particiones: así el "y" de "ochenta y cinco" o de "tengo una compra a meses de 500 y me faltan 6" no corta por error; si quedan dos lecturas distintas, `null`.
+
+### 13.2 Gramáticas
+
+```
+INGRESO    := VARIA | [VERBO] DATO ([,] [y] DATO)*
+DATO       := [VERBO] MONTO [netos|libres|limpios] | REGLA_ING | FIN_SEMANA
+VERBO      := me pagan | me depositan | cobro | gano | recibo | mi sueldo es [de] | mi quincena es [de]
+REGLA_ING  := leerRegla de configurar (§9.2)                                     "cada quincena" "cada mes el 30" "cada viernes"
+            | a la quincena | por quincena | quincenal | los días 15 y 30          → quincena (15 y último)
+            | cada 14 días | cada catorce días | cada dos semanas | catorcenal    → catorcenal, sin ancla
+            | a la semana | por semana | cada semana | semanal                   → semanal, sin día
+            | al mes | por mes | cada mes | mensual                               → mensual, sin día
+FIN_SEMANA := si cae en fin de semana [me] (pagan|depositan) (antes | después | el mismo día)
+VARIA      := varía | mi sueldo varía | no tengo [un] sueldo fijo                → frecuencia varia, nada más
+              "brutos" → null (lo bruto no es lo que llega); una regla anual → null
+
+EFECTIVO   := [ya] [traigo|tengo|cargo|llevo|me quedan|me queda] MONTO0 [(en|de) LUGAR]
+            | [ya] no (traigo|tengo|cargo|llevo) (nada|ni un peso|ni un varo) [(en|de) LUGAR] | ARQUEO (§9.2) | MONTO_SUELTO con cero (§9.4)
+LUGAR      := [el] efectivo | la cartera | mi cartera | billetes | cash | la bolsa | mi bolsa
+MONTO0     := MONTO (admite $0) | cero [pesos]
+
+CUENTAS    := CLAUSULA ((y | , | , y) CLAUSULA)*                                 hasta 6
+CLAUSULA   := [tengo|traigo|hay|me quedan|me queda] MONTO0 (en|de) DESTINO | en DESTINO [tengo|traigo|hay] MONTO0
+DESTINO    := LUGAR                                                               → efectivo (una vez)
+            | [mi|la|el] [cuenta de | tarjeta de débito de | la de] INSTITUCION      → débito o billetera según el catálogo
+            | [mi|la] [cuenta de] ahorro(s) de INSTITUCION                          → ahorro ("Ahorro Banorte")
+              la misma cuenta dos veces o un banco fuera del catálogo → null
+
+TARJETA    := DATO_T ((y | , | , y) DATO_T)*
+DATO_T     := [tengo una|mi|la|la de|una] [tarjeta] [de crédito] [NOMBRE] [que] corta el [día] N
+            | (pago|la pago|se paga|vence|tengo que pagar|la tengo que pagar) el [día] M | tengo M días para pagar
+            | (debo|le debo|traigo) MONTO0 | no [le] debo nada | está en ceros
+            | (mi límite es [de] | el límite es [de] | de límite tengo | tengo de límite | tengo un límite de | me prestan [hasta]) MONTO
+            | la pago completa [cada mes] | siempre la pago completa | pago el total                         → totalero
+            | no [siempre] la pago completa | [solo] pago el mínimo                                          → plan
+            | [que] termina en DDDD | con terminación DDDD
+            | tengo una compra a meses de MONTO [al mes|mensuales] [,] [y] (me|le) faltan N [pagos|meses|mensualidades]
+NOMBRE     := institución del catálogo con crédito | 1 o 2 palabras de letras justo antes de "[que] corta"
+              nunca se infiere si el saldo incluye los meses; dos compras a meses → null
+
+PAGOS      := PAGO ((y | , | , y) PAGO)*                                         hasta 5
+PAGO       := [art] CONCEPTO [,] [son|es|de|cuesta|me cuesta|sale en|sale] MONTO COLA
+            | (pago|me cobran) MONTO de [art] CONCEPTO COLA
+COLA       := [[,] CUANDO] [[,] [y] CUENTA] [[,] [y] RESTANTES]
+CONCEPTO   := el de configurar (§9.2) o un servicio común: renta, luz, agua, gas, internet, celular, gimnasio, streaming,
+              tanda, Netflix, Spotify, Disney, Max, Prime, YouTube, colegiatura, seguro…; sin conectores, días ni frecuencias
+CUANDO     := leerRegla de configurar | el [día] (N|primero) [de cada mes]       → mensual (en este paso)
+            | cada mes | al mes | mensual · a la quincena | quincenal · cada semana | semanal · cada año | anual   → frecuencia sola
+            | cada dos meses | bimestral                                          → sin regla, avisos: [cada_dos_meses]
+CUENTA     := (sale de | se paga con | lo pago con | la pago con | con | desde) ALIAS de una cuenta que ya existe
+RESTANTES  := [me|le] faltan N pagos
+              sin conector ni CUANDO solo vale un concepto conocido ("renta 4500"); una fecha única no es pago fijo
+
+COLCHON    := el colchón de configurar (§9.2) | MONTO_SUELTO con cero (§9.4) [de colchón]
+
+TANDA      := DATO_D ((y | , | , y) DATO_D)*
+DATO_D     := [entré a|me metí a|me metí en|estoy en|voy a entrar a] una tanda [FREC] [de MONTO] [FREC]
+            | [de|doy|pongo|aporto] MONTO [FREC] | FREC
+            | somos N [personas|participantes] | son N (personas|participantes)  N de 2 a 50
+            | (me toca|soy|mi turno es) el (ORDINAL | [número] N)                 turno ≤ participantes
+FREC       := cada (semana|quincena|mes|14 días|catorce días|dos semanas) | semanal | quincenal | mensual | catorcenal
+            | a la semana | a la quincena | al mes
+              TK01 ampliado a cada semana, cada mes y cada 14 días; nunca se infiere la fecha de inicio
+```
+
+### 13.3 Catálogo de instituciones
+
+`packages/nlu/src/pasos/instituciones.ts`. Entra una institución si la gente la nombra por su marca para decir dónde tiene su dinero o qué tarjeta paga: BBVA (bancomer), Banorte, Santander, Banamex (citibanamex, citi), HSBC, Scotiabank (scotia), Inbursa, Banco Azteca, BanCoppel (coppel), Nu ("new", nubank), Mercado Pago, Spin by OXXO, Hey Banco, Klar ("clar"), Stori, DiDi, Rappi, Ualá, Vexi y Plata. Cada una dice si da cuenta (débito o billetera) y si da crédito; los alias son como el dictado los escribe, nunca una palabra común que pueda ser otra cosa. El `id` es el de `captura.bancos.json` cuando existe, para que la cuenta creada por voz empate con sus notificaciones. Lo que no está → `null`.
+
+### 13.4 Frases y evaluación
+
+`fixtures/nlu/golden-pasos.jsonl` (100 frases, 87 `reglas: true`) contra `fixtures/nlu/contexto-onboarding.json` (sin cuentas). `esperado: null` dice que no hay lectura correcta: responder ahí es un error. La comparación es estricta (un campo de más falla) salvo `concepto`, `nombre` y `cuentaAlias`, que se comparan normalizados. `pnpm eval:nlu --pasos` exige 100 % de cobertura y de precisión; medido el 2026-10-22: cobertura 87/87 y precisión 88/88.
+
+| Paso | Frases que lee (`reglas: true`) | `reglas: false` |
+|---|---|---|
+| ingreso | "me pagan 8 mil 500 cada quincena", "8 mil 500", "cada 14 días", "me pagan 4 mil a la semana", "varía", "me pagan 8 mil cada quincena, si cae en fin de semana me pagan antes", "me pagan como 8 mil cada quincena" | "me pagan el penúltimo día hábil", "me pagan 10 mil brutos cada quincena" (null) |
+| efectivo | "traigo 340 en la cartera", "me quedan 85 pesos con 50 centavos en efectivo", "500", "no traigo nada", "tengo 200 en la bolsa" | — |
+| cuentas | "tengo 4 mil 200 en BBVA", "en Nu tengo 3 mil", "tengo 4 mil 200 en BBVA, 800 en Spin y como 300 en efectivo", "tengo 10 mil en la cuenta de ahorro de Banorte", "en BBVA tengo ochenta y cinco y en Nu 300" | "tengo 3 mil en la caja de ahorro del trabajo", "tengo 500 en BBVA y 300 en BBVA", "tengo 500 en Banjército" |
+| tarjeta | "mi Nu corta el 28, pago el 18", "tengo una Nu que corta el 28 y pago el 18", "la oro corta el 10 y tengo 20 días para pagar", "debo 3 mil", "está en ceros", "me prestan hasta 15 mil", "pago el mínimo", "termina en 4410", "tengo una compra a meses de 500 al mes y me faltan 6" | "debo 12 mil pero 4 son de meses", "debo 12 mil a 12 meses", dos compras a meses |
+| pagos fijos | "la renta son 4,500 el día primero", "el internet 500 el 10 y Netflix 219 cada mes", "la tanda son 500 cada quincena", "el coche son 3 mil cada quincena, me faltan 12 pagos", "renta 4500" | "la luz son como 400 cada dos meses" (lectura parcial con aviso; la regla la elige la persona), "gané 500", una fecha única |
+| colchón | "quiero treinta y un mil de colchón", "2 mil", "nada", "como 3 mil", "5 mil de colchón" | "ocho mil y medio" |
+| tanda | TK01 y sus variantes semanal, mensual y cada 14 días; "somos 10"; "me toca el cuarto"; "500 cada semana" | turno mayor que los participantes |

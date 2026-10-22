@@ -11,7 +11,7 @@ import { Lector } from './lector';
 import { leerEntero, leerMonto, leerOrdinal } from './montos';
 import { ARTICULOS, type Tokens, palabraDesc } from './tokens';
 
-type ReglaRecurrente = Exclude<Regla, { tipo: 'unica' }>;
+export type ReglaRecurrente = Exclude<Regla, { tipo: 'unica' }>;
 
 const DIAS: Readonly<Record<string, DiaSemana>> = {
   lunes: 1,
@@ -61,9 +61,10 @@ function quincenaDicha(l: Lector): boolean {
 /**
  * REGLA := cada (día N | día primero | mes el [día] N | quincena | semana [el DIA] | DIA | año el N de MES | N de MES)
  *        | el N de cada mes | los N de cada mes | todos los DIA | el 15 y el último [de cada mes]
- * `null` si no hay regla o le falta el dato (un "cada mes" sin día no se adivina).
+ * `null` si no hay regla o le falta el dato (un "cada mes" sin día no se adivina). La usan también los lectores
+ * por paso (`../pasos`).
  */
-function leerRegla(l: Lector): ReglaRecurrente | null {
+export function leerRegla(l: Lector): ReglaRecurrente | null {
   const inicio = l.marca();
   const diaDeMes = (): number | null => {
     if (l.palabra('primero')) return 1;
@@ -145,9 +146,10 @@ function leerRegla(l: Lector): ReglaRecurrente | null {
 /**
  * CONCEPTO := 1 a 5 palabras (artículos y "de" permitidos) sin fechas, pagos, deudas, alias ni nombres. Categoría solo
  * si todas las palabras de contenido salen del diccionario con una sola categoría; "renta del local" → `renta_local`
- * del negocio (solo con negocio activo).
+ * del negocio (solo con negocio activo). Consume `[inicio, fin)` completo o nada (`null`). La usan también los
+ * lectores por paso (`../pasos`).
  */
-function concepto(
+export function concepto(
   l: Lector,
   env: Entorno,
   fin: number,
@@ -209,7 +211,9 @@ export function configurarFrase(tokens: Tokens, env: Entorno): Interpretacion | 
       const diaCorte = leerEntero(l, 31);
       if (diaCorte === null) return null;
       if (l.fin) return configurar({ tipo: 'tarjeta_ciclo', alias: alias.alias, dia_corte: diaCorte });
-      if (!l.palabra('y')) return null;
+      // D1: "corta el 28, pago el 18" vale igual que "corta el 28 y pago el 18".
+      const conComa = l.sep();
+      if (!l.palabra('y') && !conComa) return null;
       if (
         l.alguna(
           ['la', 'pago', 'el'],

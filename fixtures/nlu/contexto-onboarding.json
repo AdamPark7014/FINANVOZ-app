@@ -1,0 +1,8 @@
+{
+  "descripcion": "Persona en el onboarding (O3 a O7) que todavía no da de alta ninguna cuenta: contra este contexto se evalúa fixtures/nlu/golden-pasos.jsonl. El catálogo de instituciones lo agrega el lector de cada paso (docs/06-NLU.md §13).",
+  "fecha_referencia": "2026-10-11",
+  "dia_semana": "domingo",
+  "espacios": ["personal"],
+  "cuentas": [],
+  "contactos": []
+}

@@ -11,6 +11,8 @@
  *       con su llave del entorno (ANTHROPIC_API_KEY, OPENAI_API_KEY o GOOGLE_API_KEY; nunca en el repositorio).
  *       --grabar escribe fixtures/nlu/grabaciones/<proveedor>/<modelo>.jsonl.
  *   --offline                                        reproduce las grabaciones y calcula el reporte
+ *   --pasos                                          lectores por paso del onboarding contra golden-pasos.jsonl
+ *                                                    (06 §13), sin red; umbral 100 % de cobertura y precisión
  *
  * Salida: 0 si cumple los umbrales (o si --offline no encuentra grabaciones), 1 si no, 2 si el uso es incorrecto.
  */
@@ -30,8 +32,15 @@ import {
   type NombreProveedor,
 } from '../../../services/proxy/supabase/functions/_shared/nlu/proveedores.ts';
 import { Interpretacion } from '../src/esquema';
-import { evaluarReglas } from '../src/eval/evaluar';
-import { cargarContexto, cargarGolden, type CasoGolden } from '../src/eval/fixtures';
+import { evaluarReglas, type ResultadoCaso } from '../src/eval/evaluar';
+import { evaluarPasos } from '../src/eval/evaluar-pasos';
+import {
+  cargarContexto,
+  cargarContextoOnboarding,
+  cargarGolden,
+  cargarGoldenPasos,
+  type CasoGolden,
+} from '../src/eval/fixtures';
 import { DIRECTORIO_GRABACIONES, escribirGrabaciones, listarGrabaciones, precioDe } from '../src/eval/grabaciones';
 import { evaluarNube, formatearReporte, type Grabacion } from '../src/eval/nube';
 
@@ -43,13 +52,19 @@ function opcion(argumentos: readonly string[], nombre: string): string | undefin
 const porcentaje = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(1)} %`);
 
 const USO =
-  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] | --offline';
+  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] | --offline | --pasos';
 
-function nivelReglas(): number {
-  const casos = cargarGolden();
-  const reporte = evaluarReglas(casos, cargarContexto().contexto);
+interface ReporteCobertura {
+  casos: ResultadoCaso[];
+  marcados: number;
+  marcadosCubiertos: number;
+  respondidos: number;
+  respondidosCorrectos: number;
+  aprobado: boolean;
+}
 
-  console.log(`Nivel 0 · reglas — ${casos.length} casos del golden set`);
+function imprimirCobertura(titulo: string, reporte: ReporteCobertura): number {
+  console.log(titulo);
   console.log(
     `Cobertura (reglas: true): ${reporte.marcadosCubiertos}/${reporte.marcados} ` +
       `(${porcentaje(reporte.marcadosCubiertos, reporte.marcados)}; umbral 100 %)`,
@@ -64,6 +79,18 @@ function nivelReglas(): number {
   for (const r of incorrectos) console.log(`  incorrecto: ${r.id} (${r.fallas.join(', ')})`);
   console.log(reporte.aprobado ? 'Resultado: pasa' : 'Resultado: falla');
   return reporte.aprobado ? 0 : 1;
+}
+
+function lectoresPorPaso(): number {
+  const casos = cargarGoldenPasos();
+  const reporte = evaluarPasos(casos, cargarContextoOnboarding());
+  return imprimirCobertura(`Nivel 0 · lectores por paso — ${casos.length} casos de golden-pasos`, reporte);
+}
+
+function nivelReglas(): number {
+  const casos = cargarGolden();
+  const reporte = evaluarReglas(casos, cargarContexto().contexto);
+  return imprimirCobertura(`Nivel 0 · reglas — ${casos.length} casos del golden set`, reporte);
 }
 
 function offline(): number {
@@ -221,6 +248,7 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
 
 async function main(argumentos: readonly string[]): Promise<number> {
   if (argumentos.includes('--offline')) return offline();
+  if (argumentos.includes('--pasos')) return lectoresPorPaso();
   const nivel = opcion(argumentos, '--nivel');
   if (nivel === 'reglas') return nivelReglas();
   if (nivel === 'nube') return nivelNube(argumentos);

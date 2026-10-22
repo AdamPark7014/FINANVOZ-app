@@ -24,8 +24,8 @@ const mov = (extra: Record<string, unknown>) => ({
 const ajuste = (a: Record<string, unknown>) => ({ intencion: 'configurar', ajuste: a });
 
 describe('CA-M1-06 · los esperados del golden set validan con Zod y con esquema.json', () => {
-  it('hay 155 casos', () => {
-    expect(golden).toHaveLength(155);
+  it('hay 164 casos', () => {
+    expect(golden).toHaveLength(164);
   });
 
   for (const caso of golden) {

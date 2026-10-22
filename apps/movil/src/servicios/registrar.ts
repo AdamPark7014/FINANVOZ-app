@@ -1,9 +1,16 @@
 import { z } from 'zod';
-import { ErrorDominio, type Centavos, type PlainDate } from '@cartera/core';
+import {
+  ErrorDominio,
+  construirConciliacion,
+  type Centavos,
+  type PlainDate,
+  type Regla,
+} from '@cartera/core';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
   interpretarReglas,
   normalizarAlias,
+  type Ajuste,
   type CodigoLimite,
   resolverCuenta,
   type ContextoInterprete,
@@ -17,6 +24,7 @@ import {
 } from '@cartera/nlu';
 /** Escritura bloqueada en solo lectura vía `exigirConsentimiento` (captura, arqueo y demás servicios igual). */
 import { exigirConsentimiento } from '../privacidad/consentimiento';
+import { fijarColchon, obtenerColchon } from './ajustes';
 import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
@@ -55,8 +63,10 @@ import type { ConsultaMeAlcanza } from './me-alcanza';
 import type { MovimientoVista } from './movimientos';
 import { esSaludEnEfectivo } from './deducciones';
 import { contextoNube, type NivelNube } from './nube';
+import { configurarIngreso, proximoPago } from './onboarding';
 import { contactosInterprete } from './personas';
 import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './preferencias';
+import { ingresoPrincipal, validarRegla } from './programados';
 import {
   aportarTanda,
   cobrarTanda,
@@ -154,6 +164,49 @@ export interface CuentaPorElegir {
   readonly alias: string | null;
   readonly candidatas: readonly { readonly id: string; readonly nombre: string }[];
 }
+
+/**
+ * Colchón, ingreso o saldo de una cuenta dictados en Hoy (K02, K03, K04 del golden set): nada se guarda hasta
+ * "Guardar" (`confirmarAjuste`), porque cambian lo que la app aparta o cuánto dice que tienes.
+ */
+export type PropuestaAjuste =
+  | {
+      readonly tipo: 'colchon';
+      readonly monto: Centavos;
+      /** El colchón de hoy ("Cambia tu colchón de $500 a $3,000"). */
+      readonly actual: Centavos;
+    }
+  | {
+      readonly tipo: 'ingreso';
+      readonly concepto: string;
+      readonly monto: Centavos;
+      readonly regla: Regla;
+      readonly proximoPago: PlainDate | null;
+      /** El ingreso que reemplaza, si ya había uno. */
+      readonly anterior: { readonly concepto: string; readonly monto: Centavos } | null;
+    }
+  | {
+      readonly tipo: 'saldo_cuenta';
+      /** Lo que dice la persona que hay en la cuenta (conciliación, `04 §4` caso 22). */
+      readonly monto: Centavos;
+      /** `null` si falta elegirla. */
+      readonly cuentaId: string | null;
+      /** Lo que dice la app hoy de esa cuenta; `null` si falta elegirla. */
+      readonly saldoActual: Centavos | null;
+      readonly faltaCuenta: Omit<CuentaPorElegir, 'campo'> | null;
+    };
+
+/** Lo que guardó "Guardar" de una `PropuestaAjuste`. */
+export type AjusteGuardado =
+  | { readonly tipo: 'colchon'; readonly monto: Centavos; readonly anterior: Centavos }
+  | { readonly tipo: 'ingreso'; readonly programadoId: string }
+  | {
+      readonly tipo: 'saldo_cuenta';
+      readonly cuentaId: string;
+      readonly saldo: Centavos;
+      /** La conciliación; `null` si el saldo ya coincidía. */
+      readonly transaccionId: string | null;
+    };
 
 /** Movimiento interpretado que necesita confirmación (`02 §5`, `06 §7`). */
 export interface PropuestaMovimiento {
@@ -272,6 +325,8 @@ export type ResultadoTexto =
   | { readonly resultado: 'no_encontrado'; readonly accion: AccionElegir | 'duplicados' }
   | { readonly resultado: 'duplicados'; readonly grupos: readonly (readonly MovimientoVista[])[] }
   | { readonly resultado: 'configurado'; readonly compromiso: CompromisoConfigurado }
+  /** K02–K04 ("quiero 500 de colchón", "me pagan 8 mil cada quincena", "tengo 4,200 en BBVA"): "Guardar" llama `confirmarAjuste`. */
+  | { readonly resultado: 'confirmar_ajuste'; readonly propuesta: PropuestaAjuste }
   /** TK01 "entré a una tanda…": formulario prellenado con el calendario de E11; "Guardar" llama `crearTanda`. */
   | { readonly resultado: 'tanda_por_crear'; readonly propuesta: PropuestaTanda }
   /** "Di mi tanda" / "me tocó la tanda" (TK02) que necesita confirmación; "Guardar" llama `confirmarTanda`. */
@@ -958,6 +1013,165 @@ export function aplicarEleccion(
   }
 }
 
+/** "la renta" → "Renta": el concepto dictado sin artículo, como lo escribe el formulario de pagos fijos. */
+function conceptoLimpio(concepto: string | undefined): string | undefined {
+  const sinArticulo = concepto?.trim().replace(/^(el|la|los|las|mi|mis)\s+/i, '') ?? '';
+  return sinArticulo === '' ? undefined : sinArticulo.charAt(0).toUpperCase() + sinArticulo.slice(1);
+}
+
+/** Concepto del ingreso, igual que O3: quincena, semana o sueldo. */
+function conceptoIngreso(regla: Regla): string {
+  if (regla.tipo === 'quincenal_15_ultimo' || regla.tipo === 'quincenal_dias') return 'quincena';
+  return regla.tipo === 'semanal' ? 'semana' : 'sueldo';
+}
+
+/** Cuentas a las que se les puede escribir el saldo por voz: débito y billeteras (sin crédito ni efectivo). */
+const cuentasConSaldo = (cuentas: readonly CuentaResolutor[]) =>
+  cuentas.filter((c) => c.tipo === 'debito' || c.tipo === 'billetera');
+
+/**
+ * `configurar` (nivel 0 o nube). Ciclo de tarjeta y compromisos se aplican con "Deshacer", como antes; la tanda
+ * abre su formulario; colchón, ingreso y saldo de cuenta (K02–K04) devuelven una propuesta que se guarda solo con
+ * "Guardar" (`confirmarAjuste`).
+ */
+function aplicarAjuste(
+  ctx: Contexto,
+  a: Ajuste,
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+): ResultadoTexto {
+  const noSoportado = { resultado: 'no_soportado', motivo: 'ajuste' } as const;
+  switch (a.tipo) {
+    case 'tarjeta_ciclo': {
+      const r = configurarCicloPorVoz(ctx, a);
+      return r.resultado === 'tarjeta_configurada' ? { ...r, deshacer: r.editada.deshacer } : r;
+    }
+    case 'tanda': {
+      const propuesta = proponerTandaPorVoz(ctx, a, frase.fecha);
+      return propuesta ? { resultado: 'tanda_por_crear', propuesta } : noSoportado;
+    }
+    case 'compromiso': {
+      const concepto = conceptoLimpio(a.concepto);
+      try {
+        return {
+          resultado: 'configurado',
+          compromiso: configurarCompromiso(ctx, concepto ? { ...a, concepto } : a, frase.fecha),
+        };
+      } catch (error) {
+        if (error instanceof ErrorDominio && error.codigo === 'espacio_no_disponible') return noSoportado;
+        throw error;
+      }
+    }
+    case 'colchon':
+      return {
+        resultado: 'confirmar_ajuste',
+        propuesta: { tipo: 'colchon', monto: a.monto, actual: obtenerColchon(ctx) },
+      };
+    case 'ingreso_recurrente': {
+      // Sin monto o sin regla no hay qué guardar; un sueldo anual no existe en O3.
+      if (a.monto === undefined || a.regla === undefined || a.regla.tipo === 'anual') return noSoportado;
+      let regla: Regla;
+      try {
+        regla = validarRegla(a.regla);
+      } catch (error) {
+        if (error instanceof ErrorDominio) return noSoportado;
+        throw error;
+      }
+      const anterior = ingresoPrincipal(ctx);
+      return {
+        resultado: 'confirmar_ajuste',
+        propuesta: {
+          tipo: 'ingreso',
+          concepto: conceptoIngreso(regla),
+          monto: a.monto,
+          regla,
+          proximoPago: proximoPago(regla, frase.fecha),
+          anterior: anterior ? { concepto: anterior.concepto, monto: anterior.monto } : null,
+        },
+      };
+    }
+    case 'saldo_cuenta': {
+      const candidatas = cuentasConSaldo(cuentas);
+      const r = resolver(
+        { tipo: 'debito', ...(a.alias !== undefined ? { alias: a.alias } : {}) },
+        'entra',
+        candidatas,
+        false,
+      );
+      const cuentaId = 'id' in r ? r.id : null;
+      return {
+        resultado: 'confirmar_ajuste',
+        propuesta: {
+          tipo: 'saldo_cuenta',
+          monto: a.monto,
+          cuentaId,
+          saldoActual: cuentaId === null ? null : ctx.libro.saldo(cuentaId),
+          faltaCuenta: 'id' in r ? null : r.falta,
+        },
+      };
+    }
+  }
+}
+
+/**
+ * "Guardar" de una `PropuestaAjuste` (K02–K04). En el saldo de una cuenta, `cuentaId` es la que eligió la persona
+ * si faltaba; la diferencia se registra como una `conciliacion` (`04 §4` caso 22) y lo anterior queda intacto.
+ */
+export function confirmarAjuste(
+  ctx: Contexto,
+  propuesta: PropuestaAjuste,
+  origen: OrigenDictado,
+  opciones: { cuentaId?: string } = {},
+): AjusteGuardado {
+  exigirConsentimiento(ctx);
+  switch (propuesta.tipo) {
+    case 'colchon': {
+      const anterior = obtenerColchon(ctx);
+      fijarColchon(ctx, propuesta.monto);
+      return { tipo: 'colchon', monto: propuesta.monto, anterior };
+    }
+    case 'ingreso':
+      return {
+        tipo: 'ingreso',
+        programadoId: configurarIngreso(ctx, {
+          concepto: propuesta.concepto,
+          monto: propuesta.monto,
+          regla: propuesta.regla,
+        }),
+      };
+    case 'saldo_cuenta': {
+      const cuentaId = opciones.cuentaId ?? propuesta.cuentaId;
+      const saldoReal = propuesta.monto;
+      if (!Number.isSafeInteger(saldoReal) || saldoReal < 0) {
+        throw new ErrorDominio('monto_invalido', 'revisa el saldo');
+      }
+      if (cuentaId === null || !cuentasConSaldo(cuentasResolutor(ctx)).some((c) => c.id === cuentaId)) {
+        throw new ErrorDominio('cuenta_invalida', 'elige una cuenta de débito o billetera');
+      }
+      return enTransaccion(ctx, () => {
+        const saldoLibro = ctx.libro.saldo(cuentaId);
+        if (saldoLibro === saldoReal) {
+          return { tipo: 'saldo_cuenta', cuentaId, saldo: saldoReal, transaccionId: null };
+        }
+        const m = construirConciliacion({
+          cuenta: cuentaId,
+          capital: CUENTAS_SISTEMA.ajusteConciliacion,
+          saldoLibro,
+          saldoReal,
+        });
+        const { transaccion } = ctx.libro.registrar({
+          tipo: m.tipo,
+          fecha: ctx.reloj.hoy(),
+          origen,
+          claveIdempotencia: `conciliacion:${ctx.generarId()}`,
+          asientos: m.asientos,
+        });
+        return { tipo: 'saldo_cuenta', cuentaId, saldo: saldoReal, transaccionId: transaccion.id };
+      });
+    }
+  }
+}
+
 /**
  * Aplica una `Interpretacion` ya validada (nivel 0 o nube): resolutor → política de confirmación (`06 §7`) →
  * servicios. Síncrono: todo ocurre en la base local.
@@ -994,25 +1208,7 @@ function aplicarInterpretacion(
         : { resultado: 'no_encontrado', accion: 'duplicados' };
     }
     case 'configurar':
-      if (i.ajuste.tipo === 'tarjeta_ciclo') {
-        const r = configurarCicloPorVoz(ctx, i.ajuste);
-        return r.resultado === 'tarjeta_configurada' ? { ...r, deshacer: r.editada.deshacer } : r;
-      }
-      if (i.ajuste.tipo === 'tanda') {
-        const propuesta = proponerTandaPorVoz(ctx, i.ajuste, frase.fecha);
-        return propuesta
-          ? { resultado: 'tanda_por_crear', propuesta }
-          : { resultado: 'no_soportado', motivo: 'ajuste' };
-      }
-      if (i.ajuste.tipo !== 'compromiso') return { resultado: 'no_soportado', motivo: 'ajuste' };
-      try {
-        return { resultado: 'configurado', compromiso: configurarCompromiso(ctx, i.ajuste, frase.fecha) };
-      } catch (error) {
-        if (error instanceof ErrorDominio && error.codigo === 'espacio_no_disponible') {
-          return { resultado: 'no_soportado', motivo: 'ajuste' };
-        }
-        throw error;
-      }
+      return aplicarAjuste(ctx, i.ajuste, cuentas, frase);
     case 'consultar':
       // El modo explicar necesita red y varias vueltas: la pantalla lo resuelve con `explicar` (que revisa Plus).
       if (i.consulta.tipo === 'explicar') {
@@ -1065,6 +1261,8 @@ function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Fr
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion === 'gasto_compartido') return proponerGastoCompartido(ctx, i.gasto);
+  // Colchón, ingreso y saldo piden "Guardar"; ciclo de tarjeta y compromisos se aplican con "Deshacer" (K01–K08).
+  if (i?.intencion === 'configurar') return aplicarAjuste(ctx, i.ajuste, cuentas, frase);
   if (i?.intencion !== 'registrar') return null;
   return registrarInterpretado(ctx, i.movimientos, cuentas, frase);
 }

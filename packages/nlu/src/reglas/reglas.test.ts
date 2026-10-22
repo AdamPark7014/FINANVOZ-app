@@ -38,11 +38,11 @@ describe('CA-M1-05 · golden set con reglas: true', () => {
     });
   }
 
-  it('cobertura 128/128 y precisión 100 % sobre los 155 casos', () => {
+  it('cobertura 135/135 y precisión 100 % sobre los 164 casos', () => {
     const reporte = evaluarReglas(golden, contexto);
-    expect(reporte.marcados).toBe(128);
-    expect(reporte.marcadosCubiertos).toBe(128);
-    expect(reporte.respondidos).toBe(128);
+    expect(reporte.marcados).toBe(135);
+    expect(reporte.marcadosCubiertos).toBe(135);
+    expect(reporte.respondidos).toBe(135);
     expect(reporte.respondidosCorrectos).toBe(reporte.respondidos);
     expect(reporte.aprobado).toBe(true);
   });
@@ -867,6 +867,44 @@ describe('nivel 0 · configurar', () => {
     expect(reglas('tengo como 4,200 en BBVA')).toBeNull();
     expect(reglas('la bbva corta el 28')).toBeNull();
     expect(reglas('me pagan 8 mil cada mes')).toBeNull();
+  });
+
+  it('D1 · ciclo de tarjeta con coma en lugar de "y"', () => {
+    expect(ajuste('mi Nu corta el 28, pago el 18')).toEqual({
+      tipo: 'tarjeta_ciclo',
+      alias: 'nu',
+      dia_corte: 28,
+      dia_limite_pago: 18,
+    });
+    expect(ajuste('la oro corta el 10, tengo 20 días para pagar')).toEqual({
+      tipo: 'tarjeta_ciclo',
+      alias: 'oro',
+      dia_corte: 10,
+      dias_para_pagar: 20,
+    });
+    expect(ajuste('mi Nu corta el 28, y pago el 18')).toMatchObject({ dia_limite_pago: 18 });
+    expect(reglas('mi Nu corta el 28, el 18')).toBeNull();
+    expect(reglas('mi Nu corta el 28 pago el 18')).toBeNull();
+  });
+
+  it('A0–A2 · montos dictados en configurar, arqueo y gasto', () => {
+    expect(ajuste('me pagan 8 mil 500 cada quincena')).toMatchObject({ monto: 850_000 });
+    expect(ajuste('me pagan 8 mil quinientos cada quincena')).toMatchObject({ monto: 850_000 });
+    expect(ajuste('quiero treinta y un mil de colchón')).toEqual({ tipo: 'colchon', monto: 3_100_000 });
+    expect(reglas('me quedan 85 pesos con 50 centavos en efectivo')).toEqual({
+      intencion: 'arqueo',
+      efectivo_real: 8_550,
+    });
+    expect(gasto('gasté 2 mil 500 en el súper')).toMatchObject({ monto: 250_000, categoria: 'super' });
+    for (const texto of [
+      'me pagan 10 mil brutos cada quincena',
+      'la renta son 4,500 el día primero',
+      'me pagan 8 mil 500 600 cada quincena',
+      'quiero ocho mil y medio de colchón',
+      'quiero un millón de colchón',
+    ]) {
+      expect(reglas(texto), texto).toBeNull();
+    }
   });
 
   it('compromisos recurrentes y de una sola vez', () => {

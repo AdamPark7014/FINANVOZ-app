@@ -6,6 +6,15 @@
 
 ## Hecho en este turno
 
+- **Intérprete de montos y lectores por paso (V-A)**: A0 («treinta y un mil»), A1 («8 mil 500»), A2 («85 pesos con 50
+  centavos»), D1 (coma en el ciclo de tarjeta); `interpretarMonto` (`reglas/monto-dictado.ts`) exportado de
+  `@cartera/nlu`; `packages/nlu/src/pasos/` (`interpretarPaso`: ingreso, efectivo, cuentas, tarjeta, pagos fijos,
+  colchón, tanda; 20 instituciones con los ids de `captura.bancos.json`); golden V01–V09, `golden-pasos.jsonl` +
+  `contexto-onboarding.json`, `pnpm eval:nlu --pasos` (87/87 cobertura, 88/88 precisión); nivel 0 aplica `configurar`
+  desde Hoy, colchón/ingreso/saldo devuelven `confirmar_ajuste` (se guardan con `confirmarAjuste()`), compromisos sin
+  artículo. vitest nlu 841/841, eval reglas 135/135, eslint limpio. **Pendiente**: `PanelRegistrar` no muestra
+  `confirmar_ajuste` (sale del switch sin tarjeta); exportar `confirmarAjuste`/`PropuestaAjuste`/`AjusteGuardado` en
+  `servicios/index.ts`; la conciliación de saldo duplica `corregirSaldoCuenta` de `cuentas-propias.ts` (B-2b).
 - **Hoy y Movimientos para iPhone (B-1)**: mensaje honesto sin nube («Lo guardé en Por revisar…»), aviso con Deshacer
   sobre el área segura y el alto real de la barra, botones que tumbaban la app ahora atrapan el error, detalle con
   «Cerrar» y «Corregir» (formulario precargado → `aplicarCorreccion`), fecha Hoy · Ayer · Elegir (7 días, sin futuro),

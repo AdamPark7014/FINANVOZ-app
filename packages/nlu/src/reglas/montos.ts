@@ -1,6 +1,7 @@
 /**
  * Montos del nivel 0 (docs/06-NLU.md §3.1 Montos y §9 MONTO): dígitos en formato mexicano, "N mil", "1.5k",
  * cardinales en palabras, jerga (varos, kilo, luca) y las marcas de aproximado. Siempre a centavos enteros.
+ * A0: "treinta y un mil" / "treinta y un pesos"; A1: "8 mil 500" / "8 mil quinientos"; A2: "85 pesos con 50 centavos".
  */
 import type { Centavos } from '@cartera/core';
 import type { Lector } from './lector';
@@ -100,6 +101,11 @@ const esPalabraNumero = (p: string | undefined) =>
   p !== undefined &&
   (p in UNIDADES || p in DECENAS || p in CENTENAS || p === 'un' || p === 'una' || p === 'mil');
 
+/** Token que empieza con una cifra ("500", "1,250", "$80"): otra cifra pegada. */
+const esCifraEnDigitos = (p: string | undefined) => p !== undefined && /^\$?\d/.test(p);
+
+const antesDeMilOMoneda = (p: string | undefined) => p === 'mil' || (p !== undefined && MONEDA.has(p));
+
 /** Grupo de hasta tres cifras en palabras ("ciento ochenta y cinco"); `null` si no hay grupo o está mal formado. */
 function grupoEnPalabras(l: Lector): number | null {
   const inicio = l.marca();
@@ -119,7 +125,9 @@ function grupoEnPalabras(l: Lector): number | null {
     hayAlgo = true;
     if (l.ver() === 'y') {
       const unidad = l.ver(1);
-      const u = unidad === undefined ? undefined : UNIDADES[unidad];
+      let u = unidad === undefined ? undefined : UNIDADES[unidad];
+      // A0: "treinta y un mil", "treinta y un pesos": "un"/"una" es la unidad solo ante "mil" o la moneda.
+      if (u === undefined && (unidad === 'un' || unidad === 'una') && antesDeMilOMoneda(l.ver(2))) u = 1;
       if (u === undefined || u > 9) {
         l.volver(inicio);
         return null;
@@ -206,14 +214,38 @@ function conDigitos(l: Lector): Centavos | null {
   }
   if (l.ver() === 'mil') {
     // "8 mil", "1.5 mil": solo enteros cortos o con decimales, nunca "1,500 mil".
-    if (!PATRON_ENTERO_CORTO.test(token.replace(/^\$/, ''))) {
+    const numero = token.replace(/^\$/, '');
+    if (!PATRON_ENTERO_CORTO.test(numero)) {
       l.volver(inicio);
       return null;
     }
     l.pos++;
-    return centavos * 1000;
+    const sigue = l.ver();
+    if (!esCifraEnDigitos(sigue) && !esPalabraNumero(sigue)) return centavos * 1000;
+    // A1: "8 mil 500", "8 mil quinientos" (N entero 1–999 y M 1–999). Cualquier otra cifra pegada → null.
+    const resto = /^\d{1,3}$/.test(numero) ? restoDeMiles(l) : null;
+    if (resto === null || esCifraEnDigitos(l.ver()) || esPalabraNumero(l.ver())) {
+      l.volver(inicio);
+      return null;
+    }
+    return centavos * 1000 + resto * 100;
   }
   return centavos;
+}
+
+/** M de "N mil M": 1–999 en dígitos sin coma ni decimales, o un grupo en palabras ("quinientos"); nunca "un" solo. */
+function restoDeMiles(l: Lector): number | null {
+  const token = l.ver();
+  if (token === undefined) return null;
+  if (/^\d{1,3}$/.test(token)) {
+    const n = Number(token);
+    if (n < 1) return null;
+    l.pos++;
+    return n;
+  }
+  if (token === 'un' || token === 'una') return null;
+  const grupo = grupoEnPalabras(l);
+  return grupo !== null && grupo >= 1 && grupo <= 999 ? grupo : null;
 }
 
 /** "un kilo", "dos lucas", "medio kilo"; nunca seguidos de "de" ("un kilo de carne" pesa, no cuesta). */
@@ -262,7 +294,18 @@ export function leerMonto(l: Lector): LecturaMonto | null {
     return null;
   }
   const moneda = l.ver();
-  if (moneda !== undefined && MONEDA.has(moneda)) l.pos++;
+  if (moneda !== undefined && MONEDA.has(moneda)) {
+    l.pos++;
+    // A2: "85 pesos con 50 centavos". Exige "pesos" antes, un monto sin decimales, N 1–99 y "centavos".
+    if ((moneda === 'pesos' || moneda === 'peso') && monto % 100 === 0) {
+      const antesDeCon = l.marca();
+      if (l.palabra('con')) {
+        const centavos = leerEntero(l, 99);
+        if (centavos !== null && l.palabra('centavos', 'centavo')) monto += centavos;
+        else l.volver(antesDeCon);
+      }
+    }
+  }
   if (APROX_DESPUES.some((s) => l.secuencia(...s))) aproximado = true;
   return { monto, aproximado };
 }

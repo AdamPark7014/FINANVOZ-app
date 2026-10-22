@@ -10,6 +10,24 @@ export {
   type TipoCuenta,
 } from './resolutor';
 export { interpretarReglas } from './reglas';
+export { interpretarMonto, type MontoDictado } from './reglas/monto-dictado';
+export {
+  interpretarPaso,
+  lecturaDesdeInterpretacion,
+  EsquemaLecturaPaso,
+  INSTITUCIONES,
+  PASOS,
+  FRECUENCIAS_INGRESO,
+  FRECUENCIAS_PAGO,
+  FRECUENCIAS_TANDA,
+  SUBTIPOS_CUENTA,
+  type Cifra,
+  type ContextoPaso,
+  type Institucion,
+  type LecturaDe,
+  type LecturaPaso,
+  type Paso,
+} from './pasos';
 export { compararInterpretacion } from './eval/comparar';
 export * from './cliente';
 export * from './explicar';

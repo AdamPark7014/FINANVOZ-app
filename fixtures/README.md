@@ -10,7 +10,9 @@ Datos de prueba que funcionan como **contrato** de la implementación. Las prueb
 | `motores/vectores.json` | Salida del oráculo (versión 3): E1, E3–E16, resolutor de cuentas y economía unitaria | `packages/core`, `packages/nlu`, `packages/fiscal` |
 | `nlu/contexto.json` | Usuario ficticio con espacio personal y de negocio (cuentas, alias, contactos, catálogos, fechas) | `packages/nlu` (eval y resolutor) |
 | `nlu/esquema.json` | JSON Schema de `Interpretacion`; debe coincidir con el esquema Zod | `packages/nlu`, `services/proxy` |
-| `nlu/golden.jsonl` | 155 frases en español de México con la interpretación esperada; `reglas: true` marca las 25 que el nivel 0 debe resolver | `pnpm eval:nlu` |
+| `nlu/golden.jsonl` | 164 frases en español de México con la interpretación esperada; `reglas: true` marca las 135 que el nivel 0 debe resolver | `pnpm eval:nlu` |
+| `nlu/golden-pasos.jsonl` | 100 frases dictadas en los pasos del onboarding con la lectura esperada (`docs/06-NLU.md §13`); `reglas: true` marca las 87 que el lector debe resolver y `esperado: null`, las que deben dar `null` | `pnpm eval:nlu --pasos` |
+| `nlu/contexto-onboarding.json` | La persona en el onboarding, todavía sin cuentas | `pnpm eval:nlu --pasos` |
 | `notificaciones/plantillas.ejemplo.json` | Plantillas **sintéticas** de tres bancos y una terminal de cobro ficticios | Motor de plantillas |
 | `notificaciones/ejemplos.jsonl` | 12 notificaciones sintéticas (personal) con su interpretación esperada | Motor de plantillas, escenario `e-captura` |
 | `notificaciones/negocio.ejemplos.jsonl` | 2 notificaciones de la terminal de cobro (espacio negocio) | Motor de plantillas, escenario `e-negocio` |
