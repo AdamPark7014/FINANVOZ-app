@@ -125,6 +125,28 @@ interna de Play; nota a Adam con qué cambió y qué probar.
 | 5 | Unificar «Borrar» y «Anular» | «Borrar», como ya lo dice la voz |
 | 6 | Llave de Claude y proyecto de Supabase | Ola 6 |
 
+## 5. Integración con el hilo de la nube (`docs/PLAN-UX-VOZ.md`, PR #24–#26 del 22-10)
+
+Un hilo de proyecto de Claude en la nube, lanzado por Adam, hizo el mismo plan (tres auditorías, Olas 1–4) y fusionó
+tres PR entre las 14:02 y las 14:37 (hora de Puebla) mientras aquí corrían V-A, V-B, B-1, B-2a, B-2b y B-3: 57
+archivos, con `voz/`, `ui/componentes`, `packages/nlu`, onboarding y textos por plataforma. `origin/main` es la base
+(Adam lo fusionó); lo de aquí se integra encima con un merge, no se pisa nada, y donde los dos hicieron lo mismo queda
+**una sola** implementación:
+
+| Tema | Hilo de la nube | Aquí | Queda |
+|---|---|---|---|
+| Teclado iPhone y «Listo» | `Pantalla`, `CampoTexto` (1.1, 1.2) | V-B: lo mismo + scroll que sigue al campo | Una sola versión en `Pantalla`/`CampoTexto`, con las pruebas de ambos |
+| Micrófono en `CampoMonto` | `ContextoDictadoCampos` inyectado desde `ProveedorDictadoCampos` (`ui/` no importa `voz/`) + `BotonDictarCampo` | V-B: `ProveedorDictado` (un micrófono a la vez, ignora eventos del anterior), `useMicrofono`, `BotonMicrofono`, `dictable`/`admiteCero`, audio iOS, `anunciar` | La forma inyectada de la nube (`ui/` sin nativos) con el motor de aquí: `BotonDictar` = `BotonMicrofono` sobre `useMicrofono`; `admiteCero` y «Abrir Ajustes» se conservan; `BotonDictarCampo`/`Microfono`/`ProveedorDictadoCampos` desaparecen |
+| Intérprete de montos | `reglas/campos.ts` `interpretarMonto` | V-A: `reglas/monto-dictado.ts` con `admiteCero` y `aproximado` | El de aquí; `campos.ts` deja de exportar `interpretarMonto` |
+| Pasos dictados | `campos.ts` `interpretarIngresoDicho`, `interpretarPagoFijoDicho`; `onboarding/DecirloPaso.tsx` en O3 y O5 | V-A: `pasos/interpretarPaso` (ingreso, cuentas, tarjeta, pagos fijos, colchón, tanda; golden de 100 casos) | `DecirloPaso` sobre `interpretarPaso`; `campos.ts` se elimina cuando nada lo importe; golden y eval al 100 % |
+| Plus sin tienda | 1.4: ocultar entradas si `compras === null` | B-2a: modo prueba + puertas honestas; `_layout` pasa `abrirPlan` solo con tienda | Ambos: son compatibles |
+| Hoy/Movimientos, textos iPhone, avisos | 1.3, 1.6, 1.10–1.15 | B-1, B-2b, B-3 | Conflicto por conflicto: gana lo más completo, sin dejar dos textos para lo mismo |
+| O6 saltado en iPhone, «Volver» en frío, bloqueo sin código, respaldo sin nube | 1.7, 1.9, 1.10, 1.11 | No hecho aquí | Lo de la nube tal cual |
+
+Verificación del merge: typecheck, lint, vitest completo, jest completo, `eval:nlu --nivel reglas` y `--pasos` al 100 %,
+y Maestro de iPhone en el siguiente push. Después del merge, Adam decide qué hilo sigue con FinanVoz: dos a la vez
+sobre los mismos archivos es trabajo doble.
+
 ## 4. Bitácora
 
 - 22-10: auditorías lanzadas; Ola 1 en curso (V-A, V-B).
@@ -142,3 +164,5 @@ interna de Play; nota a Adam con qué cambió y qué probar.
   Quedan para el coordinador: `app/_layout.tsx` debe pasar `abrirPlan` solo si `compras !== null || plusDePrueba`;
   `PanelRegistrar` y `explicar.ts` dicen «300 frases» por plan `plus` aunque el proxy siga en 30 (mirar `plusDePrueba`
   o que el proxy reconozca builds de prueba, Ola 6).
+- 22-10 (tarde): commiteados V-A (c6770f9), V-B (ddffbf7), B-1 (607313b), B-2a (8a63ed0). Al ir a subir, `origin/main`
+  trae PR #24–#26 del hilo de la nube (§5): se integran con merge cuando B-2b y B-3 terminen.

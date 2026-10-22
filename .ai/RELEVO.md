@@ -70,6 +70,11 @@
 
 ## A medias — CUIDADO
 
+- **ORIGEN SE MOVIÓ (22-10, tarde): PR #24–#26 de un hilo de Claude en la nube** (`claude/project-thread-6edvv8`,
+  fusionados por Adam 14:02–14:37) con el mismo plan (`docs/PLAN-UX-VOZ.md`): teclado iPhone, micrófono en cada
+  `CampoMonto` (`ContextoDictadoCampos`), `reglas/campos.ts`, «O dímelo» en O3 y O5, textos por plataforma. Los
+  commits locales 8fea7c8…c6770f9 **no están subidos**: se integran con `git merge origin/main` según
+  `docs/PLAN-MEJORA-2026-10.md` §5 cuando B-2b y B-3 terminen. No hagas `pull --rebase` con el árbol sucio.
 - **Ocho agentes en vuelo el 22-10 (tarde), nada commiteado de ellos**: V-A (`packages/nlu` montos y pasos), V-B
   (`src/voz`, `src/ui` teclado iOS), B-1 (`pantallas/principal`, movimientos), B-2a (plan, suscripciones,
   `ios-testflight.yml`), B-2b (cuentas, ajustes, privacidad), B-3 (tarjetas, tandas, compartido), T-1

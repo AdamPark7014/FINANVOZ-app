@@ -157,7 +157,8 @@ export default function Raiz() {
         {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
         <ProveedorNotificaciones notificaciones={notificaciones}>
           <ProveedorSesion key={estado.generacion} ctx={estado.sesion.ctx} nube={nube}>
-            <ProveedorPlan compras={compras} abrirPlan={abrirPlan}>
+            {/* Sin tienda no hay nada que comprar: sin `abrirPlan`, Hoy y los candados no ofrecen Plus. */}
+            <ProveedorPlan compras={compras} abrirPlan={compras ? abrirPlan : null}>
               <ProveedorAnalitica analitica={analitica}>
                 <AppProtegida
                   reiniciada={estado.generacion > 0}
