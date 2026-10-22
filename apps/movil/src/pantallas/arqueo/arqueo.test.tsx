@@ -1,4 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { AccessibilityInfo, Platform } from 'react-native';
+import { CUENTAS_SISTEMA } from '@cartera/datos';
+import { registrarMovimiento } from '../../servicios';
 import { abrirPruebaPantalla, conEscenario } from '../principal/__pruebas__/base';
 import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaArqueo } from './PantallaArqueo';
@@ -8,7 +11,11 @@ import {
   ACCESIBILIDAD_LISTO,
   AHORA_NO,
   AYUDA_POR_ASIGNAR,
+  CONFIRMAR,
+  CONTINUAR,
   MENSAJE_POSPONER,
+  textoResumenMarcados,
+  textoResumenTraes,
   etiquetaVacioSinEfectivo,
   ETIQUETA_GASTO_SIN_DESCRIPCION,
   ETIQUETA_MONTO_TRAES,
@@ -120,9 +127,11 @@ describe('PantallaArqueo · vacío y errores', () => {
     renderConSesion(p.ctx, <PantallaArqueo alCerrar={alCerrar} />);
     const continuar = screen.queryByTestId('arqueo-continuar');
     if (continuar) fireEvent.press(continuar);
+    // El chip solo elige; "Confirmar" guarda (nada se guarda hasta Confirmar).
     fireEvent.press(screen.getByTestId('arqueo-exacto'));
-    const sobrante = screen.queryByTestId('arqueo-sobrante-no_se');
-    if (sobrante) fireEvent.press(sobrante);
+    expect(screen.queryByTestId('arqueo-hecho')).toBeNull();
+    expect(screen.getByTestId('arqueo-calcular').props.accessibilityLabel).toBe(CONFIRMAR);
+    fireEvent.press(screen.getByTestId('arqueo-calcular'));
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('importantForAccessibility', 'yes');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityLiveRegion', 'polite');
     expect(screen.getByTestId('arqueo-mensaje-hecho')).toHaveProp('accessibilityRole', 'alert');
@@ -169,5 +178,109 @@ describe('PantallaArqueo · vacío y errores', () => {
       expect(screen.getByText(PASO_MARCAR_AYUDA)).toHaveProp('accessibilityHint', PISTA_PASO_MARCAR);
     }
     p.cerrar();
+  });
+});
+
+describe('PantallaArqueo · nada se guarda hasta Confirmar y "Cambiar" entre pasos (auditoría B-3 · 4 y 8)', () => {
+  /** e4-01 con una Coca de $25 por asignar de hace 30 h (paso 1 del arqueo). */
+  function conPorAsignar() {
+    const p = conEscenario('e4-01');
+    const INICIO = Date.UTC(2026, 9, 11, 16, 0);
+    p.reloj.fijarInstante(INICIO - 30 * 3_600_000);
+    const coca = registrarMovimiento(
+      p.ctx,
+      {
+        tipo: 'gasto',
+        categoria: 'antojos',
+        origenId: CUENTAS_SISTEMA.porAsignar,
+        monto: 2_500,
+        descripcion: 'Coca',
+        fecha: '2026-10-10',
+      },
+      { origen: 'voz' },
+    );
+    p.reloj.fijarInstante(INICIO);
+    return { ...p, coca: coca.transaccionId };
+  }
+
+  it('el sobrante se elige con chips y se guarda con "Confirmar"', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('arqueo-otra'));
+    fireEvent.changeText(screen.getByTestId('arqueo-monto'), '700');
+    expect(screen.getByTestId('arqueo-calcular').props.accessibilityLabel).toBe(CONTINUAR);
+    fireEvent.press(screen.getByTestId('arqueo-calcular'));
+    expect(screen.queryByTestId('arqueo-sobrante-confirmar')).toBeNull();
+    fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    expect(screen.queryByTestId('arqueo-hecho')).toBeNull();
+    expect(screen.getByTestId('arqueo-sobrante-no_se').props.accessibilityState).toMatchObject({
+      selected: true,
+    });
+    expect(screen.getByTestId('arqueo-sobrante-confirmar')).toHaveProp('accessibilityHint', PISTA_CONFIRMAR);
+    fireEvent.press(screen.getByTestId('arqueo-sobrante-confirmar'));
+    expect(screen.getByTestId('arqueo-hecho')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('"Cambiar" en el resultado vuelve a la cantidad con lo que escribiste', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('arqueo-otra'));
+    fireEvent.changeText(screen.getByTestId('arqueo-monto'), '300');
+    fireEvent.press(screen.getByTestId('arqueo-calcular'));
+    expect(screen.getByTestId('arqueo-faltante')).toBeTruthy();
+    expect(textoDe('arqueo-cambiar-cantidad-texto')).toBe(textoResumenTraes(30_000));
+    fireEvent.press(screen.getByTestId('arqueo-cambiar-cantidad'));
+    expect(screen.queryByTestId('arqueo-faltante')).toBeNull();
+    expect(screen.getByTestId('arqueo-monto').props.value).toBe('300');
+    fireEvent.changeText(screen.getByTestId('arqueo-monto'), '700');
+    fireEvent.press(screen.getByTestId('arqueo-calcular'));
+    expect(screen.getByTestId('arqueo-sobrante')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('"Cambiar" en la cantidad vuelve a los gastos marcados sin perderlos', () => {
+    const p = conPorAsignar();
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    fireEvent.press(screen.getByTestId(`arqueo-marcar-${p.coca}`));
+    fireEvent.press(screen.getByTestId('arqueo-continuar'));
+    expect(textoDe('arqueo-cambiar-marcar-texto')).toBe(textoResumenMarcados(1));
+    fireEvent.press(screen.getByTestId('arqueo-cambiar-marcar'));
+    expect(screen.getByTestId(`arqueo-marcar-${p.coca}`).props.accessibilityState).toMatchObject({
+      checked: true,
+    });
+    fireEvent.press(screen.getByTestId(`arqueo-marcar-${p.coca}`));
+    fireEvent.press(screen.getByTestId('arqueo-continuar'));
+    expect(textoDe('arqueo-cambiar-marcar-texto')).toBe(textoResumenMarcados(0));
+    p.cerrar();
+  });
+
+  it('el pie respeta el área segura de abajo (barra de inicio del iPhone)', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+    // SafeAreaView entrega los bordes como `{ top: 'additive', bottom: 'additive', … }`.
+    const bordes = screen.getByTestId('pantalla-arqueo').props.edges as Record<string, string> | string[];
+    expect(Array.isArray(bordes) ? bordes : Object.keys(bordes)).toEqual(
+      expect.arrayContaining(['top', 'bottom']),
+    );
+    p.cerrar();
+  });
+
+  it('iPhone: VoiceOver anuncia el resultado al confirmar', () => {
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    const anunciar = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+    try {
+      const p = conEscenario('e4-01');
+      renderConSesion(p.ctx, <PantallaArqueo alCerrar={jest.fn()} />);
+      const continuar = screen.queryByTestId('arqueo-continuar');
+      if (continuar) fireEvent.press(continuar);
+      fireEvent.press(screen.getByTestId('arqueo-exacto'));
+      fireEvent.press(screen.getByTestId('arqueo-calcular'));
+      expect(anunciar).toHaveBeenCalledWith(mensajeCuadra());
+      p.cerrar();
+    } finally {
+      anunciar.mockRestore();
+      plataforma.restore();
+    }
   });
 });

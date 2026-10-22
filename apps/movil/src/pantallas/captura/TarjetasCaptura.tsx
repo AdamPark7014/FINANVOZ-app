@@ -29,13 +29,16 @@ import {
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import { ActivarCaptura } from './ActivarCaptura';
 import {
+  BTN_ENTENDIDO_REACTIVAR_IOS,
   CUERPO_REACTIVAR_CAPTURA,
+  CUERPO_REACTIVAR_CAPTURA_IOS,
   etiquetaCuerpoReactivarCaptura,
   etiquetaGuiaCapturaInactiva,
   PISTA_DESCARTAR_REACTIVAR_CAPTURA,
   PISTA_REVISAR_ACCESO_CAPTURA,
   TITULO_CAPTURA_INACTIVA,
   TITULO_REACTIVAR_CAPTURA,
+  TITULO_REACTIVAR_CAPTURA_IOS,
 } from './textos';
 
 type Arqueo = Extract<TarjetaAccion, { tipo: 'arqueo' }>;
@@ -175,6 +178,8 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
     [ctx, mostrar],
   );
 
+  // Respaldo de Android restaurado en iPhone: no hay nada que reactivar; se dice sin hablar de Android.
+  const esIos = Platform.OS === 'ios';
   if (activando)
     return (
       <Tarjeta testID={testID}>
@@ -183,8 +188,8 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
     );
   return (
     <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte" importantForAccessibility="no">
-        {TITULO_REACTIVAR_CAPTURA}
+      <Texto variante="cuerpoFuerte" importantForAccessibility="no" testID={`${testID}-titulo`}>
+        {esIos ? TITULO_REACTIVAR_CAPTURA_IOS : TITULO_REACTIVAR_CAPTURA}
       </Texto>
       <Texto
         variante="secundario"
@@ -192,9 +197,9 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
         testID={`${testID}-cuerpo`}
         accessibilityRole="alert"
         accessibilityLiveRegion="polite"
-        accessibilityLabel={etiquetaCuerpoReactivarCaptura()}
+        accessibilityLabel={etiquetaCuerpoReactivarCaptura(esIos)}
       >
-        {CUERPO_REACTIVAR_CAPTURA}
+        {esIos ? CUERPO_REACTIVAR_CAPTURA_IOS : CUERPO_REACTIVAR_CAPTURA}
       </Texto>
       <View style={{ gap: espacio.s }}>
         {puente ? (
@@ -207,13 +212,13 @@ export function TarjetaReactivarCaptura({ testID }: { testID: string }) {
           />
         ) : null}
         <Boton
-          etiqueta="Ahora no"
+          etiqueta={esIos && !puente ? BTN_ENTENDIDO_REACTIVAR_IOS : 'Ahora no'}
           variante="texto"
           alPresionar={() => {
             desactivarCaptura(ctx);
             void puente?.fijarListaBlanca([]);
             refrescar();
-            mostrar({ mensaje: 'Va. Puedes activarla cuando quieras en Ajustes.' });
+            if (!(esIos && !puente)) mostrar({ mensaje: 'Va. Puedes activarla cuando quieras en Ajustes.' });
           }}
           testID={`${testID}-ahora-no`}
           pista={PISTA_DESCARTAR_REACTIVAR_CAPTURA}

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 import {
   construirGasto,
   construirPagoTarjeta,
@@ -18,7 +19,11 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaTarjeta } from '../tarjetas/PantallaTarjeta';
 import { esPdfCompartido } from './compartido';
 import { LeerEstadoCuenta, type ExtraerPdf } from './LeerEstadoCuenta';
+import { EsperandoPdf, leePdfEnEsteTelefono, PdfNoDisponible } from './PdfNoDisponible';
 import {
+  MENSAJE_LEYENDO_COMPARTIDO,
+  MENSAJE_NO_DISPONIBLE_IOS,
+  PISTA_VOLVER_PDF,
   ETIQUETA_AVISO_ESTADO,
   ETIQUETA_EXITO,
   ETIQUETA_LEYENDO,
@@ -401,5 +406,48 @@ describe('hoja de compartir: ¿es un PDF?', () => {
     expect(esPdfCompartido({ value: 'content://x/estado.pdf?x=1' })).toBe(true);
     expect(esPdfCompartido({ mimeType: 'application/zip', originalName: 'facturas.zip' })).toBe(false);
     expect(esPdfCompartido({ mimeType: 'text/xml', value: 'content://x/factura.xml' })).toBe(false);
+  });
+});
+
+describe('Estado de cuenta en iPhone (auditoría B-3 · 10)', () => {
+  it('iOS: sin lector de PDF lo dice sin hablar de Android y "Volver" regresa', () => {
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    try {
+      expect(leePdfEnEsteTelefono()).toBe(false);
+      const alVolver = jest.fn();
+      render(<PdfNoDisponible alVolver={alVolver} />);
+      expect(screen.getByTestId('pdf-no-disponible-mensaje')).toHaveTextContent(MENSAJE_NO_DISPONIBLE_IOS);
+      expect(JSON.stringify(screen.toJSON())).not.toMatch(/Android/);
+      expect(screen.getByTestId('pdf-no-disponible-volver')).toHaveProp(
+        'accessibilityHint',
+        PISTA_VOLVER_PDF,
+      );
+      fireEvent.press(screen.getByTestId('pdf-no-disponible-volver'));
+      expect(alVolver).toHaveBeenCalledTimes(1);
+    } finally {
+      plataforma.restore();
+    }
+  });
+
+  it('iOS: si el lector no está disponible, el aviso de la lectura tampoco habla de Android', async () => {
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    try {
+      const { ctx } = preparar();
+      const { alSalir } = montar(ctx, async () => ({ tipo: 'no_disponible' }));
+      expect(await screen.findByTestId('estado-error')).toHaveTextContent(MENSAJE_NO_DISPONIBLE_IOS);
+      await presionar('estado-salir');
+      expect(alSalir).toHaveBeenCalled();
+    } finally {
+      plataforma.restore();
+    }
+  });
+
+  it('Android: lee PDF; la espera de la hoja de compartir trae "Volver"', () => {
+    expect(leePdfEnEsteTelefono()).toBe(true);
+    const alVolver = jest.fn();
+    render(<EsperandoPdf texto={MENSAJE_LEYENDO_COMPARTIDO} alVolver={alVolver} testID="espera" />);
+    expect(screen.getByTestId('espera')).toHaveTextContent(MENSAJE_LEYENDO_COMPARTIDO);
+    fireEvent.press(screen.getByTestId('pdf-esperando-volver'));
+    expect(alVolver).toHaveBeenCalledTimes(1);
   });
 });

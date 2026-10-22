@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
+import { AccessibilityInfo, Linking, Platform } from 'react-native';
 import { crearCriptoNoble } from '@cartera/sincronizacion/noble';
 import { ProveedorCompartido } from '../../compartido/ProveedorCompartido';
 import { almacenEnMemoria } from '../../db/llave';
@@ -11,6 +12,7 @@ import {
   crearGrupoCompartido,
   listarGruposCompartidos,
   MENSAJE_MOVIMIENTO_COMPARTIDO,
+  mensajeErrorCompartido,
   obtenerGrupoCompartido,
   type Contexto,
   type DependenciasCompartido,
@@ -29,7 +31,10 @@ import { EscanerQr } from './EscanerQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
 import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
 import {
+  BTN_ABRIR_AJUSTES,
   BTN_COMPARTIDOS_CUENTAS,
+  TEXTO_CAMARA_BLOQUEADA,
+  textoConfirmarAnular,
   ETIQUETA_ACCESIBILIDAD_QR_UNION,
   ETIQUETA_CON_QUIEN_COMPARTES,
   ERROR_NOMBRE_PAREJA,
@@ -50,7 +55,8 @@ import {
   PISTA_LISTO_TRAS_QR,
   PISTA_VOLVER_GRUPO,
   PISTA_VOLVER_CUENTAS,
-  PISTA_VOLVER_LISTA,
+  PISTA_CANCELAR_CREAR,
+  PISTA_CANCELAR_UNIRSE,
   etiquetaVacioCompartidos,
   etiquetaVacioGrupoMovimientos,
   TEXTO_COMPARTIDOS_VACIO,
@@ -61,10 +67,16 @@ import {
 // La cámara falsa "lee" el QR que la prueba deja en `mockQr` al tocarla.
 let mockQr = '';
 let mockCamaraConcedida = true;
+/** `false`: la cámara se negó y el sistema ya no muestra el diálogo (iPhone). */
+let mockCamaraPreguntable = true;
 jest.mock('expo-camera', () => {
   const { Pressable, Text } = jest.requireActual('react-native');
   return {
-    useCameraPermissions: () => [{ granted: mockCamaraConcedida }, jest.fn()],
+    useCameraPermissions: () => [
+      { granted: mockCamaraConcedida, canAskAgain: mockCamaraPreguntable },
+      jest.fn(() => Promise.resolve({ granted: mockCamaraConcedida })),
+      jest.fn(() => Promise.resolve({ granted: mockCamaraConcedida })),
+    ],
     CameraView: ({
       onBarcodeScanned,
       accessibilityLabel,
@@ -192,14 +204,17 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const A = telefono(servidor, 'usuario-a');
     en(A, <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />);
     fireEvent.press(screen.getByTestId('compartidos-crear'));
-    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
+    // "Volver" siempre sale (como el gesto de iPhone); el paso se cierra con su "Cancelar".
+    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_CUENTAS);
     expect(screen.getByTestId('compartidos-crear-codigo')).toHaveProp(
       'accessibilityHint',
       PISTA_CREAR_CODIGO,
     );
-    fireEvent.press(screen.getByTestId('compartidos-volver'));
+    expect(screen.getByTestId('compartidos-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_CREAR);
+    fireEvent.press(screen.getByTestId('compartidos-cancelar'));
     fireEvent.press(screen.getByTestId('compartidos-escanear'));
-    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_LISTA);
+    expect(screen.getByTestId('compartidos-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_CUENTAS);
+    expect(screen.getByTestId('compartidos-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_UNIRSE);
     expect(screen.getByTestId('compartidos-abrir-escaner')).toHaveProp(
       'accessibilityHint',
       PISTA_ESCRIBIR_NOMBRE_PAREJA,
@@ -478,5 +493,134 @@ describe('02 §27 · Gastos con tu pareja', () => {
       [1, false],
       [1, true],
     ]);
+  });
+});
+
+describe('Compartido: botones que no llevaban a ningún lado (auditoría B-3 · 4 y 5)', () => {
+  /** Grupo de A con un "Súper" que pagó A (Beto le debe), sin que B se haya unido. */
+  async function grupoConGasto() {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    const creado = await crearGrupoCompartido(A.ctx, A.deps, 'Beto');
+    if (!creado.ok) throw new Error(creado.error);
+    agregarGastoCompartido(A.ctx, A.deps, creado.grupoId, {
+      total: 120000,
+      pagueYo: true,
+      miParteBp: 5000,
+      descripcion: 'Súper',
+      categoria: 'super',
+      cuentaId: A.cuenta,
+    });
+    const [mov] = obtenerGrupoCompartido(A.ctx, A.deps.almacen, creado.grupoId).movimientos;
+    if (!mov) throw new Error('sin movimiento');
+    return { A, grupoId: creado.grupoId, movId: mov.id };
+  }
+
+  it('sin nube lo dice al abrir, sin pedir nombre ni cámara', () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'usuario-a');
+    en(
+      { ...A, deps: { ...A.deps, cliente: null } },
+      <PantallaCompartidos alVolver={jest.fn()} alAbrirGrupo={jest.fn()} />,
+    );
+    expect(screen.getByTestId('compartidos-sin-servicio')).toHaveTextContent(
+      mensajeErrorCompartido('sin_servicio'),
+    );
+    expect(screen.queryByTestId('compartidos-crear')).toBeNull();
+    expect(screen.queryByTestId('compartidos-escanear')).toBeNull();
+    expect(screen.queryByTestId('compartidos-vacio')).toBeNull();
+    A.cerrar();
+  });
+
+  it('"Anular" pregunta antes; "Cancelar" lo deja y "Sí, anular" lo anula', async () => {
+    const { A, grupoId, movId } = await grupoConGasto();
+    en(A, <PantallaGrupoCompartido grupoId={grupoId} alVolver={jest.fn()} />);
+    await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull());
+    fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-anular`));
+    expect(
+      within(screen.getByTestId(`mov-compartido-${movId}-confirmacion`)).getByText(
+        textoConfirmarAnular('Súper', 'Beto'),
+      ),
+    ).toBeTruthy();
+    fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-cancelar-anular`));
+    expect(screen.queryByTestId(`mov-compartido-${movId}-confirmacion`)).toBeNull();
+    expect(obtenerGrupoCompartido(A.ctx, A.deps.almacen, grupoId).movimientos[0]?.anulado).toBe(false);
+    fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-anular`));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-confirmar-anular`));
+    });
+    await waitFor(() =>
+      expect(
+        obtenerGrupoCompartido(A.ctx, A.deps.almacen, grupoId).movimientos.find((m) => m.id === movId)
+          ?.anulado,
+      ).toBe(true),
+    );
+    A.cerrar();
+  });
+
+  it('iPhone: VoiceOver anuncia la pregunta de anular', async () => {
+    const { A, grupoId, movId } = await grupoConGasto();
+    const plataforma = jest.replaceProperty(Platform, 'OS', 'ios');
+    const anunciar = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+    try {
+      en(A, <PantallaGrupoCompartido grupoId={grupoId} alVolver={jest.fn()} />);
+      await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull());
+      fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-anular`));
+      expect(anunciar).toHaveBeenCalledWith(textoConfirmarAnular('Súper', 'Beto'));
+    } finally {
+      anunciar.mockRestore();
+      plataforma.restore();
+      A.cerrar();
+    }
+  });
+
+  it('"Volver" siempre sale del grupo; "Saldar" se cierra con su "Cancelar"', async () => {
+    const { A, grupoId } = await grupoConGasto();
+    const alVolver = jest.fn();
+    en(A, <PantallaGrupoCompartido grupoId={grupoId} alVolver={alVolver} />);
+    await waitFor(() => expect(screen.getByTestId('grupo-saldar-abrir')).toBeTruthy());
+    fireEvent.press(screen.getByTestId('grupo-saldar-abrir'));
+    fireEvent.press(screen.getByTestId('grupo-saldar-cancelar'));
+    expect(screen.queryByTestId('grupo-saldar')).toBeNull();
+    fireEvent.press(screen.getByTestId('grupo-saldar-abrir'));
+    expect(screen.getByTestId('grupo-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_GRUPO);
+    fireEvent.press(screen.getByTestId('grupo-volver'));
+    expect(alVolver).toHaveBeenCalledTimes(1);
+    A.cerrar();
+  });
+
+  it('grupo sin nube: no ofrece código, volver a vincular ni salir', async () => {
+    const { A, grupoId } = await grupoConGasto();
+    en(
+      { ...A, deps: { ...A.deps, cliente: null } },
+      <PantallaGrupoCompartido grupoId={grupoId} alVolver={jest.fn()} />,
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId('error-formulario')).toHaveTextContent(
+        mensajeErrorCompartido('sin_servicio'),
+      ),
+    );
+    expect(screen.queryByTestId('grupo-mostrar-codigo')).toBeNull();
+    expect(screen.queryByTestId('grupo-salir-abrir')).toBeNull();
+    expect(screen.queryByTestId('grupo-revincular-escanear')).toBeNull();
+    A.cerrar();
+  });
+
+  it('cámara negada sin poder volver a preguntar: "Abrir Ajustes"', () => {
+    mockCamaraConcedida = false;
+    mockCamaraPreguntable = false;
+    const abrir = jest.spyOn(Linking, 'openSettings').mockResolvedValue(undefined);
+    try {
+      render(<EscanerQr alLeer={jest.fn()} alCancelar={jest.fn()} />);
+      expect(screen.getByTestId('escaner-bloqueada')).toHaveTextContent(TEXTO_CAMARA_BLOQUEADA);
+      expect(screen.queryByTestId('escaner-permiso')).toBeNull();
+      expect(screen.getByTestId('escaner-abrir-ajustes').props.accessibilityLabel).toBe(BTN_ABRIR_AJUSTES);
+      fireEvent.press(screen.getByTestId('escaner-abrir-ajustes'));
+      expect(abrir).toHaveBeenCalledTimes(1);
+    } finally {
+      abrir.mockRestore();
+      mockCamaraConcedida = true;
+      mockCamaraPreguntable = true;
+    }
   });
 });

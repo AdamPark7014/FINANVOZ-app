@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import type { ResultadoExtraccionPdf } from '../../captura/puente';
 import {
   ajustarSaldoConEstado,
@@ -65,6 +65,7 @@ import {
   MENSAJE_FALTAN_DUDOSOS,
   MENSAJE_LEYENDO,
   MENSAJE_NO_DISPONIBLE,
+  MENSAJE_NO_DISPONIBLE_IOS,
   preguntaConciliacion,
   preguntaElegirTarjeta,
   preguntaMismoMovimiento,
@@ -137,7 +138,10 @@ export function LeerEstadoCuenta({
               setEstado({ tipo: 'error', mensaje: MENSAJE_DEMASIADO_GRANDE });
               return;
             case 'no_disponible':
-              setEstado({ tipo: 'error', mensaje: MENSAJE_NO_DISPONIBLE });
+              setEstado({
+                tipo: 'error',
+                mensaje: Platform.OS === 'ios' ? MENSAJE_NO_DISPONIBLE_IOS : MENSAJE_NO_DISPONIBLE,
+              });
               return;
             default:
               setEstado({ tipo: 'error', mensaje: MENSAJE_INVALIDO });

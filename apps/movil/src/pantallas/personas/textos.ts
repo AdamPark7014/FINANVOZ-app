@@ -48,6 +48,10 @@ export function mensajeRecordatorioCobro(etiquetaFecha: string): string {
 export const MENSAJE_SIN_AVISOS = 'No puedo programar avisos en este teléfono.';
 export const MENSAJE_PERMISO_AVISOS =
   'Activa los avisos en los ajustes de tu teléfono para que te lo recuerde.';
+/** Con avisos negados el sistema ya no vuelve a preguntar (iPhone): solo queda Ajustes. */
+export const BTN_ABRIR_AJUSTES = 'Abrir Ajustes';
+export const PISTA_ABRIR_AJUSTES_AVISOS =
+  'Abre los ajustes del teléfono para permitir los avisos de Finanvoz';
 export const MENSAJE_ERROR_RECORDATORIO = 'No pude programar el aviso. Intenta de nuevo.';
 
 /** "Registré: la cena $1,200 · te deben $900". */

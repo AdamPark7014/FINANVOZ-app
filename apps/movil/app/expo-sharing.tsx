@@ -4,9 +4,18 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { extraerTextoPdf } from '../src/captura/puente';
 import { ImportarCompartidas } from '../src/pantallas/deducciones';
 import { leerArchivo, nombreDeUri } from '../src/pantallas/deducciones/expo';
-import { esPdfCompartido, LeerEstadoCuenta } from '../src/pantallas/estados-cuenta';
+import {
+  EsperandoPdf,
+  esPdfCompartido,
+  LeerEstadoCuenta,
+  leePdfEnEsteTelefono,
+  PdfNoDisponible,
+} from '../src/pantallas/estados-cuenta';
+import {
+  MENSAJE_COMPARTIR_NO_DISPONIBLE_IOS,
+  MENSAJE_LEYENDO_COMPARTIDO,
+} from '../src/pantallas/estados-cuenta/textos';
 import type { ArchivoCfdi } from '../src/servicios';
-import { Pantalla, Texto } from '../src/ui';
 
 type Carga = SharePayload & {
   contentUri?: string | null;
@@ -17,9 +26,19 @@ type Carga = SharePayload & {
 /**
  * Hoja de compartir de Android → Finanvoz: `expo-sharing` abre la app en `finanvoz://expo-sharing` con lo
  * compartido (filtros del plugin en `app.json`). Un PDF es un estado de cuenta (M15, `02 §26`) y se lee en el
- * teléfono; los XML o ZIP son facturas (M12, `02 §24`). Se leen una vez y se limpian.
+ * teléfono; los XML o ZIP son facturas (M12, `02 §24`). Se leen una vez y se limpian. En iPhone la hoja de
+ * compartir no está configurada: si se llega aquí, lo dice con "Volver" en vez de quedarse en «Leyendo…».
  */
 export default function Compartido() {
+  const router = useRouter();
+  const volver = useCallback(() => (router.canGoBack() ? router.back() : router.replace('/')), [router]);
+  if (!leePdfEnEsteTelefono()) {
+    return <PdfNoDisponible alVolver={volver} texto={MENSAJE_COMPARTIR_NO_DISPONIBLE_IOS} />;
+  }
+  return <CompartidoAndroid volver={volver} />;
+}
+
+function CompartidoAndroid({ volver }: { volver: () => void }) {
   const router = useRouter();
   const { sharedPayloads, resolvedSharedPayloads, isResolving, clearSharedPayloads } = useIncomingShare();
   const cargas = useMemo<Carga[]>(
@@ -54,13 +73,8 @@ export default function Compartido() {
   );
 
   if (isResolving || pdf === undefined) {
-    return (
-      <Pantalla bordes={['top', 'left', 'right', 'bottom']}>
-        <Texto variante="cuerpo" tono="secundario">
-          Leyendo lo que compartiste…
-        </Texto>
-      </Pantalla>
-    );
+    // Con "Volver" por si lo compartido nunca termina de resolverse.
+    return <EsperandoPdf texto={MENSAJE_LEYENDO_COMPARTIDO} alVolver={volver} testID="compartido-leyendo" />;
   }
   if (pdf !== null) {
     return (

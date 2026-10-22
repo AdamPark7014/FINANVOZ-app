@@ -65,6 +65,16 @@ export const PISTA_ESCRIBIR_NOMBRE_PAREJA = 'Escribe cómo se llama tu pareja ar
 export const BTN_CANCELAR = 'Cancelar';
 /** Cierra el escáner (`02 §15`). */
 export const PISTA_CANCELAR_ESCANER = 'Cierra la cámara y vuelve atrás';
+/** Cámara negada sin poder volver a preguntar (iOS no muestra el diálogo otra vez). */
+export const TEXTO_CAMARA_BLOQUEADA =
+  'La cámara está apagada para Finanvoz. Actívala en Ajustes del teléfono y vuelve aquí para escanear.';
+export const BTN_ABRIR_AJUSTES = 'Abrir Ajustes';
+export const PISTA_ABRIR_AJUSTES_CAMARA = 'Abre los ajustes del teléfono para permitir la cámara';
+/** Cancelar en crear y unirse: vuelve a la lista de grupos (Volver siempre sale de la pantalla). */
+export const PISTA_CANCELAR_CREAR = 'Cierra sin crear el código y vuelves a tus grupos';
+export const PISTA_CANCELAR_UNIRSE = 'Cierra sin escanear y vuelves a tus grupos';
+/** Código para volver a vincular: se cierra con "Listo". */
+export const PISTA_CERRAR_CODIGO = 'Oculta el código y vuelves al grupo';
 
 export const BTN_VOLVER_A_VINCULAR = 'Volver a vincular';
 export const BTN_AGREGAR_GASTO = 'Agregar gasto';
@@ -76,7 +86,7 @@ export const BTN_ANULAR = 'Anular';
 
 /** Detalle del grupo: vuelve a Gastos compartidos (`02 §15`). */
 export const PISTA_VOLVER_GRUPO = 'Regresa a la lista de grupos';
-/** Detalle del grupo: cierra agregar, saldar, código o salir (`02 §15`). */
+/** Detalle del grupo: cada panel (agregar, saldar, código, salir) se cierra con su propio botón (`02 §15`). */
 export const PISTA_VOLVER_PANEL_GRUPO = 'Cierra este paso y vuelves al grupo';
 /** Pista TalkBack al abrir un grupo desde la lista (`02 §15`). */
 export const PISTA_ABRIR_GRUPO = 'Abre el detalle de este grupo compartido';
@@ -89,7 +99,13 @@ export const PISTA_REGISTRAR_PAGO = 'Guarda el pago en tu libro y lo comparte cu
 export const PISTA_DEJAR_DE_COMPARTIR = 'Cierra el grupo para los dos; cada quien conserva lo registrado';
 export const PISTA_CONFIRMAR_SALIR_GRUPO = 'Confirma que quieres dejar de compartir con tu pareja';
 export const PISTA_CANCELAR_PANEL = 'Cierra sin guardar ni confirmar';
-export const PISTA_ANULAR_MOVIMIENTO = 'Anula este gasto compartido en tu libro';
+export const PISTA_ANULAR_MOVIMIENTO = 'Pregunta antes de anular este gasto compartido en tu libro';
+export const BTN_SI_ANULAR = 'Sí, anular';
+export const PISTA_CONFIRMAR_ANULAR = 'Anula el gasto en tu libro y se lo comparte a tu pareja';
+/** Confirmación en línea: anular no tiene Deshacer (se corrige registrándolo otra vez). */
+export function textoConfirmarAnular(titulo: string, nombre: string): string {
+  return `¿Anular «${titulo}»? Lo quito de tu libro y se lo comparto a ${nombre}. Si fue un error, regístralo otra vez.`;
+}
 export const PISTA_CANCELAR_GASTO = 'Cierra el formulario sin guardar el gasto';
 export const TITULO_LO_COMPARTIDO = 'Lo compartido';
 /** Grupo abierto sin movimientos compartidos aún (`02 §27`). */

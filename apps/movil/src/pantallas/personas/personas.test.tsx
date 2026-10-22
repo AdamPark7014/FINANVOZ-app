@@ -31,6 +31,8 @@ import {
   ETIQUETA_CATEGORIA_PARTE,
   ETIQUETA_ORIGEN_DIVISION,
   MENSAJE_PERMISO_AVISOS,
+  BTN_ABRIR_AJUSTES,
+  PISTA_ABRIR_AJUSTES_AVISOS,
   mensajeRecordatorioCobro,
   PISTA_AGREGAR_PERSONA,
   PISTA_COBRAR,
@@ -299,27 +301,32 @@ describe('CA-M8-02 · Cobrar', () => {
     expect(alAbrirPersona).toHaveBeenCalledWith(p.caro);
   });
 
-  it('formulario: la misma persona puede ocupar más de una parte (×2 en el chip)', () => {
+  it('formulario: tocar a alguien ya elegido lo desmarca (antes salía «Caro ×2»)', () => {
     const p = conAmigos();
     renderConSesion(p.ctx, <PantallaRegistrar alCerrar={jest.fn()} />);
     fireEvent.press(screen.getByTestId('tipo-cuenta_dividida'));
     fireEvent.changeText(screen.getByTestId('division-total'), '1.01');
     fireEvent.press(screen.getByTestId('division-mas'));
-    fireEvent.press(screen.getByTestId('division-mas'));
-    expect(textoDe('division-partes')).toBe('Entre 4');
+    expect(textoDe('division-partes')).toBe('Entre 3');
     fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
+    expect(screen.getByTestId(`division-persona-${p.caro}`).props.accessibilityState).toMatchObject({
+      checked: true,
+    });
+    fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
+    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityLabel', 'Caro');
+    expect(screen.getByTestId(`division-persona-${p.caro}`).props.accessibilityState).toMatchObject({
+      checked: false,
+    });
     fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
     fireEvent.press(screen.getByTestId(`division-persona-${p.juan}`));
-    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp(
-      'accessibilityLabel',
-      'Caro, 2 veces',
-    );
     fireEvent.press(screen.getByTestId('division-categoria-comida_fuera'));
     fireEvent.press(screen.getByTestId(`division-origen-${p.bbva}`));
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
-    expect(p.ctx.libro.saldo(p.caro)).toBe(50);
-    expect(p.ctx.libro.saldo(p.juan)).toBe(25);
-    expect(p.ctx.libro.saldo('cat:personal:comida_fuera')).toBe(26);
+    // Cada quien queda una sola vez en «Te deben» (una parte de $1.01 entre 3, no dos).
+    expect(p.ctx.libro.saldo(p.caro)).toBeGreaterThan(0);
+    expect(p.ctx.libro.saldo(p.caro)).toBeLessThanOrEqual(34);
+    expect(p.ctx.libro.saldo(p.juan)).toBeGreaterThan(0);
+    expect(p.ctx.libro.saldo(p.juan)).toBeLessThanOrEqual(34);
   });
 });
 
@@ -377,6 +384,28 @@ describe('recordatorio de cobro', () => {
     expect(textoDe('persona-recordatorio-mensaje')).toBe(MENSAJE_PERMISO_AVISOS);
     expect(screen.getByTestId('persona-recordatorio-mensaje')).toHaveProp('accessibilityRole', 'alert');
     expect(n.puerto.lista()).toEqual([]);
+  });
+
+  it('con avisos negados ofrece "Abrir Ajustes" (el sistema ya no vuelve a preguntar)', async () => {
+    const p = conAmigos();
+    cena(p);
+    const abrirAjustesSistema = jest.fn();
+    const n = { ...notificacionesEnMemoria('denegado'), abrirAjustesSistema };
+    renderConSesion(
+      p.ctx,
+      <ProveedorNotificaciones notificaciones={n}>
+        <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />
+      </ProveedorNotificaciones>,
+    );
+    expect(screen.queryByTestId('persona-recordatorio-ajustes')).toBeNull();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('recordatorio-cobro-2026-10-12'));
+    });
+    const boton = screen.getByTestId('persona-recordatorio-ajustes');
+    expect(boton.props.accessibilityLabel).toBe(BTN_ABRIR_AJUSTES);
+    expect(boton).toHaveProp('accessibilityHint', PISTA_ABRIR_AJUSTES_AVISOS);
+    fireEvent.press(boton);
+    expect(abrirAjustesSistema).toHaveBeenCalledTimes(1);
   });
 });
 

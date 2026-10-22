@@ -24,6 +24,7 @@ import {
   formatearCentavos,
   Texto,
 } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError } from '../principal/textos';
 import {
@@ -110,12 +111,16 @@ export function FormularioCuentaDividida({
     return null;
   };
   const pendiente = faltante();
+  useAnunciarEnIos(error ?? (intentado ? pendiente : null));
 
+  /**
+   * Tocar a alguien ya elegido lo desmarca (antes lo volvía a sumar: «Ana ×2»). Lo dictado puede traer a la misma
+   * persona en dos partes y se respeta (el chip dice «×2»); al tocarla se quitan todas sus partes.
+   */
   const alternar = (id: string) => {
     setElegidas((xs) => {
+      if (xs.includes(id)) return xs.filter((x) => x !== id);
       if (xs.length < ajenas) return [...xs, id];
-      const idx = xs.lastIndexOf(id);
-      if (idx >= 0) return [...xs.slice(0, idx), ...xs.slice(idx + 1)];
       return xs;
     });
   };

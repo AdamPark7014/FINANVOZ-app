@@ -38,6 +38,17 @@ export const PISTA_GRUPO_PROPUESTA = 'Ajusta cuánto falta en cada parte; deben 
 export const PISTA_GRUPO_SOBRANTE = 'Elige de dónde salió el efectivo de más';
 /** TalkBack: tras mensaje de listo. */
 export const PISTA_LISTO = 'Cierra la pantalla después del conteo';
+/** Volver al paso anterior sin perder lo que ya contestaste (antes no había "Atrás" entre pasos). */
+export const CAMBIAR = 'Cambiar';
+export const PISTA_CAMBIAR_MARCADOS = 'Vuelve a la lista de gastos para marcar o desmarcar';
+export const PISTA_CAMBIAR_CANTIDAD = 'Vuelve a decir cuánto efectivo traes';
+export const textoResumenMarcados = (n: number): string =>
+  n === 0
+    ? 'No marcaste gastos en efectivo.'
+    : n === 1
+      ? 'Marcaste 1 gasto como efectivo.'
+      : `Marcaste ${n} gastos como efectivo.`;
+export const textoResumenTraes = (monto: Centavos): string => `Traes ${formatearCentavos(monto)}.`;
 /** TalkBack: tarjeta de Hoy con gastos por asignar. */
 export const PISTA_ABRIR_DESDE_TARJETA = 'Abre el conteo completo, empezando por esos gastos';
 /** TalkBack: posponer tarjeta de Hoy. */

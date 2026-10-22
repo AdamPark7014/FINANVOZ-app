@@ -95,6 +95,8 @@ describe('analítica en pantallas (03 §8, RNF-05)', () => {
     fireEvent.changeText(screen.getByTestId('arqueo-monto'), '700');
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
     fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    // El chip elige; se registra (y se mide) al confirmar.
+    fireEvent.press(screen.getByTestId('arqueo-sobrante-confirmar'));
     expect(enviados.map((e) => e.evento)).toEqual(['arqueo']);
     expect(enviados[0]?.propiedades).toMatchObject({ resultado: 'sobrante' });
     expect(JSON.stringify(propiasDe(enviados))).not.toMatch(/700|640|\$/);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { useCompartido } from '../../compartido/ProveedorCompartido';
 import {
   anularEventoCompartido,
@@ -17,7 +18,8 @@ import {
   type ResultadoAccion,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { anunciar, Boton, espacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chips, ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { CodigoQr } from './CodigoQr';
@@ -28,13 +30,17 @@ import {
   BTN_ANULAR,
   BTN_CANCELAR,
   BTN_DEJAR_DE_COMPARTIR,
+  BTN_LISTO,
   BTN_MOSTRAR_CODIGO,
   BTN_REGISTRAR_PAGO,
   BTN_SALDAR,
+  BTN_SI_ANULAR,
   BTN_VOLVER_A_VINCULAR,
   PISTA_AGREGAR_GASTO,
   PISTA_ANULAR_MOVIMIENTO,
   PISTA_CANCELAR_PANEL,
+  PISTA_CERRAR_CODIGO,
+  PISTA_CONFIRMAR_ANULAR,
   PISTA_CONFIRMAR_SALIR_GRUPO,
   PISTA_DEJAR_DE_COMPARTIR,
   PISTA_MOSTRAR_CODIGO,
@@ -42,7 +48,7 @@ import {
   PISTA_SALDAR,
   PISTA_VOLVER_A_VINCULAR,
   PISTA_VOLVER_GRUPO,
-  PISTA_VOLVER_PANEL_GRUPO,
+  textoConfirmarAnular,
   ETIQUETA_A_DONDE_LLEGO,
   ETIQUETA_ANULADO,
   ETIQUETA_CON_QUE_PAGASTE,
@@ -96,6 +102,11 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   const [cuentaPago, setCuentaPago] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  /** Movimiento que espera "Sí, anular" (anular no tiene Deshacer). */
+  const [anulando, setAnulando] = useState<string | null>(null);
+  // Sin cliente de nube no hay código, ni volver a vincular, ni salir: el aviso sale al abrir (sincronizar).
+  const conServicio = deps.cliente !== null;
+  useAnunciarEnIos(error);
 
   // Lo pendiente se comparte solo al volver la red; si no queda nada pendiente, no hay nada que reintentar.
   const errorAlSincronizar = useCallback(
@@ -169,6 +180,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   };
 
   const anular = (eventoId: string) => {
+    setAnulando(null);
     try {
       anularEventoCompartido(ctx, deps, grupoId, eventoId);
     } catch (e) {
@@ -180,13 +192,14 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
 
   return (
     <Pantalla testID="pantalla-grupo-compartido" bordes={['top', 'left', 'right', 'bottom']}>
+      {/* "Volver" siempre regresa a tus grupos (como el gesto de iPhone); cada panel tiene su propio cierre. */}
       <Boton
         testID="grupo-volver"
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
-        pista={panel === 'ninguno' ? PISTA_VOLVER_GRUPO : PISTA_VOLVER_PANEL_GRUPO}
-        alPresionar={panel === 'ninguno' ? alVolver : () => setPanel('ninguno')}
+        pista={PISTA_VOLVER_GRUPO}
+        alPresionar={alVolver}
       />
       <Texto variante="titulo" testID="grupo-titulo" accessibilityRole="header">
         {g.nombre}
@@ -216,7 +229,7 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
       ) : null}
       <MensajeError texto={error} />
 
-      {g.revincular && panel !== 'revincular' ? (
+      {g.revincular && conServicio && panel !== 'revincular' ? (
         <Tarjeta testID="grupo-revincular">
           <Texto variante="cuerpo">{instruccionRevincularGrupo(g.nombre)}</Texto>
           <Boton
@@ -265,6 +278,13 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
             pista={PISTA_REGISTRAR_PAGO}
             alPresionar={saldar}
           />
+          <Boton
+            testID="grupo-saldar-cancelar"
+            etiqueta={BTN_CANCELAR}
+            variante="texto"
+            pista={PISTA_CANCELAR_PANEL}
+            alPresionar={() => setPanel('ninguno')}
+          />
         </Tarjeta>
       ) : null}
 
@@ -272,6 +292,13 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         <Tarjeta testID="grupo-codigo">
           <Texto variante="cuerpo">{instruccionQrMostrarCodigo(g.nombre)}</Texto>
           <CodigoQr texto={qr} testID="grupo-qr" />
+          <Boton
+            testID="grupo-codigo-listo"
+            etiqueta={BTN_LISTO}
+            variante="secundario"
+            pista={PISTA_CERRAR_CODIGO}
+            alPresionar={() => setPanel('ninguno')}
+          />
         </Tarjeta>
       ) : null}
 
@@ -316,26 +343,28 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
               alPresionar={() => setPanel('saldar')}
             />
           ) : null}
-          <Boton
-            testID="grupo-mostrar-codigo"
-            etiqueta={BTN_MOSTRAR_CODIGO}
-            variante="secundario"
-            pista={PISTA_MOSTRAR_CODIGO}
-            cargando={ocupado}
-            alPresionar={() => {
-              setOcupado(true);
-              mostrarCodigo(ctx, deps, grupoId)
-                .then((r) => {
-                  if (r.ok) {
-                    setQr(r.qr);
-                    setPanel('codigo');
-                    setError(null);
-                  } else setError(mensajeErrorCompartido(r.error));
-                })
-                .catch((e: unknown) => setError(mensajeError(e, MENSAJE_SERVIDOR)))
-                .finally(() => setOcupado(false));
-            }}
-          />
+          {conServicio ? (
+            <Boton
+              testID="grupo-mostrar-codigo"
+              etiqueta={BTN_MOSTRAR_CODIGO}
+              variante="secundario"
+              pista={PISTA_MOSTRAR_CODIGO}
+              cargando={ocupado}
+              alPresionar={() => {
+                setOcupado(true);
+                mostrarCodigo(ctx, deps, grupoId)
+                  .then((r) => {
+                    if (r.ok) {
+                      setQr(r.qr);
+                      setPanel('codigo');
+                      setError(null);
+                    } else setError(mensajeErrorCompartido(r.error));
+                  })
+                  .catch((e: unknown) => setError(mensajeError(e, MENSAJE_SERVIDOR)))
+                  .finally(() => setOcupado(false));
+              }}
+            />
+          ) : null}
         </>
       ) : null}
 
@@ -373,20 +402,43 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
               {ETIQUETA_POR_COMPARTIR}
             </Texto>
           ) : null}
-          {m.anulable && panel === 'ninguno' ? (
+          {m.anulable && panel === 'ninguno' && anulando === m.id ? (
+            <View style={{ gap: espacio.s }} testID={`mov-compartido-${m.id}-confirmacion`}>
+              <Texto variante="cuerpo" accessibilityLiveRegion="polite">
+                {textoConfirmarAnular(m.titulo, g.nombre)}
+              </Texto>
+              <Boton
+                testID={`mov-compartido-${m.id}-confirmar-anular`}
+                etiqueta={BTN_SI_ANULAR}
+                variante="secundario"
+                pista={PISTA_CONFIRMAR_ANULAR}
+                alPresionar={() => anular(m.id)}
+              />
+              <Boton
+                testID={`mov-compartido-${m.id}-cancelar-anular`}
+                etiqueta={BTN_CANCELAR}
+                variante="texto"
+                pista={PISTA_CANCELAR_PANEL}
+                alPresionar={() => setAnulando(null)}
+              />
+            </View>
+          ) : m.anulable && panel === 'ninguno' ? (
             <Boton
               testID={`mov-compartido-${m.id}-anular`}
               etiqueta={BTN_ANULAR}
               variante="texto"
               ancho="contenido"
               pista={PISTA_ANULAR_MOVIMIENTO}
-              alPresionar={() => anular(m.id)}
+              alPresionar={() => {
+                setAnulando(m.id);
+                anunciar(etiquetaHablada(textoConfirmarAnular(m.titulo, g.nombre)));
+              }}
             />
           ) : null}
         </Tarjeta>
       ))}
 
-      {g.abierto && panel === 'ninguno' ? (
+      {g.abierto && conServicio && panel === 'ninguno' ? (
         <Boton
           testID="grupo-salir-abrir"
           etiqueta={BTN_DEJAR_DE_COMPARTIR}

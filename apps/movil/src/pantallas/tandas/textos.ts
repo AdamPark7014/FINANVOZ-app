@@ -48,6 +48,17 @@ export const PISTA_GUARDAR_TANDA = 'Guarda la tanda y aparto cada aportación el
 export const PISTA_CANCELAR_FORMULARIO = 'Cierra el formulario sin guardar la tanda';
 /** TalkBack al salir del flujo de cobro sin registrar (`02 §18`). */
 export const PISTA_CANCELAR_COBRO = 'Cierra sin registrar el cobro';
+/** TalkBack al cerrar "¿De dónde salió?" de "Ya la di" sin registrar. */
+export const PISTA_CANCELAR_APORTACION = 'Cierra sin registrar la aportación';
+/** "¿De dónde salió?" o "¿A qué cuenta llegó?" sin cuentas para elegir. */
+export const TEXTO_SIN_CUENTAS_TANDA =
+  'Aún no tienes cuentas de efectivo o débito. Agrégalas en Cuentas para registrar tu tanda.';
+/** Primera fecha (`02 §18`): chips con fechas cercanas y "Otra fecha" para escribirla. */
+export const ETIQUETA_FECHA_HOY = 'Hoy';
+export const PREGUNTA_FECHAS_CERCANAS = '¿Cuándo es la primera ronda?';
+export const AYUDA_FECHA = 'Toca una fecha de arriba o escríbela con día, mes y año: 16/10/2026.';
+/** Bajo el campo cuando "Guardar tanda" no pudo leer la fecha (el qué hacer va junto al botón). */
+export const MARCA_FECHA_INVALIDA = 'Revisa la fecha: día/mes/año.';
 /** TalkBack al cerrar edición sin guardar (`02 §18`). */
 export const PISTA_CANCELAR_EDICION = 'Cierra la edición sin guardar cambios';
 /** TalkBack al volver del diálogo de archivar (`02 §18`). */

@@ -9,13 +9,25 @@ import {
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
-import { AVISO_NO_SE_INCLUYE_MSI, BTN_CANCELAR, etiquetaAvisoNoSeIncluyeMsi } from './textos';
+import {
+  AVISO_NO_SE_INCLUYE_MSI,
+  BTN_CANCELAR,
+  etiquetaAvisoNoSeIncluyeMsi,
+  MARCA_CAMPO_CON_ERROR,
+} from './textos';
 
 type ModoLimite = 'dia' | 'dias';
 type SiNo = 'si' | 'no';
 type Incluye = 'si' | 'no' | 'no_se';
+/** Campo que falta o está mal: se marca ahí mismo, además del mensaje junto al botón. */
+type CampoTarjeta = 'nombre' | 'ultimos4' | 'corte' | 'limitePago' | 'limiteCredito' | 'saldo' | 'msi';
+type Armado =
+  { ok: true; entrada: EntradaTarjeta } | { ok: false; campo: CampoTarjeta | null; mensaje: string };
+
+const falta = (campo: CampoTarjeta | null, mensaje: string): Armado => ({ ok: false, campo, mensaje });
 
 interface FilaMsi {
   clave: number;
@@ -77,62 +89,84 @@ export function useFormularioTarjeta({
   const [filas, setFilas] = useState<FilaMsi[]>([{ clave: 0, mensualidad: null, restantes: '' }]);
   const [incluye, setIncluye] = useState<Incluye | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [campoError, setCampoError] = useState<CampoTarjeta | null>(null);
+  useAnunciarEnIos(error);
 
-  const cambiarFila = (clave: number, cambio: Partial<FilaMsi>) =>
+  /** Al corregir el campo marcado, se quitan la marca y el mensaje. */
+  const corregido = (campo: CampoTarjeta) => {
+    if (campoError !== campo) return;
+    setCampoError(null);
+    setError(null);
+  };
+  const errorDe = (campo: CampoTarjeta) => (campoError === campo ? MARCA_CAMPO_CON_ERROR : null);
+
+  const cambiarFila = (clave: number, cambio: Partial<FilaMsi>) => {
+    corregido('msi');
     setFilas((fs) => fs.map((f) => (f.clave === clave ? { ...f, ...cambio } : f)));
+  };
 
-  /** Arma la entrada o dice qué falta (`02 §14`: qué pasó + qué hacer). */
-  const armar = (): EntradaTarjeta | string => {
-    if (nombre.trim() === '') return 'Escribe el nombre de la tarjeta.';
+  /** Arma la entrada o dice qué falta y dónde (`02 §14`: qué pasó + qué hacer). */
+  const armar = (): Armado => {
+    if (nombre.trim() === '') return falta('nombre', 'Escribe el nombre de la tarjeta.');
     if (ultimos4 !== '' && !/^\d{4}$/.test(ultimos4))
-      return 'Los últimos 4 son cuatro números, o déjalo vacío.';
+      return falta('ultimos4', 'Los últimos 4 son cuatro números, o déjalo vacío.');
     const diaCorte = leerDiaMes(corte);
-    if (diaCorte === null) return 'Escribe el día de corte, del 1 al 31.';
+    if (diaCorte === null) return falta('corte', 'Escribe el día de corte, del 1 al 31.');
     const limite = modoLimite === 'dia' ? leerDiaMes(limitePago) : leerEntero(limitePago, 1, 60);
     if (limite === null) {
-      return modoLimite === 'dia'
-        ? 'Escribe el día límite de pago, del 1 al 31.'
-        : 'Escribe cuántos días tienes para pagar después del corte.';
+      return falta(
+        'limitePago',
+        modoLimite === 'dia'
+          ? 'Escribe el día límite de pago, del 1 al 31.'
+          : 'Escribe cuántos días tienes para pagar después del corte.',
+      );
     }
-    if (limiteCredito === null || limiteCredito <= 0) return 'Escribe tu límite de crédito.';
-    if (completa === null) return 'Dime si la pagas completa cada mes.';
-    if (saldo === null) return 'Escribe cuánto debes hoy. Si no lo tienes a la mano, agrégala después.';
+    if (limiteCredito === null || limiteCredito <= 0)
+      return falta('limiteCredito', 'Escribe tu límite de crédito.');
+    if (completa === null) return falta(null, 'Dime si la pagas completa cada mes.');
+    if (saldo === null)
+      return falta('saldo', 'Escribe cuánto debes hoy. Si no lo tienes a la mano, agrégala después.');
     const msiPrevios: { mensualidad: number; restantes: number }[] = [];
     if (conMeses === 'si') {
       for (const f of filas) {
         const restantes = leerEntero(f.restantes, 1, 48);
         if (f.mensualidad === null || f.mensualidad <= 0 || restantes === null) {
-          return 'En cada compra a meses escribe la mensualidad y cuántas te faltan (1 a 48).';
+          return falta('msi', 'En cada compra a meses escribe la mensualidad y cuántas te faltan (1 a 48).');
         }
         msiPrevios.push({ mensualidad: f.mensualidad, restantes });
       }
-      if (incluye === null) return 'Dime si el saldo que me diste ya incluye esos meses.';
+      if (incluye === null) return falta(null, 'Dime si el saldo que me diste ya incluye esos meses.');
     }
     return {
-      nombre: nombre.trim(),
-      ...(ultimos4 !== '' ? { ultimos4 } : {}),
-      // Lo dictado también sirve para reconocerla la próxima vez ("mi nu…").
-      ...(prellenado?.alias ? { alias: [prellenado.alias] } : {}),
-      diaCorte,
-      ...(modoLimite === 'dia' ? { diaLimitePago: limite } : { diasParaPagar: limite }),
-      limiteCredito,
-      modo: completa === 'si' ? 'totalero' : 'plan',
-      saldo,
-      msiPrevios,
-      ...(msiPrevios.length > 0 && incluye !== null ? { saldoIncluyeMsi: incluye } : {}),
+      ok: true,
+      entrada: {
+        nombre: nombre.trim(),
+        ...(ultimos4 !== '' ? { ultimos4 } : {}),
+        // Lo dictado también sirve para reconocerla la próxima vez ("mi nu…").
+        ...(prellenado?.alias ? { alias: [prellenado.alias] } : {}),
+        diaCorte,
+        ...(modoLimite === 'dia' ? { diaLimitePago: limite } : { diasParaPagar: limite }),
+        limiteCredito,
+        modo: completa === 'si' ? 'totalero' : 'plan',
+        saldo,
+        msiPrevios,
+        ...(msiPrevios.length > 0 && incluye !== null ? { saldoIncluyeMsi: incluye } : {}),
+      },
     };
   };
 
   const guardar = () => {
-    const entrada = armar();
-    if (typeof entrada === 'string') {
-      setError(entrada);
+    const armado = armar();
+    if (!armado.ok) {
+      setCampoError(armado.campo);
+      setError(armado.mensaje);
       return;
     }
     let creada: TarjetaCreada;
     try {
-      creada = agregarTarjetaCredito(ctx, entrada);
+      creada = agregarTarjetaCredito(ctx, armado.entrada);
     } catch {
+      setCampoError(null);
       setError('No pude guardar la tarjeta. Revisa el día de corte y el día límite.');
       return;
     }
@@ -147,7 +181,11 @@ export function useFormularioTarjeta({
         etiqueta="Nombre"
         ejemplo="Nu, Oro, Costco"
         valor={nombre}
-        alCambiar={setNombre}
+        alCambiar={(t) => {
+          corregido('nombre');
+          setNombre(t);
+        }}
+        error={errorDe('nombre')}
       />
       <CampoTexto
         testID="tarjeta-ultimos4"
@@ -155,7 +193,11 @@ export function useFormularioTarjeta({
         ejemplo="8812"
         teclado="number-pad"
         valor={ultimos4}
-        alCambiar={setUltimos4}
+        alCambiar={(t) => {
+          corregido('ultimos4');
+          setUltimos4(t);
+        }}
+        error={errorDe('ultimos4')}
         nativo={{ maxLength: 4 }}
       />
       <CampoTexto
@@ -164,7 +206,11 @@ export function useFormularioTarjeta({
         ejemplo="28"
         teclado="number-pad"
         valor={corte}
-        alCambiar={setCorte}
+        alCambiar={(t) => {
+          corregido('corte');
+          setCorte(t);
+        }}
+        error={errorDe('corte')}
       />
       <Chips
         testID="tarjeta-modo-limite"
@@ -179,25 +225,40 @@ export function useFormularioTarjeta({
         ejemplo={modoLimite === 'dia' ? '18' : '20'}
         teclado="number-pad"
         valor={limitePago}
-        alCambiar={setLimitePago}
+        alCambiar={(t) => {
+          corregido('limitePago');
+          setLimitePago(t);
+        }}
+        error={errorDe('limitePago')}
       />
       <CampoMonto
         testID="tarjeta-limite-credito"
         etiqueta="¿Hasta cuánto te presta esta tarjeta?"
-        alCambiar={setLimiteCredito}
+        alCambiar={(m) => {
+          corregido('limiteCredito');
+          setLimiteCredito(m);
+        }}
+        error={errorDe('limiteCredito')}
       />
       <Chips
         testID="tarjeta-completa"
         etiqueta="¿La pagas completa cada mes?"
         opciones={OPCIONES_SI_NO}
         valor={completa}
-        alCambiar={setCompleta}
+        alCambiar={(v) => {
+          if (campoError === null) setError(null);
+          setCompleta(v);
+        }}
       />
       <CampoMonto
         testID="tarjeta-saldo"
         etiqueta="¿Cuánto debes hoy en esta tarjeta?"
         ayuda="Es el saldo actual de la app de tu banco, no el pago mínimo."
-        alCambiar={setSaldo}
+        alCambiar={(m) => {
+          corregido('saldo');
+          setSaldo(m);
+        }}
+        error={errorDe('saldo')}
       />
       <Chips
         testID="tarjeta-msi"
@@ -219,6 +280,7 @@ export function useFormularioTarjeta({
                   testID={`tarjeta-msi-mensualidad-${i}`}
                   etiqueta="Mensualidad"
                   alCambiar={(m) => cambiarFila(f.clave, { mensualidad: m })}
+                  error={f.mensualidad === null || f.mensualidad <= 0 ? errorDe('msi') : null}
                 />
                 <CampoTexto
                   testID={`tarjeta-msi-restantes-${i}`}
@@ -227,6 +289,7 @@ export function useFormularioTarjeta({
                   teclado="number-pad"
                   valor={f.restantes}
                   alCambiar={(t) => cambiarFila(f.clave, { restantes: t })}
+                  error={leerEntero(f.restantes, 1, 48) === null ? errorDe('msi') : null}
                 />
               </View>
               {filas.length > 1 ? (
@@ -256,7 +319,10 @@ export function useFormularioTarjeta({
             etiqueta="¿El saldo que me diste ya incluye lo que te falta de esos meses?"
             opciones={OPCIONES_INCLUYE}
             valor={incluye}
-            alCambiar={setIncluye}
+            alCambiar={(v) => {
+              if (campoError === null) setError(null);
+              setIncluye(v);
+            }}
           />
           {incluye === 'no_se' ? (
             <Texto

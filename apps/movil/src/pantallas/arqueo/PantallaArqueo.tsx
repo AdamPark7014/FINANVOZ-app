@@ -26,17 +26,21 @@ import {
   Texto,
   useTema,
 } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { mensajeError } from '../principal/textos';
 import {
   ACCESIBILIDAD_CERRAR,
   ACCESIBILIDAD_LISTO,
+  CAMBIAR,
   CERRAR,
   CONFIRMAR,
   CONTINUAR,
   ETIQUETA_TARJETA_CONTEO_LISTO,
   PISTA_CALCULAR,
+  PISTA_CAMBIAR_CANTIDAD,
+  PISTA_CAMBIAR_MARCADOS,
   PISTA_CASILLA_GASTO,
   PISTA_CERRAR,
   PISTA_CONFIRMAR,
@@ -65,6 +69,8 @@ import {
   TITULO,
   textoDeberiasTraer,
   textoFaltante,
+  textoResumenMarcados,
+  textoResumenTraes,
   textoSobrante,
   TOTAL,
 } from './textos';
@@ -149,7 +155,8 @@ export function PantallaArqueo({
     }
   });
   return (
-    <Pantalla testID="pantalla-arqueo">
+    // Pantalla sin pestañas debajo: el pie necesita el área segura (barra de inicio del iPhone).
+    <Pantalla testID="pantalla-arqueo" bordes={['top', 'left', 'right', 'bottom']}>
       <View
         style={{
           flexDirection: 'row',
@@ -203,16 +210,23 @@ function Arqueo({
   const [inicial] = useState(vista);
   const [paso, setPaso] = useState<Paso>(inicial.porAsignar.length > 0 ? 'marcar' : 'cantidad');
   const [marcados, setMarcados] = useState<readonly string[]>([]);
-  const [otra, setOtra] = useState(efectivoInicial !== undefined);
+  // El chip solo elige; se calcula o se guarda con el botón de abajo ("nada se guarda hasta Confirmar").
+  const [eleccion, setEleccion] = useState<'exacto' | 'otra' | null>(
+    efectivoInicial !== undefined ? 'otra' : null,
+  );
   const [real, setReal] = useState<Centavos | null>(efectivoInicial ?? null);
   const [calculo, setCalculo] = useState<CalculoArqueo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hecho, setHecho] = useState<string | null>(null);
+  useAnunciarEnIos(error ?? hecho);
 
   const esperado =
     inicial.saldo -
     inicial.porAsignar.filter((g) => marcados.includes(g.transaccionId)).reduce((s, g) => s + g.monto, 0);
   const preguntaCantidad = textoDeberiasTraer(esperado);
+  const montoElegido = eleccion === 'exacto' ? esperado : eleccion === 'otra' ? real : null;
+  // Si lo que traes es lo esperado, el botón ya guarda: dice "Confirmar"; si no, "Continuar" lleva al resultado.
+  const cuadra = montoElegido !== null && montoElegido === esperado;
 
   const entrada = (efectivoReal: Centavos) => ({
     cuentaId: inicial.cuentaId,
@@ -313,6 +327,17 @@ function Arqueo({
 
       {paso === 'cantidad' ? (
         <View style={{ gap: espacio.s }} testID="arqueo-paso-cantidad">
+          {inicial.porAsignar.length > 0 ? (
+            <ResumenPaso
+              texto={textoResumenMarcados(marcados.length)}
+              pista={PISTA_CAMBIAR_MARCADOS}
+              alCambiar={() => {
+                setError(null);
+                setPaso('marcar');
+              }}
+              testID="arqueo-cambiar-marcar"
+            />
+          ) : null}
           <Texto variante="subtitulo" testID="arqueo-esperado" {...OCULTAR_ETIQUETA_VISIBLE}>
             {preguntaCantidad}
           </Texto>
@@ -325,31 +350,47 @@ function Arqueo({
               },
               { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
             ]}
-            valor={otra ? 'otra' : null}
-            alCambiar={(v) => (v === 'exacto' ? calcular(esperado) : setOtra(true))}
+            valor={eleccion}
+            alCambiar={(v) => {
+              setError(null);
+              setEleccion(v);
+            }}
             prefijoTestID="arqueo"
             etiqueta={preguntaCantidad}
           />
-          {otra ? (
-            <>
-              <CampoMonto
-                etiqueta={ETIQUETA_MONTO_TRAES}
-                ayuda={PISTA_MONTO_TRAES}
-                valorInicial={real}
-                alCambiar={setReal}
-                autoFocus={efectivoInicial === undefined}
-                testID="arqueo-monto"
-              />
-              <Boton
-                etiqueta={CONTINUAR}
-                pista={PISTA_CALCULAR}
-                deshabilitado={real === null}
-                alPresionar={() => real !== null && calcular(real)}
-                testID="arqueo-calcular"
-              />
-            </>
+          {eleccion === 'otra' ? (
+            <CampoMonto
+              etiqueta={ETIQUETA_MONTO_TRAES}
+              ayuda={PISTA_MONTO_TRAES}
+              valorInicial={real}
+              alCambiar={setReal}
+              autoFocus={efectivoInicial === undefined}
+              testID="arqueo-monto"
+            />
+          ) : null}
+          {eleccion !== null ? (
+            <Boton
+              etiqueta={cuadra ? CONFIRMAR : CONTINUAR}
+              pista={cuadra ? PISTA_CONFIRMAR : PISTA_CALCULAR}
+              deshabilitado={montoElegido === null}
+              alPresionar={() => montoElegido !== null && calcular(montoElegido)}
+              testID="arqueo-calcular"
+            />
           ) : null}
         </View>
+      ) : null}
+
+      {paso === 'resultado' && calculo ? (
+        <ResumenPaso
+          texto={textoResumenTraes(calculo.efectivoReal)}
+          pista={PISTA_CAMBIAR_CANTIDAD}
+          alCambiar={() => {
+            setError(null);
+            setCalculo(null);
+            setPaso('cantidad');
+          }}
+          testID="arqueo-cambiar-cantidad"
+        />
       ) : null}
 
       {paso === 'resultado' && calculo ? (
@@ -455,7 +496,10 @@ function Faltante({
 
 type OpcionSobrante = RespuestaSobrante['tipo'];
 
-/** "Traes $15 más de lo esperado. ¿De dónde salió?" (E7-09): nunca se registra sin respuesta. */
+/**
+ * "Traes $15 más de lo esperado. ¿De dónde salió?" (E7-09): nunca se registra sin respuesta. Los chips solo
+ * eligen (con "Me pagaron…", también quién); se guarda con "Confirmar", como dice la pista de "Cerrar".
+ */
 function Sobrante({
   calculo,
   alResponder,
@@ -465,7 +509,16 @@ function Sobrante({
 }) {
   const teDeben = useVista((ctx) => listarCuentas(ctx).teDeben);
   const [opcion, setOpcion] = useState<OpcionSobrante | null>(null);
+  const [personaId, setPersonaId] = useState<string | null>(null);
   const preguntaSobrante = textoSobrante(-calculo.hueco);
+  const respuesta: RespuestaSobrante | null =
+    opcion === null
+      ? null
+      : opcion === 'me_pagaron'
+        ? personaId === null
+          ? null
+          : { tipo: 'me_pagaron', personaId }
+        : ({ tipo: opcion } as RespuestaSobrante);
   return (
     <View
       style={{ gap: espacio.s }}
@@ -487,8 +540,8 @@ function Sobrante({
         ]}
         valor={opcion}
         alCambiar={(o) => {
-          if (o === 'me_pagaron') setOpcion(o);
-          else alResponder({ tipo: o } as RespuestaSobrante);
+          setOpcion(o);
+          if (o !== 'me_pagaron') setPersonaId(null);
         }}
         prefijoTestID="arqueo-sobrante"
         etiqueta={preguntaSobrante}
@@ -496,12 +549,53 @@ function Sobrante({
       {opcion === 'me_pagaron' ? (
         <GrupoChips
           opciones={teDeben.map((p) => ({ valor: p.id, etiqueta: p.nombre }))}
-          valor={null}
-          alCambiar={(personaId) => alResponder({ tipo: 'me_pagaron', personaId })}
+          valor={personaId}
+          alCambiar={setPersonaId}
           prefijoTestID="arqueo-persona"
           etiqueta={ETIQUETA_QUIEN_TE_PAGO}
         />
       ) : null}
+      {opcion !== null ? (
+        <Boton
+          etiqueta={CONFIRMAR}
+          pista={PISTA_CONFIRMAR}
+          deshabilitado={respuesta === null}
+          alPresionar={() => respuesta && alResponder(respuesta)}
+          testID="arqueo-sobrante-confirmar"
+        />
+      ) : null}
+    </View>
+  );
+}
+
+/** Lo que ya contestaste en el paso anterior, con "Cambiar" para regresar sin perderlo. */
+function ResumenPaso({
+  texto,
+  pista,
+  alCambiar,
+  testID,
+}: {
+  texto: string;
+  pista: string;
+  alCambiar: () => void;
+  testID: string;
+}) {
+  return (
+    <View
+      style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: espacio.s }}
+    >
+      <Texto variante="secundario" tono="secundario" style={{ flex: 1 }} testID={`${testID}-texto`}>
+        {texto}
+      </Texto>
+      <Boton
+        etiqueta={CAMBIAR}
+        etiquetaAccesible={etiquetaHablada(`${CAMBIAR}: ${texto}`)}
+        pista={pista}
+        variante="texto"
+        ancho="contenido"
+        alPresionar={alCambiar}
+        testID={testID}
+      />
     </View>
   );
 }

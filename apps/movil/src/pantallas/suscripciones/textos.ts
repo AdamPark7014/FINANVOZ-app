@@ -95,6 +95,20 @@ export const PISTA_NO_ES = 'Dejo de tratarla como cargo recurrente';
 
 export type AccionSuscripcion = 'compromiso' | 'cancelada' | 'no_es';
 
+/** "Ya la cancelé" y "No es suscripción" no tienen Deshacer: se confirman en la fila. */
+export const BTN_SI_CANCELADA = 'Sí, ya la cancelé';
+export const BTN_SI_NO_ES = 'Sí, quitarla';
+export const BTN_NO_DEJALA = 'No, déjala';
+export const PISTA_NO_DEJALA = 'Cierra la pregunta sin cambiar nada';
+export function textoConfirmarCancelada(nombre: string, apartada: boolean): string {
+  return apartada
+    ? `¿Ya cancelaste ${nombre}? La quito de la lista y Hoy deja de apartarla. Si vuelve a cobrarse, reaparece aquí.`
+    : `¿Ya cancelaste ${nombre}? La quito de la lista. Si vuelve a cobrarse, reaparece aquí.`;
+}
+export function textoConfirmarNoEs(nombre: string): string {
+  return `¿${nombre} no es una suscripción? La quito de la lista y no vuelvo a mostrarla aunque se repita.`;
+}
+
 export function mensajeAccionSuscripcion(accion: AccionSuscripcion, nombre: string): string {
   switch (accion) {
     case 'compromiso':

@@ -297,7 +297,8 @@ describe('Registrar', () => {
     fireEvent.changeText(screen.getByTestId('tarjeta-saldo'), '1,200');
     fireEvent.press(screen.getByTestId('tarjeta-guardar'));
     expect(screen.queryByTestId('tarjeta-por-agregar')).toBeNull();
-    expect(screen.getByText('Listo: agregué tu tarjeta.')).toBeTruthy();
+    // El aviso puede seguir con "Tu día pasa de $X a $Y" (paquete B-1).
+    expect(screen.getByText(/^Listo: agregué tu tarjeta\./)).toBeTruthy();
     expect(listarTarjetas(p.ctx).find((t) => t.nombre === 'Oro')).toMatchObject({ saldoRevolvente: 120_000 });
   });
 });
@@ -534,7 +535,7 @@ describe('Tarjetas', () => {
     expect(screen.queryByText('¿Este pago fue para liquidar tus meses?')).toBeNull();
     expect(textoDe(`plan-${tele.planId}-estado`)).toBe('Ya lo terminaste de pagar');
     expect(screen.queryByTestId('compromiso-12-meses')).toBeNull();
-    expect(screen.getByText('Listo: liquidaste la tele ($6,000).')).toBeTruthy();
+    expect(screen.getByText(/^Listo: liquidaste la tele \(\$6,000\)\./)).toBeTruthy();
     expect(obtenerHoy(p.ctx).hoyPuedesCentavos).toBeLessThanOrEqual(antes);
   });
 
@@ -610,7 +611,10 @@ describe('Tarjetas', () => {
     if (!pago) throw new Error('sin pago planeado');
     expect(pago).toMatchObject({ monto: 50_000, regla: { tipo: 'quincenal_15_ultimo' } });
     expect(screen.getByText('Aparto solo los pagos que vencen antes de tu próximo ingreso.')).toBeTruthy();
+    // "Quitar" no tiene Deshacer: primero pregunta en la misma fila.
     fireEvent.press(screen.getByTestId(`pago-planeado-${pago.programadoId}-quitar`));
+    expect(listarPagosPlaneados(p.ctx, p.oro)).toHaveLength(1);
+    fireEvent.press(screen.getByTestId(`pago-planeado-${pago.programadoId}-confirmar-quitar`));
     expect(listarPagosPlaneados(p.ctx, p.oro)).toEqual([]);
   });
 
@@ -682,9 +686,10 @@ describe('Avisos', () => {
     fireEvent.press(screen.getByTestId('ajustes-aviso-limite'));
     await waitFor(() => expect(n.puerto.lista().some((a) => a.id === limite)).toBe(true));
 
-    // Hora dentro del silencio (22:00–08:00): sale al terminar el silencio.
-    fireEvent.changeText(screen.getByTestId('ajustes-aviso-hora'), '23:30');
-    fireEvent.press(screen.getByTestId('ajustes-guardar-horario'));
+    // Hora dentro del silencio (desde las 20:00 hasta las 08:00): sale al terminar el silencio. La hora y el
+    // horario se eligen con chips y se guardan al tocarlos (Ajustes, paquete B-2b).
+    fireEvent.press(screen.getByTestId('ajustes-silencio-inicio-20:00'));
+    fireEvent.press(screen.getByTestId('ajustes-aviso-hora-20:00'));
     await waitFor(() =>
       expect(n.puerto.lista().find((a) => a.id === limite)).toMatchObject({
         fecha: '2026-11-28',
@@ -692,21 +697,16 @@ describe('Avisos', () => {
       }),
     );
 
-    // Otro horario silencioso: todo sale a las 09:30.
-    fireEvent.changeText(screen.getByTestId('ajustes-aviso-hora'), '09:00');
-    fireEvent.changeText(screen.getByTestId('ajustes-silencio-inicio'), '21:00');
-    fireEvent.changeText(screen.getByTestId('ajustes-silencio-fin'), '9:30');
-    fireEvent.press(screen.getByTestId('ajustes-guardar-horario'));
-    await waitFor(() => expect(n.puerto.lista().every((a) => a.hora === '09:30')).toBe(true));
+    // Otro horario silencioso: todo sale a las 10:00.
+    fireEvent.press(screen.getByTestId('ajustes-aviso-hora-09:00'));
+    fireEvent.press(screen.getByTestId('ajustes-silencio-inicio-21:00'));
+    fireEvent.press(screen.getByTestId('ajustes-silencio-fin-10:00'));
+    await waitFor(() => expect(n.puerto.lista().every((a) => a.hora === '10:00')).toBe(true));
     expect(screen.getByText('Listo. Tus avisos ya usan este horario.')).toBeTruthy();
 
     // Apagar "Día de corte".
     fireEvent.press(screen.getByTestId('ajustes-aviso-corte'));
     await waitFor(() => expect(n.puerto.lista().some((a) => a.id.startsWith('tarjeta:corte:'))).toBe(false));
-
-    fireEvent.changeText(screen.getByTestId('ajustes-aviso-hora'), '25:00');
-    fireEvent.press(screen.getByTestId('ajustes-guardar-horario'));
-    expect(screen.getByText('Escribe las horas así: 22:00.')).toBeTruthy();
   });
 
   it('con una tarjeta y sin permiso, Hoy explica para qué son los avisos antes de pedirlo', async () => {

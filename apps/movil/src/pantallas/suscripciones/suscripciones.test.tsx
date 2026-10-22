@@ -1,5 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { listarCuentas, obtenerHoy, sincronizarPlan, type Contexto } from '../../servicios';
+import {
+  listarCuentas,
+  listarSuscripciones,
+  obtenerHoy,
+  sincronizarPlan,
+  type Contexto,
+} from '../../servicios';
 import { registrarGastosE14, type GastoVectorE14 } from '../../servicios/__pruebas__/suscripciones';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { conEscenario, vector } from '../principal/__pruebas__/base';
@@ -7,7 +13,10 @@ import { renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaSuscripciones } from './PantallaSuscripciones';
 import {
+  BTN_SI_CANCELADA,
   BTN_SUSCRIPCIONES_CUENTAS,
+  textoConfirmarCancelada,
+  textoConfirmarNoEs,
   mensajeAccionSuscripcion,
   mensajeNombreGuardado,
   PISTA_AYUDA,
@@ -154,17 +163,40 @@ describe('Suscripciones (02 §20)', () => {
     fireEvent.press(screen.getByTestId('suscripcion-netflix-compromiso'));
     const reservado = obtenerHoy(ctx).reservado;
     fireEvent.press(screen.getByTestId('suscripcion-netflix-cancelada'));
+    // Sin Deshacer: primero pregunta en la fila; Hoy deja de apartarla al confirmar.
+    const netflix = listarSuscripciones(ctx).activas.find((s) => s.comercio.toLowerCase() === 'netflix');
+    expect(textoDe('suscripcion-netflix-confirmacion-texto')).toBe(
+      textoConfirmarCancelada(netflix?.nombre ?? '', true),
+    );
+    expect(obtenerHoy(ctx).reservado).toBe(reservado);
+    fireEvent.press(screen.getByTestId('suscripcion-netflix-confirmar'));
     expect(screen.queryByTestId('suscripcion-netflix')).toBeNull();
     expect(obtenerHoy(ctx).reservado).toBeLessThan(reservado);
   });
 
-  it('Ya la cancelé y No es suscripción la quitan de la lista y del resumen', () => {
+  it('Ya la cancelé y No es suscripción preguntan antes y la quitan de la lista y del resumen', () => {
     const { ctx } = preparar();
     renderConSesion(ctx, <PantallaSuscripciones alVolver={jest.fn()} />);
+    // "No, déjala" cierra la pregunta sin cambiar nada.
     fireEvent.press(screen.getByTestId('suscripcion-smart-fit-cancelada'));
+    fireEvent.press(screen.getByTestId('suscripcion-smart-fit-no-confirmar'));
+    expect(screen.queryByTestId('suscripcion-smart-fit-confirmacion')).toBeNull();
+    expect(screen.getByTestId('suscripcion-smart-fit')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('suscripcion-smart-fit-cancelada'));
+    expect(screen.getByTestId('suscripcion-smart-fit-confirmar').props.accessibilityLabel).toBe(
+      BTN_SI_CANCELADA,
+    );
+    fireEvent.press(screen.getByTestId('suscripcion-smart-fit-confirmar'));
     expect(screen.queryByTestId('suscripcion-smart-fit')).toBeNull();
     expect(textoDe('suscripciones-mensaje')).toBe(mensajeAccionSuscripcion('cancelada', 'Smart Fit'));
     fireEvent.press(screen.getByTestId('suscripcion-dominio-web-no-es'));
+    const dominio = listarSuscripciones(ctx).activas.find((s) => s.comercio.toLowerCase() === 'dominio web');
+    expect(textoDe('suscripcion-dominio-web-confirmacion-texto')).toBe(
+      textoConfirmarNoEs(dominio?.nombre ?? ''),
+    );
+    expect(screen.getByTestId('suscripcion-dominio-web')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('suscripcion-dominio-web-confirmar'));
     expect(screen.queryByTestId('suscripcion-dominio-web')).toBeNull();
     expect(textoDe('suscripciones-resumen')).toBe(
       'Pagas unos $998 al mes en 3 suscripciones ($11,976 al año)',

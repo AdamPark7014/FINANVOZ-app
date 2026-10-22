@@ -8,7 +8,9 @@ import { codigoError, mensajeError } from '../principal/textos';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import {
   ETIQUETA_CANCELAR,
+  PISTA_CANCELAR_APORTACION,
   PISTA_CANCELAR_COBRO,
+  TEXTO_SIN_CUENTAS_TANDA,
   mensajeAportacion,
   mensajeCobro,
   PREGUNTA_CUENTA_LLEGO,
@@ -26,6 +28,14 @@ export function ElegirCuentaTanda({
   prefijoTestID: string;
 }) {
   const cuentas = useVista((ctx) => listarCuentas(ctx).tienes.filter((c) => c.subtipo !== 'ahorro'));
+  if (cuentas.length === 0) {
+    // Sin cuentas no hay chips que tocar: se dice qué hacer en vez de dejar la pregunta sola.
+    return (
+      <Texto variante="secundario" tono="secundario" testID={`${prefijoTestID}-sin-cuentas`}>
+        {TEXTO_SIN_CUENTAS_TANDA}
+      </Texto>
+    );
+  }
   return (
     <View style={{ gap: espacio.xs }}>
       <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
@@ -66,8 +76,19 @@ export function useYaLaDi(tandaId: string, fecha: string | null, testID: string)
       else setError(mensajeError(e));
     }
   };
+  // "¿De dónde salió?" con su "Cancelar": antes solo se salía eligiendo una cuenta.
   const elegir = eligiendo ? (
-    <ElegirCuentaTanda pregunta={PREGUNTA_CUENTA_SALIO} alElegir={dar} prefijoTestID={`${testID}-cuenta`} />
+    <View style={{ gap: espacio.s }}>
+      <ElegirCuentaTanda pregunta={PREGUNTA_CUENTA_SALIO} alElegir={dar} prefijoTestID={`${testID}-cuenta`} />
+      <Boton
+        testID={`${testID}-cuenta-cancelar`}
+        etiqueta={ETIQUETA_CANCELAR}
+        variante="texto"
+        ancho="contenido"
+        alPresionar={() => setEligiendo(false)}
+        pista={PISTA_CANCELAR_APORTACION}
+      />
+    </View>
   ) : null;
   return { dar, elegir, error };
 }

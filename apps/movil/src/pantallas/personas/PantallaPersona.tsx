@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, Share, Text, View } from 'react-native';
+import { Linking, Pressable, Share, Text, View } from 'react-native';
 import type { Centavos } from '@cartera/core';
 import {
   detallePersona,
@@ -29,6 +29,7 @@ import {
   tipo,
   useTema,
 } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
@@ -37,7 +38,9 @@ import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
 import {
   AYUDA_PEDIR_DATOS_COBRO,
+  BTN_ABRIR_AJUSTES,
   ERROR_MONTO_MAYOR_CERO,
+  PISTA_ABRIR_AJUSTES_AVISOS,
   ETIQUETA_A_DONDE_LLEGO,
   ETIQUETA_COBRAR,
   PISTA_COBRAR,
@@ -417,19 +420,31 @@ function Recordatorio({
   const notificaciones = useNotificaciones();
   const opciones = useVista(opcionesRecordatorioCobro);
   const [mensaje, setMensaje] = useState<string | null>(null);
+  // Avisos negados: además del mensaje, "Abrir Ajustes" (iOS no vuelve a mostrar el diálogo).
+  const [sinPermiso, setSinPermiso] = useState(false);
+  useAnunciarEnIos(mensaje);
 
   const sincronizar = async () => {
     if (notificaciones) await sincronizarRecordatoriosCobro(ctx, notificaciones.puerto, horaDispositivo());
   };
 
+  const abrirAjustes = () => {
+    if (notificaciones?.abrirAjustesSistema) notificaciones.abrirAjustesSistema();
+    else Linking.openSettings().catch(() => {});
+  };
+
   const fijar = async (nueva: string | null) => {
     setMensaje(null);
+    setSinPermiso(false);
     try {
       if (nueva !== null) {
         if (!notificaciones) return setMensaje(MENSAJE_SIN_AVISOS);
         let permiso = await notificaciones.permiso();
         if (permiso === 'sin_preguntar') permiso = await notificaciones.pedirPermiso();
-        if (permiso !== 'concedido') return setMensaje(MENSAJE_PERMISO_AVISOS);
+        if (permiso !== 'concedido') {
+          setSinPermiso(true);
+          return setMensaje(MENSAJE_PERMISO_AVISOS);
+        }
       }
       fijarRecordatorioCobro(ctx, personaId, nueva);
       await sincronizar();
@@ -484,6 +499,15 @@ function Recordatorio({
         >
           {mensaje}
         </Texto>
+      ) : null}
+      {sinPermiso ? (
+        <Boton
+          etiqueta={BTN_ABRIR_AJUSTES}
+          variante="secundario"
+          alPresionar={abrirAjustes}
+          pista={PISTA_ABRIR_AJUSTES_AVISOS}
+          testID="persona-recordatorio-ajustes"
+        />
       ) : null}
     </Tarjeta>
   );

@@ -69,33 +69,27 @@ export function PantallaTandas({
             />
           ) : null}
           <View accessibilityRole="list" testID="tandas-lista" style={{ gap: espacio.s }}>
+            {/* Toda la tarjeta abre el detalle (antes solo "Ver calendario", abajo y pequeño). */}
             {tandas.map((t) => (
-              <Tarjeta key={t.id} testID={`tanda-${t.id}`}>
-                <View
-                  accessible
-                  accessibilityLabel={etiquetaAccesibleTandaEnLista(t)}
-                  style={{ gap: espacio.xxs }}
-                >
-                  <Texto variante="cuerpoFuerte" importantForAccessibility="no">
-                    {t.nombre}
-                  </Texto>
-                  <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
+              <Tarjeta
+                key={t.id}
+                testID={`tanda-${t.id}`}
+                alPresionar={() => alAbrirTanda(t.id)}
+                etiquetaAccesible={etiquetaAccesibleTandaEnLista(t)}
+                pista={PISTA_VER_CALENDARIO}
+              >
+                <View style={{ gap: espacio.xxs }}>
+                  <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
+                  <Texto variante="secundario" tono="secundario">
                     {t.proxima
                       ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
                       : textoSubtituloListaSinProxima(t.etiquetaCobro)}
                   </Texto>
-                  <Texto variante="secundario" importantForAccessibility="no">
-                    {textoEnRiesgo(t.enRiesgo)}
-                  </Texto>
+                  <Texto variante="secundario">{textoEnRiesgo(t.enRiesgo)}</Texto>
                 </View>
-                <Boton
-                  testID={`tanda-${t.id}-abrir`}
-                  etiqueta={ETIQUETA_VER_CALENDARIO}
-                  variante="texto"
-                  ancho="contenido"
-                  alPresionar={() => alAbrirTanda(t.id)}
-                  pista={PISTA_VER_CALENDARIO}
-                />
+                <Texto variante="etiqueta" tono="acento" testID={`tanda-${t.id}-abrir`}>
+                  {`${ETIQUETA_VER_CALENDARIO} ›`}
+                </Texto>
               </Tarjeta>
             ))}
           </View>

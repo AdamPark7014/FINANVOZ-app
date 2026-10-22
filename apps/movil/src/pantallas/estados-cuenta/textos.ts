@@ -79,6 +79,19 @@ export const MENSAJE_INVALIDO = 'No pude abrir ese archivo. Comparte el PDF que 
 export const MENSAJE_DEMASIADO_GRANDE =
   'Ese PDF es demasiado grande para leerlo en el teléfono. Comparte solo el estado de cuenta del mes.';
 export const MENSAJE_NO_DISPONIBLE = 'Por ahora solo puedo leer estados de cuenta en Android.';
+/**
+ * En iPhone (sin lector de PDF todavía, `07 §8`) no se habla de Android: qué pasa y qué hacer. Antes la ruta se
+ * quedaba en «Leyendo…» o abría el selector para nada.
+ */
+export const MENSAJE_NO_DISPONIBLE_IOS =
+  'En iPhone todavía no puedo leer el PDF de tu estado de cuenta. Si tu banco dice otro saldo, corrígelo en el detalle de tu tarjeta.';
+export const BTN_VOLVER = 'Volver';
+export const PISTA_VOLVER_PDF = 'Regresa a donde estabas sin leer el PDF';
+/** Hoja de compartir mientras se resuelve lo compartido. */
+export const MENSAJE_LEYENDO_COMPARTIDO = 'Leyendo lo que compartiste…';
+/** `finanvoz://expo-sharing` en iPhone: la hoja de compartir solo está configurada en Android. */
+export const MENSAJE_COMPARTIR_NO_DISPONIBLE_IOS =
+  'En iPhone todavía no puedo recibir estados de cuenta ni facturas desde otras apps.';
 export const MENSAJE_ERROR_GUARDAR = 'No pude guardar los movimientos. Intenta de nuevo.';
 
 export const ETIQUETA_MOVIMIENTO_DESCONOCIDO = 'un movimiento';

@@ -6,6 +6,16 @@
 
 ## Hecho en este turno
 
+- **Tarjetas, tandas, compartido, arqueo, captura y estados de cuenta en iPhone (B-3)**: compra a meses sin tarjeta
+  ofrece «Agregar tarjeta» (vuelve con la nueva elegida), errores del formulario de tarjeta junto al campo y al botón,
+  «Registrar pago»/«Guardar saldo»/«Cancelar» en cada panel, confirmación en fila antes de quitar/anular, arqueo con
+  «Cambiar» por paso y «Confirmar» (los chips solo eligen), compartido con `canGoBack`, «Abrir Ajustes» sin cámara y
+  sin nube no ofrece crear/escanear, tandas con tarjeta tocable y chips de primera fecha, personas se desmarcan,
+  captura y PDF con textos de iPhone (`PdfNoDisponible`), `avisos/anunciar.ts` = `useAnunciarEnIos` sobre `ui/`.
+  Pruebas de tandas/tarjetas aceptan la segunda línea del aviso; CA-M4-04 adaptada a los chips de hora de B-2b.
+  typecheck limpio, jest 24 suites 222/222 (compartido falla por tiempo solo bajo carga). Decisiones para ESTADO:
+  cuenta dividida no repite persona por chip (solo dictado «×2»); «Volver» siempre sale en compartido; `TarjetaArqueo`
+  de Hoy sigue guardando con un toque (`02 §7`) y `confirmarArqueo` no tiene Deshacer.
 - **Intérprete de montos y lectores por paso (V-A)**: A0 («treinta y un mil»), A1 («8 mil 500»), A2 («85 pesos con 50
   centavos»), D1 (coma en el ciclo de tarjeta); `interpretarMonto` (`reglas/monto-dictado.ts`) exportado de
   `@cartera/nlu`; `packages/nlu/src/pasos/` (`interpretarPaso`: ingreso, efectivo, cuentas, tarjeta, pagos fijos,

@@ -11,12 +11,14 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, EstadoVacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
 import {
   AVISO_REVINCULAR_LISTA,
   AYUDA_NOMBRE_PAREJA,
+  BTN_CANCELAR,
   BTN_CREAR_CODIGO,
   BTN_CREAR_CON_ALGUIEN,
   BTN_ESCANEAR_CODIGO,
@@ -32,9 +34,10 @@ import {
   PISTA_ESCANEAR_CODIGO,
   PISTA_ESCRIBIR_NOMBRE_PAREJA,
   PISTA_ABRIR_GRUPO,
+  PISTA_CANCELAR_CREAR,
+  PISTA_CANCELAR_UNIRSE,
   PISTA_LISTO_TRAS_QR,
   PISTA_VOLVER_CUENTAS,
-  PISTA_VOLVER_LISTA,
   etiquetaVacioCompartidos,
   TEXTO_COMPARTIDOS_VACIO,
   TITULO_GASTOS_COMPARTIDOS,
@@ -64,6 +67,10 @@ export function PantallaCompartidos({
   const [nombre, setNombre] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  // Sin cliente de nube (build sin Supabase) crear y unirse fallarían después de pedir nombre o cámara: se dice
+  // desde el principio y no se ofrecen.
+  const sinServicio = deps.cliente === null;
+  useAnunciarEnIos(error);
 
   useEffect(() => {
     let vivo = true;
@@ -79,6 +86,12 @@ export function PantallaCompartidos({
     setModo({ tipo: 'lista' });
     setNombre('');
     setError(null);
+  };
+
+  /** Al abrir un grupo la lista queda limpia: si regresas, ves tus grupos y no el paso anterior. */
+  const abrirGrupo = (grupoId: string) => {
+    volverALista();
+    alAbrirGrupo(grupoId);
   };
 
   const crear = async () => {
@@ -107,7 +120,7 @@ export function PantallaCompartidos({
     try {
       const r = await unirseConQr(ctx, deps, texto, nombre);
       refrescar();
-      if (r.ok) alAbrirGrupo(r.grupoId);
+      if (r.ok) abrirGrupo(r.grupoId);
       else {
         setError(mensajeErrorCompartido(r.error));
         setModo({ tipo: 'unirse', escaneando: false });
@@ -122,13 +135,14 @@ export function PantallaCompartidos({
 
   return (
     <Pantalla testID="pantalla-compartidos" bordes={['top', 'left', 'right', 'bottom']}>
+      {/* "Volver" siempre sale de la pantalla (como el gesto de iPhone); cada paso se cierra con su "Cancelar". */}
       <Boton
         testID="compartidos-volver"
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"
         ancho="contenido"
-        pista={modo.tipo === 'lista' ? PISTA_VOLVER_CUENTAS : PISTA_VOLVER_LISTA}
-        alPresionar={modo.tipo === 'lista' ? alVolver : volverALista}
+        pista={PISTA_VOLVER_CUENTAS}
+        alPresionar={alVolver}
       />
       <Texto variante="titulo" testID="compartidos-titulo" accessibilityRole="header">
         {TITULO_GASTOS_COMPARTIDOS}
@@ -136,7 +150,16 @@ export function PantallaCompartidos({
 
       {modo.tipo === 'lista' ? (
         <>
-          {grupos.length === 0 ? (
+          {sinServicio ? (
+            <Texto
+              variante="cuerpo"
+              testID="compartidos-sin-servicio"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+            >
+              {mensajeErrorCompartido('sin_servicio')}
+            </Texto>
+          ) : grupos.length === 0 ? (
             <EstadoVacio
               texto={TEXTO_COMPARTIDOS_VACIO}
               testID="compartidos-vacio"
@@ -147,7 +170,7 @@ export function PantallaCompartidos({
             <Tarjeta
               key={g.id}
               testID={`compartido-${g.id}`}
-              alPresionar={() => alAbrirGrupo(g.id)}
+              alPresionar={() => abrirGrupo(g.id)}
               etiquetaAccesible={etiquetaHablada(`${g.nombre}. ${g.avisoCierre ?? g.saldo.texto}`)}
               pista={PISTA_ABRIR_GRUPO}
             >
@@ -167,19 +190,23 @@ export function PantallaCompartidos({
               ) : null}
             </Tarjeta>
           ))}
-          <Boton
-            testID="compartidos-crear"
-            etiqueta={BTN_CREAR_CON_ALGUIEN}
-            pista={PISTA_CREAR_CON_ALGUIEN}
-            alPresionar={() => setModo({ tipo: 'crear' })}
-          />
-          <Boton
-            testID="compartidos-escanear"
-            etiqueta={BTN_ESCANEAR_CODIGO}
-            variante="secundario"
-            pista={PISTA_ESCANEAR_CODIGO}
-            alPresionar={() => setModo({ tipo: 'unirse', escaneando: false })}
-          />
+          {sinServicio ? null : (
+            <>
+              <Boton
+                testID="compartidos-crear"
+                etiqueta={BTN_CREAR_CON_ALGUIEN}
+                pista={PISTA_CREAR_CON_ALGUIEN}
+                alPresionar={() => setModo({ tipo: 'crear' })}
+              />
+              <Boton
+                testID="compartidos-escanear"
+                etiqueta={BTN_ESCANEAR_CODIGO}
+                variante="secundario"
+                pista={PISTA_ESCANEAR_CODIGO}
+                alPresionar={() => setModo({ tipo: 'unirse', escaneando: false })}
+              />
+            </>
+          )}
         </>
       ) : null}
 
@@ -200,6 +227,13 @@ export function PantallaCompartidos({
             cargando={ocupado}
             alPresionar={() => void crear()}
           />
+          <Boton
+            testID="compartidos-cancelar"
+            etiqueta={BTN_CANCELAR}
+            variante="texto"
+            pista={PISTA_CANCELAR_CREAR}
+            alPresionar={volverALista}
+          />
         </>
       ) : null}
 
@@ -213,7 +247,7 @@ export function PantallaCompartidos({
             testID="compartidos-listo"
             etiqueta={BTN_LISTO}
             pista={PISTA_LISTO_TRAS_QR}
-            alPresionar={() => alAbrirGrupo(modo.grupoId)}
+            alPresionar={() => abrirGrupo(modo.grupoId)}
           />
         </>
       ) : null}
@@ -243,6 +277,13 @@ export function PantallaCompartidos({
                   setModo({ tipo: 'unirse', escaneando: true });
                 }
               }}
+            />
+            <Boton
+              testID="compartidos-cancelar"
+              etiqueta={BTN_CANCELAR}
+              variante="texto"
+              pista={PISTA_CANCELAR_UNIRSE}
+              alPresionar={volverALista}
             />
           </>
         )

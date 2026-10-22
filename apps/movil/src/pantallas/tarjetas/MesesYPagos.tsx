@@ -25,6 +25,7 @@ import {
   Tarjeta,
   Texto,
 } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chips } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
@@ -47,6 +48,9 @@ import {
   BTN_CANCELAR,
   BTN_GUARDAR_PAGO_PLANEADO,
   BTN_QUITAR_PAGO_PLANEADO,
+  BTN_SI_QUITAR_PAGO_PLANEADO,
+  MENSAJE_PAGO_PLANEADO_QUITADO,
+  TEXTO_CONFIRMAR_QUITAR_PAGO_PLANEADO,
   BTN_LIQUIDAR_MESES,
   BTN_SI_LIQUIDAR,
   ERROR_DIA_PAGO_PLANEADO,
@@ -74,6 +78,9 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
   const [error, setError] = useState<string | null>(null);
   const activo = p.estado === 'activo' && p.restante > 0;
   const cuota = formatearCentavos(p.cuota);
+  useAnunciarEnIos(
+    activo && confirmando ? textoConfirmarLiquidar(p.descripcion, formatearCentavos(p.restante)) : error,
+  );
   return (
     <Tarjeta testID={`plan-${p.id}`}>
       <View
@@ -367,9 +374,12 @@ function descripcionRegla(r: Regla): string {
   }
 }
 
+/** Un pago planeado con "Quitar" y su confirmación en línea: quitarlo no tiene Deshacer. */
 function FilaPagoPlaneado({ p }: { p: PagoPlaneadoVista }) {
   const { ctx, refrescar } = useSesion();
   const mostrar = useMostrarAviso();
+  const [confirmando, setConfirmando] = useState(false);
+  useAnunciarEnIos(confirmando ? TEXTO_CONFIRMAR_QUITAR_PAGO_PLANEADO : null);
   const proxima = p.proximas[0];
   return (
     <Tarjeta testID={`pago-planeado-${p.programadoId}`}>
@@ -384,21 +394,42 @@ function FilaPagoPlaneado({ p }: { p: PagoPlaneadoVista }) {
           {`El próximo es el ${etiquetaDiaMes(proxima)}`}
         </Texto>
       ) : null}
-      <Boton
-        etiqueta={BTN_QUITAR_PAGO_PLANEADO}
-        variante="texto"
-        ancho="contenido"
-        testID={`pago-planeado-${p.programadoId}-quitar`}
-        alPresionar={() => {
-          try {
-            quitarPagoPlaneado(ctx, p.programadoId);
-            refrescar();
-            mostrar({ mensaje: 'Quité ese pago. Ahora aparto lo que debes completo.' });
-          } catch (e) {
-            mostrar({ mensaje: mensajeError(e) });
-          }
-        }}
-      />
+      {confirmando ? (
+        <View style={{ gap: espacio.s }} testID={`pago-planeado-${p.programadoId}-confirmacion`}>
+          <Texto variante="cuerpo" accessibilityLiveRegion="polite">
+            {TEXTO_CONFIRMAR_QUITAR_PAGO_PLANEADO}
+          </Texto>
+          <Boton
+            etiqueta={BTN_SI_QUITAR_PAGO_PLANEADO}
+            variante="secundario"
+            testID={`pago-planeado-${p.programadoId}-confirmar-quitar`}
+            alPresionar={() => {
+              try {
+                quitarPagoPlaneado(ctx, p.programadoId);
+                refrescar();
+                mostrar({ mensaje: MENSAJE_PAGO_PLANEADO_QUITADO });
+              } catch (e) {
+                setConfirmando(false);
+                mostrar({ mensaje: mensajeError(e) });
+              }
+            }}
+          />
+          <Boton
+            etiqueta={BTN_CANCELAR}
+            variante="texto"
+            testID={`pago-planeado-${p.programadoId}-cancelar-quitar`}
+            alPresionar={() => setConfirmando(false)}
+          />
+        </View>
+      ) : (
+        <Boton
+          etiqueta={BTN_QUITAR_PAGO_PLANEADO}
+          variante="texto"
+          ancho="contenido"
+          testID={`pago-planeado-${p.programadoId}-quitar`}
+          alPresionar={() => setConfirmando(true)}
+        />
+      )}
     </Tarjeta>
   );
 }

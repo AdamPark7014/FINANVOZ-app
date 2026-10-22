@@ -45,9 +45,11 @@ export const TITULO_REACTIVAR_CAPTURA = 'Vuelve a activar la lectura de notifica
 export const CUERPO_REACTIVAR_CAPTURA =
   'Recuperé tus datos, pero en este teléfono todavía no puedo leer los avisos de tu banco.';
 
-/** TalkBack: título + cuerpo de la tarjeta reactivar (`02 §15`). */
-export function etiquetaCuerpoReactivarCaptura(): string {
-  return `${TITULO_REACTIVAR_CAPTURA} ${CUERPO_REACTIVAR_CAPTURA}`;
+/** TalkBack / VoiceOver: título + cuerpo de la tarjeta reactivar (`02 §15`); en iPhone, su variante. */
+export function etiquetaCuerpoReactivarCaptura(ios = false): string {
+  return ios
+    ? `${ETIQUETA_NO_DISPONIBLE_IOS}. ${CUERPO_REACTIVAR_CAPTURA_IOS}`
+    : `${TITULO_REACTIVAR_CAPTURA} ${CUERPO_REACTIVAR_CAPTURA}`;
 }
 
 /** TalkBack: tarjeta de Hoy tras restaurar (`TarjetaReactivarCaptura`). */
@@ -84,6 +86,27 @@ export const CUERPO_NO_DISPONIBLE =
   'Finanvoz anota tus compras con los avisos de tu banco en Android, con la app instalada desde la tienda.';
 export const ALTERNATIVA_NO_DISPONIBLE = 'Por ahora, dicta o escribe tus gastos: «tacos 80 en efectivo».';
 
+/**
+ * En iPhone no se habla de Android (`02 §25`): iOS no deja que una app lea las notificaciones de otras. El
+ * onboarding debería saltarse este paso en iPhone; si alguien llega aquí (Ajustes, respaldo de Android), esto es
+ * lo que ve. Las pantallas eligen la variante con `Platform.OS` (este archivo no importa react-native: vitest).
+ */
+export const ETIQUETA_NO_DISPONIBLE_IOS = 'En iPhone no leo los avisos de tu banco';
+export const CUERPO_NO_DISPONIBLE_IOS =
+  'iPhone no deja que otras apps lean tus notificaciones, así que no puedo anotar tus compras solas.';
+
+export function textosNoDisponibleCaptura(ios: boolean): { etiqueta: string; cuerpo: string } {
+  return ios
+    ? { etiqueta: ETIQUETA_NO_DISPONIBLE_IOS, cuerpo: CUERPO_NO_DISPONIBLE_IOS }
+    : { etiqueta: ETIQUETA_NO_DISPONIBLE, cuerpo: CUERPO_NO_DISPONIBLE };
+}
+
+/** Tarjeta de Hoy tras restaurar en iPhone un respaldo que tenía la captura de Android activa. */
+export const TITULO_REACTIVAR_CAPTURA_IOS = ETIQUETA_NO_DISPONIBLE_IOS;
+export const CUERPO_REACTIVAR_CAPTURA_IOS =
+  'Recuperé tus datos. En iPhone no puedo leer los avisos de tu banco: dicta o escribe tus gastos.';
+export const BTN_ENTENDIDO_REACTIVAR_IOS = 'Entendido';
+
 export const TITULO_PERMISO_NOTIFICACIONES = 'Acceso a notificaciones';
 export const PERMISO_INSTRUCCION =
   'En Ajustes del teléfono, busca Finanvoz y activa «Permitir acceso a notificaciones». Luego regresa aquí.';
@@ -116,9 +139,10 @@ export const LISTA_CAPTURA_APPS = (nombres: readonly string[]) =>
   `Listo: anotaré lo que avisen ${nombres.join(', ')}.`;
 export const LISTA_CAPTURA_POR_REVISAR = 'Lo que no entienda queda en Movimientos → Por revisar.';
 
-/** TalkBack: tarjeta «no disponible» en `ActivarCaptura`. */
-export function etiquetaTarjetaNoDisponibleCaptura(): string {
-  return `${ETIQUETA_NO_DISPONIBLE}. ${CUERPO_NO_DISPONIBLE}`;
+/** TalkBack / VoiceOver: tarjeta «no disponible» en `ActivarCaptura`. */
+export function etiquetaTarjetaNoDisponibleCaptura(ios = false): string {
+  const t = textosNoDisponibleCaptura(ios);
+  return `${t.etiqueta}. ${t.cuerpo}`;
 }
 
 /** TalkBack: resumen al terminar de activar la captura. */

@@ -1,8 +1,17 @@
-import { esFecha, type Centavos, type PlainDate, type Regla } from '@cartera/core';
+import {
+  conDia,
+  diasDelMes,
+  esFecha,
+  partes,
+  type Centavos,
+  type PlainDate,
+  type Regla,
+} from '@cartera/core';
 import { useState } from 'react';
 import { View } from 'react-native';
 import {
   crearTanda,
+  etiquetaDiaMes,
   etiquetaFecha,
   listarCuentas,
   proponerTanda,
@@ -14,10 +23,15 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { leerEntero } from '../onboarding/ingreso';
 import {
+  AYUDA_FECHA,
   EJEMPLO_FECHA,
+  ETIQUETA_FECHA_HOY,
+  MARCA_FECHA_INVALIDA,
+  PREGUNTA_FECHAS_CERCANAS,
   EJEMPLO_NOMBRE_TANDA,
   ERROR_APORTACION,
   ERROR_APORTACIONES_HECHAS,
@@ -65,6 +79,24 @@ export function escribirFecha(fecha: PlainDate): string {
   return `${d}/${m}/${a}`;
 }
 
+/**
+ * Fechas cercanas para la primera ronda, sin teclear: hoy, el próximo 15 y el último día del mes (las fechas
+ * de pago de quincena más comunes). Sin repetir y en orden.
+ */
+export function fechasCercanas(hoy: PlainDate): PlainDate[] {
+  const { anio, mes, dia } = partes(hoy);
+  const quince = dia <= 15 ? conDia(anio, mes, 15) : conDia(anio, mes + 1, 15);
+  const ultimo = conDia(anio, mes, diasDelMes(anio, mes));
+  return [...new Set([hoy, quince, ultimo])].sort();
+}
+
+/** "Hoy · 22 oct" o "dom 15 nov". */
+function etiquetaFechaCercana(fecha: PlainDate, hoy: PlainDate): string {
+  if (fecha === hoy) return `${ETIQUETA_FECHA_HOY} · ${etiquetaDiaMes(fecha)}`;
+  const mes = etiquetaDiaMes(fecha).split(' ')[1] ?? '';
+  return `${etiquetaFecha(fecha)} ${mes}`.trim();
+}
+
 function frecuenciaDe(regla: Regla | undefined): FrecuenciaTanda | null {
   switch (regla?.tipo) {
     case 'semanal':
@@ -109,6 +141,11 @@ export function FormularioTanda({
   const [hechas, setHechas] = useState<string | null>(null);
   const [cobro, setCobro] = useState<SiNo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fechaMarcada, setFechaMarcada] = useState(false);
+  useAnunciarEnIos(error);
+  const hoy = ctx.reloj.hoy();
+  const cercanas = fechasCercanas(hoy);
+  const fechaEscrita = leerFecha(inicio);
 
   /** Arma la entrada o dice qué falta (`02 §14`). */
   const armar = (): Omit<EntradaTanda, 'aportacionesHechas' | 'yaCobraste'> | string => {
@@ -164,6 +201,7 @@ export function FormularioTanda({
   const guardar = () => {
     if (typeof entrada === 'string') {
       setError(entrada);
+      setFechaMarcada(entrada === ERROR_FECHA_INICIO);
       return;
     }
     if (hechas !== null && hechasLeidas === null) {
@@ -224,12 +262,28 @@ export function FormularioTanda({
         valor={turno}
         alCambiar={setTurno}
       />
+      <Chips
+        testID="tanda-fecha"
+        etiqueta={PREGUNTA_FECHAS_CERCANAS}
+        opciones={cercanas.map((f) => ({ valor: f, etiqueta: etiquetaFechaCercana(f, hoy) }))}
+        valor={fechaEscrita !== null && cercanas.includes(fechaEscrita) ? fechaEscrita : null}
+        alCambiar={(f) => {
+          setFechaMarcada(false);
+          setInicio(escribirFecha(f));
+        }}
+      />
       <CampoTexto
         testID="tanda-inicio"
         etiqueta={ETIQUETA_PRIMERA_FECHA}
         ejemplo={EJEMPLO_FECHA}
+        ayuda={AYUDA_FECHA}
+        error={fechaMarcada && fechaEscrita === null ? MARCA_FECHA_INVALIDA : null}
+        teclado="numbers-and-punctuation"
         valor={inicio}
-        alCambiar={setInicio}
+        alCambiar={(t) => {
+          setFechaMarcada(false);
+          setInicio(t);
+        }}
       />
       <Chips
         testID="tanda-cuenta"

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AppState, View } from 'react-native';
+import { AppState, Platform, View } from 'react-native';
 import { useCaptura } from '../../captura/ProveedorCaptura';
 import type { AppBancaria } from '../../captura/tipos';
 import {
@@ -14,9 +14,7 @@ import { Casilla } from '../onboarding/componentes';
 import { PISTA_ACTIVAR_CAPTURA } from '../ajustes/captura-textos';
 import {
   ALTERNATIVA_NO_DISPONIBLE,
-  CUERPO_NO_DISPONIBLE,
   DIVULGACION_CAPTURA,
-  ETIQUETA_NO_DISPONIBLE,
   INTRO_ELEGIR_APPS,
   LISTA_CAPTURA_ACTIVA,
   LISTA_CAPTURA_APPS,
@@ -33,6 +31,7 @@ import {
   PISTA_AHORA_NO_ACTIVAR_CAPTURA,
   PISTA_YA_ACTIVE_PERMISO,
   TEXTO_SIN_APPS_BANCO,
+  textosNoDisponibleCaptura,
   TITULO_ELEGIR_APPS,
   TITULO_PERMISO_NOTIFICACIONES,
 } from './textos';
@@ -71,6 +70,9 @@ export function ActivarCaptura({
   });
   const [marcadas, setMarcadas] = useState<readonly string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // En iPhone no hay captura de notificaciones: se dice sin hablar de Android (`02 §25`).
+  const esIos = Platform.OS === 'ios';
+  const noDisponible = textosNoDisponibleCaptura(esIos);
 
   const revisarPermiso = useCallback(async () => {
     if (!puente) return;
@@ -152,16 +154,18 @@ export function ActivarCaptura({
               variante="etiqueta"
               tono="acento"
               accessibilityRole="alert"
-              accessibilityLabel={etiquetaTarjetaNoDisponibleCaptura()}
+              accessibilityLabel={etiquetaTarjetaNoDisponibleCaptura(esIos)}
+              testID={`${testID}-pronto-titulo`}
             >
-              {ETIQUETA_NO_DISPONIBLE}
+              {noDisponible.etiqueta}
             </Texto>
             <Texto
               variante="cuerpo"
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
+              testID={`${testID}-pronto-cuerpo`}
             >
-              {CUERPO_NO_DISPONIBLE}
+              {noDisponible.cuerpo}
             </Texto>
           </Tarjeta>
           <Texto variante="cuerpo" tono="secundario">

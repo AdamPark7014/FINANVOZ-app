@@ -86,8 +86,9 @@ export const PISTA_ABRIR_DETALLE_TARJETA = 'Abre el detalle de la tarjeta';
 export const TEXTO_TARJETA_NO_ENCONTRADA = 'No encontré esa tarjeta.';
 export const ACCESIBILIDAD_TARJETA_NO_ENCONTRADA =
   'No encontré esa tarjeta. Usa Volver para regresar a Cuentas.';
-export const TITULO_PAGAR_TARJETA = 'Pagar tarjeta';
-export const BTN_PAGAR = 'Pagar';
+export const TITULO_PAGAR_TARJETA = 'Registrar un pago a tu tarjeta';
+/** Abre el formulario: el pago ya lo hiciste en tu banco; aquí solo se anota (`02 §14`, verbo primero). */
+export const BTN_PAGAR = 'Registrar pago';
 /** TalkBack: abre el formulario de pago en el detalle (`02 §15`). */
 export const PISTA_PAGAR_TARJETA = 'Registra cuánto pagaste y de qué cuenta salió';
 /** TalkBack: guarda el pago desde el detalle (`02 §15`). */
@@ -102,6 +103,8 @@ export const BTN_LEER_PDF_BANCO = 'Leer el PDF de tu banco';
 export const TITULO_CONFIGURACION = 'Configuración';
 export const BTN_EDITAR_TARJETA = 'Editar tarjeta';
 export const BTN_CORREGIR_SALDO = 'Corregir saldo';
+/** Confirma la corrección (el que abre el panel dice "Corregir saldo"). */
+export const BTN_GUARDAR_SALDO = 'Guardar saldo';
 export const MENSAJE_SALDO_SIN_CAMBIO = 'Ese ya era el saldo. No cambié nada.';
 
 /** Editar tarjeta y corregir saldo (`02 §8`). */
@@ -288,6 +291,16 @@ export const PREGUNTA_CATEGORIA_MSI = '¿En qué categoría va?';
 export const ETIQUETA_DESCRIPCION_MSI = '¿Qué compraste? (opcional)';
 export const EJEMPLO_DESCRIPCION_MSI = 'tele';
 export const BTN_GUARDAR_MSI = 'Guardar';
+/** Compra a meses dictada sin ninguna tarjeta registrada (antes salía la pregunta sin opciones). */
+export const TEXTO_SIN_TARJETAS_MSI =
+  'Aún no tienes tarjetas. Agrégala y vuelve aquí para guardar la compra.';
+export const BTN_AGREGAR_TARJETA = 'Agregar tarjeta';
+export const PISTA_AGREGAR_TARJETA_MSI = 'Abre el formulario de tarjeta nueva; la compra te espera aquí';
+/** "Volver" en tarjeta nueva cuando se abrió desde la compra a meses. */
+export const PISTA_VOLVER_COMPRA_MSI = 'Regresa a la compra a meses sin guardar la tarjeta';
+/** Por qué "Guardar" sigue apagado. */
+export const FALTA_TARJETA_MSI = 'Elige con qué tarjeta fue.';
+export const FALTA_CATEGORIA_MSI = 'Elige en qué categoría va.';
 
 export function subtituloPagosPlaneados(conPagos: boolean): string {
   return conPagos
@@ -308,6 +321,11 @@ export const BTN_LIQUIDAR_MESES = 'Liquidar meses';
 export const BTN_GUARDAR_PAGO_PLANEADO = 'Guardar pago planeado';
 export const BTN_AGREGAR_PAGO_PLANEADO = 'Agregar pago planeado';
 export const BTN_QUITAR_PAGO_PLANEADO = 'Quitar';
+export const BTN_SI_QUITAR_PAGO_PLANEADO = 'Sí, quitar';
+/** Confirmación en línea: quitar un pago planeado no se puede deshacer. */
+export const TEXTO_CONFIRMAR_QUITAR_PAGO_PLANEADO =
+  '¿Quitar este pago planeado? Dejo de apartarlo y vuelvo a apartar lo que debes completo.';
+export const MENSAJE_PAGO_PLANEADO_QUITADO = 'Quité ese pago. Ahora aparto lo que debes completo.';
 
 export function mensajePagoPlaneadoApartado(monto: Centavos): string {
   return `Listo: aparto ${formatearCentavos(monto)} para cada pago planeado.`;
@@ -333,6 +351,9 @@ export const AVISO_SALDO_A_FAVOR_EN_TARJETA = 'Va. El saldo a favor se queda en 
 export function etiquetaSiLiquidar(descripcion: string): string {
   return `Sí, ${descripcion}`;
 }
+
+/** Bajo el campo que falta o está mal; qué hacer va junto al botón Guardar (`02 §14`). */
+export const MARCA_CAMPO_CON_ERROR = 'Revisa este dato.';
 
 /** Copy al elegir «No sé» en «¿El saldo ya incluye los meses?» (`02 §3.1`, CA-M2-12). */
 export const AVISO_NO_SE_INCLUYE_MSI =

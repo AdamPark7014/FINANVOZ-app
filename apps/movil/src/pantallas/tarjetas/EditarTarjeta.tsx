@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { corregirSaldoTarjeta, editarTarjeta, type DetalleTarjeta } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoMonto, CampoTexto, espacio, formatearCentavos, leerPesos, Texto } from '../../ui';
+import { useAnunciarEnIos } from '../avisos/anunciar';
 import { Chips } from '../onboarding/componentes';
 import { leerDiaMes, leerEntero } from '../onboarding/ingreso';
 import { useMostrarAviso } from '../principal/ProveedorAvisos';
@@ -11,8 +12,8 @@ import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import {
   AYUDA_TASA_ANUAL,
   BTN_CANCELAR,
-  BTN_CORREGIR_SALDO,
   BTN_GUARDAR_CAMBIOS,
+  BTN_GUARDAR_SALDO,
   EJEMPLO_TASA_ANUAL,
   ERROR_CORREGIR_SALDO,
   ERROR_DIA_CORTE,
@@ -77,6 +78,7 @@ export function EditarTarjeta({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
   const [modo, setModo] = useState(d.modo);
   const [tasa, setTasa] = useState(d.tasaAnualBp === null ? '' : String(d.tasaAnualBp / 100));
   const [error, setError] = useState<string | null>(null);
+  useAnunciarEnIos(error);
 
   const guardar = () => {
     if (nombre.trim() === '') return setError(ERROR_NOMBRE_TARJETA);
@@ -188,6 +190,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
   const [monto, setMonto] = useState<Centavos | null>(null);
   const [sentido, setSentido] = useState<'debo' | 'a_favor'>('debo');
   const [error, setError] = useState<string | null>(null);
+  useAnunciarEnIos(error);
   return (
     <View style={{ gap: espacio.m }} testID="corregir-saldo">
       <Texto variante="secundario" tono="secundario" testID="corregir-intro">
@@ -212,7 +215,7 @@ export function CorregirSaldo({ d, alTerminar }: { d: DetalleTarjeta; alTerminar
         </Texto>
       ) : null}
       <Boton
-        etiqueta={BTN_CORREGIR_SALDO}
+        etiqueta={BTN_GUARDAR_SALDO}
         testID="corregir-guardar"
         alPresionar={() => {
           if (monto === null) return setError(ERROR_SALDO_SEGUN_BANCO);

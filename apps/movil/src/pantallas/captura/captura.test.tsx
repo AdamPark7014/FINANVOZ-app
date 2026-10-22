@@ -315,7 +315,10 @@ describe('arqueo (CA-M5-05)', () => {
     fireEvent.press(screen.getByTestId('arqueo-calcular'));
     expect(screen.getByText('Traes $60 más de lo esperado. ¿De dónde salió?')).toBeTruthy();
     expect(p.ctx.libro.saldo(efectivo)).toBe(64_000);
+    // El chip elige la respuesta; se registra con "Confirmar".
     fireEvent.press(screen.getByTestId('arqueo-sobrante-no_se'));
+    expect(p.ctx.libro.saldo(efectivo)).toBe(64_000);
+    fireEvent.press(screen.getByTestId('arqueo-sobrante-confirmar'));
     expect(p.ctx.libro.saldo(efectivo)).toBe(70_000);
     p.cerrar();
   });

@@ -88,6 +88,12 @@ const textoDe = (testID: string) => {
   return Array.isArray(hijos) ? hijos.join('') : String(hijos);
 };
 
+/**
+ * El aviso de registro puede traer una segunda línea «Tu día pasa de $X a $Y.» cuando cambia la cifra de Hoy
+ * (paquete B-1): se compara el inicio del texto.
+ */
+const empiezaCon = (texto: string) => new RegExp(`^${texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+
 function preparar(hoy: PlainDate) {
   const p = abrirPruebaPantalla(hoy);
   aceptarConsentimiento(p.ctx, { datosFinancieros: true });
@@ -171,15 +177,19 @@ describe('Tandas (02 §18)', () => {
     expect(screen.getByTestId('tanda-cancelar')).toHaveProp('accessibilityHint', PISTA_CANCELAR_FORMULARIO);
   });
 
-  it('Ver calendario en la lista tiene pista TalkBack', () => {
+  it('toda la tarjeta de la lista abre el detalle, con pista TalkBack (auditoría B-3 · 6)', () => {
     const v = vector<VectorE11>('E11-01');
     const p = preparar('2026-10-16');
     const { tandaId } = crearTanda(p.ctx, { ...entradaDe(v), cuentaId: p.bbva });
-    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
-    expect(screen.getByTestId(`tanda-${tandaId}-abrir`)).toHaveProp(
-      'accessibilityHint',
-      PISTA_VER_CALENDARIO,
-    );
+    const alAbrirTanda = jest.fn();
+    renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={alAbrirTanda} />);
+    const tarjeta = screen.getByTestId(`tanda-${tandaId}`);
+    expect(tarjeta).toHaveProp('accessibilityRole', 'button');
+    expect(tarjeta).toHaveProp('accessibilityHint', PISTA_VER_CALENDARIO);
+    // "Ver calendario ›" queda como señal visual dentro de la tarjeta, no como botón aparte.
+    expect(within(tarjeta).getByTestId(`tanda-${tandaId}-abrir`)).toHaveTextContent(/Ver calendario/);
+    fireEvent.press(tarjeta);
+    expect(alAbrirTanda).toHaveBeenCalledWith(tandaId);
   });
 
   it('lista de tandas: filas con etiqueta TalkBack y role list', () => {
@@ -190,9 +200,10 @@ describe('Tandas (02 §18)', () => {
     if (!t) throw new Error('sin tanda');
     renderConSesion(p.ctx, <PantallaTandas alVolver={jest.fn()} alAbrirTanda={jest.fn()} />);
     expect(screen.getByTestId('tandas-lista')).toHaveProp('accessibilityRole', 'list');
-    expect(
-      within(screen.getByTestId(`tanda-${tandaId}`)).getByLabelText(etiquetaAccesibleTandaEnLista(t)),
-    ).toBeTruthy();
+    expect(screen.getByTestId(`tanda-${tandaId}`)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaAccesibleTandaEnLista(t),
+    );
   });
 
   it('detalle: resumen financiero con etiqueta TalkBack', () => {
@@ -333,7 +344,7 @@ describe('Tandas (02 §18)', () => {
     fireEvent.press(screen.getByTestId(`tarjeta-accion-0-cuenta-${p.efectivo}`));
     expect(
       within(screen.getByTestId('aviso')).getByText(
-        mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never),
+        empiezaCon(mensajeAportacion({ monto: 50_000, cuenta: 'Cartera' } as never)),
         { hidden: true },
       ),
     ).toBeTruthy();
@@ -360,7 +371,7 @@ describe('Tandas (02 §18)', () => {
     fireEvent.press(screen.getByTestId(`${testID}-me-toco-cuenta-${p.bbva}`));
     expect(
       within(screen.getByTestId('aviso')).getByText(
-        mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never),
+        empiezaCon(mensajeCobro({ monto: 500_000, cuenta: 'BBVA' } as never)),
         { hidden: true },
       ),
     ).toBeTruthy();
@@ -469,7 +480,7 @@ describe('Tandas (02 §18)', () => {
     fireEvent.press(within(tarjeta).getByTestId('tanda-guardar'));
     const [t] = listarTandas(p.ctx);
     expect(t).toMatchObject({ aportacion: 50_000, participantes: 10, turno: 4 });
-    expect(screen.getByTestId('aviso')).toHaveTextContent(MENSAJE_TANDA_GUARDADA);
+    expect(screen.getByTestId('aviso')).toHaveTextContent(empiezaCon(MENSAJE_TANDA_GUARDADA));
   });
 });
 
