@@ -419,6 +419,19 @@ describe('onboarding dictado («O dímelo»)', () => {
     expect(r.getPathname()).toBe('/onboarding/cuentas');
   });
 
+  it('O5: «pago 4500 de renta cada mes el 5» llena el formulario de Renta; se agrega al tocar Agregar', async () => {
+    aceptarConsentimiento(s.ctx, { datosFinancieros: true });
+    const { f } = abrirConDictado('/onboarding/pagos-fijos');
+    const antes = conteoTablas();
+    fireEvent(screen.getByTestId('onb-pago-decir-dictar'), 'pressIn');
+    await act(async () => {});
+    f.emitir({ tipo: 'resultado', texto: 'pago 4500 de renta cada mes el 5', final: true });
+    expect(screen.getByTestId('onb-pago-nombre').props.value).toBe('Renta');
+    expect(screen.getByTestId('onb-pago-dia').props.value).toBe('5');
+    expect(screen.getByTestId('onb-pago-monto').props.value).toBe('4,500');
+    expect(conteoTablas()).toEqual(antes);
+  });
+
   it('O3: lo que no entiende no cambia nada', async () => {
     const { f } = abrirConDictado('/');
     tocar('onb-empezar');

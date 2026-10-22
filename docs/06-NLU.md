@@ -472,7 +472,14 @@ MILES_CON_RESTO := [DIGITOS(1..999)] mil DIGITOS(1..999) [pesos]                
 INGRESO_DICHO := [me pagan|me depositan|me cae(n)|cobro|gano|son|es] MONTO [REGLA | FRECUENCIA]
 FRECUENCIA := a la|por|cada quincena | quincenal | cada|a la|por semana [el DIA] | semanal
             | cada 14 días | cada dos semanas | catorcenal | cada|al|por mes | mensual(es)
+PAGO_DICHO := (pago | tengo que pagar | debo pagar) MONTO (de|del|por) CONCEPTO [REGLA | FRECUENCIA_PAGO]
+            | CONCEPTO (son|es|cuesta|me cuesta|sale en|de) MONTO [REGLA | FRECUENCIA_PAGO]
+            | CONCEPTO MONTO [REGLA | FRECUENCIA_PAGO]                    — CONCEPTO: 1 a 4 palabras, sin artículo
+FRECUENCIA_PAGO := cada|al|por mes | mensual | cada quincena | quincenal | cada semana | semanal | cada|al año | anual
 ```
+
+`interpretarPagoFijoDicho` llena el formulario de O5 con un pago a la vez: el concepto elige su chip del
+catálogo («renta», «luz»…) o «Otro» con el nombre dicho; el día que no se dijo queda vacío.
 
 `interpretarIngresoDicho` llena O3 («O dímelo»): `REGLA` es la de §9.2 CONFIGURAR (quincena, semanal con día,
 mensual con día); con `FRECUENCIA` sola el día queda vacío y se elige en pantalla (nunca se adivina).

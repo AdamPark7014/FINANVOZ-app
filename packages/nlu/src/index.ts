@@ -10,7 +10,13 @@ export {
   type TipoCuenta,
 } from './resolutor';
 export { interpretarReglas } from './reglas';
-export { interpretarIngresoDicho, interpretarMonto, type IngresoDicho } from './reglas/campos';
+export {
+  interpretarIngresoDicho,
+  interpretarMonto,
+  interpretarPagoFijoDicho,
+  type IngresoDicho,
+  type PagoFijoDicho,
+} from './reglas/campos';
 export type { LecturaMonto } from './reglas/montos';
 export { compararInterpretacion } from './eval/comparar';
 export * from './cliente';
