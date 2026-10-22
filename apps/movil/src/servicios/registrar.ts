@@ -20,8 +20,10 @@ import { exigirConsentimiento } from '../privacidad/consentimiento';
 import {
   configurarColchonDicho,
   proponerIngresoDicho,
+  proponerSaldoDicho,
   type ColchonDicho,
   type PropuestaIngreso,
+  type SaldoDicho,
 } from './ajustes-dichos';
 import { aprenderAlias, categoriaAprendida } from './aprendizaje';
 import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from './catalogo';
@@ -282,6 +284,8 @@ export type ResultadoTexto =
   | ColchonDicho
   /** «Me pagan 8 mil cada quincena»: reemplaza el ingreso; tarjeta con Guardar (`confirmarIngresoDicho`). */
   | { readonly resultado: 'ingreso_por_confirmar'; readonly propuesta: PropuestaIngreso }
+  /** «Tengo 4,200 en BBVA»: tarjeta con «Ajustar» (`confirmarSaldoDicho`), o ya cuadraba. */
+  | Exclude<SaldoDicho, { resultado: 'arqueo' }>
   /** TK01 "entré a una tanda…": formulario prellenado con el calendario de E11; "Guardar" llama `crearTanda`. */
   | { readonly resultado: 'tanda_por_crear'; readonly propuesta: PropuestaTanda }
   /** "Di mi tanda" / "me tocó la tanda" (TK02) que necesita confirmación; "Guardar" llama `confirmarTanda`. */
@@ -324,6 +328,7 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'pasar_a_meses',
   'configurado',
   'colchon_configurado',
+  'saldo_sin_cambio',
   'consulta',
   'me_alcanza',
   'explicar',
@@ -1026,6 +1031,10 @@ function aplicarInterpretacion(
           ? { resultado: 'ingreso_por_confirmar', propuesta }
           : { resultado: 'no_soportado', motivo: 'ajuste' };
       }
+      if (i.ajuste.tipo === 'saldo_cuenta') {
+        const r = i.ajuste.alias ? proponerSaldoDicho(ctx, i.ajuste.alias, i.ajuste.monto) : null;
+        return r ?? { resultado: 'no_soportado', motivo: 'ajuste' };
+      }
       if (i.ajuste.tipo !== 'compromiso') return { resultado: 'no_soportado', motivo: 'ajuste' };
       try {
         return { resultado: 'configurado', compromiso: configurarCompromiso(ctx, i.ajuste, frase.fecha) };
@@ -1087,10 +1096,13 @@ function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Fr
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion === 'gasto_compartido') return proponerGastoCompartido(ctx, i.gasto);
-  // Colchón e ingreso dichos: el nivel 0 ya los entiende y no necesitan la nube (sin ella quedaban por revisar).
+  // Colchón, ingreso y saldo dichos: el nivel 0 ya los entiende y no necesitan la nube (sin ella quedaban por
+  // revisar).
   if (
     i?.intencion === 'configurar' &&
-    (i.ajuste.tipo === 'colchon' || i.ajuste.tipo === 'ingreso_recurrente')
+    (i.ajuste.tipo === 'colchon' ||
+      i.ajuste.tipo === 'ingreso_recurrente' ||
+      i.ajuste.tipo === 'saldo_cuenta')
   ) {
     return aplicarInterpretacion(ctx, i, cuentas, frase);
   }

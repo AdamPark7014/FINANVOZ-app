@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { aceptarConsentimiento, agregarEfectivo, configurarIngreso } from '../../servicios';
+import { aceptarConsentimiento, agregarCuenta, agregarEfectivo, configurarIngreso } from '../../servicios';
 import { obtenerColchon } from '../../servicios/ajustes';
 import { ingresoPrincipal } from '../../servicios/programados';
 import { abrirPruebaPantalla, conEscenario } from './__pruebas__/base';
@@ -9,6 +9,7 @@ import { listarMovimientos } from '../../servicios/movimientos';
 import {
   BTN_GUARDAR_INGRESO,
   mensajeColchonDicho,
+  mensajeSaldoAjustado,
   TEXTO_PRIMER_USO,
   TITULO_CONFIRMAR_INGRESO,
 } from './textos';
@@ -79,6 +80,28 @@ describe('Hoy · primer uso y cifra destacada', () => {
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: true });
     fireEvent.press(screen.getByTestId('hoy-cifra'));
     expect(screen.queryByTestId('desglose')).toBeNull();
+    p.cerrar();
+  });
+});
+
+describe('Hoy · saldo dicho', () => {
+  it('«tengo 4,200 en BBVA» muestra lo que llevo y lo que dices, y ajusta al tocar Ajustar', () => {
+    const p = abrirPruebaPantalla();
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const bbva = agregarCuenta(p.ctx, { subtipo: 'debito', nombre: 'BBVA', saldo: 435_000 });
+    configurarIngreso(p.ctx, {
+      concepto: 'quincena',
+      monto: 600_000,
+      regla: { tipo: 'quincenal_15_ultimo' },
+    });
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    escribirEnHoy('tengo 4,200 en BBVA');
+    expect(screen.getByTestId('confirmacion-saldo-llevo')).toHaveTextContent(/4,350/);
+    expect(screen.getByTestId('confirmacion-saldo-dices')).toHaveTextContent(/4,200/);
+    expect(p.ctx.libro.saldo(bbva)).toBe(435_000);
+    fireEvent.press(screen.getByTestId('boton-ajustar-saldo'));
+    expect(p.ctx.libro.saldo(bbva)).toBe(420_000);
+    expect(screen.getByText(mensajeSaldoAjustado('BBVA', 420_000))).toBeTruthy();
     p.cerrar();
   });
 });
