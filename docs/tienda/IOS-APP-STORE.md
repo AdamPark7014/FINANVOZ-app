@@ -59,17 +59,20 @@ La app de NEXARA (`6814597698`) y la de ARTA (`6819117925`) viven en el mismo eq
 
 ## 3. Secretos de GitHub (una vez)
 
+**Cargados el 22-10-2026.** Para repetirlo:
+
 ```powershell
-pwsh -File scripts\subir-secretos-ios.ps1
+pwsh -File scripts\subir-secretos-ios.ps1 -IssuerId fe0d58b2-b9ab-4d7c-aecb-e8cbe30af200
 ```
 
-Reusa el certificado de distribución `.p12` y la llave `AuthKey_*.p8` de NEXARA (`C:\dev\secrets\nexara-ios`):
-mismo equipo de Apple. Carga en el repo `AdamPark7014/FINANVOZ-app` los secretos que lee el flujo:
-`APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_PRIVATE_KEY`,
-`BUILD_CERTIFICATE_BASE64` y `P12_PASSWORD` (el flujo también acepta el par `CERTIFICATE_PRIVATE_KEY` +
-`DISTRIBUTION_CERT_CER_BASE64`). Necesita `gh` autenticado; ningún valor se imprime. La llave de App Store
-Connect necesita rol **Admin** (o App Manager con acceso a Certificates, Identifiers & Profiles). El repositorio
-es público: el flujo solo corre a mano y los secretos nunca llegan a corridas de forks.
+Reusa el certificado de distribución del equipo (vence el 5-10-2027) y la llave de App Store Connect
+`AuthKey_H7VXTV487C.p8` («GitHub Actions ARTA», rol Gestor de apps) de `C:\dev\secrets\arta-ios`: mismo equipo de
+Apple. Carga en el repo `AdamPark7014/FINANVOZ-app` `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`,
+`APP_STORE_CONNECT_PRIVATE_KEY`, `CERTIFICATE_PRIVATE_KEY` (`arta_distribution.key`) y
+`DISTRIBUTION_CERT_CER_BASE64` (`arta_distribution.cer.base64.txt`); antes comprueba que certificado y llave son
+pareja. `C:\dev\secrets\nexara-ios` solo tiene otra llave y su CSR, sin certificado: no sirve. Necesita `gh`
+autenticado; ningún valor se imprime. El repositorio es público: el flujo solo corre a mano y los secretos nunca
+llegan a corridas de forks.
 
 ## 4. TestFlight
 

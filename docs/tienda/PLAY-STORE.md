@@ -207,7 +207,7 @@ revisión legal → 5. Prueba cerrada → 6. Producción escalonada (10 % → 10
 
 | # | Qué | Quién | Bloquea |
 | --- | --- | --- | --- |
-| 1 | Generar la llave de subida con `scripts\crear-llave-android.ps1` (una vez), guardar una copia fuera de la PC y cargar los secretos con `scripts\subir-secretos-android.ps1` | Adam (llave y custodia) | §1, §3 |
+| 1 | ~~Generar la llave de subida y cargar los secretos~~ **Hecho**: llave creada el 21-10 y secretos `ANDROID_*` cargados el 22-10 con `scripts\subir-secretos-android.ps1`. **Falta solo guardar una copia de `Documents\LLAVES-ANDROID\FINANVOZ` fuera de la PC** (si se pierde, la app no se puede actualizar) | Adam (custodia) | — |
 | 2 | ~~Crear la app en Play Console (§2)~~ **Hecha el 21-10-2026** con la cuenta NEXARA (Claude in Chrome, con el sí de Adam): app «Finanvoz», paquete `com.finanvoz.app`, id de Play Console `4974369200915032127`, idioma predeterminado **Español (Latinoamérica) – es-419** (Play no ofrece es-MX como idioma predeterminado), Aplicación, Sin coste, declaraciones aceptadas, «protección automática» del instalador dejada como viene | — | — |
 | 3 | Primera subida a prueba interna y probadores (§3) | Adam | Pruebas en el teléfono, despliegue escalonado |
 | 4 | Dominio y páginas públicas (`finanvoz.com`, aviso, eliminación de datos) y revisión legal del aviso (pendientes 4, 12, 26, 103) | Adam + abogado | Ficha pública, prueba cerrada y producción. **No** la prueba interna |
