@@ -99,8 +99,12 @@ export function auditar(raiz: Nodo | Nodo[] | null, opciones: OpcionesAuditoria 
     }
 
     const rol = typeof p.accessibilityRole === 'string' ? p.accessibilityRole : null;
+    // `accessible={false}` (Tarjeta con `accionesAnidadas`): el área de toque extra no existe para el lector de
+    // pantalla, que llega al botón equivalente de adentro; ese botón es el que se audita.
+    const fueraDelLector = p.accessible === false;
     const tocable =
-      (typeof p.onClick === 'function' && rol !== 'text') || (rol !== null && ROLES_TOCABLES.has(rol));
+      !fueraDelLector &&
+      ((typeof p.onClick === 'function' && rol !== 'text') || (rol !== null && ROLES_TOCABLES.has(rol)));
     if (tocable && n.type !== 'TextInput') {
       const nombre = etiquetaPropia ?? texto;
       if (!rol || !ROLES_TOCABLES.has(rol)) agregar('tocable sin rol', nombre || String(p.testID ?? ''));

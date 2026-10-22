@@ -19,6 +19,7 @@ import { catalogoApp } from '../captura/catalogo';
 import { procesarApertura } from './apertura';
 import { arqueoPendiente, efectivoMenosPreciso, type ArqueoPendiente } from './arqueo';
 import { avisosPendientes, type Aviso } from './avisos';
+import { hayMovimientos } from './movimientos';
 import { preguntasCoberturaPendientes } from './cobertura';
 import { capturaInactiva, reactivarCapturaPendiente } from './estado-captura';
 import { listarCapturasPorRevisar, preguntasCaptura, type PreguntaCaptura } from './preguntas-captura';
@@ -188,6 +189,8 @@ export interface VistaHoy {
   readonly tarjetaDelDia: TarjetaDelDia | null;
   /** Insignia "menos preciso": efectivo sin arqueo por más de 7 días (`02 §4.2`); tocarla abre el arqueo. */
   readonly efectivoMenosPreciso: boolean;
+  /** Todavía no hay ningún movimiento: Hoy enseña a dictar el primero. */
+  readonly primerUso: boolean;
 }
 
 /** L (`04 §2.2`): líquidas activas + `min(0, por_asignar)` + `min(0, tránsito)` del espacio personal. */
@@ -414,6 +417,7 @@ function armarVistaHoy(
     avisos: avisosPendientes(ctx),
     tarjetaDelDia: tarjetaDelDia(ctx),
     efectivoMenosPreciso: efectivoMenosPreciso(ctx),
+    primerUso: !hayMovimientos(ctx),
   };
 }
 

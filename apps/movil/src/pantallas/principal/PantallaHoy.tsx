@@ -52,6 +52,8 @@ import {
   TITULO_HOY_PUEDES_GASTAR,
   TITULO_SIN_INGRESO,
   TITULO_TARJETA_DEL_DIA,
+  TEXTO_PRIMER_USO,
+  TITULO_PRIMER_USO,
   PISTA_AVISO_ENTENDIDO,
   PISTA_CONFIGURAR_INGRESO_HOY,
   PISTA_CONTAR_EFECTIVO,
@@ -91,6 +93,7 @@ export function PantallaHoy({
   // Sin tienda (iPhone por ahora) no se anuncia lo que no se puede contratar.
   const contratable = usePlanTienda().compras !== null;
   const [verDesglose, setVerDesglose] = useState(false);
+  const { c } = useTema();
   // "Hablar" y "Escribir" van fijos al pie (sobre las pestañas): el aviso de "Deshacer" sube para no taparlos.
   const [altoPie, setAltoPie] = useState(0);
   useReservarEspacioAviso(altoPie);
@@ -117,41 +120,53 @@ export function PantallaHoy({
       <Texto variante="secundario" tono="secundario" testID="hoy-fecha">
         {encabezadoFecha(etiquetaFecha(vista.hoy), etiquetaDiaMes(vista.hoy))}
       </Texto>
-      <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
-      {vista.estado !== 'sin_ingreso' ? (
+      {vista.estado === 'sin_ingreso' ? (
+        <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
+      ) : (
         <>
-          {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad. */}
-          {plus.probabilidad ? (
-            <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
-          ) : contratable ? (
-            <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
-          ) : null}
-          <BotonDesglose
-            expandido={verDesglose}
-            etiqueta={
-              verDesglose
-                ? 'Ocultar desglose'
-                : vista.estado === 'libre_negativo'
-                  ? 'Ver qué viene'
-                  : 'Ver de dónde sale'
-            }
-            pista={
-              verDesglose
-                ? PISTA_OCULTAR_DESGLOSE
-                : vista.estado === 'libre_negativo'
-                  ? PISTA_VER_QUE_VIENE
-                  : PISTA_VER_DESGLOSE
-            }
+          {/* La cifra en un bloque destacado: tocarlo abre o cierra el desglose (`02 §4`). */}
+          <Tarjeta
+            testID="hoy-cifra"
+            accionesAnidadas
+            expandida={verDesglose}
             alPresionar={() => setVerDesglose((v) => !v)}
-          />
-          {verDesglose ? <Desglose vista={vista} /> : null}
+            style={{ backgroundColor: c.superficieAlterna, borderColor: c.acentoTexto, gap: espacio.m }}
+          >
+            <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
+            <BotonDesglose
+              expandido={verDesglose}
+              etiqueta={
+                verDesglose
+                  ? 'Ocultar desglose'
+                  : vista.estado === 'libre_negativo'
+                    ? 'Ver qué viene'
+                    : 'Ver de dónde sale'
+              }
+              pista={
+                verDesglose
+                  ? PISTA_OCULTAR_DESGLOSE
+                  : vista.estado === 'libre_negativo'
+                    ? PISTA_VER_QUE_VIENE
+                    : PISTA_VER_DESGLOSE
+              }
+              alPresionar={() => setVerDesglose((v) => !v)}
+            />
+            {verDesglose ? <Desglose vista={vista} /> : null}
+          </Tarjeta>
+          {/* Plus (`02 §4`): la probabilidad, junto a la cifra. */}
+          {plus.probabilidad ? <ProbabilidadHoy {...(bloques ? { bloques } : {})} /> : null}
         </>
+      )}
+      {vista.primerUso ? (
+        <Tarjeta testID="hoy-primer-uso">
+          <Texto variante="cuerpoFuerte">{TITULO_PRIMER_USO}</Texto>
+          <Texto variante="secundario" tono="secundario" testID="hoy-primer-uso-texto">
+            {TEXTO_PRIMER_USO}
+          </Texto>
+        </Tarjeta>
       ) : null}
-      {/* "Lo que veo" (`02 §4.3`): bajo el desglose y antes de las tarjetas de acción. */}
-      <Observaciones
-        observaciones={observaciones}
-        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
-      />
+      {/* Primero lo que pide que hagas algo; después lo que observo (desvío de `02 §4.3` en ESTADO). */}
+      <AvisosUnaVez avisos={vista.avisos} />
       {vista.efectivoMenosPreciso ? (
         <Tarjeta testID="efectivo-menos-preciso">
           <Texto
@@ -175,11 +190,14 @@ export function PantallaHoy({
           ) : null}
         </Tarjeta>
       ) : null}
-      <AvisosUnaVez avisos={vista.avisos} />
       <TarjetasAccion
         tarjetas={vista.tarjetasAccion}
         alVerMovimientos={() => navegacion.alVerMovimientos()}
         {...(navegacion.alAbrirArqueo ? { alAbrirArqueo: () => navegacion.alAbrirArqueo?.() } : {})}
+      />
+      <Observaciones
+        observaciones={observaciones}
+        alVerMovimientos={(filtro) => navegacion.alVerMovimientos(filtro)}
       />
       {plus.tarjetaDelDia && vista.tarjetaDelDia ? (
         <Tarjeta testID="tarjeta-del-dia">
@@ -196,6 +214,10 @@ export function PantallaHoy({
         </Tarjeta>
       ) : null}
       <InvitacionAvisos />
+      {/* Lo de Plus, al final: el candado de la probabilidad y «¿Me alcanza?». */}
+      {vista.estado !== 'sin_ingreso' && !plus.probabilidad && contratable ? (
+        <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
+      ) : null}
       {navegacion.alAbrirMeAlcanza && (plus.meAlcanza || contratable) ? (
         <Boton
           etiqueta="¿Me alcanza?"
@@ -382,8 +404,12 @@ function FilaCifra({
 /** "Efectivo y débito · Reservado (Nu, tanda, internet) · Colchón · Libre" (02-UX §4). */
 function Desglose({ vista }: { vista: VistaHoy }) {
   const nombres = vista.reservadoDetalle.map((r) => r.concepto);
+  const { c } = useTema();
   return (
-    <Tarjeta testID="desglose">
+    <View
+      testID="desglose"
+      style={{ gap: espacio.s, borderTopWidth: 1, borderTopColor: c.borde, paddingTop: espacio.m }}
+    >
       <Fila etiqueta="Efectivo y débito" centavos={vista.liquidez} testID="desglose-liquidez" />
       <Fila
         etiqueta={nombres.length > 0 ? `Reservado (${nombres.join(', ')})` : 'Reservado'}
@@ -403,7 +429,7 @@ function Desglose({ vista }: { vista: VistaHoy }) {
       })}
       <Fila etiqueta="Colchón" centavos={-vista.colchon} testID="desglose-colchon" />
       <Fila etiqueta="Libre" centavos={vista.libre} fuerte testID="desglose-libre" />
-    </Tarjeta>
+    </View>
   );
 }
 

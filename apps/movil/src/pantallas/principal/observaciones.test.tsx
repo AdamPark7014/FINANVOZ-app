@@ -103,7 +103,7 @@ describe('Hoy · Lo que veo (`02 §4.3`)', () => {
     p.cerrar();
   });
 
-  it('muestra a lo más dos observaciones con su cifra, su frase y TalkBack completo, antes de las tarjetas de acción', () => {
+  it('muestra a lo más dos observaciones con su cifra, su frase y TalkBack completo, después de las tarjetas de acción', () => {
     const p = conObservaciones();
     const esperadas = obtenerObservaciones(p.ctx);
     expect(esperadas.map((o) => o.tipo)).toEqual(['doble', 'inusual']);

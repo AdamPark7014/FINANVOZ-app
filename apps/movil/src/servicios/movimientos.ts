@@ -75,6 +75,13 @@ const ENTRADA = new Set<string>([
 const AUTOMATICOS = new Set<string>(['notificacion', 'correo', 'estado_cuenta', 'ticket']);
 const PUENTES = new Set<string>([CUENTAS_SISTEMA.porAsignar, CUENTAS_SISTEMA.porAsignarEntradas]);
 
+/** ¿Hay al menos un movimiento vigente (sin contar saldos de apertura)? Hoy lo usa para la tarjeta de primer uso. */
+export function hayMovimientos(ctx: Contexto): boolean {
+  return (
+    ctx.db.select({ id: tv.id }).from(tv).where(ne(tv.tipo, 'saldo_inicial')).limit(1).get() !== undefined
+  );
+}
+
 /**
  * Movimientos vigentes (sin anulados ni reversas, ni saldos de apertura) agrupados por día, del más reciente al
  * más antiguo, con los filtros de `02 §10`.
