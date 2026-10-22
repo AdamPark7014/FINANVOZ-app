@@ -8,6 +8,8 @@ import { Pantalla, Texto } from '../src/ui';
 /** Centro de privacidad (RF-PRI-03), desde Ajustes. */
 export default function Privacidad() {
   const router = useRouter();
+  // Abierta desde un aviso o un enlace no hay a dónde regresar: se va a Hoy.
+  const volver = () => (router.canGoBack() ? router.back() : router.replace('/hoy'));
   const control = useControlApp();
   const soloLectura = useVista(enSoloLectura);
   return (
@@ -23,7 +25,7 @@ export default function Privacidad() {
         </Texto>
       ) : null}
       <CentroPrivacidad
-        alVolver={() => router.back()}
+        alVolver={volver}
         alLeerAviso={() => router.push('/aviso-privacidad')}
         alLeerTerminos={() => router.push('/terminos')}
         alBorrarTodo={() => control.borrarTodo()}

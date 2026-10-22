@@ -10,13 +10,18 @@ export interface ControlCaptura {
   mostrar(): Promise<void>;
 }
 
+/** Difuminado máximo en el selector de apps de iOS (por omisión Expo usa 0.5, que deja leer cifras grandes). */
+export const INTENSIDAD_DIFUMINADO_IOS = 1;
+
 /**
  * Android: `FLAG_SECURE` (preventScreenCaptureAsync): la vista previa de recientes sale en blanco
- * y tampoco se permiten capturas de pantalla. iOS (v2): difumina la vista del selector de apps.
+ * y tampoco se permiten capturas de pantalla. iOS: difumina al máximo la vista del selector de apps; las capturas
+ * de pantalla siguen permitidas (iOS no deja bloquearlas), así que el texto de Ajustes no lo promete.
  */
 export const capturaExpo: ControlCaptura = {
   async ocultar() {
-    if (Platform.OS === 'ios') await ScreenCapture.enableAppSwitcherProtectionAsync();
+    if (Platform.OS === 'ios')
+      await ScreenCapture.enableAppSwitcherProtectionAsync(INTENSIDAD_DIFUMINADO_IOS);
     else await ScreenCapture.preventScreenCaptureAsync(LLAVE_MULTITAREA);
   },
   async mostrar() {

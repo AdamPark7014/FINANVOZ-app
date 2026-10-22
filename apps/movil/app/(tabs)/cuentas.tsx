@@ -3,8 +3,9 @@ import { useRouter } from 'expo-router';
 
 type Router = ReturnType<typeof useRouter>;
 import { View } from 'react-native';
+import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacion';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
-import { PantallaCuentas } from '../../src/pantallas/principal';
+import { PantallaCuentas, useMostrarAviso } from '../../src/pantallas/principal';
 import { propsContenedorPestana } from './pestanas-textos';
 
 /** Callbacks de la pestaña Cuentas hacia el stack (`02 §11`). */
@@ -19,15 +20,24 @@ export function navegacionDesdeCuentas(router: Router): ComponentProps<typeof Pa
     alAbrirCompartidos: () => router.push('/compartido'),
     alAbrirSuscripciones: () => router.push('/suscripciones'),
     alAbrirDeducciones: () => router.push('/deducciones'),
+    alAgregarCuenta: () => router.push('/cuentas/nueva'),
+    alAbrirCuenta: (id) => router.push({ pathname: '/cuentas/[id]', params: { id } }),
+    alAgregarPagoFijo: () => router.push('/pagos-fijos/nuevo'),
+    alAbrirPagoFijo: (id) => router.push({ pathname: '/pagos-fijos/[id]', params: { id } }),
+    alVerPagosFijos: () => router.push('/pagos-fijos'),
+    alVerPersonas: () => router.push('/personas'),
   };
 }
 
 /**
  * Pestaña Cuentas (`02 §11`): Tienes · Debes · Compromisos. Sin datos, `PantallaCuentas` muestra
- * `TEXTO_CUENTAS_*_VACIO` (`cuentas-tienes-vacio`, `cuentas-debes-vacio`, `cuentas-compromisos-vacio`).
+ * `TEXTO_CUENTAS_*_VACIO` (`cuentas-tienes-vacio`, `cuentas-debes-vacio`, `cuentas-compromisos-vacio`). Al volver de
+ * agregar una cuenta o un pago fijo (o de quitarlo) muestra «Listo: …» en el aviso inferior.
  */
 export default function Cuentas() {
   const router = useRouter();
+  const mostrar = useMostrarAviso();
+  useConfirmacionAlVolver((mensaje) => mostrar({ mensaje }));
   return (
     <View style={{ flex: 1 }} {...propsContenedorPestana('cuentas')}>
       <PantallaCuentas {...navegacionDesdeCuentas(router)} />

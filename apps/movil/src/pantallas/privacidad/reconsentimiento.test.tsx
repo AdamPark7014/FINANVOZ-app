@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import Inicio from '../../../app/index';
 import ReconsentimientoRuta from '../../../app/reconsentimiento';
@@ -20,6 +20,7 @@ import {
   PISTA_RECONSENT_ACEPTAR,
   PISTA_RECONSENT_BORRAR,
   PISTA_RECONSENT_SOLO_LECTURA,
+  TEXTO_BORRAR_ADVERTENCIA,
   TITULO_AVISO_PRIVACIDAD,
 } from './textos';
 
@@ -71,10 +72,33 @@ describe('reconsentimiento (pendiente 31)', () => {
     expect(obtenerConsentimiento(s.ctx)?.version).toBe('2026-10-m2');
   });
 
-  it('borrar todo llama al control de la app', () => {
+  it('borrar todo pide escribir BORRAR antes de llamar al control de la app', () => {
     abrir('/');
     tocar('reconsent-borrar');
+    // Un toque solo abre la confirmación: nada se borra todavía.
+    expect(s.control.borrarTodo).not.toHaveBeenCalled();
+    expect(screen.getByText(TEXTO_BORRAR_ADVERTENCIA)).toBeTruthy();
+    expect(screen.getByTestId('reconsent-borrar-confirmar')).toHaveProp('accessibilityState', {
+      disabled: true,
+      busy: false,
+    });
+    tocar('reconsent-borrar-confirmar');
+    expect(s.control.borrarTodo).not.toHaveBeenCalled();
+    // Cancelar cierra la confirmación sin borrar.
+    tocar('reconsent-borrar-cancelar');
+    expect(screen.queryByTestId('reconsent-borrar-confirmar')).toBeNull();
+    tocar('reconsent-borrar');
+    fireEvent.changeText(screen.getByTestId('reconsent-borrar-palabra'), 'borrar');
+    tocar('reconsent-borrar-confirmar');
     expect(s.control.borrarTodo).toHaveBeenCalledTimes(1);
+  });
+
+  it('VoiceOver: «Leer el aviso completo» queda fuera del resumen agrupado (alcanzable en iOS)', () => {
+    abrir('/');
+    const resumen = screen.getByTestId('reconsent-aviso-simplificado');
+    expect(resumen).toHaveProp('accessible', true);
+    expect(within(resumen).queryByTestId('reconsent-aviso-completo')).toBeNull();
+    expect(screen.getByTestId('reconsent-aviso-completo')).toHaveProp('accessibilityRole', 'button');
   });
 
   it('TalkBack: aviso resumido, casillas y pistas en los botones', () => {

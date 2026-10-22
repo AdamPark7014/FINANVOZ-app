@@ -1,4 +1,5 @@
 import * as LocalAuthentication from 'expo-local-authentication';
+import { Platform } from 'react-native';
 
 export type ErrorAutenticacion =
   /** La persona canceló; se le vuelve a ofrecer "Desbloquear". */
@@ -24,6 +25,23 @@ export const MENSAJES_AUTENTICACION: Record<ErrorAutenticacion, string> = {
     'Tu teléfono no tiene bloqueo de pantalla. Configura un PIN o tu huella en los ajustes del teléfono para entrar.',
   fallo: 'No pude verificar que eres tú. Intenta de nuevo.',
 };
+
+/** En iPhone se habla de Face ID y del código, no de huella ni PIN. */
+export const MENSAJES_AUTENTICACION_IOS: Record<ErrorAutenticacion, string> = {
+  ...MENSAJES_AUTENTICACION,
+  sin_seguridad:
+    'Tu iPhone no tiene código. Ponle uno en Ajustes › Face ID y código para usar el bloqueo de Finanvoz.',
+};
+
+/** Mensaje de un error de autenticación con las palabras de la plataforma (`os` inyectable en pruebas). */
+export function mensajeAutenticacion(error: ErrorAutenticacion, os: string = Platform.OS): string {
+  return (os === 'ios' ? MENSAJES_AUTENTICACION_IOS : MENSAJES_AUTENTICACION)[error];
+}
+
+/** Texto del botón de respaldo cuando falla la biometría: «Usar código» en iPhone, «Usar PIN» en Android. */
+export function etiquetaRespaldoAutenticacion(os: string = Platform.OS): string {
+  return os === 'ios' ? 'Usar código' : 'Usar PIN';
+}
 
 function traducir(error: LocalAuthentication.LocalAuthenticationError): ErrorAutenticacion {
   switch (error) {
@@ -53,7 +71,7 @@ export const autenticadorExpo: Autenticador = {
     const r = await LocalAuthentication.authenticateAsync({
       promptMessage: 'Desbloquea Finanvoz',
       cancelLabel: 'Cancelar',
-      fallbackLabel: 'Usar PIN',
+      fallbackLabel: etiquetaRespaldoAutenticacion(),
       disableDeviceFallback: false,
     });
     return r.success ? { exito: true } : { exito: false, error: traducir(r.error) };

@@ -44,6 +44,36 @@ export const ETIQUETA_SILENCIO_HASTA = 'Hasta';
 export const EJEMPLO_SILENCIO_DESDE = '22:00';
 export const EJEMPLO_SILENCIO_HASTA = '08:00';
 
+/** Preguntas de los chips de hora (sin teclear «09:00» a mano; el teclado de iPhone no tiene «:» fácil). */
+export const PREGUNTA_HORA_AVISOS = '¿A qué hora te aviso?';
+export const PREGUNTA_SILENCIO_DESDE = 'Silencio desde';
+export const PREGUNTA_SILENCIO_HASTA = 'Silencio hasta';
+
+/** Horas comunes, en formato de 24 horas como el horario silencioso de `02 §13` («22:00–08:00»). */
+export const HORAS_AVISOS = ['07:00', '08:00', '09:00', '10:00', '12:00', '18:00', '20:00'] as const;
+export const HORAS_SILENCIO_DESDE = ['20:00', '21:00', '22:00', '23:00', '00:00'] as const;
+export const HORAS_SILENCIO_HASTA = ['06:00', '07:00', '08:00', '09:00', '10:00'] as const;
+
+/** Chips de hora: las comunes y, si la guardada no está entre ellas, también esa (en orden). */
+export function opcionesHora(
+  comunes: readonly string[],
+  actual: string,
+): readonly { valor: string; etiqueta: string; etiquetaAccesible: string }[] {
+  const horas = comunes.includes(actual) ? [...comunes] : [...comunes, actual].sort();
+  return horas.map((h) => ({ valor: h, etiqueta: h, etiquetaAccesible: horaHablada(h) }));
+}
+
+/** «09:00» → «9 de la mañana»; «22:00» → «10 de la noche»; «00:00» → «12 de la noche». */
+export function horaHablada(hora: string): string {
+  const [hh = '0', mm = '00'] = hora.split(':');
+  const h = Number(hh);
+  const min = mm === '00' ? '' : ` y ${Number(mm)}`;
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  const parte = h < 12 ? (h < 6 ? 'de la noche' : 'de la mañana') : h < 19 ? 'de la tarde' : 'de la noche';
+  if (h === 12) return `12${min} del día`;
+  return `${h12}${min} ${parte}`;
+}
+
 export const BTN_GUARDAR_HORARIO = 'Guardar horario';
 /** TalkBack al guardar hora y silencio (`02 §12`). */
 export const PISTA_GUARDAR_HORARIO = 'Guarda la hora de avisos y el horario silencioso';

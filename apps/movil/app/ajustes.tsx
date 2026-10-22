@@ -8,17 +8,11 @@ import {
   BTN_PRIVACIDAD,
   BTN_RESPALDAR_RESTAURAR,
   BTN_TERMINOS,
-  DESC_BLOQUEO,
-  DESC_MULTITAREA,
-  ETIQUETA_BLOQUEO,
-  ETIQUETA_MULTITAREA,
   ETIQUETA_VOLVER,
-  MENSAJE_NO_GUARDAR,
   PISTA_AYUDA,
   PISTA_VOLVER,
   SECCION_ACERCA,
   SECCION_AYUDA,
-  SECCION_BLOQUEO,
   SECCION_DEV,
   SECCION_PRIVACIDAD,
   SECCION_RESPALDO,
@@ -32,6 +26,7 @@ import {
   mensajeErrorCargarEscenario,
 } from '../src/pantallas/ajustes';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
+import { SeccionBloqueo } from '../src/pantallas/ajustes/SeccionBloqueo';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionColchon } from '../src/pantallas/ajustes/SeccionColchon';
 import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
@@ -40,39 +35,31 @@ import { SeccionVoz } from '../src/pantallas/ajustes/SeccionVoz';
 import { SeccionWidget } from '../src/pantallas/ajustes/SeccionWidget';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
-import { fijarBloqueo, obtenerBloqueo, obtenerRespaldoNube } from '../src/servicios';
+import { obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
-import { useSesion, useVista } from '../src/sesion/ProveedorSesion';
-import { Boton, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../src/ui';
+import { useVista } from '../src/sesion/ProveedorSesion';
+import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../src/ui';
 
 const TOQUES_MENU_DEV = 7;
 
 /**
- * Ajustes (`02 §12`, RF-CFG-03): bloqueo, ocultar en multitarea, avisos de tarjetas (M4), captura, widget (M10), respaldo (M9), privacidad
- * (exportar, borrar todo y el aviso viven en el centro de privacidad, `app/privacidad.tsx`), ayuda (M13,
- * `app/ayuda.tsx`) y versión. En builds
- * de desarrollo, tocar 7 veces la versión abre el menú de escenarios semilla.
+ * Ajustes (`02 §12`, RF-CFG-03): bloqueo y ocultar en multitarea (`SeccionBloqueo`), avisos de tarjetas (M4),
+ * captura y widget (solo Android, M10), respaldo (M9), privacidad (exportar, borrar todo y el aviso viven en el
+ * centro de privacidad, `app/privacidad.tsx`), ayuda (M13, `app/ayuda.tsx`) y versión. En builds de desarrollo,
+ * tocar 7 veces la versión abre el menú de escenarios semilla.
  */
 export default function Ajustes() {
   const router = useRouter();
-  const { ctx, refrescar } = useSesion();
   const control = useControlApp();
-  const bloqueo = useVista(obtenerBloqueo);
-  const respaldo = useVista(obtenerRespaldoNube);
+  // Sin nube (build sin Supabase), la tarjeta no habla de la nube: invita a exportar el archivo.
+  const conNube = Boolean(control.respaldo?.nube);
+  const respaldo = useVista((ctx) => obtenerRespaldoNube(ctx, { conNube }));
   const version = Constants.expoConfig?.version ?? '—';
 
-  const [mensaje, setMensaje] = useState<string | null>(null);
   const [menuDev, setMenuDev] = useState(false);
   const toques = useRef(0);
-
-  const cambiarBloqueo = (cambios: Parameters<typeof fijarBloqueo>[1]) => {
-    try {
-      fijarBloqueo(ctx, cambios);
-      refrescar();
-    } catch {
-      setMensaje(MENSAJE_NO_GUARDAR);
-    }
-  };
+  // Abierto desde un aviso o un enlace no hay a dónde regresar: se va a Hoy.
+  const volver = () => (router.canGoBack() ? router.back() : router.replace('/hoy'));
 
   const tocarVersion = () => {
     if (!__DEV__ || !control.cargarEscenario) return;
@@ -88,7 +75,7 @@ export default function Ajustes() {
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         pista={PISTA_VOLVER}
-        alPresionar={() => router.back()}
+        alPresionar={volver}
       />
       <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
         {TITULO}
@@ -97,23 +84,7 @@ export default function Ajustes() {
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
       <SeccionColchon />
 
-      <Tarjeta testID="ajustes-seccion-bloqueo">
-        <Texto variante="subtitulo">{SECCION_BLOQUEO}</Texto>
-        <Interruptor
-          testID="ajustes-bloqueo"
-          etiqueta={ETIQUETA_BLOQUEO}
-          descripcion={DESC_BLOQUEO}
-          valor={bloqueo.activo}
-          alCambiar={(activo) => cambiarBloqueo({ activo })}
-        />
-        <Interruptor
-          testID="ajustes-multitarea"
-          etiqueta={ETIQUETA_MULTITAREA}
-          descripcion={DESC_MULTITAREA}
-          valor={bloqueo.ocultarEnMultitarea}
-          alCambiar={(ocultarEnMultitarea) => cambiarBloqueo({ ocultarEnMultitarea })}
-        />
-      </Tarjeta>
+      <SeccionBloqueo />
 
       <SeccionVoz />
       <SeccionAvisos />
@@ -147,11 +118,6 @@ export default function Ajustes() {
           etiqueta={BTN_PRIVACIDAD}
           alPresionar={() => router.push('/privacidad')}
         />
-        {mensaje ? (
-          <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
-            {mensaje}
-          </Texto>
-        ) : null}
       </Tarjeta>
 
       <Tarjeta testID="ajustes-ayuda">

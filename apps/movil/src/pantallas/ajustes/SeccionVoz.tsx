@@ -7,7 +7,7 @@ import { MENSAJE_NO_GUARDAR } from './textos';
 import {
   DESC_CONTESTAR_EN_VOZ,
   ETIQUETA_CONTESTAR_EN_VOZ,
-  PISTA_CONTESTAR_EN_VOZ,
+  pistaContestarEnVoz,
   SECCION_VOZ,
 } from './voz-textos';
 
@@ -27,7 +27,7 @@ export function SeccionVoz() {
           testID="ajustes-voz-contestar"
           etiqueta={ETIQUETA_CONTESTAR_EN_VOZ}
           descripcion={DESC_CONTESTAR_EN_VOZ}
-          pista={PISTA_CONTESTAR_EN_VOZ}
+          pista={pistaContestarEnVoz()}
           valor={activa}
           alCambiar={(valor) => {
             try {

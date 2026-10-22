@@ -49,10 +49,21 @@ const Estado = z.strictObject({
   ultimo: z.string().nullable(),
   /** La nube respondió `sin_correo`: hay que pedir otra vez el correo y el código. */
   pedir_correo: z.boolean(),
+  /**
+   * Fecha civil del último archivo `.cartera` exportado (hoja de compartir). Opcional: los estados guardados antes
+   * no la traen. También cuenta como respaldo para el aviso de 14 días.
+   */
+  ultimo_archivo: z.string().nullable().optional(),
 });
 type Estado = z.infer<typeof Estado>;
 
-const INICIAL: Estado = { automatico: false, solo_wifi: true, ultimo: null, pedir_correo: false };
+const INICIAL: Estado = {
+  automatico: false,
+  solo_wifi: true,
+  ultimo: null,
+  pedir_correo: false,
+  ultimo_archivo: null,
+};
 
 function leer(ctx: Contexto): Estado {
   return leerAjuste(ctx, CLAVE, Estado) ?? INICIAL;
@@ -67,14 +78,26 @@ function escribir(ctx: Contexto, cambios: Partial<Estado>): Estado {
 export interface VistaRespaldoNube {
   readonly automatico: boolean;
   readonly soloWifi: boolean;
+  /** Último respaldo en la nube (o restaurado). */
   readonly ultimo: PlainDate | null;
-  /** "Último respaldo: hace 2 días" · "Todavía no tienes respaldos en la nube." */
+  /** Último archivo `.cartera` exportado. */
+  readonly ultimoArchivo: PlainDate | null;
+  /**
+   * El más reciente de los dos: "Último respaldo: hace 2 días" · "Último respaldo: ayer (archivo exportado)" ·
+   * sin ninguno, "Todavía no tienes respaldos en la nube." o, en una build sin nube, una invitación a exportar.
+   */
   readonly textoUltimo: string;
-  /** 14 días o más sin respaldo (desde el último o desde el onboarding). */
+  /** Solo la nube, para la tarjeta de la nube: "Último respaldo: hace 2 días" · "Todavía no…". */
+  readonly textoUltimoNube: string;
+  /** 14 días o más sin respaldo (desde el último en la nube o en archivo, o desde el onboarding). */
   readonly pendiente: boolean;
   /** La sesión de correo ya no sirve: pedir correo y código otra vez. */
   readonly pedirCorreo: boolean;
 }
+
+export const TEXTO_SIN_RESPALDOS_NUBE = 'Todavía no tienes respaldos en la nube.';
+export const TEXTO_SIN_RESPALDOS =
+  'Todavía no tienes respaldos. Exporta un archivo y guárdalo fuera del teléfono.';
 
 function haceDias(desde: PlainDate, hoy: PlainDate): string {
   const d = diferenciaDias(desde, hoy);
@@ -83,24 +106,64 @@ function haceDias(desde: PlainDate, hoy: PlainDate): string {
   return `hace ${d} días`;
 }
 
-/** Referencia del aviso de 14 días: el último respaldo o, si nunca hubo, el fin del onboarding. */
-function desdeAviso(ctx: Contexto): PlainDate | null {
-  return leer(ctx).ultimo ?? fechaOnboarding(ctx);
+/** La fecha más reciente (civiles `YYYY-MM-DD`: se comparan como texto). */
+function fechaMasReciente(
+  a: PlainDate | null | undefined,
+  b: PlainDate | null | undefined,
+): PlainDate | null {
+  if (!a) return b ?? null;
+  if (!b) return a;
+  return a >= b ? a : b;
 }
 
-export function obtenerRespaldoNube(ctx: Contexto): VistaRespaldoNube {
+/** Referencia del aviso de 14 días: el último respaldo (nube o archivo) o, si nunca hubo, el fin del onboarding. */
+function desdeAviso(ctx: Contexto): PlainDate | null {
+  const e = leer(ctx);
+  return fechaMasReciente(e.ultimo, e.ultimo_archivo) ?? fechaOnboarding(ctx);
+}
+
+/**
+ * Ajustes → Respaldo. `conNube: false` en builds sin nube (sin Supabase): sin respaldos, el texto invita a exportar
+ * un archivo en vez de hablar de la nube.
+ */
+export function obtenerRespaldoNube(
+  ctx: Contexto,
+  opciones: { readonly conNube?: boolean } = {},
+): VistaRespaldoNube {
   const e = leer(ctx);
   const hoy = ctx.reloj.hoy();
+  const archivo = e.ultimo_archivo ?? null;
+  const reciente = fechaMasReciente(e.ultimo, archivo);
+  const textoUltimoNube = e.ultimo ? `Último respaldo: ${haceDias(e.ultimo, hoy)}` : TEXTO_SIN_RESPALDOS_NUBE;
+  const textoUltimo =
+    reciente === null
+      ? opciones.conNube === false
+        ? TEXTO_SIN_RESPALDOS
+        : TEXTO_SIN_RESPALDOS_NUBE
+      : reciente === e.ultimo
+        ? textoUltimoNube
+        : `Último respaldo: ${haceDias(reciente, hoy)} (archivo exportado)`;
   return {
     automatico: e.automatico,
     soloWifi: e.solo_wifi,
     ultimo: e.ultimo,
-    textoUltimo: e.ultimo
-      ? `Último respaldo: ${haceDias(e.ultimo, hoy)}`
-      : 'Todavía no tienes respaldos en la nube.',
+    ultimoArchivo: archivo,
+    textoUltimo,
+    textoUltimoNube,
     pendiente: respaldoPendiente(desdeAviso(ctx), hoy),
     pedirCorreo: e.pedir_correo,
   };
+}
+
+/**
+ * Tras abrir la hoja de compartir con el `.cartera`: guarda la fecha para que la tarjeta de Ajustes y el aviso
+ * "Respalda tus datos" la cuenten. El sistema no dice si la persona guardó el archivo o cerró la hoja; contar de más
+ * aquí solo retrasa un aviso, nunca toca el dinero. Sin datos del archivo: solo la fecha civil.
+ */
+export function registrarRespaldoArchivo(ctx: Contexto): PlainDate {
+  const fecha = ctx.reloj.hoy();
+  escribir(ctx, { ultimo_archivo: fecha });
+  return fecha;
 }
 
 /** Ajustes → Respaldo: interruptores del automático semanal y de "solo con Wi-Fi". */
@@ -214,7 +277,8 @@ export async function borrarCuentaRespaldo(
   const r = await nube.respaldos.borrarCuenta();
   if (!r.ok) return r;
   await nube.cuenta.olvidarSesion();
-  escribir(ctx, INICIAL);
+  // El archivo exportado no depende de la cuenta de la nube: su fecha se conserva.
+  escribir(ctx, { ...INICIAL, ultimo_archivo: leer(ctx).ultimo_archivo ?? null });
   return { ok: true };
 }
 

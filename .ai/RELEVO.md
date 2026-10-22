@@ -6,6 +6,18 @@
 
 ## Hecho en este turno
 
+- **Cuentas, Ajustes, privacidad, bloqueo y respaldo en iPhone (B-2b)**: «Agregar cuenta» (`/cuentas/nueva`), detalle
+  de cuenta con «Corregir saldo» (ajuste de conciliación, caso 22 de `04 §4`) y «Ver movimientos»; «Agregar pago fijo»
+  (`/pagos-fijos/nuevo`, mismo formulario del onboarding), lista y detalle de pagos fijos («Cambiar monto», «Quitar»
+  con confirmación); lista de personas; Reconsentimiento pide escribir BORRAR y «Leer el aviso completo» ya es
+  alcanzable con VoiceOver; bloqueo solo con código del teléfono (revisa `disponible()`, «Abrir Ajustes», cortina se
+  quita si el teléfono perdió el código); multitarea difumina en iPhone; exportar archivo cuenta como respaldo y en
+  iPhone pasa el UTI; tarea diaria reporta a Sentry `tarea_diaria_sin_registrar`; Ajustes sin «Captura automática» en
+  iPhone, «Volver» con `canGoBack`, horas de avisos por chips que guardan al tocar; textos por plataforma en
+  privacidad, ayuda y voz; «Configurar mi ingreso» unificado. `servicios/cuentas-propias.ts` y
+  `registrarRespaldoArchivo` (que `servicios/index.ts` ya exportaba desde ddffbf7) entran aquí. typecheck limpio, jest
+  ajustes/cuentas/seguridad/riesgo/respaldo/tareas 110/110. Decisiones para ESTADO: el archivo exportado cuenta como
+  respaldo; «Corregir saldo» de débito registra un ajuste; la cortina se quita en iPhone sin código.
 - **Tarjetas, tandas, compartido, arqueo, captura y estados de cuenta en iPhone (B-3)**: compra a meses sin tarjeta
   ofrece «Agregar tarjeta» (vuelve con la nueva elegida), errores del formulario de tarjeta junto al campo y al botón,
   «Registrar pago»/«Guardar saldo»/«Cancelar» en cada panel, confirmación en fila antes de quitar/anular, arqueo con

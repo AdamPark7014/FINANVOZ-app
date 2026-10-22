@@ -1,5 +1,6 @@
 import { etiquetaDiaMes } from '../../servicios';
 import { enteroEnPalabras, etiquetaHablada } from '../../ui/formato';
+import { segunPlataforma } from '../ajustes/plataforma';
 import { RESPONSABLE, type SeccionAviso } from '../onboarding/aviso';
 import { TEXTO_NO_ASESORIA, VERSION_TERMINOS } from './legales';
 
@@ -36,7 +37,8 @@ export const PISTA_CASILLA_DATOS_FINANCIEROS = 'Primero marca la casilla de tus 
 export const PISTA_RECONSENT_ACEPTAR = 'Actualiza tu consentimiento y abre tu día';
 export const PISTA_RECONSENT_SOLO_LECTURA =
   'Entras en solo lectura y abres tu día sin aceptar el aviso nuevo';
-export const PISTA_RECONSENT_BORRAR = 'Borra todos los datos de este teléfono';
+/** Abre la confirmación (escribir BORRAR); un toque nunca borra nada. */
+export const PISTA_RECONSENT_BORRAR = 'Muestra la confirmación para borrar todos los datos de este teléfono';
 
 /** Desde O2, reconsentimiento o Ajustes: abre `/aviso-privacidad`. */
 export const BTN_LEER_AVISO_COMPLETO = 'Leer el aviso completo';
@@ -99,6 +101,17 @@ export const SALE_DEL_TELEFONO: readonly { readonly que: string; readonly quien:
   },
 ];
 
+/**
+ * Qué sale del teléfono según la plataforma: en iPhone Plus todavía no se vende (no hay compras en iOS), así que no
+ * sale nada hacia una tienda ni hacia RevenueCat y esa fila no aparece.
+ */
+export function saleDelTelefono(os?: string): readonly { readonly que: string; readonly quien: string }[] {
+  return segunPlataforma(
+    { ios: SALE_DEL_TELEFONO.filter((s) => !s.quien.includes('RevenueCat')), android: SALE_DEL_TELEFONO },
+    os,
+  );
+}
+
 export const SECCION_DECISIONES = 'Tus decisiones';
 export const ETIQUETA_ESTADISTICAS = 'Compartir estadísticas anónimas de uso';
 export const DESC_ESTADISTICAS =
@@ -107,6 +120,11 @@ export const DESC_ESTADISTICAS =
 export const SECCION_PERMISOS = 'Permisos del teléfono';
 export const BTN_PERMISOS_TELEFONO = 'Revisar permisos en tu teléfono';
 export const PISTA_PERMISOS_TELEFONO = 'Abre los ajustes de Finanvoz en Android';
+export const PISTA_PERMISOS_TELEFONO_IOS = 'Abre Finanvoz en la app Ajustes del iPhone';
+
+export function pistaPermisosTelefono(os?: string): string {
+  return segunPlataforma({ ios: PISTA_PERMISOS_TELEFONO_IOS, android: PISTA_PERMISOS_TELEFONO }, os);
+}
 
 export const PERMISOS: readonly { readonly nombre: string; readonly para: string }[] = [
   { nombre: 'Micrófono', para: 'Para registrar hablando. Solo escucha mientras mantienes el botón.' },
@@ -117,6 +135,18 @@ export const PERMISOS: readonly { readonly nombre: string; readonly para: string
   { nombre: 'Notificaciones', para: 'Para avisarte de cortes, fechas límite y arqueos.' },
   { nombre: 'Huella o rostro', para: 'Solo si activas el bloqueo de la app.' },
 ];
+
+/** iPhone: no hay acceso a notificaciones de otras apps (la captura automática es solo de Android). */
+export const PERMISOS_IOS: readonly { readonly nombre: string; readonly para: string }[] = [
+  { nombre: 'Micrófono', para: 'Para registrar hablando. Solo escucha mientras mantienes el botón.' },
+  { nombre: 'Reconocimiento de voz', para: 'Para convertir en texto lo que dictas.' },
+  { nombre: 'Notificaciones', para: 'Para avisarte de cortes, fechas límite y arqueos.' },
+  { nombre: 'Face ID', para: 'Solo si activas el bloqueo de la app.' },
+];
+
+export function permisosTelefono(os?: string): readonly { readonly nombre: string; readonly para: string }[] {
+  return segunPlataforma({ ios: PERMISOS_IOS, android: PERMISOS }, os);
+}
 
 export const SECCION_DATOS = 'Tus datos';
 export const TEXTO_DESCARGA_GRATIS = 'Descárgalos cuando quieras, gratis, también si cancelas Plus.';
@@ -201,14 +231,18 @@ export function cuenta(n: number, singular: string, plural: string): string {
   return `${n} ${n === 1 ? singular : plural}`;
 }
 
-export function textoCaptura(activada: boolean, appsBanco: number): string {
+export const TEXTO_CAPTURA_IOS =
+  'Captura automática: no existe en iPhone, porque iOS no deja que una app lea los avisos de otras. Tus pagos los dictas o los escribes.';
+
+export function textoCaptura(activada: boolean, appsBanco: number, os?: string): string {
+  if (segunPlataforma({ ios: true, android: false }, os)) return TEXTO_CAPTURA_IOS;
   return activada
     ? `Captura automática: activa con ${cuenta(appsBanco, 'app de banco', 'apps de banco')}. La apagas en Ajustes.`
     : 'Captura automática: apagada. La activas en Ajustes.';
 }
 
-export function etiquetaAccesibleCaptura(activada: boolean, appsBanco: number): string {
-  return etiquetaHablada(textoCaptura(activada, appsBanco));
+export function etiquetaAccesibleCaptura(activada: boolean, appsBanco: number, os?: string): string {
+  return etiquetaHablada(textoCaptura(activada, appsBanco, os));
 }
 
 export function textoConsentimiento(version: string, fecha: string): string {

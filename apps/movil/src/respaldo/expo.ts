@@ -75,6 +75,9 @@ async function compartir(nombre: string, bytes: Uint8Array): Promise<void> {
   archivo.write(bytes);
   await Sharing.shareAsync(archivo.uri, {
     mimeType: 'application/octet-stream',
+    // iOS elige las apps de la hoja por el UTI: `.cartera` no tiene uno propio declarado, así que va como datos
+    // genéricos (Archivos, AirDrop, correo). Sin él la hoja puede salir casi vacía.
+    UTI: 'public.data',
     dialogTitle: 'Tu respaldo de Finanvoz',
   });
 }

@@ -9,6 +9,7 @@ import { useControlApp } from '../../sesion/ControlApp';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, CampoTexto, Tarjeta, Texto } from '../../ui';
+import { anunciar } from '../../ui/anunciar';
 import { FlujoCorreo, type CuentaConfirmada } from './FlujoCorreo';
 import {
   ACCESIBILIDAD_VOLVER_RESTAURAR,
@@ -66,7 +67,12 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
   });
   const [paso, setPaso] = useState<Paso>({ tipo: 'elegir' });
   const [contrasena, setContrasena] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setErrorBase] = useState<string | null>(null);
+  // VoiceOver no lee la región viva del error: en iPhone se anuncia aparte.
+  const setError = (texto: string | null) => {
+    setErrorBase(texto);
+    if (texto) anunciar(texto);
+  };
   const [trabajando, setTrabajando] = useState(false);
 
   const elegir = async () => {
@@ -204,7 +210,10 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 alCambiar={setContrasena}
                 autoFocus
                 nativo={{ secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false }}
-                alEnviar={() => void abrir(paso.archivo)}
+                // Con la contraseña vacía (o mientras abre) la tecla de retorno no hace nada, igual que el botón.
+                alEnviar={() => {
+                  if (contrasena !== '' && !trabajando) void abrir(paso.archivo);
+                }}
               />
               <Boton
                 testID="restaurar-abrir"
@@ -215,6 +224,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 alPresionar={() => void abrir(paso.archivo)}
               />
               <Boton
+                testID="restaurar-otro"
                 variante="texto"
                 etiqueta={paso.deLaNube ? BTN_VOLVER_A_ELEGIR : BTN_ELEGIR_OTRO_ARCHIVO}
                 deshabilitado={trabajando}
@@ -222,7 +232,9 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
                 alPresionar={() => {
                   setError(null);
                   setContrasena('');
-                  setPaso({ tipo: 'elegir' });
+                  // «Elegir otro archivo» abre el selector de una vez; desde la nube se vuelve a elegir el origen.
+                  if (paso.deLaNube) setPaso({ tipo: 'elegir' });
+                  else void elegir();
                 }}
               />
             </>

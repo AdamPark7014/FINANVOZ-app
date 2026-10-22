@@ -3,6 +3,7 @@ import { Linking, View } from 'react-native';
 import { exportarCsv, exportarJson, fijarEstadisticas, obtenerCentroPrivacidad } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
+import { anunciar } from '../../ui/anunciar';
 import { compartirArchivo } from '../ajustes/compartir';
 import { TarjetaRespaldo } from '../respaldo/TarjetaRespaldo';
 import {
@@ -32,7 +33,7 @@ import {
   NOTA_CIFRADO_GUARDADO,
   NOTA_SERVICIOS_FUERA_MX,
   PALABRA_BORRAR,
-  PERMISOS,
+  permisosTelefono,
   PISTA_BORRAR_CANCELAR,
   PISTA_BORRAR_CONFIRMAR,
   PISTA_BORRAR_INICIAR,
@@ -40,9 +41,9 @@ import {
   PISTA_EXPORTAR_JSON,
   PISTA_LEER_AVISO,
   PISTA_LEER_TERMINOS,
-  PISTA_PERMISOS_TELEFONO,
+  pistaPermisosTelefono,
   PISTA_VOLVER,
-  SALE_DEL_TELEFONO,
+  saleDelTelefono,
   SECCION_BORRAR,
   SECCION_DATOS,
   SECCION_DECISIONES,
@@ -85,7 +86,12 @@ export function CentroPrivacidad({
   const { ctx, refrescar } = useSesion();
   const vista = useVista(obtenerCentroPrivacidad);
   const [exportando, setExportando] = useState<'json' | 'csv' | null>(null);
-  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [mensaje, setMensajeBase] = useState<string | null>(null);
+  // VoiceOver no lee la región viva del mensaje: en iPhone se anuncia aparte.
+  const setMensaje = (texto: string | null) => {
+    setMensajeBase(texto);
+    if (texto) anunciar(texto);
+  };
   const [confirmando, setConfirmando] = useState(false);
   const [palabra, setPalabra] = useState('');
   const [borrando, setBorrando] = useState(false);
@@ -174,7 +180,7 @@ export function CentroPrivacidad({
         <Texto testID="privacidad-sale-titulo" variante="subtitulo" accessibilityRole="header">
           {SECCION_SALE}
         </Texto>
-        {SALE_DEL_TELEFONO.map((s) => (
+        {saleDelTelefono().map((s) => (
           <View key={s.que} style={{ gap: espacio.xxs }}>
             <Texto variante="cuerpo">{s.que}</Texto>
             <Texto variante="secundario" tono="secundario">
@@ -229,7 +235,7 @@ export function CentroPrivacidad({
         <Texto testID="privacidad-permisos-titulo" variante="subtitulo" accessibilityRole="header">
           {SECCION_PERMISOS}
         </Texto>
-        {PERMISOS.map((p) => (
+        {permisosTelefono().map((p) => (
           <View key={p.nombre} style={{ gap: espacio.xxs }}>
             <Texto variante="cuerpo">{p.nombre}</Texto>
             <Texto variante="secundario" tono="secundario">
@@ -241,7 +247,7 @@ export function CentroPrivacidad({
           testID="privacidad-ajustes-telefono"
           variante="secundario"
           etiqueta={BTN_PERMISOS_TELEFONO}
-          pista={PISTA_PERMISOS_TELEFONO}
+          pista={pistaPermisosTelefono()}
           alPresionar={() => void Linking.openSettings().catch(() => {})}
         />
       </Tarjeta>

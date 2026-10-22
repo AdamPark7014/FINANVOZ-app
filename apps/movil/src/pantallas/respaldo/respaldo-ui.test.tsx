@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import type { Contexto } from '../../servicios';
 import { ProveedorControlApp, type ControlApp } from '../../sesion/ControlApp';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
-import { fijarContrasenaRespaldo } from '../../servicios';
+import { fijarContrasenaRespaldo, obtenerRespaldoNube } from '../../servicios';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { PantallaRespaldo } from './PantallaRespaldo';
 import { Restaurar } from './Restaurar';
@@ -18,6 +18,7 @@ import {
   BTN_CREAR_CONTRASENA,
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
+  MENSAJE_ARCHIVO_COMPARTIDO,
   PISTA_BORRAR_CUENTA,
   PISTA_CAMBIAR_CONTRASENA,
   PISTA_CONFIRMAR_BORRAR_CUENTA,
@@ -183,6 +184,66 @@ describe('accesibilidad en pantalla respaldo', () => {
     expect(screen.getByTestId('restaurar-elegir')).toHaveProp(
       'accessibilityHint',
       PISTA_RESTAURAR_ELEGIR_ARCHIVO,
+    );
+    p.cerrar();
+  });
+});
+
+describe('respaldo en iPhone (auditoría de botones)', () => {
+  it('exportar el archivo guarda la fecha y, al cerrar la hoja de compartir, dice dónde queda', async () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    const contrasena = 'mi frase de respaldo segura';
+    await fijarContrasenaRespaldo(r.deps, contrasena, contrasena);
+    montar(p.ctx, <TarjetaRespaldo alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
+    expect(obtenerRespaldoNube(p.ctx).ultimoArchivo).toBeNull();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('privacidad-respaldo-exportar'));
+    });
+    expect(r.archivos.compartir).toHaveBeenCalledTimes(1);
+    expect(obtenerRespaldoNube(p.ctx).ultimoArchivo).toBe('2026-10-11');
+    expect(screen.getByTestId('privacidad-respaldo-mensaje')).toHaveTextContent(MENSAJE_ARCHIVO_COMPARTIDO);
+    p.cerrar();
+  }, 30_000);
+
+  it('Restaurar: con la contraseña vacía el retorno no hace nada y «Elegir otro archivo» abre el selector', async () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    r.archivos.elegir.mockResolvedValue(new Uint8Array([1, 2, 3]));
+    montar(p.ctx, <Restaurar alVolver={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('restaurar-elegir'));
+    });
+    expect(r.archivos.elegir).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent(screen.getByTestId('restaurar-contrasena'), 'submitEditing');
+    });
+    // Sin contraseña no intentó abrir: ni error ni cambio de paso.
+    expect(screen.queryByTestId('restaurar-error')).toBeNull();
+    expect(screen.getByTestId('restaurar-contrasena')).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('restaurar-otro'));
+    });
+    expect(r.archivos.elegir).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId('restaurar-contrasena')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('sin nube, Respaldo dice el último archivo exportado o invita a exportar uno', () => {
+    const p = crearSesionPrueba('2026-10-11');
+    const r = crearRespaldoPrueba();
+    montar(p.ctx, <PantallaRespaldo alVolver={jest.fn()} alRestaurar={jest.fn()} />, {
+      borrarTodo: async () => {},
+      respaldo: { deps: r.deps, archivos: r.archivos, restaurar: async () => {} },
+    });
+    expect(screen.getByTestId('respaldo-ultimo')).toHaveTextContent(
+      'Todavía no tienes respaldos. Exporta un archivo y guárdalo fuera del teléfono.',
     );
     p.cerrar();
   });

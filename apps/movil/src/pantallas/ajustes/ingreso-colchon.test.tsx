@@ -56,7 +56,7 @@ jest.mock('../../respaldo/expo', () => {
   const r = crearRespaldoPrueba();
   return { dependenciasRespaldoExpo: r.deps, archivosRespaldoExpo: r.archivos };
 });
-// Hoy real (navegación y aviso de regreso) con la pantalla reducida a su botón "Decir cada cuándo me pagan".
+// Hoy real (navegación y aviso de regreso) con la pantalla reducida a su botón "Configurar mi ingreso".
 jest.mock('../principal', () => {
   const real = jest.requireActual('../principal');
   const { createElement } = jest.requireActual('react');
@@ -154,7 +154,7 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     expect(auditar(screen.toJSON() as never)).toEqual([]);
   });
 
-  it('sin ingreso lo dice y ofrece decir cada cuándo te pagan', () => {
+  it('sin ingreso lo dice y ofrece «Configurar mi ingreso»', () => {
     mockPreparar = base;
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(RESUMEN_SIN_INGRESO);
@@ -162,6 +162,8 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       'accessibilityLabel',
       ETIQUETA_CONFIGURAR_INGRESO,
     );
+    // Ajustes y Hoy dicen lo mismo.
+    expect(ETIQUETA_CONFIGURAR_INGRESO).toBe('Configurar mi ingreso');
   });
 
   it('cambiar el ingreso abre el formulario con lo guardado, guarda con el servicio y regresa con confirmación', () => {
@@ -289,7 +291,7 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
   });
 });
 
-describe('Hoy → "Decir cada cuándo me pagan"', () => {
+describe('Hoy → "Configurar mi ingreso"', () => {
   it('lleva directo a Ajustes › Ingreso y, al guardar, regresa a Hoy con el aviso', () => {
     mockPreparar = base;
     const r = renderRouter(RUTAS, { initialUrl: '/hoy' });

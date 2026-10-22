@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { generarRespaldo, nombreArchivoRespaldo, tieneContrasenaRespaldo } from '../../servicios';
+import {
+  generarRespaldo,
+  nombreArchivoRespaldo,
+  registrarRespaldoArchivo,
+  tieneContrasenaRespaldo,
+} from '../../servicios';
 import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Tarjeta, Texto } from '../../ui';
+import { anunciar } from '../../ui/anunciar';
 import { FormularioContrasena } from './FormularioContrasena';
 import {
   BTN_CAMBIAR_CONTRASENA,
@@ -10,6 +16,7 @@ import {
   BTN_EXPORTAR_ARCHIVO,
   BTN_RESTAURAR_RESPALDO,
   DESCRIPCION_ARCHIVO,
+  MENSAJE_ARCHIVO_COMPARTIDO,
   MENSAJE_CONTRASENA_GUARDADA,
   MENSAJE_NO_EXPORTAR,
   PISTA_CAMBIAR_CONTRASENA,
@@ -31,7 +38,7 @@ export function TarjetaRespaldo({
   /** Ajustes → Respaldo: avisa a la tarjeta de la nube que ya hay contraseña. */
   alCambiarContrasena?: () => void;
 }) {
-  const { ctx } = useSesion();
+  const { ctx, refrescar } = useSesion();
   const respaldo = useControlApp().respaldo;
   const [conContrasena, setConContrasena] = useState(() => {
     try {
@@ -43,7 +50,12 @@ export function TarjetaRespaldo({
   });
   const [editando, setEditando] = useState(false);
   const [exportando, setExportando] = useState(false);
-  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [mensaje, setMensajeBase] = useState<string | null>(null);
+  // VoiceOver no lee la región viva del mensaje: en iPhone se anuncia aparte.
+  const setMensaje = (texto: string | null) => {
+    setMensajeBase(texto);
+    if (texto) anunciar(texto);
+  };
 
   if (!respaldo) return null;
 
@@ -53,6 +65,10 @@ export function TarjetaRespaldo({
     try {
       const archivo = await generarRespaldo(respaldo.deps, ctx);
       await respaldo.archivos.compartir(nombreArchivoRespaldo(ctx), archivo);
+      // La hoja ya se cerró: la fecha cuenta como respaldo para la tarjeta de Ajustes y el aviso de 14 días.
+      registrarRespaldoArchivo(ctx);
+      refrescar();
+      setMensaje(MENSAJE_ARCHIVO_COMPARTIDO);
     } catch {
       setMensaje(MENSAJE_NO_EXPORTAR);
     } finally {

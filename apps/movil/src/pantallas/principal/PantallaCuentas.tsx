@@ -4,6 +4,7 @@ import {
   etiquetaFecha,
   fijarApartarDeuda,
   listarCuentas,
+  listarPersonas,
   listarTarjetas,
   type CuentaDebes,
 } from '../../servicios';
@@ -11,6 +12,23 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
 import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
+import {
+  BTN_AGREGAR_CUENTA,
+  BTN_AGREGAR_PAGO_FIJO,
+  BTN_VER,
+  BTN_VER_PAGOS_FIJOS,
+  BTN_VER_PERSONAS,
+  etiquetaFila,
+  etiquetaVerCuenta,
+  PISTA_ABRIR_COMPROMISO,
+  PISTA_ABRIR_CUENTA,
+  PISTA_ABRIR_EFECTIVO,
+  PISTA_AGREGAR_CUENTA,
+  PISTA_AGREGAR_PAGO_FIJO,
+  PISTA_CTA_AGREGAR_CUENTA,
+  PISTA_VER_PAGOS_FIJOS,
+  PISTA_VER_PERSONAS,
+} from '../cuentas/textos';
 import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
@@ -45,7 +63,9 @@ const NOMBRE_SUBTIPO: Record<string, string> = {
 
 /**
  * Cuentas (02-UX §11): Tienes · Debes · Te deben · Compromisos (próximos 30 días). Engrane → Ajustes. Cada tarjeta
- * de crédito abre su detalle (02-UX §8).
+ * de crédito abre su detalle (02-UX §8); cada cuenta de Tienes, el suyo (corregir saldo, ver movimientos); cada
+ * compromiso, el del pago fijo (cambiar monto, quitar). «Agregar cuenta» y «Agregar pago fijo» cumplen lo que el
+ * onboarding promete («agrégalas después en Cuentas»).
  */
 export function PantallaCuentas({
   alAbrirAjustes,
@@ -57,6 +77,12 @@ export function PantallaCuentas({
   alAbrirCompartidos,
   alAbrirSuscripciones,
   alAbrirDeducciones,
+  alAgregarCuenta,
+  alAbrirCuenta,
+  alAgregarPagoFijo,
+  alAbrirPagoFijo,
+  alVerPagosFijos,
+  alVerPersonas,
 }: {
   alAbrirAjustes: () => void;
   /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
@@ -65,6 +91,18 @@ export function PantallaCuentas({
   alAgregarTarjeta?: () => void;
   /** Cuentas → Efectivo → arqueo (`02 §7`). */
   alContarEfectivo?: (cuentaId: string) => void;
+  /** Tienes → Agregar cuenta (débito, billetera o ahorro). */
+  alAgregarCuenta?: () => void;
+  /** Tienes → detalle de la cuenta (corregir saldo, ver movimientos). */
+  alAbrirCuenta?: (cuentaId: string) => void;
+  /** Compromisos → Agregar pago fijo. */
+  alAgregarPagoFijo?: () => void;
+  /** Compromisos → detalle del pago (cambiar monto, quitar). */
+  alAbrirPagoFijo?: (programadoId: string) => void;
+  /** Compromisos → todos los pagos fijos (también los que caen en más de 30 días). */
+  alVerPagosFijos?: () => void;
+  /** Personas → lista completa (también con las que estás a mano). */
+  alVerPersonas?: () => void;
   /** Cuentas → Tandas (`02 §18`). */
   alAbrirTandas?: () => void;
   /** Cuentas → Gastos compartidos (`02 §27`, M16). */
@@ -76,6 +114,7 @@ export function PantallaCuentas({
 }) {
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
+  const hayPersonas = useVista((ctx) => listarPersonas(ctx).length > 0);
   return (
     <Pantalla testID="pantalla-cuentas">
       <View
@@ -106,6 +145,7 @@ export function PantallaCuentas({
             texto={TEXTO_CUENTAS_TIENES_VACIO}
             testID="cuentas-tienes-vacio"
             etiquetaAccesible={etiquetaVacioCuentasTienes()}
+            {...(alAgregarCuenta ? { pistaCta: PISTA_CTA_AGREGAR_CUENTA } : {})}
           />
         ) : null}
         {v.tienes.length > 0 ? (
@@ -128,9 +168,28 @@ export function PantallaCuentas({
                       },
                     }
                   : {})}
+                {...(alAbrirCuenta
+                  ? {
+                      abrir: {
+                        etiquetaVer: etiquetaVerCuenta(c.nombre),
+                        pista: c.subtipo === 'efectivo' ? PISTA_ABRIR_EFECTIVO : PISTA_ABRIR_CUENTA,
+                        alPresionar: () => alAbrirCuenta(c.id),
+                      },
+                    }
+                  : {})}
               />
             ))}
           </View>
+        ) : null}
+        {alAgregarCuenta ? (
+          <Boton
+            etiqueta={BTN_AGREGAR_CUENTA}
+            pista={PISTA_AGREGAR_CUENTA}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alAgregarCuenta}
+            testID="boton-agregar-cuenta"
+          />
         ) : null}
       </Seccion>
 
@@ -203,6 +262,17 @@ export function PantallaCuentas({
         </Seccion>
       ) : null}
 
+      {alVerPersonas && hayPersonas ? (
+        <Boton
+          etiqueta={BTN_VER_PERSONAS}
+          pista={PISTA_VER_PERSONAS}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVerPersonas}
+          testID="boton-ver-personas"
+        />
+      ) : null}
+
       <Seccion
         titulo="Compromisos"
         subtitulo={SUBTITULO_CUENTAS_COMPROMISOS}
@@ -226,8 +296,40 @@ export function PantallaCuentas({
                 subtitulo={etiquetaFecha(c.fecha)}
                 centavos={c.monto}
                 contextoSaldo={contextoSaldoCompromiso(c.concepto, etiquetaFecha(c.fecha))}
+                {...(alAbrirPagoFijo
+                  ? {
+                      abrir: {
+                        pista: PISTA_ABRIR_COMPROMISO,
+                        alPresionar: () => alAbrirPagoFijo(c.programadoId),
+                      },
+                    }
+                  : {})}
               />
             ))}
+          </View>
+        ) : null}
+        {alAgregarPagoFijo || alVerPagosFijos ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+            {alAgregarPagoFijo ? (
+              <Boton
+                etiqueta={BTN_AGREGAR_PAGO_FIJO}
+                pista={PISTA_AGREGAR_PAGO_FIJO}
+                variante="texto"
+                ancho="contenido"
+                alPresionar={alAgregarPagoFijo}
+                testID="boton-agregar-pago-fijo"
+              />
+            ) : null}
+            {alVerPagosFijos ? (
+              <Boton
+                etiqueta={BTN_VER_PAGOS_FIJOS}
+                pista={PISTA_VER_PAGOS_FIJOS}
+                variante="texto"
+                ancho="contenido"
+                alPresionar={alVerPagosFijos}
+                testID="boton-ver-pagos-fijos"
+              />
+            ) : null}
           </View>
         ) : null}
       </Seccion>
@@ -323,6 +425,11 @@ function Seccion({
   );
 }
 
+/**
+ * Fila de Tienes, Te deben o Compromisos. Con `abrir` y sin otros botones, toda la tarjeta es un solo botón (el
+ * lector oye nombre, detalle y cifra en palabras); con `accion` (Contar mi efectivo, Cobrar) aparece además «Ver»
+ * junto a ella, para no anidar botones dentro de otro.
+ */
 function Fila({
   titulo,
   subtitulo,
@@ -330,6 +437,7 @@ function Fila({
   contextoSaldo,
   testID,
   accion,
+  abrir,
 }: {
   titulo: string;
   subtitulo: string | null;
@@ -337,40 +445,76 @@ function Fila({
   contextoSaldo: string;
   testID?: string;
   accion?: { etiqueta: string; etiquetaAccesible?: string; pista?: string; alPresionar: () => void };
+  abrir?: { pista: string; alPresionar: () => void; etiquetaVer?: string };
 }) {
+  const contenido = (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{ flex: 1, gap: espacio.xxs }}
+      >
+        <Texto variante="cuerpoFuerte">{titulo}</Texto>
+        {subtitulo ? (
+          <Texto variante="secundario" tono="secundario">
+            {subtitulo}
+          </Texto>
+        ) : null}
+      </View>
+      <Cifra
+        centavos={centavos}
+        contexto={contextoSaldo}
+        {...(testID ? { testID: `${testID}-saldo` } : {})}
+      />
+    </View>
+  );
+  const botonAccion = accion ? (
+    <Boton
+      etiqueta={accion.etiqueta}
+      variante="texto"
+      ancho="contenido"
+      alPresionar={accion.alPresionar}
+      {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
+      {...(accion.pista ? { pista: accion.pista } : {})}
+      {...(testID ? { testID: `${testID}-accion` } : {})}
+    />
+  ) : null;
+
+  if (abrir && !accion) {
+    return (
+      <View role="listitem" {...(testID ? { testID } : {})}>
+        <Tarjeta
+          alPresionar={abrir.alPresionar}
+          etiquetaAccesible={etiquetaFila({ titulo, subtitulo, contexto: contextoSaldo, centavos })}
+          pista={abrir.pista}
+          {...(testID ? { testID: `${testID}-abrir` } : {})}
+        >
+          {contenido}
+        </Tarjeta>
+      </View>
+    );
+  }
+
   return (
     <View role="listitem" {...(testID ? { testID } : {})}>
       <Tarjeta>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-          <View
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={{ flex: 1, gap: espacio.xxs }}
-          >
-            <Texto variante="cuerpoFuerte">{titulo}</Texto>
-            {subtitulo ? (
-              <Texto variante="secundario" tono="secundario">
-                {subtitulo}
-              </Texto>
-            ) : null}
+        {contenido}
+        {abrir ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+            {botonAccion}
+            <Boton
+              etiqueta={BTN_VER}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={abrir.alPresionar}
+              pista={abrir.pista}
+              {...(abrir.etiquetaVer ? { etiquetaAccesible: abrir.etiquetaVer } : {})}
+              {...(testID ? { testID: `${testID}-ver` } : {})}
+            />
           </View>
-          <Cifra
-            centavos={centavos}
-            contexto={contextoSaldo}
-            {...(testID ? { testID: `${testID}-saldo` } : {})}
-          />
-        </View>
-        {accion ? (
-          <Boton
-            etiqueta={accion.etiqueta}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={accion.alPresionar}
-            {...(accion.etiquetaAccesible ? { etiquetaAccesible: accion.etiquetaAccesible } : {})}
-            {...(accion.pista ? { pista: accion.pista } : {})}
-            {...(testID ? { testID: `${testID}-accion` } : {})}
-          />
-        ) : null}
+        ) : (
+          botonAccion
+        )}
       </Tarjeta>
     </View>
   );

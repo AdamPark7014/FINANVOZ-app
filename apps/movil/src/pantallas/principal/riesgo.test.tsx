@@ -9,12 +9,7 @@ import {
 } from '../../servicios';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
-import {
-  ETIQUETA_HORARIO_SILENCIOSO,
-  PISTA_GUARDAR_HORARIO,
-  PISTA_PERMITIR_AVISOS,
-  SECCION_AVISOS,
-} from '../ajustes/avisos-textos';
+import { ETIQUETA_HORARIO_SILENCIOSO, PISTA_PERMITIR_AVISOS, SECCION_AVISOS } from '../ajustes/avisos-textos';
 import { notificacionesEnMemoria, ProveedorNotificaciones } from '../avisos/notificaciones';
 import { activarPlus, conEscenario } from './__pruebas__/base';
 import { etiquetaAccesibleProbabilidad, ProbabilidadHoy } from './ProbabilidadHoy';
@@ -151,7 +146,7 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
     await waitFor(() => expect(sinPermiso.puerto.lista()).toEqual([]));
   });
 
-  it('Ajustes → Avisos: pistas TalkBack en permitir y guardar horario', async () => {
+  it('Ajustes → Avisos: pista TalkBack en permitir y horas en chips con nombre hablado', async () => {
     const p = conEscenario('e4-01');
     montar(p.ctx, <SeccionAvisos />, notificacionesEnMemoria('sin_preguntar'));
     await screen.findByTestId('ajustes-avisos-permitir');
@@ -159,10 +154,10 @@ describe('aviso de riesgo en Hoy (P < 50 %, 02 §13)', () => {
       'accessibilityHint',
       PISTA_PERMITIR_AVISOS,
     );
-    expect(screen.getByTestId('ajustes-guardar-horario')).toHaveProp(
-      'accessibilityHint',
-      PISTA_GUARDAR_HORARIO,
-    );
+    // La hora ya no se teclea: chips que se guardan al tocarlos (sin botón «Guardar horario»).
+    expect(screen.queryByTestId('ajustes-guardar-horario')).toBeNull();
+    expect(screen.getByTestId('ajustes-aviso-hora-09:00')).toHaveProp('accessibilityRole', 'radio');
+    expect(screen.getByTestId('ajustes-aviso-hora-09:00')).toHaveProp('accessibilityLabel', '9 de la mañana');
     expect(screen.getByTestId('ajustes-avisos-horario-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByText(ETIQUETA_HORARIO_SILENCIOSO)).toBeTruthy();
   });

@@ -166,3 +166,6 @@ sobre los mismos archivos es trabajo doble.
   o que el proxy reconozca builds de prueba, Ola 6).
 - 22-10 (tarde): commiteados V-A (c6770f9), V-B (ddffbf7), B-1 (607313b), B-2a (8a63ed0). Al ir a subir, `origin/main`
   trae PR #24–#26 del hilo de la nube (§5): se integran con merge cuando B-2b y B-3 terminen.
+- 22-10 (tarde): Adam detiene el hilo de la nube en FinanVoz; esta sesión integra sus PR y sigue sola con la app.
+  La rama `claude/project-thread-lief9t` (2 commits sin PR: jest, rutas de pestañas, onboarding, calculadora) se
+  evalúa en el merge y se borra después.

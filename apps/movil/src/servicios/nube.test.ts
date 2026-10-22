@@ -65,6 +65,9 @@ const RESPUESTAS: Record<string, unknown> = {
   },
 };
 for (const id of ['K06', 'C04', 'C06']) RESPUESTAS[golden(id).texto] = golden(id).esperado;
+// K06 ya lo resuelve el nivel 0 en el teléfono; esta variante sin «cada» (V09) no, y la nube contesta lo de K06.
+const RENTA_NUBE = 'la renta son 6,500 el día primero';
+RESPUESTAS[RENTA_NUBE] = golden('K06').esperado;
 
 function conCuentas(hoy = HOY) {
   const p = abrirPrueba(hoy);
@@ -148,10 +151,10 @@ describe('nivel 2 · nube', () => {
     expect(p.ctx.libro.comprobarIntegridad()).toEqual([]);
   });
 
-  it('CA-M3-08 · "la renta son 6,500 cada día primero" crea el programado mensual y sus ocurrencias', async () => {
+  it('CA-M3-08 · "la renta son 6,500 el día primero" crea el programado mensual y sus ocurrencias', async () => {
     const p = conCuentas();
-    const k06 = golden('K06');
-    const r = await registrarTexto(p.ctx, k06.texto, 'voz', { nube: p.nube });
+    const r = await registrarTexto(p.ctx, RENTA_NUBE, 'voz', { nube: p.nube });
+    expect(p.recibidas.map((x) => x.texto)).toEqual([RENTA_NUBE]);
     if (r.resultado !== 'configurado') throw new Error(r.resultado);
     expect(r.compromiso).toMatchObject({ concepto: 'Vivienda', monto: 650_000, proxima: '2026-11-01' });
     const [renta] = programadosActivos(p.ctx);
@@ -419,7 +422,7 @@ describe('cola "por interpretar"', () => {
   it('CA-M3-05 · las frases guardadas sin red se interpretan al reconectar, en orden', async () => {
     const p = conCuentas();
     p.desconectar();
-    const frases = [TACOS_Y_COCA, TACOS_EN_EFECTIVO, golden('K06').texto];
+    const frases = [TACOS_Y_COCA, TACOS_EN_EFECTIVO, RENTA_NUBE];
     for (const f of frases) {
       expect(await registrarTexto(p.ctx, f, 'voz', { nube: p.nube })).toMatchObject({
         resultado: 'por_interpretar',

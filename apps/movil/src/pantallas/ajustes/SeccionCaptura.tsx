@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import { useCaptura } from '../../captura/ProveedorCaptura';
 import { desactivarCaptura, fijarModoAvisoCaptura, obtenerEstadoCaptura } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -26,13 +27,16 @@ import {
 
 /**
  * Ajustes → Captura automática (`08 §3.1`: "Puedes desactivarlo cuando quieras en Ajustes"). Desactivar vacía
- * la lista blanca nativa: desde ese momento toda notificación se descarta sin guardarse (regla 10).
+ * la lista blanca nativa: desde ese momento toda notificación se descarta sin guardarse (regla 10). Solo Android:
+ * en iPhone no se muestra.
  */
 export function SeccionCaptura() {
   const { ctx, refrescar } = useSesion();
   const { puente } = useCaptura();
   const estado = useVista(obtenerEstadoCaptura);
   const [activando, setActivando] = useState(false);
+  // iOS no deja que una app lea los avisos de otras: en iPhone la sección solo diría «No disponible».
+  if (Platform.OS === 'ios') return null;
   return (
     <Tarjeta testID="ajustes-captura">
       <Texto variante="subtitulo" testID="ajustes-captura-titulo" accessibilityRole="header">

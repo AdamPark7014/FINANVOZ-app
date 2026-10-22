@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
 import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto, useTema } from '../../ui';
-import { CORREO_AYUDA, enlaceCorreoAyuda, PREGUNTAS_FRECUENTES } from './preguntas';
+import { anunciar } from '../../ui/anunciar';
+import { CORREO_AYUDA, enlaceCorreoAyuda, preguntasFrecuentes } from './preguntas';
 import {
   ACCESIBILIDAD_ESCRIBIR_CORREO,
   ACCESIBILIDAD_VOLVER,
@@ -28,7 +29,8 @@ import {
 /**
  * Ayuda (CA-M13-04): las preguntas frecuentes de `textos.ts` (se abren una a una) y el correo de contacto.
  * El correo se abre con `mailto:` y solo el asunto: la persona decide qué contar (regla 9). Si el teléfono no
- * tiene app de correo, se muestra la dirección para escribirla a mano.
+ * tiene app de correo (un iPhone sin Mail), se avisa y la dirección se puede copiar (texto seleccionable; la app no
+ * trae `expo-clipboard`). Las respuestas usan la redacción de la plataforma (`preguntasFrecuentes`).
  */
 export function PantallaAyuda({
   alVolver,
@@ -43,7 +45,11 @@ export function PantallaAyuda({
 
   const escribir = () => {
     setSinCorreo(false);
-    abrirEnlace(enlaceCorreoAyuda()).catch(() => setSinCorreo(true));
+    abrirEnlace(enlaceCorreoAyuda()).catch(() => {
+      setSinCorreo(true);
+      // VoiceOver no lee la región viva del aviso: en iPhone se anuncia aparte.
+      anunciar(etiquetaAccesibleSinAppCorreo(CORREO_AYUDA));
+    });
   };
 
   return (
@@ -73,7 +79,7 @@ export function PantallaAyuda({
       </Texto>
 
       <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityRole="list">
-        {PREGUNTAS_FRECUENTES.map((p) => (
+        {preguntasFrecuentes().map((p) => (
           <Pregunta
             key={p.id}
             p={p}
@@ -91,6 +97,8 @@ export function PantallaAyuda({
           variante="cuerpo"
           testID="ayuda-contacto-cuerpo"
           accessibilityLabel={etiquetaAccesibleCuerpoContacto(CORREO_AYUDA)}
+          // Sin app de correo (o en iPhone sin Mail) la dirección se puede copiar manteniéndola presionada.
+          selectable
         >
           {textoCuerpoContacto(CORREO_AYUDA)}
         </Texto>
@@ -111,6 +119,7 @@ export function PantallaAyuda({
             importantForAccessibility="yes"
             accessibilityLabel={etiquetaAccesibleSinAppCorreo(CORREO_AYUDA)}
             testID="ayuda-sin-correo"
+            selectable
           >
             {mensajeSinAppCorreo(CORREO_AYUDA)}
           </Texto>

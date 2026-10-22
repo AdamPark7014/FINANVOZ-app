@@ -72,6 +72,12 @@ export const BTN_CAMBIAR_CONTRASENA = 'Cambiar contraseña';
 export const BTN_CREAR_CONTRASENA = 'Crear contraseña de respaldo';
 export const BTN_RESTAURAR_RESPALDO = 'Restaurar un respaldo';
 export const MENSAJE_NO_EXPORTAR = 'No pude preparar tu respaldo. Intenta de nuevo.';
+/**
+ * Después de cerrar la hoja de compartir: el sistema no dice si se guardó, así que se explica dónde queda y para
+ * qué sirve, sin prometer que ya está a salvo.
+ */
+export const MENSAJE_ARCHIVO_COMPARTIDO =
+  'Listo: preparé tu respaldo. Si lo guardaste en Archivos o te lo mandaste, ahí queda; con él y tu contraseña recuperas todo en otro teléfono.';
 
 /** Aviso antes de crear la contraseña (`02 §19`, `05 §E16`). */
 export const AVISO_CONTRASENA =

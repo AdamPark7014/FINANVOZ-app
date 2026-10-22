@@ -26,6 +26,11 @@ export interface OpcionesBloqueo {
   reloj?: () => number;
   autenticador?: Autenticador;
   estadoApp?: FuenteEstadoApp;
+  /**
+   * El teléfono ya no tiene ni biometría ni código (se lo quitaron después de encender el bloqueo): la app entra
+   * sin pedir nada y avisa aquí para que la raíz apague el bloqueo en Ajustes.
+   */
+  alSinSeguridad?: () => void;
 }
 
 export interface Bloqueo {
@@ -35,6 +40,11 @@ export interface Bloqueo {
   error: ErrorAutenticacion | null;
   /** Pide biometría o PIN; `true` si se desbloqueó. */
   desbloquear: () => Promise<boolean>;
+  /**
+   * Se desbloqueó sin autenticar porque el teléfono no tiene biometría ni código: sin eso el sistema nunca
+   * autentica y la cortina no se podría quitar. La raíz debe apagar el bloqueo y explicarlo.
+   */
+  sinSeguridad: boolean;
 }
 
 /**
@@ -50,10 +60,16 @@ export function useBloqueo({
   reloj = Date.now,
   autenticador = autenticadorExpo,
   estadoApp = estadoAppRN,
+  alSinSeguridad,
 }: OpcionesBloqueo): Bloqueo {
   const [bloqueado, setBloqueado] = useState(() => activo && bloquearAlIniciar);
   const [autenticando, setAutenticando] = useState(false);
   const [error, setError] = useState<ErrorAutenticacion | null>(null);
+  const [sinSeguridad, setSinSeguridad] = useState(false);
+  const avisarSinSeguridad = useRef(alSinSeguridad);
+  useEffect(() => {
+    avisarSinSeguridad.current = alSinSeguridad;
+  });
 
   const seguimiento = useRef({ bloqueado, salioEn: null as number | null });
   const enCurso = useRef(false);
@@ -69,6 +85,18 @@ export function useBloqueo({
         seguimiento.current = { bloqueado: false, salioEn: null };
         setBloqueado(false);
         return true;
+      }
+      if (r.error === 'sin_seguridad') {
+        // Se vuelve a preguntar al sistema: solo si de verdad no hay biometría ni código se entra sin pedir nada
+        // (un error suelto no basta para saltarse el bloqueo).
+        const hay = await autenticador.disponible().catch(() => true);
+        if (!hay) {
+          seguimiento.current = { bloqueado: false, salioEn: null };
+          setBloqueado(false);
+          setSinSeguridad(true);
+          avisarSinSeguridad.current?.();
+          return true;
+        }
       }
       setError(r.error);
       return false;
@@ -114,5 +142,5 @@ export function useBloqueo({
 
   // Si apagan el bloqueo, deja de aplicar sin esperar autenticación.
   const efectivo = activo && bloqueado;
-  return { bloqueado: efectivo, autenticando, error: efectivo ? error : null, desbloquear };
+  return { bloqueado: efectivo, autenticando, error: efectivo ? error : null, desbloquear, sinSeguridad };
 }

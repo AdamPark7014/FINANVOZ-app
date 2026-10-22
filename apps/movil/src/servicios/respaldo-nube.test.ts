@@ -11,6 +11,7 @@ import { puertoEnMemoria } from '../avisos/puerto';
 import { almacenEnMemoria } from '../db/llave';
 import { aleatorioNode, puertoNode } from '../db/node';
 import { TABLAS_EXPORTADAS } from '../privacidad/exportar';
+import { aceptarConsentimiento } from '../privacidad/consentimiento';
 import { completarOnboarding } from './ajustes';
 import { fijarPreferenciasAvisos } from './avisos-tarjetas';
 import { crearContexto, type Contexto } from './contexto';
@@ -32,8 +33,11 @@ import {
   mensajeErrorNube,
   obtenerRespaldoNube,
   planAvisoRespaldo,
+  registrarRespaldoArchivo,
   registrarRespaldoRestaurado,
   respaldarEnNube,
+  TEXTO_SIN_RESPALDOS,
+  TEXTO_SIN_RESPALDOS_NUBE,
   sincronizarAvisoRespaldo,
   type NubeRespaldo,
   type TipoRed,
@@ -376,6 +380,39 @@ describe('respaldo en la nube (M9)', () => {
     // Un respaldo restaurado más viejo no retrocede la fecha.
     registrarRespaldoRestaurado(p.ctx, '2026-10-01');
     expect(obtenerRespaldoNube(p.ctx).ultimo).toBe('2026-10-11');
+    p.base.cerrar();
+  });
+});
+
+describe('exportar el archivo también cuenta como respaldo (auditoría iPhone)', () => {
+  it('la fecha del archivo apaga el «Respalda tus datos» y se ve en Ajustes; sin nube el texto no habla de la nube', () => {
+    const p = abrirPrueba('2026-10-01');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    completarOnboarding(p.ctx);
+    expect(obtenerRespaldoNube(p.ctx).textoUltimo).toBe(TEXTO_SIN_RESPALDOS_NUBE);
+    expect(obtenerRespaldoNube(p.ctx, { conNube: false }).textoUltimo).toBe(TEXTO_SIN_RESPALDOS);
+    expect(TEXTO_SIN_RESPALDOS).not.toMatch(/nube/);
+
+    // 20 días después del onboarding sin respaldo: pendiente.
+    p.reloj.fijar('2026-10-21');
+    expect(obtenerRespaldoNube(p.ctx).pendiente).toBe(true);
+
+    // Exporta el archivo: deja de estar pendiente y el aviso se recorre 14 días desde hoy.
+    expect(registrarRespaldoArchivo(p.ctx)).toBe('2026-10-21');
+    const vista = obtenerRespaldoNube(p.ctx, { conNube: false });
+    expect(vista).toMatchObject({ pendiente: false, ultimo: null, ultimoArchivo: '2026-10-21' });
+    expect(vista.textoUltimo).toBe('Último respaldo: hoy (archivo exportado)');
+    expect(vista.textoUltimoNube).toBe(TEXTO_SIN_RESPALDOS_NUBE);
+    expect(planAvisoRespaldo(p.ctx, '10:00')[0]?.fecha).toBe('2026-11-04');
+
+    // Un respaldo en la nube más nuevo manda en el texto general.
+    p.reloj.fijar('2026-10-23');
+    registrarRespaldoRestaurado(p.ctx, '2026-10-23');
+    expect(obtenerRespaldoNube(p.ctx).textoUltimo).toBe('Último respaldo: hoy');
+    p.reloj.fijar('2026-10-25');
+    registrarRespaldoArchivo(p.ctx);
+    expect(obtenerRespaldoNube(p.ctx).textoUltimo).toBe('Último respaldo: hoy (archivo exportado)');
+    expect(obtenerRespaldoNube(p.ctx).textoUltimoNube).toBe('Último respaldo: hace 2 días');
     p.base.cerrar();
   });
 });

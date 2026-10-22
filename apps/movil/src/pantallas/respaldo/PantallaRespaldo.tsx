@@ -11,6 +11,7 @@ import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, Interruptor, Tarjeta, Texto } from '../../ui';
+import { anunciar } from '../../ui/anunciar';
 import { FlujoCorreo } from './FlujoCorreo';
 import { FormularioContrasena } from './FormularioContrasena';
 import { TarjetaRespaldo } from './TarjetaRespaldo';
@@ -82,12 +83,31 @@ export function PantallaRespaldo({
           generacion={desdeArchivo}
           alCrearContrasena={() => setDesdeNube((n) => n + 1)}
         />
-      ) : null}
+      ) : (
+        <UltimoRespaldoSinNube />
+      )}
       <TarjetaRespaldo
         key={desdeNube}
         alRestaurar={alRestaurar}
         alCambiarContrasena={() => setDesdeArchivo((n) => n + 1)}
       />
+    </>
+  );
+}
+
+/** Build sin nube (p. ej. TestFlight sin Supabase): el último archivo exportado, o la invitación a exportar uno. */
+function UltimoRespaldoSinNube() {
+  const vista = useVista((ctx) => obtenerRespaldoNube(ctx, { conNube: false }));
+  return (
+    <>
+      <Texto variante="cuerpo" testID="respaldo-ultimo">
+        {vista.textoUltimo}
+      </Texto>
+      {vista.pendiente ? (
+        <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente" accessibilityRole="alert">
+          {AVISO_PENDIENTE}
+        </Texto>
+      ) : null}
     </>
   );
 }
@@ -127,7 +147,12 @@ function TarjetaNube({
   }, [deps, generacion, creada]);
   const [respaldando, setRespaldando] = useState(false);
   const [borrando, setBorrando] = useState<'no' | 'confirmar' | 'borrando'>('no');
-  const [mensaje, setMensaje] = useState<{ texto: string; error: boolean } | null>(null);
+  const [mensaje, setMensajeBase] = useState<{ texto: string; error: boolean } | null>(null);
+  // VoiceOver no lee la región viva del mensaje: en iPhone se anuncia aparte.
+  const setMensaje = (m: { texto: string; error: boolean } | null) => {
+    setMensajeBase(m);
+    if (m) anunciar(m.texto);
+  };
 
   const leerCuenta = useCallback(async () => {
     setCuenta(estadoCuenta(await nube.cuenta.estado().catch(() => null)));
@@ -198,7 +223,7 @@ function TarjetaNube({
         {SUBTITULO_NUBE}
       </Texto>
       <Texto variante="cuerpo" testID="respaldo-ultimo">
-        {vista.textoUltimo}
+        {vista.textoUltimoNube}
       </Texto>
       {vista.pendiente ? (
         <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente" accessibilityRole="alert">

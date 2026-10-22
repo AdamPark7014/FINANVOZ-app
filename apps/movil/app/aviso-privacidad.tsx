@@ -14,6 +14,9 @@ import { Boton, espacio, Pantalla, Texto } from '../src/ui';
 /** Aviso de privacidad completo dentro de la app (`08 §2`), desde O2 y desde Ajustes. Solo lectura. */
 export default function AvisoPrivacidad() {
   const router = useRouter();
+  // Sin pantalla anterior (enlace directo) se vuelve al inicio, que decide entre onboarding y Hoy: el aviso también
+  // se abre desde O2, antes de terminar el onboarding.
+  const volver = () => (router.canGoBack() ? router.back() : router.replace('/'));
   return (
     <Pantalla testID="aviso-privacidad" bordes={['top', 'left', 'right', 'bottom']}>
       <Boton
@@ -22,7 +25,7 @@ export default function AvisoPrivacidad() {
         ancho="contenido"
         etiqueta={ETIQUETA_VOLVER}
         pista={PISTA_VOLVER}
-        alPresionar={() => router.back()}
+        alPresionar={volver}
       />
       <Texto variante="titulo">{TITULO_AVISO_PRIVACIDAD}</Texto>
       <Texto variante="secundario" tono="secundario">

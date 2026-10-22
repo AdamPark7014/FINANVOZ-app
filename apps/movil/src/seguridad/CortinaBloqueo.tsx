@@ -1,10 +1,17 @@
-import { View } from 'react-native';
+import { useEffect } from 'react';
+import { Platform, View } from 'react-native';
+import { anunciar } from '../ui/anunciar';
 import { Boton } from '../ui/componentes/Boton';
 import { Texto } from '../ui/componentes/Texto';
 import { useTema } from '../ui/tema';
 import { espacio, margenPantalla } from '../ui/tokens';
-import { MENSAJES_AUTENTICACION } from './autenticador';
+import { mensajeAutenticacion } from './autenticador';
 import type { Bloqueo } from './useBloqueo';
+
+/** Pista de «Desbloquear» con las palabras de cada plataforma. */
+export function pistaDesbloquear(os: string = Platform.OS): string {
+  return os === 'ios' ? 'Usa Face ID o el código del iPhone' : 'Usa tu huella, tu cara o el PIN del teléfono';
+}
 
 /**
  * Cubre toda la app mientras está bloqueada: no muestra ninguna cifra ni dato.
@@ -12,6 +19,11 @@ import type { Bloqueo } from './useBloqueo';
  */
 export function CortinaBloqueo({ bloqueo }: { bloqueo: Bloqueo }) {
   const { c } = useTema();
+  const mensaje = bloqueo.bloqueado && bloqueo.error ? mensajeAutenticacion(bloqueo.error) : null;
+  // VoiceOver no lee la región viva: en iPhone el motivo se anuncia aparte.
+  useEffect(() => {
+    if (mensaje) anunciar(mensaje);
+  }, [mensaje]);
   if (!bloqueo.bloqueado) return null;
   return (
     <View
@@ -32,14 +44,14 @@ export function CortinaBloqueo({ bloqueo }: { bloqueo: Bloqueo }) {
       <Texto variante="titulo" alinear="center">
         Finanvoz está bloqueada
       </Texto>
-      {bloqueo.error ? (
+      {mensaje ? (
         <Texto variante="cuerpo" tono="secundario" alinear="center" accessibilityLiveRegion="polite">
-          {MENSAJES_AUTENTICACION[bloqueo.error]}
+          {mensaje}
         </Texto>
       ) : null}
       <Boton
         etiqueta="Desbloquear"
-        pista="Usa tu huella, tu cara o el PIN del teléfono"
+        pista={pistaDesbloquear()}
         cargando={bloqueo.autenticando}
         alPresionar={() => {
           void bloqueo.desbloquear();

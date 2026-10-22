@@ -1,6 +1,7 @@
 import { LEYENDA_ESTIMACION } from '../../servicios/deducciones';
 import { INTERPRETACIONES_NUBE_MES } from '../../servicios/plan';
 import { etiquetaHablada } from '../../ui/formato';
+import { segunPlataforma } from '../ajustes/plataforma';
 
 export interface PreguntaFrecuente {
   /** Estable: forma el `testID` y sirve para medir cuál se abre (sin contenido). */
@@ -60,7 +61,7 @@ export function textoCuerpoContacto(correo: string): string {
 }
 
 export function mensajeSinAppCorreo(correo: string): string {
-  return `No encontré una app de correo en tu teléfono. Escríbenos desde tu correo a ${correo}.`;
+  return `No encontré una app de correo en tu teléfono. Mantén presionada la dirección para copiarla y escríbenos desde tu correo a ${correo}.`;
 }
 
 /**
@@ -195,3 +196,40 @@ export const PREGUNTAS_FRECUENTES: readonly PreguntaFrecuente[] = [
     ],
   },
 ];
+
+/**
+ * Respuestas de iPhone para las preguntas cuyo texto de Android no es cierto allí (sin captura automática, sin Google
+ * Play, con Face ID). Mismo id y mismo orden; las demás se quedan igual.
+ */
+const RESPUESTAS_IOS: Readonly<Record<string, readonly string[]>> = {
+  captura: [
+    'En iPhone no puedo leer los avisos de tu banco: iOS no deja que una app lea las notificaciones de otras.',
+    'Dicta tu gasto, como «tacos 80 en efectivo», o escríbelo. Lo dudoso va a Por revisar.',
+  ],
+  permisos: [
+    'Micrófono y reconocimiento de voz para dictar; avisos de cortes y arqueos; Face ID si activas el bloqueo.',
+    'Ninguno es obligatorio: puedes escribir todo a mano. Los revisas en Ajustes › Privacidad › Revisar permisos en tu teléfono.',
+  ],
+  respaldo: [
+    'Ajustes › Respaldo: exporta un archivo .cartera y guárdalo en Archivos o mándatelo. Si ves la opción de la nube, también puedes respaldar ahí con tu correo. Va cifrado con una contraseña que solo tú conoces.',
+    'En otro teléfono: instala Finanvoz › «Restaurar respaldo» con tu archivo (o tu correo, si respaldaste en la nube) y tu contraseña. El respaldo es gratis.',
+  ],
+  plus: [
+    `Plus: probabilidad de llegar al pago, «¿Me alcanza?», tarjeta del día, meses a 12 meses, preguntas libres, deducciones y ${INTERPRETACIONES_NUBE_MES.plus} frases al mes en internet (Gratis, ${INTERPRETACIONES_NUBE_MES.gratis}).`,
+    'Gratis: «hoy puedes», voz, cuentas y tarjetas, avisos, arqueo, respaldo y exportar o borrar datos. En iPhone, Plus todavía no se vende en la App Store. Si cancelas, vuelves a Gratis sin perder datos.',
+  ],
+  borrar: [
+    'Ajustes › Privacidad: «Descargar todos mis datos» (gratis) o «Borrar todos mis datos» en este teléfono; confirmas escribiendo BORRAR y no se deshace.',
+    'Respaldo en la nube: Ajustes › Respaldo › Borrar cuenta de respaldo. Borrar tus datos no cancela una suscripción: eso se hace en la tienda donde la compraste.',
+  ],
+};
+
+export const PREGUNTAS_FRECUENTES_IOS: readonly PreguntaFrecuente[] = PREGUNTAS_FRECUENTES.map((p) => {
+  const respuesta = RESPUESTAS_IOS[p.id];
+  return respuesta ? { ...p, respuesta } : p;
+});
+
+/** Las preguntas frecuentes con la redacción de la plataforma (`os` inyectable en pruebas). */
+export function preguntasFrecuentes(os?: string): readonly PreguntaFrecuente[] {
+  return segunPlataforma({ ios: PREGUNTAS_FRECUENTES_IOS, android: PREGUNTAS_FRECUENTES }, os);
+}

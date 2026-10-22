@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
-import { Text } from 'react-native';
+import { Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
 import Ayuda from '../../../app/ayuda';
@@ -12,6 +12,7 @@ import {
   aceptarConsentimiento,
   agregarEfectivo,
   completarOnboarding,
+  fijarBloqueo,
   obtenerBloqueo,
   obtenerPreferenciasAvisos,
   type Contexto,
@@ -20,7 +21,15 @@ import { abrirSesion } from '../../servicios/sesion';
 import { notificacionesEnMemoria } from '../avisos/notificaciones';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { etiquetaAccesibilidadVersion, PISTA_AYUDA, PISTA_VOLVER } from './textos';
+import {
+  confirmacionBloqueoActivo,
+  etiquetaAccesibilidadVersion,
+  MENSAJE_BLOQUEO_NO_VERIFICADO,
+  mensajeBloqueoApagadoSinSeguridad,
+  mensajeBloqueoSinSeguridad,
+  PISTA_AYUDA,
+  PISTA_VOLVER,
+} from './textos';
 
 /**
  * La raíz real (`app/_layout.tsx`) con la apertura nativa sustituida: cada `abrirSesion` entrega una base nueva
@@ -45,6 +54,13 @@ jest.mock('../../servicios/sesion', () => ({
 jest.mock('expo-screen-capture', () => ({
   preventScreenCaptureAsync: jest.fn(async () => {}),
   allowScreenCaptureAsync: jest.fn(async () => {}),
+}));
+// Biometría del teléfono: con código y desbloqueo con éxito por omisión; cada prueba la cambia.
+const mockAutenticacion = { nivel: 2, resultado: { success: true } as { success: boolean; error?: string } };
+jest.mock('expo-local-authentication', () => ({
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
+  getEnrolledLevelAsync: jest.fn(async () => mockAutenticacion.nivel),
+  authenticateAsync: jest.fn(async () => mockAutenticacion.resultado),
 }));
 // El SDK de Sentry deja temporizadores vivos en jest; sin DSN `iniciarSentry` no hace nada de todos modos.
 jest.mock('../../observabilidad', () => ({ iniciarSentry: jest.fn() }));
@@ -93,6 +109,8 @@ function ctxInicial(): Contexto {
 afterEach(() => {
   for (const s of mockAbiertas.splice(0)) s.cerrar();
   mockNotificaciones = null;
+  mockAutenticacion.nivel = 2;
+  mockAutenticacion.resultado = { success: true };
   jest.clearAllMocks();
 });
 
@@ -119,7 +137,7 @@ describe('ajustes', () => {
     mockPreparar = conDatos;
   });
 
-  it('bloqueo y ocultar en multitarea se guardan', () => {
+  it('bloqueo y ocultar en multitarea se guardan; el bloqueo solo tras un desbloqueo con éxito', async () => {
     renderRouter(RUTAS, { initialUrl: '/ajustes' });
     const ctx = ctxInicial();
     fireEvent.press(screen.getByTestId('ajustes-multitarea'));
@@ -128,8 +146,60 @@ describe('ajustes', () => {
       checked: true,
       disabled: false,
     });
-    fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
+    });
     expect(obtenerBloqueo(ctx).activo).toBe(true);
+    expect(screen.getByTestId('ajustes-bloqueo-mensaje')).toHaveTextContent(
+      confirmacionBloqueoActivo('android'),
+    );
+  });
+
+  it('en un teléfono sin código el bloqueo no se enciende y se explica cómo ponerlo (con «Abrir Ajustes»)', async () => {
+    mockAutenticacion.nivel = 0;
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const ctx = ctxInicial();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
+    });
+    expect(obtenerBloqueo(ctx).activo).toBe(false);
+    expect(screen.getByTestId('ajustes-bloqueo-mensaje')).toHaveTextContent(
+      mensajeBloqueoSinSeguridad('android'),
+    );
+    const abrir = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
+    fireEvent.press(screen.getByTestId('ajustes-bloqueo-abrir-ajustes'));
+    expect(abrir).toHaveBeenCalled();
+  });
+
+  it('si el desbloqueo se cancela, el bloqueo sigue apagado', async () => {
+    mockAutenticacion.resultado = { success: false, error: 'user_cancel' };
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const ctx = ctxInicial();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
+    });
+    expect(obtenerBloqueo(ctx).activo).toBe(false);
+    expect(screen.getByTestId('ajustes-bloqueo-mensaje')).toHaveTextContent(MENSAJE_BLOQUEO_NO_VERIFICADO);
+  });
+
+  it('con el bloqueo encendido y el teléfono ya sin código, Ajustes lo apaga y lo explica', async () => {
+    mockPreparar = (ctx) => {
+      conDatos(ctx);
+      fijarBloqueo(ctx, { activo: true });
+    };
+    mockAutenticacion.nivel = 0;
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const ctx = ctxInicial();
+    await waitFor(() => expect(obtenerBloqueo(ctx).activo).toBe(false));
+    expect(screen.getByTestId('ajustes-bloqueo-mensaje')).toHaveTextContent(
+      mensajeBloqueoApagadoSinSeguridad('android'),
+    );
+  });
+
+  it('«Volver» sin pantalla anterior lleva a Hoy', () => {
+    const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    fireEvent.press(screen.getByTestId('ajustes-volver'));
+    expect(r.getPathname()).toBe('/hoy');
   });
 
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
