@@ -7,6 +7,11 @@ export const TITULO = 'Ajustes';
 
 export const MENSAJE_NO_GUARDAR = 'No pude guardar el cambio. Intenta de nuevo.';
 
+/** Grupos de Ajustes (`02 §12`). */
+export const GRUPO_DINERO = 'Tu dinero';
+export const GRUPO_APP = 'Voz y avisos';
+export const GRUPO_SEGURIDAD = 'Seguridad y datos';
+export const GRUPO_AYUDA = 'Plan y ayuda';
 export const SECCION_BLOQUEO = 'Bloqueo';
 export const ETIQUETA_BLOQUEO = 'Pedir huella o PIN al abrir';
 export const DESC_BLOQUEO = 'También al volver después de 1 minuto fuera de la app.';

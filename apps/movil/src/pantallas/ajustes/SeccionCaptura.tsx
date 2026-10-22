@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import { useCaptura } from '../../captura/ProveedorCaptura';
 import { desactivarCaptura, fijarModoAvisoCaptura, obtenerEstadoCaptura } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
@@ -29,6 +30,12 @@ import {
  * la lista blanca nativa: desde ese momento toda notificación se descarta sin guardarse (regla 10).
  */
 export function SeccionCaptura() {
+  // En iPhone no hay captura de notificaciones (`02 §25`): sin sección que solo diga «no disponible».
+  if (Platform.OS === 'ios') return null;
+  return <SeccionCapturaAndroid />;
+}
+
+function SeccionCapturaAndroid() {
   const { ctx, refrescar } = useSesion();
   const { puente } = useCaptura();
   const estado = useVista(obtenerEstadoCaptura);

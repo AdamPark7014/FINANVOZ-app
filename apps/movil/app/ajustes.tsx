@@ -18,6 +18,10 @@ import {
   PISTA_VOLVER,
   SECCION_ACERCA,
   SECCION_AYUDA,
+  GRUPO_APP,
+  GRUPO_AYUDA,
+  GRUPO_DINERO,
+  GRUPO_SEGURIDAD,
   SECCION_BLOQUEO,
   SECCION_DEV,
   SECCION_PRIVACIDAD,
@@ -115,9 +119,18 @@ export default function Ajustes() {
         {TITULO}
       </Texto>
 
+      <Grupo titulo={GRUPO_DINERO} />
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
       <SeccionColchon />
+      <SeccionDatosCobro />
 
+      <Grupo titulo={GRUPO_APP} />
+      <SeccionVoz />
+      <SeccionAvisos />
+      <SeccionCaptura />
+      <SeccionWidget />
+
+      <Grupo titulo={GRUPO_SEGURIDAD} />
       <Tarjeta testID="ajustes-seccion-bloqueo">
         <Texto variante="subtitulo">{SECCION_BLOQUEO}</Texto>
         <Interruptor
@@ -135,11 +148,6 @@ export default function Ajustes() {
           alCambiar={(ocultarEnMultitarea) => cambiarBloqueo({ ocultarEnMultitarea })}
         />
       </Tarjeta>
-
-      <SeccionVoz />
-      <SeccionAvisos />
-      <SeccionCaptura />
-      <SeccionWidget />
 
       <Tarjeta testID="ajustes-respaldo">
         <Texto variante="subtitulo">{SECCION_RESPALDO}</Texto>
@@ -161,9 +169,6 @@ export default function Ajustes() {
         />
       </Tarjeta>
 
-      <SeccionDatosCobro />
-      <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
-
       <Tarjeta>
         <Texto variante="subtitulo">{SECCION_PRIVACIDAD}</Texto>
         <Texto variante="secundario" tono="secundario">
@@ -182,6 +187,8 @@ export default function Ajustes() {
         ) : null}
       </Tarjeta>
 
+      <Grupo titulo={GRUPO_AYUDA} />
+      <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
       <Tarjeta testID="ajustes-ayuda">
         <Texto variante="subtitulo">{SECCION_AYUDA}</Texto>
         <Texto variante="secundario" tono="secundario">
@@ -232,6 +239,15 @@ export default function Ajustes() {
         <MenuDesarrollo cargar={control.cargarEscenario} />
       ) : null}
     </Pantalla>
+  );
+}
+
+/** Encabezado de un grupo de Ajustes (`02 §12`): separa lo de tu dinero, la app, la seguridad y la ayuda. */
+function Grupo({ titulo }: { titulo: string }) {
+  return (
+    <Texto variante="etiqueta" tono="secundario" accessibilityRole="header" style={{ marginTop: espacio.m }}>
+      {titulo.toUpperCase()}
+    </Texto>
   );
 }
 
