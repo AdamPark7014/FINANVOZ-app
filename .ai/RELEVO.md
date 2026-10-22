@@ -1,7 +1,7 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-21
+- **Fecha:** 2026-10-22
 - **Rama:** main
 
 ## Hecho en este turno
@@ -41,7 +41,9 @@
   fallas eran `rendimiento.test.ts` (RNF-01, tiempos de E8 en Node: ~109 ms contra el umbral de 100 con Ollama y
   otros procesos cargando la PC; el núcleo no cambió) y `personas.test.tsx` (ya corregida: el aviso usa la
   descripción). Al repetir `rendimiento.test.ts` solo pasó.
-- **App Store Connect**: Chrome sin sesión; Adam entra y luego se crea la app (`com.finanvoz.app`, SKU `FINANVOZ-IOS`).
+- **App Store Connect: app «Finanvoz» creada el 22-10** (Apple ID 6825850016, es-MX, SKU `FINANVOZ-IOS`, acceso
+  ilimitado) y App ID `com.finanvoz.app` registrado con Push Notifications en el equipo AHNW9K8745. Falta llenar ficha,
+  privacidad y revisión (§5–§7 de `docs/tienda/IOS-APP-STORE.md`) y la primera build por «iOS · TestFlight».
 - **Adam:** correr `pwsh -File scripts\subir-secretos-ios.ps1` y `pwsh -File scripts\subir-secretos-android.ps1`;
   respaldar la llave de subida fuera de la PC. Después: Actions → «iOS · TestFlight» y «Android · Play», y subir el
   AAB a prueba interna.
@@ -52,7 +54,8 @@
 
 ## Siguiente paso
 
-1. Adam — sesión en App Store Connect, secretos, primera corrida de TestFlight y de Play (prueba interna).
+1. Adam — secretos (`subir-secretos-ios.ps1`, `subir-secretos-android.ps1`); luego primera corrida de TestFlight y
+   de Play (prueba interna).
 2. Adam — M0 antes del 6 nov; cuentas Expo/RevenueCat/PostHog; contador; abogado; pruebas en teléfono.
 3. Código: los 27 casos del golden set que siguen en `null` (`06 §9.3`) se quedan así a propósito; si Adam quiere
    más cobertura sin nube, conviene crecer el golden set con frases reales antes de inventar reglas.
@@ -67,5 +70,5 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; camino tienda ~55 % (pipelines, fichas y app en Play listos; faltan secretos, App Store Connect,
+FinanVoz código ~95 %; camino tienda ~60 % (pipelines, fichas y apps creadas en Play y App Store Connect; faltan secretos,
 dominio, legal).

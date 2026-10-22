@@ -180,7 +180,7 @@ precio, periodo, prueba y forma de cancelar visibles antes de comprar).
 
 | # | Qué | Quién | Bloquea |
 | --- | --- | --- | --- |
-| 1 | Crear la app en App Store Connect (§2) | Adam | Todo lo demás |
+| 1 | ~~Crear la app en App Store Connect (§2)~~ **Hecha el 22-10-2026** con la cuenta NEXARA (Claude in Chrome, con el sí de Adam): App ID `com.finanvoz.app` registrado en Certificates, Identifiers & Profiles (equipo AHNW9K8745, Push Notifications activo) y app «Finanvoz» creada (Apple ID **6825850016**, iOS, Español (México), SKU `FINANVOZ-IOS`, acceso ilimitado). Falta llenar §5–§7 en la consola | — | — |
 | 2 | Cargar los secretos con `scripts\subir-secretos-ios.ps1` (§3); confirmar que la llave de ASC tiene rol Admin | Adam (con `gh`) | §4 |
 | 3 | Primera corrida de «iOS · TestFlight» con `upload` marcado y prueba interna en un iPhone del equipo | Adam lanza; Claude revisa la corrida | Capturas, prueba externa |
 | 4 | Dominio `finanvoz.com` y páginas públicas: aviso de privacidad y soporte (sentada 1 de `LANZAMIENTO.md`, pendientes 12 y 26); revisión legal del aviso (pendientes 4, 26 y 103) | Adam + abogado | Prueba externa, envío a revisión y ficha pública. **No** bloquea la prueba interna |
