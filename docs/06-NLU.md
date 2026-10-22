@@ -469,7 +469,13 @@ Cuando la persona toca el micrófono de un campo de monto, lo dicho se interpret
 ```
 CAMPO_MONTO := [son|es|fue|fueron|de|pon|ponle|tengo|traigo] (MONTO | MILES_CON_RESTO | cero | nada)   — toda la frase
 MILES_CON_RESTO := [DIGITOS(1..999)] mil DIGITOS(1..999) [pesos]                                        — «2 mil 500», «mil 500»
+INGRESO_DICHO := [me pagan|me depositan|me cae(n)|cobro|gano|son|es] MONTO [REGLA | FRECUENCIA]
+FRECUENCIA := a la|por|cada quincena | quincenal | cada|a la|por semana [el DIA] | semanal
+            | cada 14 días | cada dos semanas | catorcenal | cada|al|por mes | mensual(es)
 ```
+
+`interpretarIngresoDicho` llena O3 («O dímelo»): `REGLA` es la de §9.2 CONFIGURAR (quincena, semanal con día,
+mensual con día); con `FRECUENCIA` sola el día queda vacío y se elige en pantalla (nunca se adivina).
 
 `MONTO` es la pieza de §9.1 (dígitos, `k`, «N mil», palabras, jerga y aproximados). Lo que no se lea completo da
 `null` y el campo no cambia («dos cincuenta», «500 de tacos»). La voz nunca guarda: llena el campo, muestra
