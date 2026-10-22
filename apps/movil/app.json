@@ -16,7 +16,9 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "NSMicrophoneUsageDescription": "Finanvoz usa el micrófono para registrar lo que dictas.",
+        "NSPhotoLibraryUsageDescription": "Finanvoz no lee tu galería de fotos. Si algún día eliges una imagen para importarla, se queda en tu teléfono."
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,
@@ -75,7 +77,7 @@
         "expo-camera",
         {
           "cameraPermission": "Finanvoz usa la cámara solo para escanear el código QR de tu pareja en gastos compartidos.",
-          "microphonePermission": false,
+          "microphonePermission": "Finanvoz usa el micrófono para registrar lo que dictas.",
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": true
         }

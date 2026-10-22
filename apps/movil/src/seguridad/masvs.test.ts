@@ -78,7 +78,16 @@ describe('MASVS L1 verificable en código', () => {
       'android.permission.CAMERA',
     ]);
     const camara = appJson.expo.plugins.find((p) => Array.isArray(p) && p[0] === 'expo-camera');
-    expect(camara?.[1]).toMatchObject({ microphonePermission: false, recordAudioAndroid: false });
+    // La cámara no graba audio en Android. En iOS no se puede dejar `microphonePermission: false`: el plugin de la
+    // cámara se aplica después del de dictado y borraría NSMicrophoneUsageDescription (Apple rechazó la carga
+    // 1.0.0 (2) con ITMS-90683). Lleva el mismo texto del dictado: un solo propósito para el micrófono.
+    const dictado = appJson.expo.plugins.find(
+      (p) => Array.isArray(p) && p[0] === 'expo-speech-recognition',
+    ) as [string, { microphonePermission: string }] | undefined;
+    expect(camara?.[1]).toMatchObject({
+      recordAudioAndroid: false,
+      microphonePermission: dictado?.[1].microphonePermission,
+    });
     expect(appJson.expo.android.blockedPermissions).toEqual(
       expect.arrayContaining([
         'android.permission.READ_EXTERNAL_STORAGE',

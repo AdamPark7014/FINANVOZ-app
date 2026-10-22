@@ -128,6 +128,18 @@ jobs:
           test -f "$IOS_DIR/Finanvoz/PrivacyInfo.xcprivacy" || { echo "::error::Falta PrivacyInfo.xcprivacy (expo prebuild debía generarlo)."; exit 1; }
           /usr/bin/plutil -lint "$IOS_DIR/Finanvoz/PrivacyInfo.xcprivacy"
           echo "ITSAppUsesNonExemptEncryption: $(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$IOS_DIR/Finanvoz/Info.plist")"
+          # ITMS-90683 (carga 1.0.0 (2) rechazada): Apple exige el texto de cada permiso que el binario puede pedir,
+          # aunque lo pida una librería. Se revisa aquí y no a los 25 minutos, tras archivar.
+          falta=0
+          for clave in NSMicrophoneUsageDescription NSSpeechRecognitionUsageDescription NSCameraUsageDescription \
+                       NSFaceIDUsageDescription NSPhotoLibraryUsageDescription; do
+            if valor="$(/usr/libexec/PlistBuddy -c "Print :$clave" "$IOS_DIR/Finanvoz/Info.plist" 2>/dev/null)" && [ -n "$valor" ]; then
+              echo "$clave: $valor"
+            else
+              echo "::error::Falta $clave en Info.plist (app.json → ios.infoPlist o el plugin que la pone)."; falta=1
+            fi
+          done
+          [ $falta -eq 0 ] || exit 1
           echo "Entitlements:"
           cat "$IOS_DIR"/Finanvoz/*.entitlements 2>/dev/null || echo "(sin archivo de entitlements)"
 
