@@ -59,6 +59,7 @@ import { mensajeAportacion, mensajeCobro } from '../tandas/textos';
 import { FormularioTarjetaNueva } from '../tarjetas/FormularioTarjetaNueva';
 import { TarjetaConfirmarMsi } from '../tarjetas/TarjetaConfirmarMsi';
 import { mensajeCompraMsi, mensajeTarjetaConfigurada } from '../tarjetas/textos';
+import { TarjetaConfirmarIngreso } from './TarjetaConfirmarIngreso';
 import { TarjetaConfirmarTanda } from './TarjetaConfirmarTanda';
 import { ConfirmacionRegistro, EnlaceAnaliticaCorreccion } from './ConfirmacionRegistro';
 import { TarjetaConsulta } from './TarjetaConsulta';
@@ -75,6 +76,7 @@ import {
   MENSAJE_SIN_DUPLICADOS,
   EJEMPLO_CAMPO_REGISTRAR,
   mensajeAnulado,
+  mensajeColchonDicho,
   mensajeConfigurado,
   mensajeCorregido,
   mensajeEsperandoConexion,
@@ -102,7 +104,8 @@ type ConTarjeta = Extract<
       | 'confirmar_compartido'
       | 'confirmar_tanda'
       | 'tarjeta_por_agregar'
-      | 'tanda_por_crear';
+      | 'tanda_por_crear'
+      | 'ingreso_por_confirmar';
   }
 >;
 
@@ -307,6 +310,11 @@ export function PanelRegistrar({
             transaccionId: r.movimiento.transaccionId,
           });
           return;
+        case 'colchon_configurado':
+          terminarRevision();
+          setTexto('');
+          avisar(mensajeColchonDicho(r.monto), r.deshacer);
+          return;
         case 'tarjeta_configurada':
           terminarRevision();
           setTexto('');
@@ -322,6 +330,7 @@ export function PanelRegistrar({
         case 'confirmar_tanda':
         case 'tarjeta_por_agregar':
         case 'tanda_por_crear':
+        case 'ingreso_por_confirmar':
           if (medicion.current) medicion.current.pregunto = true;
           setTarjeta({ datos: r, origen });
           return;
@@ -616,6 +625,19 @@ export function PanelRegistrar({
             alCancelar={() => setTarjeta(null)}
           />
         </Tarjeta>
+      ) : null}
+      {tarjeta?.datos.resultado === 'ingreso_por_confirmar' ? (
+        <TarjetaConfirmarIngreso
+          propuesta={tarjeta.datos.propuesta}
+          alGuardar={(mensaje) => {
+            terminarRevision();
+            setTarjeta(null);
+            setTexto('');
+            avisarRegistro(mensaje);
+            if (tarjeta.origen === 'voz') contestar(mensaje, true);
+          }}
+          alCancelar={() => setTarjeta(null)}
+        />
       ) : null}
       {tarjeta?.datos.resultado === 'aclarar' ? (
         <TarjetaAclarar
