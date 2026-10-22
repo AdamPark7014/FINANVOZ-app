@@ -143,3 +143,126 @@ export function interpretarIngresoDicho(texto: string): IngresoDicho | null {
   }
   return l.fin ? { ...lectura, frecuencia } : null;
 }
+
+export type FrecuenciaPagoDicha = 'mensual' | 'quincenal' | 'semanal' | 'anual';
+
+/** Un pago fijo de O5 dicho de una vez; lo que no se dijo (día, mes) queda vacío y se elige en pantalla. */
+export interface PagoFijoDicho extends LecturaMonto {
+  /** Como se dijo, sin artículo: «renta», «Netflix», «la colegiatura» → «colegiatura». */
+  concepto: string;
+  frecuencia: FrecuenciaPagoDicha | null;
+  diaMes: number | null;
+  diaSemana: DiaSemana | null;
+  mes: number | null;
+}
+
+const VERBOS_PAGO: readonly (readonly string[])[] = [
+  ['tengo', 'que', 'pagar'],
+  ['debo', 'pagar'],
+  ['me', 'toca', 'pagar'],
+  ['pago'],
+];
+const UNION_MONTO: readonly (readonly string[])[] = [
+  ['me', 'cuesta'],
+  ['sale', 'en'],
+  ['cuesta'],
+  ['son'],
+  ['es'],
+  ['de'],
+];
+/** Donde termina el concepto y empieza la frecuencia o el monto. */
+const FIN_CONCEPTO = new Set([
+  'cada',
+  'el',
+  'los',
+  'al',
+  'a',
+  'por',
+  'todos',
+  'mensual',
+  'quincenal',
+  'semanal',
+  'anual',
+]);
+const ARTICULOS_CONCEPTO = new Set(['la', 'el', 'los', 'las', 'mi', 'mis', 'un', 'una']);
+const MAX_PALABRAS_CONCEPTO = 4;
+
+/** Palabras del concepto en su forma original (con mayúsculas); `null` si no hay o son demasiadas. */
+function leerConcepto(l: Lector, terminaEn: (k: number) => boolean): string | null {
+  while (ARTICULOS_CONCEPTO.has(l.ver() ?? '')) l.pos++;
+  const inicio = l.pos;
+  while (!l.fin && !terminaEn(0)) {
+    const p = l.ver() ?? '';
+    if (!/^[a-zñ]+$/.test(p)) break;
+    l.pos++;
+  }
+  const n = l.pos - inicio;
+  if (n === 0 || n > MAX_PALABRAS_CONCEPTO) return null;
+  return l.tokens.c.slice(inicio, l.pos).join(' ');
+}
+
+/** «cada mes el 5», «el 5 de cada mes», «cada mes», «al año», «cada quincena»… Debe terminar la frase. */
+function frecuenciaDePago(
+  l: Lector,
+): Pick<PagoFijoDicho, 'frecuencia' | 'diaMes' | 'diaSemana' | 'mes'> | null {
+  const nada = { frecuencia: null, diaMes: null, diaSemana: null, mes: null } as const;
+  if (l.fin) return nada;
+  const marca = l.marca();
+  const regla = leerRegla(l);
+  if (regla && l.fin) {
+    switch (regla.tipo) {
+      case 'mensual':
+        return { ...nada, frecuencia: 'mensual', diaMes: regla.dia };
+      case 'quincenal_15_ultimo':
+        return { ...nada, frecuencia: 'quincenal' };
+      case 'semanal':
+        return { ...nada, frecuencia: 'semanal', diaSemana: regla.dia_semana as DiaSemana };
+      case 'anual':
+        return { ...nada, frecuencia: 'anual', diaMes: regla.dia, mes: regla.mes };
+      default:
+        return null;
+    }
+  }
+  l.volver(marca);
+  let frecuencia: FrecuenciaPagoDicha | null = null;
+  if (l.alguna(['cada', 'mes'], ['al', 'mes'], ['por', 'mes'], ['mensual'], ['mensuales']))
+    frecuencia = 'mensual';
+  else if (l.alguna(['cada', 'quincena'], ['a', 'la', 'quincena'], ['por', 'quincena'], ['quincenal']))
+    frecuencia = 'quincenal';
+  else if (l.alguna(['cada', 'semana'], ['a', 'la', 'semana'], ['por', 'semana'], ['semanal']))
+    frecuencia = 'semanal';
+  else if (l.alguna(['cada', 'año'], ['al', 'año'], ['por', 'año'], ['anual'])) frecuencia = 'anual';
+  return frecuencia !== null && l.fin ? { ...nada, frecuencia } : null;
+}
+
+/**
+ * PAGO_DICHO := (pago | tengo que pagar | debo pagar) MONTO (de | del | por) CONCEPTO [FRECUENCIA]
+ *             | CONCEPTO (son | es | cuesta | me cuesta | sale en | de) MONTO [FRECUENCIA]
+ *             | CONCEPTO MONTO [FRECUENCIA]
+ * «pago 4500 de renta cada mes el 5», «la luz son 450 cada mes», «Netflix 299 al mes».
+ */
+export function interpretarPagoFijoDicho(texto: string): PagoFijoDicho | null {
+  const l = new Lector(tokenizar(texto));
+  if (l.fin) return null;
+  const terminaEnFrecuencia = (k: number) => FIN_CONCEPTO.has(l.ver(k) ?? '');
+
+  if (l.alguna(...VERBOS_PAGO)) {
+    const lectura = leerMonto(l);
+    if (lectura === null || lectura.monto <= 0 || !l.palabra('de', 'del', 'por')) return null;
+    const concepto = leerConcepto(l, terminaEnFrecuencia);
+    if (concepto === null) return null;
+    const f = frecuenciaDePago(l);
+    return f ? { ...lectura, concepto, ...f } : null;
+  }
+
+  const concepto = leerConcepto(
+    l,
+    (k) => terminaEnFrecuencia(k) || UNION_MONTO.some((u) => u[0] === l.ver(k)),
+  );
+  if (concepto === null) return null;
+  l.alguna(...UNION_MONTO);
+  const lectura = leerMonto(l);
+  if (lectura === null || lectura.monto <= 0) return null;
+  const f = frecuenciaDePago(l);
+  return f ? { ...lectura, concepto, ...f } : null;
+}

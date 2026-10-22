@@ -14,6 +14,7 @@ import {
 import { OPCIONES_DIA_SEMANA } from '../../src/pantallas/onboarding/ingreso';
 import {
   capitalizar,
+  respuestasDePagoDicho,
   describirRegla,
   hastaDePago,
   leerPagosRestantes,
@@ -69,6 +70,8 @@ import {
   PAGOS_FIJOS_SUGERIDOS,
   quitarPagoFijo,
 } from '../../src/servicios';
+import { interpretarPagoFijoDicho } from '@cartera/nlu';
+import { DecirloPaso } from '../../src/pantallas/onboarding/DecirloPaso';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import {
   Boton,
@@ -216,6 +219,19 @@ export default function PagosFijos() {
         />
       }
     >
+      <DecirloPaso
+        testID="onb-pago-decir"
+        ejemplo="pago 4500 de renta cada mes el 5"
+        interpretar={interpretarPagoFijoDicho}
+        alEntender={(d) => {
+          const r = respuestasDePagoDicho(d, PAGOS_FIJOS_SUGERIDOS);
+          // Igual que tocar el chip (nombre, «cambia cada vez», campos nuevos) y luego lo dicho encima.
+          reiniciar(r.clave);
+          setNombre(r.nombre);
+          setRespuestas(r.respuestas);
+          setMonto(r.monto);
+        }}
+      />
       <Chips testID="onb-pago" opciones={CHIPS} valor={clave} alCambiar={reiniciar} />
       {clave !== null ? (
         <Tarjeta key={`${clave}-${formulario}`} testID="onb-pago-formulario">
@@ -266,6 +282,7 @@ export default function PagosFijos() {
             testID="onb-pago-monto"
             etiqueta={variable ? ETIQUETA_PAGO_MONTO_VARIABLE : ETIQUETA_PAGO_MONTO_FIJO}
             {...(variable ? { ayuda: AYUDA_PAGO_VARIABLE } : {})}
+            valorInicial={monto}
             alCambiar={setMonto}
           />
           <Casilla

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { interpretarIngresoDicho, interpretarMonto } from './campos';
+import { interpretarIngresoDicho, interpretarMonto, interpretarPagoFijoDicho } from './campos';
 
 describe('interpretarMonto (campo de monto dictado, 06 §9.4)', () => {
   it.each([
@@ -62,4 +62,46 @@ describe('interpretarIngresoDicho (O3 dictado)', () => {
       expect(interpretarIngresoDicho(texto)).toBeNull();
     },
   );
+});
+
+describe('interpretarPagoFijoDicho (O5 dictado)', () => {
+  const nada = { aproximado: false, diaMes: null, diaSemana: null, mes: null };
+  it.each([
+    [
+      'pago 4500 de renta cada mes el 5',
+      { ...nada, concepto: 'renta', monto: 450_000, frecuencia: 'mensual', diaMes: 5 },
+    ],
+    ['la luz son 450 cada mes', { ...nada, concepto: 'luz', monto: 45_000, frecuencia: 'mensual' }],
+    ['Netflix 299 al mes', { ...nada, concepto: 'Netflix', monto: 29_900, frecuencia: 'mensual' }],
+    [
+      'el internet me cuesta 499 el 10 de cada mes',
+      { ...nada, concepto: 'internet', monto: 49_900, frecuencia: 'mensual', diaMes: 10 },
+    ],
+    ['gimnasio 600', { ...nada, concepto: 'gimnasio', monto: 60_000, frecuencia: null }],
+    [
+      'debo pagar 1200 de la colegiatura cada quincena',
+      { ...nada, concepto: 'colegiatura', monto: 120_000, frecuencia: 'quincenal' },
+    ],
+    [
+      'el seguro del coche 8 mil cada año el 3 de marzo',
+      { ...nada, concepto: 'seguro del coche', monto: 800_000, frecuencia: 'anual', diaMes: 3, mes: 3 },
+    ],
+    [
+      'la tanda son 500 cada viernes',
+      { ...nada, concepto: 'tanda', monto: 50_000, frecuencia: 'semanal', diaSemana: 5 },
+    ],
+  ])('«%s»', (texto, esperado) => {
+    expect(interpretarPagoFijoDicho(texto)).toEqual(esperado);
+  });
+
+  it.each([
+    '',
+    'renta',
+    'pago la renta',
+    '450 cada mes',
+    'la luz son 450 cuando llega',
+    'pago 4500 de renta cada mes y luz 300',
+  ])('«%s» no se adivina', (texto) => {
+    expect(interpretarPagoFijoDicho(texto)).toBeNull();
+  });
 });
