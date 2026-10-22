@@ -325,8 +325,15 @@ export type ResultadoTexto =
   | { readonly resultado: 'no_encontrado'; readonly accion: AccionElegir | 'duplicados' }
   | { readonly resultado: 'duplicados'; readonly grupos: readonly (readonly MovimientoVista[])[] }
   | { readonly resultado: 'configurado'; readonly compromiso: CompromisoConfigurado }
-  /** K02–K04 ("quiero 500 de colchón", "me pagan 8 mil cada quincena", "tengo 4,200 en BBVA"): "Guardar" llama `confirmarAjuste`. */
+  /** K03–K04 ("me pagan 8 mil cada quincena", "tengo 4,200 en BBVA"): "Guardar" llama `confirmarAjuste`. */
   | { readonly resultado: 'confirmar_ajuste'; readonly propuesta: PropuestaAjuste }
+  /** K02 ("quiero 500 de colchón"): ya aplicado, con Deshacer (`k:<anterior>`) que regresa al anterior. */
+  | {
+      readonly resultado: 'colchon_configurado';
+      readonly monto: Centavos;
+      readonly anterior: Centavos;
+      readonly deshacer: string;
+    }
   /** TK01 "entré a una tanda…": formulario prellenado con el calendario de E11; "Guardar" llama `crearTanda`. */
   | { readonly resultado: 'tanda_por_crear'; readonly propuesta: PropuestaTanda }
   /** "Di mi tanda" / "me tocó la tanda" (TK02) que necesita confirmación; "Guardar" llama `confirmarTanda`. */
@@ -1062,11 +1069,21 @@ function aplicarAjuste(
         throw error;
       }
     }
-    case 'colchon':
+    case 'colchon': {
+      // Reversible con Deshacer, como el ciclo de tarjeta y los compromisos; ingreso y saldo sí se confirman.
+      const g = confirmarAjuste(
+        ctx,
+        { tipo: 'colchon', monto: a.monto, actual: obtenerColchon(ctx) },
+        frase.origen,
+      );
+      if (g.tipo !== 'colchon') return noSoportado;
       return {
-        resultado: 'confirmar_ajuste',
-        propuesta: { tipo: 'colchon', monto: a.monto, actual: obtenerColchon(ctx) },
+        resultado: 'colchon_configurado',
+        monto: g.monto,
+        anterior: g.anterior,
+        deshacer: `k:${g.anterior}`,
       };
+    }
     case 'ingreso_recurrente': {
       // Sin monto o sin regla no hay qué guardar; un sueldo anual no existe en O3.
       if (a.monto === undefined || a.regla === undefined || a.regla.tipo === 'anual') return noSoportado;
@@ -1261,7 +1278,7 @@ function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Fr
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
   if (i?.intencion === 'gasto_compartido') return proponerGastoCompartido(ctx, i.gasto);
-  // Colchón, ingreso y saldo piden "Guardar"; ciclo de tarjeta y compromisos se aplican con "Deshacer" (K01–K08).
+  // Ingreso y saldo piden "Guardar"; colchón, ciclo de tarjeta y compromisos se aplican con "Deshacer" (K01–K08).
   if (i?.intencion === 'configurar') return aplicarAjuste(ctx, i.ajuste, cuentas, frase);
   if (i?.intencion !== 'registrar') return null;
   return registrarInterpretado(ctx, i.movimientos, cuentas, frase);

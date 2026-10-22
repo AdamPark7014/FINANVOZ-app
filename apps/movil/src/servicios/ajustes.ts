@@ -31,6 +31,12 @@ export function fijarColchon(ctx: Contexto, monto: Centavos): void {
   escribirAjuste(ctx, 'colchon', Colchon, { monto });
 }
 
+/** Deshacer de un colchón dicho desde Hoy (token `k:<anterior>`, `deshacer.ts`). */
+export function deshacerColchon(ctx: Contexto, anterior: string): void {
+  const monto = Number(anterior);
+  if (Number.isSafeInteger(monto) && monto >= 0) fijarColchon(ctx, monto as Centavos);
+}
+
 export function obtenerColchon(ctx: Contexto): Centavos {
   return leerAjuste(ctx, 'colchon', Colchon)?.monto ?? 0;
 }

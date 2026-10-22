@@ -6,6 +6,7 @@ import { listarMovimientos } from './movimientos';
 import { agregarCuenta, agregarTarjetaCredito } from './onboarding';
 import type { PlainDate, Regla } from '@cartera/core';
 import { obtenerColchon } from './ajustes';
+import { deshacer as deshacerAviso } from './deshacer';
 import { ingresoPrincipal, programadosActivos } from './programados';
 import {
   confirmarAjuste,
@@ -138,24 +139,23 @@ describe('registrar por voz o texto', () => {
 });
 
 describe('configurar desde Hoy con el nivel 0 (K01–K08, sin nube)', () => {
-  it('K02 · el colchón se propone y solo se guarda con "Guardar"', async () => {
+  it('K02 · el colchón se aplica al momento y "Deshacer" regresa al anterior', async () => {
     const p = conCuentas();
     const r = await registrarTexto(p.ctx, golden('K02').texto, 'voz');
-    if (r.resultado !== 'confirmar_ajuste') throw new Error(r.resultado);
-    expect(r.propuesta).toEqual({ tipo: 'colchon', monto: 50_000, actual: 0 });
-    expect(obtenerColchon(p.ctx)).toBe(0);
-    expect(contarPorInterpretar(p.ctx)).toBe(0);
-    expect(confirmarAjuste(p.ctx, r.propuesta, 'voz')).toEqual({
-      tipo: 'colchon',
-      monto: 50_000,
-      anterior: 0,
-    });
+    expect(r).toEqual({ resultado: 'colchon_configurado', monto: 50_000, anterior: 0, deshacer: 'k:0' });
     expect(obtenerColchon(p.ctx)).toBe(50_000);
+    expect(contarPorInterpretar(p.ctx)).toBe(0);
     // V03 · "treinta y un mil" (A0).
     const v03 = registrarTextoLocal(p.ctx, 'quiero treinta y un mil de colchón', 'voz');
-    expect(v03).toMatchObject({
-      resultado: 'confirmar_ajuste',
-      propuesta: { monto: 3_100_000, actual: 50_000 },
+    expect(v03).toMatchObject({ resultado: 'colchon_configurado', monto: 3_100_000, anterior: 50_000 });
+    if (v03?.resultado !== 'colchon_configurado') throw new Error(v03?.resultado ?? 'null');
+    deshacerAviso(p.ctx, v03.deshacer);
+    expect(obtenerColchon(p.ctx)).toBe(50_000);
+    // La propuesta de colchón sigue sirviendo a quien la confirme a mano (onboarding, asistente).
+    expect(confirmarAjuste(p.ctx, { tipo: 'colchon', monto: 0, actual: 50_000 }, 'texto')).toEqual({
+      tipo: 'colchon',
+      monto: 0,
+      anterior: 50_000,
     });
   });
 

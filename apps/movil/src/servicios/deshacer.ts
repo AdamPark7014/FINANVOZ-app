@@ -1,4 +1,5 @@
 import { exigirConsentimiento } from '../privacidad/consentimiento';
+import { deshacerColchon } from './ajustes';
 import { deshacerCicloTarjeta } from './config-tarjetas';
 import { enTransaccion, type Contexto } from './contexto';
 import { deshacerCompromiso, deshacerCorreccion, restaurarAnulado } from './correcciones';
@@ -14,6 +15,7 @@ import { deshacerLiquidacion, deshacerPasarAMeses } from './msi';
  * - `m:<compra_msi>:<cargo>`: pasar a meses → vuelve el cargo original y se anulan sus cuotas facturadas.
  * - `l:<plan>:<liquidación>`: liquidar meses → se anula la liquidación y el plan vuelve a estar activo.
  * - `t:<tarjeta>:<corte>:<límite>:<días>`: cambio de ciclo de una tarjeta → vuelve al ciclo anterior.
+ * - `k:<anterior>`: colchón dicho → vuelve al colchón anterior.
  * Una compra a meses se deshace con su id (anularla anula también el plan y sus cuotas facturadas).
  * El libro nunca se edita: deshacer siempre escribe transacciones nuevas (regla 2).
  */
@@ -29,6 +31,7 @@ export function deshacer(ctx: Contexto, token: string): void {
       else if (prefijo === 'm' && a && b) deshacerPasarAMeses(ctx, a, b);
       else if (prefijo === 'l' && a && b) deshacerLiquidacion(ctx, a, b);
       else if (prefijo === 't' && a) deshacerCicloTarjeta(ctx, parte);
+      else if (prefijo === 'k' && a !== undefined) deshacerColchon(ctx, a);
       else anularMovimiento(ctx, parte);
     }
   });

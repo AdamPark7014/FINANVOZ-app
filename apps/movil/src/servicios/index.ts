@@ -62,6 +62,7 @@ export {
 } from './widget';
 export { fijarVozRespuesta, obtenerVozRespuesta, type AjustesVozRespuesta } from './voz-respuesta';
 export {
+  confirmarAjuste,
   aplicarEleccion,
   confirmarCompraMsi,
   confirmarCuentaDividida,
@@ -82,11 +83,13 @@ export {
   type MotivoPorInterpretar,
   type OpcionesTexto,
   type OrigenDictado,
+  type PropuestaAjuste,
   type PropuestaCompraMsi,
   type PropuestaCuentaDividida,
   type PropuestaGastoCompartido,
   type PropuestaMovimiento,
   type ResultadoCola,
+  type AjusteGuardado,
   type ResultadoTexto,
   type ResumenMovimiento,
 } from './registrar';

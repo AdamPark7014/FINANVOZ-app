@@ -6,6 +6,13 @@
 
 ## Hecho en este turno
 
+- **PR #28 integrado (colchón e ingreso dichos desde Hoy)**: queda una sola vía en `servicios/registrar.ts`
+  (`aplicarAjuste`): colchón al momento con Deshacer (`colchon_configurado`, token `k:<anterior>` en
+  `deshacer.ts`, `deshacerColchon` en `ajustes.ts`); ingreso y saldo con `confirmar_ajuste` →
+  `TarjetaConfirmarAjuste` (la de #28 generalizada: «¿Cambio tu ingreso?» y «¿Ajusto el saldo?» con elección de
+  cuenta) en `PanelRegistrar`. Se borran `servicios/ajustes-dichos.ts` y su prueba; `servicios/index.ts` exporta
+  `confirmarAjuste`, `PropuestaAjuste` y `AjusteGuardado`. Cierra el pendiente de V-A (el panel no mostraba
+  `confirmar_ajuste`). `06 §7` unificado. typecheck limpio, vitest registrar 22/22, jest principal 115/115.
 - **Merge con el hilo de la nube (PR #24–#27)**: teclado de iPhone, `ContextoDictadoCampos`/`BotonDictarCampo`,
   `reglas/campos.ts`, «O dímelo» en O3 y O5 (`DecirloPaso`), O6 saltado en iPhone, textos por plataforma,
   `FormularioCuenta`/`FormularioPagoFijo` extraídos del onboarding. Las rutas `/cuenta-nueva` y `/pago-fijo-nuevo` de
@@ -100,8 +107,6 @@
 
 ## A medias — CUIDADO
 
-- **El hilo de la nube siguió publicando tras la orden de Adam**: #28 (e8f5214, «colchón e ingreso dichos desde Hoy
-  sin la nube») entró a origen a las 15:18 y todavía no está fusionado aquí; duplica `confirmar_ajuste` de V-A.
 - **Ocho agentes en vuelo el 22-10 (tarde), nada commiteado de ellos**: V-A (`packages/nlu` montos y pasos), V-B
   (`src/voz`, `src/ui` teclado iOS), B-1 (`pantallas/principal`, movimientos), B-2a (plan, suscripciones,
   `ios-testflight.yml`), B-2b (cuentas, ajustes, privacidad), B-3 (tarjetas, tandas, compartido), T-1
