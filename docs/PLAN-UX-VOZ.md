@@ -51,7 +51,7 @@ Siguiente build: iOS 1.0.0 (4) y Android versionCode 2.
 3. **Barra de navegación nativa** (título grande y chevron en iOS), sin «Volver» dentro del contenido.
 4. **«Agregar» en Cuentas** (débito, billetera, ahorro, pago fijo) fuera del onboarding: hoy en iPhone no se puede. Hecho.
 5. **Íconos de sistema y vibración** (`expo-symbols`, `expo-haptics`).
-6. **Ajustes como lista agrupada** con valor actual y ›.
+6. **Ajustes como lista agrupada** con valor actual y ›. Grupos hechos y Captura oculta en iPhone; el formato de lista con › espera a la barra nativa.
 7. **Movimientos:** `SectionList` por día con total, chips de filtro, detalle en hoja, botón en el vacío.
 8. **Onboarding más corto:** barra de progreso, ‹ arriba, menos tips, «Más opciones» en O3/O5, tarjeta de primer uso
    en Hoy («Prueba decir «tacos 80 en efectivo»»).
