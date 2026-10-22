@@ -11,7 +11,8 @@ import { PantallaRegistrar } from './PantallaRegistrar';
 import { PISTA_REVISAR_FRASE } from './textos';
 
 const HOY = '2026-10-11';
-const TACOS_Y_COCA = 'me eché unos tacos de 80 con la Nu y una coca de 25 en efectivo';
+// Sin verbo y con «chelas» (fuera del diccionario): el nivel 0 la deja a la nube (06 §9.3).
+const TACOS_Y_COCA = 'unas chelas de 80 con la Nu y una coca de 25 en efectivo';
 const TACOS_EN_EFECTIVO = 'no, los tacos fueron en efectivo';
 
 const RESPUESTAS = {
@@ -178,7 +179,8 @@ describe('Registrar con la nube', () => {
   it('una frase que la nube entendió pero necesita confirmación lleva "Revisar" y se confirma en Registrar', async () => {
     const p = preparar();
     p.desconectar();
-    p.responder('ayer compré una tele de 6,000 con la morada', {
+    // Sin verbo y con «chelas»: el nivel 0 la deja a la nube (06 §9.3); la nube contesta un monto alto.
+    p.responder('anoche unas chelas de 6,000 con la morada', {
       intencion: 'registrar',
       movimientos: [
         {
@@ -190,7 +192,7 @@ describe('Registrar con la nube', () => {
         },
       ],
     });
-    await escribir('ayer compré una tele de 6,000 con la morada');
+    await escribir('anoche unas chelas de 6,000 con la morada');
     await act(async () => {
       p.reconectar();
     });

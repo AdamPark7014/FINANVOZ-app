@@ -1056,6 +1056,11 @@ function aplicarInterpretacion(
 function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
   const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
   if (i?.intencion === 'consultar' && tienePlantilla(i.consulta.tipo)) {
+    // La misma puerta que la nube (`aplicarInterpretacion`): "Hoy puedes" es de Gratis; las demás consultas, de
+    // Plus (`01 §11`). Sin esto, el nivel 0 ampliado regalaría las consultas de Plus.
+    if (i.consulta.tipo !== 'hoy_puedes' && !funcionesPlan(ctx).consultas) {
+      return { resultado: 'consulta', respuesta: respuestaSoloPlus(i.consulta.tipo) };
+    }
     return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
   }
   if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };

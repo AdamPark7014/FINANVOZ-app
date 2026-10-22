@@ -137,7 +137,8 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     });
     fireEvent.press(screen.getByTestId('boton-guardar-division'));
 
-    expect(screen.getByTestId('aviso')).toHaveTextContent(/Cuenta dividida \$1,200 · te deben \$900/);
+    // El nivel 0 (06 §9) trae la descripción («cena»): el aviso la usa, como documenta `textos.ts`.
+    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: cena \$1,200 · te deben \$900/);
     const [mov] = listarMovimientos(p.ctx).flatMap((d) => d.movimientos);
     expect(p.ctx.libro.obtener(mov?.id as string)?.asientos.map((a) => [a.cuentaId, a.monto])).toEqual([
       ['cat:personal:comida_fuera', 30_000],

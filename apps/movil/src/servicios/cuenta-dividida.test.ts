@@ -169,8 +169,8 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
   it('"Cena de 1,200 entre 4 con la Nu" con tres contactos: caso 8, Te deben $300 c/u y el cobro de Caro la deja en 0', async () => {
     const p = base();
     const f = nubeFalsa({ [D01.texto]: D01.esperado });
-    // El nivel 0 no lo resuelve (golden: reglas false): va a la nube.
-    expect(registrarTextoLocal(p.ctx, D01.texto, 'voz')).toBeNull();
+    // Desde el nivel 0 ampliado (06 §9) la propone sin nube; con nube el resultado es el mismo.
+    expect(registrarTextoLocal(p.ctx, D01.texto, 'voz')).toMatchObject({ resultado: 'confirmar_division' });
     const r = await registrarTexto(p.ctx, D01.texto, 'voz', { nube: f.nube });
     if (r.resultado !== 'confirmar_division') throw new Error(r.resultado);
     expect(r.propuesta).toMatchObject({
@@ -263,8 +263,10 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
 
   it('en la cola "por interpretar" queda para revisar (necesita a la persona)', async () => {
     const p = base();
-    const f = nubeFalsa({ [D01.texto]: D01.esperado });
-    const r = await registrarTexto(p.ctx, D01.texto, 'voz', { nube: null });
+    // D03 sigue en la nube (06 §9.3: quién debe qué se decide con la persona).
+    const D03 = golden('D03');
+    const f = nubeFalsa({ [D03.texto]: D03.esperado });
+    const r = await registrarTexto(p.ctx, D03.texto, 'voz', { nube: null });
     expect(r.resultado).toBe('por_interpretar');
     expect(await procesarPorInterpretar(p.ctx, f.nube)).toEqual({
       aplicadas: 0,

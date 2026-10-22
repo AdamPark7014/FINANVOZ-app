@@ -287,41 +287,179 @@ Crecimiento del golden set: casos nuevos a partir de correcciones reales **solo*
 
 ## 9. Nivel 0 · Gramática de reglas
 
-Acepta únicamente estas formas (mayúsculas, acentos y puntuación final se ignoran); cualquier otra cosa → `null`:
+Acepta únicamente estas formas; cualquier otra cosa → `null`. Mayúsculas, acentos y los signos `¿¡?!` se ignoran; una coma, dos puntos o punto y coma seguidos de espacio son el separador `,` (las comas de miles no). Implementación: `packages/nlu/src/reglas/` (un archivo por familia; `index.ts` fija el orden). Ninguna regla usa el reloj: la fecha viene en el contexto.
+
+### 9.1 Piezas comunes
 
 ```
-GASTO     := VERBO DESC [de|por|en]? MONTO [pesos]? [METODO]?
-           | DESC_CONOCIDA [de|por|en]? MONTO [pesos]? [METODO]?     ← sin verbo
-           | VERBO MONTO (de|en) DESC [METODO]?
-           | MONTO (de|del|en) DESC_CONOCIDA [METODO]?                 ← "800 de la consulta con el médico"
-GASTO_COMPARTIDO := frase con SEÑAL y, sin la señal ni QUIEN_PAGO, solo
-             [de|por]? MONTO [de|del|en]? DESC_CONOCIDA | DESC_CONOCIDA [de|del|en]? MONTO
-SEÑAL     := REPARTO | compartido | gasto compartido | mitad y mitad | a medias | con mi (pareja|esposa|esposo|novia|novio)
-REPARTO   := a/b con a, b ≥ 1 y a + b = 100 (uno solo por frase)
+MONTO     := [APROX] (DIGITOS | DIGITOS mil | DIGITOS k | PALABRAS | PALABRAS mil [PALABRAS] | mil [PALABRAS] | JERGA) [MONEDA] [APROX_FIN]
+DIGITOS   := [$] dígitos con "," de miles y "." decimal (≤ 2 decimales, ≤ 9 enteros)      "1,250.50" "$96" "1.5k" "8 mil" "1.5 mil"
+PALABRAS  := cardinal bien formado: [CENTENA] [DECENA [y UNIDAD] | UNIDAD]                  "ochenta y cinco" "doscientos cincuenta" "veinticinco mil"
+             (otra cifra pegada es ambigua: "dos cincuenta" → null; "un"/"una" solos son artículos, no un peso)
+JERGA     := (N | medio) (kilo|kilos|luca|lucas) no seguido de de/del/y                     "un kilo" → 1,000; "medio kilo" → 500; "un kilo de carne" → null
+MONEDA    := pesos | peso | pesitos | varos | varo | baros | baro
+APROX     := como | aprox | aproximadamente | más o menos | unos | unas (solo ante una cifra) → aproximado: true
+APROX_FIN := y feria | y pico | aprox | aproximadamente | más o menos
+N         := entero en dígitos o en palabras (meses, partes, días)
+FECHA     := hoy | ayer | anoche | antier | anteayer | hace N (días|día) | el DIA_SEMANA [pasado] | el N | el N de MES (solo si ≤ hoy)
+             al registrar: ocurrencia pasada más reciente sin contar hoy; "el N" = fecha más reciente ≤ hoy con ese día; nada futuro
+FECHA_SIM := hoy | mañana | el [próximo] DIA_SEMANA (próxima ocurrencia) | el N (próxima fecha ≥ hoy) | la [próxima] quincena (proximo_ingreso)
+PERIODO   := hoy | ayer | esta semana | este mes | lo que va del mes | el mes pasado | esta quincena | este año | los (próximos|siguientes) N días
+METODO    := (en|con) (efectivo|cash|billetes) | (con|en|por) (débito|la de débito|transferencia|tarjeta de débito)
+           | (con|en) (crédito|la de crédito|tarjeta de crédito) | (con|en) [la] tarjeta | (con|en) [PREFIJO] ALIAS
+PREFIJO   := la | el | mi | la de | la tarjeta | mi tarjeta | la cuenta de | mi cuenta de
+ALIAS     := alias de una cuenta del contexto dicho tal cual (hasta 4 palabras); el mismo alias en cuentas de tipos distintos → null.
+             Con "en", un alias de efectivo no es método ("en la tienda" es un lugar, y además señal de negocio → null).
+PERSONA   := [mi|la|el] [don|doña] NOMBRE — NOMBRE: alias de contacto o cliente (1 o 2 palabras), o 1 palabra desconocida que no es
+             artículo, pronombre, palabra del diccionario, de las que DESCARTAN ni alias de cuenta ("la vecina", "mi primo")
+DESC      := [art] 1 a 3 palabras de letras, sin palabras de enlace (por con en de del para a al y que me te se le nos) ni de las que
+             DESCARTAN, sin nombres ni alias; categoría por diccionario (§3.1) si sus palabras del diccionario son de una sola categoría
+DESC_CONOCIDA := DESC con todas sus palabras en el diccionario (sin categoría si son de dos: "tacos coca")
+DESC (compuesta) := A (con|de|del|en) [art] B, ≤ 3 palabras, todas del diccionario y de una sola categoría    "consulta con el médico"
+                  | A en [art] COMERCIO, con A conocida                                                      "despensa en Soriana"
+FRASE_CONOCIDA := corte de pelo | corte de cabello | me cortaron el pelo | me corté el pelo | el agua | recibo de (agua|luz)  (vale como DESC_CONOCIDA)
+COMERCIO  := 1 o 2 palabras con mayúscula inicial en el texto (nunca la primera de la frase) que no son alias, nombre, palabra del
+             diccionario ni de enlace                                                                           "Oxxo" "Soriana" "Liverpool"
+DESCARTAN := hoy ayer anoche antier anteayer hace mañana lunes…domingo semana mes pasado pasada quincena cada año próximo próxima siempre
+             efectivo cash billetes débito crédito tarjeta cajero transferencia depósito mínimo mensualidad meses msi préstamo deuda abono
+             tanda nómina sueldo ingreso ingresos retiro venta ventas cobro pago pagos reembolso devolución premio bono aguinaldo beca
+             rendimientos saldo colchón cuenta cuentas medio media entre tienda negocio caja cliente clientes mercancía local insumos fiado
+```
+
+### 9.2 Producciones
+
+Orden (gana la primera que consume la frase completa): `GASTO_COMPARTIDO`, `CONSULTA`, `SIMULAR`, `ARQUEO`, `CONFIGURAR`, `CORREGIR`, `ANULAR`, `DUPLICADOS`, `RETIRO`, `TRANSFERENCIA`, `INGRESO`, `PAGO_TDC`, `PRESTAMOS`, `TANDA`, `MSI`, `DIVIDIDA` y `GASTO`. Así "pagué 3,000 de la Nu" es pago de tarjeta y no un gasto, y "tengo 4,200 en BBVA" es conciliación y no un gasto.
+
+```
+GASTO     := [FECHA [,]] PARTE ((y | ,) PARTE)* [, [todo|todos|ambos|los dos] METODO] [FECHA]       1 a 10 partes, una fecha por frase
+PARTE     := NUCLEO [en [art] COMERCIO] [METODO]
+NUCLEO    := VERBO [yo] [(en|a) [art]] DESC [,] [de|por|en] [fueron|fue|costó|salió] MONTO          "pagué la luz, fueron 410" "comí en un restaurante, 640"
+           | DESC_CONOCIDA [,] [de|por|en] [fueron|fue] MONTO                                        "uber 120" "tacos, 80" "me cortaron el pelo, 150"
+           | VERBO MONTO (de|en|por) [art] DESC                                                     "gasté 450 de gasolina" "pagué 380 de agua" (→ servicios)
+           | MONTO (de|del|en|por) [art] DESC_CONOCIDA                                              "800 de la consulta con el médico" "1.5k en el súper"
+           | (me costó | me salió) [en] MONTO [art] DESC                                            "me costó un kilo la chamarra"
+           | (registra | anota | apunta) MONTO                                                      "registra 50" (gasto sin categoría ni descripción)
+           | le (puse | eché | cargué) MONTO de (gasolina|diésel|magna|premium) [al coche|al carro|al auto|a la camioneta|a la moto]
+VERBO     := me compré | compré | me eché | me gasté | gasté | pagué | comí | cené | desayuné | registra | anota | apunta
+```
+
+- El METODO final con "todo" vale para todas las partes; una parte con método propio lo conserva ("gasolina 500 con la Nu y un café de 60 en efectivo"); "todo" junto a un método propio → `null`. El VERBO de la primera parte vale para las siguientes ("pagué netflix 219 y la plomería 300"). Una parte sin monto ("unos tacos de 80 y una coca") → `null`.
+- Con negocio activo, DESC "mercancía" o "insumos" [para la tienda|para el negocio] → esa categoría con `espacio: 'negocio'` ("compré mercancía para la tienda, 2,300 con la de Banorte"); sin negocio → `null`.
+- "agua" es `servicios` solo como "el agua" o tras "MONTO de" ("pagué 380 de agua"); "gasté 15 en agua" queda sin categoría y "agua 15" → `null`.
+
+```
+GASTO_COMPARTIDO := [FECHA] frase con SEÑAL y, en cualquier orden, [QUIEN_PAGO] [REPARTO] y
+                    [de|por]? MONTO [de|del|en|por]? DESC_CONOCIDA | DESC_CONOCIDA [de|del|en|por]? MONTO   (las comas se ignoran)
+SEÑAL      := REPARTO | compartido | compartida | gasto compartido | mitad y mitad | a medias | con mi (pareja|esposa|esposo|novia|novio)
+REPARTO    := a/b con a, b ≥ 1 y a + b = 100 (uno solo por frase)
 QUIEN_PAGO := [lo] pagué [yo] | yo pagué | [lo] pagó (ella|él|mi pareja…|NOMBRE)
-VERBO     := me compré | compré | me eché | gasté | pagué
-METODO    := (en|con) (efectivo | cash | débito | la de débito | la de crédito | tarjeta | [la] ALIAS)
-INGRESO   := me depositaron MONTO | me cayó la quincena[,] MONTO
-RETIRO    := saqué MONTO del cajero
-PAGO_TDC  := pagué MONTO de [la] ALIAS_CREDITO
-ARQUEO    := traigo MONTO en (la cartera | efectivo)
-CONSULTA  := cuánto puedo gastar [hoy]
-MONTO     := dígitos con "," de miles y "." decimal opcionales (sin palabras en v1)
-DESC      := 1 a 3 palabras después de quitar un artículo inicial (un una unos unas el la los las),
-             sin ninguna de: por con en de del para a al y que me te se le nos;
-             categoría por diccionario (§3.1) o sin categoría
-DESC_CONOCIDA := DESC con al menos una palabra del diccionario de categorías
-DESC (compuesta) := hasta 3 palabras unidas por con/de/del/en (sin contar artículos), todas del
-             diccionario y de una sola categoría: "consulta médica", "consulta con el médico"
 ```
 
-- `GASTO_COMPARTIDO` se prueba antes que todo lo demás: con SEÑAL, el nivel 0 responde `gasto_compartido` o `null`, nunca un gasto personal. En "a/b" la primera cifra es la parte del usuario solo con "pagué yo"; si pagó la pareja (o no se dijo quién) y el reparto no es 50/50 → `null` (lo resuelve la nube o pregunta). "N mil" (1 a 3 dígitos) solo se acepta dentro de esta forma. Un `NOMBRE` es una palabra de al menos 2 letras que no es pronombre, artículo, palabra del diccionario ni alias de cuenta; va en `grupo`.
+- Se prueba antes que todo lo demás: con SEÑAL, el nivel 0 responde `gasto_compartido` o `null`, nunca un gasto personal. En "a/b" la primera cifra es la parte del usuario solo con "pagué yo"; si pagó la pareja (o no se dijo quién) y el reparto no es 50/50 → `null`. Un `NOMBRE` dicho tras "pagó" va en `grupo`. "ayer pagué 1,500 del súper con mi pareja, 70/30" → fecha de ayer, `pagador: 'yo'`, `mi_parte: 70`.
 
-Sin `DESC_CONOCIDA`, frases como "me quedan 85 pesos en efectivo" o "tengo 4,200 en BBVA" se registrarían como gastos (falsos positivos encontrados al validar esta gramática con una implementación de referencia contra el golden set: cobertura 16/16, precisión 17/17).
+```
+INGRESO   := [FECHA] ( me cayó la quincena [,] MONTO                                             → sueldo
+                     | me depositaron la quincena [en [PREFIJO] ALIAS_DEB] [,] MONTO             → sueldo, destino débito
+                     | me depositaron MONTO [(en|a) [PREFIJO] ALIAS_DEB]                         → destino débito
+                     | [PERSONA] me regaló MONTO | me regalaron MONTO                            → regalo_recibido
+                     | me reembolsaron MONTO [(de|por) TEXTO] [(a|en) [PREFIJO] ALIAS_DEB]       → reembolso
+                     | [me cayeron|me depositaron|me pagaron|me llegaron] [los] rendimientos [de TEXTO] [,] MONTO   → rendimientos
+                     | vendí MONTO [en la tienda|en el negocio]                                  → ventas, espacio negocio (solo con negocio activo)
+                     | vendí (mi|el|la|un|una|unos|unas) TEXTO (en|por) MONTO [, me [lo|la] pagaron METODO]   → ventas (personal, METODO = destino) )
+TEXTO     := 1 a 6 palabras de letras sin las que DESCARTAN, sin alias ni nombres ("de la comida de trabajo", "de cetes")
+RETIRO    := [FECHA] (saqué|retiré) MONTO ( del cajero [con [PREFIJO] ALIAS_NO_EFE]                           → origen débito (o la tarjeta dicha)
+                                           | (de|del) [PREFIJO] ALIAS_NO_EFE [(en|del) [el] cajero]           "retiré mil de BBVA"
+                                           | con [PREFIJO] ALIAS_NO_EFE (en|del) [el] cajero )                "saqué 300 con la oro en el cajero" (disposición)
+RETIRO_DUEÑO := [FECHA] (saqué|me pagué) MONTO (de la caja|de la tienda|del negocio) para mí      → retiro_dueno con ese alias (solo con negocio)
+TRANSFERENCIA := [FECHA] (pasé|transferí|moví|mandé) MONTO (de|del) [PREFIJO] ALIAS_A (a|al) [PREFIJO] ALIAS_B   propias, distintas, ninguna de crédito
+               | [FECHA] deposité [MONTO] [en] efectivo [MONTO] (a|en) [PREFIJO] ALIAS_DEB                     → efectivo → ALIAS
+PAGO_TDC  := [FECHA] pagué MONTO (de|a) [la|mi] [tarjeta] ALIAS_CRED [ORIGEN]                                   "pagué 3,000 de la Nu"
+           | [FECHA] (pagué|liquidé|aboné) [el mínimo de|el total de] [la|mi] [tarjeta] ALIAS_CRED [ORIGEN] [,] [fueron|fue] MONTO
+                                                                                "liquidé la Nu, fueron 2,150" "pagué el mínimo de la oro, 600"
+ORIGEN    := (desde|con|de) [PREFIJO] ALIAS_NO_CRED | con efectivo | en efectivo | por transferencia              "pagué la tarjeta oro desde BBVA, 4,200"
+PRESTAMOS := [FECHA] ( le (presté|fié) MONTO a PERSONA                                         → prestamo_otorgado
+                     | PERSONA [ya] me (regresó|devolvió) [los|las] MONTO [CLAUSULA_DEBIA]     → cobro_prestamo
+                     | PERSONA [ya] me (pagó|depositó) [los|las] MONTO CLAUSULA_DEBIA          → cobro_prestamo (depositó → destino débito)
+                     | PERSONA me prestó MONTO                                                 → prestamo_recibido
+                     | le pagué [a PERSONA] MONTO [a PERSONA] CLAUSULA_PRESTO )                → pago_prestamo
+CLAUSULA_DEBIA  := [de lo] que le presté | que le había prestado | [de lo] que me debía | [de lo] que me debe
+CLAUSULA_PRESTO := [de lo] que me prestó | que me había prestado | [de lo] que le debía | [de lo] que le debo
+TANDA     := [FECHA] ( (di|pagué|aboné|puse|deposité) (mi|la) tanda [METODO] [,] MONTO | (di|pagué) MONTO (de|a) (mi|la) tanda [METODO]  → aportacion_tanda
+                     | [ya] (me tocó|cobré) la tanda [,] [me dieron|fueron|fue|son] MONTO [METODO] )                                 → cobro_tanda (METODO = destino)
+MSI       := [FECHA] [VERBO|saqué] [art] DESC ( (de|por) MONTO a N (meses|msi) [sin intereses|msi] [con [PREFIJO] ALIAS_CRED | con la de crédito]
+                                              | a N (meses|msi) [sin intereses|msi] [con …] [,] MONTO )     N = 2..48; origen crédito si no dijo tarjeta
+DIVIDIDA  := [FECHA] (VERBO|dividimos) [art] DESC [(de|por) MONTO] entre N [,] [yo pagué MONTO] [METODO]      N = 2..50, un solo monto
+```
 
-- Se prueban en este orden y gana la primera: `GASTO_COMPARTIDO`, `CONSULTA`, `ARQUEO`, `RETIRO`, `INGRESO`, `PAGO_TDC`, `GASTO` (y dentro de `GASTO`, sus formas en el orden escrito). Así "pagué 3,000 de la Nu" es pago de tarjeta y no un gasto con descripción "la Nu".
-- `INGRESO` con "me depositaron" produce `destino: {tipo: 'debito'}`; `RETIRO` produce `origen: {tipo: 'debito'}` y `destino: {tipo: 'efectivo'}`.
-- Exactamente un monto por frase; sin fechas relativas, comas intermedias (salvo en `GASTO_COMPARTIDO`, que las ignora) ni números en palabras (eso va al nivel 2).
+- Una `PERSONA` que es cliente del contexto, o "fié" con negocio activo, ponen `espacio: 'negocio'`. "Juan me pagó 300" sin cláusula → `null` (podría ser un ingreso); "le pagué 200 a mi jefa" sin cláusula → `null` (gasto con contraparte y categoría por juicio).
+- `MSI` sin verbo exige DESC_CONOCIDA o artículo ("la lavadora de 8,499 a 6 msi" sí; "debo 4,200 a 6 meses" → `null`); con débito o efectivo → `null`.
+- `INGRESO` y `RETIRO` con "me depositaron"/"saqué … del cajero" producen `destino`/`origen` `{tipo: 'debito'}` sin alias, como antes.
+
+```
+ARQUEO    := (traigo|tengo|me quedan|me queda) MONTO [pesos] (en|de) EFECTIVO         "me quedan 85 pesos en efectivo" "tengo como 1,200 en billetes" (→ aproximado)
+           | [ya] no (traigo|tengo) (nada|ni un peso|ni un varo) (de|en) EFECTIVO    → 0
+EFECTIVO  := efectivo | el efectivo | cash | billetes | la cartera | mi cartera
+CONSULTA  := cuánto puedo gastar [hoy] | cuánto (me queda|tengo) para gastar [hoy] | qué tanto puedo gastar [hoy]           → hoy_puedes
+           | (cuánto|qué tanto) (gasté|he gastado|llevo gastado|llevo de gasto|llevo) [en CAT] PERIODO | … PERIODO [en CAT]  → gasto_total | gasto_por_categoria
+           | cuánto (tengo|hay|me queda|queda) en [PREFIJO] ALIAS                                                     → saldo (alias normalizado)
+           | cuánto debo (de|en) [las|mis|la] (tarjetas|tarjeta)                                                      → deuda_tarjetas
+           | (qué pagos tengo|qué compromisos tengo|qué tengo que pagar|qué me toca pagar|qué pagos [se] vienen) PERIODO que empiece hoy   → compromisos
+           | quién me debe [dinero] | quiénes me deben [dinero] | cuánto me deben | qué me deben                     → por_cobrar
+           | (estoy gastando más|gasto más|llevo más|he gastado más|voy gastando más) [en CAT] que el mes pasado      → comparar_periodos (§3.1)
+           | en qué se me va el dinero | en qué gasto más | cuáles son mis mayores gastos | …                          → mayores_gastos (últimos 30 días, limite 5)
+           | qué suscripciones tengo | cuáles son mis suscripciones | cuánto pago (de|en) suscripciones               → suscripciones
+           | cuánto puedo (sacar|retirar) (del negocio|de la tienda|de la caja)                                        → puedo_retirar (solo con negocio)
+           | cuánto (llevo|debo) de impuestos PERIODO                                                                 → impuestos (solo con negocio)
+           | cuánto llevo (de deducibles|de deducciones|deducible) [PERIODO]                                          → deducciones (sin periodo: el año en curso)
+CAT       := comida | movilidad | casa (grupos) | nombre de categoría (antojos, transporte, ropa, salud…) | palabra del diccionario ("uber" → transporte)
+SIMULAR   := [si] ABRE [art] DESC_LIBRE (de|por|en) MONTO [a N (meses|msi)] [FECHA_SIM] [, COLA]
+ABRE      := me alcanza para [comprar] | me alcanzaría para | puedo comprar[me] | me compro | compro | me conviene comprar[me]
+           | me conviene esperar a la quincena para comprar[me]   (→ fecha = proximo_ingreso)
+COLA      := llego [bien] a la quincena | me alcanza [para|hasta la quincena] | aguanto [hasta la quincena] | la libro hasta la quincena | llego | me conviene
+DESC_LIBRE := 1 a 3 palabras de letras sin las que DESCARTAN, sin alias ni nombres (no se evalúa)
+```
+
+```
+CONFIGURAR := [PREFIJO] ALIAS_CRED corta el N [y (pago|la pago|se paga|vence) el M | y tengo M días para pagar]        → tarjeta_ciclo
+            | quiero [tener] [siempre] MONTO de colchón | [quiero] [un] colchón de MONTO | guárdame MONTO de colchón       → colchon
+            | (me pagan|me depositan|cobro|gano) MONTO REGLA_REC                                                          → ingreso_recurrente (sin anual)
+            | tengo MONTO en [PREFIJO] ALIAS_DEB                                                                          → saldo_cuenta ("como" → null; crédito → null)
+            | [art] CONCEPTO (son|es|de|cuesta|me cuesta|sale [en]) MONTO REGLA_REC                                       → compromiso
+            | el N de MES (tengo que pagar|debo pagar|me toca pagar|pago) [art] CONCEPTO [,] (son|es|de) MONTO            → compromiso, regla unica (próxima fecha ≥ hoy)
+            | (tengo que pagar|debo pagar|me toca pagar|pago) [art] CONCEPTO el N de MES [,] (son|es|de) MONTO            → idem
+            | (entré a|me metí a|me metí en|estoy en) una tanda de MONTO cada quincena [,] somos N [,] [y] (me toca|soy) el (ORDINAL|[número] N)   → tanda
+REGLA_REC  := cada día (N|primero) | cada mes el [día] (N|primero) | (el|los) (N|primero) de cada mes         → mensual
+            | cada quincena [, el 15 y el último] | el 15 y el último [de cada mes]                             → quincenal_15_ultimo
+            | cada semana (el|los) DIA_SEMANA | cada DIA_SEMANA | todos los DIA_SEMANA                          → semanal
+            | cada año el N de MES | cada N de MES                                                              → anual
+CONCEPTO   := 1 a 5 palabras (artículos y "de" permitidos) sin las que DESCARTAN, alias ni nombres; categoría solo si todas sus palabras de
+              contenido salen del diccionario con una sola categoría ("la renta" → vivienda; "el seguro del coche" → sin categoría);
+              "renta del local" → renta_local con espacio negocio (solo con negocio activo)
+```
+
+- "cada mes" sin día, "cada semana" sin día o "cada 5" a secas → `null` (no se adivina el día). "la tanda son 500 cada quincena" y "mi sueldo son 8 mil cada quincena" → `null` (DESCARTAN); la tanda tiene su producción y el sueldo es `ingreso_recurrente`.
+
+```
+CORREGIR  := no [,] [art] DESC_REF CAMBIO | no [,] (fue|fueron|era|es|son) ([de] MONTO | METODO)        → objetivo {ultimo: true}   "no, fueron 80"
+           | [lo de] [art] DESC_REF [de COMERCIO] CAMBIO
+CAMBIO    := (fue|fueron|era|eran|es|son|lo pagué|la pagué) ( METODO                             → cambios.origen     "no, los tacos fueron con la de crédito"
+                                                            | FECHA                              → cambios.fecha      "lo de la gasolina fue ayer"
+                                                            | a N (meses|msi) [sin intereses]    → cambios.msi        "la tele de Liverpool fue a 12 meses sin intereses"
+                                                            | [de] MONTO [, no [de] MONTO_ANTERIOR]   → cambios.monto (y objetivo.monto)   "el uber fue de 150, no de 120"
+                                                            | [de] CATEGORIA [, no …] )          → cambios.categoria  "la coca era antojo, no comida" (nunca un grupo: "era comida" → null)
+ANULAR    := (borra|elimina|quita|cancela|deshaz|anula) ( (el|lo) últim[o|a] [movimiento|registro|gasto|pago|ingreso|cargo|abono]   → {ultimo: true}
+                                                        | lo (de|del|de la|de los|de las) DESC_REF | [art] DESC_REF )                → {texto}   "borra lo del cine"
+DUPLICADOS := [creo que|me parece que] (anoté|registré|apunté|capturé|metí) dos veces [art] DESC_REF | [art] DESC_REF (está|salió|aparece) (duplicado|duplicada|dos veces)
+DESC_REF  := [art] 1 a 3 palabras aptas de DESC, sin nombres, alias ni pronombres ("todo", "eso", "último")      "borra todo" → null
+```
+
+### 9.3 Lo que sigue en `null` a propósito
+
+- Sin verbo, una DESC desconocida se registraría como gasto; por eso "una devolución de 500", "anoche unas chelas, 340 en efectivo" o "mil quinientos de la tele en efectivo" → `null`. Las frases que esa regla protegía ("tengo 4,200 en BBVA", "me quedan 85 pesos en efectivo") hoy tienen producción propia (`saldo_cuenta`, `ARQUEO`); los falsos positivos de la primera implementación de referencia (cobertura 16/16, precisión 17/17) siguen cubiertos por pruebas.
+- Montos ambiguos ("dos cincuenta"), pesos ("un kilo de carne", "medio kilo de despensa"), fechas futuras o "la semana pasada" al registrar, dos fechas o dos montos en una parte.
+- Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6"), "¿me alcanza?" sin monto, las preguntas abiertas (`explicar`) y todo lo fuera de alcance: eso lo decide el nivel 2 o la persona.
+
+Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-21: cobertura 128/128 y precisión 128/128 sobre los 155 casos (antes 25/25 y 27/27). Los 27 casos restantes están en `null` por las razones de §9.3.
 
 ## 10. Prompt del nivel nube (plantilla)
 

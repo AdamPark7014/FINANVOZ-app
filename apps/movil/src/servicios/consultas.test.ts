@@ -54,8 +54,9 @@ describe('consultas tipadas sobre la semilla e4-01 (CA-M7-03)', () => {
       if (r.resultado !== 'consulta') throw new Error(r.resultado);
       expect(r.respuesta.plantilla).toBe(ESPERADO[id].plantilla);
       expect(r.respuesta.texto).toBe(ESPERADO[id].texto);
-      // Q01 lo resuelve el nivel 0 (reglas: true); las demás pasan por la nube.
-      expect(f.recibidas).toHaveLength(id === 'Q01' ? 0 : 1);
+      // Desde el nivel 0 ampliado (06 §9) las consultas tipadas se resuelven sin nube, salvo Q11 («esta
+      // quincena» depende del periodo de ingreso: sigue en la nube, 06 §9.3).
+      expect(f.recibidas).toHaveLength(id === 'Q11' ? 1 : 0);
       // Nada se escribió en el libro.
       expect(listarMovimientos(p.ctx)).toEqual([]);
     });

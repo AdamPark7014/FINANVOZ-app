@@ -8,7 +8,8 @@ import { contarEsperandoConexion, procesarPorInterpretar, registrarTexto } from 
 import { abrirPrueba } from './__pruebas__/base';
 import { nubeFalsa } from './__pruebas__/nube';
 
-const COMPLEJA = 'me eché unos tacos de 80 y una coca de 25 en efectivo';
+// Sin verbo y con «chelas» (fuera del diccionario): el nivel 0 la deja a la nube (06 §9.3).
+const COMPLEJA = 'unas chelas de 80 y una coca de 25 en efectivo';
 
 function preparar() {
   const p = abrirPrueba();

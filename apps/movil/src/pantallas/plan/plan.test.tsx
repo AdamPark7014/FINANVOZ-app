@@ -51,8 +51,8 @@ import {
 } from './textos';
 
 const DIA = 86_400_000;
-/** Frase que el nivel de reglas no cubre: va a la nube. */
-const COMPLEJA = 'me eché unos tacos de 80 con la Nu y una coca de 25 en efectivo';
+/** Frase que el nivel de reglas no cubre (sin verbo, «chelas» fuera del diccionario): va a la nube. */
+const COMPLEJA = 'unas chelas de 80 con la Nu y una coca de 25 en efectivo';
 const T0 = Date.UTC(2026, 9, 11, 18, 0, 0);
 
 const textoDe = (testID: string) => {
