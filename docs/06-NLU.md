@@ -461,6 +461,20 @@ DESC_REF  := [art] 1 a 3 palabras aptas de DESC, sin nombres, alias ni pronombre
 
 Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-21: cobertura 128/128 y precisión 128/128 sobre los 155 casos (antes 25/25 y 27/27). Los 27 casos restantes están en `null` por las razones de §9.3.
 
+### 9.4 Gramáticas de campo (lo que se dicta en un campo)
+
+Cuando la persona toca el micrófono de un campo de monto, lo dicho se interpreta solo como monto, fuera de
+`PRODUCCIONES` (no mueve el golden set). `interpretarMonto` (`packages/nlu/src/reglas/campos.ts`):
+
+```
+CAMPO_MONTO := [son|es|fue|fueron|de|pon|ponle|tengo|traigo] (MONTO | MILES_CON_RESTO | cero | nada)   — toda la frase
+MILES_CON_RESTO := [DIGITOS(1..999)] mil DIGITOS(1..999) [pesos]                                        — «2 mil 500», «mil 500»
+```
+
+`MONTO` es la pieza de §9.1 (dígitos, `k`, «N mil», palabras, jerga y aproximados). Lo que no se lea completo da
+`null` y el campo no cambia («dos cincuenta», «500 de tacos»). La voz nunca guarda: llena el campo, muestra
+«Oí «…»: $X» con «Deshacer», y la persona confirma con el botón del formulario (§7).
+
 ## 10. Prompt del nivel nube (plantilla)
 
 ```

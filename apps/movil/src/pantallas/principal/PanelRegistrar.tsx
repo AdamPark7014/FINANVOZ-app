@@ -38,6 +38,7 @@ import {
   ETIQUETA_ESCUCHANDO,
   fraseRespuestaVoz,
   MENSAJES_DICTADO,
+  Microfono,
   mensajeEstoOi,
   PISTA_ESCUCHANDO,
   PISTA_HABLAR,
@@ -810,32 +811,6 @@ export function PanelRegistrar({
       {respuestas}
       {controles}
       {extras}
-    </View>
-  );
-}
-
-/** Ícono de micrófono dibujado con vistas (sin dependencias de íconos). */
-function Microfono({ color }: { color: string }) {
-  return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-      style={{ alignItems: 'center' }}
-    >
-      <View style={{ width: 10, height: 15, borderRadius: 5, backgroundColor: color }} />
-      <View
-        style={{
-          width: 16,
-          height: 8,
-          marginTop: -4,
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8,
-          borderWidth: 2,
-          borderTopWidth: 0,
-          borderColor: color,
-        }}
-      />
-      <View style={{ width: 2, height: 3, backgroundColor: color }} />
     </View>
   );
 }

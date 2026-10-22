@@ -11,3 +11,6 @@ export {
 } from './useBotonHablar';
 export * from './textos';
 export { callarVoz, decirEnVoz, fraseRespuestaVoz } from './respuesta';
+export { Microfono } from './Microfono';
+export { BotonDictarCampo, PISTA_DICTAR_CAMPO } from './BotonDictarCampo';
+export { ProveedorDictadoCampos } from './ProveedorDictadoCampos';
