@@ -27,6 +27,8 @@ export function navegacionDesdeCuentas(
     alAbrirAjustes: () => router.push('/ajustes'),
     alAbrirTarjeta: (id) => router.push({ pathname: '/tarjetas/[id]', params: { id } }),
     alAgregarTarjeta: () => router.push('/tarjetas/nueva'),
+    alAgregarCuenta: () => router.push('/cuenta-nueva'),
+    alAgregarPagoFijo: () => router.push('/pago-fijo-nuevo'),
     alAbrirPersona: (id) => router.push({ pathname: '/persona/[id]', params: { id } }),
     alContarEfectivo: (cuentaId) => abrirArqueo(router, { cuentaId }),
     alAbrirTandas: () => router.push('/tandas'),

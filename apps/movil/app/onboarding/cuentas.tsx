@@ -2,29 +2,14 @@ import type { Centavos } from '@cartera/core';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import {
-  Chips,
-  ERROR_GUARDAR,
-  MensajeError,
-  PasoOnboarding,
-} from '../../src/pantallas/onboarding/componentes';
+import { ERROR_GUARDAR, MensajeError, PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
 import {
   AYUDA_EFECTIVO_ONB,
-  BTN_AGREGAR_CUENTA_ONB,
   BTN_AGREGAR_DEBITO_BILLETERA,
   BTN_AGREGAR_TARJETA_CREDITO,
-  BTN_ONB_CANCELAR,
   BTN_ONB_CONTINUAR,
-  EJEMPLO_NOMBRE_BILLETERA,
-  EJEMPLO_NOMBRE_DEBITO,
-  ERROR_CUENTA_INCOMPLETA,
   ETIQUETA_CUENTA_GENERICA,
-  ETIQUETA_CHIP_AHORRO,
-  ETIQUETA_CHIP_BILLETERA,
-  ETIQUETA_CHIP_DEBITO,
   ETIQUETA_EFECTIVO_ONB,
-  ETIQUETA_NOMBRE_CUENTA,
-  ETIQUETA_SALDO_CUENTA_ONB,
   ETIQUETA_TARJETA_DEBES,
   ETIQUETAS_SUBTIPO_CUENTA,
   PISTA_AGREGAR_TARJETA_ONB,
@@ -33,17 +18,10 @@ import {
   TIP_CUENTAS_MINIMO,
   TITULO_CUENTAS,
 } from '../../src/pantallas/onboarding/textos';
-import { agregarCuenta, agregarEfectivo, listarCuentas } from '../../src/servicios';
+import { agregarEfectivo, listarCuentas } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
-import { Boton, CampoMonto, CampoTexto, Cifra, espacio, Tarjeta, Texto } from '../../src/ui';
-
-type TipoCuenta = 'debito' | 'billetera' | 'ahorro';
-
-const OPCIONES_TIPO: readonly { valor: TipoCuenta; etiqueta: string }[] = [
-  { valor: 'debito', etiqueta: ETIQUETA_CHIP_DEBITO },
-  { valor: 'billetera', etiqueta: ETIQUETA_CHIP_BILLETERA },
-  { valor: 'ahorro', etiqueta: ETIQUETA_CHIP_AHORRO },
-];
+import { FormularioCuenta } from '../../src/pantallas/cuentas/FormularioCuenta';
+import { Boton, CampoMonto, Cifra, espacio, Tarjeta, Texto } from '../../src/ui';
 
 /**
  * O4 · Cuentas (`02 §3`): el efectivo es el mínimo; débito, billeteras y tarjetas de crédito (§3.1) son
@@ -58,28 +36,7 @@ export default function Cuentas() {
 
   const [efectivo, setEfectivo] = useState<Centavos | null>(null);
   const [formulario, setFormulario] = useState(false);
-  const [tipo, setTipo] = useState<TipoCuenta>('debito');
-  const [nombre, setNombre] = useState('');
-  const [saldo, setSaldo] = useState<Centavos | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const agregar = () => {
-    if (nombre.trim() === '' || saldo === null) {
-      setError(ERROR_CUENTA_INCOMPLETA);
-      return;
-    }
-    try {
-      agregarCuenta(ctx, { subtipo: tipo, nombre: nombre.trim(), saldo });
-    } catch {
-      setError(ERROR_GUARDAR);
-      return;
-    }
-    setError(null);
-    setNombre('');
-    setSaldo(null);
-    setFormulario(false);
-    refrescar();
-  };
 
   const continuar = () => {
     try {
@@ -145,26 +102,7 @@ export default function Cuentas() {
       ) : null}
 
       {formulario ? (
-        <Tarjeta testID="onb-cuenta-formulario">
-          <Chips testID="onb-cuenta-tipo" opciones={OPCIONES_TIPO} valor={tipo} alCambiar={setTipo} />
-          <CampoTexto
-            testID="onb-cuenta-nombre"
-            etiqueta={ETIQUETA_NOMBRE_CUENTA}
-            ejemplo={tipo === 'billetera' ? EJEMPLO_NOMBRE_BILLETERA : EJEMPLO_NOMBRE_DEBITO}
-            valor={nombre}
-            alCambiar={setNombre}
-          />
-          <CampoMonto testID="onb-cuenta-saldo" etiqueta={ETIQUETA_SALDO_CUENTA_ONB} alCambiar={setSaldo} />
-          <Boton testID="onb-cuenta-agregar" etiqueta={BTN_AGREGAR_CUENTA_ONB} alPresionar={agregar} />
-          <Boton
-            variante="texto"
-            etiqueta={BTN_ONB_CANCELAR}
-            alPresionar={() => {
-              setFormulario(false);
-              setError(null);
-            }}
-          />
-        </Tarjeta>
+        <FormularioCuenta alGuardar={() => setFormulario(false)} alCancelar={() => setFormulario(false)} />
       ) : (
         <Boton
           testID="onb-agregar-cuenta"

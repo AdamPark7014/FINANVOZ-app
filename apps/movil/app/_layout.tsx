@@ -229,6 +229,8 @@ function AppProtegida({
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
+          <Stack.Screen name="cuenta-nueva" />
+          <Stack.Screen name="pago-fijo-nuevo" />
           <Stack.Screen name="persona/[id]" />
           <Stack.Screen name="tandas/index" />
           <Stack.Screen name="tandas/[id]" />

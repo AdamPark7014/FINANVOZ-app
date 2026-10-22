@@ -81,6 +81,18 @@ export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 /** TalkBack en Debes (`02 §11`, `02 §15`). */
 export const PISTA_AGREGAR_TARJETA_CREDITO = 'Abre el formulario para registrar una tarjeta de crédito';
+/** Tienes en Cuentas: débito, billetera o ahorro después del onboarding (`02 §11`). */
+export const BTN_AGREGAR_CUENTA = 'Agregar cuenta';
+export const PISTA_AGREGAR_CUENTA =
+  'Abre el formulario para registrar una cuenta de débito, billetera o ahorro';
+export const TITULO_CUENTA_NUEVA = 'Cuenta nueva';
+/** Compromisos en Cuentas: un pago fijo después del onboarding (`02 §11`). */
+export const BTN_AGREGAR_PAGO_FIJO = 'Agregar pago fijo';
+export const PISTA_AGREGAR_PAGO_FIJO =
+  'Abre el formulario para registrar renta, luz, internet u otro pago fijo';
+export const TITULO_PAGO_FIJO_NUEVO = 'Pago fijo';
+export const AYUDA_PAGO_FIJO_NUEVO =
+  'Lo que pagas cada mes, quincena o semana. Lo aparto de tu dinero libre antes de que llegue.';
 /** Te deben en Cuentas: abre la ficha (`02 §17`, `02 §15`). */
 export const PISTA_COBRAR_DESDE_CUENTAS = 'Abre su ficha para cobrarle';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
@@ -385,7 +397,7 @@ export function etiquetaConfirmarAnularMovimiento(): string {
 
 /** Tienes: sin efectivo, débito, billetera ni ahorro. */
 export const TEXTO_CUENTAS_TIENES_VACIO =
-  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrégalas al configurar la app o cuando captures un movimiento.';
+  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrega una aquí abajo o cuando captures un movimiento.';
 
 /** Debes: sin tarjetas ni deudas con personas. */
 export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamos con personas.';
