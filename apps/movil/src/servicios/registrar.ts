@@ -375,6 +375,7 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
   'anulado',
   'pasar_a_meses',
   'configurado',
+  'colchon_configurado',
   'consulta',
   'me_alcanza',
   'explicar',

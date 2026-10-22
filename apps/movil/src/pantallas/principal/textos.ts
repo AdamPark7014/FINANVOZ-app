@@ -83,6 +83,10 @@ export const PISTA_ABRIR_AJUSTES = 'Abre la pantalla de Ajustes';
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 /** TalkBack en Debes (`02 §11`, `02 §15`). */
 export const PISTA_AGREGAR_TARJETA_CREDITO = 'Abre el formulario para registrar una tarjeta de crédito';
+/** Sin ningún movimiento todavía: cómo se dicta el primero (#29; lo usa el estado vacío del asistente, Ola 7). */
+export const TITULO_PRIMER_USO = 'Dime tu primer gasto';
+export const TEXTO_PRIMER_USO =
+  'Toca el botón del micrófono y di algo como «tacos 80 en efectivo». Lo anoto al momento y la cifra de arriba se ajusta.';
 /** Te deben en Cuentas: abre la ficha (`02 §17`, `02 §15`). */
 export const PISTA_COBRAR_DESDE_CUENTAS = 'Abre su ficha para cobrarle';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
@@ -112,7 +116,7 @@ export const MENSAJE_NO_SOPORTADO: Record<MotivoNoSoportado, string> = {
   tipo_movimiento: 'Todavía no registro ese tipo de movimiento hablando. Usa el formulario.',
   intencion: 'Eso todavía no lo hago. Llega pronto.',
   ajuste:
-    'Eso todavía no lo configuro hablando. Tu ingreso y tu colchón los cambias en Ajustes; tus tarjetas, en Cuentas.',
+    'No encontré esa cuenta, o eso todavía no lo configuro hablando. Tus cuentas y tarjetas están en Cuentas; tu ingreso y tu colchón, en Ajustes.',
   consulta: 'Todavía no sé responder esa pregunta.',
   meses_sin_tarjeta: MENSAJE_MESES_SIN_TARJETA,
   correccion: MENSAJE_CORRECCION_NO_SOPORTADA,
@@ -252,6 +256,10 @@ export function mensajeIngresoDicho(monto: number, cuando: string, proximo: stri
   const siguiente = proximo ? ` Tu próximo pago es el ${proximo}.` : '';
   return `Listo: tu ingreso es ${formatearCentavos(monto)}, ${cuando}.${siguiente}`;
 }
+
+/** «Tengo 4,200 en BBVA»: el ajuste no cuenta como gasto ni ingreso (#30). */
+export const AYUDA_SALDO_DICHO =
+  'Si falta algún movimiento, mejor regístralo. Si no, ajusto la diferencia y no la cuento como gasto ni ingreso.';
 
 export function mensajePasarAMeses(m: ResumenTransaccion, meses: number): string {
   return `Anoté que ${(m.descripcion ?? 'la compra').toLowerCase()} va a ${meses} meses. Lo verás en tu tarjeta pronto.`;

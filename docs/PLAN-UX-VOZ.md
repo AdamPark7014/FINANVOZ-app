@@ -39,19 +39,19 @@ Siguiente build: iOS 1.0.0 (4) y Android versionCode 2.
    (tarjeta «Entendí esto» editable, alta atómica), O5 «pago 4500 de renta cada mes» (día vacío si no se dijo),
    O7 por el micrófono del campo.
 4. **Desde Hoy:** aplicar `ingreso_recurrente`, `saldo_cuenta` y `colchon` que el nivel 0 ya entiende, con tarjeta de
-   confirmación. Hecho para colchón (con Deshacer) e ingreso (con tarjeta); el saldo de cuenta queda pendiente.
+   confirmación. Hecho: colchón (con Deshacer), ingreso y saldo de cuenta (con tarjeta de confirmación).
 5. Permiso al primer toque, «Abrir ajustes» si se niega, micrófono oculto si no hay reconocimiento, cero texto dictado
    en logs (regla 9). Pruebas: tabla + propiedad fast-check de montos en palabras, jest de `CampoMonto` con motor falso.
 
 ## Ola 3 · Más intuitiva (sigue `02 §16`; cada desvío se registra en ESTADO)
 
 1. **Hoy con jerarquía:** cifra en un bloque destacado y tocable, desglose abierto en 4 filas, acciones antes que
-   observaciones, Plus y «¿Me alcanza?» abajo.
+   observaciones, Plus y «¿Me alcanza?» abajo. Hecho (el desglose sigue cerrado al abrir; tocar la cifra lo abre).
 2. **Registrar como hoja modal** (`presentation: 'modal'`), con «Hablar · Escribir · Formulario» y fecha Hoy/Ayer.
 3. **Barra de navegación nativa** (título grande y chevron en iOS), sin «Volver» dentro del contenido.
 4. **«Agregar» en Cuentas** (débito, billetera, ahorro, pago fijo) fuera del onboarding: hoy en iPhone no se puede. Hecho.
 5. **Íconos de sistema y vibración** (`expo-symbols`, `expo-haptics`).
-6. **Ajustes como lista agrupada** con valor actual y ›.
+6. **Ajustes como lista agrupada** con valor actual y ›. Grupos hechos y Captura oculta en iPhone; el formato de lista con › espera a la barra nativa.
 7. **Movimientos:** `SectionList` por día con total, chips de filtro, detalle en hoja, botón en el vacío.
 8. **Onboarding más corto:** barra de progreso, ‹ arriba, menos tips, «Más opciones» en O3/O5, tarjeta de primer uso
    en Hoy («Prueba decir «tacos 80 en efectivo»»).

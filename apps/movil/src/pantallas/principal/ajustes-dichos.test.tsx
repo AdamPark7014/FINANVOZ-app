@@ -5,7 +5,7 @@ import { ingresoPrincipal } from '../../servicios/programados';
 import { conEscenario } from './__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaHoy } from './PantallaHoy';
-import { BTN_GUARDAR_INGRESO, mensajeColchonDicho, TITULO_CONFIRMAR_INGRESO } from './textos';
+import { AYUDA_SALDO_DICHO, BTN_GUARDAR_INGRESO, mensajeColchonDicho, TITULO_CONFIRMAR_INGRESO } from './textos';
 
 function escribirEnHoy(frase: string) {
   fireEvent.press(screen.getByTestId('boton-escribir'));
@@ -44,6 +44,19 @@ describe('Hoy · colchón e ingreso dichos', () => {
     fireEvent.press(screen.getByTestId('boton-guardar-ingreso'));
     expect(ingresoPrincipal(p.ctx)).toMatchObject({ monto: 800_000, regla: { tipo: 'mensual', dia: 30 } });
     expect(screen.queryByTestId('confirmacion-ingreso')).toBeNull();
+    p.cerrar();
+  });
+
+  it('K04 «tengo 4,200 en BBVA» muestra lo que llevo contra lo que dices y ajusta solo al confirmar', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    escribirEnHoy('tengo 4,200 en BBVA');
+    expect(screen.getByTestId('confirmacion-saldo-app')).toHaveTextContent(/3,590/);
+    expect(screen.getByTestId('confirmacion-saldo-tu')).toHaveTextContent(/4,200/);
+    expect(screen.getByText(AYUDA_SALDO_DICHO)).toBeTruthy();
+    fireEvent.press(screen.getByTestId('boton-guardar-saldo'));
+    expect(screen.queryByTestId('confirmacion-saldo')).toBeNull();
+    expect(screen.getByText(/Registré la diferencia como un ajuste/)).toBeTruthy();
     p.cerrar();
   });
 });

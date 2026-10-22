@@ -31,6 +31,12 @@ import {
  * en iPhone no se muestra.
  */
 export function SeccionCaptura() {
+  // En iPhone no hay captura de notificaciones (`02 §25`): sin sección que solo diga «no disponible».
+  if (Platform.OS === 'ios') return null;
+  return <SeccionCapturaAndroid />;
+}
+
+function SeccionCapturaAndroid() {
   const { ctx, refrescar } = useSesion();
   const { puente } = useCaptura();
   const estado = useVista(obtenerEstadoCaptura);

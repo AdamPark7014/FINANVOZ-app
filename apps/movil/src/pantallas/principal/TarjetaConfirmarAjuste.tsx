@@ -7,6 +7,7 @@ import { formatearCentavos } from '../../ui/formato';
 import { Chips } from '../onboarding/componentes';
 import { describirRegla } from '../onboarding/pagos-fijos';
 import {
+  AYUDA_SALDO_DICHO,
   BTN_GUARDAR_INGRESO,
   BTN_GUARDAR_SALDO,
   mensajeColchonDicho,
@@ -107,6 +108,9 @@ export function TarjetaConfirmarAjuste({
       {propuesta.tipo === 'saldo_cuenta' ? (
         <>
           <Texto variante="subtitulo">{TITULO_CONFIRMAR_SALDO}</Texto>
+          <Texto variante="secundario" tono="secundario">
+            {AYUDA_SALDO_DICHO}
+          </Texto>
           {propuesta.faltaCuenta && propuesta.faltaCuenta.candidatas.length > 0 ? (
             <Chips
               etiqueta={TITULO_ELEGIR_CUENTA_SALDO}

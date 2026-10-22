@@ -6,6 +6,14 @@
 
 ## Hecho en este turno
 
+- **PR #29–#31 integrados (el hilo de la nube siguió tras la orden de Adam)**: #30 (saldo dicho) cede a la vía única
+  (`confirmar_ajuste` + `TarjetaConfirmarAjuste`, que toma su texto de ayuda «Si falta algún movimiento…»); se borran
+  `ajustes-dichos.ts`, `TarjetaConfirmarSaldo.tsx` y `hoy-ola3.test.tsx`; prueba nueva K04 en `ajustes-dichos.test.tsx`.
+  #29 (Hoy con cifra destacada y primer uso) cede a la Hoy de B-1 porque la Ola 7 la reemplaza; quedan `primerUso`
+  en `VistaHoy` y los textos `TITULO_PRIMER_USO`/`TEXTO_PRIMER_USO` para el estado vacío del asistente. #31 (Ajustes en
+  cuatro grupos) se queda, con `SeccionBloqueo` de B-2b. Issuer ID de App Store Connect fuera del repo
+  (`C:\dev\secretsrta-ios\issuer-id.txt`). jest 79 suites 651/651, vitest 2723/2725 (2 del proxy por tiempo
+  bajo carga; solas 20/20), eval reglas 135/135, pasos 88/88, typecheck y eslint limpios.
 - **PR #28 integrado (colchón e ingreso dichos desde Hoy)**: queda una sola vía en `servicios/registrar.ts`
   (`aplicarAjuste`): colchón al momento con Deshacer (`colchon_configurado`, token `k:<anterior>` en
   `deshacer.ts`, `deshacerColchon` en `ajustes.ts`); ingreso y saldo con `confirmar_ajuste` →
