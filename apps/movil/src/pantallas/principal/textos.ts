@@ -73,10 +73,12 @@ export const EJEMPLO_CAMPO_REGISTRAR = 'tacos 80 en efectivo';
 
 /** CTAs en tarjetas de consulta y explicar (`06 §6`, RF-CON-01 / RF-CON-02). */
 export const BTN_VER_PLUS = 'Ver Plus';
-/** Engrane en la cabecera de Cuentas (`02 §11`). */
-export const BTN_AJUSTES_CUENTAS = '⚙ Ajustes';
-/** TalkBack: sin emoji del engrane. */
-export const BTN_AJUSTES_CUENTAS_ACCESIBLE = 'Ajustes';
+/** Acceso a Ajustes en la cabecera de Cuentas (`02 §11`) y de Hoy; sin emoji (VoiceOver lo leía en voz alta). */
+export const BTN_AJUSTES = 'Ajustes';
+export const BTN_AJUSTES_CUENTAS = BTN_AJUSTES;
+/** TalkBack y VoiceOver. */
+export const BTN_AJUSTES_CUENTAS_ACCESIBLE = BTN_AJUSTES;
+export const PISTA_ABRIR_AJUSTES = 'Abre la pantalla de Ajustes';
 /** Sección Debes en Cuentas (`02 §11`). */
 export const BTN_AGREGAR_TARJETA_CREDITO = 'Agregar tarjeta de crédito';
 /** TalkBack en Debes (`02 §11`, `02 §15`). */
@@ -87,12 +89,20 @@ export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
 export const BTN_VER_MOVIMIENTOS_CHEVRON = 'Ver movimientos ›';
 export const BTN_LISTO = 'Listo';
 
+/** Sin internet y fuera del nivel de reglas (`02 §5`, punto 8): se interpreta al volver la conexión. */
 export const MENSAJE_POR_INTERPRETAR =
   'Lo guardé; lo interpreto cuando tengas internet. Lo encuentras en Movimientos, en Por revisar.';
 
+/**
+ * Build sin intérprete en internet (`sin_nube`): aunque haya conexión, la frase no se va a interpretar sola. No
+ * prometer «cuando tengas internet» (`02 §14`: qué pasó y qué hacer).
+ */
+export const MENSAJE_SIN_NUBE =
+  'Lo guardé en Por revisar. Por ahora entiendo frases sencillas, como «tacos 80 en efectivo». Esta la puedes registrar con el formulario.';
+
 /** Por qué quedó guardada la frase (`02 §5`, punto 8). */
 export const MENSAJE_GUARDADA: Record<MotivoPorInterpretar, string> = {
-  sin_nube: MENSAJE_POR_INTERPRETAR,
+  sin_nube: MENSAJE_SIN_NUBE,
   sin_red: MENSAJE_POR_INTERPRETAR,
   limite: MENSAJE_LIMITE_NUBE,
   error: 'No pude interpretarla en este momento. La guardé y lo intento de nuevo más tarde.',
@@ -234,6 +244,14 @@ export function mensajeRegistrado(movimientos: readonly ResumenMovimiento[]): st
   return `Registré: ${movimientos.map(resumenMovimiento).join('; ')}`;
 }
 
+/**
+ * Segunda línea del aviso de registro (causa y efecto): "Tu día pasa de $214 a $194." Las dos cifras son las que
+ * muestra Hoy, leídas de `obtenerHoy` antes y después (regla 4: aquí no se calcula nada).
+ */
+export function lineaCambioDia(antes: string, despues: string): string {
+  return `Tu día pasa de ${antes} a ${despues}.`;
+}
+
 /** Código de un error de dominio, o `null` si es otro error. */
 export function codigoError(e: unknown): string | null {
   return e instanceof ErrorDominio ? e.codigo : null;
@@ -253,6 +271,8 @@ export const CONTEXTO_CIFRA_HOY_PUEDES = TITULO_HOY_PUEDES_GASTAR;
 export const CONTEXTO_CIFRA_LIBRE_NEGATIVO = 'Hoy';
 export const TITULO_SIN_INGRESO = 'Dime cada cuándo te pagan';
 export const SUBTITULO_SIN_INGRESO = 'Así reparto tu dinero libre hasta el próximo pago.';
+/** Botón del estado sin ingreso (`02 §4.2`): verbo primero (`02 §14`). */
+export const BTN_CONFIGURAR_INGRESO_HOY = 'Configurar mi ingreso';
 
 /** Plus: tip del día en Hoy (`02 §4`). */
 export const TITULO_TARJETA_DEL_DIA = 'Tarjeta del día';
@@ -292,6 +312,20 @@ export const PISTA_CONTAR_EFECTIVO = 'Abre el arqueo para contar el efectivo que
 export const PISTA_AVISO_ENTENDIDO = 'Oculta este aviso';
 export const PISTA_ME_ALCANZA_HOY = 'Calcula si te alcanza para una compra';
 
+/** Respuestas de "¿Ya pagaste…?" y "¿Ya te pagaron?" (`02 §4.1`), como chips en fila. */
+export const RESPUESTAS_OCURRENCIA = {
+  compromiso: {
+    si: { etiqueta: 'Ya la pagué', pista: 'Registra el pago y deja de apartarlo' },
+    todaviaNo: { etiqueta: 'Todavía no', pista: 'Lo sigo apartando y te pregunto mañana' },
+    omitir: { etiqueta: 'Ya no aplica', pista: 'Deja de apartarlo en este periodo' },
+  },
+  ingreso: {
+    si: { etiqueta: 'Sí, ya llegó', pista: 'Registra el ingreso y recalcula tu día' },
+    todaviaNo: { etiqueta: 'Todavía no', pista: 'Te pregunto mañana' },
+    omitir: { etiqueta: 'Este periodo no me pagan', pista: 'No cuento con ese pago en este periodo' },
+  },
+} as const;
+
 // ——— Modo explicar (`02 §22`) ———
 
 export const MENSAJE_EXPLICANDO = 'Revisando tus datos…';
@@ -317,16 +351,20 @@ export function esMensajeRegistroAlerta(mensaje: string): boolean {
 
 // ——— Movimientos (`02 §10`) ———
 
-/** Lista vacía (sin filtro). */
+/** Lista vacía (sin filtro); debajo va el botón para registrar. */
 export const TEXTO_MOVIMIENTOS_VACIO =
-  'Todavía no hay movimientos. Ve a Hoy y di o escribe algo como «tacos 80 en efectivo».';
+  'Todavía no hay movimientos. Dime uno, por ejemplo «tacos 80 en efectivo».';
+export const BTN_REGISTRAR_PRIMER_MOVIMIENTO = 'Registrar un movimiento';
+/** TalkBack del vacío: señala el botón de abajo (`EstadoVacio`, `02 §15`). */
+export const PISTA_VACIO_MOVIMIENTOS = 'Más abajo, botón Registrar un movimiento';
 
 /** Consulta filtrada sin resultados (`06 §6`). */
 export const TEXTO_MOVIMIENTOS_FILTRO_VACIO = 'No hay movimientos que coincidan.';
 
 export const TITULO_POR_REVISAR = 'Por revisar';
+/** Sin prometer internet: en la build sin nube estas frases no se interpretan solas. */
 export const TEXTO_POR_REVISAR =
-  'Las interpreto cuando tengas internet. Si ya lo registraste a mano, descártala.';
+  'Estas frases todavía no son movimientos. Si ya registraste alguna a mano, descártala.';
 export const TEXTO_MOVIMIENTOS_FILTRO_ACTIVO = 'Solo los movimientos de tu pregunta.';
 
 /** CTA «Registrar» en la pestaña Movimientos (`02 §15`). */
@@ -364,16 +402,29 @@ export function etiquetaVacioMovimientos(conFiltro: boolean): string {
 
 export const PREGUNTA_PASAR_A_MESES = '¿A cuántos meses sin intereses fue?';
 export const PISTA_ELEGIR_CUENTA_CONFIRMACION = 'Elige una cuenta en los chips de arriba.';
-export const MENSAJE_ANULADO_MOVIMIENTO = 'Anulé el movimiento.';
+/**
+ * En la UI se dice «Borrar», como en la voz («borra lo del cine»); por dentro el servicio anula con la transacción
+ * espejo (regla 2) y los nombres de servicios no cambian.
+ */
+export const MENSAJE_ANULADO_MOVIMIENTO = 'Borré el movimiento.';
 
 /** Fila de movimiento expandible (`02 §10`, TalkBack). */
 export const PISTA_MOSTRAR_DETALLE_MOVIMIENTO = 'Muestra el detalle';
 export const PISTA_OCULTAR_DETALLE_MOVIMIENTO = 'Oculta el detalle';
+/** Cerrar el detalle abierto (tocar el texto del detalle no lo cerraba). */
+export const BTN_CERRAR_DETALLE = 'Cerrar';
+export const ETIQUETA_CERRAR_DETALLE = 'Cerrar detalle';
 
-/** Anular desde el detalle (`02 §10`, TalkBack). */
-export const TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO = '¿Anular este movimiento? Sus montos vuelven a tus cuentas.';
-export const PISTA_ANULAR_MOVIMIENTO = 'Pide confirmación para anular este movimiento';
-export const PISTA_CONFIRMAR_ANULAR_MOVIMIENTO = 'Anula el movimiento y devuelve los montos a tus cuentas';
+/** Corregir desde el detalle (`02 §5`: "Tocar el aviso abre la edición"; regla 2: se reemplaza, no se edita). */
+export const BTN_CORREGIR_MOVIMIENTO = 'Corregir';
+export const PISTA_CORREGIR_MOVIMIENTO = 'Abre el formulario con este movimiento para cambiar sus datos';
+
+/** Borrar desde el detalle (`02 §10`, TalkBack). */
+export const BTN_BORRAR_MOVIMIENTO = ETIQUETA_BORRAR;
+export const BTN_CONFIRMAR_BORRAR_MOVIMIENTO = 'Sí, borrar';
+export const TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO = '¿Borrar este movimiento? Sus montos vuelven a tus cuentas.';
+export const PISTA_ANULAR_MOVIMIENTO = 'Pide confirmación para borrar este movimiento';
+export const PISTA_CONFIRMAR_ANULAR_MOVIMIENTO = 'Borra el movimiento y devuelve los montos a tus cuentas';
 
 export function etiquetaConfirmarAnularMovimiento(): string {
   return etiquetaHablada(TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO);

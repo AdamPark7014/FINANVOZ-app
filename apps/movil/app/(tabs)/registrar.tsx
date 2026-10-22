@@ -1,15 +1,19 @@
+import { useContext } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaRegistrar, paramsDeDetalle, paramsDeFiltro } from '../../src/pantallas/principal';
+import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { propsContenedorRegistrar } from './pestanas-textos';
 
 /** Ruta Registrar (sin pestaña): dictado, texto y formulario (`02 §2`). */
 export default function Registrar() {
   const router = useRouter();
+  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   // Solo el id de una frase de "Por revisar" viaja en la ruta, nunca su texto (regla 9).
   const { frase, dictar } = useLocalSearchParams<{ frase?: string; dictar?: string }>();
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));

@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { useRouter } from 'expo-router';
+import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
@@ -6,11 +8,14 @@ import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacio
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { PantallaHoy, paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
+import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { propsContenedorPestana } from './pestanas-textos';
 
 export default function Hoy() {
   const router = useRouter();
   const mostrarAviso = useMostrarAviso();
+  // El aviso con "Deshacer" se coloca sobre la barra real (en iPhone mide más que el token, `ProveedorAvisos`).
+  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   // "Listo: guardé tu ingreso…" al regresar de Ajustes › Ingreso.
   useConfirmacionAlVolver((mensaje) => mostrarAviso({ mensaje }));
   return (
@@ -29,6 +34,8 @@ export default function Hoy() {
             alAbrirArqueo: (efectivoReal) =>
               abrirArqueo(router, efectivoReal !== undefined ? { efectivoReal } : {}),
             alAbrirMeAlcanza: (consulta) => abrirMeAlcanza(router, consulta),
+            // Mismo destino que el botón de Cuentas (`navegacionDesdeCuentas`).
+            alAbrirAjustes: () => router.push('/ajustes'),
           }}
         />
       </ProveedorCompartido>

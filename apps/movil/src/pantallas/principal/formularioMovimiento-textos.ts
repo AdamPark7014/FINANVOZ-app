@@ -25,6 +25,29 @@ export const ERROR_ELEGIR_CATEGORIA = 'Elige una categoría.';
 export const ERROR_ELEGIR_PERSONA = 'Elige a la persona.';
 export const ERROR_CUENTAS_DISTINTAS = 'Elige dos cuentas distintas.';
 
+/** Fecha del movimiento (`02 §5.3`: "Hoy · Ayer · Elegir"); sin calendario nativo (sin dependencias nuevas). */
+export const ETIQUETA_FECHA = '¿Cuándo fue?';
+export type OpcionFecha = 'hoy' | 'ayer' | 'elegir';
+export const OPCIONES_FECHA: Record<OpcionFecha, string> = {
+  hoy: 'Hoy',
+  ayer: 'Ayer',
+  elegir: 'Elegir',
+};
+export const ETIQUETA_ELEGIR_DIA = 'Elige el día';
+export const ETIQUETA_OTRA_FECHA = 'Otra fecha (AAAA-MM-DD)';
+export const ERROR_FECHA_FUTURA = 'Elige hoy o un día anterior.';
+
+/** "Escribe la fecha así: 2026-10-09." con un ejemplo real (ayer). */
+export function errorFechaFormato(ejemplo: string): string {
+  return `Escribe la fecha así: ${ejemplo}.`;
+}
+
+/** Corregir un movimiento desde su detalle (`02 §10`): se reemplaza, nunca se edita (regla 2). */
+export const BTN_GUARDAR_CAMBIOS = 'Guardar cambios';
+export const PISTA_GUARDAR_CAMBIOS = 'Reemplaza el movimiento con los datos corregidos';
+export const BTN_CANCELAR_CORRECCION = 'Cancelar';
+export const MENSAJE_SIN_CAMBIOS = 'No cambiaste nada.';
+
 export const AVISO_RETIRO_EFECTIVO_TARJETA =
   'Sacar efectivo con tarjeta de crédito suele cobrar comisión e intereses desde el primer día.';
 

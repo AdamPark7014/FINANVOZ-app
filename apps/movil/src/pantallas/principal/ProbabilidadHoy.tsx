@@ -12,6 +12,7 @@ import { UMBRAL_RIESGO } from '../../avisos/riesgo';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { Barra, espacio, Tarjeta, Texto, useTema } from '../../ui';
 import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { useAnuncio } from './ProveedorAvisos';
 import {
   ETIQUETA_PROBABILIDAD_CALCULANDO,
   etiquetaAvisoRiesgo,
@@ -66,6 +67,14 @@ export function ProbabilidadHoy({
 
   const vista = leida ?? (calculada?.version === version ? calculada.vista : null);
   const lista = vista !== null;
+  // VoiceOver no lee las regiones vivas: el mensaje de pocos datos y el aviso de riesgo se anuncian en iOS.
+  useAnuncio(
+    vista?.estado === 'datos_insuficientes'
+      ? vista.mensaje
+      : vista?.estado === 'ok' && vista.riesgo
+        ? etiquetaAvisoRiesgo()
+        : null,
+  );
 
   // Con la probabilidad de hoy lista, replanea el aviso local de riesgo (1 por horizonte). Sin permiso, nada.
   useEffect(() => {

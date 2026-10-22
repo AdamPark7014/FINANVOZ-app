@@ -10,7 +10,22 @@ import {
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
+import { useAnuncio } from './ProveedorAvisos';
 import { BTN_LISTO, BTN_VER_MOVIMIENTOS_CHEVRON, BTN_VER_PLUS, MENSAJE_EXPLICAR_SOLO_PLUS } from './textos';
+
+/** Lo que TalkBack lee por la región viva de cada tipo de respuesta; en iOS se anuncia aparte. */
+function textoAnunciado(respuesta: ExplicacionMostrable): string {
+  switch (respuesta.tipo) {
+    case 'explicacion':
+      return respuesta.texto;
+    case 'plantilla':
+      return AVISO_SIN_EXPLICACION;
+    case 'solo_plus':
+      return MENSAJE_EXPLICAR_SOLO_PLUS;
+    case 'limite':
+      return respuesta.mensaje;
+  }
+}
 
 export type ExplicacionMostrable = Extract<
   RespuestaExplicar,
@@ -60,6 +75,7 @@ export function TarjetaExplicacion({
     (respuesta.tipo === 'solo_plus' ||
       (respuesta.tipo === 'limite' && respuesta.codigo === 'limite_mensual' && plan === 'gratis'));
   const mostrarPie = respuesta.tipo !== 'solo_plus' && respuesta.tipo !== 'limite';
+  useAnuncio(textoAnunciado(respuesta));
   return (
     <Tarjeta testID="respuesta-explicar">
       {respuesta.tipo === 'explicacion' ? (

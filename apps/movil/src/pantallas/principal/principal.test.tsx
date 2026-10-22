@@ -58,7 +58,11 @@ import {
   contextoSaldoCompromiso,
   contextoSaldoTarjeta,
   contextoSaldoTienes,
+  lineaCambioDia,
+  MENSAJE_GUARDADA,
+  MENSAJE_SIN_NUBE,
 } from './textos';
+import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
@@ -103,7 +107,13 @@ describe('Hoy', () => {
   it('CTAs traen accessibilityHint para TalkBack (`02 §15`)', () => {
     const p = conEscenario('e4-01');
     const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
-    renderConSesion(p.ctx, <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />);
+    // En Gratis, "¿Me alcanza?" solo aparece si hay pantalla del plan a la cual llevar.
+    renderConSesion(
+      p.ctx,
+      <ProveedorPlan compras={null} abrirPlan={jest.fn()}>
+        <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />
+      </ProveedorPlan>,
+    );
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_DESGLOSE);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: false });
     expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
@@ -316,13 +326,20 @@ describe('Registrar', () => {
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
 
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByText(/^Registré: Coca \$25 · .+ · Cartera$/)).toBeTruthy();
+    // Causa y efecto (`02 §5`): la segunda línea dice cómo cambió la cifra de Hoy, leída de `obtenerHoy`.
+    const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
+    expect(despues).not.toBe('$214');
+    expect(textoDe('hoy-puedes')).toBe(despues);
+    // Las consultas de texto normalizan el salto de línea a un espacio.
+    const linea = lineaCambioDia('$214', despues).replace(/[$.]/g, '\\$&');
+    const registrado = new RegExp(`^Registré: Coca \\$25 · .+ · Cartera\\s${linea}$`);
+    expect(within(aviso).getByText(registrado)).toBeTruthy();
     expect(within(aviso).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
     expect(textoDe(`monto-${mov?.id}`)).toBe('−$25');
 
-    fireEvent.press(within(aviso).getByText(/^Registré: Coca \$25 · .+ · Cartera$/));
+    fireEvent.press(within(aviso).getByText(registrado));
     expect(nav.alVerMovimiento).toHaveBeenCalledWith(mov?.id);
 
     fireEvent.press(within(aviso).getByText('Deshacer'));
@@ -358,7 +375,10 @@ describe('Registrar', () => {
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     await screen.findByTestId('mensaje-registro');
-    expect(textoDe('mensaje-registro')).toMatch(/^Lo guardé; lo interpreto cuando tengas internet\./);
+    // Sin intérprete en internet no se promete "cuando tengas internet" (sí hay internet): se dice qué hacer.
+    expect(textoDe('mensaje-registro')).toContain(MENSAJE_SIN_NUBE);
+    expect(textoDe('mensaje-registro')).not.toMatch(/cuando tengas internet/);
+    expect(MENSAJE_GUARDADA.sin_red).toMatch(/cuando tengas internet/);
     expect(screen.getByText('«ayer fui al súper con mi prima y pagó ella»')).toBeTruthy();
     expect(screen.getByText('Tienes 1 frase por revisar.')).toBeTruthy();
   });
@@ -387,8 +407,12 @@ describe('Registrar', () => {
     expect(chipNu.props.accessibilityState).toMatchObject({ selected: true });
     fireEvent.press(screen.getByTestId('boton-guardar-confirmacion'));
     expect(screen.queryByTestId('confirmacion-registro')).toBeNull();
+    // Una compra con la tarjeta que pagas completa se aparta: la cifra de Hoy baja y el aviso lo dice.
+    const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
     expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Tacos $80 · Comida fuera · Nu ••4410'),
+      within(screen.getByTestId('aviso')).getByText(
+        `Registré: Tacos $80 · Comida fuera · Nu ••4410\n${lineaCambioDia('$214', despues)}`,
+      ),
     ).toBeTruthy();
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
   });

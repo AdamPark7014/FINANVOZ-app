@@ -8,7 +8,7 @@ import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
 import { PantallaRegistrar } from './PantallaRegistrar';
-import { PISTA_REVISAR_FRASE } from './textos';
+import { lineaCambioDia, PISTA_REVISAR_FRASE } from './textos';
 
 const HOY = '2026-10-11';
 // Sin verbo y con «chelas» (fuera del diccionario): el nivel 0 la deja a la nube (06 §9.3).
@@ -87,9 +87,10 @@ describe('Registrar con la nube', () => {
     const nu = p.e.cuentas.nu as string;
 
     await escribir(TACOS_Y_COCA);
+    // Causa y efecto: la segunda línea dice cómo cambió la cifra de Hoy ($214 de E4-01).
     expect(
       within(screen.getByTestId('aviso')).getByText(
-        'Registré: Tacos $80 · Comida fuera · Nu ••4410; Coca $25 · Antojos · Cartera',
+        `Registré: Tacos $80 · Comida fuera · Nu ••4410; Coca $25 · Antojos · Cartera\n${lineaCambioDia('$214', '$187')}`,
       ),
     ).toBeTruthy();
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
@@ -155,7 +156,9 @@ describe('Registrar con la nube', () => {
       fireEvent.press(within(tarjeta).getByTestId('aclarar-$2.50'));
     });
     expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Chicle $2.50 · Otros gastos · Cartera'),
+      within(screen.getByTestId('aviso')).getByText(
+        `Registré: Chicle $2.50 · Otros gastos · Cartera\n${lineaCambioDia('$214', '$213')}`,
+      ),
     ).toBeTruthy();
   });
 

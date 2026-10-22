@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import {
   detalleDeParams,
@@ -6,11 +8,13 @@ import {
   PantallaMovimientos,
   type ParamsMovimientos,
 } from '../../src/pantallas/principal';
+import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { propsContenedorPestana } from './pestanas-textos';
 
 /** Pestaña Movimientos (`02 §10`): filtro y detalle solo vía parámetros de ruta (regla 9). */
 export default function Movimientos() {
   const router = useRouter();
+  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   const params = useLocalSearchParams<ParamsMovimientos>();
   const filtro = filtroDeParams(params);
   const detalle = detalleDeParams(params);

@@ -6,6 +6,13 @@
 
 ## Hecho en este turno
 
+- **Hoy y Movimientos para iPhone (B-1)**: mensaje honesto sin nube («Lo guardé en Por revisar…»), aviso con Deshacer
+  sobre el área segura y el alto real de la barra, botones que tumbaban la app ahora atrapan el error, detalle con
+  «Cerrar» y «Corregir» (formulario precargado → `aplicarCorreccion`), fecha Hoy · Ayer · Elegir (7 días, sin futuro),
+  «Borrar» en pantalla, «Tu día pasa de $214 a $194» cuando cambia la cifra, candado y «¿Me alcanza?» ocultos si
+  `abrirPlan` es null, vacío de Movimientos con «Registrar un movimiento», «Configurar mi ingreso», «Ajustes» desde
+  Hoy, respuestas como chips, anuncios VoiceOver. jest principal 110/111 (la roja es `riesgo` por un id de Ajustes de
+  B-2b). Rompe 2 aserciones de `tandas.test.tsx` (segunda línea del aviso): B-3 las ajusta.
 - **Voz compartida y teclado de iPhone (V-B)**: `ProveedorDictado` único en `_layout.tsx` (un micrófono a la vez, ignora
   el «abortado/fin» del anterior), `useMicrofono`, `BotonMicrofono` (ícono 48 dp o pastilla «Dímelo»), motor falso
   compartido en `voz/__pruebas__`; `CampoMonto` con `dictable`/`admiteCero` (entendido, aproximado, $0, error, «Abrir

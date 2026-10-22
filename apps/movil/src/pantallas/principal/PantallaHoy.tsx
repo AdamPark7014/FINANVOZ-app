@@ -15,6 +15,7 @@ import {
   type VistaHoy,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
+import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import {
   Boton,
   Cifra,
@@ -40,8 +41,12 @@ import { OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { Observaciones } from './Observaciones';
 import { PanelRegistrar } from './PanelRegistrar';
 import { ProbabilidadHoy } from './ProbabilidadHoy';
+import { useAnuncio } from './ProveedorAvisos';
 import { TarjetasAccion } from './TarjetasAccion';
+import { cifraHoyMostrada, useRecordarHoyVisto } from './useAvisoRegistro';
 import {
+  BTN_AJUSTES,
+  BTN_CONFIGURAR_INGRESO_HOY,
   CONTEXTO_CIFRA_HOY_PUEDES,
   CONTEXTO_CIFRA_LIBRE_NEGATIVO,
   encabezadoFecha,
@@ -51,6 +56,7 @@ import {
   TITULO_HOY_PUEDES_GASTAR,
   TITULO_SIN_INGRESO,
   TITULO_TARJETA_DEL_DIA,
+  PISTA_ABRIR_AJUSTES,
   PISTA_AVISO_ENTENDIDO,
   PISTA_CONFIGURAR_INGRESO_HOY,
   PISTA_CONTAR_EFECTIVO,
@@ -71,6 +77,8 @@ export interface NavegacionHoy {
   alAbrirArqueo?: (efectivoReal?: number) => void;
   /** "¿Me alcanza?" (`02 §9`): con el botón de Hoy (sin consulta) o diciendo "¿me alcanza para…?". */
   alAbrirMeAlcanza?: (consulta?: ConsultaMeAlcanza) => void;
+  /** Ajustes desde la cabecera de Hoy (además del acceso en Cuentas, `02 §11`). */
+  alAbrirAjustes?: () => void;
 }
 
 /** Hoy (02-UX §4): cifra principal, días al ingreso, desglose, tarjetas de acción, avisos y registro. */
@@ -87,6 +95,11 @@ export function PantallaHoy({
   const vista = useVista(obtenerHoy);
   const observaciones = useVista(obtenerObservaciones);
   const plus = useVista(funcionesPlan);
+  // Sin pantalla de plan a la cual llevar (build sin tienda), un candado o "¿Me alcanza?" en Gratis sería un
+  // callejón sin salida: no se muestran.
+  const { abrirPlan } = usePlanTienda();
+  // "Tu día pasa de $214 a $194." en el aviso de registro (`useAvisoRegistro`).
+  useRecordarHoyVisto(cifraHoyMostrada(vista));
   const [verDesglose, setVerDesglose] = useState(false);
   // "Hablar" y "Escribir" van fijos al pie (sobre las pestañas): el aviso de "Deshacer" sube para no taparlos.
   const [altoPie, setAltoPie] = useState(0);
@@ -111,18 +124,37 @@ export function PantallaHoy({
         </View>
       }
     >
-      <Texto variante="secundario" tono="secundario" testID="hoy-fecha">
-        {encabezadoFecha(etiquetaFecha(vista.hoy), etiquetaDiaMes(vista.hoy))}
-      </Texto>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: espacio.s,
+        }}
+      >
+        <Texto variante="secundario" tono="secundario" testID="hoy-fecha" style={{ flexShrink: 1 }}>
+          {encabezadoFecha(etiquetaFecha(vista.hoy), etiquetaDiaMes(vista.hoy))}
+        </Texto>
+        {navegacion.alAbrirAjustes ? (
+          <Boton
+            etiqueta={BTN_AJUSTES}
+            pista={PISTA_ABRIR_AJUSTES}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={navegacion.alAbrirAjustes}
+            testID="boton-ajustes-hoy"
+          />
+        ) : null}
+      </View>
       <Heroe vista={vista} alConfigurarIngreso={navegacion.alConfigurarIngreso} />
       {vista.estado !== 'sin_ingreso' ? (
         <>
-          {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad. */}
+          {/* Plus (`02 §4`): en Gratis, un candado discreto en lugar de la probabilidad (si hay plan que abrir). */}
           {plus.probabilidad ? (
             <ProbabilidadHoy {...(bloques ? { bloques } : {})} />
-          ) : (
+          ) : abrirPlan ? (
             <CandadoPlus texto="Ver probabilidad" testID="candado-probabilidad" />
-          )}
+          ) : null}
           <BotonDesglose
             expandido={verDesglose}
             etiqueta={
@@ -193,7 +225,7 @@ export function PantallaHoy({
         </Tarjeta>
       ) : null}
       <InvitacionAvisos />
-      {navegacion.alAbrirMeAlcanza ? (
+      {navegacion.alAbrirMeAlcanza && (plus.meAlcanza || abrirPlan) ? (
         <Boton
           etiqueta="¿Me alcanza?"
           variante="secundario"
@@ -263,7 +295,7 @@ function Heroe({ vista, alConfigurarIngreso }: { vista: VistaHoy; alConfigurarIn
           {SUBTITULO_SIN_INGRESO}
         </Texto>
         <Boton
-          etiqueta="Decir cada cuándo me pagan"
+          etiqueta={BTN_CONFIGURAR_INGRESO_HOY}
           alPresionar={alConfigurarIngreso}
           pista={PISTA_CONFIGURAR_INGRESO_HOY}
           testID="boton-configurar-ingreso"
@@ -417,10 +449,18 @@ function AvisosUnaVez({ avisos }: { avisos: readonly Aviso[] }) {
   if (nuevos.length > 0) setMostrados([...mostrados, ...nuevos]);
 
   useEffect(() => {
-    for (const a of avisos) marcarAvisoVisto(ctx, a.id);
+    for (const a of avisos) {
+      try {
+        marcarAvisoVisto(ctx, a.id);
+      } catch {
+        // Si no se pudo guardar, el aviso vuelve a salir la próxima vez; Hoy no se cae por eso.
+      }
+    }
   }, [ctx, avisos]);
 
   const visibles = mostrados.filter((a) => !cerrados.includes(a.id));
+  // VoiceOver: el aviso nuevo se anuncia como en TalkBack (`accessibilityRole="alert"`).
+  useAnuncio(visibles[0]?.texto);
   if (visibles.length === 0) return null;
   return (
     <View style={{ gap: espacio.m }}>

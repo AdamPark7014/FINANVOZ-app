@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -31,9 +31,18 @@ import { leerEntero } from '../onboarding/ingreso';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { EstadoVacio } from './EstadoVacio';
-import { useMostrarAviso } from './ProveedorAvisos';
-import { useAvisoRegistro } from './useAvisoRegistro';
+import { esCorregible, FormularioMovimiento } from './FormularioMovimiento';
+import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
+import { mostrarDespuesDeCerrar, useAvisoRegistro } from './useAvisoRegistro';
 import {
+  BTN_BORRAR_MOVIMIENTO,
+  BTN_CERRAR_DETALLE,
+  BTN_CONFIRMAR_BORRAR_MOVIMIENTO,
+  BTN_CORREGIR_MOVIMIENTO,
+  BTN_REGISTRAR_PRIMER_MOVIMIENTO,
+  ETIQUETA_CERRAR_DETALLE,
+  PISTA_CORREGIR_MOVIMIENTO,
+  PISTA_VACIO_MOVIMIENTOS,
   NOMBRE_ORIGEN,
   NOMBRE_TIPO_LIBRO,
   resumenMovimiento,
@@ -116,6 +125,8 @@ export function PantallaMovimientos({
     setDetallePrevio(detalleInicial);
     if (detalleInicial) setAbierto(detalleInicial);
   }
+  // VoiceOver: el aviso de filtro activo se anuncia como en TalkBack (región viva).
+  useAnuncio(filtro ? TEXTO_MOVIMIENTOS_FILTRO_ACTIVO : null);
 
   return (
     <Pantalla testID="pantalla-movimientos">
@@ -177,8 +188,12 @@ export function PantallaMovimientos({
                 ancho="contenido"
                 pista={PISTA_DESCARTAR_FRASE}
                 alPresionar={() => {
-                  descartarPorInterpretar(ctx, f.id);
-                  refrescar();
+                  try {
+                    descartarPorInterpretar(ctx, f.id);
+                    refrescar();
+                  } catch (e) {
+                    mostrar({ mensaje: mensajeError(e) });
+                  }
                 }}
                 testID={`descartar-${f.id}`}
               />
@@ -216,6 +231,16 @@ export function PantallaMovimientos({
           testID="movimientos-vacio"
           texto={filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
           etiquetaAccesible={etiquetaVacioMovimientos(filtro != null)}
+          {...(filtro ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
+        />
+      ) : null}
+      {dias.length === 0 && !filtro ? (
+        <Boton
+          etiqueta={BTN_REGISTRAR_PRIMER_MOVIMIENTO}
+          variante="secundario"
+          alPresionar={alRegistrar}
+          pista={PISTA_REGISTRAR_MOVIMIENTO}
+          testID="boton-registrar-primer-movimiento"
         />
       ) : null}
 
@@ -240,6 +265,7 @@ export function PantallaMovimientos({
                   {...(alAbrirPersona ? { alAbrirPersona } : {})}
                   alAbrirDetalle={(id) => setAbierto(id)}
                   alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
+                  alCerrar={() => setAbierto(null)}
                   alAnular={() => {
                     try {
                       anularMovimiento(ctx, m.id);
@@ -263,8 +289,12 @@ export function PantallaMovimientos({
                         accion: {
                           etiqueta: 'Deshacer',
                           alPresionar: () => {
-                            marcarExtraordinaria(ctx, m.id, !marcar);
-                            refrescar();
+                            try {
+                              marcarExtraordinaria(ctx, m.id, !marcar);
+                              refrescar();
+                            } catch (e) {
+                              mostrarDespuesDeCerrar(mostrar, mensajeError(e));
+                            }
                           },
                         },
                       });
@@ -304,6 +334,7 @@ function PasarAMeses({
   const [meses, setMeses] = useState<string | null>(null);
   const [otro, setOtro] = useState('');
   const [error, setError] = useState<string | null>(null);
+  useAnuncio(error);
   const guardar = () => {
     const n = meses !== null ? Number(meses) : leerEntero(otro, 2, 48);
     if (n === null) return setError('Elige los meses, de 2 a 48.');
@@ -356,6 +387,7 @@ function FilaMovimiento({
   abierto,
   aMeses,
   alTocar,
+  alCerrar,
   alAnular,
   alExtraordinario,
   alAbrirPersona,
@@ -365,6 +397,7 @@ function FilaMovimiento({
   abierto: boolean;
   aMeses: boolean;
   alTocar: () => void;
+  alCerrar: () => void;
   alAnular: () => void;
   alExtraordinario: () => void;
   alAbrirPersona?: (personaId: string) => void;
@@ -372,10 +405,27 @@ function FilaMovimiento({
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [pasando, setPasando] = useState(false);
+  const [corrigiendo, setCorrigiendo] = useState(false);
+  // VoiceOver: la pregunta de borrar se anuncia como en TalkBack (`accessibilityRole="alert"`).
+  useAnuncio(abierto && confirmando ? TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO : null);
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
   const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
   const etiquetaAccesible = etiquetaHablada(
     [titulo(m), subtitulo, cifraEnPalabras(centavos)].filter(Boolean).join(', '),
+  );
+  const ocupado = pasando || confirmando || corrigiendo;
+  const encabezado = (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+      <View style={{ flex: 1, gap: espacio.xxs }}>
+        <Texto variante="cuerpoFuerte">{titulo(m)}</Texto>
+        {subtitulo ? (
+          <Texto variante="secundario" tono="secundario">
+            {subtitulo}
+          </Texto>
+        ) : null}
+      </View>
+      <Cifra centavos={centavos} testID={`monto-${m.id}`} />
+    </View>
   );
   return (
     <Tarjeta
@@ -386,17 +436,23 @@ function FilaMovimiento({
       etiquetaAccesible={etiquetaAccesible}
       pista={abierto ? PISTA_OCULTAR_DETALLE_MOVIMIENTO : PISTA_MOSTRAR_DETALLE_MOVIMIENTO}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <View style={{ flex: 1, gap: espacio.xxs }}>
-          <Texto variante="cuerpoFuerte">{titulo(m)}</Texto>
-          {subtitulo ? (
-            <Texto variante="secundario" tono="secundario">
-              {subtitulo}
-            </Texto>
-          ) : null}
-        </View>
-        <Cifra centavos={centavos} testID={`monto-${m.id}`} />
-      </View>
+      {abierto ? (
+        // Con el detalle abierto, el fondo de la tarjeta queda detrás del texto: el encabezado también la cierra.
+        <Pressable
+          testID={`encabezado-${m.id}`}
+          onPress={alTocar}
+          accessibilityRole="button"
+          accessibilityLabel={etiquetaAccesible}
+          accessibilityHint={PISTA_OCULTAR_DETALLE_MOVIMIENTO}
+          accessibilityState={{ expanded: true }}
+        >
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {encabezado}
+          </View>
+        </Pressable>
+      ) : (
+        encabezado
+      )}
       {abierto ? (
         <View style={{ gap: espacio.xs }} testID={`detalle-${m.id}`}>
           {m.saleDe.length > 0 ? (
@@ -425,7 +481,28 @@ function FilaMovimiento({
           {pasando ? (
             <PasarAMeses m={m} alTerminar={() => setPasando(false)} alAbrirDetalle={alAbrirDetalle} />
           ) : null}
-          {aMeses && !pasando && !confirmando ? (
+          {corrigiendo && esCorregible(m) ? (
+            <FormularioMovimiento
+              corregir={m}
+              alCorregido={(nuevoId) => {
+                setCorrigiendo(false);
+                // La versión corregida reemplaza a esta: su detalle queda abierto con el historial.
+                alAbrirDetalle(nuevoId);
+              }}
+              alCancelar={() => setCorrigiendo(false)}
+            />
+          ) : null}
+          {esCorregible(m) && !ocupado ? (
+            <Boton
+              etiqueta={BTN_CORREGIR_MOVIMIENTO}
+              variante="secundario"
+              ancho="contenido"
+              alPresionar={() => setCorrigiendo(true)}
+              pista={PISTA_CORREGIR_MOVIMIENTO}
+              testID="boton-corregir"
+            />
+          ) : null}
+          {aMeses && !ocupado ? (
             <Boton
               etiqueta="Pasar a meses"
               variante="secundario"
@@ -439,7 +516,7 @@ function FilaMovimiento({
               Lo marcaste como extraordinario
             </Texto>
           ) : null}
-          {m.tipo === 'gasto' && !pasando && !confirmando ? (
+          {m.tipo === 'gasto' && !ocupado ? (
             m.extraordinaria ? (
               <Boton
                 etiqueta="Volver a contarlo"
@@ -460,7 +537,7 @@ function FilaMovimiento({
               />
             )
           ) : null}
-          {pasando ? null : confirmando ? (
+          {pasando || corrigiendo ? null : confirmando ? (
             <View style={{ gap: espacio.s }} testID={`confirmar-anular-${m.id}`}>
               <Texto
                 variante="cuerpo"
@@ -472,7 +549,7 @@ function FilaMovimiento({
                 {TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO}
               </Texto>
               <Boton
-                etiqueta="Sí, anular"
+                etiqueta={BTN_CONFIRMAR_BORRAR_MOVIMIENTO}
                 alPresionar={alAnular}
                 pista={PISTA_CONFIRMAR_ANULAR_MOVIMIENTO}
                 testID="boton-confirmar-anular"
@@ -481,12 +558,23 @@ function FilaMovimiento({
             </View>
           ) : (
             <Boton
-              etiqueta="Anular"
+              etiqueta={BTN_BORRAR_MOVIMIENTO}
               variante="secundario"
               ancho="contenido"
               alPresionar={() => setConfirmando(true)}
               pista={PISTA_ANULAR_MOVIMIENTO}
               testID="boton-anular"
+            />
+          )}
+          {ocupado ? null : (
+            <Boton
+              etiqueta={BTN_CERRAR_DETALLE}
+              etiquetaAccesible={ETIQUETA_CERRAR_DETALLE}
+              pista={PISTA_OCULTAR_DETALLE_MOVIMIENTO}
+              variante="texto"
+              ancho="contenido"
+              alPresionar={alCerrar}
+              testID={`cerrar-detalle-${m.id}`}
             />
           )}
         </View>

@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import type { FiltroMovimientos, RespuestaConsulta } from '../../servicios';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import { Boton, espacio, Tarjeta, Texto } from '../../ui';
+import { useAnuncio } from './ProveedorAvisos';
 import { BTN_LISTO, BTN_VER_MOVIMIENTOS, BTN_VER_PLUS } from './textos';
 
 /**
@@ -19,6 +20,8 @@ export function TarjetaConsulta({
   alCerrar: () => void;
 }) {
   const { abrirPlan } = usePlanTienda();
+  // VoiceOver: la respuesta se anuncia como en TalkBack (región viva).
+  useAnuncio(respuesta.texto);
   return (
     <Tarjeta testID="respuesta-consulta">
       <Texto variante="cuerpo" accessibilityLiveRegion="polite" testID="respuesta-consulta-texto">

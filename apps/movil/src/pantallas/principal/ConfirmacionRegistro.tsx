@@ -13,6 +13,7 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, Cifra, espacio, Tarjeta, Texto } from '../../ui';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { useAnuncio } from './ProveedorAvisos';
 import {
   ETIQUETA_CANCELAR,
   ETIQUETA_GUARDAR,
@@ -67,6 +68,8 @@ export function ConfirmacionRegistro({
     return inicial;
   });
   const [error, setError] = useState<string | null>(null);
+  // VoiceOver: el error al guardar se anuncia (en Android lo lee la región viva).
+  useAnuncio(error);
   const completo = propuestas.every((p, i) => p.faltan.every((f) => elecciones[clave(i, f.campo)]));
 
   const guardar = () => {
@@ -123,7 +126,7 @@ export function ConfirmacionRegistro({
         </View>
       ))}
       {error ? (
-        <Texto variante="secundario" tono="faltante">
+        <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
           {error}
         </Texto>
       ) : null}

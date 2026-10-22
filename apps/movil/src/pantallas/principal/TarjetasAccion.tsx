@@ -20,10 +20,21 @@ import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
-import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
-import { useMostrarAviso } from './ProveedorAvisos';
-import { codigoError, mensajeError } from './textos';
+import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
+import { codigoError, mensajeError, RESPUESTAS_OCURRENCIA } from './textos';
 import { useAvisoRegistro } from './useAvisoRegistro';
+
+/** Error de una tarjeta de acción: visible y, en iOS, anunciado (VoiceOver no lee regiones vivas). */
+function ErrorTarjeta({ mensaje }: { mensaje: string | null }) {
+  useAnuncio(mensaje);
+  if (!mensaje) return null;
+  return (
+    <Texto variante="secundario" tono="faltante" accessibilityLiveRegion="polite">
+      {mensaje}
+    </Texto>
+  );
+}
 
 type Compromiso = Extract<TarjetaAccion, { tipo: 'compromiso_vencido' }>;
 type Ingreso = Extract<TarjetaAccion, { tipo: 'ingreso_no_llego' }>;
@@ -142,22 +153,34 @@ function TarjetaOcurrencia({ t, testID }: { t: Compromiso | Ingreso; testID: str
       else setError(mensajeError(e));
     }
   };
+  // Un servicio que lanza (p. ej. sin consentimiento) no debe tumbar Hoy: el error se dice en la tarjeta.
   const posponer = () => {
-    todaviaNo(ctx, ref);
-    refrescar();
-    mostrar({
-      mensaje: esIngreso ? 'Va. Te pregunto mañana.' : 'Lo sigo apartando. Te pregunto mañana.',
-    });
+    setError(null);
+    try {
+      todaviaNo(ctx, ref);
+      refrescar();
+      mostrar({
+        mensaje: esIngreso ? 'Va. Te pregunto mañana.' : 'Lo sigo apartando. Te pregunto mañana.',
+      });
+    } catch (e) {
+      setError(mensajeError(e));
+    }
   };
   const omitir = () => {
-    omitirOcurrencia(ctx, ref);
-    refrescar();
-    mostrar({ mensaje: esIngreso ? 'Listo, no cuento con ese pago.' : 'Listo, ya no lo aparto.' });
+    setError(null);
+    try {
+      omitirOcurrencia(ctx, ref);
+      refrescar();
+      mostrar({ mensaje: esIngreso ? 'Listo, no cuento con ese pago.' : 'Listo, ya no lo aparto.' });
+    } catch (e) {
+      setError(mensajeError(e));
+    }
   };
 
   const detalle = esIngreso
     ? `${formatearCentavos(t.monto)} · ${t.cuando === 'hoy' ? 'hoy' : t.etiquetaFecha}`
     : `${formatearCentavos(t.monto)}, vencía el ${t.etiquetaFecha}`;
+  const respuestas = RESPUESTAS_OCURRENCIA[esIngreso ? 'ingreso' : 'compromiso'];
 
   return (
     <Tarjeta testID={testID}>
@@ -172,31 +195,35 @@ function TarjetaOcurrencia({ t, testID }: { t: Compromiso | Ingreso; testID: str
           testID={`${testID}-cuenta`}
         />
       ) : (
-        <View style={{ gap: espacio.s }}>
-          <Boton
-            etiqueta={esIngreso ? 'Sí, ya llegó' : 'Ya la pagué'}
+        // Chips en fila, la respuesta más probable primero (`02 §1.2`, `02 §4.1`).
+        <View
+          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}
+          testID={`${testID}-respuestas`}
+        >
+          <Chip
+            etiqueta={respuestas.si.etiqueta}
+            pista={respuestas.si.pista}
+            seleccionado={false}
             alPresionar={() => registrar()}
             testID={`${testID}-${esIngreso ? 'ya-llego' : 'ya-la-pague'}`}
           />
-          <Boton
-            etiqueta="Todavía no"
-            variante="secundario"
+          <Chip
+            etiqueta={respuestas.todaviaNo.etiqueta}
+            pista={respuestas.todaviaNo.pista}
+            seleccionado={false}
             alPresionar={posponer}
             testID={`${testID}-todavia-no`}
           />
-          <Boton
-            etiqueta={esIngreso ? 'Este periodo no me pagan' : 'Ya no aplica'}
-            variante="texto"
+          <Chip
+            etiqueta={respuestas.omitir.etiqueta}
+            pista={respuestas.omitir.pista}
+            seleccionado={false}
             alPresionar={omitir}
             testID={`${testID}-${esIngreso ? 'no-me-pagan' : 'ya-no-aplica'}`}
           />
         </View>
       )}
-      {error ? (
-        <Texto variante="secundario" tono="faltante">
-          {error}
-        </Texto>
-      ) : null}
+      <ErrorTarjeta mensaje={error} />
     </Tarjeta>
   );
 }
@@ -238,6 +265,17 @@ function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
   const mostrar = useMostrarAviso();
   const [pagando, setPagando] = useState(false);
   const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const posponer = () => {
+    setError(null);
+    try {
+      todaviaNoPagoTarjeta(ctx, { tarjetaId: t.tarjetaId, corte: t.corte });
+      refrescar();
+      mostrar({ mensaje: 'Lo sigo apartando. Te pregunto mañana.' });
+    } catch (e) {
+      setError(mensajeError(e));
+    }
+  };
   if (pregunta) return <PreguntaLiquidarMeses pregunta={pregunta} testID={`${testID}-liquidar`} />;
   return (
     <Tarjeta testID={testID}>
@@ -268,14 +306,11 @@ function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
             etiqueta="Todavía no"
             variante="secundario"
             testID={`${testID}-todavia-no`}
-            alPresionar={() => {
-              todaviaNoPagoTarjeta(ctx, { tarjetaId: t.tarjetaId, corte: t.corte });
-              refrescar();
-              mostrar({ mensaje: 'Lo sigo apartando. Te pregunto mañana.' });
-            }}
+            alPresionar={posponer}
           />
         </View>
       )}
+      <ErrorTarjeta mensaje={error} />
     </Tarjeta>
   );
 }
@@ -311,11 +346,7 @@ function TarjetaAumentoSuscripcion({ t, testID }: { t: AumentoSuscripcion; testI
           testID={`${testID}-no`}
         />
       </View>
-      {error ? (
-        <Texto variante="secundario" tono="faltante">
-          {error}
-        </Texto>
-      ) : null}
+      <ErrorTarjeta mensaje={error} />
     </Tarjeta>
   );
 }
@@ -354,11 +385,7 @@ function TarjetaCobertura({ t, testID }: { t: Cobertura; testID: string }) {
           testID={`${testID}-no`}
         />
       </View>
-      {error ? (
-        <Texto variante="secundario" tono="faltante">
-          {error}
-        </Texto>
-      ) : null}
+      <ErrorTarjeta mensaje={error} />
     </Tarjeta>
   );
 }
