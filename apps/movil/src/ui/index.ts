@@ -41,3 +41,5 @@ export {
 export { EstadoVacio } from './componentes/EstadoVacio';
 export { Barra, type BarraProps } from './componentes/Barra';
 export { Aviso, useAviso, type AccionAviso, type AvisoProps, type DatosAviso } from './componentes/Aviso';
+export { TarjetaEntendi } from './componentes/TarjetaEntendi';
+export type { AccionEntendi, FilaEntendi, OpcionFilaEntendi, PropuestaEntendi } from './entendi';
