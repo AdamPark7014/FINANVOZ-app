@@ -24,18 +24,14 @@ export {
 } from './componentes/CampoTexto';
 export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
 export { anunciar, useAnunciar } from './anunciar';
-export {
-  CampoMonto,
-  ERROR_FORMATO_MONTO,
-  textoOidoMonto,
-  type CampoMontoProps,
-} from './componentes/CampoMonto';
+export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export {
   ContextoDictadoCampos,
   useDictadoCampos,
   type AvisoDictadoCampo,
   type DictadoCampos,
   type LecturaMontoDictado,
+  type LectorMontoDictado,
   type PropsBotonDictarCampo,
 } from './componentes/dictado-campo';
 export { EstadoVacio } from './componentes/EstadoVacio';

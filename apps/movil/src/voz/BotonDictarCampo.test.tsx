@@ -1,16 +1,31 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { textoOidoMonto } from '../ui';
+import { Platform } from 'react-native';
 import { crearMotorFalso } from './__pruebas__/motor-falso';
 import { BotonDictarCampo } from './BotonDictarCampo';
-import { MENSAJES_DICTADO } from './estado';
+import { ProveedorDictado } from './ProveedorDictado';
+import {
+  ETIQUETA_ESCUCHANDO,
+  MENSAJES_DICTADO_CAMPO,
+  MENSAJES_DICTADO_FRASE,
+  PISTA_MICROFONO_CAMPO,
+  PISTA_MICROFONO_FRASE,
+} from './textos';
+
+afterEach(() => jest.restoreAllMocks());
+
+async function tocar(id = 'monto-dictar') {
+  await act(async () => {
+    fireEvent(screen.getByTestId(id), 'pressIn');
+  });
+  fireEvent(screen.getByTestId(id), 'pressOut');
+}
 
 /**
- * Micrófono de campo del hilo de la nube (PR #24). `CampoMonto` ya no lo monta (usa `BotonMicrofono` sobre
- * `useMicrofono`, probado en `ui/componentes/CampoMonto.test.tsx`); estas pruebas cubren solo la pieza suelta
- * mientras conviven las dos implementaciones (`docs/PLAN-MEJORA-2026-10.md` §5).
+ * El micrófono que `ProveedorDictado` inyecta en los campos de `ui/` (`CampoMonto`, «O dímelo»): `BotonMicrofono`
+ * sobre `useMicrofono`. Lo que el campo hace con lo oído se prueba en `ui/componentes/CampoMonto.test.tsx`.
  */
 describe('BotonDictarCampo', () => {
-  it('toca, dicta «mil quinientos» y la transcripción final llega a alOir; el aviso se apaga al terminar', async () => {
+  it('toca, dicta «mil quinientos»: avisa lo que va oyendo, entrega la transcripción y apaga el aviso', async () => {
     const f = crearMotorFalso();
     const alOir = jest.fn();
     const alAviso = jest.fn();
@@ -23,14 +38,19 @@ describe('BotonDictarCampo', () => {
         testID="monto-dictar"
       />,
     );
-    expect(screen.getByTestId('monto-dictar')).toHaveProp('accessibilityLabel', 'Dictar Monto');
-    fireEvent(screen.getByTestId('monto-dictar'), 'pressIn');
-    await act(async () => {});
-    fireEvent(screen.getByTestId('monto-dictar'), 'pressOut');
-    expect(alAviso).toHaveBeenLastCalledWith({ texto: 'Te escucho…', sinPermiso: false });
+    const mic = () => screen.getByTestId('monto-dictar');
+    expect(mic()).toHaveProp('accessibilityLabel', 'Dictar en voz: Monto');
+    expect(mic()).toHaveProp('accessibilityHint', PISTA_MICROFONO_CAMPO);
+    await tocar();
+    expect(mic()).toHaveProp('accessibilityLabel', ETIQUETA_ESCUCHANDO);
+    expect(alAviso).toHaveBeenLastCalledWith({ texto: 'Te escucho…', escuchando: true, sinPermiso: false });
+    f.emitir({ tipo: 'resultado', texto: 'mil', final: false });
+    expect(alAviso).toHaveBeenLastCalledWith({ texto: '«mil»', escuchando: true, sinPermiso: false });
     f.emitir({ tipo: 'resultado', texto: 'mil quinientos', final: true });
+    expect(alOir).toHaveBeenCalledTimes(1);
     expect(alOir).toHaveBeenCalledWith('mil quinientos');
     expect(alAviso).toHaveBeenLastCalledWith(null);
+    expect(mic()).toHaveProp('accessibilityLabel', 'Dictar en voz: Monto');
   });
 
   it('sin permiso avisa con sinPermiso para que el campo ofrezca «Abrir Ajustes»', async () => {
@@ -45,12 +65,59 @@ describe('BotonDictarCampo', () => {
         testID="monto-dictar"
       />,
     );
-    fireEvent(screen.getByTestId('monto-dictar'), 'pressIn');
-    await act(async () => {});
-    expect(alAviso).toHaveBeenLastCalledWith({ texto: MENSAJES_DICTADO.sin_permiso, sinPermiso: true });
+    await tocar();
+    expect(f.motor.iniciar).not.toHaveBeenCalled();
+    expect(alAviso).toHaveBeenLastCalledWith({
+      texto: MENSAJES_DICTADO_CAMPO.sin_permiso,
+      escuchando: false,
+      sinPermiso: true,
+    });
   });
 
-  it('sin reconocimiento en el teléfono no se muestra', () => {
+  it('en iPhone el aviso sin permiso nombra el micrófono y el reconocimiento de voz', async () => {
+    jest.replaceProperty(Platform, 'OS', 'ios');
+    const f = crearMotorFalso({ permiso: false });
+    const alAviso = jest.fn();
+    render(
+      <BotonDictarCampo
+        etiquetaCampo="Monto"
+        alOir={jest.fn()}
+        alAviso={alAviso}
+        motor={f.motor}
+        testID="monto-dictar"
+      />,
+    );
+    await tocar();
+    expect(alAviso).toHaveBeenLastCalledWith(
+      expect.objectContaining({ texto: MENSAJES_DICTADO_CAMPO.sin_permiso_ios, sinPermiso: true }),
+    );
+  });
+
+  it('«O dímelo» (dicta="frase"): pista y errores de un paso completo, no de una cifra', async () => {
+    const f = crearMotorFalso();
+    const alAviso = jest.fn();
+    render(
+      <BotonDictarCampo
+        etiquetaCampo="este paso"
+        dicta="frase"
+        alOir={jest.fn()}
+        alAviso={alAviso}
+        motor={f.motor}
+        testID="paso-dictar"
+      />,
+    );
+    expect(screen.getByTestId('paso-dictar')).toHaveProp('accessibilityHint', PISTA_MICROFONO_FRASE);
+    await tocar('paso-dictar');
+    f.emitir({ tipo: 'error', codigo: 'no-speech' });
+    expect(alAviso).toHaveBeenLastCalledWith({
+      texto: MENSAJES_DICTADO_FRASE.sin_voz,
+      escuchando: false,
+      sinPermiso: false,
+    });
+    expect(MENSAJES_DICTADO_FRASE.sin_voz).not.toMatch(/cifra|gasto/);
+  });
+
+  it('sin reconocimiento en el teléfono no se muestra ni se suscribe al reconocedor', () => {
     const f = crearMotorFalso({ disponible: false });
     render(
       <BotonDictarCampo
@@ -62,11 +129,28 @@ describe('BotonDictarCampo', () => {
       />,
     );
     expect(screen.queryByTestId('monto-dictar')).toBeNull();
+    expect(f.motor.suscribir).not.toHaveBeenCalled();
   });
 
-  it('textoOidoMonto dice qué oyó, qué puso y si fue aproximado', () => {
-    expect(textoOidoMonto('mil quinientos', 150_000, false)).toBe('Oí «mil quinientos»: $1,500.');
-    expect(textoOidoMonto('como 500', 50_000, true)).toMatch(/aproximado/);
-    expect(textoOidoMonto('dos cincuenta', null, false)).toMatch(/No entendí el monto/);
+  it('con ProveedorDictado usa el reconocedor de la app: el segundo micrófono calla al primero', async () => {
+    const f = crearMotorFalso();
+    const oirA = jest.fn();
+    const oirB = jest.fn();
+    render(
+      <ProveedorDictado motor={f.motor} leerMonto={() => null}>
+        <BotonDictarCampo etiquetaCampo="A" alOir={oirA} alAviso={jest.fn()} testID="a" />
+        <BotonDictarCampo etiquetaCampo="B" alOir={oirB} alAviso={jest.fn()} testID="b" />
+      </ProveedorDictado>,
+    );
+    await tocar('a');
+    await tocar('b');
+    expect(f.motor.abortar).toHaveBeenCalledTimes(1);
+    // Los restos del dictado abortado no le llegan al nuevo.
+    f.emitir({ tipo: 'error', codigo: 'aborted' });
+    f.emitir({ tipo: 'fin' });
+    f.emitir({ tipo: 'inicio' });
+    f.emitir({ tipo: 'resultado', texto: 'dos mil', final: true });
+    expect(oirB).toHaveBeenCalledWith('dos mil');
+    expect(oirA).not.toHaveBeenCalled();
   });
 });

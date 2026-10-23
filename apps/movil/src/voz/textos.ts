@@ -10,15 +10,24 @@ export const PISTA_HABLAR =
 export const PISTA_ESCUCHANDO = 'Toca otra vez cuando termines de hablar.';
 export const TEXTO_TE_ESCUCHO = 'Te escucho…';
 
-/** Con el permiso negado, iOS no vuelve a preguntar: solo queda ir a Ajustes. */
-export const BTN_ABRIR_AJUSTES_DICTADO = 'Abrir Ajustes';
-export const PISTA_ABRIR_AJUSTES_DICTADO = 'Abre los ajustes del teléfono para permitir el dictado.';
+/**
+ * La redacción del campo de dinero vive con su contrato en `ui/` (`ui/` no importa `voz/`); aquí se vuelve a
+ * exportar para el panel de registro y las pruebas de textos.
+ */
+export {
+  BTN_ABRIR_AJUSTES_DICTADO,
+  mensajeMontoAproximado,
+  mensajeMontoNoEntendido,
+  mensajeMontoOido,
+  PISTA_ABRIR_AJUSTES_DICTADO,
+  PISTA_CAMPO_ESCUCHANDO,
+} from '../ui/componentes/dictado-campo';
 
 /** Lo dictado que no se entendió vuelve al campo "Escribir" para corregirlo (no se pierde). */
 export const mensajeEstoOi = (frase: string) =>
   `Esto oí: «${frase}». ¿Lo arreglas? Corrígelo aquí abajo y toca Registrar.`;
 
-// --- Dictar una cifra en un campo de dinero (CampoMonto) ---
+// --- Dictar en un campo (CampoMonto) o un paso completo («O dímelo») ---
 
 /** Botón con texto para dictar en formularios. */
 export const TEXTO_DIMELO = 'Dímelo';
@@ -27,25 +36,11 @@ export const TEXTO_DIMELO = 'Dímelo';
 export const etiquetaMicrofonoCampo = (campo: string) => `Dictar en voz: ${campo}`;
 export const PISTA_MICROFONO_CAMPO =
   'Di la cifra y la escribo en el campo. Cuando dejes de hablar, termino solo.';
-/** Pista del campo mientras se escucha: nunca lleva lo que se va oyendo (puede traer cifras a medias). */
-export const PISTA_CAMPO_ESCUCHANDO = 'Te escucho. Cuando termines, escribo la cifra aquí.';
+/** «O dímelo» de un paso: se dice todo junto, como en el ejemplo. */
+export const PISTA_MICROFONO_FRASE =
+  'Dilo todo junto, como en el ejemplo, y lleno los datos. Cuando dejes de hablar, termino solo.';
 /** Lo que se va oyendo, solo a la vista. */
 export const textoOyendoCampo = (parcial: string) => (parcial === '' ? TEXTO_TE_ESCUCHO : `«${parcial}»`);
-
-/** `monto` ya formateado para la UI (`$8,500`). */
-export const mensajeMontoOido = (frase: string, monto: string) => `Oí «${frase}»: puse ${monto}.`;
-
-/** Marcas de cifra aproximada que reconoce el intérprete (`06`, `reglas/montos`). */
-const MARCA_APROXIMADO = /\b(m[aá]s o menos|aproximadamente|aprox|como|unos|unas|y feria|y pico)\b/i;
-
-/** «Como 500»: se escribe la cifra, pero se pide corregirla si se sabe la exacta. */
-export const mensajeMontoAproximado = (frase: string) => {
-  const marca = MARCA_APROXIMADO.exec(frase)?.[1] ?? frase;
-  return `Dijiste «${marca}»: corrígelo si sabes la cifra exacta.`;
-};
-
-export const mensajeMontoNoEntendido = (frase: string) =>
-  `No entendí la cifra en «${frase}». Dila otra vez o escríbela.`;
 
 /** Errores del dictado en un campo de dinero: como `MENSAJES_DICTADO`, sin "di tu gasto" ni "lo registro". */
 export const MENSAJES_DICTADO_CAMPO = {
@@ -59,4 +54,18 @@ export const MENSAJES_DICTADO_CAMPO = {
   ocupado: 'El micrófono está ocupado. Intenta de nuevo en un momento.',
   audio: 'No pude usar el micrófono. Intenta de nuevo o escribe la cifra.',
   desconocido: 'Algo falló con el dictado. Intenta de nuevo o escribe la cifra.',
+} as const satisfies Record<ClaveMensajeDictado, string>;
+
+/** Errores al dictar un paso completo («O dímelo»): la otra vía es llenar los datos a mano. */
+export const MENSAJES_DICTADO_FRASE = {
+  sin_permiso:
+    'Para dictar, permite el micrófono en los ajustes del teléfono. También puedes llenar los datos a mano.',
+  sin_permiso_ios:
+    'Para dictar, permite el micrófono y el reconocimiento de voz en Ajustes. También puedes llenar los datos a mano.',
+  no_disponible: 'Tu teléfono no tiene dictado disponible. Llena los datos a mano.',
+  sin_voz: 'No te escuché. Toca el micrófono y dilo otra vez, o llena los datos.',
+  red: 'El dictado necesita internet en este teléfono. Llena los datos o inténtalo de nuevo.',
+  ocupado: 'El micrófono está ocupado. Intenta de nuevo en un momento.',
+  audio: 'No pude usar el micrófono. Intenta de nuevo o llena los datos.',
+  desconocido: 'Algo falló con el dictado. Intenta de nuevo o llena los datos.',
 } as const satisfies Record<ClaveMensajeDictado, string>;

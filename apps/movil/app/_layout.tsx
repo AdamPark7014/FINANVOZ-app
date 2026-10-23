@@ -23,7 +23,6 @@ import { SincronizarRespaldoAutomatico } from '../src/pantallas/respaldo/Sincron
 import { SincronizarWidget } from '../src/widget/SincronizarWidget';
 import { programarTareaDiaria } from '../src/tareas/programar';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
-import { ProveedorDictadoCampos } from '../src/voz';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import {
@@ -153,7 +152,10 @@ export default function Raiz() {
 
   return (
     <ProveedorControlApp control={control}>
-      {/* Un solo reconocedor para toda la app: un micrófono a la vez y la cifra dicha en los campos de dinero. */}
+      {/*
+        Un solo reconocedor para toda la app: un micrófono a la vez, y el micrófono de cada campo de dinero y de
+        «O dímelo» con la cifra leída por el nivel 0 (`ui/` no conoce el reconocedor: se lo inyecta `voz/`).
+      */}
       <ProveedorDictado motor={motorExpo} leerMonto={leerMontoDictado}>
         {/* `key`: tras borrar todo o cargar un escenario, la navegación y las vistas arrancan de cero. */}
         <ProveedorNotificaciones notificaciones={notificaciones}>
@@ -161,14 +163,11 @@ export default function Raiz() {
             {/* Sin tienda no hay nada que comprar: sin `abrirPlan`, Hoy y los candados no ofrecen Plus. */}
             <ProveedorPlan compras={compras} abrirPlan={compras ? abrirPlan : null}>
               <ProveedorAnalitica analitica={analitica}>
-                {/* Micrófono de cada campo de dinero (`ui/` no conoce el reconocedor): lo arma `voz/`. */}
-                <ProveedorDictadoCampos>
-                  <AppProtegida
-                    reiniciada={estado.generacion > 0}
-                    evidencia={evidencia}
-                    avisoInicial={estado.aviso ?? null}
-                  />
-                </ProveedorDictadoCampos>
+                <AppProtegida
+                  reiniciada={estado.generacion > 0}
+                  evidencia={evidencia}
+                  avisoInicial={estado.aviso ?? null}
+                />
               </ProveedorAnalitica>
             </ProveedorPlan>
           </ProveedorSesion>

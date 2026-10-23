@@ -30,6 +30,39 @@ export {
   type ControlHablar,
 } from './useBotonHablar';
 export * from './textos';
-export { callarVoz, decirEnVoz, fraseRespuestaVoz } from './respuesta';
-export { BotonDictarCampo, PISTA_DICTAR_CAMPO } from './BotonDictarCampo';
-export { ProveedorDictadoCampos } from './ProveedorDictadoCampos';
+export {
+  callarVoz,
+  configurarVoz,
+  configuracionVoz,
+  decirEnVoz,
+  decirTurno,
+  estaHablando,
+  fraseRespuestaVoz,
+  hablar,
+  suscribirHabla,
+  CONFIG_VOZ_INICIAL,
+  type ConfigVoz,
+  type FinHabla,
+  type OpcionesHabla,
+} from './respuesta';
+export { fraseHablada, type DatosHablados, type TurnoHablable } from '../servicios/voz-respuesta';
+export {
+  useVozAsistente,
+  useHablando,
+  useReducirMovimiento,
+  CORTAR_VOZ_AL_TOCAR,
+  type VozAsistente,
+} from './useVozAsistente';
+export { IndicadorVoz } from './IndicadorVoz';
+export { senalEscucha, type SenalEscucha } from './senales';
+export {
+  elegirVoz,
+  faltaVozMejorada,
+  opcionesVoz,
+  parametrosVoz,
+  type CalidadVoz,
+  type OpcionVoz,
+  type VozSistema,
+} from './voces';
+export { cargarVoces, hayInternet } from './catalogo';
+export { BotonDictarCampo } from './BotonDictarCampo';

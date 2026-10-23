@@ -1,17 +1,21 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { AccessibilityInfo, Linking, Platform } from 'react-native';
+import { AccessibilityInfo, Linking, Platform, Pressable } from 'react-native';
 import { auditar } from '../../pantallas/__pruebas__/accesibilidad';
 import { crearMotorFalso, type OpcionesMotorFalso } from '../../voz/__pruebas__/motor-falso';
 import { ProveedorDictado, type LectorMonto } from '../../voz/ProveedorDictado';
-import {
-  ETIQUETA_ESCUCHANDO,
-  MENSAJES_DICTADO_CAMPO,
-  PISTA_CAMPO_ESCUCHANDO,
-  PISTA_MICROFONO_CAMPO,
-} from '../../voz/textos';
+import { ETIQUETA_ESCUCHANDO, MENSAJES_DICTADO_CAMPO, PISTA_MICROFONO_CAMPO } from '../../voz/textos';
 import { CampoMonto, type CampoMontoProps } from './CampoMonto';
+import {
+  ContextoDictadoCampos,
+  PISTA_CAMPO_ESCUCHANDO,
+  type LectorMontoDictado,
+  type PropsBotonDictarCampo,
+} from './dictado-campo';
 
-/** Lector falso: el de verdad (intérprete) se prueba en `servicios/voz-campos` y en `@cartera/nlu`. */
+/**
+ * Integración con el micrófono real de la app (`ProveedorDictado` de `voz/`, que inyecta `BotonDictarCampo`).
+ * Lector falso: el de verdad (intérprete) se prueba en `servicios/voz-campos` y en `@cartera/nlu`.
+ */
 const LECTURAS: Record<string, ReturnType<LectorMonto>> = {
   'ocho mil quinientos': { centavos: 850_000, aproximado: false },
   'como quinientos': { centavos: 50_000, aproximado: true },
@@ -231,6 +235,36 @@ describe('CampoMonto · dictar la cifra', () => {
       expect(anunciar).toHaveBeenCalledTimes(1);
       expect(anunciar).toHaveBeenCalledWith('Oí «ocho mil quinientos»: puse ocho mil quinientos pesos.');
     });
+  });
+
+  it('contrato inyectado: con cualquier `BotonDictar` (sin `voz/`) escribe la cifra que lee `interpretarMonto`', () => {
+    const interpretarMonto = jest.fn<ReturnType<LectorMontoDictado>, Parameters<LectorMontoDictado>>(() => ({
+      centavos: 0,
+      aproximado: false,
+    }));
+    const BotonDictar = ({ alOir, alAviso, testID }: PropsBotonDictarCampo) => (
+      <Pressable
+        testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel="Dictar"
+        onPress={() => {
+          alAviso({ texto: '«no debo»', escuchando: true, sinPermiso: false });
+          alAviso(null);
+          alOir('no debo nada');
+        }}
+      />
+    );
+    const alCambiar = jest.fn();
+    render(
+      <ContextoDictadoCampos.Provider value={{ BotonDictar, interpretarMonto }}>
+        <CampoMonto etiqueta="Deuda" alCambiar={alCambiar} admiteCero testID="monto" />
+      </ContextoDictadoCampos.Provider>,
+    );
+    fireEvent.press(microfono());
+    expect(interpretarMonto).toHaveBeenCalledWith('no debo nada', { admiteCero: true });
+    expect(campo().props.value).toBe('0');
+    expect(alCambiar).toHaveBeenLastCalledWith(0);
+    expect(ayuda()).toHaveTextContent('Oí «no debo nada»: puse $0.');
   });
 
   it('dos campos: el segundo micrófono calla al primero y solo él recibe la cifra', async () => {

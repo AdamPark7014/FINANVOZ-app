@@ -6,6 +6,13 @@
 
 ## Hecho en este turno
 
+- **Voz unificada y voz amigable (U-1 + V-2)**: un solo `ProveedorDictado` (sin `ProveedorDictadoCampos` ni
+  `voz/Microfono`), `BotonDictarCampo` sobre `useMicrofono`; respuesta hablada con `voz/voces` (es-MX → es-US →
+  Latinoamérica → España; premium > mejorada), velocidades 0.85 / 0.95 / 1.1 con tono 1, silencio del iPhone respetado
+  salvo el ajuste, guía de «Paulina (mejorada)» una sola vez, la voz se corta al tocar; `useVozAsistente`,
+  `IndicadorVoz` y señales de escucha (`senales.ts`) con **`expo-haptics` ~57.0.3** (vibración ligera en iPhone al
+  escuchar; `pnpm install --frozen-lockfile` verificado). Ajustes › Voz: voz, velocidad, silencio y «Confirmar por
+  voz».
 - **Ola 7 · intérprete (`feat(nlu)`)**: `leerConfirmacion` (sí / no / cambio de fila, `pasos/confirmacion.ts`) y
   `sugerirReparacion` («No entendí» con la frase reescrita que el nivel 0 sí entiende, `pasos/reparacion.ts`), con golden
   propio (`fixtures/nlu/golden-confirmacion.jsonl` 123 casos, `golden-reparacion.jsonl` 52) y `pnpm eval:nlu

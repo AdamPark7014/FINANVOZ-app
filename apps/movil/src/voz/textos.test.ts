@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   etiquetaMicrofonoCampo,
   MENSAJES_DICTADO_CAMPO,
+  MENSAJES_DICTADO_FRASE,
   mensajeMontoAproximado,
   mensajeMontoNoEntendido,
   mensajeMontoOido,
+  PISTA_MICROFONO_FRASE,
   textoOyendoCampo,
 } from './textos';
 
@@ -40,5 +42,12 @@ describe('textos del dictado en un campo de dinero (02-UX §14)', () => {
       expect(m).not.toMatch(/gasto|registr|!|¡|por favor/i);
     }
     expect(etiquetaMicrofonoCampo('Monto')).toBe('Dictar en voz: Monto');
+  });
+
+  it('«O dímelo» tiene sus propios errores: llenar los datos, no escribir una cifra', () => {
+    for (const m of [...Object.values(MENSAJES_DICTADO_FRASE), PISTA_MICROFONO_FRASE]) {
+      expect(m).not.toMatch(/gasto|registr|cifra|!|¡|por favor/i);
+    }
+    expect(Object.keys(MENSAJES_DICTADO_FRASE).sort()).toEqual(Object.keys(MENSAJES_DICTADO_CAMPO).sort());
   });
 });

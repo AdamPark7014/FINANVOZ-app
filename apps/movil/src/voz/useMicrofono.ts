@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useId, useMemo } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef } from 'react';
 import { Linking, Platform } from 'react-native';
 import { MENSAJES_DICTADO, type ClaveMensajeDictado } from './estado';
 import type { MotorDictado } from './motor';
 import { motorExpo } from './motor-expo';
-import { useDictador } from './ProveedorDictado';
+import { useDictador } from './dictador';
 import { callarVoz } from './respuesta';
+import { senalEscucha } from './senales';
 import { useBotonHablar, type BotonHablar } from './useBotonHablar';
 import { useDictado } from './useDictado';
 
@@ -85,6 +86,18 @@ export function useMicrofono({
     if (estado !== 'escuchando' && estado !== 'procesando') dictador?.liberar(id);
   }, [dictador, id, estado]);
   useEffect(() => () => dictador?.liberar(id), [dictador, id]);
+
+  // Vibración ligera al empezar a escuchar y al dejar de hacerlo (`voz/senales`), una vez por dictado.
+  const vibro = useRef(false);
+  useEffect(() => {
+    if (estado === 'escuchando' && !vibro.current) {
+      vibro.current = true;
+      senalEscucha('inicio');
+    } else if (estado !== 'escuchando' && vibro.current) {
+      vibro.current = false;
+      senalEscucha('fin');
+    }
+  }, [estado]);
 
   const boton = useBotonHablar({ escuchando, iniciar, detener });
   const sinPermiso = estado === 'sin_permiso';

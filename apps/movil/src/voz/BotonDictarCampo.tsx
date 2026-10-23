@@ -1,77 +1,70 @@
-import { useCallback, useEffect } from 'react';
-import { Pressable } from 'react-native';
-import { etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../ui';
-import type { PropsBotonDictarCampo } from '../ui';
-import { MENSAJES_DICTADO } from './estado';
+import { useEffect, useMemo } from 'react';
+import { BotonMicrofono } from '../ui/componentes/BotonMicrofono';
+import type { PropsBotonDictarCampo } from '../ui/componentes/dictado-campo';
+import { useDictador } from './dictador';
 import type { MotorDictado } from './motor';
 import { motorExpo } from './motor-expo';
-import { Microfono } from './Microfono';
-import { callarVoz } from './respuesta';
-import { TEXTO_TE_ESCUCHO } from './textos';
-import { useBotonHablar } from './useBotonHablar';
-import { useDictado } from './useDictado';
+import {
+  etiquetaMicrofonoCampo,
+  MENSAJES_DICTADO_CAMPO,
+  MENSAJES_DICTADO_FRASE,
+  PISTA_MICROFONO_CAMPO,
+  PISTA_MICROFONO_FRASE,
+  textoOyendoCampo,
+} from './textos';
+import { useMicrofono } from './useMicrofono';
 
-export const PISTA_DICTAR_CAMPO =
-  'Toca y di la cantidad, por ejemplo mil quinientos. Toca otra vez para terminar.';
+type Props = PropsBotonDictarCampo & {
+  /** Reconocedor explícito (pruebas); si no, el de `ProveedorDictado`, y sin proveedor el de Expo. */
+  motor?: MotorDictado;
+};
+
+const SEGUN_LO_QUE_DICTA = {
+  cifra: { mensajes: MENSAJES_DICTADO_CAMPO, pista: PISTA_MICROFONO_CAMPO },
+  frase: { mensajes: MENSAJES_DICTADO_FRASE, pista: PISTA_MICROFONO_FRASE },
+} as const;
 
 /**
- * Micrófono a la derecha de un campo de monto: toca, di la cantidad y el campo se llena (lo interpreta el nivel 0
- * en el teléfono). Sin reconocimiento en el teléfono no se muestra.
+ * El micrófono de un campo (`CampoMonto`) o de «O dímelo»: es `BotonMicrofono` (48 dp, toca o mantén, acción
+ * «activar» del lector) sobre `useMicrofono`, el mismo reconocedor de toda la app, así que solo uno escucha a la vez
+ * y un dictado abortado no le llega al nuevo. Avisa al campo lo que se va oyendo, el error o la falta de permiso;
+ * la transcripción final va a `alOir` y nunca a logs (regla 9). Sin reconocimiento en el teléfono no se muestra ni
+ * se suscribe al reconocedor.
  */
-export function BotonDictarCampo({
+export function BotonDictarCampo({ motor: motorPropio, ...props }: Props) {
+  const dictador = useDictador();
+  const motor = motorPropio ?? dictador?.motor ?? motorExpo;
+  const disponible = useMemo(() => motor.disponible(), [motor]);
+  if (!disponible) return null;
+  return <MicrofonoDeCampo {...props} motor={motor} />;
+}
+
+function MicrofonoDeCampo({
   etiquetaCampo,
   alOir,
   alAviso,
+  dicta = 'cifra',
   testID,
-  motor = motorExpo,
-}: PropsBotonDictarCampo & { motor?: MotorDictado }) {
-  const { c } = useTema();
-  const dictado = useDictado({ motor, alTerminar: alOir });
-  const escuchando = dictado.estado === 'escuchando' || dictado.estado === 'procesando';
-  const iniciar = useCallback(() => {
-    callarVoz();
-    return dictado.iniciar();
-  }, [dictado]);
-  const boton = useBotonHablar({ escuchando, iniciar, detener: dictado.detener });
-  const aviso =
-    dictado.estado === 'sin_permiso'
-      ? MENSAJES_DICTADO.sin_permiso
-      : dictado.error && dictado.error !== 'no_disponible'
-        ? MENSAJES_DICTADO[dictado.error]
-        : escuchando
-          ? dictado.parcial || TEXTO_TE_ESCUCHO
-          : null;
-  const sinPermiso = dictado.estado === 'sin_permiso';
+  motor,
+}: PropsBotonDictarCampo & { motor: MotorDictado }) {
+  const { mensajes, pista } = SEGUN_LO_QUE_DICTA[dicta];
+  const mic = useMicrofono({ alTerminar: alOir, motor, mensajes });
+  const { escuchando, parcial, aviso, sinPermiso } = mic;
+  const texto = escuchando ? textoOyendoCampo(parcial) : aviso;
+  const negado = !escuchando && sinPermiso;
   useEffect(() => {
-    alAviso(aviso === null ? null : { texto: aviso, sinPermiso });
-  }, [aviso, sinPermiso, alAviso]);
-  if (!motor.disponible() || dictado.error === 'no_disponible') return null;
+    alAviso(texto === null ? null : { texto, escuchando, sinPermiso: negado });
+  }, [alAviso, texto, escuchando, negado]);
+  // Si el micrófono desaparece (el campo se deshabilita), el campo deja de mostrar lo que se iba oyendo.
+  useEffect(() => () => alAviso(null), [alAviso]);
   return (
-    <Pressable
+    <BotonMicrofono
+      forma="icono"
+      escuchando={escuchando}
+      boton={mic.boton}
+      etiqueta={etiquetaMicrofonoCampo(etiquetaCampo)}
+      pista={pista}
       {...(testID === undefined ? {} : { testID })}
-      onPressIn={boton.alPresionarDentro}
-      onPressOut={boton.alSoltar}
-      accessibilityActions={boton.accionesAccesibles}
-      onAccessibilityAction={boton.alAccionAccesible}
-      accessibilityRole="button"
-      accessibilityLabel={
-        escuchando ? 'Escuchando. Toca para terminar' : `Dictar ${etiquetaHablada(etiquetaCampo)}`
-      }
-      accessibilityHint={PISTA_DICTAR_CAMPO}
-      accessibilityState={{ busy: escuchando }}
-      style={({ pressed }) => ({
-        width: OBJETIVO_TACTIL_MIN,
-        height: OBJETIVO_TACTIL_MIN,
-        borderRadius: radio.pastilla,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: escuchando ? c.acento : c.superficie,
-        borderWidth: 1,
-        borderColor: escuchando ? c.acento : c.bordeControl,
-        opacity: pressed ? 0.85 : 1,
-      })}
-    >
-      <Microfono color={escuchando ? c.sobreAcento : c.acentoTexto} />
-    </Pressable>
+    />
   );
 }

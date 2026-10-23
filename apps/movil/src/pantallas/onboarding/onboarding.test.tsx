@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { interpretarMontoCampo as interpretarMonto } from '@cartera/nlu';
+import { interpretarMonto } from '@cartera/nlu';
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import type { ReactNode } from 'react';
 import { Text } from 'react-native';

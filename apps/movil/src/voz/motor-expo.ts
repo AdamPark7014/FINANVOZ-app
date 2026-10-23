@@ -29,6 +29,53 @@ export const CATEGORIA_AUDIO_IOS: Readonly<SetCategoryOptions> = {
   mode: 'default',
 };
 
+/**
+ * Sesión de audio de iPhone para la respuesta hablada. `ambient` respeta el interruptor de silencio (el sistema la
+ * calla) y se mezcla con la música sin cortarla. Siempre por la bocina, nunca por el auricular.
+ */
+export const CATEGORIA_RESPUESTA_IOS: Readonly<SetCategoryOptions> = {
+  category: 'ambient',
+  categoryOptions: [],
+  mode: 'default',
+};
+
+/**
+ * Para hablar aunque el iPhone esté en silencio (Ajustes › Voz, o al tocar «Escuchar»): `playback` no obedece al
+ * interruptor; `duckOthers` baja la música mientras habla y `soltarAudioRespuestaIOS` la regresa al terminar.
+ */
+export const CATEGORIA_RESPUESTA_SILENCIO_IOS: Readonly<SetCategoryOptions> = {
+  category: 'playback',
+  categoryOptions: ['duckOthers'],
+  mode: 'default',
+};
+
+/**
+ * Prepara la sesión de audio de la app antes de hablar en iPhone. `true`: la respuesta debe usar la sesión de la
+ * app (`useApplicationAudioSession: true`); `false` (Android, sin módulo nativo o si iOS no lo permitió): que
+ * `expo-speech` use su propia sesión, como antes.
+ */
+export function prepararAudioRespuestaIOS(enSilencio: boolean): boolean {
+  const m = modulo();
+  if (!m) return false;
+  const c = enSilencio ? CATEGORIA_RESPUESTA_SILENCIO_IOS : CATEGORIA_RESPUESTA_IOS;
+  try {
+    m.setCategoryIOS({ ...c, categoryOptions: [...c.categoryOptions] });
+    m.setAudioSessionActiveIOS(true);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Tras hablar con `duckOthers`: suelta la sesión para que la música vuelva a su volumen. */
+export function soltarAudioRespuestaIOS(): void {
+  try {
+    modulo()?.setAudioSessionActiveIOS(false, { notifyOthersOnDeactivation: true });
+  } catch {
+    // Otra parte de la app sigue usando el audio (p. ej. el micrófono ya empezó): se queda activa.
+  }
+}
+
 /** Reconocedor real sobre expo-speech-recognition. */
 export const motorExpo: MotorDictado = {
   disponible() {
