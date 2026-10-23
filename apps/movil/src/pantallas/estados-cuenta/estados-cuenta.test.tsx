@@ -158,7 +158,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     );
     await presionar('estado-guardar');
     expect(screen.getByTestId('estado-conciliacion-texto')).toHaveTextContent(
-      'Según tu banco debes $14,021.95; según Cartera, $13,871.95. ¿Ajusto?',
+      'Según tu banco debes $14,021.95; según Finanvoz, $13,871.95. ¿Ajusto?',
     );
     expect(auditar(screen.toJSON(), { etiquetaExplicita: true })).toStrictEqual([]);
     await presionar('estado-ajustar');
@@ -187,7 +187,7 @@ describe('Estado de cuenta en PDF (02 §26)', () => {
     await presionar('estado-guardar');
     expect(screen.getByTestId('estado-guardado')).toHaveTextContent('Agregué 2 movimientos a tu Oro.');
     // Sin la bonificación, Cartera dice que debes más que el banco: propone ajustar.
-    expect(screen.getByTestId('estado-conciliacion-texto')).toHaveTextContent(/según Cartera, \$14,121\.95/);
+    expect(screen.getByTestId('estado-conciliacion-texto')).toHaveTextContent(/según Finanvoz, \$14,121\.95/);
     await presionar('estado-no-ajustar');
     expect(screen.queryByTestId('estado-conciliacion')).toBeNull();
   });

@@ -44,7 +44,7 @@ import {
   PISTA_CORREGIR_MOVIMIENTO,
   PISTA_VACIO_MOVIMIENTOS,
   NOMBRE_ORIGEN,
-  NOMBRE_TIPO_LIBRO,
+  nombreTipoLibro,
   resumenMovimiento,
   PREGUNTA_PASAR_A_MESES,
   etiquetaEncabezadoDiaMovimientos,
@@ -324,7 +324,7 @@ export function PantallaMovimientos({
 }
 
 function titulo(m: MovimientoVista): string {
-  return m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
+  return m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo);
 }
 
 const MESES_COMUNES = ['3', '6', '9', '12', '18', '24'] as const;

@@ -32,7 +32,7 @@ import {
 import { useAnunciarEnIos } from '../avisos/anunciar';
 import { useNotificaciones } from '../avisos/notificaciones';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
-import { mensajeError, NOMBRE_TIPO_LIBRO } from '../principal/textos';
+import { mensajeError, nombreTipoLibro } from '../principal/textos';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { useAvisoRegistro } from '../principal/useAvisoRegistro';
 import { FormularioDatosCobro } from './FormularioDatosCobro';
@@ -266,16 +266,14 @@ function Detalle({
                   style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
                 >
                   <View style={{ flex: 1, gap: espacio.xxs }}>
-                    <Texto variante="cuerpoFuerte">
-                      {m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
-                    </Texto>
+                    <Texto variante="cuerpoFuerte">{m.descripcion ?? nombreTipoLibro(m.tipo)}</Texto>
                     <Texto variante="secundario" tono="secundario">
-                      {`${NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo} · ${etiquetaDiaMes(m.fecha)}`}
+                      {`${nombreTipoLibro(m.tipo)} · ${etiquetaDiaMes(m.fecha)}`}
                     </Texto>
                   </View>
                   <Cifra
                     centavos={m.monto}
-                    contexto={m.descripcion ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? m.tipo}
+                    contexto={m.descripcion ?? nombreTipoLibro(m.tipo)}
                     testID={`persona-mov-${m.id}-saldo`}
                   />
                 </View>

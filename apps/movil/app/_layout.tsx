@@ -44,6 +44,9 @@ import { motorExpo, ProveedorDictado } from '../src/voz';
 
 iniciarSentry();
 
+// Cualquier error al pintar una pantalla se queda en una pantalla amable con «Intentar de nuevo» (antes cerraba la app).
+export { PantallaError as ErrorBoundary } from '../src/pantallas/error/PantallaError';
+
 type Estado =
   | { tipo: 'lista'; sesion: Sesion; generacion: number; aviso?: string }
   | { tipo: 'trabajando'; generacion: number }

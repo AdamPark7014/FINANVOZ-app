@@ -29,7 +29,7 @@ import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { matrizQr, tramos } from './CodigoQr';
 import { EscanerQr } from './EscanerQr';
 import { PantallaCompartidos } from './PantallaCompartidos';
-import { PantallaGrupoCompartido } from './PantallaGrupoCompartido';
+import { PantallaGrupoCompartido, TEXTO_GRUPO_NO_ENCONTRADO } from './PantallaGrupoCompartido';
 import {
   BTN_ABRIR_AJUSTES,
   BTN_COMPARTIDOS_CUENTAS,
@@ -584,6 +584,17 @@ describe('Compartido: botones que no llevaban a ningún lado (auditoría B-3 · 
     expect(screen.queryByTestId('grupo-saldar')).toBeNull();
     fireEvent.press(screen.getByTestId('grupo-saldar-abrir'));
     expect(screen.getByTestId('grupo-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER_GRUPO);
+    fireEvent.press(screen.getByTestId('grupo-volver'));
+    expect(alVolver).toHaveBeenCalledTimes(1);
+    A.cerrar();
+  });
+
+  it('un enlace a un grupo que ya no existe no tumba la app: lo dice y deja volver', () => {
+    const servidor = servidorCompartidoFalso();
+    const A = telefono(servidor, 'a');
+    const alVolver = jest.fn();
+    en(A, <PantallaGrupoCompartido grupoId="00000000-0000-4000-8000-000000000000" alVolver={alVolver} />);
+    expect(screen.getByTestId('grupo-no-encontrado')).toHaveTextContent(TEXTO_GRUPO_NO_ENCONTRADO);
     fireEvent.press(screen.getByTestId('grupo-volver'));
     expect(alVolver).toHaveBeenCalledTimes(1);
     A.cerrar();

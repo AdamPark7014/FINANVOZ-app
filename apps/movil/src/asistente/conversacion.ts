@@ -12,7 +12,7 @@ import type {
 import { interpretarMonto } from '@cartera/nlu';
 import { formatearCentavos, leerPesos } from '../ui/formato';
 import { textoObservacion } from '../pantallas/principal/observaciones-textos';
-import { NOMBRE_TIPO_LIBRO, TEXTO_AVISO_RIESGO_HOY } from '../pantallas/principal/textos';
+import { nombreTipoLibro, TEXTO_AVISO_RIESGO_HOY } from '../pantallas/principal/textos';
 import type { ChipRespuesta, Respuesta, Turno } from './tipos';
 
 /**
@@ -94,7 +94,7 @@ function capitalizar(t: string): string {
 
 /** «Registré Coca $25 · Antojos · Efectivo.» de un movimiento del libro. */
 export function textoMovimientoDelDia(m: MovimientoVista): string {
-  const nombre = NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
+  const nombre = nombreTipoLibro(m.tipo);
   const partes = [
     `${capitalizar(m.descripcion ?? m.comercio ?? nombre.toLowerCase())} ${formatearCentavos(m.monto)}`,
   ];

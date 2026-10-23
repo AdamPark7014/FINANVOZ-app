@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { compararFechas, esFecha, sumarDias, type Centavos, type PlainDate } from '@cartera/core';
+import { compararFechas, diferenciaDias, sumarDias, type Centavos, type PlainDate } from '@cartera/core';
 import {
   aplicarCorreccion,
   AVISO_DEDUCIBLE_EFECTIVO,
@@ -29,10 +29,10 @@ import {
   BTN_GUARDAR_MOVIMIENTO,
   CAMPOS_FORMULARIO_MOVIMIENTO,
   ERROR_FECHA_FUTURA,
-  errorFechaFormato,
   ETIQUETA_ELEGIR_DIA,
   ETIQUETA_FECHA,
-  ETIQUETA_OTRA_FECHA,
+  BTN_VER_DIAS_ANTERIORES,
+  PISTA_VER_DIAS_ANTERIORES,
   MENSAJE_SIN_CAMBIOS,
   OPCIONES_FECHA,
   PISTA_GUARDAR_CAMBIOS,
@@ -72,6 +72,9 @@ const TIPOS: readonly TipoFormulario[] = [
 
 /** Días que se ofrecen como chips al elegir la fecha: hoy y los seis anteriores. */
 const DIAS_ELEGIBLES = 7;
+/** «Ver días anteriores» suma de 14 en 14 hasta ~3 meses atrás (sin escribir fechas a mano). */
+const DIAS_MAS = 14;
+const DIAS_MAXIMOS = 91;
 
 /**
  * Lo que ya se dijo, para abrir el formulario lleno (R2 de la Ola 7, «Cambiar» en la tarjeta «Entendí»). Nada se
@@ -211,19 +214,17 @@ export function FormularioMovimiento({
   const [intentado, setIntentado] = useState(false);
   const [clave, setClave] = useState(0);
 
-  // Fecha (`02 §5.3`): "Hoy · Ayer · Elegir"; Elegir ofrece los últimos 7 días y un campo para otra fecha.
+  // Fecha (`02 §5.3`): "Hoy · Ayer · Elegir"; Elegir ofrece los últimos 7 días y «Ver días anteriores» (de 14 en 14,
+  // hasta ~3 meses). Antes había un campo «Otra fecha (AAAA-MM-DD)» para escribir a mano: se quitó (auditoría 23-10).
   const fechaDicha = prellenado?.fecha && compararFechas(prellenado.fecha, hoy) <= 0 ? prellenado.fecha : hoy;
   const fechaInicial = corregir?.fecha ?? fechaDicha;
-  const dias = Array.from({ length: DIAS_ELEGIBLES }, (_, i) => sumarDias(hoy, -i));
   const [fecha, setFecha] = useState<PlainDate>(fechaInicial);
   const [eligiendoFecha, setEligiendoFecha] = useState(fechaInicial !== hoy && fechaInicial !== ayer);
-  const [otraFecha, setOtraFecha] = useState(dias.includes(fechaInicial) ? '' : fechaInicial);
-  const errorOtraFecha = (() => {
-    const f = otraFecha.trim();
-    if (!eligiendoFecha || f === '') return null;
-    if (!esFecha(f)) return errorFechaFormato(ayer);
-    return compararFechas(f, hoy) > 0 ? ERROR_FECHA_FUTURA : null;
-  })();
+  // Una fecha vieja (al corregir) se ve desde el principio entre los días.
+  const [diasVisibles, setDiasVisibles] = useState(() =>
+    Math.max(DIAS_ELEGIBLES, Math.min(diferenciaDias(fechaInicial, hoy) + 1, DIAS_MAXIMOS)),
+  );
+  const dias = Array.from({ length: diasVisibles }, (_, i) => sumarDias(hoy, -i));
   const opcionFecha: OpcionFecha = eligiendoFecha ? 'elegir' : fecha === hoy ? 'hoy' : 'ayer';
 
   const campos = CAMPOS_FORMULARIO_MOVIMIENTO[tipo];
@@ -243,19 +244,13 @@ export function FormularioMovimiento({
   const elegirOpcionFecha = (o: OpcionFecha) => {
     if (o === 'elegir') return setEligiendoFecha(true);
     setEligiendoFecha(false);
-    setOtraFecha('');
     setFecha(o === 'hoy' ? hoy : ayer);
-  };
-  const escribirOtraFecha = (t: string) => {
-    setOtraFecha(t);
-    const f = t.trim();
-    if (esFecha(f) && compararFechas(f, hoy) <= 0) setFecha(f);
   };
 
   const faltante = (): string | null => {
     if (monto === null || monto <= 0) return ERROR_MONTO_CERO;
     if (campos.categoria && !categoria) return ERROR_ELEGIR_CATEGORIA;
-    if (errorOtraFecha) return errorOtraFecha;
+    if (compararFechas(fecha, hoy) > 0) return ERROR_FECHA_FUTURA;
     if (corregir) {
       // Solo la cuenta de la que salió se puede cambiar; no puede ser a la que llegó.
       if (origenId && origenId === inicial?.destinoId) return ERROR_CUENTAS_DISTINTAS;
@@ -331,7 +326,7 @@ export function FormularioMovimiento({
       setDescripcion('');
       setFecha(hoy);
       setEligiendoFecha(false);
-      setOtraFecha('');
+      setDiasVisibles(DIAS_ELEGIBLES);
       setIntentado(false);
       setClave((k) => k + 1);
       alGuardar?.();
@@ -414,23 +409,21 @@ export function FormularioMovimiento({
                 valor: f,
                 etiqueta: encabezadoFecha(etiquetaFecha(f), etiquetaDiaMes(f)),
               }))}
-              valor={otraFecha === '' && dias.includes(fecha) ? fecha : null}
-              alCambiar={(f) => {
-                setOtraFecha('');
-                setFecha(f);
-              }}
+              valor={dias.includes(fecha) ? fecha : null}
+              alCambiar={setFecha}
               prefijoTestID="dia"
               etiqueta={ETIQUETA_ELEGIR_DIA}
             />
-            <CampoTexto
-              etiqueta={ETIQUETA_OTRA_FECHA}
-              valor={otraFecha}
-              alCambiar={escribirOtraFecha}
-              ejemplo={ayer}
-              teclado="numbers-and-punctuation"
-              error={errorOtraFecha}
-              testID="campo-otra-fecha"
-            />
+            {diasVisibles < DIAS_MAXIMOS ? (
+              <Boton
+                etiqueta={BTN_VER_DIAS_ANTERIORES}
+                variante="texto"
+                ancho="contenido"
+                pista={PISTA_VER_DIAS_ANTERIORES}
+                alPresionar={() => setDiasVisibles((n) => Math.min(n + DIAS_MAS, DIAS_MAXIMOS))}
+                testID="fecha-dias-anteriores"
+              />
+            ) : null}
           </>
         ) : null}
       </View>

@@ -1,4 +1,4 @@
-import { ErrorDominio } from '@cartera/core';
+import { ErrorDominio, type TipoTransaccion } from '@cartera/core';
 import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import {
   MENSAJE_LIMITE_DIARIO,
@@ -44,15 +44,35 @@ export const NOMBRE_TIPO: Record<TipoMovimiento, string> = {
   pago_prestamo: 'Pagué lo que debía',
 };
 
-/** Tipos de movimiento del libro que aparecen en Movimientos (incluye los que no origina el usuario). */
-export const NOMBRE_TIPO_LIBRO: Record<string, string> = {
+/**
+ * Nombre llano de cada tipo del libro (incluye los que no origina el usuario). Completo a propósito: `satisfies`
+ * obliga a nombrar cada `TipoTransaccion`, así ningún «compra_msi» o «saldo_inicial» llega a la pantalla.
+ */
+export const NOMBRE_TIPO_LIBRO = {
   ...NOMBRE_TIPO,
+  transferencia_pendiente: 'Pasar entre mis cuentas',
+  compra_msi: 'Compra a meses',
+  reclasificacion_msi: 'Pasar a meses',
+  liquidacion_msi: 'Liquidar meses',
   ajuste_arqueo: 'Ajuste de efectivo',
   aportacion_tanda: 'Tanda',
   cobro_tanda: 'Cobro de tanda',
   cuenta_dividida: 'Cuenta dividida',
   reembolso: 'Reembolso',
-};
+  saldo_inicial: 'Saldo con el que empezaste',
+  conciliacion: 'Corrección de saldo',
+  reversa: 'Movimiento borrado',
+  venta_credito: 'Venta fiada',
+  cobro_cliente: 'Cobro a un cliente',
+  retiro_dueno: 'Retiro del negocio',
+  aportacion_dueno: 'Dinero que pusiste al negocio',
+  pago_impuestos: 'Pago de impuestos',
+} satisfies Record<TipoTransaccion, string>;
+
+/** Nombre llano de un tipo del libro; si llegara uno desconocido, «Movimiento» (nunca el nombre interno). */
+export function nombreTipoLibro(tipo: string): string {
+  return (NOMBRE_TIPO_LIBRO as Record<string, string>)[tipo] ?? 'Movimiento';
+}
 
 export const NOMBRE_ORIGEN: Record<string, string> = {
   voz: 'Registrado por voz',
@@ -271,7 +291,7 @@ function capitalizar(texto: string): string {
 
 /** "Coca $25 · Antojos · Efectivo" (02-UX §5). */
 export function resumenMovimiento(m: ResumenMovimiento | ResumenTransaccion): string {
-  const nombre = NOMBRE_TIPO_LIBRO[m.tipo] ?? 'Movimiento';
+  const nombre = nombreTipoLibro(m.tipo);
   const partes = [`${capitalizar(m.descripcion ?? nombre.toLowerCase())} ${formatearCentavos(m.monto)}`];
   if (m.categoria) partes.push(m.categoria);
   partes.push(m.porAsignar ? 'por asignar' : m.cuenta);

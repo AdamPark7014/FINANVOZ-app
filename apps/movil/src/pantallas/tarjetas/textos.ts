@@ -156,7 +156,7 @@ export const AYUDA_SALDO_A_FAVOR =
 
 /** TalkBack: saldo a favor en el resumen del detalle (E4-07). */
 export function etiquetaAccesibleSaldoAFavorDetalle(monto: Centavos): string {
-  return `${ETIQUETA_SALDO_A_FAVOR}: ${cifraEnPalabras(monto, 'pesos')}. ${AYUDA_SALDO_A_FAVOR}`;
+  return `${ETIQUETA_SALDO_A_FAVOR}: ${cifraEnPalabras(monto)}. ${AYUDA_SALDO_A_FAVOR}`;
 }
 
 export const ETIQUETA_PNGI = 'Para no generar intereses';
@@ -177,7 +177,7 @@ export function etiquetaAccesibleUsoTarjeta(porcentaje: number): string {
 
 /** TalkBack en la barra de uso: incluye límite y la marca del 30 % (el pie visual queda oculto). */
 export function etiquetaAccesibleBarraUsoTarjeta(porcentaje: number, limite: Centavos): string {
-  return `Usas ${porcentaje} % de tu límite de ${cifraEnPalabras(limite, 'pesos')}. La marca es el 30 %.`;
+  return `Usas ${porcentaje} % de tu límite de ${cifraEnPalabras(limite)}. La marca es el 30 %.`;
 }
 
 const TEXTO_TARJETA_CREDITO_LISTA = 'Tarjeta de crédito';
@@ -191,16 +191,16 @@ export function etiquetaAccesibleTarjetaEnLista(d: CuentaDebes, t: TarjetaVista 
   const partes = [
     d.nombre,
     aFavor ? ETIQUETA_SALDO_A_FAVOR : TEXTO_TARJETA_CREDITO_LISTA,
-    `${contextoSaldoTarjeta(d.nombre, aFavor)} ${cifraEnPalabras(saldo, 'pesos')}`,
+    `${contextoSaldoTarjeta(d.nombre, aFavor)} ${cifraEnPalabras(saldo)}`,
   ];
   if (d.meses > 0) {
-    partes.push(`${TEXTO_MSI_FALTAN_LISTA}: ${cifraEnPalabras(d.meses, 'pesos')}`);
+    partes.push(`${TEXTO_MSI_FALTAN_LISTA}: ${cifraEnPalabras(d.meses)}`);
   }
   if (aFavor) {
     partes.push(TEXTO_NO_SUMA_DINERO_LIBRE);
   }
   if (t && t.pngi > 0) {
-    partes.push(`${ETIQUETA_PNGI}: ${cifraEnPalabras(t.pngi, 'pesos')} antes del ${t.etiquetaFechaLimite}`);
+    partes.push(`${ETIQUETA_PNGI}: ${cifraEnPalabras(t.pngi)} antes del ${t.etiquetaFechaLimite}`);
   } else if (t) {
     partes.push(etiquetaAccesibleDato(ETIQUETA_FECHA_LIMITE, t.etiquetaFechaLimite));
     partes.push(etiquetaAccesibleDato(ETIQUETA_PROXIMO_CORTE, t.etiquetaProximoCorte));
@@ -208,7 +208,7 @@ export function etiquetaAccesibleTarjetaEnLista(d: CuentaDebes, t: TarjetaVista 
   if (t) {
     partes.push(etiquetaAccesibleBarraUsoTarjeta(t.usoPorcentaje, t.limiteCredito));
   } else if (d.limiteCredito !== null) {
-    partes.push(`Límite: ${cifraEnPalabras(d.limiteCredito, 'pesos')}`);
+    partes.push(`Límite: ${cifraEnPalabras(d.limiteCredito)}`);
   }
   return partes.join('. ');
 }
@@ -250,9 +250,9 @@ export function etiquetaAccesibleEstadoCuentaTarjeta(
   const saldoEtiqueta = etiquetaSaldoAlCorte(saldoCorte);
   return [
     tituloEstadoCuenta(fechaCorte),
-    `${saldoEtiqueta}: ${cifraEnPalabras(Math.abs(saldoCorte) as Centavos, 'pesos')}`,
-    `${ETIQUETA_PAGADO_DESDE_CORTE}: ${cifraEnPalabras(pagosPosteriores, 'pesos')}`,
-    `${ETIQUETA_PNGI}: ${cifraEnPalabras(pngi, 'pesos')}`,
+    `${saldoEtiqueta}: ${cifraEnPalabras(Math.abs(saldoCorte) as Centavos)}`,
+    `${ETIQUETA_PAGADO_DESDE_CORTE}: ${cifraEnPalabras(pagosPosteriores)}`,
+    `${ETIQUETA_PNGI}: ${cifraEnPalabras(pngi)}`,
     textoFechaLimiteEstado(fechaLimite),
   ].join('. ');
 }

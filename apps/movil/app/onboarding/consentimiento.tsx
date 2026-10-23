@@ -56,13 +56,23 @@ export default function Consentimiento() {
       titulo={TITULO_CONSENTIMIENTO}
       tip={TIP_CONSENTIMIENTO}
       pie={
-        <Boton
-          testID="onb-aceptar"
-          etiqueta={BTN_ACEPTAR_CONTINUAR}
-          deshabilitado={!acepta}
-          pista={acepta ? PISTA_ONB_CONTINUAR : PISTA_MARCAR_CASILLA_DATOS}
-          alPresionar={aceptar}
-        />
+        // La casilla obligatoria va junto al botón: en pantallas altas quedaba debajo del pie y el botón se veía
+        // apagado sin explicación (auditoría 23-10).
+        <View style={{ gap: espacio.m }}>
+          <Casilla
+            testID="onb-casilla-datos"
+            etiqueta={CASILLA_DATOS_FINANCIEROS}
+            valor={acepta}
+            alCambiar={setAcepta}
+          />
+          <Boton
+            testID="onb-aceptar"
+            etiqueta={BTN_ACEPTAR_CONTINUAR}
+            deshabilitado={!acepta}
+            pista={acepta ? PISTA_ONB_CONTINUAR : PISTA_MARCAR_CASILLA_DATOS}
+            alPresionar={aceptar}
+          />
+        </View>
       }
     >
       <Tarjeta>
@@ -101,12 +111,6 @@ export default function Consentimiento() {
           alPresionar={() => router.push('/aviso-privacidad')}
         />
       </Tarjeta>
-      <Casilla
-        testID="onb-casilla-datos"
-        etiqueta={CASILLA_DATOS_FINANCIEROS}
-        valor={acepta}
-        alCambiar={setAcepta}
-      />
       <Casilla
         testID="onb-casilla-estadisticas"
         etiqueta={CASILLA_ESTADISTICAS_OPCIONAL}

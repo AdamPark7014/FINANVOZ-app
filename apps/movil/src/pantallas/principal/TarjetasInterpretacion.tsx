@@ -16,8 +16,7 @@ import {
   BTN_DUPLICADOS_OK,
   ETIQUETA_CANCELAR,
   etiquetaBotonElegirMovimiento,
-  MOVIMIENTO_SIN_NOMBRE,
-  NOMBRE_TIPO_LIBRO,
+  nombreTipoLibro,
   preguntaCuentaElegirMovimiento,
   TEXTO_ACLARAR_SIN_OPCIONES,
   TITULO_DUPLICADOS,
@@ -29,7 +28,7 @@ type Duplicados = Extract<ResultadoTexto, { resultado: 'duplicados' }>;
 type Aclarar = Extract<ResultadoTexto, { resultado: 'aclarar' }>;
 
 function nombre(m: MovimientoVista): string {
-  return m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_NOMBRE;
+  return m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo);
 }
 
 /** "Tacos $80 · 11 oct · Nu" */

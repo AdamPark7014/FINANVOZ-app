@@ -14,7 +14,7 @@ import { useVista } from '../../sesion/ProveedorSesion';
 import { Barra, Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
 import { CandadoPlus } from '../plan/CandadoPlus';
 import { EstadoVacio } from '../principal/EstadoVacio';
-import { NOMBRE_TIPO_LIBRO } from '../principal/textos';
+import { nombreTipoLibro } from '../principal/textos';
 import { Dato, FormularioPago, PreguntaLiquidarMeses, Seccion } from './componentes';
 import { CorregirSaldo, EditarTarjeta } from './EditarTarjeta';
 import { CompromisoMeses, PagosPlaneados, SeccionMeses } from './MesesYPagos';
@@ -43,7 +43,6 @@ import {
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   etiquetaSaldoAlCorte,
-  MOVIMIENTO_SIN_TITULO,
   NOMBRE_MODO,
   TEXTO_PNGI_CUBIERTO,
   TEXTO_TARJETA_NO_ENCONTRADA,
@@ -197,8 +196,7 @@ function Detalle({
           />
         ) : null}
         {d.desdeElCorte.map((m) => {
-          const titulo =
-            m.descripcion ?? m.comercio ?? m.categoria ?? NOMBRE_TIPO_LIBRO[m.tipo] ?? MOVIMIENTO_SIN_TITULO;
+          const titulo = m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo);
           const fecha = etiquetaDiaMes(m.fecha);
           const esSalida = m.sentido === 'salida';
           return (

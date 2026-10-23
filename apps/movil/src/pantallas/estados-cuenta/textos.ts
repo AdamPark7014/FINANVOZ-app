@@ -36,7 +36,7 @@ export const PISTA_ABRIR_PDF = 'Abre el PDF con la contraseña que escribiste';
 export const PISTA_CANCELAR_ESTADO = 'Sales sin guardar movimientos del estado de cuenta';
 export const PISTA_GUARDAR_ESTADO = 'Guarda en tu tarjeta los movimientos que marcaste';
 export const PISTA_AJUSTAR_SALDO = 'Ajusta el saldo de tu tarjeta para que coincida con tu banco';
-export const PISTA_NO_AJUSTAR = 'Dejas el saldo como está en Cartera';
+export const PISTA_NO_AJUSTAR = 'Dejas el saldo como está en Finanvoz';
 export const PISTA_VER_TARJETA_ESTADO = 'Abre el detalle de la tarjeta';
 export const PISTA_ELEGIR_TARJETA = 'Usa esta tarjeta para leer el estado de cuenta';
 
@@ -109,7 +109,7 @@ export function mensajeIncompleto(banco: string): string {
 }
 
 export function mensajeSinTarjetas(banco: string): string {
-  return `Es un estado de cuenta de ${banco}, pero no tienes esa tarjeta en Cartera. Agrégala y vuelve a compartir el PDF.`;
+  return `Es un estado de cuenta de ${banco}, pero no tienes esa tarjeta en Finanvoz. Agrégala y vuelve a compartir el PDF.`;
 }
 
 export function mensajeAnteriorAlAlta(corte: PlainDate, nombreTarjeta: string): string {
@@ -231,5 +231,5 @@ export function preguntaConciliacion(p: PropuestaConciliacionEstado): string {
     p.saldoCartera >= 0
       ? formatearCentavos(p.saldoCartera)
       : `${formatearCentavos(-p.saldoCartera)} a tu favor`;
-  return `Según tu banco ${deuda(p.saldoBanco)}; según Cartera, ${cartera}. ¿Ajusto?`;
+  return `Según tu banco ${deuda(p.saldoBanco)}; según Finanvoz, ${cartera}. ¿Ajusto?`;
 }

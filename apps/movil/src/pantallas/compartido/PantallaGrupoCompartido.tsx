@@ -92,7 +92,45 @@ function TextoCifras({
  * Detalle de un grupo compartido (`02 §27`): saldo ("Le debes $1,600.01 a Ana"), Agregar, Saldar, Mostrar código,
  * Volver a vincular, Dejar de compartir y la lista de lo compartido. Al abrir y después de cada cambio sincroniza.
  */
+/** Texto cuando el enlace apunta a un grupo que ya no está (lo cerraste, saliste o borraste tus datos). */
+export const TEXTO_GRUPO_NO_ENCONTRADO =
+  'Este grupo ya no está en tu teléfono. Vuelve a tus gastos compartidos.';
+
+/**
+ * Grupo compartido por su id. Un enlace viejo (`/compartido/<id>` de un grupo que ya no existe) antes tumbaba la app
+ * (`grupo_inexistente`); ahora dice qué pasó y deja volver, como la tarjeta y la persona.
+ */
 export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () => void }) {
+  const deps = useCompartido();
+  const existe = useVista((c) => {
+    try {
+      obtenerGrupoCompartido(c, deps.almacen, grupoId);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!existe) {
+    return (
+      <Pantalla testID="pantalla-grupo-compartido" bordes={['top', 'left', 'right', 'bottom']}>
+        <Boton
+          testID="grupo-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          pista={PISTA_VOLVER_GRUPO}
+          alPresionar={alVolver}
+        />
+        <Texto variante="cuerpo" tono="secundario" testID="grupo-no-encontrado">
+          {TEXTO_GRUPO_NO_ENCONTRADO}
+        </Texto>
+      </Pantalla>
+    );
+  }
+  return <GrupoCompartido grupoId={grupoId} alVolver={alVolver} />;
+}
+
+function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () => void }) {
   const { ctx, refrescar } = useSesion();
   const deps = useCompartido();
   const g = useVista((c) => obtenerGrupoCompartido(c, deps.almacen, grupoId));

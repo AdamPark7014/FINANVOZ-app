@@ -14,12 +14,7 @@ import { etiquetaHablada } from '../../ui';
 import { abrirPruebaPantalla, conEscenario } from './__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
 import { FormularioMovimiento } from './FormularioMovimiento';
-import {
-  BTN_GUARDAR_CAMBIOS,
-  ERROR_FECHA_FUTURA,
-  errorFechaFormato,
-  MENSAJE_SIN_CAMBIOS,
-} from './formularioMovimiento-textos';
+import { BTN_GUARDAR_CAMBIOS, MENSAJE_SIN_CAMBIOS } from './formularioMovimiento-textos';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
 import { ProveedorAvisos, useInformarAltoPestanas } from './ProveedorAvisos';
@@ -395,7 +390,7 @@ describe('Fecha en el formulario manual (Hoy · Ayer · Elegir)', () => {
     p.cerrar();
   });
 
-  it('"Elegir" ofrece los últimos 7 días y otra fecha validada', () => {
+  it('"Elegir" ofrece los últimos 7 días y «Ver días anteriores», sin escribir fechas a mano', () => {
     const p = conEscenario('e4-01');
     const efectivo = p.e.cuentas.efectivo as string;
     renderConSesion(p.ctx, <FormularioMovimiento />);
@@ -404,15 +399,13 @@ describe('Fecha en el formulario manual (Hoy · Ayer · Elegir)', () => {
     expect(screen.getByTestId('dia-2026-10-11')).toBeTruthy();
     expect(screen.getByTestId('dia-2026-10-05')).toBeTruthy();
     expect(screen.queryByTestId('dia-2026-10-04')).toBeNull();
+    expect(screen.queryByTestId('campo-otra-fecha')).toBeNull();
+    // Ningún día futuro.
+    expect(screen.queryByTestId('dia-2026-10-12')).toBeNull();
 
-    fireEvent.changeText(screen.getByTestId('campo-otra-fecha'), '11/10/2026');
-    fireEvent.press(screen.getByTestId('boton-guardar-movimiento'));
-    expect(screen.getAllByText(errorFechaFormato('2026-10-10')).length).toBeGreaterThan(0);
-    fireEvent.changeText(screen.getByTestId('campo-otra-fecha'), '2026-10-12');
-    expect(screen.getAllByText(ERROR_FECHA_FUTURA).length).toBeGreaterThan(0);
-    expect(listarMovimientos(p.ctx)).toEqual([]);
-
-    fireEvent.changeText(screen.getByTestId('campo-otra-fecha'), '2026-09-30');
+    fireEvent.press(screen.getByTestId('fecha-dias-anteriores'));
+    expect(screen.getByTestId('dia-2026-09-21')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('dia-2026-09-30'));
     fireEvent.press(screen.getByTestId('boton-guardar-movimiento'));
     expect(listarMovimientos(p.ctx)[0]?.movimientos[0]?.fecha).toBe('2026-09-30');
     p.cerrar();

@@ -34,13 +34,9 @@ export const OPCIONES_FECHA: Record<OpcionFecha, string> = {
   elegir: 'Elegir',
 };
 export const ETIQUETA_ELEGIR_DIA = 'Elige el día';
-export const ETIQUETA_OTRA_FECHA = 'Otra fecha (AAAA-MM-DD)';
+export const BTN_VER_DIAS_ANTERIORES = 'Ver días anteriores';
+export const PISTA_VER_DIAS_ANTERIORES = 'Muestra dos semanas más para elegir el día';
 export const ERROR_FECHA_FUTURA = 'Elige hoy o un día anterior.';
-
-/** "Escribe la fecha así: 2026-10-09." con un ejemplo real (ayer). */
-export function errorFechaFormato(ejemplo: string): string {
-  return `Escribe la fecha así: ${ejemplo}.`;
-}
 
 /** Corregir un movimiento desde su detalle (`02 §10`): se reemplaza, nunca se edita (regla 2). */
 export const BTN_GUARDAR_CAMBIOS = 'Guardar cambios';

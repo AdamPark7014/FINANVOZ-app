@@ -114,7 +114,7 @@ export function etiquetaAccesibleTandaEnLista(t: {
   enRiesgo: Centavos;
 }): string {
   const calendario = t.proxima
-    ? `${cifraEnPalabras(t.aportacion, 'pesos')} el ${t.proxima.etiqueta}. Cobras el ${t.etiquetaCobro}`
+    ? `${cifraEnPalabras(t.aportacion)} el ${t.proxima.etiqueta}. Cobras el ${t.etiquetaCobro}`
     : `Ya diste todas tus aportaciones. Cobras el ${t.etiquetaCobro}`;
   return `${t.nombre}. ${calendario}. Si la tanda se cae, arriesgas ${cifraEnPalabras(t.enRiesgo, 'centavos')}`;
 }
@@ -179,7 +179,7 @@ export function etiquetaAccesibleSubtituloDetalleTanda(
   participantes: number,
   turno: number,
 ): string {
-  return `${cifraEnPalabras(aportacion, 'pesos')} por ronda. ${participantes} participantes. Tu turno: ${turno}`;
+  return `${cifraEnPalabras(aportacion)} por ronda. ${participantes} participantes. Tu turno: ${turno}`;
 }
 
 /** TalkBack: tarjeta de resumen (aportado, riesgo, por aportar) en el detalle (`02 §18`). */
@@ -206,7 +206,7 @@ export function etiquetaAccesibleProximaAportacionDetalle(etiqueta: string): str
 
 /** TalkBack: bloque de cobro pendiente en el detalle (`02 §18`). */
 export function etiquetaAccesibleCobroDetalle(cobro: Centavos, etiquetaCobro: string): string {
-  return `Cobras ${cifraEnPalabras(cobro, 'pesos')} el ${etiquetaCobro}. ${TEXTO_NO_ES_INGRESO}`;
+  return `Cobras ${cifraEnPalabras(cobro)} el ${etiquetaCobro}. ${TEXTO_NO_ES_INGRESO}`;
 }
 
 /** TalkBack: resumen al crear tanda (cuándo cobras + compromiso) (`02 §18`). */
@@ -216,7 +216,7 @@ export function etiquetaAccesibleResumenCobroFormulario(
   turno: number,
   participantes: number,
 ): string {
-  return `Cobras ${cifraEnPalabras(cobro, 'pesos')} el ${etiquetaCobro}, ronda ${turno} de ${participantes}. ${TEXTO_COMPROMISO_APORTACION}`;
+  return `Cobras ${cifraEnPalabras(cobro)} el ${etiquetaCobro}, ronda ${turno} de ${participantes}. ${TEXTO_COMPROMISO_APORTACION}`;
 }
 
 /** TalkBack: texto dinámico «ya empezó» en el formulario (`02 §18`). */
@@ -224,7 +224,7 @@ export function etiquetaAccesibleTextoYaEmpezo(y: TandaYaEmpezada): string {
   const llevas =
     y.aportacionesHechas === 1 ? 'Llevas 1 aportación' : `Llevas ${y.aportacionesHechas} aportaciones`;
   const cobro = y.yaCobraste ? ' y ya cobraste' : '';
-  return `${TITULO_YA_EMPEZO} ${llevas}${cobro}: te faltan ${y.faltan}, ${cifraEnPalabras(y.porAportar, 'pesos')}. ${SUFIJO_RONDAS_NO_APARTO}`;
+  return `${TITULO_YA_EMPEZO} ${llevas}${cobro}: te faltan ${y.faltan}, ${cifraEnPalabras(y.porAportar)}. ${SUFIJO_RONDAS_NO_APARTO}`;
 }
 
 /** TalkBack: diálogo de confirmación al archivar (`02 §18`). */
@@ -240,7 +240,7 @@ export function etiquetaAccesibleTarjetaHoyAportacion(t: {
   cuando: 'hoy' | 'vencida';
   etiquetaFecha: string;
 }): string {
-  const monto = cifraEnPalabras(t.monto, 'pesos');
+  const monto = cifraEnPalabras(t.monto);
   const detalle =
     t.cuando === 'hoy' ? `${t.nombre}. ${monto} hoy` : `${t.nombre}. ${monto}, tocaba el ${t.etiquetaFecha}`;
   return `${t.pregunta} ${detalle}`;
@@ -252,7 +252,7 @@ export function etiquetaAccesibleTarjetaHoyCobro(t: {
   nombre: string;
   monto: Centavos;
 }): string {
-  return `${t.pregunta} ${t.nombre}. ${cifraEnPalabras(t.monto, 'pesos')}. ${TEXTO_NO_ES_INGRESO}`;
+  return `${t.pregunta} ${t.nombre}. ${cifraEnPalabras(t.monto)}. ${TEXTO_NO_ES_INGRESO}`;
 }
 
 export function textoProximaAportacion(etiqueta: string): string {
