@@ -6,6 +6,11 @@
 
 ## Hecho en este turno
 
+- **Formularios de cuenta y pago fijo + sobras de U-1**: `FormularioCuenta` / `FormularioPagoFijo` con `prellenado`,
+  `conDecirlo` y `enfocar` (primer dato que falta: `primerHuecoCuenta` / `primerHuecoPago`); el «O dímelo» del pago fijo
+  lee con `interpretarPaso` (`pagos-fijos/prellenado.ts`); `app.json` con el plugin `expo-background-task`; la raíz
+  apaga el bloqueo y lo explica si el teléfono se quedó sin código (`alSinSeguridad`, `raiz-sin-seguridad.test`);
+  consentimiento con «Leer el aviso completo» alcanzable en VoiceOver.
 - **Voz unificada y voz amigable (U-1 + V-2)**: un solo `ProveedorDictado` (sin `ProveedorDictadoCampos` ni
   `voz/Microfono`), `BotonDictarCampo` sobre `useMicrofono`; respuesta hablada con `voz/voces` (es-MX → es-US →
   Latinoamérica → España; premium > mejorada), velocidades 0.85 / 0.95 / 1.1 con tono 1, silencio del iPhone respetado

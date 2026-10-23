@@ -65,16 +65,22 @@ export default function Consentimiento() {
         />
       }
     >
-      <View
-        testID="onb-aviso-simplificado"
-        accessible
-        accessibilityRole="summary"
-        accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(
-          TITULO_AVISO_SIMPLIFICADO,
-          AVISO_SIMPLIFICADO,
-        )}
-      >
-        <Tarjeta>
+      <Tarjeta>
+        {/*
+          Solo el resumen se agrupa en un elemento: en iOS un contenedor `accessible` vuelve inalcanzables para
+          VoiceOver los botones que tenga dentro, así que «Leer el aviso completo» queda fuera del grupo (igual que
+          en `Reconsentimiento`).
+        */}
+        <View
+          testID="onb-aviso-simplificado"
+          accessible
+          accessibilityRole="summary"
+          accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(
+            TITULO_AVISO_SIMPLIFICADO,
+            AVISO_SIMPLIFICADO,
+          )}
+          style={{ gap: espacio.s }}
+        >
           <Texto variante="subtitulo" accessibilityElementsHidden>
             {TITULO_AVISO_SIMPLIFICADO}
           </Texto>
@@ -85,16 +91,16 @@ export default function Consentimiento() {
               </Texto>
             ))}
           </View>
-          <Boton
-            testID="onb-aviso-completo"
-            variante="texto"
-            ancho="contenido"
-            etiqueta={BTN_LEER_AVISO_COMPLETO}
-            pista={PISTA_LEER_AVISO_COMPLETO}
-            alPresionar={() => router.push('/aviso-privacidad')}
-          />
-        </Tarjeta>
-      </View>
+        </View>
+        <Boton
+          testID="onb-aviso-completo"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={BTN_LEER_AVISO_COMPLETO}
+          pista={PISTA_LEER_AVISO_COMPLETO}
+          alPresionar={() => router.push('/aviso-privacidad')}
+        />
+      </Tarjeta>
       <Casilla
         testID="onb-casilla-datos"
         etiqueta={CASILLA_DATOS_FINANCIEROS}

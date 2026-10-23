@@ -12,9 +12,15 @@ import {
   listarPersonas,
   registrarPrestamo,
 } from '../../servicios';
+import { leerMontoDictado } from '../../servicios/voz-campos';
+import { ProveedorDictado } from '../../voz';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { renderConSesion } from '../principal/__pruebas__/arnes';
+import { RESPUESTAS_PAGO_INICIALES } from '../onboarding/pagos-fijos';
+import { FormularioPagoFijo } from '../pagos-fijos/FormularioPagoFijo';
+import { PantallaCuentas } from '../principal';
+import { crearMotorFalso, renderConSesion } from '../principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../principal/__pruebas__/base';
+import { FormularioCuenta } from './FormularioCuenta';
 import { PantallaDetalleCuenta } from './PantallaDetalleCuenta';
 import { PantallaDetallePagoFijo } from './PantallaDetallePagoFijo';
 import { PantallaNuevaCuenta } from './PantallaNuevaCuenta';
@@ -22,6 +28,8 @@ import { PantallaNuevoPagoFijo } from './PantallaNuevoPagoFijo';
 import { PantallaPagosFijos } from './PantallaPagosFijos';
 import { PantallaPersonas } from './PantallaPersonas';
 import {
+  BTN_AGREGAR_CUENTA,
+  BTN_AGREGAR_PAGO_FIJO,
   COMPROMISO_DE_OTRA_PANTALLA,
   ERROR_CUENTA_INCOMPLETA,
   ERROR_PAGO_FIJO_INCOMPLETO,
@@ -161,7 +169,7 @@ describe('Agregar pago fijo después del onboarding', () => {
     const p = preparar();
     const alGuardar = jest.fn();
     renderConSesion(p.ctx, <PantallaNuevoPagoFijo alVolver={jest.fn()} alGuardar={alGuardar} />);
-    fireEvent.press(screen.getByTestId('pago-nuevo-tipo-renta'));
+    fireEvent.press(screen.getByTestId('pago-nuevo-renta'));
     expect(screen.getByTestId('pago-nuevo-nombre').props.value).toBe('Renta');
     fireEvent.press(screen.getByTestId('pago-nuevo-guardar'));
     expect(screen.getByTestId('pago-nuevo-error')).toHaveTextContent(ERROR_PAGO_FIJO_INCOMPLETO);
@@ -188,7 +196,7 @@ describe('Agregar pago fijo después del onboarding', () => {
     const p = preparar();
     const alGuardar = jest.fn();
     renderConSesion(p.ctx, <PantallaNuevoPagoFijo alVolver={jest.fn()} alGuardar={alGuardar} />);
-    fireEvent.press(screen.getByTestId('pago-nuevo-tipo-otro'));
+    fireEvent.press(screen.getByTestId('pago-nuevo-otro'));
     fireEvent.changeText(screen.getByTestId('pago-nuevo-nombre'), 'Seguro del coche');
     fireEvent.press(screen.getByTestId('pago-nuevo-frecuencia-anual'));
     fireEvent.press(screen.getByTestId('pago-nuevo-mes-3'));
@@ -208,6 +216,174 @@ describe('Agregar pago fijo después del onboarding', () => {
         hasta: '2028-03-15',
       }),
     ]);
+    p.cerrar();
+  });
+
+  it('«O dímelo» en Cuentas: «pago 4500 de renta cada mes el 5» llena el formulario y no guarda hasta tocar', async () => {
+    const p = preparar();
+    const f = crearMotorFalso();
+    const alGuardar = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <ProveedorDictado motor={f.motor} leerMonto={leerMontoDictado}>
+        <PantallaNuevoPagoFijo alVolver={jest.fn()} alGuardar={alGuardar} />
+      </ProveedorDictado>,
+    );
+    await act(async () => {
+      fireEvent(screen.getByTestId('pago-nuevo-decir-dictar'), 'pressIn');
+    });
+    fireEvent(screen.getByTestId('pago-nuevo-decir-dictar'), 'pressOut');
+    f.emitir({ tipo: 'resultado', texto: 'pago 4500 de renta cada mes el 5', final: true });
+    expect(screen.getByTestId('pago-nuevo-renta')).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('pago-nuevo-nombre').props.value).toBe('Renta');
+    expect(screen.getByTestId('pago-nuevo-dia').props.value).toBe('5');
+    expect(screen.getByTestId('pago-nuevo-monto').props.value).toBe('4,500');
+    expect(listarPagosFijos(p.ctx)).toEqual([]);
+    fireEvent.press(screen.getByTestId('pago-nuevo-guardar'));
+    expect(alGuardar).toHaveBeenCalledWith('Listo: agregué renta. Ya lo aparto.');
+    expect(listarPagosFijos(p.ctx)).toEqual([
+      expect.objectContaining({ concepto: 'renta', monto: 450_000, regla: { tipo: 'mensual', dia: 5 } }),
+    ]);
+    p.cerrar();
+  });
+});
+
+/**
+ * Un formulario por entidad (`docs/PLAN-MEJORA-2026-10.md` §5): `FormularioCuenta` y `FormularioPagoFijo` son los de
+ * O4 y O5 y los que envuelven las pantallas de Cuentas. Aquí se prueban como los usa el onboarding (tarjeta con su
+ * botón) y su API nueva (prellenado, sin «O dímelo»).
+ */
+describe('Formularios compartidos con el onboarding', () => {
+  it('«Agregar cuenta» y «Agregar pago fijo» solo aparecen con su destino y lo abren', () => {
+    const p = preparar();
+    const alAgregarCuenta = jest.fn();
+    const alAgregarPagoFijo = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <PantallaCuentas
+        alAbrirAjustes={jest.fn()}
+        alAgregarCuenta={alAgregarCuenta}
+        alAgregarPagoFijo={alAgregarPagoFijo}
+      />,
+    );
+    expect(screen.getByTestId('boton-agregar-cuenta').props.accessibilityLabel).toBe(BTN_AGREGAR_CUENTA);
+    expect(screen.getByTestId('boton-agregar-pago-fijo').props.accessibilityLabel).toBe(
+      BTN_AGREGAR_PAGO_FIJO,
+    );
+    fireEvent.press(screen.getByTestId('boton-agregar-cuenta'));
+    fireEvent.press(screen.getByTestId('boton-agregar-pago-fijo'));
+    expect(alAgregarCuenta).toHaveBeenCalled();
+    expect(alAgregarPagoFijo).toHaveBeenCalled();
+    screen.unmount();
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.queryByTestId('boton-agregar-cuenta')).toBeNull();
+    expect(screen.queryByTestId('boton-agregar-pago-fijo')).toBeNull();
+    p.cerrar();
+  });
+
+  it('cuenta en tarjeta (O4): dice qué falta, guarda con últimos 4 y queda en Tienes', () => {
+    const p = preparar();
+    const alGuardar = jest.fn();
+    const alCancelar = jest.fn();
+    renderConSesion(p.ctx, <FormularioCuenta alGuardar={alGuardar} alCancelar={alCancelar} />);
+    fireEvent.press(screen.getByTestId('onb-cuenta-agregar'));
+    expect(screen.getByTestId('error-formulario')).toHaveTextContent(ERROR_CUENTA_INCOMPLETA);
+    expect(alGuardar).not.toHaveBeenCalled();
+    fireEvent.press(screen.getByTestId('onb-cuenta-tipo-ahorro'));
+    fireEvent.changeText(screen.getByTestId('onb-cuenta-nombre'), 'Nu');
+    fireEvent.changeText(screen.getByTestId('onb-cuenta-saldo'), '2,500');
+    fireEvent.changeText(screen.getByTestId('onb-cuenta-ultimos4'), '0042');
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    fireEvent.press(screen.getByTestId('onb-cuenta-agregar'));
+    expect(alGuardar).toHaveBeenCalledWith(expect.any(String), 'Nu');
+    expect(listarCuentas(p.ctx).tienes.find((c) => c.nombre === 'Nu')).toMatchObject({
+      subtipo: 'ahorro',
+      saldo: 250_000,
+    });
+    fireEvent.press(screen.getByTestId('onb-cuenta-cancelar'));
+    expect(alCancelar).toHaveBeenCalled();
+    p.cerrar();
+  });
+
+  it('cuenta prellenada (lo dicho): sale llena y sin «Cancelar» si no se pide', () => {
+    const p = preparar();
+    const alGuardar = jest.fn();
+    renderConSesion(
+      p.ctx,
+      <FormularioCuenta
+        alGuardar={alGuardar}
+        prellenado={{ tipo: 'billetera', nombre: 'Mercado Pago', saldo: 0 }}
+      />,
+    );
+    expect(screen.getByTestId('onb-cuenta-tipo-billetera')).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onb-cuenta-nombre').props.value).toBe('Mercado Pago');
+    expect(screen.getByTestId('onb-cuenta-saldo').props.value).toBe('0');
+    expect(screen.queryByTestId('onb-cuenta-cancelar')).toBeNull();
+    fireEvent.press(screen.getByTestId('onb-cuenta-agregar'));
+    expect(alGuardar).toHaveBeenCalledWith(expect.any(String), 'Mercado Pago');
+    p.cerrar();
+  });
+
+  it('pago fijo en tarjeta (O5): avisa lo agregado, vuelve a empezar y aparece en Compromisos', () => {
+    const p = preparar();
+    const alAgregado = jest.fn();
+    renderConSesion(p.ctx, <FormularioPagoFijo alAgregado={alAgregado} />);
+    fireEvent.press(screen.getByTestId('onb-pago-renta'));
+    fireEvent.changeText(screen.getByTestId('onb-pago-dia'), '5');
+    fireEvent.changeText(screen.getByTestId('onb-pago-monto'), '4,500');
+    fireEvent.press(screen.getByTestId('onb-pago-agregar'));
+    expect(alAgregado).toHaveBeenCalledWith(
+      expect.objectContaining({ concepto: 'Renta', conceptoGuardado: 'renta', monto: 450_000, cuenta: null }),
+    );
+    expect(screen.queryByTestId('onb-pago-formulario')).toBeNull();
+    screen.unmount();
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    expect(screen.getByTestId('seccion-compromisos-lista')).toHaveTextContent(/renta/i);
+    p.cerrar();
+  });
+
+  it('pago fijo prellenado: chip, nombre, día, monto y cuenta de salida a la vista; sin «O dímelo» si no se pide', () => {
+    const p = preparar();
+    const alAgregado = jest.fn();
+    const f = crearMotorFalso();
+    renderConSesion(
+      p.ctx,
+      <ProveedorDictado motor={f.motor} leerMonto={leerMontoDictado}>
+        <FormularioPagoFijo
+          alAgregado={alAgregado}
+          conDecirlo={false}
+          prellenado={{
+            clave: 'luz',
+            nombre: 'Luz',
+            monto: 40_000,
+            respuestas: { ...RESPUESTAS_PAGO_INICIALES, frecuencia: 'mensual', diaMes: '20' },
+            cuentaId: p.bbva,
+          }}
+        />
+      </ProveedorDictado>,
+    );
+    expect(screen.queryByTestId('onb-pago-decir')).toBeNull();
+    expect(screen.getByTestId('onb-pago-nombre').props.value).toBe('Luz');
+    expect(screen.getByTestId('onb-pago-dia').props.value).toBe('20');
+    expect(screen.getByTestId('onb-pago-monto').props.value).toBe('400');
+    expect(screen.getByTestId('onb-pago-variable')).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ checked: true }),
+    );
+    expect(screen.getByTestId(`onb-pago-cuenta-${p.bbva}`)).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ selected: true }),
+    );
+    fireEvent.press(screen.getByTestId('onb-pago-agregar'));
+    expect(alAgregado).toHaveBeenCalledWith(
+      expect.objectContaining({ concepto: 'Luz', conceptoGuardado: 'luz', cuenta: 'BBVA' }),
+    );
     p.cerrar();
   });
 });

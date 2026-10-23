@@ -62,6 +62,9 @@ export const ERROR_CUENTA_INCOMPLETA = 'Escribe el nombre y el saldo de la cuent
 export const ERROR_ULTIMOS4 = 'Los últimos 4 son cuatro números. Si no los sabes, deja el campo vacío.';
 export const BTN_GUARDAR_CUENTA = 'Guardar cuenta';
 export const PISTA_GUARDAR_CUENTA = 'Guarda la cuenta con su saldo de hoy y regresa a Cuentas';
+/** El mismo formulario dentro de una tarjeta (O4): guarda y la cuenta aparece en la lista de arriba. */
+export const PISTA_AGREGAR_CUENTA_FORMULARIO = 'Guarda la cuenta con su saldo de hoy';
+export const PISTA_CANCELAR_CUENTA = 'Cierra el formulario sin agregar la cuenta';
 
 export function confirmacionCuentaAgregada(nombre: string): string {
   return `Listo: agregué ${nombre}.`;
@@ -128,6 +131,8 @@ export function textoProximoPago(fecha: string | null): string {
 }
 
 export const TITULO_NUEVO_PAGO = 'Agregar pago fijo';
+/** Ejemplo de «O dímelo» (sin comillas): un pago a la vez. */
+export const EJEMPLO_DECIR_PAGO = 'pago 4500 de renta cada mes el 5';
 export const PREGUNTA_PAGO = '¿Qué pago es?';
 export const CHIP_PAGO_OTRO = 'Otro';
 export const ETIQUETA_PAGO_NOMBRE = '¿Cómo le llamas?';
@@ -147,7 +152,8 @@ export const PISTA_PAGO_MENOS_OPCIONES = 'Oculta las opciones extra del pago';
 export const ETIQUETA_PAGO_CUENTA = '¿De dónde sale?';
 export const CHIP_PAGO_CUENTA_DESPUES = 'Lo decido después';
 export const ETIQUETA_PAGO_RESTANTES = '¿Cuántos pagos te faltan?';
-export const AYUDA_PAGO_RESTANTES = 'Si tiene fin, como un crédito. Si no, déjalo vacío.';
+export const AYUDA_PAGO_RESTANTES =
+  'Déjalo vacío si no tiene fin. Sirve para un crédito, un plan o un préstamo.';
 export const ERROR_PAGO_NOMBRE = 'Escribe cómo le llamas a este pago.';
 export const ERROR_PAGO_FIJO_INCOMPLETO = 'Escribe cuánto pagas y cuándo lo pagas.';
 export const ERROR_PAGO_RESTANTES = 'Los pagos que faltan van de 1 a 999, o deja el campo vacío.';

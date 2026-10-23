@@ -73,6 +73,7 @@
         }
       ],
       "expo-secure-store",
+      "expo-background-task",
       [
         "expo-camera",
         {

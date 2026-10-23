@@ -96,6 +96,12 @@ describe('MASVS L1 verificable en código', () => {
     );
   });
 
+  it('PLATFORM: el plugin de tareas en segundo plano está declarado (sin él, iOS no deja registrarlas)', () => {
+    // `expo-background-task` escribe UIBackgroundModes `processing` y el identificador de BGTaskScheduler en el
+    // Info.plist: sin eso no corren en iPhone la apertura del día ni el respaldo automático (`src/tareas/programar.ts`).
+    expect(appJson.expo.plugins).toContain('expo-background-task');
+  });
+
   it('CODE: ninguna llave de proveedor ni secreto en el código ni en la configuración', async () => {
     const { buscarSecretos } = await import('./secretos');
     const hallados = [...codigoDeLaApp(), { ruta: 'app.json', texto: JSON.stringify(appJson) }].filter(

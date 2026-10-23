@@ -25,8 +25,10 @@ import { programarTareaDiaria } from '../src/tareas/programar';
 import { CortinaBloqueo, useBloqueo, useOcultarEnMultitarea } from '../src/seguridad';
 import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
+import { mensajeBloqueoApagadoSinSeguridad } from '../src/pantallas/ajustes/textos';
 import {
   cargarEscenario,
+  fijarBloqueo,
   leerMontoDictado,
   mensajeRestaurado,
   obtenerBloqueo,
@@ -36,7 +38,7 @@ import {
 import { abrirSesion, borrarTodoApp, restaurarSesion, type Sesion } from '../src/servicios/sesion';
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
-import { ProveedorSesion, useVista } from '../src/sesion/ProveedorSesion';
+import { ProveedorSesion, useSesion, useVista } from '../src/sesion/ProveedorSesion';
 import { Aviso, Boton, etiquetaHablada, Pantalla, Texto, useAnunciar, useTema } from '../src/ui';
 import { motorExpo, ProveedorDictado } from '../src/voz';
 
@@ -203,8 +205,22 @@ function AppProtegida({
   useEffect(() => {
     registrarEvento({ nombre: 'app_abierta', propiedades: {} });
   }, [registrarEvento]);
+  const { ctx, refrescar } = useSesion();
   const preferencias = useVista(obtenerBloqueo);
-  const bloqueo = useBloqueo({ activo: preferencias.activo });
+  // El teléfono ya no tiene código ni biometría: la cortina se quita (si no, nunca se podría entrar), el bloqueo se
+  // apaga en Ajustes y se explica por qué, como en Ajustes › Seguridad.
+  const bloqueo = useBloqueo({
+    activo: preferencias.activo,
+    alSinSeguridad: () => {
+      try {
+        fijarBloqueo(ctx, { activo: false });
+      } catch {
+        // Sin consentimiento no hay ajustes que escribir; la cortina ya se quitó.
+      }
+      refrescar();
+      setAviso(mensajeBloqueoApagadoSinSeguridad());
+    },
+  });
   useOcultarEnMultitarea(preferencias.ocultarEnMultitarea);
   useProcesarCola();
   useEvidenciaConsentimiento(evidencia);
@@ -237,8 +253,8 @@ function AppProtegida({
           <Stack.Screen name="ajustes" />
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
-          <Stack.Screen name="cuenta-nueva" />
-          <Stack.Screen name="pago-fijo-nuevo" />
+          <Stack.Screen name="cuentas/nueva" />
+          <Stack.Screen name="pagos-fijos/nuevo" />
           <Stack.Screen name="persona/[id]" />
           <Stack.Screen name="tandas/index" />
           <Stack.Screen name="tandas/[id]" />
