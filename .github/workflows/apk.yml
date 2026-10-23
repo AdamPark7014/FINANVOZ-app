@@ -29,6 +29,9 @@ jobs:
       # Solo builds de prueba; quitar antes de la tienda pública. Este APK no tiene tienda: con esto, «Plus de
       # prueba» sin cobro (app.config.ts → extra.plusSinTienda, src/servicios/plan.ts).
       EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
+      # Nube (backend propio en el Hetzner, finanvoz-api.zynoratek.com): variables de repositorio, no secretos.
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

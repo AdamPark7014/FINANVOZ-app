@@ -1,0 +1,271 @@
+# Backend en la nube de FinanVoz: Supabase propio y mínimo en el Hetzner (finanvoz-api.zynoratek.com).
+# Basado en supabase/supabase docker/docker-compose.yml + docker-compose.kong.yml (octubre de 2026), sin Studio,
+# Realtime, analytics, vector, imgproxy, meta ni pooler. Solo Kong sale a la red `proxy` (Traefik); la base no se
+# publica en ningún puerto. Los nombres de host son los nombres de contenedor (únicos en el servidor) porque Kong
+# y functions también están en `proxy`, donde otros proyectos tienen servicios llamados `db`, `api`, etc.
+#
+# Uso (en /opt/finanvoz-backend, con el .env de .env.example ya lleno):
+#   docker compose up -d
+# Despliegue completo y funciones: services/proxy/scripts/desplegar-backend.sh y desplegar-funciones.sh.
+
+name: finanvoz-backend
+
+x-reinicio: &reinicio
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  db:
+    <<: *reinicio
+    container_name: finanvoz-db
+    image: supabase/postgres:17.6.1.136
+    mem_limit: 1g
+    networks: [interna]
+    volumes:
+      # Contraseñas de los roles de servicio (authenticator, supabase_auth_admin, supabase_storage_admin).
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:ro
+      - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:ro
+      - db-data:/var/lib/postgresql/data
+      - db-config:/etc/postgresql-custom
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: 5432
+      POSTGRES_PORT: 5432
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: postgres
+      POSTGRES_DB: postgres
+      JWT_EXP: ${JWT_EXPIRY:-3600}
+    command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf', '-c', 'log_min_messages=fatal']
+
+  auth:
+    <<: *reinicio
+    container_name: finanvoz-auth
+    image: supabase/gotrue:v2.197.0
+    mem_limit: 256m
+    networks: [interna]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://127.0.0.1:9999/health']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${SUPABASE_PUBLIC_URL}/auth/v1
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@finanvoz-db:5432/postgres
+      GOTRUE_SITE_URL: ${SITE_URL:-https://finanvoz.com}
+      GOTRUE_URI_ALLOW_LIST: ''
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_ISSUER: ${SUPABASE_PUBLIC_URL}/auth/v1
+      # La app crea una sesión anónima en el primer arranque (POST /auth/v1/signup sin correo).
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: 'true'
+      # Correo: solo lo usa la cuenta de respaldo (M9: vincular con PUT /user + código; entrar con /otp). Sin
+      # SMTP_HOST no sale ningún correo; para encender el respaldo, llenar SMTP_* en .env (ver deploy/README.md).
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+      GOTRUE_MAILER_AUTOCONFIRM: 'false'
+      GOTRUE_MAILER_OTP_EXP: 600
+      GOTRUE_MAILER_OTP_LENGTH: 6
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-}
+      GOTRUE_SMTP_HOST: ${SMTP_HOST:-}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-587}
+      GOTRUE_SMTP_USER: ${SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS:-}
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME:-FinanVoz}
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      GOTRUE_EXTERNAL_PHONE_ENABLED: 'false'
+      # Límites por cliente: Traefik reemplaza X-Forwarded-For y Kong agrega su salto; sin esto todos los
+      # teléfonos compartirían el límite de la IP de Kong.
+      GOTRUE_RATE_LIMIT_HEADER: X-Forwarded-For
+      GOTRUE_RATE_LIMIT_ANONYMOUS_USERS: ${RATE_LIMIT_ANONYMOUS_USERS:-60}
+
+  rest:
+    <<: *reinicio
+    container_name: finanvoz-rest
+    image: postgrest/postgrest:v14.18
+    mem_limit: 256m
+    networks: [interna]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'postgrest', '--ready']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@finanvoz-db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_MAX_ROWS: 1000
+      PGRST_DB_EXTRA_SEARCH_PATH: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_ADMIN_SERVER_PORT: 3001
+      PGRST_ADMIN_SERVER_HOST: localhost
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY:-3600}
+    command: ['postgrest']
+
+  # Buckets `respaldos` (privado, URLs firmadas) y `plantillas` (público). Archivos en un volumen local.
+  storage:
+    <<: *reinicio
+    container_name: finanvoz-storage
+    image: supabase/storage-api:v1.81.0
+    mem_limit: 512m
+    networks: [interna]
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://127.0.0.1:5000/status']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://finanvoz-rest:3000
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@finanvoz-db:5432/postgres
+      STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      REQUEST_ALLOW_X_FORWARDED_PATH: 'true'
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      GLOBAL_S3_BUCKET: stub
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
+    volumes:
+      - storage-data:/var/lib/storage
+
+  # Edge Functions del repo (services/proxy/supabase/functions) más el enrutador `main` de deploy/volumes.
+  functions:
+    <<: *reinicio
+    container_name: finanvoz-functions
+    image: supabase/edge-runtime:v1.77.4
+    mem_limit: 1g
+    # `proxy`: para llegar a la puerta de IA (puerta-ia:8080) por nombre.
+    networks: [interna, proxy]
+    depends_on:
+      kong:
+        condition: service_healthy
+    volumes:
+      - ./volumes/functions:/home/deno/functions:ro
+      - deno-cache:/root/.cache/deno
+    healthcheck:
+      test: ['CMD-SHELL', "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      # Llamadas de las funciones a Auth, PostgREST y Storage: por Kong, sin salir a internet.
+      SUPABASE_URL: http://finanvoz-kong:8000
+      # Las funciones de FUNCIONES_URL_PUBLICA reciben esta como SUPABASE_URL: `respaldo` firma URLs de Storage
+      # que el teléfono usa directo, así que deben llevar el dominio público.
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      FUNCIONES_URL_PUBLICA: respaldo
+      # Igual que supabase/config.toml (verify_jwt = false): la web pública y RevenueCat no traen sesión.
+      VERIFY_JWT: 'true'
+      FUNCIONES_SIN_JWT: lista-espera,webhooks-revenuecat
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      # Intérprete y modo explicar (nlu-interpretar, llm-turno).
+      NLU_PROVEEDORES: ${NLU_PROVEEDORES:-anthropic}
+      NLU_TOPE_GLOBAL_DIARIO: ${NLU_TOPE_GLOBAL_DIARIO:-2000}
+      NLU_SAL_USUARIO: ${NLU_SAL_USUARIO}
+      NLU_MODELO_ANTHROPIC: ${NLU_MODELO_ANTHROPIC:-}
+      NLU_ANTHROPIC_MODO: ${NLU_ANTHROPIC_MODO:-}
+      LLM_MODELO_ANTHROPIC: ${LLM_MODELO_ANTHROPIC:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      # lista-espera (calculadora pública) y webhooks-revenuecat.
+      LISTA_ESPERA_SAL: ${LISTA_ESPERA_SAL}
+      CALCULADORA_ORIGEN: ${CALCULADORA_ORIGEN:-https://finanvoz.com}
+      REVENUECAT_WEBHOOK_SECRET: ${REVENUECAT_WEBHOOK_SECRET:-}
+    command:
+      ['start', '--user-worker-request-idle-timeout', '150000', '--main-service', '/home/deno/functions/main']
+
+  # Único punto de entrada: Traefik (red `proxy`) → finanvoz-kong:8000 → auth / rest / storage / functions.
+  kong:
+    <<: *reinicio
+    container_name: finanvoz-kong
+    image: kong/kong:3.9.3
+    mem_limit: 512m
+    networks: [interna, proxy]
+    depends_on:
+      auth:
+        condition: service_healthy
+      rest:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'kong', 'health']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
+      - ./volumes/api/kong-entrypoint.sh:/home/kong/kong-entrypoint.sh:ro
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+      KONG_ROUTER_FLAVOR: expressions
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_DNS_NOT_FOUND_TTL: 1
+      KONG_DNS_VALID_TTL: 5
+      KONG_NGINX_WORKER_PROCESSES: 2
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,request-termination,post-function
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+      KONG_PROXY_ACCESS_LOG: /dev/stdout combined
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_PUBLISHABLE_KEY: ''
+      SUPABASE_SECRET_KEY: ''
+      ANON_KEY_ASYMMETRIC: ''
+      SERVICE_ROLE_KEY_ASYMMETRIC: ''
+    entrypoint: ['/bin/sh', '/home/kong/kong-entrypoint.sh']
+
+networks:
+  interna:
+    name: finanvoz_internal
+  proxy:
+    external: true
+    name: proxy
+
+volumes:
+  db-data:
+  db-config:
+  storage-data:
+  deno-cache:

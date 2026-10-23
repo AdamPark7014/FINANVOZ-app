@@ -6,6 +6,17 @@
 
 ## Hecho en este turno
 
+- **Backend propio de FinanVoz en el Hetzner (S-1)**: `https://finanvoz-api.zynoratek.com` (Supabase mínimo: db
+  Postgres 17, GoTrue con anónimos, PostgREST, Storage, edge-runtime, Kong; ~600 MB RAM; compose en
+  `/opt/finanvoz-backend`, plantilla en `services/proxy/deploy/`). 9 migraciones, RLS verificado, 6 funciones; la IA va
+  por la puerta única (`ANTHROPIC_BASE_URL=http://puerta-ia:8080`, token `C:\dev\secrets\puerta-iainanvoz.token`,
+  `NLU_PROVEEDORES=anthropic`). `probar-backend.mjs`: 30/31 (falla `llm-turno` Plus hasta que `_shared/llm/proveedores.ts`
+  lea `ANTHROPIC_BASE_URL` y se redespliegue con `scripts/desplegar-funciones.sh`). Secretos en
+  `C:\dev\secretsinanvoz-backend\`. Variables `EXPO_PUBLIC_SUPABASE_URL`/`ANON_KEY` en GitHub; `apk.yml` ya las lee.
+  Respaldo en la nube apagado hasta tener SMTP (correo con código). Sin respaldos de la base (decisión de Adam).
+- **Disco del Hetzner**: llegó al 100 %; se vació el log de Traefik (1.8 GB), se quitaron 7 imágenes `agora-api:prev-*`
+  viejas (quedan 2) y la caché de construcción; regla `/etc/logrotate.d/docker-contenedores` (200 MB, 2 copias).
+  Quedó en 88 %.
 - **Ficha de tiendas (T-1)**: ícono 512 (Play, opaco) y 1024 (App Store, sin alfa) con `scripts/tienda/iconos-tienda.py`, gráfico 1024×500 (`grafico-funciones.py`), páginas públicas en GitHub Pages (`publicar-calculadora.yml` con destino `github-pages`: aviso, soporte con las 10 preguntas de Ayuda, índice), flujos `ios-capturas.yml` (iPhone 16 Pro Max 6.9") y `android-capturas.yml` (Pixel 7) + `enmarcar.py`, `docs/tienda/play/` (ficha, Data safety, contenido) y **App Store Connect por API** (`asc-ficha.py`): versión 1.0.0, FINANCE/PRODUCTIVITY, edad, textos es-MX, URLs de Pages, set de capturas APP_IPHONE_67 listo y vacío. El Issuer ID se lee de `C:\dev\secrets\arta-ios\issuer-id.txt`.
 - **Ola 7 decidida y diseñada**: mockups (`docs/diseno/mockups-asistente.html`), elección de Adam (Hoy A + R1 + 4 pestañas + «Sí» directo en ingreso y colchón + barra) y diseño técnico `docs/diseno/OLA-7-ASISTENTE.md`.
 - Rama `claude/project-thread-lief9t` borrada en origen (2 commits previos a #24–#31, ya superados: c29b72f, 11bbe4a; recuperables por SHA).

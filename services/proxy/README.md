@@ -4,6 +4,19 @@ Supabase: Edge Functions (Deno) y migraciones. Las llaves de proveedores viven s
 
 > **Tip (despliegue · env sin secretos):** Configura secretos solo con `supabase secrets set` en el proyecto de Supabase o en la CI de ese proyecto — nunca en el repositorio, issues ni capturas. Supabase inyecta en runtime `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` (no hace falta `secrets set`). El resto son nombres documentados en cada sección: `LISTA_ESPERA_SAL`, `CALCULADORA_ORIGEN`; `NLU_PROVEEDORES`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `NLU_MODELO_*`, `NLU_ANTHROPIC_MODO`, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`; `LLM_MODELO_*`; `REVENUECAT_WEBHOOK_SECRET`. En la terminal local (benchmark NLU, no en git): `NLU_PROXY_URL`, `NLU_PROXY_JWT` y las mismas llaves de proveedor. Script `limpiar-anonimos.mjs`: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Calculadora (Cloudflare): `VITE_LISTA_ESPERA_URL`. App (EAS): `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, `EXPO_PUBLIC_PLANTILLAS_LLAVES`. Firma de plantillas (fuera del repo): `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX`. Genera sales y webhook con ≥ 32 caracteres aleatorios; las llaves de proveedor salen de cada consola. **`NLU_SAL_USUARIO`** y **`LISTA_ESPERA_SAL`** alimentan el **hash** en logs (usuario o IP); **`usuario_hash: null`** en respaldo, compartido y RevenueCat es intencional (no se registra el id).
 
+## Backend propio en el Hetzner (`finanvoz-api.zynoratek.com`)
+
+No hay proyecto en Supabase Cloud: el mismo contrato corre en el servidor de Adam como un Supabase mínimo (Postgres, GoTrue, PostgREST, Storage, edge-runtime y Kong detrás de Traefik). Lo que abajo dice `https://<ref>.supabase.co` es **`https://finanvoz-api.zynoratek.com`**, y en vez de `supabase db push` / `secrets set` / `functions deploy` se usan estos scripts (desde la raíz del repo, en Git Bash):
+
+| Paso | Comando |
+|---|---|
+| Secretos (una vez; `C:\dev\secrets\finanvoz-backend\`, nunca en git) | `node services/proxy/scripts/generar-secretos-backend.mjs` |
+| Todo: `.env`, contenedores, funciones y migraciones pendientes | `bash services/proxy/scripts/desplegar-backend.sh` |
+| Solo el código de las funciones | `bash services/proxy/scripts/desplegar-funciones.sh` |
+| Prueba de humo de punta a punta | `node services/proxy/scripts/probar-backend.mjs` (`--sin-ia` para no llamar a Claude) |
+
+Claude va por la puerta única de IA (`ANTHROPIC_BASE_URL=http://puerta-ia:8080`, token de proyecto en `ANTHROPIC_API_KEY`). La build de la app lee `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY` de las variables del repositorio en GitHub. El correo de la cuenta de respaldo está apagado hasta configurar SMTP y plantillas. Detalle, diferencias con la nube y operación: [`deploy/README.md`](deploy/README.md).
+
 ## M0 · `lista-espera`
 
 1. Crea el proyecto en Supabase (región más cercana a México) e instala la CLI: `npm i -g supabase`.

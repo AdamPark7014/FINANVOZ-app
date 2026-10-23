@@ -1,0 +1,38 @@
+## Traefik — finanvoz-api.zynoratek.com (backend en la nube de FinanVoz: Supabase propio)
+## Solo se expone Kong (finanvoz-kong:8000, red proxy), que enruta /auth/v1, /rest/v1, /storage/v1 y /functions/v1.
+## La base y los demás servicios viven en la red finanvoz_internal. Compose: /opt/finanvoz-backend.
+## Fuente: FINANVOZ-app/services/proxy/deploy/README.md
+
+http:
+  routers:
+    finanvoz-backend-http:
+      rule: Host(`finanvoz-api.zynoratek.com`)
+      entryPoints: [web]
+      middlewares: [redirect-https-finanvoz-backend]
+      service: dummy-finanvoz-backend
+
+    finanvoz-backend-https:
+      rule: Host(`finanvoz-api.zynoratek.com`)
+      service: finanvoz-kong
+      entryPoints: [websecure]
+      priority: 50
+      tls:
+        certResolver: letsencrypt
+
+  middlewares:
+    redirect-https-finanvoz-backend:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+  services:
+    finanvoz-kong:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: 'http://finanvoz-kong:8000'
+
+    dummy-finanvoz-backend:
+      loadBalancer:
+        servers:
+          - url: 'http://localhost'

@@ -64,8 +64,8 @@ jobs:
       # Solo builds de prueba; quitar antes de la tienda pública. iPhone no tiene tienda: con esto, «Plus de
       # prueba» sin cobro (app.config.ts → extra.plusSinTienda, src/servicios/plan.ts).
       EXPO_PUBLIC_PLUS_SIN_TIENDA: '1'
-      # Nube del intérprete (Ola 6): variables de repositorio (no secretos), vacías mientras no exista el proyecto
-      # de Supabase; app.config.ts ignora las cadenas vacías y la nube queda apagada.
+      # Nube (backend propio en el Hetzner, finanvoz-api.zynoratek.com, desde el 22-10-2026): variables de
+      # repositorio (no secretos); app.config.ts ignora las cadenas vacías y entonces la nube queda apagada.
       EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
       EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
