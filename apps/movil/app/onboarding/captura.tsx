@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ActivarCaptura, DIVULGACION_CAPTURA } from '../../src/pantallas/captura/ActivarCaptura';
-import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
+import { PasoOnboarding, pasoVisibleOnb } from '../../src/pantallas/onboarding/componentes';
 import { PISTA_CAPTURA_AHORA_NO, TIP_CAPTURA_AHORA_NO } from '../../src/pantallas/onboarding/textos';
 
 /**
@@ -12,7 +12,7 @@ export default function Captura() {
   return (
     <PasoOnboarding
       testID="onb-captura"
-      paso={6}
+      paso={pasoVisibleOnb(6)}
       titulo={DIVULGACION_CAPTURA.titulo}
       tip={TIP_CAPTURA_AHORA_NO}
     >

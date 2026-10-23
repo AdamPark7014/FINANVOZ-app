@@ -170,6 +170,108 @@ export const BTN_SIN_COLCHON_POR_AHORA = 'Sin colchón por ahora';
 export const PISTA_COLCHON_SALTAR = 'Termina el recorrido sin apartar colchón';
 export const PISTA_VER_MI_DIA = 'Termina el recorrido y abre tu día';
 
+/**
+ * «Dímelo» (Ola 7 §7, maqueta «Onboarding por voz»): cada paso se puede decir completo y termina en la tarjeta
+ * «Entendí». En O3 y O7 «Sí» guarda y sigue; en O4 y O5 guarda si está completo y, si no, llena el formulario.
+ */
+export const TITULO_DECIRLO = 'Dímelo';
+export const ejemploDecirlo = (ejemplo: string) => `Como se lo dirías a alguien: «${ejemplo}».`;
+export const textoDijiste = (oido: string) => `Dijiste «${oido}».`;
+/** Forma corta de «Dímelo» (solo llena el formulario): la persona revisa antes de guardar. */
+export const textoLlenado = (oido: string) => `Oí «${oido}». Revisa los datos abajo antes de guardar.`;
+export const textoNoEntendido = (oido: string) =>
+  `Oí «${oido}», pero no lo entendí. Prueba como en el ejemplo o llena los datos.`;
+/** La corrección dicha no cambió nada de la tarjeta. */
+export const textoCorreccionNoEntendida = (oido: string) =>
+  `Oí «${oido}», pero no supe qué cambiar. Toca «Cambiar algo» o dilo otra vez.`;
+export const pistaConfirmarVoz = (correccion: string) =>
+  `También puedes tocar el micrófono y decir «sí» o «${correccion}».`;
+export const ERROR_GUARDAR_DICHO = 'No pude guardarlo. Intenta otra vez o toca «Cambiar algo».';
+/** Mientras el micrófono espera la respuesta a la tarjeta «Entendí» (un turno, tras decirla en voz). */
+export const TEXTO_ESPERO_SI_PASO = 'Te escucho: di «sí», «no» o lo que hay que cambiar.';
+
+export const TITULO_ENTENDI = 'Entendí';
+export const TITULO_ENTENDI_GUARDO = 'Entendí · ¿lo guardo?';
+/** «Entendí · ¿la agrego?» (una cuenta o tarjeta) · «¿las agrego?» · «¿lo agrego?» (un pago) · «¿los agrego?». */
+export function tituloEntendiAgrego(cuantos: number, genero: 'f' | 'm'): string {
+  const pronombre = genero === 'f' ? 'la' : 'lo';
+  return `Entendí · ¿${pronombre}${cuantos > 1 ? 's' : ''} agrego?`;
+}
+export function btnSiAgrega(cuantos: number, genero: 'f' | 'm'): string {
+  const pronombre = genero === 'f' ? 'la' : 'lo';
+  return `Sí, agréga${pronombre}${cuantos > 1 ? 's' : ''}`;
+}
+export const BTN_SI_ASI_ES = 'Sí, así es';
+export const BTN_SI_GUARDALO = 'Sí, guárdalo';
+export const BTN_SI_SEGUIR = 'Sí, sigo con lo que falta';
+export const BTN_CAMBIAR_ALGO = 'Cambiar algo';
+export const BTN_ENTENDIDO = 'Entendido';
+
+export const FALTA_DATO = 'Falta';
+export const textoMeFalta = (cosas: readonly string[]) => `Me falta saber ${unir(cosas)}.`;
+export const EFECTO_APROXIMADO = 'Es una cifra aproximada: corrígela si sabes la exacta.';
+export const EFECTO_COLCHON = 'Tu colchón no cuenta para lo que puedes gastar.';
+export const textoYaEstanEnLista = (nombres: readonly string[]) =>
+  nombres.length === 1
+    ? `${nombres[0] ?? ''} ya está en tu lista: no la agrego otra vez.`
+    : `${unir(nombres)} ya están en tu lista: no las agrego otra vez.`;
+export const TEXTO_EFECTIVO_YA_ESTA = 'Tu efectivo ya está anotado: si cambió, ajústalo en Cuentas.';
+export const TEXTO_NADA_NUEVO = 'Eso ya está en tu lista.';
+/** Después de «Sí» en O4 y O5: lo agregado, sin cifras (va a la pantalla y al lector). */
+export const textoAgregue = (nombres: readonly string[]) => `Listo: agregué ${unir(nombres)}.`;
+export const textoCompletaAbajo = (concepto: string) => `Completa ${concepto} abajo.`;
+export const textoDimeDespues = (nombres: readonly string[]) => `Después dime ${unir(nombres)} otra vez.`;
+export const TEXTO_COMPLETA_TARJETA = 'Completa lo que falta de la tarjeta abajo.';
+export const textoTarjetaAgregada = (nombre: string) => `Listo: agregué tu tarjeta ${nombre}.`;
+
+/** Filas de la tarjeta «Entendí». */
+export const FILA_CADA_CUANDO = 'Cada cuándo';
+export const FILA_CADA_VEZ = '¿Cuánto te pagan cada vez?';
+export const FILA_FIN_DE_SEMANA = 'Si cae en fin de semana';
+export const FILAS_TARJETA = {
+  nombre: 'Tarjeta',
+  corte: 'Corta',
+  limite_pago: 'Pagas',
+  limite_credito: 'Límite de crédito',
+  saldo: 'Debes hoy',
+  modo: '¿La pagas completa?',
+} as const;
+
+/** Lo que falta, para «Me falta saber…». */
+export const FALTANTES_INGRESO = {
+  dia_semana: 'qué día te pagan',
+  ancla: 'cuándo te pagan la próxima vez',
+  dia_mes: 'qué día del mes te pagan',
+  monto: 'cuánto te pagan',
+} as const;
+export const FALTANTES_PAGO = {
+  frecuencia: 'cada cuándo',
+  dia: 'el día',
+  dia_semana: 'el día de la semana',
+  mes: 'el mes',
+} as const;
+export const FALTANTES_PAGO_FRASE = {
+  frecuencia: 'cada cuándo pagas',
+  dia: 'qué día pagas',
+  dia_semana: 'qué día de la semana pagas',
+  mes: 'en qué mes pagas',
+} as const;
+export const textoEscribeAbajo = (cosas: readonly string[]) => `Escribe abajo ${unir(cosas)}.`;
+export const FALTANTES_TARJETA = {
+  nombre: 'cómo se llama',
+  corte: 'qué día corta',
+  limite_pago: 'cuándo la pagas',
+  limite_credito: 'tu límite de crédito',
+  modo: 'si la pagas completa',
+  saldo: 'cuánto debes hoy',
+  msi: 'si tu saldo ya incluye los meses',
+} as const;
+
+function unir(cosas: readonly string[]): string {
+  if (cosas.length <= 1) return cosas[0] ?? '';
+  return `${cosas.slice(0, -1).join(', ')} y ${cosas[cosas.length - 1] ?? ''}`;
+}
+
 /** TalkBack: el consejo no depende solo del color del texto secundario. */
 export function etiquetaTipOnboarding(tip: string): string {
   return `Consejo: ${tip}`;
@@ -183,6 +285,22 @@ export function textoProgresoOnboarding(paso: number, total: number = PASOS_ONBO
 /** TalkBack: el contador de pasos no depende solo del color. */
 export function etiquetaProgresoOnboarding(paso: number, total: number = PASOS_ONBOARDING): string {
   return `${textoProgresoOnboarding(paso, total)} del recorrido inicial`;
+}
+
+/** En iPhone no hay O6 (captura de notificaciones, `02 §25`): 6 pasos; en Android, los 7 de `02 §3`. */
+export function pasosVisiblesOnboarding(omitirCaptura: boolean): number {
+  return omitirCaptura ? PASOS_ONBOARDING - 1 : PASOS_ONBOARDING;
+}
+
+/** El número que ve la persona para O1–O7: sin captura, el colchón (O7) es el paso 6. */
+export function numeroPasoOnboarding(o: 1 | 2 | 3 | 4 | 5 | 6 | 7, omitirCaptura: boolean): number {
+  return omitirCaptura && o === 7 ? 6 : o;
+}
+
+/** Lo lleno de la barra de progreso en puntos base (0–10 000): el paso n de N llena n/N. */
+export function progresoOnboardingBp(paso: number, total: number): number {
+  if (total <= 0) return 0;
+  return Math.round(Math.min(Math.max(paso / total, 0), 1) * 10_000);
 }
 
 /** TalkBack: pista del indicador «Paso n de 7». */

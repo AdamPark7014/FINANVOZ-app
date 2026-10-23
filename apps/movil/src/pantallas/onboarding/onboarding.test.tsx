@@ -1,7 +1,5 @@
 import { Stack } from 'expo-router';
-import { interpretarMonto } from '@cartera/nlu';
-import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
-import type { ReactNode } from 'react';
+import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 import AvisoPrivacidad from '../../../app/aviso-privacidad';
 import Inicio from '../../../app/index';
@@ -33,14 +31,7 @@ import {
   TIP_PAGOS_SALTAR,
 } from './tips';
 import { PISTA_ONBOARDING_RESTAURAR } from '../respaldo/textos';
-import {
-  ContextoDictadoCampos,
-  etiquetaHablada,
-  type DictadoCampos,
-  type PropsBotonDictarCampo,
-} from '../../ui';
-import { BotonDictarCampo } from '../../voz/BotonDictarCampo';
-import { crearMotorFalso } from '../principal/__pruebas__/arnes';
+import { etiquetaHablada } from '../../ui';
 import {
   etiquetaProgresoOnboarding,
   etiquetaProximoPagoOnboarding,
@@ -102,6 +93,10 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-bienvenida')).toBeTruthy();
     expect(screen.getByTestId('onb-titulo-paso')).toHaveProp('accessibilityLabel', TITULO_BIENVENIDA);
     expect(screen.getByTestId('onb-progreso').props.accessibilityLabel).toBe(etiquetaProgresoOnboarding(1));
+    // Android: 7 pasos; la barra repite el texto y el lector no la lee dos veces.
+    const barra = screen.getByTestId('onb-progreso-barra', { includeHiddenElements: true });
+    expect(barra.props.accessibilityValue).toMatchObject({ now: 14 });
+    expect(screen.queryByTestId('onb-progreso-barra', { includeHiddenElements: false })).toBeNull();
     expect(screen.getByTestId('onb-empezar')).toHaveProp('accessibilityHint', PISTA_ONB_EMPEZAR);
     expect(screen.getByTestId('onb-restaurar')).toHaveProp('accessibilityHint', PISTA_ONBOARDING_RESTAURAR);
   });
@@ -162,6 +157,15 @@ describe('onboarding', () => {
     tocar('onb-aviso-completo');
     expect(r.getPathname()).toBe('/aviso-privacidad');
     expect(screen.getByText('Tus derechos')).toBeTruthy();
+  });
+
+  it('«Leer el aviso completo» queda fuera del resumen accesible: el lector lo alcanza como botón propio', () => {
+    abrir('/onboarding/consentimiento');
+    const resumen = screen.getByTestId('onb-aviso-simplificado');
+    // El resumen es un solo elemento para el lector (`accessible`): un botón dentro no se podría enfocar.
+    expect(resumen).toHaveProp('accessible', true);
+    expect(within(resumen).queryByTestId('onb-aviso-completo', { includeHiddenElements: true })).toBeNull();
+    expect(screen.getByTestId('onb-aviso-completo')).toHaveProp('accessibilityRole', 'button');
   });
 
   describe('tarjeta de crédito (02 §3.1)', () => {
@@ -300,6 +304,11 @@ describe('onboarding', () => {
       TIP_COLCHON_SIN_POR_AHORA,
     );
     expect(screen.getByTestId('onb-colchon-monto')).toHaveProp('value', '1,300');
+    const colchon = within(screen.getByTestId('onb-colchon'));
+    expect(colchon.getByTestId('onb-progreso')).toHaveTextContent('Paso 7 de 7');
+    expect(
+      colchon.getByTestId('onb-progreso-barra', { includeHiddenElements: true }).props.accessibilityValue,
+    ).toMatchObject({ now: 100 });
     tocar('onb-ver-mi-dia');
 
     expect(r.getPathname()).toBe('/hoy');
@@ -379,68 +388,5 @@ describe('onboarding', () => {
     expect(obtenerAjustes(s.ctx).colchon).toBe(0);
     r.unmount();
     expect(abrir('/').getPathname()).toBe('/hoy');
-  });
-});
-
-describe('onboarding dictado («O dímelo»)', () => {
-  function abrirConDictado(url: string) {
-    const f = crearMotorFalso();
-    const valor: DictadoCampos = {
-      BotonDictar: (p: PropsBotonDictarCampo) => <BotonDictarCampo {...p} motor={f.motor} />,
-      interpretarMonto,
-    };
-    const Envoltura = ({ children }: { children: ReactNode }) => (
-      <s.Envoltura>
-        <ContextoDictadoCampos.Provider value={valor}>{children}</ContextoDictadoCampos.Provider>
-      </s.Envoltura>
-    );
-    return { r: renderRouter(RUTAS, { initialUrl: url, wrapper: Envoltura }), f };
-  }
-
-  it('O3: «me pagan 8 mil cada viernes» llena frecuencia, día y monto; nada se guarda hasta Continuar', async () => {
-    const { r, f } = abrirConDictado('/');
-    tocar('onb-empezar');
-    tocar('onb-casilla-datos');
-    tocar('onb-aceptar');
-    const antes = conteoTablas();
-    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressIn');
-    await act(async () => {});
-    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressOut');
-    f.emitir({ tipo: 'resultado', texto: 'me pagan 8 mil cada viernes', final: true });
-    expect(screen.getByTestId('onb-ingreso-decir-resultado')).toHaveTextContent(/Revisa los datos/);
-    expect(screen.getByTestId('onb-ingreso-monto').props.value).toBe('8,000');
-    expect(screen.getByTestId('onb-dia-semana-5')).toHaveProp(
-      'accessibilityState',
-      expect.objectContaining({ selected: true }),
-    );
-    expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/vie 16/);
-    expect(conteoTablas()).toEqual(antes);
-    tocar('onb-ingreso-continuar');
-    expect(r.getPathname()).toBe('/onboarding/cuentas');
-  });
-
-  it('O5: «pago 4500 de renta cada mes el 5» llena el formulario de Renta; se agrega al tocar Agregar', async () => {
-    aceptarConsentimiento(s.ctx, { datosFinancieros: true });
-    const { f } = abrirConDictado('/onboarding/pagos-fijos');
-    const antes = conteoTablas();
-    fireEvent(screen.getByTestId('onb-pago-decir-dictar'), 'pressIn');
-    await act(async () => {});
-    f.emitir({ tipo: 'resultado', texto: 'pago 4500 de renta cada mes el 5', final: true });
-    expect(screen.getByTestId('onb-pago-nombre').props.value).toBe('Renta');
-    expect(screen.getByTestId('onb-pago-dia').props.value).toBe('5');
-    expect(screen.getByTestId('onb-pago-monto').props.value).toBe('4,500');
-    expect(conteoTablas()).toEqual(antes);
-  });
-
-  it('O3: lo que no entiende no cambia nada', async () => {
-    const { f } = abrirConDictado('/');
-    tocar('onb-empezar');
-    tocar('onb-casilla-datos');
-    tocar('onb-aceptar');
-    fireEvent(screen.getByTestId('onb-ingreso-decir-dictar'), 'pressIn');
-    await act(async () => {});
-    f.emitir({ tipo: 'resultado', texto: 'no sé cuánto gano', final: true });
-    expect(screen.getByTestId('onb-ingreso-decir-resultado')).toHaveTextContent(/no lo entendí/);
-    expect(screen.getByTestId('onb-ingreso-monto').props.value).toBe('');
   });
 });

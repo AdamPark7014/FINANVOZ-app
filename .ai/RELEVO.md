@@ -6,6 +6,11 @@
 
 ## Hecho en este turno
 
+- **Onboarding por voz (A-4)**: `DecirloPaso` sobre `interpretarPaso` con «Entendí» en O3, O4, O5 y O7; «Sí» guarda en
+  O3 / O7 y lo completo en O4 / O5; lo incompleto llena el formulario con el foco en el primer dato que falta; la voz dice
+  la tarjeta y, al terminar (`await decirTurno`), el micrófono escucha un turno (`useConfirmacionPorVoz`; un toque lo
+  corta); la tarjeta de crédito dicha llega a `/onboarding/tarjeta` en memoria con todo lo dicho; «Paso n de 6» en
+  iPhone. `reglas/campos.ts` sale aquí (O3 y O5 eran sus últimos usuarios; todo pasa por `interpretarPaso`).
 - **Asistente por voz (A-1 + A-2 y O-1 en la app)**: pestañas Asistente · Movimientos · Cuentas · Tú (`barraPestanas`
   con 4; los textos de pestañas salieron de `app/(tabs)` a `src/rutas/` para que Expo Router no los vuelva rutas),
   `/registrar` modal R2 declarado en la raíz, Tú sin «Volver», `PantallaAsistente` (cabecera, barra del día,

@@ -1,18 +1,29 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { AccessibilityInfo, findNodeHandle, Platform, Pressable, View } from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
-import { Pantalla, Texto, espacio, etiquetaHablada, OBJETIVO_TACTIL_MIN, radio, useTema } from '../../ui';
+import {
+  Barra,
+  Pantalla,
+  Texto,
+  espacio,
+  etiquetaHablada,
+  OBJETIVO_TACTIL_MIN,
+  radio,
+  useTema,
+} from '../../ui';
 import {
   anuncioCambioPasoOnboarding,
   etiquetaAyudaPasoOnboarding,
   etiquetaProgresoOnboarding,
-  PASOS_ONBOARDING,
   etiquetaTipOnboarding,
   etiquetaTituloPasoOnboarding,
+  numeroPasoOnboarding,
+  pasosVisiblesOnboarding,
   PISTA_CASILLA_ONB,
   PISTA_CHIP_ONB_ELEGIR,
   PISTA_CHIP_ONB_SELECCIONADA,
   PISTA_PROGRESO_ONB,
+  progresoOnboardingBp,
   textoProgresoOnboarding,
 } from './textos';
 
@@ -20,7 +31,10 @@ export { ERROR_GUARDAR, PASOS_ONBOARDING } from './textos';
 
 /** En iPhone no hay captura de notificaciones: O6 se omite (`02 §25`) y el onboarding tiene un paso menos. */
 export const OMITIR_CAPTURA_ONB = Platform.OS === 'ios';
-export const PASOS_VISIBLES_ONB = OMITIR_CAPTURA_ONB ? PASOS_ONBOARDING - 1 : PASOS_ONBOARDING;
+/** «Paso n de 6» en iPhone, «de 7» en Android. */
+export const PASOS_VISIBLES_ONB = pasosVisiblesOnboarding(OMITIR_CAPTURA_ONB);
+/** Número visible de O1–O7 en este teléfono (en iPhone el colchón es el paso 6). */
+export const pasoVisibleOnb = (o: 1 | 2 | 3 | 4 | 5 | 6 | 7) => numeroPasoOnboarding(o, OMITIR_CAPTURA_ONB);
 
 export interface OpcionChip<T> {
   valor: T;
@@ -36,18 +50,33 @@ export function Chips<T extends string | number>({
   opciones,
   valor,
   alCambiar,
+  enfocar = false,
   testID,
 }: {
   etiqueta?: string;
   opciones: readonly OpcionChip<T>[];
   valor: T | null;
   alCambiar: (valor: T) => void;
+  /** Lleva el foco del lector a este grupo (el primer dato que falta después de «Dímelo»). */
+  enfocar?: boolean;
   /** Prefijo: cada chip queda como `<testID>-<valor>`. */
   testID: string;
 }) {
   const { c } = useTema();
+  const ref = useRef<View>(null);
+  useEffect(() => {
+    if (!enfocar) return;
+    const nodo = findNodeHandle(ref.current);
+    if (nodo != null) AccessibilityInfo.setAccessibilityFocus(nodo);
+  }, [enfocar]);
   return (
-    <View style={{ gap: espacio.xs }} accessibilityRole="radiogroup" accessibilityLabel={etiqueta}>
+    <View
+      ref={ref}
+      style={{ gap: espacio.xs }}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={etiqueta}
+      testID={`${testID}-grupo`}
+    >
       {etiqueta ? <Texto variante="etiqueta">{etiqueta}</Texto> : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
         {opciones.map((o) => {
@@ -130,7 +159,7 @@ export function Casilla({
   );
 }
 
-/** Marco de cada paso: "Paso n de 7", título, ayuda y botones fijos al pie. */
+/** Marco de cada paso: «Paso n de 7» (de 6 en iPhone) con su barra, título, ayuda y botones fijos al pie. */
 export function PasoOnboarding({
   paso,
   titulo,
@@ -186,6 +215,15 @@ export function PasoOnboarding({
       >
         {textoProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
       </Texto>
+      {/* La barra repite lo que dice el texto de arriba: el lector no la lee dos veces. */}
+      <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+        <Barra
+          testID="onb-progreso-barra"
+          llenoBp={progresoOnboardingBp(paso, PASOS_VISIBLES_ONB)}
+          etiquetaAccesible={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
+          alto={6}
+        />
+      </View>
       <View
         ref={refTitulo}
         testID="onb-titulo-paso"

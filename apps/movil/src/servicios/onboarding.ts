@@ -15,11 +15,11 @@ import {
   type TarjetaCredito,
 } from '@cartera/core';
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
-import { ReglaRecurrente } from '@cartera/nlu';
+import { ReglaRecurrente, type ContextoPaso, type CuentaContexto } from '@cartera/nlu';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
 import { marcarIngresoVariable } from './ajustes';
 import { crearAvisoMsiDoble } from './avisos';
-import { idCategoriaDe, insertarCuenta } from './catalogo';
+import { cuentasPropias, idCategoriaDe, insertarCuenta, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
 import { desactivarProgramado, insertarProgramado, validarRegla } from './programados';
 import { tarjetaPorId } from './tarjetas';
@@ -53,6 +53,28 @@ export function registrarSaldoInicial(
     claveIdempotencia: `saldo_inicial:${cuentaId}`,
     asientos: m.asientos,
   });
+}
+
+// ——— «O dímelo» de cada paso (Ola 7 §7, `06 §13`) ———
+
+const TIPO_EN_CONTEXTO: Partial<Record<CuentaPropia['subtipo'], CuentaContexto['tipo']>> = {
+  efectivo: 'efectivo',
+  debito: 'debito',
+  billetera: 'billetera',
+  tarjeta_credito: 'credito',
+};
+
+/**
+ * Contexto del intérprete para leer lo que se dice en un paso del onboarding: las cuentas que la persona ya dio de
+ * alta (en O3 suele no haber ninguna). `interpretarPaso` le suma el catálogo de instituciones. Sin texto ni cifras.
+ */
+export function contextoPasoOnboarding(ctx: Contexto): ContextoPaso {
+  const cuentas: CuentaContexto[] = [];
+  for (const c of cuentasPropias(ctx)) {
+    const tipo = TIPO_EN_CONTEXTO[c.subtipo];
+    if (tipo) cuentas.push({ tipo, alias: c.alias, espacio: 'personal' });
+  }
+  return { fecha_referencia: ctx.reloj.hoy(), espacios: ['personal'], cuentas };
 }
 
 // ——— O3 · Ingreso ———
@@ -127,28 +149,51 @@ export const EntradaCuenta = z.strictObject({
 });
 export type EntradaCuenta = z.input<typeof EntradaCuenta>;
 
+/** Cuenta con su saldo inicial; quien llama abre la transacción. */
+function insertarCuentaConSaldo(ctx: Contexto, e: z.output<typeof EntradaCuenta>): string {
+  const id = insertarCuenta(ctx, {
+    naturaleza: 'activo',
+    subtipo: e.subtipo,
+    nombre: e.nombre,
+    liquida: e.subtipo === 'ahorro' ? 0 : 1,
+    ultimos4: e.ultimos4 ?? null,
+    institucion: e.institucion ?? null,
+    alias: [e.nombre, ...(e.subtipo === 'efectivo' ? ['efectivo'] : []), ...e.alias],
+  });
+  registrarSaldoInicial(ctx, id, e.saldo, ctx.reloj.hoy());
+  return id;
+}
+
 /** O4: efectivo ("¿cuánto traes ahorita?"), débito, billetera o ahorro, con su saldo inicial. */
 export function agregarCuenta(ctx: Contexto, entrada: EntradaCuenta): string {
   exigirConsentimiento(ctx);
   const e = validar(EntradaCuenta, entrada, 'cuenta_invalida');
-  return enTransaccion(ctx, () => {
-    const id = insertarCuenta(ctx, {
-      naturaleza: 'activo',
-      subtipo: e.subtipo,
-      nombre: e.nombre,
-      liquida: e.subtipo === 'ahorro' ? 0 : 1,
-      ultimos4: e.ultimos4 ?? null,
-      institucion: e.institucion ?? null,
-      alias: [e.nombre, ...(e.subtipo === 'efectivo' ? ['efectivo'] : []), ...e.alias],
-    });
-    registrarSaldoInicial(ctx, id, e.saldo, ctx.reloj.hoy());
-    return id;
-  });
+  return enTransaccion(ctx, () => insertarCuentaConSaldo(ctx, e));
 }
 
 /** O4 mínimo: el efectivo. */
 export function agregarEfectivo(ctx: Contexto, saldo: Centavos, nombre = 'Efectivo'): string {
   return agregarCuenta(ctx, { subtipo: 'efectivo', nombre, saldo });
+}
+
+/**
+ * O4 «Sí» en la tarjeta «Entendí» (Ola 7 §7): el efectivo y las cuentas que la persona dijo de una vez, todo o
+ * nada (una sola transacción: si una no vale, no queda ninguna a medias). Devuelve los ids en el mismo orden,
+ * con el del efectivo primero si lo hubo.
+ */
+export function agregarCuentasDichas(
+  ctx: Contexto,
+  dichas: { efectivo: Centavos | null; cuentas: readonly EntradaCuenta[] },
+): string[] {
+  exigirConsentimiento(ctx);
+  const entradas = [
+    ...(dichas.efectivo === null
+      ? []
+      : [{ subtipo: 'efectivo', nombre: 'Efectivo', saldo: dichas.efectivo } satisfies EntradaCuenta]),
+    ...dichas.cuentas,
+  ].map((c) => validar(EntradaCuenta, c, 'cuenta_invalida'));
+  if (entradas.length === 0) throw new ErrorDominio('cuenta_invalida', 'no hay cuentas que agregar');
+  return enTransaccion(ctx, () => entradas.map((e) => insertarCuentaConSaldo(ctx, e)));
 }
 
 const MsiPrevio = z.strictObject({
@@ -375,23 +420,40 @@ export const EntradaPagoFijo = z.strictObject({
 });
 export type EntradaPagoFijo = Omit<z.input<typeof EntradaPagoFijo>, 'regla'> & { regla: Regla };
 
+/** Un pago fijo ya validado como programado de egreso desde hoy; quien llama abre la transacción. */
+function insertarPagoFijo(ctx: Contexto, e: z.output<typeof EntradaPagoFijo>, regla: Regla): string {
+  return insertarProgramado(ctx, {
+    tipo: 'egreso',
+    concepto: e.concepto,
+    monto: e.monto,
+    regla,
+    desde: ctx.reloj.hoy(),
+    hasta: e.hasta,
+    cuentaId: e.cuentaId,
+    categoriaCuentaId: e.categoria ? idCategoriaDe(ctx, e.categoria, 'gasto') : null,
+    variable: e.variable,
+  });
+}
+
 /** O5: un pago fijo como programado de egreso desde hoy (sus ocurrencias se materializan en Hoy). */
 export function agregarPagoFijo(ctx: Contexto, entrada: EntradaPagoFijo): string {
   exigirConsentimiento(ctx);
   const e = validar(EntradaPagoFijo, entrada, 'pago_fijo_invalido');
-  return enTransaccion(ctx, () =>
-    insertarProgramado(ctx, {
-      tipo: 'egreso',
-      concepto: e.concepto,
-      monto: e.monto,
-      regla: validarRegla(e.regla),
-      desde: ctx.reloj.hoy(),
-      hasta: e.hasta,
-      cuentaId: e.cuentaId,
-      categoriaCuentaId: e.categoria ? idCategoriaDe(ctx, e.categoria, 'gasto') : null,
-      variable: e.variable,
-    }),
-  );
+  return enTransaccion(ctx, () => insertarPagoFijo(ctx, e, validarRegla(e.regla)));
+}
+
+/**
+ * O5 «Sí» en la tarjeta «Entendí» (Ola 7 §7): los pagos fijos que la persona dijo de una vez, todos o ninguno
+ * (una sola transacción). Devuelve los ids en el mismo orden.
+ */
+export function agregarPagosFijosDichos(ctx: Contexto, pagos: readonly EntradaPagoFijo[]): string[] {
+  exigirConsentimiento(ctx);
+  if (pagos.length === 0) throw new ErrorDominio('pago_fijo_invalido', 'no hay pagos que agregar');
+  const validos = pagos.map((p) => {
+    const e = validar(EntradaPagoFijo, p, 'pago_fijo_invalido');
+    return { e, regla: validarRegla(e.regla) };
+  });
+  return enTransaccion(ctx, () => validos.map(({ e, regla }) => insertarPagoFijo(ctx, e, regla)));
 }
 
 /** O5: quita un pago fijo recién agregado (lo desactiva; sus ocurrencias dejan de apartarse en E4). */

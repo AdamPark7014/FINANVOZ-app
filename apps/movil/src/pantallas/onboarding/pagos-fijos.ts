@@ -1,5 +1,4 @@
 import { proximasFechas, type Centavos, type DiaSemana, type PlainDate, type Regla } from '@cartera/core';
-import type { PagoFijoDicho } from '@cartera/nlu';
 import { leerEntero, OPCIONES_DIA_SEMANA } from './ingreso';
 
 /**
@@ -139,33 +138,4 @@ export function limpiarNombrePago(texto: string): string | null {
 /** "Renta", "Luz"… para chips y lista. */
 export function capitalizar(texto: string): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
-}
-
-/** Lo que llena O5 cuando la persona dice un pago («pago 4500 de renta cada mes el 5»). */
-export interface PagoDichoPantalla<C extends string> {
-  /** Chip del catálogo si el concepto es uno de ellos; si no, `otro` con el nombre como se dijo. */
-  clave: C | 'otro';
-  nombre: string;
-  monto: Centavos;
-  respuestas: RespuestasPago;
-}
-
-export function respuestasDePagoDicho<C extends string>(
-  d: PagoFijoDicho,
-  sugeridos: readonly { readonly clave: C; readonly concepto: string }[],
-): PagoDichoPantalla<C> {
-  const normal = d.concepto.toLowerCase();
-  const sugerido = sugeridos.find((s) => s.concepto === normal);
-  return {
-    clave: sugerido ? sugerido.clave : 'otro',
-    nombre: capitalizar(sugerido ? sugerido.concepto : d.concepto),
-    monto: d.monto,
-    respuestas: {
-      ...RESPUESTAS_PAGO_INICIALES,
-      ...(d.frecuencia ? { frecuencia: d.frecuencia } : {}),
-      diaMes: d.diaMes === null ? '' : String(d.diaMes),
-      diaSemana: d.diaSemana,
-      mes: d.mes,
-    },
-  };
 }

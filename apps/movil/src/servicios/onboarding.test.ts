@@ -8,12 +8,15 @@ import { obtenerHoy } from './hoy';
 import { listarMovimientos } from './movimientos';
 import {
   agregarCuenta,
+  agregarCuentasDichas,
   agregarEfectivo,
   agregarMsiQueYaTenia,
   agregarPagoFijo,
+  agregarPagosFijosDichos,
   agregarTarjetaCredito,
   configurarIngreso,
   configurarIngresoVariable,
+  contextoPasoOnboarding,
   PAGOS_FIJOS_SUGERIDOS,
   proximoPago,
 } from './onboarding';
@@ -268,5 +271,69 @@ describe('onboarding', () => {
     expect(variable.estado).toBe('ingreso_variable');
     expect(variable.dias).toBe(30);
     expect(variable.mensaje).toBe('Reparto tu dinero libre en 30 días.');
+  });
+});
+
+describe('«Dímelo» del onboarding (Ola 7 §7)', () => {
+  it('O4 «Sí»: el efectivo y las cuentas dichas entran juntas con su saldo inicial e institución', () => {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const ids = agregarCuentasDichas(p.ctx, {
+      efectivo: 50_000,
+      cuentas: [{ subtipo: 'debito', nombre: 'BBVA', saldo: 300_000, institucion: 'bbva_mx' }],
+    });
+    expect(ids).toHaveLength(2);
+    expect(listarCuentas(p.ctx).tienes.map((c) => [c.nombre, c.subtipo, c.saldo])).toEqual([
+      ['Efectivo', 'efectivo', 50_000],
+      ['BBVA', 'debito', 300_000],
+    ]);
+    // El intérprete ya las reconoce por su nombre: «pagué con la BBVA».
+    expect(contextoPasoOnboarding(p.ctx)).toEqual({
+      fecha_referencia: '2026-10-11',
+      espacios: ['personal'],
+      cuentas: [
+        { tipo: 'efectivo', alias: expect.arrayContaining(['efectivo']), espacio: 'personal' },
+        { tipo: 'debito', alias: expect.arrayContaining(['bbva']), espacio: 'personal' },
+      ],
+    });
+  });
+
+  it('O4 «Sí»: todo o nada; si una cuenta no vale no queda ninguna a medias', () => {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    expect(() =>
+      agregarCuentasDichas(p.ctx, {
+        efectivo: 50_000,
+        cuentas: [{ subtipo: 'debito', nombre: '   ', saldo: 300_000 }],
+      }),
+    ).toThrow();
+    expect(() => agregarCuentasDichas(p.ctx, { efectivo: null, cuentas: [] })).toThrow();
+    expect(listarCuentas(p.ctx).tienes).toEqual([]);
+  });
+
+  it('O5 «Sí»: los pagos dichos se apartan juntos; uno con regla inválida no deja ninguno', () => {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    const ids = agregarPagosFijosDichos(p.ctx, [
+      { concepto: 'renta', monto: 450_000, regla: { tipo: 'mensual', dia: 5 }, categoria: 'vivienda' },
+      { concepto: 'Netflix', monto: 21_900, regla: { tipo: 'mensual', dia: 10 } },
+    ]);
+    expect(ids).toHaveLength(2);
+    expect(() =>
+      agregarPagosFijosDichos(p.ctx, [
+        { concepto: 'luz', monto: 40_000, regla: { tipo: 'mensual', dia: 14 } },
+        { concepto: 'gas', monto: 30_000, regla: { tipo: 'mensual', dia: 40 } as never },
+      ]),
+    ).toThrow();
+    expect(() => agregarPagosFijosDichos(p.ctx, [])).toThrow();
+    // Hoy materializa [hoy, hoy + 90): renta el 5 y Netflix el 10 de nov, dic y ene; nada de la luz.
+    obtenerHoy(p.ctx);
+    expect(listarOcurrencias(p.ctx, { tipo: 'egreso' }).map((o) => o.fecha)).toEqual([
+      '2026-11-05',
+      '2026-11-10',
+      '2026-12-05',
+      '2026-12-10',
+      '2027-01-05',
+    ]);
   });
 });

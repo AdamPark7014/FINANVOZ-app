@@ -28,13 +28,6 @@ export {
   type LecturaPaso,
   type Paso,
 } from './pasos';
-export {
-  interpretarIngresoDicho,
-  interpretarMonto as interpretarMontoCampo,
-  interpretarPagoFijoDicho,
-  type IngresoDicho,
-  type PagoFijoDicho,
-} from './reglas/campos';
 export type { LecturaMonto } from './reglas/montos';
 export {
   leerConfirmacion,
