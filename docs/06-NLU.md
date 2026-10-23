@@ -465,10 +465,20 @@ DESC_REF  := [art] 1 a 3 palabras aptas de DESC, sin nombres, alias ni pronombre
 
 ### 9.3 Lo que sigue en `null` a propósito
 
+**Cambio del 23-10-2026 (regla de costo de Adam):** lo que iba a la nube solo para que la nube preguntara o dijera que
+no ya se contesta en el teléfono (`reglas/sin-nube.ts`, al principio y al final de las producciones): fuera de alcance
+claro (imperativos de mover dinero, consejo de inversión, «prompt»/«ignora tus instrucciones», chistes); «¿por qué…?»
+→ `consultar/explicar` con la pregunta tal cual; y, solo si ninguna otra producción entendió la frase, las
+aclaraciones obvias: gasto dicho como hecho sin ninguna cifra → `monto_faltante`, «la semana pasada» sin día →
+`fecha_ambigua`, sueldo «bruto» → `monto_ambiguo` y «¿me alcanza?» sin precio (y sin hablar de la quincena) →
+`monto_faltante`. Nada de esto registra. Golden: 147 de 164 con `reglas: true` (X05, P05, S04, Q13, Z05, B01, B02,
+F01–F04 y V08 cambiaron solo la bandera). La app contesta además la charla corta («hola», «gracias», «¿qué puedes
+hacer?») sin intérprete (`apps/movil/src/asistente/charla.ts`). Lo de abajo sigue en `null`:
+
 - Sin verbo, una DESC desconocida se registraría como gasto; por eso "una devolución de 500", "anoche unas chelas, 340 en efectivo" o "mil quinientos de la tele en efectivo" → `null`. Las frases que esa regla protegía ("tengo 4,200 en BBVA", "me quedan 85 pesos en efectivo") hoy tienen producción propia (`saldo_cuenta`, `ARQUEO`); los falsos positivos de la primera implementación de referencia (cobertura 16/16, precisión 17/17) siguen cubiertos por pruebas.
 - Montos ambiguos ("dos cincuenta"), pesos ("un kilo de carne", "medio kilo de despensa"), fechas futuras o "la semana pasada" al registrar, dos fechas o dos montos en una parte.
 - Montos que el nivel 0 todavía no lee: "millón", "y medio" ("ocho mil y medio"), "N mil M" con otra cifra detrás ("8 mil 500 600") o con decimales en N ("1.5 mil 200"), "un" suelto tras "N mil" y centavos sin "pesos" antes ("85 con 50 centavos").
-- Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6"), "¿me alcanza?" sin monto, las preguntas abiertas (`explicar`) y todo lo fuera de alcance: eso lo decide el nivel 2 o la persona.
+- Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6") y lo fuera de alcance que no es evidente: eso lo decide el nivel 2 o la persona.
 
 Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-23 (sin cambio desde el 22-10; «traigo 300» y «¿cuánto llevo en CAT?» se probaron con pruebas unitarias, no en el golden): cobertura 135/135 y precisión 135/135 sobre los 164 casos (el 2026-10-21, 128/128 sobre 155; antes 25/25 y 27/27). Los 29 casos restantes están en `null` por las razones de §9.3. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V08 y V09 son `reglas: false`. La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
 

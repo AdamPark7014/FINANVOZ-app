@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Centavos } from '@cartera/core';
+import { respuestaCharla } from '../../asistente/charla';
 import { chipsIntencion, unirPrefijo, type ChipIntencion } from '../../asistente/chips';
 import { useConfirmacionPorVoz } from '../../asistente/confirmacion-voz';
 import { leerPuedoGastar, turnoPuedoGastar, turnosPuedoGastar } from '../../asistente/puedo-gastar';
@@ -475,6 +476,14 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
         local = registrarTextoLocal(ctx, limpio, origen);
       } catch (e) {
         agregar({ id: nuevoId('texto'), de: 'asistente', clase: 'texto', texto: mensajeError(e) });
+        return;
+      }
+      // «Hola», «gracias», «¿qué puedes hacer?»: charla corta en el teléfono, sin intérprete ni nube.
+      const charla = local === null ? respuestaCharla(limpio) : null;
+      if (charla) {
+        const turno: Turno = { id: nuevoId('texto'), de: 'asistente', clase: 'texto', texto: charla };
+        agregar(turno);
+        if (porVoz) void contestarEnVoz(turno);
         return;
       }
       // «¿Puedo gastar 500 en unos tenis?» se contesta en el teléfono (cero tokens) si el nivel 0 no la tomó.

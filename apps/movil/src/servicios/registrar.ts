@@ -1269,6 +1269,15 @@ function aplicarInterpretacion(
 /** Nivel 0: solo lo que el teléfono ya sabe hacer sin la nube; `null` si hay que preguntarle a la nube. */
 function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
   const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
+  // Lo que el nivel 0 contesta sin registrar nada (`reglas/sin-nube.ts`): preguntas obvias, fuera de alcance y
+  // «¿por qué…?» (explicar revisa Plus en la pantalla). Igual que si lo hubiera dicho la nube, sin pagarla.
+  if (
+    i?.intencion === 'aclarar' ||
+    i?.intencion === 'fuera_de_alcance' ||
+    (i?.intencion === 'consultar' && i.consulta.tipo === 'explicar')
+  ) {
+    return aplicarInterpretacion(ctx, i, cuentas, frase);
+  }
   if (i?.intencion === 'consultar' && tienePlantilla(i.consulta.tipo)) {
     // La misma puerta que la nube (`aplicarInterpretacion`): "Hoy puedes" es de Gratis; las demás consultas, de
     // Plus (`01 §11`). Sin esto, el nivel 0 ampliado regalaría las consultas de Plus.

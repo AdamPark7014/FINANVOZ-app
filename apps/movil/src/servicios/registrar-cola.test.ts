@@ -14,7 +14,8 @@ import { nubeFalsa } from './__pruebas__/nube';
 
 const HOY = '2026-10-11';
 const RECHAZADA = 'una frase que el proxy rechaza';
-const PAN = 'compré el pan de siempre en efectivo';
+// Con cifra: sin ella el nivel 0 ya pregunta el monto sin la nube (reglas/sin-nube.ts).
+const PAN = 'compré el pan de siempre en efectivo por 35';
 const BORRA_CINE = 'borra lo del cine';
 
 function conCuenta() {

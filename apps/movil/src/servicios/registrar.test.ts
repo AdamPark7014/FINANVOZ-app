@@ -260,15 +260,33 @@ describe('configurar desde Hoy con el nivel 0 (K01–K08, sin nube)', () => {
     });
   });
 
-  it('lo que el nivel 0 deja en null (V08, V09) sigue esperando a la nube', async () => {
+  it('lo que el nivel 0 deja en null (V09) sigue esperando a la nube; el sueldo bruto (V08) se pregunta aquí', async () => {
     const p = conCuentas();
-    for (const id of ['V08', 'V09']) {
-      expect(await registrarTexto(p.ctx, golden(id).texto, 'voz'), id).toMatchObject({
-        resultado: 'por_interpretar',
-        motivo: 'sin_nube',
-      });
-    }
-    expect(contarPorInterpretar(p.ctx)).toBe(2);
+    expect(await registrarTexto(p.ctx, golden('V09').texto, 'voz')).toMatchObject({
+      resultado: 'por_interpretar',
+      motivo: 'sin_nube',
+    });
+    expect(await registrarTexto(p.ctx, golden('V08').texto, 'voz')).toMatchObject({
+      resultado: 'aclarar',
+      motivo: 'monto_ambiguo',
+    });
+    expect(contarPorInterpretar(p.ctx)).toBe(1);
+  });
+
+  it('sin nube, el nivel 0 contesta fuera de alcance, «¿por qué…?» y la pregunta del monto (23-10)', async () => {
+    const p = conCuentas();
+    expect(await registrarTexto(p.ctx, 'transfiérele 500 a Juan', 'voz')).toEqual({
+      resultado: 'fuera_de_alcance',
+      motivo: 'mueve_dinero',
+    });
+    expect(await registrarTexto(p.ctx, 'me compré una coca', 'texto')).toMatchObject({
+      resultado: 'aclarar',
+      motivo: 'monto_faltante',
+    });
+    expect(await registrarTexto(p.ctx, '¿por qué gasté tanto este mes?', 'texto')).toMatchObject({
+      resultado: 'explicar',
+    });
+    expect(contarPorInterpretar(p.ctx)).toBe(0);
   });
 });
 
