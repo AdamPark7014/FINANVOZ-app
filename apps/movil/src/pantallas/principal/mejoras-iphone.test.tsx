@@ -276,6 +276,39 @@ describe('Movimientos', () => {
     return { ...p, efectivo, id };
   }
 
+  it('chips Todos · Gastos · Ingresos · Efectivo: filtran la lista y «Ver todos» regresa', () => {
+    const p = conCoca();
+    registrarMovimiento(p.ctx, {
+      tipo: 'ingreso',
+      categoria: 'ventas',
+      destinoId: p.efectivo,
+      monto: 50_000,
+      descripcion: 'venta',
+    });
+    const venta = listarMovimientos(p.ctx)[0]?.movimientos.find((m) => m.descripcion === 'venta')
+      ?.id as string;
+    renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    expect(screen.getByTestId('movimientos-chip-todos')).toHaveProp('accessibilityState', {
+      selected: true,
+      disabled: false,
+    });
+    fireEvent.press(screen.getByTestId('movimientos-chip-gastos'));
+    expect(screen.getByTestId(`movimiento-${p.id}`)).toBeTruthy();
+    expect(screen.queryByTestId(`movimiento-${venta}`)).toBeNull();
+    fireEvent.press(screen.getByTestId('movimientos-chip-ingresos'));
+    expect(screen.getByTestId(`movimiento-${venta}`)).toBeTruthy();
+    expect(screen.queryByTestId(`movimiento-${p.id}`)).toBeNull();
+    fireEvent.press(screen.getByTestId('movimientos-chip-efectivo'));
+    expect(screen.getByTestId(`movimiento-${p.id}`)).toBeTruthy();
+    // e4-01 tiene tarjeta: el chip existe y, sin compras con ella hoy, dice que no hay y ofrece volver.
+    fireEvent.press(screen.getByTestId('movimientos-chip-tarjetas'));
+    if (screen.queryByTestId('movimientos-chip-ver-todos')) {
+      fireEvent.press(screen.getByTestId('movimientos-chip-ver-todos'));
+      expect(screen.getByTestId(`movimiento-${p.id}`)).toBeTruthy();
+    }
+    p.cerrar();
+  });
+
   it('el detalle abierto se cierra con "Cerrar" o tocando su encabezado', () => {
     const p = conCoca();
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);

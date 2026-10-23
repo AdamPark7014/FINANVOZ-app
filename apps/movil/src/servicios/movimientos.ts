@@ -52,6 +52,10 @@ export interface FiltroMovimientos {
   /** Solo movimientos con gasto (consultas de gasto, `06 §6`). */
   readonly soloGastos?: boolean;
   readonly origen?: Origen;
+  /** Chips de Movimientos: solo lo que sale (gastos) o lo que entra (ingresos). */
+  readonly sentido?: 'salida' | 'entrada';
+  /** Chips de Movimientos: con efectivo o con una tarjeta de crédito (incluye compras a meses). */
+  readonly medio?: 'efectivo' | 'tarjeta';
   readonly porRevisar?: boolean;
   readonly estimados?: boolean;
   readonly limite?: number;
@@ -131,6 +135,17 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     )
       continue;
     const propias = suyos.filter((a) => a.c.naturaleza !== 'gasto' && a.c.naturaleza !== 'ingreso');
+    const sentido = SALIDA.has(t.tipo) ? 'salida' : ENTRADA.has(t.tipo) ? 'entrada' : 'neutro';
+    if (filtro.sentido && sentido !== filtro.sentido) continue;
+    if (
+      filtro.medio &&
+      !suyos.some((a) =>
+        filtro.medio === 'efectivo'
+          ? a.c.naturaleza === 'activo' && a.c.subtipo === 'efectivo'
+          : a.c.naturaleza === 'pasivo' && (a.c.subtipo === 'tarjeta_credito' || a.c.subtipo === 'msi'),
+      )
+    )
+      continue;
     const personasPorId = new Map<string, string>();
     for (const a of suyos) {
       if (a.c.naturaleza === 'contraparte' && a.c.subtipo === 'persona' && a.monto !== 0) {
@@ -152,7 +167,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
       origen: t.origen as Origen,
       registradaEn: t.registradaEn,
       monto: suyos.reduce((s, a) => s + Math.max(0, a.monto), 0),
-      sentido: SALIDA.has(t.tipo) ? 'salida' : ENTRADA.has(t.tipo) ? 'entrada' : 'neutro',
+      sentido,
       saleDe: propias.filter((a) => a.monto < 0).map((a) => a.c.nombre),
       llegaA: propias.filter((a) => a.monto > 0).map((a) => a.c.nombre),
       personas,

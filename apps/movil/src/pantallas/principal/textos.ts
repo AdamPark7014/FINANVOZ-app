@@ -18,6 +18,7 @@ import {
   type CompromisoConfigurado,
   type CuentaPorElegir,
   type EntradaMovimiento,
+  type FiltroMovimientos,
   type MotivoNoSoportado,
   type MotivoPorInterpretar,
   type ResultadoTexto,
@@ -419,6 +420,25 @@ export const PISTA_VACIO_MOVIMIENTOS = 'Más abajo, botón Registrar un movimien
 
 /** Consulta filtrada sin resultados (`06 §6`). */
 export const TEXTO_MOVIMIENTOS_FILTRO_VACIO = 'No hay movimientos que coincidan.';
+
+/** Chips de Movimientos (maqueta aprobada de la Ola 7, «Pestañas y vacíos»). */
+export const CHIPS_MOVIMIENTOS = ['todos', 'gastos', 'ingresos', 'efectivo', 'tarjetas'] as const;
+export type ChipMovimientos = (typeof CHIPS_MOVIMIENTOS)[number];
+export const ETIQUETA_CHIP_MOVIMIENTOS: Record<ChipMovimientos, string> = {
+  todos: 'Todos',
+  gastos: 'Gastos',
+  ingresos: 'Ingresos',
+  efectivo: 'Efectivo',
+  tarjetas: 'Tarjetas',
+};
+export const ETIQUETA_FILTRAR_MOVIMIENTOS = 'Mostrar';
+export const FILTRO_DE_CHIP: Record<ChipMovimientos, FiltroMovimientos> = {
+  todos: {},
+  gastos: { sentido: 'salida' },
+  ingresos: { sentido: 'entrada' },
+  efectivo: { medio: 'efectivo' },
+  tarjetas: { medio: 'tarjeta' },
+};
 
 export const TITULO_POR_REVISAR = 'Por revisar';
 /** Sin prometer internet: en la build sin nube estas frases no se interpretan solas. */

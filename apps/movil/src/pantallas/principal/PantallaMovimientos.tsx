@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -36,6 +36,11 @@ import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
 import { mostrarDespuesDeCerrar, useAvisoRegistro } from './useAvisoRegistro';
 import {
   BTN_BORRAR_MOVIMIENTO,
+  CHIPS_MOVIMIENTOS,
+  ETIQUETA_CHIP_MOVIMIENTOS,
+  ETIQUETA_FILTRAR_MOVIMIENTOS,
+  FILTRO_DE_CHIP,
+  type ChipMovimientos,
   BTN_CERRAR_DETALLE,
   BTN_CONFIRMAR_BORRAR_MOVIMIENTO,
   BTN_CORREGIR_MOVIMIENTO,
@@ -97,13 +102,20 @@ export function PantallaMovimientos({
   detalleInicial?: string | null;
 }) {
   const { ctx, version, refrescar } = useSesion();
-  const claveFiltro = JSON.stringify(filtro ?? {});
+  // Chips de la maqueta aprobada (Ola 7 §5): Todos · Gastos · Ingresos · Efectivo · Tarjetas. Se suman al filtro de
+  // una consulta («Ver movimientos») si lo hay.
+  const [chip, setChip] = useState<ChipMovimientos>('todos');
+  const conTarjetas = useVista((c) => listarTarjetas(c).length > 0);
+  const chips = CHIPS_MOVIMIENTOS.filter((c) => c !== 'tarjetas' || conTarjetas);
+  const filtroEfectivo: FiltroMovimientos = { ...(filtro ?? {}), ...FILTRO_DE_CHIP[chip] };
+  const claveFiltro = JSON.stringify(filtroEfectivo);
   const dias = useMemo(
-    () => listarMovimientos(ctx, filtro ?? {}),
+    () => listarMovimientos(ctx, filtroEfectivo),
     // `claveFiltro` resume el filtro; `version` relee tras cada escritura.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ctx, version, claveFiltro],
   );
+  const hayMovimientos = useVista((c) => listarMovimientos(c, { limite: 1 }).length > 0);
   const porRevisar = useVista(listarPorInterpretar);
   // Compras cargadas a una tarjeta de crédito: las únicas que se pueden pasar a meses (02-UX §10).
   const conTarjeta = useVista(
@@ -214,6 +226,23 @@ export function PantallaMovimientos({
 
       <PorRevisarCapturas alRegistrar={alRegistrar} />
 
+      {hayMovimientos ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: espacio.xxs }}
+          testID="movimientos-chips"
+        >
+          <GrupoChips
+            opciones={chips.map((c) => ({ valor: c, etiqueta: ETIQUETA_CHIP_MOVIMIENTOS[c] }))}
+            valor={chip}
+            alCambiar={setChip}
+            prefijoTestID="movimientos-chip"
+            etiqueta={ETIQUETA_FILTRAR_MOVIMIENTOS}
+          />
+        </ScrollView>
+      ) : null}
+
       {filtro ? (
         <Tarjeta testID="movimientos-filtro">
           <Texto
@@ -239,12 +268,22 @@ export function PantallaMovimientos({
       {dias.length === 0 ? (
         <EstadoVacio
           testID="movimientos-vacio"
-          texto={filtro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
-          etiquetaAccesible={etiquetaVacioMovimientos(filtro != null)}
-          {...(filtro ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
+          texto={filtro || chip !== 'todos' ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
+          etiquetaAccesible={etiquetaVacioMovimientos(filtro != null || chip !== 'todos')}
+          {...(filtro || chip !== 'todos' ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
         />
       ) : null}
-      {dias.length === 0 && !filtro ? (
+      {dias.length === 0 && chip !== 'todos' ? (
+        <Boton
+          etiqueta="Ver todos"
+          variante="texto"
+          ancho="contenido"
+          alPresionar={() => setChip('todos')}
+          pista={PISTA_VER_TODOS_MOVIMIENTOS}
+          testID="movimientos-chip-ver-todos"
+        />
+      ) : null}
+      {dias.length === 0 && !filtro && chip === 'todos' ? (
         <Boton
           etiqueta={BTN_REGISTRAR_PRIMER_MOVIMIENTO}
           variante="secundario"
