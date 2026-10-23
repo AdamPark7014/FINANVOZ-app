@@ -10,52 +10,139 @@ import {
   respuestaGoogle,
   respuestaOpenAI,
 } from './__pruebas__/dobles.ts';
-import { construirPrompt } from './prompt.ts';
-import { crearAnthropic, crearGoogle, crearOpenAI, FallaProveedor } from './proveedores.ts';
+import { construirPrompt, FORMATO_JSON } from './prompt.ts';
+import {
+  abrirTextoJson,
+  crearAnthropic,
+  crearGoogle,
+  crearOpenAI,
+  FallaProveedor,
+  leerModoAnthropic,
+  modoParaModelo,
+  pensamientoMinimo,
+  urlMensajesAnthropic,
+  usoAnthropic,
+} from './proveedores.ts';
 
 const prompt = construirPrompt('unos tacos con la nu', CONTEXTO);
 const senal = () => new AbortController().signal;
 const salida = JSON.stringify({ interpretacion: INTERPRETACION });
 
 describe('Anthropic (Messages API)', () => {
-  it('pide salida estructurada con la proyección estándar, sistema en caché y modelo claude-haiku-5-5', async () => {
-    const f = fetchFalso([json(respuestaAnthropic(salida))]);
+  const herramienta = (input: unknown) => ({
+    ...respuestaAnthropic(''),
+    content: [{ type: 'tool_use', id: 't1', name: 'interpretacion', input }],
+    stop_reason: 'tool_use',
+  });
+
+  it('por omisión: herramienta forzada, API 2026-10-21, esfuerzo low, sin razonamiento y sistema en caché', async () => {
+    const f = fetchFalso([json(herramienta({ interpretacion: INTERPRETACION }))]);
     const a = crearAnthropic({ llave: 'llave-de-prueba', fetch: f.fetch });
     const r = await a.llamar({ prompt, senal: senal() });
-    expect(r).toEqual({ texto: salida, tokens_entrada: 1200, tokens_salida: 80 });
+    expect(JSON.parse(r.texto)).toEqual({ interpretacion: INTERPRETACION });
+    expect(r).toMatchObject({ tokens_entrada: 1200, tokens_salida: 80, tokens_cache_leidos: 1000 });
 
     const p = en(f.peticiones, 0);
     expect(p.url).toBe('https://api.anthropic.com/v1/messages');
     expect(p.encabezados['x-api-key']).toBe('llave-de-prueba');
-    expect(p.encabezados['anthropic-version']).toBe('2023-06-01');
+    expect(p.encabezados['anthropic-version']).toBe('2026-10-21');
     expect(p.cuerpo.model).toBe('claude-haiku-5-5');
-    expect(p.cuerpo.output_config).toEqual({
-      effort: 'medium',
-      format: { type: 'json_schema', schema: esquemas.estandar },
-    });
+    expect(p.cuerpo.max_tokens).toBe(1024);
+    expect(p.cuerpo.output_config).toEqual({ effort: 'low' });
     expect(p.cuerpo.thinking).toEqual({ type: 'disabled' });
-    expect(p.cuerpo).not.toHaveProperty('temperature');
+    for (const prohibido of ['temperature', 'top_p', 'top_k']) expect(p.cuerpo).not.toHaveProperty(prohibido);
+    const tools = p.cuerpo.tools as { input_schema: unknown }[];
+    expect(en(tools, 0).input_schema).toEqual(esquemas.estandar);
+    expect(p.cuerpo.tool_choice).toEqual({ type: 'tool', name: 'interpretacion' });
+    // Herramienta + sistema fijos antes del corte; el contexto del usuario va después, en el mensaje.
     expect(p.cuerpo.system).toEqual([
       { type: 'text', text: prompt.sistema, cache_control: { type: 'ephemeral' } },
     ]);
     expect(p.cuerpo.messages).toEqual([{ role: 'user', content: prompt.usuario }]);
   });
 
-  it('modo herramienta: input_schema y lectura del bloque tool_use', async () => {
-    const respuesta = {
-      ...respuestaAnthropic(''),
-      content: [
-        { type: 'tool_use', id: 't1', name: 'interpretacion', input: { interpretacion: INTERPRETACION } },
-      ],
-    };
-    const f = fetchFalso([json(respuesta)]);
-    const a = crearAnthropic({ llave: 'k', fetch: f.fetch, modoAnthropic: 'herramienta' });
+  it('modo json_schema: output_config.format con la proyección estándar y sin herramientas', async () => {
+    const f = fetchFalso([json(respuestaAnthropic(salida))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch, modoAnthropic: 'json_schema' });
+    const r = await a.llamar({ prompt, senal: senal() });
+    expect(r.texto).toBe(salida);
+    const p = en(f.peticiones, 0);
+    expect(p.cuerpo.output_config).toEqual({
+      effort: 'low',
+      format: { type: 'json_schema', schema: esquemas.estandar },
+    });
+    expect(p.cuerpo).not.toHaveProperty('tools');
+  });
+
+  it('modo texto: la forma va en el sistema cacheado y se saca el JSON aunque venga en un bloque de código', async () => {
+    const f = fetchFalso([json(respuestaAnthropic(`\`\`\`json\n${salida}\n\`\`\``))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch, modoAnthropic: 'texto' });
+    const r = await a.llamar({ prompt, senal: senal() });
+    expect(r.texto).toBe(salida);
+    const p = en(f.peticiones, 0);
+    expect(p.cuerpo).not.toHaveProperty('tools');
+    expect(p.cuerpo.output_config).toEqual({ effort: 'low' });
+    expect(p.cuerpo.system).toEqual([
+      { type: 'text', text: `${prompt.sistema}\n\n${FORMATO_JSON}`, cache_control: { type: 'ephemeral' } },
+    ]);
+  });
+
+  it('ANTHROPIC_BASE_URL: la misma petición a la raíz configurada (puerta única)', async () => {
+    const f = fetchFalso([json(herramienta({ interpretacion: INTERPRETACION }))]);
+    const a = crearAnthropic({
+      llave: 'token-proyecto',
+      fetch: f.fetch,
+      urlBase: 'https://ia.zynoratek.com/',
+    });
+    await a.llamar({ prompt, senal: senal() });
+    const p = en(f.peticiones, 0);
+    expect(p.url).toBe('https://ia.zynoratek.com/v1/messages');
+    expect(p.encabezados['x-api-key']).toBe('token-proyecto');
+    expect(urlMensajesAnthropic()).toBe('https://api.anthropic.com/v1/messages');
+  });
+
+  it('abre `interpretacion` mandada como texto JSON, aunque traiga una llave de más, sin gastar el reintento', async () => {
+    const comoTexto = `${JSON.stringify(INTERPRETACION)}}`;
+    const f = fetchFalso([json(herramienta({ interpretacion: comoTexto }))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch });
     const r = await a.llamar({ prompt, senal: senal() });
     expect(JSON.parse(r.texto)).toEqual({ interpretacion: INTERPRETACION });
-    const tools = en(f.peticiones, 0).cuerpo.tools as { input_schema: unknown }[];
-    expect(en(tools, 0).input_schema).toEqual(esquemas.estandar);
-    expect(en(f.peticiones, 0).cuerpo.tool_choice).toEqual({ type: 'tool', name: 'interpretacion' });
-    expect(en(f.peticiones, 0).cuerpo.output_config).toEqual({ effort: 'medium' });
+    expect(abrirTextoJson('no es json {')).toBe('no es json {');
+    expect(abrirTextoJson('{roto')).toBe('{roto');
+  });
+
+  it('separa la caché leída y escrita del uso', () => {
+    expect(
+      usoAnthropic({
+        input_tokens: 200,
+        cache_read_input_tokens: 900,
+        cache_creation_input_tokens: 100,
+        output_tokens: 50,
+      }),
+    ).toEqual({
+      tokens_entrada: 1200,
+      tokens_salida: 50,
+      tokens_cache_leidos: 900,
+      tokens_cache_escritos: 100,
+    });
+  });
+
+  it('con Sonnet 5.5 no manda lo que rechaza: thinking between_tools y sin herramienta forzada (modo texto)', async () => {
+    const f = fetchFalso([json(respuestaAnthropic(salida))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch, modelo: 'claude-sonnet-5-5' });
+    await a.llamar({ prompt, senal: senal() });
+    const p = en(f.peticiones, 0);
+    expect(p.cuerpo.thinking).toEqual({ type: 'between_tools' });
+    expect(p.cuerpo).not.toHaveProperty('tool_choice');
+    expect(modoParaModelo('herramienta', 'claude-haiku-5-5')).toBe('herramienta');
+    expect(pensamientoMinimo('claude-haiku-5-5')).toEqual({ type: 'disabled' });
+  });
+
+  it('NLU_ANTHROPIC_MODO: valores conocidos o el modo por omisión', () => {
+    expect(leerModoAnthropic('texto')).toBe('texto');
+    expect(leerModoAnthropic('json_schema')).toBe('json_schema');
+    expect(leerModoAnthropic(undefined)).toBe('herramienta');
+    expect(leerModoAnthropic('otro')).toBe('herramienta');
   });
 
   it('un rechazo de seguridad (stop_reason refusal) es falla del servidor para que intente el alterno', async () => {
@@ -64,7 +151,7 @@ describe('Anthropic (Messages API)', () => {
     await expect(a.llamar({ prompt, senal: senal() })).rejects.toMatchObject({ tipo: 'servidor' });
   });
 
-  it('el reintento agrega la salida anterior y la corrección', async () => {
+  it('el reintento agrega la salida anterior y la corrección, y termina en un turno del usuario', async () => {
     const f = fetchFalso([json(respuestaAnthropic(salida))]);
     const a = crearAnthropic({ llave: 'k', fetch: f.fetch });
     await a.llamar({ prompt, reintento: { salidaAnterior: '{}', correccion: 'corrige' }, senal: senal() });

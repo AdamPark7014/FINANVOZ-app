@@ -84,6 +84,8 @@ export function crearManejadorTurno(deps: DependenciasManejadorTurno): (req: Req
         modelo: r.modelo,
         tokens_entrada: r.tokens_entrada,
         tokens_salida: r.tokens_salida,
+        tokens_cache_leidos: r.tokens_cache_leidos,
+        tokens_cache_escritos: r.tokens_cache_escritos,
         latencia_ms: r.latencia_ms,
         llamadas: r.llamadas,
         resultados_herramienta: resultadosHerramienta,

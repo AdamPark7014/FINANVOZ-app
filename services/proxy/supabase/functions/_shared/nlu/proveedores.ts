@@ -3,7 +3,7 @@
 // inyecta: las pruebas usan respuestas grabadas, sin llaves. Privacidad (regla 9): los errores llevan solo el
 // estado HTTP, nunca el cuerpo de la petición o de la respuesta.
 import esquemas from '../esquema-proveedor.json' with { type: 'json' };
-import type { Prompt } from './prompt.ts';
+import { FORMATO_JSON, type Prompt } from './prompt.ts';
 
 export type NombreProveedor = 'anthropic' | 'openai' | 'google';
 export const NOMBRES_PROVEEDOR: readonly NombreProveedor[] = ['anthropic', 'openai', 'google'];
@@ -29,14 +29,34 @@ export const TIEMPO_MINIMO_INTENTO_MS = 1500;
 const TOKENS_SALIDA_MAXIMOS = 2048;
 
 /**
+ * Raíz de la API de Anthropic. `ANTHROPIC_BASE_URL` la cambia sin tocar nada más del contrato (p. ej. la puerta
+ * única https://ia.zynoratek.com, compatible con la API de Anthropic y autenticada con `x-api-key`).
+ */
+export const URL_BASE_ANTHROPIC = 'https://api.anthropic.com';
+/** Versión de la API de Anthropic. Con 2026-10-21, `temperature`/`top_p`/`top_k` dan 400: no se mandan. */
+export const VERSION_API_ANTHROPIC = '2026-10-21';
+/**
+ * Tope de salida en Anthropic. Es un respaldo, no un ajuste de costo (solo se cobra lo generado): la respuesta más
+ * larga del golden set mide ~230 tokens y 10 movimientos (el máximo del esquema) caben de sobra.
+ */
+export const TOKENS_SALIDA_ANTHROPIC = 1024;
+
+/** URL de Messages a partir de la raíz configurada (sin barra final). */
+export const urlMensajesAnthropic = (base?: string) =>
+  `${(base?.trim() || URL_BASE_ANTHROPIC).replace(/\/+$/, '')}/v1/messages`;
+
+/**
  * Parámetros de generación por proveedor, fijados explícitamente para que un cambio de valores por omisión del
  * proveedor no mueva la latencia ni el costo. El intérprete es extracción a un esquema cerrado: sin razonamiento
  * extendido en ningún proveedor. Claude Haiku 5.5 no acepta `temperature` distinta de la de omisión (400), así que
  * no se manda en ningún adaptador; el formato lo garantiza la salida estructurada.
  */
 export const PARAMETROS = {
-  /** `medium` es el valor por omisión de Haiku 5.5; con el razonamiento apagado solo se acepta hasta `high`. */
-  anthropic: { esfuerzo: 'medium' },
+  /**
+   * `low`: con `thinking` apagado (aceptado en low/medium/high) y la herramienta forzada, el esfuerzo bajo no perdió
+   * precisión en el golden set (services/proxy/README.md, costos).
+   */
+  anthropic: { esfuerzo: 'low' },
   /** `low` lo aceptan todos los modelos de razonamiento de OpenAI (el valor por omisión es `medium`). */
   openai: { esfuerzoRazonamiento: 'low' },
   /** Gemini Flash razona por omisión: presupuesto 0 lo apaga, igual que en el modo explicar. */
@@ -60,8 +80,12 @@ export interface Llamada {
 export interface RespuestaProveedor {
   /** Texto JSON tal como lo devolvió el modelo (se interpreta y valida afuera). */
   texto: string;
+  /** Entrada total (incluye la leída y la escrita en caché). */
   tokens_entrada: number;
   tokens_salida: number;
+  /** De la entrada, cuántos se leyeron de caché (0.1×) y cuántos se escribieron (1.25×), si el proveedor lo dice. */
+  tokens_cache_leidos?: number;
+  tokens_cache_escritos?: number;
 }
 
 export type TipoFalla = 'servidor' | 'tiempo' | 'cliente';
@@ -86,17 +110,96 @@ export interface Adaptador {
   llamar(llamada: Llamada): Promise<RespuestaProveedor>;
 }
 
+/**
+ * Cómo se pide la salida a Anthropic:
+ * - `herramienta`: `tools[].input_schema` con la proyección y la herramienta forzada (~9,700 tokens de esquema).
+ * - `texto`: sin esquema nativo; la forma va en el sistema (`FORMATO_JSON`, ~1,000 tokens) y Zod valida después.
+ * - `json_schema`: `output_config.format`. La salida estricta rechaza la proyección actual con 400 (78 parámetros
+ *   opcionales; el límite es 24), así que solo sirve si el esquema se reduce.
+ */
+export type ModoAnthropic = 'herramienta' | 'texto' | 'json_schema';
+export const MODOS_ANTHROPIC: readonly ModoAnthropic[] = ['herramienta', 'texto', 'json_schema'];
+export const MODO_ANTHROPIC_POR_OMISION: ModoAnthropic = 'herramienta';
+/** Lee `NLU_ANTHROPIC_MODO`; un valor desconocido o vacío da el modo por omisión. */
+export const leerModoAnthropic = (valor: string | undefined): ModoAnthropic =>
+  (MODOS_ANTHROPIC as readonly string[]).includes(valor ?? '')
+    ? (valor as ModoAnthropic)
+    : MODO_ANTHROPIC_POR_OMISION;
+
+/** Modelos que rechazan la herramienta forzada (`tool_choice` tool/any → 400): con ellos `herramienta` pasa a `texto`. */
+const SIN_HERRAMIENTA_FORZADA = /^claude-(sonnet-5-5|opus-5-5|fable-5-1|mythos-5-1)/;
+/**
+ * `thinking` más bajo que acepta cada modelo: Sonnet 5.5 rechaza `disabled` (400) y pide `between_tools`; los demás
+ * (Haiku 5.5 incluido, con esfuerzo hasta `high`) aceptan `disabled`. Así `NLU_MODELO_ANTHROPIC` no rompe la llamada.
+ */
+export const pensamientoMinimo = (modelo: string) =>
+  ({ type: /^claude-sonnet-5-5/.test(modelo) ? 'between_tools' : 'disabled' }) as const;
+/** Modo efectivo para un modelo: la herramienta forzada solo donde el modelo la acepta. */
+export const modoParaModelo = (modo: ModoAnthropic, modelo: string): ModoAnthropic =>
+  modo === 'herramienta' && SIN_HERRAMIENTA_FORZADA.test(modelo) ? 'texto' : modo;
+
 export interface ConfiguracionAdaptador {
   llave: string;
   modelo?: string;
   fetch: Fetch;
-  /** Solo Anthropic: `json_schema` (salida estructurada, por omisión) o `herramienta` (input_schema). */
-  modoAnthropic?: 'json_schema' | 'herramienta';
+  /** Solo Anthropic (`NLU_ANTHROPIC_MODO`); ver `ModoAnthropic` y `MODO_ANTHROPIC_POR_OMISION`. */
+  modoAnthropic?: ModoAnthropic;
+  /** Solo Anthropic: raíz de la API (`ANTHROPIC_BASE_URL`); por omisión `URL_BASE_ANTHROPIC`. */
+  urlBase?: string;
 }
 
 const numero = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 type Objeto = Record<string, unknown>;
 const esObjeto = (v: unknown): v is Objeto => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/**
+ * Sin modo estricto, el modelo a veces manda un objeto anidado (casi siempre `interpretacion`) como texto JSON. Se
+ * abre aquí en vez de gastar el reintento por validación; Zod valida igual después.
+ */
+export function abrirTextoJson(valor: unknown, profundidad = 0): unknown {
+  if (profundidad > 8) return valor;
+  if (typeof valor === 'string') {
+    const t = valor.trim();
+    if (!((t.startsWith('{') && t.endsWith('}')) || (t.startsWith('[') && t.endsWith(']')))) return valor;
+    // A veces cierra el texto con una llave de más (la del objeto que lo envolvía): se prueba quitándola.
+    for (let quitar = 0; quitar <= 2; quitar += 1) {
+      const candidato = t.slice(0, t.length - quitar);
+      if (quitar > 0 && !/^[}\]]+$/.test(t.slice(t.length - quitar))) break;
+      try {
+        return abrirTextoJson(JSON.parse(candidato) as unknown, profundidad + 1);
+      } catch {
+        // Siguiente candidato.
+      }
+    }
+    return valor;
+  }
+  if (Array.isArray(valor)) return valor.map((v) => abrirTextoJson(v, profundidad + 1));
+  if (esObjeto(valor)) {
+    return Object.fromEntries(Object.entries(valor).map(([k, v]) => [k, abrirTextoJson(v, profundidad + 1)]));
+  }
+  return valor;
+}
+
+/** Saca el objeto JSON de una respuesta en texto: quita un bloque de código o texto alrededor si el modelo lo puso. */
+export function extraerJson(texto: string): string {
+  const t = texto.trim();
+  const inicio = t.indexOf('{');
+  const fin = t.lastIndexOf('}');
+  return inicio >= 0 && fin > inicio ? t.slice(inicio, fin + 1) : t;
+}
+
+/** Medidores de uso de Anthropic: entrada total (sin caché + leída + escrita), salida y caché por separado. */
+export function usoAnthropic(uso: unknown) {
+  const u = esObjeto(uso) ? uso : {};
+  const leidos = numero(u.cache_read_input_tokens);
+  const escritos = numero(u.cache_creation_input_tokens);
+  return {
+    tokens_entrada: numero(u.input_tokens) + leidos + escritos,
+    tokens_salida: numero(u.output_tokens),
+    tokens_cache_leidos: leidos,
+    tokens_cache_escritos: escritos,
+  };
+}
 
 /** POST JSON al proveedor con la señal de tiempo; ante error lanza `FallaProveedor` sin leer el cuerpo. */
 export async function enviar(
@@ -132,7 +235,8 @@ export async function enviar(
 
 export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
   const modelo = c.modelo ?? MODELO_POR_OMISION.anthropic;
-  const modo = c.modoAnthropic ?? 'json_schema';
+  const modo = modoParaModelo(c.modoAnthropic ?? MODO_ANTHROPIC_POR_OMISION, modelo);
+  const url = urlMensajesAnthropic(c.urlBase);
   return {
     nombre: 'anthropic',
     modelo,
@@ -145,11 +249,19 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
       }
       const cuerpo: Objeto = {
         model: modelo,
-        max_tokens: TOKENS_SALIDA_MAXIMOS,
-        // El sistema es fijo: se guarda en caché (06 §10).
-        system: [{ type: 'text', text: prompt.sistema, cache_control: { type: 'ephemeral' } }],
+        max_tokens: TOKENS_SALIDA_ANTHROPIC,
+        // Herramienta y sistema son fijos y van antes que el turno del usuario: el corte de caché al final del
+        // sistema cubre a los dos (06 §10). Nada variable va antes del corte.
+        system: [
+          {
+            type: 'text',
+            text: modo === 'texto' ? `${prompt.sistema}\n\n${FORMATO_JSON}` : prompt.sistema,
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
         messages: mensajes,
-        thinking: { type: 'disabled' },
+        // Extracción a un esquema cerrado: sin razonamiento extendido (con la herramienta forzada no se usaría).
+        thinking: pensamientoMinimo(modelo),
       };
       const salidaConfig: Objeto = { effort: PARAMETROS.anthropic.esfuerzo };
       if (modo === 'herramienta') {
@@ -161,14 +273,14 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
           },
         ];
         cuerpo.tool_choice = { type: 'tool', name: 'interpretacion' };
-      } else {
+      } else if (modo === 'json_schema') {
         salidaConfig.format = { type: 'json_schema', schema: esquemas.estandar };
       }
       cuerpo.output_config = salidaConfig;
       const datos = await enviar(
         c.fetch,
-        'https://api.anthropic.com/v1/messages',
-        { 'x-api-key': c.llave, 'anthropic-version': '2023-06-01' },
+        url,
+        { 'x-api-key': c.llave, 'anthropic-version': VERSION_API_ANTHROPIC },
         cuerpo,
         senal,
       );
@@ -176,23 +288,17 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
       // Haiku 5.5 no tiene respaldo del lado de Anthropic ante un rechazo de seguridad (HTTP 200): se trata como
       // falla del servidor para que lo intente el proveedor alterno.
       if (datos.stop_reason === 'refusal') throw new FallaProveedor('servidor');
-      const uso = esObjeto(datos.usage) ? datos.usage : {};
       const bloques = Array.isArray(datos.content) ? datos.content.filter(esObjeto) : [];
       const herramienta = bloques.find((b) => b.type === 'tool_use');
       const texto = herramienta
-        ? JSON.stringify(herramienta.input ?? null)
-        : bloques
-            .filter((b) => b.type === 'text' && typeof b.text === 'string')
-            .map((b) => b.text as string)
-            .join('');
-      return {
-        texto,
-        tokens_entrada:
-          numero(uso.input_tokens) +
-          numero(uso.cache_read_input_tokens) +
-          numero(uso.cache_creation_input_tokens),
-        tokens_salida: numero(uso.output_tokens),
-      };
+        ? JSON.stringify(abrirTextoJson(herramienta.input ?? null))
+        : extraerJson(
+            bloques
+              .filter((b) => b.type === 'text' && typeof b.text === 'string')
+              .map((b) => b.text as string)
+              .join(''),
+          );
+      return { texto, ...usoAnthropic(datos.usage) };
     },
   };
 }

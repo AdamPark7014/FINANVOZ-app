@@ -37,9 +37,15 @@ describe('Anthropic (tool_use)', () => {
       salida: { tipo: 'respuesta', texto: 'Gastaste $6,430.' },
       tokens_entrada: 1200,
       tokens_salida: 80,
+      tokens_cache_leidos: 1000,
+      tokens_cache_escritos: 0,
     });
-    const p = en(f.peticiones, 0).cuerpo;
+    const peticion = en(f.peticiones, 0);
+    expect(peticion.url).toBe('https://api.anthropic.com/v1/messages');
+    expect(peticion.encabezados['anthropic-version']).toBe('2026-10-21');
+    const p = peticion.cuerpo;
     expect(p.model).toBe('claude-haiku-5-5');
+    for (const prohibido of ['temperature', 'top_p', 'top_k']) expect(p).not.toHaveProperty(prohibido);
     expect(p.system).toEqual([
       { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
     ]);
@@ -48,7 +54,7 @@ describe('Anthropic (tool_use)', () => {
     ]);
     expect(p.tool_choice).toEqual({ type: 'auto' });
     expect(p.thinking).toEqual({ type: 'disabled' });
-    expect(p.output_config).toEqual({ effort: 'medium' });
+    expect(p.output_config).toEqual({ effort: 'low' });
     expect(p.messages).toEqual([
       { role: 'user', content: PREGUNTA.rol === 'usuario' ? PREGUNTA.texto : '' },
       {
@@ -60,6 +66,25 @@ describe('Anthropic (tool_use)', () => {
         content: [{ type: 'tool_result', tool_use_id: 'a1', content: '{"texto":"Gastaste $6,430."}' }],
       },
     ]);
+  });
+
+  it('la fecha de hoy va en un bloque aparte, después del corte de caché; la raíz de la API es configurable', async () => {
+    const f = fetchFalso([json(respuestaAnthropic('ok'))]);
+    const a = crearAnthropicTurno({ llave: 'tok', fetch: f.fetch, urlBase: 'https://ia.zynoratek.com' });
+    await a.llamar({ ...base, mensajes: [PREGUNTA], fecha: 'Hoy es jueves 2026-10-22.', senal: senal() });
+    const p = en(f.peticiones, 0);
+    expect(p.url).toBe('https://ia.zynoratek.com/v1/messages');
+    expect(p.cuerpo.system).toEqual([
+      { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: 'Hoy es jueves 2026-10-22.' },
+    ]);
+  });
+
+  it('con Sonnet 5.5 apaga el razonamiento con between_tools (disabled da 400)', async () => {
+    const f = fetchFalso([json(respuestaAnthropic('ok'))]);
+    const a = crearAnthropicTurno({ llave: 'k', fetch: f.fetch, modelo: 'claude-sonnet-5-5' });
+    await a.llamar({ ...base, mensajes: [PREGUNTA], senal: senal() });
+    expect(en(f.peticiones, 0).cuerpo.thinking).toEqual({ type: 'between_tools' });
   });
 
   it('lee las llamadas a herramientas; con 3 resultados fuerza la respuesta (tool_choice none)', async () => {

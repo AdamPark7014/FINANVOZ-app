@@ -6,6 +6,12 @@
 
 ## Hecho en este turno
 
+- **IA de FinanVoz optimizada (O-1)**: el modo `json_schema` del intérprete daba 400 en cada llamada (78 parámetros
+  opcionales contra 24 permitidos en salida estricta): ahora `herramienta` por omisión, esfuerzo `low`, thinking
+  apagado, API `2026-10-21`, `ANTHROPIC_BASE_URL` configurable, reparación del JSON con llave de más. Golden 164:
+  97.6 % completo, nube 28/29, caché leída 96.9 %, 0.261 USD por 1,000 frases (~7.8 USD/mes con 1,000 usuarios × 30).
+  Se queda Haiku 5.5 (Sonnet resuelve los 4–5 casos que falla, a ~11×). «Explicar»: prompt corto sin consejos, fecha
+  de hoy y periodos resueltos (`_shared/llm/fecha.ts`), 19/20 cifras válidas. Gasto de pruebas 0.63 USD.
 - **Backend propio de FinanVoz en el Hetzner (S-1)**: `https://finanvoz-api.zynoratek.com` (Supabase mínimo: db
   Postgres 17, GoTrue con anónimos, PostgREST, Storage, edge-runtime, Kong; ~600 MB RAM; compose en
   `/opt/finanvoz-backend`, plantilla en `services/proxy/deploy/`). 9 migraciones, RLS verificado, 6 funciones; la IA va

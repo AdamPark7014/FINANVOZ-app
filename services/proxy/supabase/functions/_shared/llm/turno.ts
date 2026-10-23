@@ -5,16 +5,21 @@
 import { conTiempo, crearPresupuesto, type OpcionesTiempo } from '../nlu/interpretar.ts';
 import { FallaProveedor, type NombreProveedor } from '../nlu/proveedores.ts';
 import { contarResultados, LLAMADAS_MAXIMAS, type SalidaTurno, type SolicitudTurno } from './contrato.ts';
+import { contextoFecha } from './fecha.ts';
 import type { AdaptadorTurno } from './proveedores.ts';
 
 export interface OpcionesTurno extends OpcionesTiempo {
   /** Principal primero, alterno después (se usa como mucho uno alterno). */
   adaptadores: readonly AdaptadorTurno[];
+  /** Fecha civil de hoy ('YYYY-MM-DD'); sin ella el modelo no recibe fecha y las herramientas usan sus omisiones. */
+  hoy?: () => string;
 }
 
 interface Metadatos {
   tokens_entrada: number;
   tokens_salida: number;
+  tokens_cache_leidos: number;
+  tokens_cache_escritos: number;
   latencia_ms: number;
   llamadas: number;
 }
@@ -33,6 +38,7 @@ export async function turno(solicitud: SolicitudTurno, opciones: OpcionesTurno):
   const inicio = opciones.ahora();
   const plazo = crearPresupuesto(opciones, inicio);
   const forzarRespuesta = contarResultados(solicitud.mensajes) >= LLAMADAS_MAXIMAS;
+  const fecha = opciones.hoy ? (contextoFecha(opciones.hoy()) ?? undefined) : undefined;
   let llamadas = 0;
   let ultimaFalla: FallaProveedor | undefined;
   let ultimo: AdaptadorTurno | undefined;
@@ -49,6 +55,7 @@ export async function turno(solicitud: SolicitudTurno, opciones: OpcionesTurno):
           mensajes: solicitud.mensajes,
           herramientas: solicitud.herramientas,
           forzarRespuesta,
+          ...(fecha ? { fecha } : {}),
           senal,
         }),
       );
@@ -59,6 +66,8 @@ export async function turno(solicitud: SolicitudTurno, opciones: OpcionesTurno):
         modelo: adaptador.modelo,
         tokens_entrada: r.tokens_entrada,
         tokens_salida: r.tokens_salida,
+        tokens_cache_leidos: r.tokens_cache_leidos ?? 0,
+        tokens_cache_escritos: r.tokens_cache_escritos ?? 0,
         latencia_ms: opciones.ahora() - inicio,
         llamadas,
       };
@@ -78,6 +87,8 @@ export async function turno(solicitud: SolicitudTurno, opciones: OpcionesTurno):
     estado_proveedor: ultimaFalla?.estado,
     tokens_entrada: 0,
     tokens_salida: 0,
+    tokens_cache_leidos: 0,
+    tokens_cache_escritos: 0,
     latencia_ms: opciones.ahora() - inicio,
     llamadas,
   };

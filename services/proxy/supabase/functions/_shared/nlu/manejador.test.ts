@@ -280,6 +280,8 @@ describe('CA-M3-04 · registros solo con metadatos', () => {
             'modelo',
             'tokens_entrada',
             'tokens_salida',
+            'tokens_cache_leidos',
+            'tokens_cache_escritos',
             'latencia_ms',
             'llamadas',
             'estado_proveedor',

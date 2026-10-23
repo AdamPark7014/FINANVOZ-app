@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 0 · Reglas | Teléfono (`packages/nlu/src/reglas`) | Siempre primero. Responde solo si está seguro; si no, devuelve `null` | 0 |
 | 1 · Modelo en el dispositivo | Teléfono | v2 (iOS: Foundation Models; Android: modelo del sistema donde exista) | 0 |
-| 2 · Nube | Proxy → LLM | Cuando el nivel 0 devuelve `null` y hay red | Por token |
+| 2 · Nube | Proxy → LLM | Cuando el nivel 0 devuelve `null` y hay red | Por token: Claude Haiku 5.5 con caché, ~0.26 USD por 1,000 frases (medido 22-10-2026, `services/proxy/README.md` → Costos medidos) |
 
 Requisito del nivel 0: **precisión 100 %** (si responde, acierta) y cobertura total de los casos marcados `reglas: true` del golden set.
 
@@ -551,7 +551,7 @@ La salida estructurada se exige con el mecanismo nativo de cada proveedor (herra
 
 ## 11. Elección de modelo (M3)
 
-Candidatos iniciales: Claude Haiku 5.5 (`claude-haiku-5-5`), el modelo "Flash" vigente de Google y el modelo "mini" vigente de OpenAI. Se elige el de **menor costo por caso completo correcto** que cumpla todos los umbrales y tenga latencia p95 < 5 s. La decisión, con el reporte, se registra en `docs/ESTADO.md`. El adaptador permite cambiar de proveedor sin tocar la app.
+Candidatos iniciales: Claude Haiku 5.5 (`claude-haiku-5-5`), el modelo "Flash" vigente de Google y el modelo "mini" vigente de OpenAI. Se elige el de **menor costo por caso completo correcto** que cumpla todos los umbrales y tenga latencia p95 < 5 s. La decisión, con el reporte, se registra en `docs/ESTADO.md`. El adaptador permite cambiar de proveedor sin tocar la app. Medición del 22-10-2026 (Anthropic): Haiku 5.5 con la herramienta forzada, esfuerzo `low` y sin razonamiento cumple todos los umbrales (97.6 % de casos completos, p95 1.9 s) a ~0.26 USD por 1,000 frases; la salida estructurada estricta (`json_schema`) rechaza la proyección actual (más de 24 parámetros opcionales).
 
 ## 12. Aprendizaje local
 

@@ -2,7 +2,7 @@
 
 Supabase: Edge Functions (Deno) y migraciones. Las llaves de proveedores viven solo aquí, como variables del proyecto de Supabase (regla 8).
 
-> **Tip (despliegue · env sin secretos):** Configura secretos solo con `supabase secrets set` en el proyecto de Supabase o en la CI de ese proyecto — nunca en el repositorio, issues ni capturas. Supabase inyecta en runtime `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` (no hace falta `secrets set`). El resto son nombres documentados en cada sección: `LISTA_ESPERA_SAL`, `CALCULADORA_ORIGEN`; `NLU_PROVEEDORES`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `NLU_MODELO_*`, `NLU_ANTHROPIC_MODO`, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`; `LLM_MODELO_*`; `REVENUECAT_WEBHOOK_SECRET`. En la terminal local (benchmark NLU, no en git): `NLU_PROXY_URL`, `NLU_PROXY_JWT` y las mismas llaves de proveedor. Script `limpiar-anonimos.mjs`: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Calculadora (Cloudflare): `VITE_LISTA_ESPERA_URL`. App (EAS): `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, `EXPO_PUBLIC_PLANTILLAS_LLAVES`. Firma de plantillas (fuera del repo): `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX`. Genera sales y webhook con ≥ 32 caracteres aleatorios; las llaves de proveedor salen de cada consola. **`NLU_SAL_USUARIO`** y **`LISTA_ESPERA_SAL`** alimentan el **hash** en logs (usuario o IP); **`usuario_hash: null`** en respaldo, compartido y RevenueCat es intencional (no se registra el id).
+> **Tip (despliegue · env sin secretos):** Configura secretos solo con `supabase secrets set` en el proyecto de Supabase o en la CI de ese proyecto — nunca en el repositorio, issues ni capturas. Supabase inyecta en runtime `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` (no hace falta `secrets set`). El resto son nombres documentados en cada sección: `LISTA_ESPERA_SAL`, `CALCULADORA_ORIGEN`; `NLU_PROVEEDORES`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `NLU_MODELO_*`, `NLU_ANTHROPIC_MODO`, `ANTHROPIC_BASE_URL`, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`; `LLM_MODELO_*`; `REVENUECAT_WEBHOOK_SECRET`. En la terminal local (benchmark NLU, no en git): `NLU_PROXY_URL`, `NLU_PROXY_JWT` y las mismas llaves de proveedor. Script `limpiar-anonimos.mjs`: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Calculadora (Cloudflare): `VITE_LISTA_ESPERA_URL`. App (EAS): `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`, `EXPO_PUBLIC_PLANTILLAS_LLAVES`. Firma de plantillas (fuera del repo): `CARTERA_PLANTILLAS_LLAVE_PRIVADA_HEX`. Genera sales y webhook con ≥ 32 caracteres aleatorios; las llaves de proveedor salen de cada consola. **`NLU_SAL_USUARIO`** y **`LISTA_ESPERA_SAL`** alimentan el **hash** en logs (usuario o IP); **`usuario_hash: null`** en respaldo, compartido y RevenueCat es intencional (no se registra el id).
 
 ## Backend propio en el Hetzner (`finanvoz-api.zynoratek.com`)
 
@@ -38,8 +38,8 @@ El endpoint `POST /nlu/interpretar` de `docs/03-ARQUITECTURA.md §6` es la Edge 
 | Archivo | Qué hace |
 |---|---|
 | `_shared/nlu/contrato.ts` | Valida `{texto, contexto_min, version_esquema}` (texto ≤ 500 caracteres, cuerpo ≤ 16 KB, contexto de `06 §4` sin claves extra) y define los códigos de error |
-| `_shared/nlu/prompt.ts` | Prompt de `06 §10`: sistema fijo y cacheable (reglas, catálogo, 6 ejemplos propios) y turno del usuario con el contexto y `<frase>` |
-| `_shared/nlu/proveedores.ts` | Adaptadores de Anthropic (Messages API, `output_config.format` o herramienta), OpenAI (Chat Completions, `json_schema` estricto) y Google (Gemini, `responseJsonSchema`) |
+| `_shared/nlu/prompt.ts` | Prompt de `06 §10`: sistema fijo y cacheable (reglas de `06 §3.1`, catálogo, regla del negocio y 6 ejemplos propios) y turno del usuario con la fecha, el mes anterior ya resuelto, cuentas, contactos, clientes y `<frase>`. `FORMATO_JSON`: la forma de salida compacta del modo `texto` |
+| `_shared/nlu/proveedores.ts` | Adaptadores de Anthropic (Messages API `2026-10-21`; herramienta forzada por omisión, `texto` o `json_schema`; raíz configurable), OpenAI (Chat Completions, `json_schema` estricto) y Google (Gemini, `responseJsonSchema`). Separa los tokens leídos y escritos en caché |
 | `_shared/nlu/interpretar.ts` | 8 s por llamada; ante 5xx, 429, red o tiempo, un intento con el alterno; Zod; un reintento con el error; luego `aclarar/no_entendi` |
 | `_shared/nlu/manejador.ts` | JWT → cuerpo → cupo → interpretación → respuesta; registra solo metadatos |
 | `_shared/nlu/registro.ts` | Línea JSON con hash de usuario, endpoint, código, estado, proveedor, modelo, tokens, latencia y llamadas |
@@ -92,8 +92,9 @@ Con 502 o 504 la interpretación se devuelve al cupo del usuario (no al tope glo
    |---|---|---|
    | `NLU_PROVEEDORES` | No (`anthropic,openai`) | Principal y alterno, separados por coma (`anthropic`, `openai`, `google`) |
    | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY` | Las de los proveedores elegidos | Un proveedor sin llave se omite |
-   | `NLU_MODELO_ANTHROPIC`, `NLU_MODELO_OPENAI`, `NLU_MODELO_GOOGLE` | No (`claude-haiku-5-5`, `gpt-5-mini`, `gemini-2.5-flash`) | Cambiar de modelo sin tocar la app (`06 §11`) |
-   | `NLU_ANTHROPIC_MODO` | No (`json_schema`) | `herramienta` usa `tools[].input_schema` si la salida estructurada rechaza el esquema |
+   | `NLU_MODELO_ANTHROPIC`, `NLU_MODELO_OPENAI`, `NLU_MODELO_GOOGLE` | No (`claude-haiku-5-5`, `gpt-5-mini`, `gemini-2.5-flash`) | Cambiar de modelo sin tocar la app (`06 §11`). Con Sonnet 5.5 u Opus 5.5 el adaptador manda solo lo que aceptan (`thinking: between_tools` en Sonnet; sin herramienta forzada → modo `texto`) |
+   | `NLU_ANTHROPIC_MODO` | No (`herramienta`) | `herramienta`: `tools[].input_schema` con la herramienta forzada (el que da la precisión). `texto`: sin esquema nativo, 35 % más barato pero falla 2–3 casos de nube del golden set (ver costos). `json_schema`: hoy responde 400 con la proyección (78 parámetros opcionales; el límite de la salida estricta es 24) |
+   | `ANTHROPIC_BASE_URL` | No (`https://api.anthropic.com`) | Raíz compatible con la API de Anthropic, p. ej. la puerta única `https://ia.zynoratek.com`; entonces `ANTHROPIC_API_KEY` es el token del proyecto (`x-api-key`). La usan `nlu-interpretar` y `llm-turno` |
    | `NLU_TOPE_GLOBAL_DIARIO` | Sí | Interpretaciones por día de todos los usuarios; al llegar, 429 `tope_global` |
    | `NLU_SAL_USUARIO` | Sí | Sal del hash de usuario en los registros |
 4. `supabase functions deploy nlu-interpretar` (con la verificación de JWT del gateway activa; no uses `--no-verify-jwt`). El mapa de importaciones está en `nlu-interpretar/deno.json`.
@@ -101,18 +102,34 @@ Con 502 o 504 la interpretación se devuelve al cupo del usuario (no al tope glo
 
 Desde M7 el plan lo actualiza el webhook de RevenueCat (sección siguiente). Para probar sin tienda: `insert into derechos (usuario_id, plan) values ('<uuid>', 'plus') on conflict (usuario_id) do update set plan = excluded.plan;`.
 
-Registros: en Logs → Edge Functions cada petición deja una línea JSON solo con metadatos (nunca el texto, montos, alias ni el cuerpo del proveedor). Alerta del tope global: filtra `codigo = tope_global`. Uso diario total: `select * from nlu_uso_resumen;`.
+Registros: en Logs → Edge Functions cada petición deja una línea JSON solo con metadatos (nunca el texto, montos, alias ni el cuerpo del proveedor). Alerta del tope global: filtra `codigo = tope_global`. Uso diario total: `select * from nlu_uso_resumen;`. Caché: `tokens_cache_leidos` debe llevarse casi toda la entrada (~15,400 de ~15,900 por frase en el intérprete); si cae a 0 en peticiones seguidas, algo rompió la caché (el sistema o la herramienta cambiaron), y `tokens_cache_escritos` alto en muchas filas indica que el tráfico es tan espaciado que la caché de 5 min expira.
 
 ### Benchmark y elección de modelo (CA-M3-01, CA-M3-06)
 
 Lo corre Adam con sus llaves, en su máquina (las llaves nunca entran al repositorio):
 
-1. Contrato con el proveedor real (`06 §10.1` punto 3), 3 frases por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --limite 3` (igual con `openai` + `OPENAI_API_KEY` y `google` + `GOOGLE_API_KEY`). Si Anthropic rechaza el esquema, repite con `NLU_ANTHROPIC_MODO=herramienta`. Para usar otro modelo: `--modelo <id>`.
+1. Contrato con el proveedor real (`06 §10.1` punto 3), 3 frases por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --limite 3` (igual con `openai` + `OPENAI_API_KEY` y `google` + `GOOGLE_API_KEY`). Mientras `packages/nlu/scripts/eval-nlu.ts` siga mandando `json_schema` cuando la variable no está, corre el eval con `NLU_ANTHROPIC_MODO=herramienta` (sin ella, Anthropic responde 400 en cada caso). Para usar otro modelo: `--modelo <id>`.
 2. Golden set completo y grabación, por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --grabar` → `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl`.
 3. Confirma los precios de `config/nlu/precios.json` y corre `pnpm eval:nlu --offline`: imprime el reporte de cada modelo grabado.
 4. Elige el de menor costo por caso completo correcto que cumpla todos los umbrales y p95 < 5 s (`06 §11`); registra el reporte y la decisión en `docs/ESTADO.md` (Reportes del intérprete y Decisiones), pon ese proveedor primero en `NLU_PROVEEDORES` y haz commit de las grabaciones.
 
 Contra el proxy (local con `supabase functions serve nlu-interpretar` o desplegado): `NLU_PROXY_URL=<url> NLU_PROXY_JWT=<access_token> pnpm eval:nlu --nivel nube --proveedor anthropic --limite 3`. Consume el cupo de ese usuario (Gratis: 20 al día), así que el benchmark completo se corre directo contra el proveedor.
+
+### Costos medidos (22-10-2026)
+
+Golden set completo (164 frases, todas por la nube; en producción el nivel 0 resuelve antes la mayoría) con Claude Haiku 5.5, API directa y por la puerta única (`ia.zynoratek.com`, mismo resultado: 29/29 en los casos de nube, misma caché). Precios: 0.10 / 0.50 USD por millón (entrada/salida), lectura de caché 0.1×, escritura 1.25×. Costo real con los medidores de caché; el reporte del eval no los separa y cobra toda la entrada a precio lleno.
+
+| Configuración | Caso completo | Casos de nube (`reglas: false`) | Entrada / salida por frase | Caché leída | USD por 1,000 frases | USD al mes (1,000 usuarios × 30 frases) |
+|---|---|---|---|---|---|---|
+| Antes: `json_schema` (omisión), esfuerzo medium, API 2023-06-01 | 0 % (400 en cada llamada) | 0/29 | — | — | — | — |
+| Antes con `herramienta`, mismo prompt | 70.7 % (116/164) | 21/29 | 14,788 / 132 (21 reintentos) | 93.9 % | 0.295 | 8.85 |
+| **Ahora: `herramienta`, esfuerzo low, sin razonamiento, API 2026-10-21, prompt nuevo** | **97.6 % (160/164)** | **28/29** (29/29 en 4 de 5 corridas) | 15,988 / 112 (1 reintento) | 96.9 % | **0.261** | **7.82** |
+| `texto` (opción, no por omisión) | 97.0 % (159/164) | 26–27/29 | 7,833 / 88 | 93.8 % | 0.170 | 5.11 |
+| Sonnet 5.5 (`texto`, referencia) | 5/5 de los que falla Haiku | — | 7,737 / 86 | — | ≈ 2.9 | ≈ 87 |
+
+- El prefijo fijo (herramienta con la proyección, ~9,700 tokens, + sistema, ~5,700) se lee de caché en cada frase; lo que cambia por usuario (~500 tokens) va después del corte. Una frase sin caché (la primera tras 5 min sin tráfico) cuesta ~0.0019 USD más por la escritura.
+- Esfuerzo `low` contra `medium`: misma precisión (98.2 % y 97.6 %) y misma salida (~110 tokens); con la herramienta forzada no hay razonamiento que recortar.
+- Lo que sigue fallando a Haiku (G16, M09, X06, I01: `tarjeta` sin tipo, «como 300» leído como duda, un movimiento sin monto, quincena con destino supuesto) varía entre corridas (la API 2026-10-21 no acepta `temperature`) y Sonnet 5.5 lo resuelve con el mismo prompt: es del modelo, no del prompt.
 
 Hasta que existan las grabaciones, CA-M3-01 y CA-M3-06 quedan pendientes; `pnpm eval:nlu --offline` ya corre en CI y avisa "sin grabaciones".
 
@@ -226,8 +243,9 @@ Modo explicar (`docs/06-NLU.md §6`, `02 §22`): un turno **sin estado** de un b
 | Archivo | Qué hace |
 |---|---|
 | `_shared/llm/contrato.ts` | Valida `{mensajes, herramientas}`: una sola pregunta (≤ 500 caracteres) al inicio, después solo llamadas del asistente y sus resultados (cada resultado responde a una llamada pendiente), ≤ 3 resultados, ≤ 12 herramientas, cuerpo ≤ 32 KB, sin claves extra |
-| `_shared/llm/proveedores.ts` | Adaptadores con herramientas nativas: Anthropic (`tool_use`/`tool_result`), OpenAI (`tool_calls`, `store: false`) y Google (`functionCall`/`functionResponse`, sin razonamiento). Con 3 resultados ya no ofrece herramientas (`tool_choice` none) |
-| `_shared/llm/turno.ts` | 8 s por llamada; ante 5xx, 429, red o tiempo, un intento con el alterno |
+| `_shared/llm/proveedores.ts` | Adaptadores con herramientas nativas: Anthropic (`tool_use`/`tool_result`, API `2026-10-21`, esfuerzo low, raíz configurable), OpenAI (`tool_calls`, `store: false`) y Google (`functionCall`/`functionResponse`, sin razonamiento). Con 3 resultados ya no ofrece herramientas (`tool_choice` none). La fecha de hoy va en un bloque aparte, después del sistema cacheado |
+| `_shared/llm/turno.ts` | 8 s por llamada; ante 5xx, 429, red o tiempo, un intento con el alterno. Agrega la fecha de hoy (`fecha.ts`) |
+| `_shared/llm/fecha.ts` | Hoy en la hora del centro de México y los periodos ya resueltos (ayer, lunes de la semana, mes, mes pasado, próximos 7 días): el teléfono no manda su fecha y sin ella el modelo inventaba años |
 | `_shared/llm/manejador.ts` | JWT → cuerpo → cupo (`consumir_turno_llm`) → turno → respuesta; registra solo metadatos (código `herramientas` o `respuesta`) |
 | `migrations/20261110000000_llm_turno.sql` | `consumir_turno_llm`: solo Plus o Negocio vigente (`solo_plus` en Gratis, sin consumir); cada turno cuenta una interpretación del mismo cupo que `/nlu/interpretar` |
 | `_shared/llm/cupo-explicar.ts` | Constantes del cupo por pregunta (2–4 interpretaciones estimadas; 1–4 reales); alineadas con `packages/nlu/src/explicar/cupo.ts` |
@@ -267,7 +285,9 @@ Errores `{ "error": "<código>" }`: los de `/nlu/interpretar` más **403 `solo_p
 ### Desplegar
 
 1. `supabase db push` aplica `20261110000000_llm_turno.sql`.
-2. Usa los mismos secretos que `nlu-interpretar` (`NLU_PROVEEDORES`, llaves, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`). Opcional: `LLM_MODELO_ANTHROPIC` / `LLM_MODELO_OPENAI` / `LLM_MODELO_GOOGLE` para usar en el modo explicar un modelo distinto del intérprete (si faltan, usa `NLU_MODELO_*` y después los de `06 §11`).
+2. Usa los mismos secretos que `nlu-interpretar` (`NLU_PROVEEDORES`, llaves, `NLU_TOPE_GLOBAL_DIARIO`, `NLU_SAL_USUARIO`). Opcional: `LLM_MODELO_ANTHROPIC` / `LLM_MODELO_OPENAI` / `LLM_MODELO_GOOGLE` para usar en el modo explicar un modelo distinto del intérprete (si faltan, usa `NLU_MODELO_*` y después los de `06 §11`), y `ANTHROPIC_BASE_URL` para pasar por la puerta única.
+
+   Medido el 22-10-2026 con 20 preguntas libres y un teléfono simulado: Haiku 5.5 responde 19/20 con todas las cifras validadas (la que falla repite el monto de la pregunta, «¿puedo gastar 500…?», y el teléfono muestra la plantilla), 1.9 llamadas por pregunta, ~0.22 USD por 1,000 preguntas. Sonnet 5.5 también da 19/20 a ~4 USD por 1,000.
 3. `supabase functions deploy llm-turno` (con la verificación de JWT del gateway activa).
 4. Prueba de humo: con la sesión anónima de un usuario Gratis, `curl -X POST https://<ref>.supabase.co/functions/v1/llm-turno -H "Authorization: Bearer <token>" -H 'content-type: application/json' -d '{"mensajes":[{"rol":"usuario","texto":"¿en qué gasto más?"}],"herramientas":[{"nombre":"mayores_gastos","descripcion":"Top de gastos","parametros":{"type":"object","properties":{}}}]}'` responde 403 `solo_plus`; con un usuario en `derechos` como `plus`, 200 con `salida.tipo = "herramientas"`.
 

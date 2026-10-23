@@ -36,29 +36,47 @@ export interface OpcionesInterpretar extends OpcionesTiempo {
 }
 
 export type ResultadoInterpretar =
-  | {
+  | ({
       ok: true;
       interpretacion: unknown;
       proveedor: NombreProveedor;
       modelo: string;
-      tokens_entrada: number;
-      tokens_salida: number;
       latencia_ms: number;
       /** `ok`, `reintento_validacion` o `no_entendi` (para el registro de metadatos). */
       desenlace: 'ok' | 'reintento_validacion' | 'no_entendi';
       llamadas: number;
-    }
-  | {
+    } & UsoTokens)
+  | ({
       ok: false;
       codigo: 'proveedor_fallo' | 'tiempo_agotado';
       proveedor: NombreProveedor | undefined;
       modelo: string | undefined;
-      tokens_entrada: number;
-      tokens_salida: number;
       latencia_ms: number;
       llamadas: number;
       estado_proveedor: number | undefined;
-    };
+    } & UsoTokens);
+
+/** Tokens sumados de todas las llamadas de una petición; la caché, aparte, para vigilar el costo (sin PII). */
+export interface UsoTokens {
+  tokens_entrada: number;
+  tokens_salida: number;
+  tokens_cache_leidos: number;
+  tokens_cache_escritos: number;
+}
+
+export const usoVacio = (): UsoTokens => ({
+  tokens_entrada: 0,
+  tokens_salida: 0,
+  tokens_cache_leidos: 0,
+  tokens_cache_escritos: 0,
+});
+
+export function sumarUso(uso: UsoTokens, r: Partial<UsoTokens>): void {
+  uso.tokens_entrada += r.tokens_entrada ?? 0;
+  uso.tokens_salida += r.tokens_salida ?? 0;
+  uso.tokens_cache_leidos += r.tokens_cache_leidos ?? 0;
+  uso.tokens_cache_escritos += r.tokens_cache_escritos ?? 0;
+}
 
 export const NO_ENTENDI = {
   intencion: 'aclarar',
@@ -146,8 +164,7 @@ export async function interpretar(
   const plazo = crearPresupuesto(opciones, inicio);
   const prompt: Prompt = construirPrompt(texto, contexto);
   const candidatos = opciones.adaptadores.slice(0, 2);
-  let tokensEntrada = 0;
-  let tokensSalida = 0;
+  const uso = usoVacio();
   let llamadas = 0;
   let ultimaFalla: FallaProveedor | undefined;
   let ultimo: Adaptador | undefined;
@@ -168,8 +185,7 @@ export async function interpretar(
       if (falla.tipo === 'cliente') break;
       continue;
     }
-    tokensEntrada += respuesta.tokens_entrada;
-    tokensSalida += respuesta.tokens_salida;
+    sumarUso(uso, respuesta);
 
     const base = { proveedor: adaptador.nombre, modelo: adaptador.modelo };
     const primera = leer(respuesta.texto, adaptador, opciones.validar);
@@ -178,8 +194,7 @@ export async function interpretar(
         ok: true,
         ...base,
         interpretacion: primera.valor,
-        tokens_entrada: tokensEntrada,
-        tokens_salida: tokensSalida,
+        ...uso,
         latencia_ms: opciones.ahora() - inicio,
         desenlace: 'ok',
         llamadas,
@@ -194,8 +209,7 @@ export async function interpretar(
         llamadas += 1;
         const reintento = { salidaAnterior: respuesta.texto, correccion: mensajeCorreccion(primera.error) };
         const r = await conTiempo(tiempoReintento, (senal) => adaptador.llamar({ prompt, reintento, senal }));
-        tokensEntrada += r.tokens_entrada;
-        tokensSalida += r.tokens_salida;
+        sumarUso(uso, r);
         segunda = leer(r.texto, adaptador, opciones.validar);
       } catch {
         // Si el reintento falla, se responde no_entendi: ya hubo una respuesta del proveedor.
@@ -205,8 +219,7 @@ export async function interpretar(
       ok: true,
       ...base,
       interpretacion: segunda.ok ? segunda.valor : NO_ENTENDI,
-      tokens_entrada: tokensEntrada,
-      tokens_salida: tokensSalida,
+      ...uso,
       latencia_ms: opciones.ahora() - inicio,
       desenlace: segunda.ok ? 'reintento_validacion' : 'no_entendi',
       llamadas,
@@ -218,8 +231,7 @@ export async function interpretar(
     codigo: ultimaFalla?.tipo === 'tiempo' ? 'tiempo_agotado' : 'proveedor_fallo',
     proveedor: ultimo?.nombre,
     modelo: ultimo?.modelo,
-    tokens_entrada: tokensEntrada,
-    tokens_salida: tokensSalida,
+    ...uso,
     latencia_ms: opciones.ahora() - inicio,
     llamadas,
     estado_proveedor: ultimaFalla?.estado,

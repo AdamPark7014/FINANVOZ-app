@@ -9,6 +9,10 @@ import {
   MODELO_POR_OMISION,
   type NombreProveedor,
   PARAMETROS,
+  pensamientoMinimo,
+  urlMensajesAnthropic,
+  usoAnthropic,
+  VERSION_API_ANTHROPIC,
 } from '../nlu/proveedores.ts';
 import {
   contarResultados,
@@ -26,13 +30,18 @@ export interface LlamadaTurno {
   herramientas: readonly DefinicionHerramienta[];
   /** `true` cuando ya se usaron las 3 llamadas: el modelo debe responder sin pedir más herramientas. */
   forzarRespuesta: boolean;
+  /** Hoy y sus periodos ya resueltos (`contextoFecha`); va después del sistema fijo, fuera del corte de caché. */
+  fecha?: string;
   senal: AbortSignal;
 }
 
 export interface RespuestaProveedorTurno {
   salida: SalidaTurno;
+  /** Entrada total (incluye la leída y la escrita en caché). */
   tokens_entrada: number;
   tokens_salida: number;
+  tokens_cache_leidos?: number;
+  tokens_cache_escritos?: number;
 }
 
 export interface AdaptadorTurno {
@@ -45,6 +54,8 @@ export interface ConfiguracionTurno {
   llave: string;
   modelo?: string;
   fetch: Fetch;
+  /** Solo Anthropic: raíz de la API (`ANTHROPIC_BASE_URL`); por omisión https://api.anthropic.com. */
+  urlBase?: string;
 }
 
 type Objeto = Record<string, unknown>;
@@ -73,10 +84,11 @@ function enBloques(mensajes: readonly MensajeTurno[]) {
 
 export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
   const modelo = c.modelo ?? MODELO_POR_OMISION.anthropic;
+  const url = urlMensajesAnthropic(c.urlBase);
   return {
     nombre: 'anthropic',
     modelo,
-    async llamar({ mensajes, herramientas, forzarRespuesta, senal }) {
+    async llamar({ mensajes, herramientas, forzarRespuesta, fecha, senal }) {
       const messages = enBloques(mensajes).map((b) => {
         if (Array.isArray(b)) {
           return {
@@ -103,12 +115,17 @@ export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
       });
       const datos = await enviar(
         c.fetch,
-        'https://api.anthropic.com/v1/messages',
-        { 'x-api-key': c.llave, 'anthropic-version': '2023-06-01' },
+        url,
+        { 'x-api-key': c.llave, 'anthropic-version': VERSION_API_ANTHROPIC },
         {
           model: modelo,
           max_tokens: TOKENS_SALIDA_MAXIMOS,
-          system: [{ type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } }],
+          // Herramientas y sistema son fijos (el teléfono manda siempre las mismas definiciones, en el mismo orden):
+          // el corte de caché al final del sistema cubre a los dos. La conversación va después.
+          system: [
+            { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
+            ...(fecha ? [{ type: 'text', text: fecha }] : []),
+          ],
           tools: herramientas.map((h) => ({
             name: h.nombre,
             description: h.descripcion,
@@ -116,14 +133,13 @@ export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
           })),
           tool_choice: { type: forzarRespuesta ? 'none' : 'auto' },
           messages,
-          thinking: { type: 'disabled' },
+          thinking: pensamientoMinimo(modelo),
           output_config: { effort: PARAMETROS.anthropic.esfuerzo },
         },
         senal,
       );
       if (!esObjeto(datos)) throw new FallaProveedor('servidor');
       if (datos.stop_reason === 'refusal') throw new FallaProveedor('servidor');
-      const uso = esObjeto(datos.usage) ? datos.usage : {};
       const bloques = Array.isArray(datos.content) ? datos.content.filter(esObjeto) : [];
       const llamadas: LlamadaHerramienta[] = bloques
         .filter((b) => b.type === 'tool_use' && typeof b.id === 'string' && typeof b.name === 'string')
@@ -136,14 +152,7 @@ export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
         .filter((b) => b.type === 'text' && typeof b.text === 'string')
         .map((b) => b.text as string)
         .join('');
-      return {
-        salida: salida(texto, llamadas, forzarRespuesta),
-        tokens_entrada:
-          numero(uso.input_tokens) +
-          numero(uso.cache_read_input_tokens) +
-          numero(uso.cache_creation_input_tokens),
-        tokens_salida: numero(uso.output_tokens),
-      };
+      return { salida: salida(texto, llamadas, forzarRespuesta), ...usoAnthropic(datos.usage) };
     },
   };
 }
@@ -163,8 +172,10 @@ export function crearOpenAITurno(c: ConfiguracionTurno): AdaptadorTurno {
   return {
     nombre: 'openai',
     modelo,
-    async llamar({ mensajes, herramientas, forzarRespuesta, senal }) {
-      const messages: unknown[] = [{ role: 'system', content: SISTEMA_EXPLICAR }];
+    async llamar({ mensajes, herramientas, forzarRespuesta, fecha, senal }) {
+      const messages: unknown[] = [
+        { role: 'system', content: fecha ? `${SISTEMA_EXPLICAR}\n\n${fecha}` : SISTEMA_EXPLICAR },
+      ];
       for (const m of mensajes) {
         if (m.rol === 'usuario') messages.push({ role: 'user', content: m.texto });
         else if (m.rol === 'asistente') {
@@ -225,7 +236,7 @@ export function crearGoogleTurno(c: ConfiguracionTurno): AdaptadorTurno {
   return {
     nombre: 'google',
     modelo,
-    async llamar({ mensajes, herramientas, forzarRespuesta, senal }) {
+    async llamar({ mensajes, herramientas, forzarRespuesta, fecha, senal }) {
       const contents = enBloques(mensajes).map((b) => {
         if (Array.isArray(b)) {
           return {
@@ -252,7 +263,7 @@ export function crearGoogleTurno(c: ConfiguracionTurno): AdaptadorTurno {
         `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelo)}:generateContent`,
         { 'x-goog-api-key': c.llave },
         {
-          systemInstruction: { parts: [{ text: SISTEMA_EXPLICAR }] },
+          systemInstruction: { parts: [{ text: SISTEMA_EXPLICAR }, ...(fecha ? [{ text: fecha }] : [])] },
           contents,
           tools: [
             {

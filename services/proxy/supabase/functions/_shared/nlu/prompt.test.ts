@@ -4,8 +4,14 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
 import esquemas from '../esquema-proveedor.json' with { type: 'json' };
 import { CONTEXTO } from './__pruebas__/dobles.ts';
-import { CATEGORIAS, Interpretacion } from './esquema.generado.ts';
-import { construirPrompt, EJEMPLOS, SISTEMA } from './prompt.ts';
+import {
+  CATEGORIAS,
+  Interpretacion,
+  MOTIVOS_ACLARAR,
+  TIPOS_CONSULTA,
+  TIPOS_MOVIMIENTO,
+} from './esquema.generado.ts';
+import { construirPrompt, EJEMPLOS, FORMATO_JSON, mesAnterior, SISTEMA } from './prompt.ts';
 
 const golden = readFileSync(new URL('../../../../../../fixtures/nlu/golden.jsonl', import.meta.url), 'utf8')
   .split('\n')
@@ -42,15 +48,34 @@ describe('prompt del nivel nube (06 §10)', () => {
     expect(usuario).not.toContain('7b.');
   });
 
-  it('la regla del negocio solo aparece con el espacio negocio activo', () => {
+  it('la regla del negocio vive en el sistema fijo; los clientes solo van con el espacio negocio activo', () => {
+    expect(SISTEMA).toContain('# Negocio (solo si Espacios incluye negocio)');
+    expect(SISTEMA).toContain('renta_local');
     const { usuario } = construirPrompt('x', {
       ...CONTEXTO,
       espacios: ['personal', 'negocio'],
       clientes: [['dona mari', 'mari']],
     });
-    expect(usuario).toContain('7b. Espacios');
-    expect(usuario).toContain('dona mari/mari');
-    expect(usuario).toContain('renta_local');
+    expect(usuario).toContain('Espacios: personal, negocio.');
+    expect(usuario).toContain('Clientes: dona mari/mari.');
+    expect(construirPrompt('x', CONTEXTO).usuario).not.toContain('Clientes:');
+  });
+
+  it('el turno del usuario trae el mes anterior ya resuelto para "el N" (sin que el modelo cuente)', () => {
+    expect(construirPrompt('x', CONTEXTO).usuario).toContain(
+      'Hoy es 2026-10-11 (domingo); mes anterior: 2026-09 (30 días).',
+    );
+    expect(mesAnterior('2026-01-05')).toEqual({ mes: '2025-12', dias: 31 });
+    expect(mesAnterior('2028-03-01')).toEqual({ mes: '2028-02', dias: 29 });
+    expect(mesAnterior('2026-03-31')).toEqual({ mes: '2026-02', dias: 28 });
+    expect(mesAnterior('2026-13-01')).toBeNull();
+    expect(mesAnterior('ayer')).toBeNull();
+  });
+
+  it('la forma del modo texto es fija y nombra todos los tipos del esquema', () => {
+    for (const t of [...TIPOS_MOVIMIENTO, ...TIPOS_CONSULTA, ...MOTIVOS_ACLARAR])
+      expect(FORMATO_JSON).toContain(t);
+    for (const dato of ['2026-10-11', 'morada', 'jefa']) expect(FORMATO_JSON).not.toContain(dato);
   });
 
   it('el texto del usuario no puede cerrar la etiqueta <frase> (regla 9)', () => {

@@ -3,11 +3,13 @@
 // Usa las mismas variables que `nlu-interpretar` (regla 8: solo en el proyecto de Supabase): SUPABASE_URL,
 // SUPABASE_SERVICE_ROLE_KEY, NLU_PROVEEDORES, ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY,
 // NLU_MODELO_<PROVEEDOR> (opcionales), NLU_TOPE_GLOBAL_DIARIO y NLU_SAL_USUARIO. Opcional:
-// LLM_MODELO_<PROVEEDOR> para usar otro modelo solo en el modo explicar.
+// LLM_MODELO_<PROVEEDOR> para usar otro modelo solo en el modo explicar; ANTHROPIC_BASE_URL (raíz compatible con
+// la API de Anthropic, p. ej. https://ia.zynoratek.com).
 // Privacidad (regla 9): solo se registran metadatos (`_shared/nlu/registro.ts`).
 import { createClient } from '@supabase/supabase-js';
 import { crearManejadorTurno, esResultadoCupoTurno } from '../_shared/llm/manejador.ts';
 import { type AdaptadorTurno, CREADORES_TURNO } from '../_shared/llm/proveedores.ts';
+import { fechaCivil } from '../_shared/llm/fecha.ts';
 import { turno } from '../_shared/llm/turno.ts';
 import { leerTopeGlobal } from '../_shared/nlu/limites.ts';
 import { NOMBRES_PROVEEDOR, type NombreProveedor } from '../_shared/nlu/proveedores.ts';
@@ -33,11 +35,13 @@ function adaptadores(): AdaptadorTurno[] {
     if (!llave) continue;
     const sufijo = nombre.toUpperCase();
     const modelo = env(`LLM_MODELO_${sufijo}`) ?? env(`NLU_MODELO_${sufijo}`);
+    const urlBase = nombre === 'anthropic' ? env('ANTHROPIC_BASE_URL') : undefined;
     lista.push(
       CREADORES_TURNO[nombre]({
         llave,
         fetch: (url, init) => fetch(url, init),
         ...(modelo ? { modelo } : {}),
+        ...(urlBase ? { urlBase } : {}),
       }),
     );
   }
@@ -68,7 +72,8 @@ const manejador = crearManejadorTurno({
   async devolverCupo(usuarioId) {
     await supabase.rpc('devolver_interpretacion', { p_usuario: usuarioId });
   },
-  turno: (solicitud) => turno(solicitud, { adaptadores: lista, ahora: () => Date.now() }),
+  turno: (solicitud) =>
+    turno(solicitud, { adaptadores: lista, ahora: () => Date.now(), hoy: () => fechaCivil(Date.now()) }),
   hashUsuario: (id) => hashUsuario(id, sal ?? ''),
   registrar: registrarEnConsola,
 });

@@ -10,6 +10,9 @@ export interface EventoRegistro {
   modelo?: string | undefined;
   tokens_entrada?: number | undefined;
   tokens_salida?: number | undefined;
+  /** De la entrada, leídos de caché y escritos en caché: si los leídos caen a 0, algo rompió la caché. */
+  tokens_cache_leidos?: number | undefined;
+  tokens_cache_escritos?: number | undefined;
   latencia_ms?: number | undefined;
   llamadas?: number | undefined;
   /** Resultados de herramientas ya en la conversación (`/llm/turno`, 0–3); ayuda a medir vueltas sin PII. */
@@ -23,6 +26,8 @@ const CAMPOS_NUMERO = [
   'estado_http',
   'tokens_entrada',
   'tokens_salida',
+  'tokens_cache_leidos',
+  'tokens_cache_escritos',
   'latencia_ms',
   'llamadas',
   'resultados_herramienta',

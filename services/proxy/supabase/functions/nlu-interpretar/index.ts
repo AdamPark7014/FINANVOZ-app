@@ -4,7 +4,9 @@
 // SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase), NLU_PROVEEDORES (p. ej. "anthropic,openai": principal y
 // alterno), ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY (las de los proveedores elegidos),
 // NLU_MODELO_ANTHROPIC / NLU_MODELO_OPENAI / NLU_MODELO_GOOGLE (opcionales), NLU_ANTHROPIC_MODO (opcional:
-// json_schema | herramienta), NLU_TOPE_GLOBAL_DIARIO y NLU_SAL_USUARIO (sal del hash de usuario en los registros).
+// herramienta | texto | json_schema; por omisión herramienta), ANTHROPIC_BASE_URL (opcional: raíz compatible con la API
+// de Anthropic, p. ej. https://ia.zynoratek.com), NLU_TOPE_GLOBAL_DIARIO y NLU_SAL_USUARIO (sal del hash de
+// usuario en los registros).
 // Privacidad (regla 9): solo se registran metadatos (`_shared/nlu/registro.ts`).
 import { createClient } from '@supabase/supabase-js';
 import { interpretar } from '../_shared/nlu/interpretar.ts';
@@ -13,6 +15,7 @@ import { crearManejador } from '../_shared/nlu/manejador.ts';
 import {
   type Adaptador,
   CREADORES,
+  leerModoAnthropic,
   NOMBRES_PROVEEDOR,
   type NombreProveedor,
 } from '../_shared/nlu/proveedores.ts';
@@ -38,13 +41,14 @@ function adaptadores(): Adaptador[] {
     const llave = env(LLAVE[nombre]);
     if (!llave) continue;
     const modelo = env(`NLU_MODELO_${nombre.toUpperCase()}`);
-    const modo = env('NLU_ANTHROPIC_MODO') === 'herramienta' ? 'herramienta' : 'json_schema';
+    const urlBase = env('ANTHROPIC_BASE_URL');
     lista.push(
       CREADORES[nombre]({
         llave,
         fetch: (url, init) => fetch(url, init),
         ...(modelo ? { modelo } : {}),
-        modoAnthropic: modo,
+        modoAnthropic: leerModoAnthropic(env('NLU_ANTHROPIC_MODO')),
+        ...(urlBase ? { urlBase } : {}),
       }),
     );
   }
