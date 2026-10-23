@@ -24,9 +24,11 @@ tags:
     visible:
       id: onb-consentimiento
     timeout: 10000
+# En pantallas altas la casilla queda «visible» pero debajo del pie fijo: un desplazamiento más la saca de ahí.
 - scrollUntilVisible:
     element:
       id: onb-casilla-datos
+- scroll
 - tapOn:
     id: onb-casilla-datos
 - tapOn:
