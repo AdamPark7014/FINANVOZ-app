@@ -6,6 +6,7 @@
 
 ## Hecho en este turno
 
+- **Maestro de iPhone fallaba en los 8 flujos** («No pude abrir tus datos»): `ios.yml` compilaba el simulador sin firma, sin llavero no hay llave de SQLCipher. Ahora firma «para correr local» (`CODE_SIGN_IDENTITY=-`). Los iPhone reales (TestFlight, firmado) no tenían el problema.
 - **Docs de la Ola 7**: `ESTADO` (decisiones del 22-10: voz, conversación, onboarding por voz, confirmación y
   reparación, intérprete en la nube, «Sí» inactivo, «¿cuánto llevo?» y la discrepancia de la plantilla de `06 §10`),
   `06-NLU` (§3.1, §9.2, §9.5 con `interpretarPaso`, §13.4 y §14 confirmación y reparación), `fixtures/README.md` (los dos

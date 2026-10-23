@@ -66,6 +66,9 @@ jobs:
           # Sin cuenta de Sentry todavía (pendiente de Adam): no se suben símbolos ni source maps.
           SENTRY_DISABLE_AUTO_UPLOAD: 'true'
           RCT_NO_LAUNCH_PACKAGER: '1'
+        # Firma «para correr local» (identidad «-», sin certificado): sin firma la app no tiene llavero en el simulador,
+        # expo-secure-store falla, no hay llave para la base cifrada y la app se queda en «No pude abrir tus datos»
+        # (así fallaban los 8 flujos de Maestro el 23-10). Los iPhone reales usan la build firmada de TestFlight.
         run: |
           set -o pipefail
           xcodebuild \
@@ -75,8 +78,10 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM= \
             COMPILER_INDEX_STORE_ENABLE=NO \
             2>&1 | tee xcodebuild.log | xcbeautify --quiet
       - name: Empaquetar Finanvoz.app
