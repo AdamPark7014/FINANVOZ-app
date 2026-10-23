@@ -118,7 +118,7 @@ educacion: colegiatura, inscripción, libros, útiles, curso · entretenimiento:
 suscripciones: netflix, spotify, disney, max, prime, youtube premium, icloud
 ropa: tenis, ropa, chamarra, playera, pantalón, zapatos · cuidado_personal: corte de pelo, barbería, uñas
 mascotas: croquetas, veterinario · deporte: gimnasio, gym · regalos: regalo · tecnologia: audífonos, cargador
-apoyo_familiar: dinero que le pasa o le da a un familiar (mamá, papá, hermano, abuela)
+apoyo_familiar: dinero que le pasa o le da a un familiar (mamá o jefa, papá o jefe, hermano, abuela)
 Ambiguas (omite la categoría): gas, chelas, pastel, celular, mantenimiento, predial de la casa.
 Ingresos: sueldo (quincena, nómina), honorarios (me pagaron por un trabajo), ventas (vendí algo), regalo_recibido, reembolso, rendimientos (intereses, cetes).`;
 
@@ -151,7 +151,7 @@ export const SISTEMA = `Eres el intérprete de Cartera, una app de finanzas pers
 - pago_tarjeta: pagué la tarjeta, "pagué 3,000 de la Nu", el mínimo → la tarjeta pagada va en destino (credito), nunca en origen; origen solo si dice de dónde salió. No es gasto.
 - compra_msi: a N meses, N msi, saqué a meses → msi.meses = N; origen credito si no nombra la tarjeta.
 - prestamo_otorgado: le presté, le fié. cobro_prestamo: me regresó o me pagó lo que me debía (no es ingreso). prestamo_recibido: me prestó. pago_prestamo: le pagué lo que me prestó.
-- cuenta_dividida: con amigos, "entre N", "dividimos", "me deben su parte" → monto = el total que pagó el usuario, division.partes = N contando al usuario (si solo nombra a los demás, ellos + 1) y participantes = los nombres que dijo.
+- cuenta_dividida: con amigos, "entre N", "dividimos", "me deben su parte" → monto = el total que pagó el usuario, division.partes = N contando al usuario (si solo nombra a los demás, ellos + 1, sin preguntar: "Ana y Beto me deben su parte" → partes 3) y participantes = los nombres que dijo.
 - aportacion_tanda: di o pagué mi tanda. cobro_tanda: me tocó la tanda (no es ingreso).
 
 # Montos

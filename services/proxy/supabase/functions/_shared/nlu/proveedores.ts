@@ -120,12 +120,20 @@ export interface Adaptador {
 /**
  * Cómo se pide la salida a Anthropic:
  * - `herramienta`: `tools[].input_schema` con la proyección y la herramienta forzada (~9,700 tokens de esquema).
- * - `texto`: sin esquema nativo; la forma va en el sistema (`FORMATO_JSON`, ~1,000 tokens) y Zod valida después.
+ * - `herramienta_minima`: la herramienta forzada con un esquema de una sola propiedad (`interpretacion`, objeto) y la
+ *   forma completa en el sistema (`FORMATO_JSON`, ~1,000 tokens). Conserva la salida por herramienta (siempre JSON,
+ *   sin texto alrededor) con un prefijo fijo de ~6,700 tokens en vez de ~15,400; Zod valida igual después.
+ * - `texto`: sin esquema nativo; la forma va en el sistema (`FORMATO_JSON`) y Zod valida después.
  * - `json_schema`: `output_config.format`. La salida estricta rechaza la proyección actual con 400 (78 parámetros
  *   opcionales; el límite es 24), así que solo sirve si el esquema se reduce.
  */
-export type ModoAnthropic = 'herramienta' | 'texto' | 'json_schema';
-export const MODOS_ANTHROPIC: readonly ModoAnthropic[] = ['herramienta', 'texto', 'json_schema'];
+export type ModoAnthropic = 'herramienta' | 'herramienta_minima' | 'texto' | 'json_schema';
+export const MODOS_ANTHROPIC: readonly ModoAnthropic[] = [
+  'herramienta',
+  'herramienta_minima',
+  'texto',
+  'json_schema',
+];
 export const MODO_ANTHROPIC_POR_OMISION: ModoAnthropic = 'herramienta';
 /** Lee `NLU_ANTHROPIC_MODO`; un valor desconocido o vacío da el modo por omisión. */
 export const leerModoAnthropic = (valor: string | undefined): ModoAnthropic =>
@@ -143,7 +151,37 @@ export const pensamientoMinimo = (modelo: string) =>
   ({ type: /^claude-sonnet-5-5/.test(modelo) ? 'between_tools' : 'disabled' }) as const;
 /** Modo efectivo para un modelo: la herramienta forzada solo donde el modelo la acepta. */
 export const modoParaModelo = (modo: ModoAnthropic, modelo: string): ModoAnthropic =>
-  modo === 'herramienta' && SIN_HERRAMIENTA_FORZADA.test(modelo) ? 'texto' : modo;
+  (modo === 'herramienta' || modo === 'herramienta_minima') && SIN_HERRAMIENTA_FORZADA.test(modelo)
+    ? 'texto'
+    : modo;
+
+/**
+ * Corte de caché del prefijo fijo (herramienta + sistema) con vida de 1 h. La escritura cuesta 2× la entrada (contra
+ * 1.25× la de 5 min) pero se paga una vez por hora: con tráfico espaciado (una frase cada 5 min a 1 h, como en las
+ * pruebas y con pocos usuarios) cada frase ya no reescribe el prefijo; con tráfico alto la caché se lee en cada frase
+ * y da igual. Lo usan el intérprete y el modo explicar (`llm/proveedores.ts`).
+ */
+export const CACHE_PREFIJO = { type: 'ephemeral', ttl: '1h' } as const;
+
+/**
+ * Encabezado que la puerta única (`ia.zynoratek.com`) registra por función para separar el gasto; la puerta no lo
+ * reenvía a Anthropic y, si no lo conoce, lo ignora.
+ */
+export const ENCABEZADO_PROCESO = 'x-proceso';
+export const PROCESO_INTERPRETAR = 'finanvoz-interpretar';
+export const PROCESO_EXPLICAR = 'finanvoz-explicar';
+
+/** Esquema de la herramienta en `herramienta_minima`: la forma detallada va en el sistema (`FORMATO_JSON`). */
+export const ESQUEMA_HERRAMIENTA_MINIMA = {
+  type: 'object',
+  properties: {
+    interpretacion: {
+      type: 'object',
+      description: 'La interpretación I, con la forma de «Formato de salida» del sistema.',
+    },
+  },
+  required: ['interpretacion'],
+} as const;
 
 export interface ConfiguracionAdaptador {
   llave: string;
@@ -262,8 +300,11 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
         system: [
           {
             type: 'text',
-            text: modo === 'texto' ? `${prompt.sistema}\n\n${FORMATO_JSON}` : prompt.sistema,
-            cache_control: { type: 'ephemeral' },
+            text:
+              modo === 'texto' || modo === 'herramienta_minima'
+                ? `${prompt.sistema}\n\n${FORMATO_JSON}`
+                : prompt.sistema,
+            cache_control: CACHE_PREFIJO,
           },
         ],
         messages: mensajes,
@@ -271,12 +312,12 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
         thinking: pensamientoMinimo(modelo),
       };
       const salidaConfig: Objeto = { effort: PARAMETROS.anthropic.esfuerzo };
-      if (modo === 'herramienta') {
+      if (modo === 'herramienta' || modo === 'herramienta_minima') {
         cuerpo.tools = [
           {
             name: 'interpretacion',
             description: 'Devuelve la interpretación de la frase.',
-            input_schema: esquemas.estandar,
+            input_schema: modo === 'herramienta' ? esquemas.estandar : ESQUEMA_HERRAMIENTA_MINIMA,
           },
         ];
         cuerpo.tool_choice = { type: 'tool', name: 'interpretacion' };
@@ -287,7 +328,11 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
       const datos = await enviar(
         c.fetch,
         url,
-        { 'x-api-key': c.llave, 'anthropic-version': VERSION_API_ANTHROPIC },
+        {
+          'x-api-key': c.llave,
+          'anthropic-version': VERSION_API_ANTHROPIC,
+          [ENCABEZADO_PROCESO]: PROCESO_INTERPRETAR,
+        },
         cuerpo,
         senal,
       );

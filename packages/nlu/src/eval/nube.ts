@@ -25,11 +25,12 @@ export interface Grabacion {
 }
 
 /**
- * Precio de la caché respecto al de entrada (Anthropic: lectura 0.1×, escritura de 5 min 1.25×). Solo cuenta
- * para los tokens que el proveedor reporta como de caché; los demás se cobran a precio de entrada.
+ * Precio de la caché respecto al de entrada (Anthropic: lectura 0.1×, escritura de 1 h 2×; la de 5 min es 1.25×).
+ * El intérprete y el modo explicar escriben el prefijo con vida de 1 h (`CACHE_PREFIJO` del proxy). Solo cuenta para
+ * los tokens que el proveedor reporta como de caché; los demás se cobran a precio de entrada.
  */
 export const FACTOR_CACHE_LECTURA = 0.1;
-export const FACTOR_CACHE_ESCRITURA = 1.25;
+export const FACTOR_CACHE_ESCRITURA = 2;
 
 /** Precio en USD por millón de tokens (`config/nlu/precios.json`); `null` si no está confirmado. */
 export interface Precio {

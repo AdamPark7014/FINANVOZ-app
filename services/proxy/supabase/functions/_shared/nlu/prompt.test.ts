@@ -28,7 +28,9 @@ describe('prompt del nivel nube (06 §10)', () => {
     });
     expect(a.sistema).toBe(SISTEMA);
     expect(b.sistema).toBe(SISTEMA);
-    for (const dato of ['2026-10-11', 'morada', 'jefa', '2026-10-15']) expect(SISTEMA).not.toContain(dato);
+    // «jefa» sí está en el diccionario (jerga de mamá); lo del usuario es la lista de contactos «jefa/mama».
+    for (const dato of ['2026-10-11', 'morada', 'jefa/mama', '2026-10-15'])
+      expect(SISTEMA).not.toContain(dato);
   });
 
   it('el sistema trae el catálogo completo de categorías y los 6 ejemplos', () => {

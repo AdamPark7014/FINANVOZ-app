@@ -125,7 +125,7 @@ describe('precios y percentiles', () => {
   });
 });
 
-describe('costo con caché (lectura 0.1×, escritura 1.25×)', () => {
+describe('costo con caché (lectura 0.1×, escritura de 1 h 2×)', () => {
   it('cobra la entrada leída y escrita en caché con su factor, no a precio lleno', () => {
     const caso = casos.find((c) => c.id === 'G01');
     if (!caso) throw new Error('falta G01');
@@ -142,8 +142,8 @@ describe('costo con caché (lectura 0.1×, escritura 1.25×)', () => {
       latencia_ms: 900,
     };
     const r = evaluarNube([caso], [g], { entrada: 0.1, salida: 0.5 });
-    // 1,000 sin caché × 0.1 + 8,000 × 0.01 + 1,000 × 0.125 + 100 × 0.5, por millón.
-    expect(r.costo_total).toBeCloseTo((100 + 80 + 125 + 50) / 1_000_000, 12);
+    // 1,000 sin caché × 0.1 + 8,000 × 0.01 + 1,000 × 0.2 + 100 × 0.5, por millón.
+    expect(r.costo_total).toBeCloseTo((100 + 80 + 200 + 50) / 1_000_000, 12);
     expect(r.tokens).toMatchObject({ cache_leida_promedio: 8_000, cache_escrita_promedio: 1_000 });
     expect(formatearReporte(r)).toContain('caché leída 8000 · escrita 1000');
   });

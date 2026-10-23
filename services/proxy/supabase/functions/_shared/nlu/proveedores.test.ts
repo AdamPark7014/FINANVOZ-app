@@ -16,6 +16,7 @@ import {
   crearAnthropic,
   crearGoogle,
   crearOpenAI,
+  ESQUEMA_HERRAMIENTA_MINIMA,
   FallaProveedor,
   leerModoAnthropic,
   modoParaModelo,
@@ -56,9 +57,36 @@ describe('Anthropic (Messages API)', () => {
     expect(p.cuerpo.tool_choice).toEqual({ type: 'tool', name: 'interpretacion' });
     // Herramienta + sistema fijos antes del corte; el contexto del usuario va después, en el mensaje.
     expect(p.cuerpo.system).toEqual([
-      { type: 'text', text: prompt.sistema, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: prompt.sistema, cache_control: { type: 'ephemeral', ttl: '1h' } },
     ]);
     expect(p.cuerpo.messages).toEqual([{ role: 'user', content: prompt.usuario }]);
+    // La puerta separa el gasto por función; Anthropic no lo recibe (la puerta no lo reenvía).
+    expect(p.encabezados['x-proceso']).toBe('finanvoz-interpretar');
+  });
+
+  it('modo herramienta_minima: herramienta forzada de una propiedad y la forma en el sistema cacheado', async () => {
+    const f = fetchFalso([json(herramienta({ interpretacion: INTERPRETACION }))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch, modoAnthropic: 'herramienta_minima' });
+    const r = await a.llamar({ prompt, senal: senal() });
+    expect(JSON.parse(r.texto)).toEqual({ interpretacion: INTERPRETACION });
+    const p = en(f.peticiones, 0);
+    const tools = p.cuerpo.tools as { input_schema: unknown }[];
+    expect(en(tools, 0).input_schema).toEqual(ESQUEMA_HERRAMIENTA_MINIMA);
+    expect(p.cuerpo.tool_choice).toEqual({ type: 'tool', name: 'interpretacion' });
+    expect(p.cuerpo.system).toEqual([
+      {
+        type: 'text',
+        text: `${prompt.sistema}\n\n${FORMATO_JSON}`,
+        cache_control: { type: 'ephemeral', ttl: '1h' },
+      },
+    ]);
+    // La proyección completa (~9,700 tokens de JSON denso) se cambia por ~1,000 de FORMATO_JSON.
+    expect(JSON.stringify(ESQUEMA_HERRAMIENTA_MINIMA).length * 20).toBeLessThan(
+      JSON.stringify(esquemas.estandar).length,
+    );
+    expect(FORMATO_JSON.length * 3).toBeLessThan(JSON.stringify(esquemas.estandar).length);
+    expect(modoParaModelo('herramienta_minima', 'claude-sonnet-5-5')).toBe('texto');
+    expect(leerModoAnthropic('herramienta_minima')).toBe('herramienta_minima');
   });
 
   it('modo json_schema: output_config.format con la proyección estándar y sin herramientas', async () => {
@@ -83,7 +111,11 @@ describe('Anthropic (Messages API)', () => {
     expect(p.cuerpo).not.toHaveProperty('tools');
     expect(p.cuerpo.output_config).toEqual({ effort: 'low' });
     expect(p.cuerpo.system).toEqual([
-      { type: 'text', text: `${prompt.sistema}\n\n${FORMATO_JSON}`, cache_control: { type: 'ephemeral' } },
+      {
+        type: 'text',
+        text: `${prompt.sistema}\n\n${FORMATO_JSON}`,
+        cache_control: { type: 'ephemeral', ttl: '1h' },
+      },
     ]);
   });
 

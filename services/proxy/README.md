@@ -131,6 +131,27 @@ Golden set completo (164 frases, todas por la nube; en producción el nivel 0 re
 - Esfuerzo `low` contra `medium`: misma precisión (98.2 % y 97.6 %) y misma salida (~110 tokens); con la herramienta forzada no hay razonamiento que recortar.
 - Lo que sigue fallando a Haiku (G16, M09, X06, I01: `tarjeta` sin tipo, «como 300» leído como duda, un movimiento sin monto, quincena con destino supuesto) varía entre corridas (la API 2026-10-21 no acepta `temperature`) y Sonnet 5.5 lo resuelve con el mismo prompt: es del modelo, no del prompt.
 
+### Costos medidos (23-10-2026, regla de Adam: reducir el gasto sin perder funciones)
+
+Solo los 29 casos de nube (`pnpm eval:nlu --nivel nube --proveedor anthropic --solo-nube`), Haiku 5.5 por la puerta
+con el token de pruebas, sin jueces. Gasto de la medición: ~0.08 USD.
+
+| Configuración | Caso completo (corridas) | Prefijo fijo | p50 / p95 | USD por frase con caché caliente |
+|---|---|---|---|---|
+| Antes: `herramienta`, caché de 5 min | 28/29 · 28/29 (falla X06) | ~15,400 | 1,273 / 2,358 ms | 0.000256 |
+| **Ahora: `herramienta`, caché de 1 h, «jefa/jefe» y «ellos + 1» sin preguntar** | **29/29 · 29/29** | ~15,400 | 1,205–1,354 / 2,216–2,500 ms | **0.000255** |
+| `herramienta_minima` (opción, no adoptada) | 27/29 · 28/29 · 29/29 (1 reintento) | ~6,700 | 1,056 / 1,899–2,342 ms | 0.000180 |
+
+- **Caché de 1 h** (`CACHE_PREFIJO`): escribir el prefijo cuesta 2× la entrada (0.0031 USD) pero una vez por hora; con
+  la de 5 min, cada frase que llegaba después de 5 min sin tráfico pagaba 0.0019 USD de escritura (casi todas en
+  pruebas y con pocos usuarios). Con tráfico alto da igual: la caché se lee en cada frase.
+- **`herramienta_minima`** (herramienta forzada de una propiedad + `FORMATO_JSON` en el sistema) cuesta ~30 % menos y
+  responde un poco antes, pero en 3 corridas no igualó a `herramienta` (perdió X06 o L05/D03 y tuvo un reintento por
+  validación): se queda como opción (`NLU_ANTHROPIC_MODO=herramienta_minima`), no por omisión.
+- Encabezado `x-proceso: finanvoz-interpretar` / `finanvoz-explicar` para que la puerta separe el gasto por función.
+- El eval de nube ya no corre con Sonnet ni Opus sin `--permitir-caro`; `--solo G01,X06` y `--solo-nube` limitan los
+  casos; `--ver` imprime lo que contestó el modelo en los que fallan.
+
 Hasta que existan las grabaciones, CA-M3-01 y CA-M3-06 quedan pendientes; `pnpm eval:nlu --offline` ya corre en CI y avisa "sin grabaciones".
 
 ## M7 · `webhooks-revenuecat` (`POST /webhooks/revenuecat`)

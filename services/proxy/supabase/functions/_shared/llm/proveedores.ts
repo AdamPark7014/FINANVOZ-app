@@ -3,6 +3,8 @@
 // respuesta vuelve a la forma neutral. `fetch` se inyecta (las pruebas usan respuestas con la forma pública de
 // cada API). Privacidad (regla 9): las fallas llevan solo el estado HTTP (`FallaProveedor`).
 import {
+  CACHE_PREFIJO,
+  ENCABEZADO_PROCESO,
   enviar,
   FallaProveedor,
   type Fetch,
@@ -10,6 +12,7 @@ import {
   type NombreProveedor,
   PARAMETROS,
   pensamientoMinimo,
+  PROCESO_EXPLICAR,
   urlMensajesAnthropic,
   usoAnthropic,
   VERSION_API_ANTHROPIC,
@@ -116,14 +119,18 @@ export function crearAnthropicTurno(c: ConfiguracionTurno): AdaptadorTurno {
       const datos = await enviar(
         c.fetch,
         url,
-        { 'x-api-key': c.llave, 'anthropic-version': VERSION_API_ANTHROPIC },
+        {
+          'x-api-key': c.llave,
+          'anthropic-version': VERSION_API_ANTHROPIC,
+          [ENCABEZADO_PROCESO]: PROCESO_EXPLICAR,
+        },
         {
           model: modelo,
           max_tokens: TOKENS_SALIDA_MAXIMOS,
           // Herramientas y sistema son fijos (el teléfono manda siempre las mismas definiciones, en el mismo orden):
           // el corte de caché al final del sistema cubre a los dos. La conversación va después.
           system: [
-            { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
+            { type: 'text', text: SISTEMA_EXPLICAR, cache_control: CACHE_PREFIJO },
             ...(fecha ? [{ type: 'text', text: fecha }] : []),
           ],
           tools: herramientas.map((h) => ({

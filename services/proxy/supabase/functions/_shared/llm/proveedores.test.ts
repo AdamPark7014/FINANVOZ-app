@@ -43,11 +43,12 @@ describe('Anthropic (tool_use)', () => {
     const peticion = en(f.peticiones, 0);
     expect(peticion.url).toBe('https://api.anthropic.com/v1/messages');
     expect(peticion.encabezados['anthropic-version']).toBe('2026-10-21');
+    expect(peticion.encabezados['x-proceso']).toBe('finanvoz-explicar');
     const p = peticion.cuerpo;
     expect(p.model).toBe('claude-haiku-5-5');
     for (const prohibido of ['temperature', 'top_p', 'top_k']) expect(p).not.toHaveProperty(prohibido);
     expect(p.system).toEqual([
-      { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral', ttl: '1h' } },
     ]);
     expect(p.tools).toEqual([
       { name: 'gasto', description: 'Gasto en un periodo.', input_schema: HERRAMIENTAS[0]?.parametros },
@@ -75,7 +76,7 @@ describe('Anthropic (tool_use)', () => {
     const p = en(f.peticiones, 0);
     expect(p.url).toBe('https://ia.zynoratek.com/v1/messages');
     expect(p.cuerpo.system).toEqual([
-      { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: SISTEMA_EXPLICAR, cache_control: { type: 'ephemeral', ttl: '1h' } },
       { type: 'text', text: 'Hoy es jueves 2026-10-22.' },
     ]);
   });

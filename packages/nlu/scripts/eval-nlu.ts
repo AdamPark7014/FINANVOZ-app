@@ -61,7 +61,7 @@ function opcion(argumentos: readonly string[], nombre: string): string | undefin
 const porcentaje = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(1)} %`);
 
 const USO =
-  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] | --offline | --pasos | --confirmacion | --reparacion';
+  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] [--solo-nube] [--solo G01,G02] [--permitir-caro] | --offline | --pasos | --confirmacion | --reparacion';
 
 interface ReporteCobertura {
   casos: ResultadoCaso[];
@@ -253,6 +253,22 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
   const limite = Number(opcion(argumentos, '--limite') ?? '0');
   const concurrencia = Number(opcion(argumentos, '--concurrencia') ?? '4');
   const grabar = argumentos.includes('--grabar');
+  // Costo de pruebas (regla de Adam, 23-10): solo el modelo de producción (Haiku) salvo que se pida otro a propósito;
+  // los jueces y comparaciones con Sonnet u Opus se llevaron casi todo el gasto de pruebas.
+  if (nombre === 'anthropic' && !/haiku/.test(modelo) && !argumentos.includes('--permitir-caro')) {
+    console.error(
+      `eval:nlu: ${modelo} cuesta de 20 a 40 veces lo que Haiku. Si de verdad hace falta, agrega --permitir-caro ` +
+        'y usa --solo con los casos que cambiaste.',
+    );
+    return 2;
+  }
+  const soloNube = argumentos.includes('--solo-nube');
+  const soloIds = new Set(
+    (opcion(argumentos, '--solo') ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0),
+  );
 
   const url = process.env.NLU_PROXY_URL?.trim();
   const jwt = process.env.NLU_PROXY_JWT?.trim();
@@ -266,8 +282,14 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
     console.error('eval:nlu: fixtures/nlu/contexto.json no cumple el contrato de /nlu/interpretar');
     return 2;
   }
-  const todos = cargarGolden();
-  const casos = limite > 0 ? todos.slice(0, limite) : todos;
+  const filtrados = cargarGolden().filter(
+    (c) => (!soloNube || c.reglas !== true) && (soloIds.size === 0 || soloIds.has(c.id)),
+  );
+  const casos = limite > 0 ? filtrados.slice(0, limite) : filtrados;
+  if ((soloNube || soloIds.size > 0) && grabar) {
+    console.error('eval:nlu: --grabar exige el golden set completo (sin --solo ni --solo-nube); no se escribió nada.');
+    return 2;
+  }
   const base = nombre === 'anthropic' ? process.env.ANTHROPIC_BASE_URL?.trim() : undefined;
   const via = url && jwt ? 'proxy' : (base ?? 'API directa');
   console.error(`eval:nlu: ${casos.length} casos con ${nombre}/${modelo} vía ${via}`);
@@ -275,6 +297,25 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
 
   const reporte = evaluarNube(casos, grabaciones, precioDe(nombre, modelo));
   console.log(formatearReporte(reporte));
+  // Desenlaces que cuestan de más: un reintento por validación es una segunda llamada; `no_entendi` es una salida
+  // inválida dos veces.
+  const desenlaces = new Map<string, number>();
+  for (const g of grabaciones) desenlaces.set(g.codigo, (desenlaces.get(g.codigo) ?? 0) + 1);
+  console.log(
+    `  desenlaces      ${[...desenlaces].map(([k, v]) => `${k} ${v}`).join(' · ')}` +
+      (reporte.costo_total === null || casos.length === 0
+        ? ''
+        : ` · US$${(reporte.costo_total / casos.length).toFixed(6)} por frase`),
+  );
+  const fallidos = reporte.resultados.filter((c) => !c.correcto).map((c) => `${c.id} (${c.fallas.join(', ')})`);
+  if (fallidos.length > 0) console.log(`  fallan          ${fallidos.join(' · ')}`);
+  // --ver: lo que contestó el modelo en los que fallan (solo frases del golden set; nada de usuarios).
+  if (argumentos.includes('--ver')) {
+    const porId = new Map(grabaciones.map((g) => [g.id, g]));
+    for (const r of reporte.resultados.filter((c) => !c.correcto)) {
+      console.log(`  ${r.id}: ${JSON.stringify(porId.get(r.id)?.interpretacion ?? null)}`);
+    }
+  }
   if (grabar) {
     if (limite > 0) {
       console.error('eval:nlu: --grabar exige el golden set completo (sin --limite); no se escribió nada.');
