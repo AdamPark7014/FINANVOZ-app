@@ -6,6 +6,11 @@
 
 ## Hecho en este turno
 
+- **Docs de la Ola 7**: `ESTADO` (decisiones del 22-10: voz, conversación, onboarding por voz, confirmación y
+  reparación, intérprete en la nube, «Sí» inactivo, «¿cuánto llevo?» y la discrepancia de la plantilla de `06 §10`),
+  `06-NLU` (§3.1, §9.2, §9.5 con `interpretarPaso`, §13.4 y §14 confirmación y reparación), `fixtures/README.md` (los dos
+  goldens) y `02-UX`. Verificación final: typecheck y lint limpios; vitest 193 archivos 3100/3100; jest
+  95 suites 872/872; eval reglas 135/135, pasos 90/90 · 91/91, confirmación 90/90, reparación 52/52.
 - **Intérprete del proxy (`fix(proxy)`)**: tope de 4 s por intento (`TIEMPO_INTENTO_INTERPRETAR_MS`) dentro del
   presupuesto de 7 s y un reintento con el mismo proveedor cuando no hay alterno (tiempo, 5xx, 429 o red; nunca tras un
   4xx); +4 pruebas en `interpretar.test.ts`. **Falta redesplegar** las funciones en el Hetzner
@@ -177,12 +182,10 @@
 
 ## A medias — CUIDADO
 
-- **Ocho agentes en vuelo el 22-10 (tarde), nada commiteado de ellos**: V-A (`packages/nlu` montos y pasos), V-B
-  (`src/voz`, `src/ui` teclado iOS), B-1 (`pantallas/principal`, movimientos), B-2a (plan, suscripciones,
-  `ios-testflight.yml`), B-2b (cuentas, ajustes, privacidad), B-3 (tarjetas, tandas, compartido), T-1
-  (`docs/tienda`, `scripts/tienda`, `apps/calculadora`, workflows nuevos de capturas), D-1
-  (`docs/diseno/mockups-asistente.html`). Si entras y hay archivos sin commitear en esas rutas, son suyos: `salvar`,
-  no pisar. El coordinador verifica (typecheck, lint, vitest, jest por carpeta, eval 100 %) y commitea por paquete.
+- **Ola 7 integrada el 23-10** (U-1, A-1…A-4, V-2, O-1 y el coordinador, en 8 commits): nada queda sin commitear.
+  **Sin probar en teléfono**: la conversación del asistente, la voz (Paulina, silencio, haptics) y el onboarding por voz
+  solo se han visto en jest; la próxima build (TestFlight 4 / Play código 2) es la primera con la Ola 7. Las funciones
+  del proxy con el reintento nuevo **no están redesplegadas** en el Hetzner.
 
 - Verificación final del 21-10: typecheck, lint, eval nivel 0 (128/128, 100 %), vitest 2460/2461 y jest 505/506 → las dos
   fallas eran `rendimiento.test.ts` (RNF-01, tiempos de E8 en Node: ~109 ms contra el umbral de 100 con Ollama y
@@ -210,8 +213,9 @@
 
 ## Siguiente paso
 
-1. Adam — instalar desde TestFlight (iPhone) y desde el enlace de prueba interna (Android) y probar en sus teléfonos;
-   lo que encuentre se corrige y se sube como build 4 / código 2.
+1. Subir la Ola 7 como build 4 (TestFlight) / código 2 (Play) y redesplegar las funciones del proxy
+   (`scripts/desplegar-funciones.sh`); Adam la prueba en sus teléfonos (asistente, voz y onboarding por voz) y lo que
+   encuentre se corrige.
 2. Adam — M0 antes del 6 nov; cuentas Expo/RevenueCat/PostHog; contador; abogado; pruebas en teléfono.
 3. Código: los 27 casos del golden set que siguen en `null` (`06 §9.3`) se quedan así a propósito; si Adam quiere
    más cobertura sin nube, conviene crecer el golden set con frases reales antes de inventar reglas.

@@ -126,7 +126,7 @@ type Motivo = 'monto_faltante' | 'monto_ambiguo' | 'tipo_ambiguo' | 'fecha_ambig
 | la quincena | — | `proximo_ingreso` del contexto |
 | la semana pasada (sin día) | `aclarar/fecha_ambigua` | — |
 
-**Rangos de consulta** (inclusivos): hoy `[hoy, hoy]`; ayer; esta semana `[lunes, hoy]`; este mes `[día 1, hoy]`; el mes pasado `[1, último día]`; esta quincena `[ultimo_ingreso, hoy]`; los próximos N días `[hoy, hoy + N − 1]`; sin periodo en `mayores_gastos` → últimos 30 días, `limite: 5`. En `comparar_periodos` "este mes contra el pasado" compara el mes en curso con **los mismos días** del mes anterior.
+**Rangos de consulta** (inclusivos): hoy `[hoy, hoy]`; ayer; esta semana `[lunes, hoy]`; este mes `[día 1, hoy]`; el mes pasado `[1, último día]`; esta quincena `[ultimo_ingreso, hoy]`; los próximos N días `[hoy, hoy + N − 1]`; sin periodo en `mayores_gastos` → últimos 30 días, `limite: 5`; sin periodo en "¿cuánto llevo [gastado] en CAT?" → el mes en curso (lo que va). En `comparar_periodos` "este mes contra el pasado" compara el mes en curso con **los mismos días** del mes anterior.
 
 **Cuentas**
 
@@ -404,10 +404,12 @@ DIVIDIDA  := [FECHA] (VERBO|dividimos) [art] DESC [(de|por) MONTO] entre N [,] [
 
 ```
 ARQUEO    := (traigo|tengo|me quedan|me queda) MONTO [pesos] (en|de) EFECTIVO         "me quedan 85 pesos en efectivo" "tengo como 1,200 en billetes" (→ aproximado)
+           | traigo MONTO [pesos]                                                     "traigo 300" (Ola 7); "tengo 300" a secas no: puede ser el saldo de una cuenta
            | [ya] no (traigo|tengo) (nada|ni un peso|ni un varo) (de|en) EFECTIVO    → 0
 EFECTIVO  := efectivo | el efectivo | cash | billetes | la cartera | mi cartera
 CONSULTA  := cuánto puedo gastar [hoy] | cuánto (me queda|tengo) para gastar [hoy] | qué tanto puedo gastar [hoy]           → hoy_puedes
            | (cuánto|qué tanto) (gasté|he gastado|llevo gastado|llevo de gasto|llevo) [en CAT] PERIODO | … PERIODO [en CAT]  → gasto_total | gasto_por_categoria
+           | (cuánto|qué tanto) (llevo gastado|llevo de gasto) [en CAT] | (cuánto|qué tanto) llevo (en|de) CAT   → sin PERIODO, el mes en curso (Ola 7)
            | cuánto (tengo|hay|me queda|queda) en [PREFIJO] ALIAS                                                     → saldo (alias normalizado)
            | cuánto debo (de|en) [las|mis|la] (tarjetas|tarjeta)                                                      → deuda_tarjetas
            | (qué pagos tengo|qué compromisos tengo|qué tengo que pagar|qué me toca pagar|qué pagos [se] vienen) PERIODO que empiece hoy   → compromisos
@@ -468,7 +470,7 @@ DESC_REF  := [art] 1 a 3 palabras aptas de DESC, sin nombres, alias ni pronombre
 - Montos que el nivel 0 todavía no lee: "millón", "y medio" ("ocho mil y medio"), "N mil M" con otra cifra detrás ("8 mil 500 600") o con decimales en N ("1.5 mil 200"), "un" suelto tras "N mil" y centavos sin "pesos" antes ("85 con 50 centavos").
 - Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6"), "¿me alcanza?" sin monto, las preguntas abiertas (`explicar`) y todo lo fuera de alcance: eso lo decide el nivel 2 o la persona.
 
-Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-22: cobertura 135/135 y precisión 135/135 sobre los 164 casos (el 2026-10-21, 128/128 sobre 155; antes 25/25 y 27/27). Los 29 casos restantes están en `null` por las razones de §9.3. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V08 y V09 son `reglas: false`. La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
+Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-23 (sin cambio desde el 22-10; «traigo 300» y «¿cuánto llevo en CAT?» se probaron con pruebas unitarias, no en el golden): cobertura 135/135 y precisión 135/135 sobre los 164 casos (el 2026-10-21, 128/128 sobre 155; antes 25/25 y 27/27). Los 29 casos restantes están en `null` por las razones de §9.3. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V08 y V09 son `reglas: false`. La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
 
 ### 9.4 Monto dictado en un campo
 
@@ -485,31 +487,23 @@ CERO         := cero [pesos] | nada | ni un peso | ni un varo                   
 
 "como", "más o menos", "aproximadamente" (y las demás marcas de `MONTO`) → `aproximado: true`. Sin `admiteCero`, "0", "cero" y "nada" dan `null`. Todo lo que sobra da `null`: "más de 500", "menos de", "entre 500 y 600", "hasta 500", "500 o 600", dos cifras, "500 al mes", "cada…", un "no" fuera de CERO.
 
-### 9.5 Pasos dictados del onboarding («O dímelo», hilo de la nube PR #25–#26)
+### 9.5 Pasos dictados del onboarding («Dímelo», Ola 7 §7)
 
-Gramáticas de paso del nivel 0 (`packages/nlu/src/reglas/campos.ts`), fuera de `PRODUCCIONES` (no mueven el golden
-set). El monto de un campo suelto es §9.4; estas leen un paso completo del onboarding:
+El onboarding y los formularios de cuenta y pago fijo leen lo dicho con **`interpretarPaso(paso, texto, contexto)`**
+(§13, `packages/nlu/src/pasos/`), la misma lectura para todos los pasos: ingreso (O3), efectivo, cuentas y tarjeta
+(O4), pagos fijos (O5), colchón (O7) y tanda. Las gramáticas de campo de la primera versión (`reglas/campos.ts`, con
+`interpretarIngresoDicho` e `interpretarPagoFijoDicho`) se borraron el 22-10-2026 al unificar: ya no existen.
 
-```
-INGRESO_DICHO := [me pagan|me depositan|me cae(n)|cobro|gano|son|es] MONTO [REGLA | FRECUENCIA]
-FRECUENCIA := a la|por|cada quincena | quincenal | cada|a la|por semana [el DIA] | semanal
-            | cada 14 días | cada dos semanas | catorcenal | cada|al|por mes | mensual(es)
-PAGO_DICHO := (pago | tengo que pagar | debo pagar) MONTO (de|del|por) CONCEPTO [REGLA | FRECUENCIA_PAGO]
-            | CONCEPTO (son|es|cuesta|me cuesta|sale en|de) MONTO [REGLA | FRECUENCIA_PAGO]
-            | CONCEPTO MONTO [REGLA | FRECUENCIA_PAGO]                    — CONCEPTO: 1 a 4 palabras, sin artículo
-FRECUENCIA_PAGO := cada|al|por mes | mensual | cada quincena | quincenal | cada semana | semanal | cada|al año | anual
-```
+- **Con tarjeta «Entendí»** (`DecirloPaso` en O3, O4, O5 y O7): la lectura se muestra fila por fila. En O3 y O7 «Sí»
+  guarda y sigue sin formulario; en O4 y O5 «Sí» guarda lo completo y lo incompleto llena el formulario con el foco
+  en el primer dato que falta; «Cambiar algo» llena el formulario con lo leído. Con la tarjeta a la vista, la voz la
+  dice y el micrófono escucha un turno: «sí», «no» o una corrección (§14.1); la corrección del mismo paso se lee con
+  `interpretarPaso` y se junta con lo que ya había («no, son 12 mil» cambia solo el monto).
+- **Sin tarjeta** (Cuentas › «Agregar pago fijo», el «O dímelo» del formulario): `interpretarPaso('pagos_fijos')`
+  llena los campos (`prellenadoDePagoLeido`); una frase con dos pagos no llena nada (un pago a la vez).
 
-`interpretarPagoFijoDicho` llena el formulario de O5 con un pago a la vez: el concepto elige su chip del
-catálogo («renta», «luz»…) o «Otro» con el nombre dicho; el día que no se dijo queda vacío.
-
-`interpretarIngresoDicho` llena O3 («O dímelo»): `REGLA` es la de §9.2 CONFIGURAR (quincena, semanal con día,
-mensual con día); con `FRECUENCIA` sola el día queda vacío y se elige en pantalla (nunca se adivina).
-
-`MONTO` es la pieza de §9.1. Lo que no se lea completo da `null` y la pantalla no cambia. La voz nunca guarda: llena
-el paso y la persona confirma con Continuar o Agregar (§7). Pendiente de integración (`docs/PLAN-MEJORA-2026-10.md`
-§5): estos dos lectores se unifican con `interpretarPaso` (`reglas/pasos`), que ya cubre ingreso, cuentas, tarjeta,
-pagos fijos, colchón y tanda con golden propio.
+`MONTO` es la pieza de §9.1. Lo que no se lea completo da `null` y la pantalla no cambia: la voz nunca guarda sin la
+tarjeta «Entendí» o el botón del formulario (§7).
 
 ## 10. Prompt del nivel nube (plantilla)
 
@@ -660,7 +654,7 @@ FREC       := cada (semana|quincena|mes|14 días|catorce días|dos semanas) | se
 
 ### 13.4 Frases y evaluación
 
-`fixtures/nlu/golden-pasos.jsonl` (100 frases, 87 `reglas: true`) contra `fixtures/nlu/contexto-onboarding.json` (sin cuentas). `esperado: null` dice que no hay lectura correcta: responder ahí es un error. La comparación es estricta (un campo de más falla) salvo `concepto`, `nombre` y `cuentaAlias`, que se comparan normalizados. `pnpm eval:nlu --pasos` exige 100 % de cobertura y de precisión; medido el 2026-10-22: cobertura 87/87 y precisión 88/88.
+`fixtures/nlu/golden-pasos.jsonl` (104 frases, 90 `reglas: true`; ING27–ING29 y CTA14 son correcciones dichas en la tarjeta «Entendí», como «son 12 mil») contra `fixtures/nlu/contexto-onboarding.json` (sin cuentas). `esperado: null` dice que no hay lectura correcta: responder ahí es un error. La comparación es estricta (un campo de más falla) salvo `concepto`, `nombre` y `cuentaAlias`, que se comparan normalizados. `pnpm eval:nlu --pasos` exige 100 % de cobertura y de precisión; medido el 2026-10-23: cobertura 90/90 y precisión 91/91 (el 2026-10-22, 87/87 y 88/88).
 
 | Paso | Frases que lee (`reglas: true`) | `reglas: false` |
 |---|---|---|
@@ -671,3 +665,64 @@ FREC       := cada (semana|quincena|mes|14 días|catorce días|dos semanas) | se
 | pagos fijos | "la renta son 4,500 el día primero", "el internet 500 el 10 y Netflix 219 cada mes", "la tanda son 500 cada quincena", "el coche son 3 mil cada quincena, me faltan 12 pagos", "renta 4500" | "la luz son como 400 cada dos meses" (lectura parcial con aviso; la regla la elige la persona), "gané 500", una fecha única |
 | colchón | "quiero treinta y un mil de colchón", "2 mil", "nada", "como 3 mil", "5 mil de colchón" | "ocho mil y medio" |
 | tanda | TK01 y sus variantes semanal, mensual y cada 14 días; "somos 10"; "me toca el cuarto"; "500 cada semana" | turno mayor que los participantes |
+
+## 14. Confirmación y reparación por voz (Ola 7)
+
+Dos lectores del nivel 0 para el asistente (`docs/diseno/OLA-7-ASISTENTE.md` §3–§4), fuera de `PRODUCCIONES` (no
+mueven el golden set principal), con golden propio y umbral de 100 % como `--pasos`. Deterministas: la fecha viene
+del contexto, nunca del reloj; nada de lo oído va a logs (regla 9).
+
+### 14.1 Respuesta a «Entendí» (`leerConfirmacion`, `packages/nlu/src/pasos/confirmacion.ts`)
+
+Tras un registro dictado con tarjeta «Entendí» (y en el onboarding por voz), la voz dice la tarjeta y el micrófono
+escucha **un** turno de hasta 6 s (`apps/movil/src/asistente/confirmacion-voz.ts`, Ajustes › Voz «Confirmar por
+voz»). La lectura consume la frase completa:
+
+```
+CONFIRMACION := SI | NO | CAMBIO
+SI       := AFIRMA ([,] (AFIRMA | CORTESIA))*                 "sí" "dale" "sale" "va" "así es" "sí, porfa" "regístralo"
+NO       := NIEGA ([,] (NIEGA | CORTESIA))*                   "no" "nel" "cancela" "mejor no" "no, gracias"
+CAMBIO   := [ENTRADA [,]] DATO ([,] [y] DATO)*                cada fila a lo más una vez
+ENTRADA  := [ah] no [,] [más bien | pero | mejor] | sí [,] pero | pero | mejor | más bien | perdón
+DATO     := [VERBO] VALOR [[,] no [VERBO] VALOR_ANTERIOR]     "eran 40, no 50" (lo anterior se lee y se descarta)
+VERBO    := fue | fueron | era | eran | es | son | lo pagué | la pagué | lo compré | la compré | pagué | costó
+          | salió [en] | me cobraron | ponle | ponlo | ponla | pon | cámbialo a | cámbiala a | cámbiale a
+VALOR    := CUENTA                                     → fila cuenta      "con la Nu" "en efectivo" "la BBVA" "con la de crédito"
+          | [de] MONTO                                 → fila monto       MONTO de §9.1 ("40", "como 40", "ochenta y cinco")
+          | [de|en|a] [la categoría de] [art] CAT      → fila categoria   "comida" "antojos" "súper"
+          | FECHA                                      → fila cuando      §9.1 al registrar, con la fecha del contexto
+```
+
+- `si` confirma; `no` abre «Cambiar»; `cambio` cambia esas filas y la tarjeta se vuelve a mostrar (y a escuchar).
+  Las filas que no muestra la tarjeta (`filas` del contexto) dan `null`.
+- "sí" seguido de un dato sin "pero" ("sí, con la Nu") es ambiguo: `null`. "no, X" en medio de un dato ("eran 40,
+  no, 50") también. "con la tarjeta" no dice cuál: `null`.
+- Categoría por el catálogo (`04 §2.3`): **"comida" sola es Comida fuera**, como en el diccionario (`06 §3.1`); los
+  grupos "casa" y "movilidad" no son categoría. Con `movimiento: 'ingreso'` solo valen las de ingreso.
+- Fechas solo pasadas o de hoy; sin `fecha_referencia`, una fecha da `null`.
+- La app trata además como corrección lo que empieza como una ("no, cada semana", "fue con la Coppel") aunque no se
+  lea como fila: en el onboarding lo vuelve a leer el lector del paso (§13) y lo junta con lo que había; nunca
+  confirma. Con «Sí» inactivo (`confirmar.deshabilitado`, falta la cuenta) un "sí" dicho no hace nada.
+
+`fixtures/nlu/golden-confirmacion.jsonl`: 123 casos (`SI*` 34, `NO*` 14, `CA*` 42 con la `tarjeta` que muestra
+filas y tipo de movimiento, y `NU*` 33 con `esperado: null`, donde leer cualquier cosa es un error) contra
+`fixtures/nlu/contexto.json`. `pnpm eval:nlu --confirmacion` exige 100 % de cobertura y de precisión; medido el 2026-10-23: 90/90 y 90/90.
+
+### 14.2 «No entendí» con reparación (`sugerirReparacion`, `packages/nlu/src/pasos/reparacion.ts`)
+
+Para una frase que el nivel 0 no entendió, hasta 3 tipos de movimiento ordenados de más a menos probable y «otra» al
+final (`gasto`, `ingreso`, `prestamo`, `me_pagaron`, `pago_tarjeta`, `transferencia`; empates en ese orden). Cada
+opción lleva, si se puede, la frase **reescrita** en una forma que el nivel 0 entiende tal cual como ese tipo con ese
+monto; elegirla registra por la vía normal (`registrarTexto`), y sin frase abre R2 con ese tipo y el monto oído.
+
+1. Piezas con las reglas del nivel 0: fechas, cuentas (alias y tipos), montos y personas (contactos, parentescos con
+   artículo, nombres con mayúscula fuera de la primera palabra; los comercios conocidos no son personas).
+2. Pistas: «le di/pasé/presté» (sale hacia alguien), «me pagó/dio/regresó» (alguien me paga), «me pagaron/
+   depositaron/cayó» (ingreso), verbos de gasto o palabras del diccionario, una tarjeta de crédito, dos cuentas
+   propias o un verbo de traspaso.
+3. Solo hay frase reescrita si las piezas no son ambiguas (un monto, a lo más una fecha y una persona) y si
+   `interpretarReglas` la entiende como ese tipo con ese monto. El nombre pierde el artículo («los 300 del Beto» →
+   «le presté 300 a Beto») y «me pagó» agrega «de lo que me debía» para que se lea como cobro y no como ingreso.
+
+`fixtures/nlu/golden-reparacion.jsonl`: 52 casos (`REP*`) con las opciones en orden y su frase; `pnpm eval:nlu
+--reparacion` exige 100 %, y cada frase esperada se vuelve a interpretar con el nivel 0; medido el 2026-10-23: 52/52 y 52/52.
