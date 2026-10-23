@@ -30,12 +30,12 @@ describe('golden de pasos (06 §13)', () => {
     });
   }
 
-  it('cobertura 87/87 y precisión 100 % sobre los 100 casos', () => {
+  it('cobertura 90/90 y precisión 100 % sobre los 104 casos', () => {
     const r = evaluarPasos(golden, onboarding);
-    expect(golden).toHaveLength(100);
-    expect(r.marcados).toBe(87);
-    expect(r.marcadosCubiertos).toBe(87);
-    expect(r.respondidos).toBe(88);
+    expect(golden).toHaveLength(104);
+    expect(r.marcados).toBe(90);
+    expect(r.marcadosCubiertos).toBe(90);
+    expect(r.respondidos).toBe(91);
     expect(r.respondidosCorrectos).toBe(r.respondidos);
     expect(r.aprobado).toBe(true);
   });
@@ -264,5 +264,39 @@ describe('catálogo de instituciones', () => {
       expect(i.cuenta !== null || i.credito, i.id).toBe(true);
       for (const a of i.alias) expect(a).toMatch(/^[a-z0-9ñ ]+$/);
     }
+  });
+});
+
+describe('interpretarPaso · corrección en la tarjeta «Entendí» del onboarding', () => {
+  // La confirmación por voz quita el «no» de «no, son 12 mil»; lo que queda se vuelve a leer en el mismo paso.
+  it('«son», «eran» y «es de» delante de la cifra del ingreso', () => {
+    for (const texto of ['son 12 mil', 'eran 12 mil', 'es de 12 mil']) {
+      expect(leer('ingreso', texto), texto).toEqual({
+        paso: 'ingreso',
+        monto: { monto: 1_200_000, aproximado: false },
+      });
+    }
+  });
+
+  it('«son» y «eran» en una cuenta, en los dos órdenes', () => {
+    const bbva = {
+      paso: 'cuentas',
+      cuentas: [
+        {
+          nombre: 'BBVA',
+          institucion: 'bbva_mx',
+          subtipo: 'debito',
+          saldo: { monto: 400_000, aproximado: false },
+        },
+      ],
+    };
+    expect(leer('cuentas', 'son 4 mil en BBVA')).toEqual(bbva);
+    expect(leer('cuentas', 'en BBVA eran 4 mil')).toEqual(bbva);
+  });
+
+  it('el verbo solo o con algo que no es dinero sigue en null', () => {
+    expect(leer('ingreso', 'son')).toBeNull();
+    expect(leer('ingreso', 'son las 3 de la tarde')).toBeNull();
+    expect(leer('cuentas', 'son en BBVA')).toBeNull();
   });
 });

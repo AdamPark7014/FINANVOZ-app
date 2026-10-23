@@ -5,6 +5,7 @@
  *   INGRESO   := VARIA | [VERBO] DATO ([,] [y] DATO)*
  *   DATO      := [VERBO] MONTO [netos|libres|limpios] | REGLA_ING | FIN_SEMANA
  *   VERBO     := me pagan | me depositan | cobro | gano | recibo | mi sueldo es [de] | mi quincena es [de]
+ *              | son | eran | es de                                     (corrección: «no, son 12 mil»)
  *   REGLA_ING := leerRegla de configurar ("cada quincena", "cada mes el 30", "cada viernes", "el 15 y el último")
  *              | a la quincena | por quincena | quincenal | los días 15 y 30                → quincena (15 y último)
  *              | cada 14 días | cada catorce días | cada dos semanas | catorcenal           → catorcenal, sin ancla
@@ -35,6 +36,10 @@ const VERBOS: readonly (readonly string[])[] = [
   ['cobro'],
   ['gano'],
   ['recibo'],
+  // Corrección en la tarjeta «Entendí» del onboarding: «no, son 12 mil».
+  ['son'],
+  ['eran'],
+  ['es', 'de'],
 ];
 const VARIA: readonly (readonly string[])[] = [
   ['varia'],

@@ -220,6 +220,12 @@ export function esteMesContraElPasado(hoy: string): { actual: Rango; anterior: R
   };
 }
 
+/** Mes en curso: [día 1, hoy] (lo mismo que «este mes»). */
+export function esteMes(hoy: string): Rango {
+  const { anio, mes } = partes(hoy);
+  return { desde: conDia(anio, mes, 1), hasta: hoy };
+}
+
 /** Ejercicio en curso: [1 de enero, hoy]. */
 export function esteAnio(hoy: string): Rango {
   const { anio } = partes(hoy);

@@ -13,6 +13,10 @@
  *   --offline                                        reproduce las grabaciones y calcula el reporte
  *   --pasos                                          lectores por paso del onboarding contra golden-pasos.jsonl
  *                                                    (06 §13), sin red; umbral 100 % de cobertura y precisión
+ *   --confirmacion                                   respuesta hablada a una tarjeta «Entendí» (sí / no / cambio)
+ *                                                    contra golden-confirmacion.jsonl; umbral 100 % como --pasos
+ *   --reparacion                                     opciones de «No entendí» con su frase reescrita contra
+ *                                                    golden-reparacion.jsonl; umbral 100 % como --pasos
  *
  * Salida: 0 si cumple los umbrales (o si --offline no encuentra grabaciones), 1 si no, 2 si el uso es incorrecto.
  */
@@ -27,18 +31,23 @@ import {
 } from '../../../services/proxy/supabase/functions/_shared/nlu/interpretar.ts';
 import {
   CREADORES,
+  leerModoAnthropic,
   MODELO_POR_OMISION,
   NOMBRES_PROVEEDOR,
   type NombreProveedor,
 } from '../../../services/proxy/supabase/functions/_shared/nlu/proveedores.ts';
 import { Interpretacion } from '../src/esquema';
 import { evaluarReglas, type ResultadoCaso } from '../src/eval/evaluar';
+import { evaluarConfirmacion } from '../src/eval/evaluar-confirmacion';
 import { evaluarPasos } from '../src/eval/evaluar-pasos';
+import { evaluarReparacion } from '../src/eval/evaluar-reparacion';
 import {
   cargarContexto,
   cargarContextoOnboarding,
   cargarGolden,
+  cargarGoldenConfirmacion,
   cargarGoldenPasos,
+  cargarGoldenReparacion,
   type CasoGolden,
 } from '../src/eval/fixtures';
 import { DIRECTORIO_GRABACIONES, escribirGrabaciones, listarGrabaciones, precioDe } from '../src/eval/grabaciones';
@@ -52,7 +61,7 @@ function opcion(argumentos: readonly string[], nombre: string): string | undefin
 const porcentaje = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(1)} %`);
 
 const USO =
-  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] | --offline | --pasos';
+  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] | --offline | --pasos | --confirmacion | --reparacion';
 
 interface ReporteCobertura {
   casos: ResultadoCaso[];
@@ -63,10 +72,10 @@ interface ReporteCobertura {
   aprobado: boolean;
 }
 
-function imprimirCobertura(titulo: string, reporte: ReporteCobertura): number {
+function imprimirCobertura(titulo: string, reporte: ReporteCobertura, marcados = 'reglas: true'): number {
   console.log(titulo);
   console.log(
-    `Cobertura (reglas: true): ${reporte.marcadosCubiertos}/${reporte.marcados} ` +
+    `Cobertura (${marcados}): ${reporte.marcadosCubiertos}/${reporte.marcados} ` +
       `(${porcentaje(reporte.marcadosCubiertos, reporte.marcados)}; umbral 100 %)`,
   );
   console.log(
@@ -85,6 +94,26 @@ function lectoresPorPaso(): number {
   const casos = cargarGoldenPasos();
   const reporte = evaluarPasos(casos, cargarContextoOnboarding());
   return imprimirCobertura(`Nivel 0 · lectores por paso — ${casos.length} casos de golden-pasos`, reporte);
+}
+
+function confirmacionPorVoz(): number {
+  const casos = cargarGoldenConfirmacion();
+  const reporte = evaluarConfirmacion(casos, cargarContexto().contexto);
+  return imprimirCobertura(
+    `Nivel 0 · confirmación por voz — ${casos.length} casos de golden-confirmacion`,
+    reporte,
+    'con lectura esperada',
+  );
+}
+
+function reparacion(): number {
+  const casos = cargarGoldenReparacion();
+  const reporte = evaluarReparacion(casos, cargarContexto().contexto);
+  return imprimirCobertura(
+    `Nivel 0 · reparación de «No entendí» — ${casos.length} casos de golden-reparacion`,
+    reporte,
+    'todos los casos',
+  );
 }
 
 function nivelReglas(): number {
@@ -129,9 +158,16 @@ function llamadaDirecta(proveedor: NombreProveedor, modelo: string): Llamar | nu
     console.error(`eval:nlu: falta ${variable} en el entorno (o NLU_PROXY_URL y NLU_PROXY_JWT para usar el proxy).`);
     return null;
   }
-  const modoAnthropic = process.env.NLU_ANTHROPIC_MODO === 'herramienta' ? 'herramienta' : 'json_schema';
+  // Igual que la Edge Function: modo por omisión del adaptador (herramienta) y raíz configurable (puerta única).
+  const urlBase = process.env.ANTHROPIC_BASE_URL?.trim();
   // Un solo proveedor, sin alterno: cada grabación mide un modelo.
-  const adaptador = CREADORES[proveedor]({ llave, modelo, fetch: (u, i) => fetch(u, i), modoAnthropic });
+  const adaptador = CREADORES[proveedor]({
+    llave,
+    modelo,
+    fetch: (u, i) => fetch(u, i),
+    modoAnthropic: leerModoAnthropic(process.env.NLU_ANTHROPIC_MODO?.trim()),
+    ...(urlBase ? { urlBase } : {}),
+  });
   return async (caso, contexto) => {
     const r = await interpretar(caso.texto, contexto, {
       adaptadores: [adaptador],
@@ -146,6 +182,8 @@ function llamadaDirecta(proveedor: NombreProveedor, modelo: string): Llamar | nu
       interpretacion: r.ok ? (r.interpretacion as Record<string, unknown>) : null,
       tokens_entrada: r.tokens_entrada,
       tokens_salida: r.tokens_salida,
+      tokens_cache_leidos: r.tokens_cache_leidos,
+      tokens_cache_escritos: r.tokens_cache_escritos,
       latencia_ms: Math.round(r.latencia_ms),
     };
   };
@@ -230,7 +268,9 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
   }
   const todos = cargarGolden();
   const casos = limite > 0 ? todos.slice(0, limite) : todos;
-  console.error(`eval:nlu: ${casos.length} casos con ${nombre}/${modelo} vía ${url && jwt ? 'proxy' : 'API directa'}`);
+  const base = nombre === 'anthropic' ? process.env.ANTHROPIC_BASE_URL?.trim() : undefined;
+  const via = url && jwt ? 'proxy' : (base ?? 'API directa');
+  console.error(`eval:nlu: ${casos.length} casos con ${nombre}/${modelo} vía ${via}`);
   const grabaciones = await enParalelo(casos, concurrencia, (c) => llamar(c, solicitud.contexto_min));
 
   const reporte = evaluarNube(casos, grabaciones, precioDe(nombre, modelo));
@@ -249,6 +289,8 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
 async function main(argumentos: readonly string[]): Promise<number> {
   if (argumentos.includes('--offline')) return offline();
   if (argumentos.includes('--pasos')) return lectoresPorPaso();
+  if (argumentos.includes('--confirmacion')) return confirmacionPorVoz();
+  if (argumentos.includes('--reparacion')) return reparacion();
   const nivel = opcion(argumentos, '--nivel');
   if (nivel === 'reglas') return nivelReglas();
   if (nivel === 'nube') return nivelNube(argumentos);

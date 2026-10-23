@@ -98,3 +98,7 @@
 {"id": "TAN06", "paso": "tanda", "texto": "me toca el cuarto", "esperado": {"paso": "tanda", "turno": 4}, "reglas": true}
 {"id": "TAN07", "paso": "tanda", "texto": "500 cada semana", "esperado": {"paso": "tanda", "aportacion": {"monto": 50000, "aproximado": false}, "frecuencia": "semanal"}, "reglas": true}
 {"id": "TAN08", "paso": "tanda", "texto": "entré a una tanda de 500 cada quincena, somos 3 y me toca el cuarto", "esperado": null, "reglas": false, "nota": "El turno pasa de los participantes: debe dar null"}
+{"id": "ING27", "paso": "ingreso", "texto": "son 12 mil", "esperado": {"paso": "ingreso", "monto": {"monto": 1200000, "aproximado": false}}, "reglas": true, "nota": "Corrección en la tarjeta Entendí de O3: «no, son 12 mil» (el «no» lo quita la confirmación)"}
+{"id": "ING28", "paso": "ingreso", "texto": "cada quincena, son como 13 mil", "esperado": {"paso": "ingreso", "monto": {"monto": 1300000, "aproximado": true}, "frecuencia": "quincena", "regla": {"tipo": "quincenal_15_ultimo"}}, "reglas": true, "nota": "Maqueta Onboarding por voz"}
+{"id": "ING29", "paso": "ingreso", "texto": "son las 3", "esperado": null, "reglas": false, "nota": "«son» sin cifra de dinero: debe dar null"}
+{"id": "CTA14", "paso": "cuentas", "texto": "son 4 mil en BBVA", "esperado": {"paso": "cuentas", "cuentas": [{"nombre": "BBVA", "institucion": "bbva_mx", "subtipo": "debito", "saldo": {"monto": 400000, "aproximado": false}}]}, "reglas": true, "nota": "Corrección en la tarjeta Entendí de O4: «no, son 4 mil en BBVA»"}

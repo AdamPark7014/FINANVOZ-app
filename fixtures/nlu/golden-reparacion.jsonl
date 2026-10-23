@@ -1,0 +1,52 @@
+{"id":"REP01","texto":"los 300 del Beto","esperado":[{"tipo":"prestamo","frase":"le presté 300 a Beto"},{"tipo":"me_pagaron","frase":"el Beto me pagó 300 de lo que me debía"},{"tipo":"gasto","frase":"registra 300"},{"tipo":"otra"}],"nota":"Ejemplo del diseño: le presté o me pagó"}
+{"id":"REP02","texto":"300 del Beto","esperado":[{"tipo":"prestamo","frase":"le presté 300 a Beto"},{"tipo":"me_pagaron","frase":"el Beto me pagó 300 de lo que me debía"},{"tipo":"gasto","frase":"registra 300"},{"tipo":"otra"}]}
+{"id":"REP03","texto":"Beto me debe 300","esperado":[{"tipo":"prestamo","frase":"le presté 300 a Beto"},{"tipo":"me_pagaron","frase":"Beto me pagó 300 de lo que me debía"},{"tipo":"otra"}],"nota":"«me debe»: lo más probable es que le haya prestado"}
+{"id":"REP04","texto":"le di 300 al Beto","esperado":[{"tipo":"prestamo","frase":"le presté 300 a Beto"},{"tipo":"gasto","frase":"registra 300"},{"tipo":"otra"}],"nota":"Sale dinero hacia alguien: nunca «me pagó»; «al Beto» se reescribe «a Beto» (el nivel 0 no lee «al»)"}
+{"id":"REP05","texto":"ayer los 300 del Beto","esperado":[{"tipo":"prestamo","frase":"ayer le presté 300 a Beto"},{"tipo":"me_pagaron","frase":"ayer el Beto me pagó 300 de lo que me debía"},{"tipo":"gasto","frase":"ayer registra 300"},{"tipo":"otra"}],"nota":"La fecha leída se conserva en la frase"}
+{"id":"REP06","texto":"el Beto ya me dio los 300","esperado":[{"tipo":"me_pagaron","frase":"el Beto me pagó 300 de lo que me debía"},{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"otra"}],"nota":"Alguien me paga: nunca gasto"}
+{"id":"REP07","texto":"Juan me pagó 300","esperado":[{"tipo":"me_pagaron","frase":"Juan me pagó 300 de lo que me debía"},{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"otra"}],"nota":"06 §9.2: sin cláusula es null; la frase reescrita lleva «de lo que me debía»"}
+{"id":"REP08","texto":"le pasé 200 a mi jefa","esperado":[{"tipo":"prestamo","frase":"le presté 200 a mi jefa"},{"tipo":"gasto","frase":"registra 200"},{"tipo":"otra"}],"nota":"06 §9.3: exige juicio (apoyo familiar o préstamo)"}
+{"id":"REP09","texto":"le di 200 a mi primo","esperado":[{"tipo":"prestamo","frase":"le presté 200 a mi primo"},{"tipo":"gasto","frase":"registra 200"},{"tipo":"otra"}]}
+{"id":"REP10","texto":"mi primo me dio 200","esperado":[{"tipo":"me_pagaron","frase":"mi primo me pagó 200 de lo que me debía"},{"tipo":"ingreso","frase":"me depositaron 200"},{"tipo":"otra"}]}
+{"id":"REP11","texto":"500 de doña Mari","esperado":[{"tipo":"prestamo","frase":"le presté 500 a doña Mari"},{"tipo":"me_pagaron","frase":"doña Mari me pagó 500 de lo que me debía"},{"tipo":"gasto","frase":"registra 500"},{"tipo":"otra"}],"nota":"Cliente del fiado como persona"}
+{"id":"REP12","texto":"como 300 del Beto","esperado":[{"tipo":"prestamo","frase":"le presté como 300 a Beto"},{"tipo":"me_pagaron","frase":"el Beto me pagó como 300 de lo que me debía"},{"tipo":"gasto","frase":"registra como 300"},{"tipo":"otra"}],"nota":"Aproximado: la frase conserva «como»"}
+{"id":"REP13","texto":"le presté a Beto","esperado":[{"tipo":"prestamo"},{"tipo":"gasto"},{"tipo":"otra"}],"nota":"Sin monto: opciones sin frase (abren el formulario)"}
+{"id":"REP14","texto":"le debo 300 a Beto","esperado":[{"tipo":"gasto","frase":"registra 300"},{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"otra"}],"nota":"Yo debo: ni «le presté» ni «me pagó»"}
+{"id":"REP15","texto":"le pagué 200 a mi jefa","esperado":[{"tipo":"gasto","frase":"registra 200"},{"tipo":"prestamo","frase":"le presté 200 a mi jefa"},{"tipo":"otra"}]}
+{"id":"REP16","texto":"Caro me regresó lo de la comida","esperado":[{"tipo":"me_pagaron"},{"tipo":"gasto"},{"tipo":"otra"}],"nota":"Sin monto"}
+{"id":"REP17","texto":"transfiérele 500 a Juan","esperado":[{"tipo":"prestamo","frase":"le presté 500 a Juan"},{"tipo":"me_pagaron","frase":"Juan me pagó 500 de lo que me debía"},{"tipo":"gasto","frase":"registra 500"},{"tipo":"otra"}],"nota":"Imperativo: no es descripción"}
+{"id":"REP18","texto":"me pagaron 300","esperado":[{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"gasto","frase":"registra 300"},{"tipo":"otra"}]}
+{"id":"REP19","texto":"me cayeron 300","esperado":[{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"gasto","frase":"registra 300"},{"tipo":"otra"}]}
+{"id":"REP20","texto":"me pagaron 3,500 por un diseño","esperado":[{"tipo":"ingreso","frase":"me depositaron 3500"},{"tipo":"gasto","frase":"gasté 3500 en un diseño"},{"tipo":"otra"}],"nota":"06 §9.3: honorarios o venta"}
+{"id":"REP21","texto":"una devolución de 500","esperado":[{"tipo":"ingreso","frase":"me depositaron 500"},{"tipo":"gasto","frase":"registra 500"},{"tipo":"otra"}]}
+{"id":"REP22","texto":"me pagan 10 mil brutos cada quincena","esperado":[{"tipo":"ingreso"},{"tipo":"gasto"},{"tipo":"otra"}],"nota":"«cada quincena» no cabe en una frase de registro: sin frases"}
+{"id":"REP23","texto":"me llegaron 1,200 a BBVA","esperado":[{"tipo":"ingreso","frase":"me depositaron 1200 en BBVA"},{"tipo":"gasto","frase":"registra 1200 con BBVA"},{"tipo":"otra"}]}
+{"id":"REP24","texto":"cobré 800 de un trabajo","esperado":[{"tipo":"ingreso","frase":"me depositaron 800"},{"tipo":"gasto","frase":"gasté 800 en un trabajo"},{"tipo":"otra"}]}
+{"id":"REP25","texto":"300 de la Nu","esperado":[{"tipo":"pago_tarjeta","frase":"pagué 300 de la Nu"},{"tipo":"gasto","frase":"registra 300 con la Nu"},{"tipo":"otra"}]}
+{"id":"REP26","texto":"la Nu 300","esperado":[{"tipo":"pago_tarjeta","frase":"pagué 300 de la Nu"},{"tipo":"gasto","frase":"registra 300 con la Nu"},{"tipo":"otra"}]}
+{"id":"REP27","texto":"pagué la Nu","esperado":[{"tipo":"pago_tarjeta"},{"tipo":"gasto"},{"tipo":"otra"}],"nota":"Sin monto"}
+{"id":"REP28","texto":"pagué la tarjeta","esperado":[{"tipo":"pago_tarjeta"},{"tipo":"gasto"},{"tipo":"otra"}],"nota":"Sin monto ni cuál tarjeta"}
+{"id":"REP29","texto":"abonó 1000 a la oro desde BBVA","esperado":[{"tipo":"pago_tarjeta","frase":"pagué 1000 de la oro desde BBVA"},{"tipo":"gasto"},{"tipo":"otra"}]}
+{"id":"REP30","texto":"le metí 2 mil a la Nu","esperado":[{"tipo":"pago_tarjeta","frase":"pagué 2000 de la Nu"},{"tipo":"gasto","frase":"registra 2000 con la Nu"},{"tipo":"otra"}]}
+{"id":"REP31","texto":"500 de BBVA a Mercado Pago","esperado":[{"tipo":"transferencia","frase":"pasé 500 de BBVA a Mercado Pago"},{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}]}
+{"id":"REP32","texto":"pasé 500 a Mercado Pago","esperado":[{"tipo":"transferencia"},{"tipo":"gasto","frase":"registra 500 con Mercado Pago"},{"tipo":"ingreso","frase":"me depositaron 500 en Mercado Pago"},{"tipo":"otra"}],"nota":"Una sola cuenta: traspaso sin frase"}
+{"id":"REP33","texto":"cooperé con 150 para el pastel","esperado":[{"tipo":"gasto","frase":"gasté 150 en el pastel"},{"tipo":"ingreso","frase":"me depositaron 150"},{"tipo":"otra"}]}
+{"id":"REP34","texto":"le di dos lucas al mecánico","esperado":[{"tipo":"gasto","frase":"gasté 2000 en mecánico"},{"tipo":"prestamo"},{"tipo":"otra"}],"nota":"06 §9.3"}
+{"id":"REP35","texto":"mil quinientos de la tele en efectivo","esperado":[{"tipo":"gasto","frase":"gasté 1500 en la tele en efectivo"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"06 §9.3: sin verbo"}
+{"id":"REP36","texto":"anoche unas chelas, 340 en efectivo","esperado":[{"tipo":"gasto","frase":"anoche gasté 340 en unas chelas en efectivo"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"06 §9.3"}
+{"id":"REP37","texto":"cargué gas 400","esperado":[{"tipo":"gasto","frase":"gasté 400 en gas"},{"tipo":"ingreso","frase":"me depositaron 400"},{"tipo":"otra"}]}
+{"id":"REP38","texto":"el lunes cargué gas, 520","esperado":[{"tipo":"gasto","frase":"el lunes gasté 520 en gas"},{"tipo":"ingreso","frase":"el lunes me depositaron 520"},{"tipo":"otra"}]}
+{"id":"REP39","texto":"croquetas para el perro 300","esperado":[{"tipo":"gasto","frase":"registra 300"},{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"otra"}],"nota":"Dos descripciones: no se adivina cuál"}
+{"id":"REP40","texto":"chelas 200","esperado":[{"tipo":"gasto","frase":"gasté 200 en chelas"},{"tipo":"ingreso","frase":"me depositaron 200"},{"tipo":"otra"}]}
+{"id":"REP41","texto":"300 del Oxxo","esperado":[{"tipo":"gasto","frase":"gasté 300 en oxxo"},{"tipo":"ingreso","frase":"me depositaron 300"},{"tipo":"otra"}],"nota":"Comercio con mayúscula: no es persona"}
+{"id":"REP42","texto":"unos tacos y una coca 120","esperado":[{"tipo":"gasto","frase":"registra 120"},{"tipo":"ingreso","frase":"me depositaron 120"},{"tipo":"otra"}]}
+{"id":"REP43","texto":"me salió en dos cincuenta el estacionamiento","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"Cifra ambigua: ni frase ni monto"}
+{"id":"REP44","texto":"gasté 500 la semana pasada en la farmacia","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"Fecha que el nivel 0 no lee: sin frases"}
+{"id":"REP45","texto":"medio kilo de despensa en la tienda","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}]}
+{"id":"REP46","texto":"compré la tele a meses, 8 mil","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"Meses: una frase de gasto lo perdería"}
+{"id":"REP47","texto":"quinientos pesitos de regalo para mi sobrina","esperado":[{"tipo":"gasto","frase":"gasté 500 en regalo"},{"tipo":"prestamo","frase":"le presté 500 a mi sobrina"},{"tipo":"me_pagaron","frase":"mi sobrina me pagó 500 de lo que me debía"},{"tipo":"otra"}]}
+{"id":"REP48","texto":"veinticinco mil del enganche del coche por transferencia","esperado":[{"tipo":"gasto","frase":"registra 25000 con débito"},{"tipo":"ingreso","frase":"me depositaron 25000"},{"tipo":"otra"}]}
+{"id":"REP49","texto":"blablá","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}],"nota":"Sin sentido: tres opciones"}
+{"id":"REP50","texto":"no sé","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}]}
+{"id":"REP51","texto":"cuéntame un chiste","esperado":[{"tipo":"gasto"},{"tipo":"ingreso"},{"tipo":"otra"}]}
+{"id":"REP52","texto":"   ","esperado":[],"nota":"Nada oído: ninguna opción"}

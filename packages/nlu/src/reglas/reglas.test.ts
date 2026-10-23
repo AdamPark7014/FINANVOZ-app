@@ -761,6 +761,58 @@ describe('nivel 0 · consultas', () => {
     expect(reglas('cuánto gasté en chelas este mes')).toBeNull();
   });
 
+  it('«¿cuánto llevo …?» es lo que va: sin periodo, el mes en curso (Ola 7, CA-O7 4)', () => {
+    expect(consulta('¿cuánto llevo en antojos?')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-10-01',
+      hasta: '2026-10-11',
+      categoria: 'antojos',
+    });
+    expect(consulta('cuánto llevo de antojos')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-10-01',
+      hasta: '2026-10-11',
+      categoria: 'antojos',
+    });
+    expect(consulta('¿Cuánto llevo en comida?')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-10-01',
+      hasta: '2026-10-11',
+      categoria: 'comida',
+    });
+    expect(consulta('¿cuánto llevo este mes?')).toEqual({
+      tipo: 'gasto_total',
+      desde: '2026-10-01',
+      hasta: '2026-10-11',
+    });
+    expect(consulta('¿cuánto llevo gastado?')).toEqual({
+      tipo: 'gasto_total',
+      desde: '2026-10-01',
+      hasta: '2026-10-11',
+    });
+    // Con periodo dicho, manda el periodo.
+    expect(consulta('¿cuánto llevo en antojos esta semana?')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-10-05',
+      hasta: '2026-10-11',
+      categoria: 'antojos',
+    });
+    expect(consulta('qué tanto llevo en uber esta quincena')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-09-30',
+      hasta: '2026-10-11',
+      categoria: 'transporte',
+    });
+  });
+
+  it('«¿cuánto llevo?» a secas no es consulta: también es «cuánto efectivo traigo»; «gasté» sin periodo tampoco', () => {
+    expect(reglas('¿cuánto llevo?')).toBeNull();
+    expect(reglas('cuánto gasté en antojos')).toBeNull();
+    expect(reglas('cuánto he gastado en antojos')).toBeNull();
+    expect(reglas('¿cuánto llevo en chelas?')).toBeNull();
+    expect(reglas('cuánto llevo en antojos y comida')).toBeNull();
+  });
+
   it('saldo, deuda, compromisos, por cobrar, comparar, mayores gastos, suscripciones', () => {
     expect(consulta('¿cuánto tengo en BBVA?')).toEqual({ tipo: 'saldo', alias: 'bbva' });
     expect(consulta('cuánto tengo en efectivo')).toEqual({ tipo: 'saldo', alias: 'efectivo' });
@@ -1048,4 +1100,24 @@ describe('nivel 0 · responde null ante la duda', () => {
       expect(reglas(texto)).toBeNull();
     });
   }
+});
+
+describe('nivel 0 · arqueo «traigo MONTO» a secas (Ola 7, CA-O7 5)', () => {
+  it('«traigo 300» y «traigo 300 pesos» son un arqueo', () => {
+    expect(reglas('traigo 300')).toEqual({ intencion: 'arqueo', efectivo_real: 30_000 });
+    expect(reglas('traigo 300 pesos')).toEqual({ intencion: 'arqueo', efectivo_real: 30_000 });
+    expect(reglas('traigo como 1,200')).toEqual({
+      intencion: 'arqueo',
+      efectivo_real: 120_000,
+      aproximado: true,
+    });
+  });
+
+  it('«tengo 300» a secas no es arqueo (puede ser el saldo de una cuenta)', () => {
+    expect(reglas('tengo 300')?.intencion).not.toBe('arqueo');
+  });
+
+  it('con EFECTIVO sigue igual', () => {
+    expect(reglas('traigo 340 en la cartera')).toEqual({ intencion: 'arqueo', efectivo_real: 34_000 });
+  });
 });

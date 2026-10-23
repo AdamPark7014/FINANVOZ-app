@@ -15,10 +15,21 @@ export interface Grabacion {
   /** `ok`, `reintento_validacion`, `no_entendi` o el código de error (`proveedor_fallo`, `tiempo_agotado`, …). */
   codigo: string;
   interpretacion: Record<string, unknown> | null;
+  /** Entrada total, incluida la leída y la escrita en caché. */
   tokens_entrada: number;
   tokens_salida: number;
+  /** De la entrada, leídos y escritos en caché (solo los proveedores que lo reportan; grabaciones viejas: 0). */
+  tokens_cache_leidos?: number;
+  tokens_cache_escritos?: number;
   latencia_ms: number;
 }
+
+/**
+ * Precio de la caché respecto al de entrada (Anthropic: lectura 0.1×, escritura de 5 min 1.25×). Solo cuenta
+ * para los tokens que el proveedor reporta como de caché; los demás se cobran a precio de entrada.
+ */
+export const FACTOR_CACHE_LECTURA = 0.1;
+export const FACTOR_CACHE_ESCRITURA = 1.25;
 
 /** Precio en USD por millón de tokens (`config/nlu/precios.json`); `null` si no está confirmado. */
 export interface Precio {
@@ -69,7 +80,13 @@ export interface ReporteNube {
   faltantes: string[];
   campos: Record<CampoMetrica, Conteo>;
   latencia: { p50: number; p95: number };
-  tokens: { entrada_promedio: number; salida_promedio: number };
+  tokens: {
+    entrada_promedio: number;
+    salida_promedio: number;
+    /** Promedio por caso de la entrada leída y escrita en caché. */
+    cache_leida_promedio: number;
+    cache_escrita_promedio: number;
+  };
   /** USD; `null` sin precio confirmado. */
   costo_total: number | null;
   costo_por_correcto: number | null;
@@ -157,9 +174,16 @@ export function evaluarNube(
   const n = Math.max(usadas.length, 1);
   const tokensEntrada = usadas.reduce((s, g) => s + g.tokens_entrada, 0);
   const tokensSalida = usadas.reduce((s, g) => s + g.tokens_salida, 0);
+  const leidos = usadas.reduce((s, g) => s + (g.tokens_cache_leidos ?? 0), 0);
+  const escritos = usadas.reduce((s, g) => s + (g.tokens_cache_escritos ?? 0), 0);
+  // Costo real: la entrada sin caché a precio lleno, la leída y la escrita con su factor.
   const costoTotal =
     precio && precio.entrada !== null && precio.salida !== null
-      ? (tokensEntrada * precio.entrada + tokensSalida * precio.salida) / 1_000_000
+      ? ((tokensEntrada - leidos - escritos) * precio.entrada +
+          leidos * precio.entrada * FACTOR_CACHE_LECTURA +
+          escritos * precio.entrada * FACTOR_CACHE_ESCRITURA +
+          tokensSalida * precio.salida) /
+        1_000_000
       : null;
   const latencias = usadas.map((g) => g.latencia_ms);
   const latencia = { p50: percentil(latencias, 50), p95: percentil(latencias, 95) };
@@ -180,7 +204,12 @@ export function evaluarNube(
     faltantes,
     campos,
     latencia,
-    tokens: { entrada_promedio: tokensEntrada / n, salida_promedio: tokensSalida / n },
+    tokens: {
+      entrada_promedio: tokensEntrada / n,
+      salida_promedio: tokensSalida / n,
+      cache_leida_promedio: leidos / n,
+      cache_escrita_promedio: escritos / n,
+    },
     costo_total: costoTotal,
     costo_por_correcto:
       costoTotal === null || campos.completo.aciertos === 0 ? null : costoTotal / campos.completo.aciertos,
@@ -214,7 +243,10 @@ export function formatearReporte(r: ReporteNube): string {
     `  latencia        p50 ${r.latencia.p50} ms · p95 ${r.latencia.p95} ms (máximo p95 ${LATENCIA_P95_MAXIMA_MS} ms)`,
   );
   lineas.push(
-    `  tokens          entrada ${r.tokens.entrada_promedio.toFixed(0)} · salida ${r.tokens.salida_promedio.toFixed(0)} (promedio por caso)`,
+    `  tokens          entrada ${r.tokens.entrada_promedio.toFixed(0)} · salida ${r.tokens.salida_promedio.toFixed(0)} (promedio por caso)` +
+      (r.tokens.cache_leida_promedio + r.tokens.cache_escrita_promedio > 0
+        ? ` · caché leída ${r.tokens.cache_leida_promedio.toFixed(0)} · escrita ${r.tokens.cache_escrita_promedio.toFixed(0)}`
+        : ''),
   );
   lineas.push(
     r.costo_total === null

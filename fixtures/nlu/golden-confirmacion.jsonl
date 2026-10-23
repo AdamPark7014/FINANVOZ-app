@@ -1,0 +1,123 @@
+{"id":"SI01","texto":"sí","esperado":{"tipo":"si"}}
+{"id":"SI02","texto":"Sí.","esperado":{"tipo":"si"}}
+{"id":"SI03","texto":"si","esperado":{"tipo":"si"},"nota":"Sin acento, como lo escribe el teclado"}
+{"id":"SI04","texto":"dale","esperado":{"tipo":"si"}}
+{"id":"SI05","texto":"sale","esperado":{"tipo":"si"}}
+{"id":"SI06","texto":"ándale","esperado":{"tipo":"si"}}
+{"id":"SI07","texto":"va","esperado":{"tipo":"si"}}
+{"id":"SI08","texto":"correcto","esperado":{"tipo":"si"}}
+{"id":"SI09","texto":"así es","esperado":{"tipo":"si"}}
+{"id":"SI10","texto":"regístralo","esperado":{"tipo":"si"}}
+{"id":"SI11","texto":"agrégala","esperado":{"tipo":"si"}}
+{"id":"SI12","texto":"sí, porfa","esperado":{"tipo":"si"}}
+{"id":"SI13","texto":"sí, por favor","esperado":{"tipo":"si"}}
+{"id":"SI14","texto":"sí, gracias","esperado":{"tipo":"si"}}
+{"id":"SI15","texto":"ok","esperado":{"tipo":"si"}}
+{"id":"SI16","texto":"okey","esperado":{"tipo":"si"}}
+{"id":"SI17","texto":"simón","esperado":{"tipo":"si"}}
+{"id":"SI18","texto":"órale","esperado":{"tipo":"si"}}
+{"id":"SI19","texto":"sale pues","esperado":{"tipo":"si"}}
+{"id":"SI20","texto":"ándale pues","esperado":{"tipo":"si"}}
+{"id":"SI21","texto":"sí, regístralo","esperado":{"tipo":"si"}}
+{"id":"SI22","texto":"está bien","esperado":{"tipo":"si"}}
+{"id":"SI23","texto":"perfecto","esperado":{"tipo":"si"}}
+{"id":"SI24","texto":"exacto","esperado":{"tipo":"si"}}
+{"id":"SI25","texto":"sí, así es","esperado":{"tipo":"si"}}
+{"id":"SI26","texto":"guárdalo","esperado":{"tipo":"si"}}
+{"id":"SI27","texto":"claro","esperado":{"tipo":"si"}}
+{"id":"SI28","texto":"de acuerdo","esperado":{"tipo":"si"}}
+{"id":"SI29","texto":"eso es","esperado":{"tipo":"si"}}
+{"id":"SI30","texto":"va, regístralo","esperado":{"tipo":"si"}}
+{"id":"SI31","texto":"sí sí","esperado":{"tipo":"si"}}
+{"id":"SI32","texto":"ajá","esperado":{"tipo":"si"}}
+{"id":"SI33","texto":"déjalo así","esperado":{"tipo":"si"}}
+{"id":"SI34","texto":"agrégalo por favor","esperado":{"tipo":"si"}}
+{"id":"NO01","texto":"no","esperado":{"tipo":"no"}}
+{"id":"NO02","texto":"nel","esperado":{"tipo":"no"}}
+{"id":"NO03","texto":"cancela","esperado":{"tipo":"no"}}
+{"id":"NO04","texto":"mejor no","esperado":{"tipo":"no"}}
+{"id":"NO05","texto":"no, gracias","esperado":{"tipo":"no"}}
+{"id":"NO06","texto":"nop","esperado":{"tipo":"no"}}
+{"id":"NO07","texto":"no, cancela","esperado":{"tipo":"no"}}
+{"id":"NO08","texto":"cancélalo","esperado":{"tipo":"no"}}
+{"id":"NO09","texto":"no lo registres","esperado":{"tipo":"no"}}
+{"id":"NO10","texto":"está mal","esperado":{"tipo":"no"}}
+{"id":"NO11","texto":"no, mejor no","esperado":{"tipo":"no"}}
+{"id":"NO12","texto":"olvídalo","esperado":{"tipo":"no"}}
+{"id":"NO13","texto":"así no","esperado":{"tipo":"no"}}
+{"id":"NO14","texto":"no no","esperado":{"tipo":"no"}}
+{"id":"CA01","texto":"no, fue con la Nu","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]},"nota":"Ejemplo del diseño (§4)"}
+{"id":"CA02","texto":"eran 40","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false}]}}
+{"id":"CA03","texto":"fue en efectivo","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"efectivo"}}]}}
+{"id":"CA04","texto":"ponle comida","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"comida_fuera"}]},"nota":"«comida» sola es Comida fuera, como en el diccionario (06 §3.1)"}
+{"id":"CA05","texto":"fue ayer","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-10"}]},"nota":"Fecha civil del contexto (2026-10-11), nunca el reloj"}
+{"id":"CA06","texto":"no, eran 40","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false}]}}
+{"id":"CA07","texto":"no, 450","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":45000,"aproximado":false}]}}
+{"id":"CA08","texto":"fueron cuatrocientos cincuenta","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":45000,"aproximado":false}]}}
+{"id":"CA09","texto":"no, con la BBVA","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"debito","alias":"bbva"}}]}}
+{"id":"CA10","texto":"con la oro","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"oro"}}]}}
+{"id":"CA11","texto":"no, fue el viernes","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-09"}]}}
+{"id":"CA12","texto":"fue antier","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-09"}]}}
+{"id":"CA13","texto":"no, era antojo","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"antojos"}]}}
+{"id":"CA14","texto":"ponlo en transporte","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"transporte"}]}}
+{"id":"CA15","texto":"es de súper","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"super"}]}}
+{"id":"CA16","texto":"no, eran 40 con la Nu","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false},{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]},"nota":"Dos filas en una frase"}
+{"id":"CA17","texto":"fue ayer en efectivo","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-10"},{"fila":"cuenta","cuenta":{"tipo":"efectivo"}}]}}
+{"id":"CA18","texto":"eran como 40","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":true}]},"nota":"Aproximado"}
+{"id":"CA19","texto":"sí, pero eran 40","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false}]}}
+{"id":"CA20","texto":"no, fueron 80, no 120","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":8000,"aproximado":false}]},"nota":"Lo anterior se lee y se descarta"}
+{"id":"CA21","texto":"no, fue con la Nu, no con la BBVA","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]}}
+{"id":"CA22","texto":"fue con Mercado Pago","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"debito","alias":"mercado pago"}}]}}
+{"id":"CA23","texto":"lo pagué con la de crédito","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito"}}]},"nota":"Tipo genérico: la app resuelve la cuenta"}
+{"id":"CA24","texto":"no, en efectivo","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"efectivo"}}]}}
+{"id":"CA25","texto":"eran ochenta y cinco","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":8500,"aproximado":false}]},"nota":"La «y» de la cifra no parte la frase"}
+{"id":"CA26","texto":"cámbialo a 300","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":30000,"aproximado":false}]}}
+{"id":"CA27","texto":"ponle 250","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":25000,"aproximado":false}]}}
+{"id":"CA28","texto":"fue hace tres días","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-08"}]}}
+{"id":"CA29","texto":"no, fue el 5","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-10-05"}]}}
+{"id":"CA30","texto":"era de transporte","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"transporte"}]}}
+{"id":"CA31","texto":"fue con débito","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"debito"}}]}}
+{"id":"CA32","texto":"fueron 1,250.50","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":125050,"aproximado":false}]}}
+{"id":"CA33","texto":"no, fue mil quinientos","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":150000,"aproximado":false}]}}
+{"id":"CA34","texto":"salió de la BBVA","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"debito","alias":"bbva"}}]}}
+{"id":"CA35","texto":"no, la Nu","esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]}}
+{"id":"CA36","texto":"eran 40 pesos","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false}]}}
+{"id":"CA37","texto":"eran cuarenta varos","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false}]}}
+{"id":"CA38","texto":"no, eran 40 y fue con la Nu","esperado":{"tipo":"cambio","cambios":[{"fila":"monto","monto":4000,"aproximado":false},{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]}}
+{"id":"CA39","texto":"no, fue el 25","esperado":{"tipo":"cambio","cambios":[{"fila":"cuando","fecha":"2026-09-25"}]},"nota":"El 25 más reciente ≤ hoy"}
+{"id":"CA40","texto":"no, era comida, no antojos","esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"comida_fuera"}]}}
+{"id":"CA41","texto":"era sueldo","tarjeta":{"movimiento":"ingreso"},"esperado":{"tipo":"cambio","cambios":[{"fila":"categoria","categoria":"sueldo"}]},"nota":"Tarjeta de ingreso: categorías de ingreso"}
+{"id":"CA42","texto":"no, fue con la Nu","tarjeta":{"filas":["monto","que","cuenta","categoria","cuando"]},"esperado":{"tipo":"cambio","cambios":[{"fila":"cuenta","cuenta":{"tipo":"credito","alias":"nu"}}]}}
+{"id":"NU01","texto":"mmm","esperado":null}
+{"id":"NU02","texto":"no sé","esperado":null}
+{"id":"NU03","texto":"a ver","esperado":null}
+{"id":"NU04","texto":"sí, no","esperado":null,"nota":"Contradictorio"}
+{"id":"NU05","texto":"no, sí","esperado":null}
+{"id":"NU06","texto":"creo que sí","esperado":null,"nota":"Ante la duda, la tarjeta espera el toque"}
+{"id":"NU07","texto":"espérame","esperado":null}
+{"id":"NU08","texto":"no, eran 40 o 50","esperado":null,"nota":"Dos cifras"}
+{"id":"NU09","texto":"ya","esperado":null}
+{"id":"NU10","texto":"sí, con la Nu","esperado":null,"nota":"«sí» con un dato sin «pero»: ¿confirma o corrige?"}
+{"id":"NU11","texto":"no, fue con la Coppel","esperado":null,"nota":"Alias que no es de la persona"}
+{"id":"NU12","texto":"no, fue mañana","esperado":null,"nota":"Fecha futura"}
+{"id":"NU13","texto":"fue la semana pasada","esperado":null,"nota":"06 §9.3: el nivel 0 no lee «la semana pasada»"}
+{"id":"NU14","texto":"ponle casa","esperado":null,"nota":"Grupo, no categoría"}
+{"id":"NU15","texto":"no, otra cosa","esperado":null}
+{"id":"NU16","texto":"eran entre 40 y 50","esperado":null}
+{"id":"NU17","texto":"tal vez","esperado":null}
+{"id":"NU18","texto":"no, fue con la tarjeta","esperado":null,"nota":"No dice cuál tarjeta"}
+{"id":"NU19","texto":"eran 40, no, 50","esperado":null,"nota":"Se corrige a sí misma"}
+{"id":"NU20","texto":"sí pero no","esperado":null}
+{"id":"NU21","texto":"dale, no, mejor no","esperado":null}
+{"id":"NU22","texto":"no, fue con la Nu y con la BBVA","esperado":null,"nota":"La misma fila dos veces"}
+{"id":"NU23","texto":"no, fue ayer, no, hoy","esperado":null}
+{"id":"NU24","texto":"no, está bien","esperado":null,"nota":"¿«no hace falta» o «no está bien»?"}
+{"id":"NU25","texto":"sí, eran 40","esperado":null}
+{"id":"NU26","texto":"era sueldo","esperado":null,"nota":"Por omisión la tarjeta es de gasto"}
+{"id":"NU27","texto":"ponle cero","esperado":null}
+{"id":"NU28","texto":"fueron 40 y 50","esperado":null}
+{"id":"NU29","texto":"fue el 30 de octubre","esperado":null,"nota":"Fecha futura respecto al contexto"}
+{"id":"NU30","texto":"regístralo en efectivo","esperado":null,"nota":"¿Confirma o cambia la cuenta?"}
+{"id":"NU31","texto":"ponle comida","tarjeta":{"movimiento":"ingreso"},"esperado":null,"nota":"Tarjeta de ingreso"}
+{"id":"NU32","texto":"no, fue con la Nu","tarjeta":{"filas":["monto","que","categoria","cuando"]},"esperado":null,"nota":"La tarjeta no tiene fila de cuenta"}
+{"id":"NU33","texto":"no, era para el súper","esperado":null}

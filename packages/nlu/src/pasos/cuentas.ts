@@ -7,8 +7,8 @@
  *   LUGAR    := [el] efectivo | la cartera | mi cartera | billetes | cash | la bolsa | mi bolsa
  *
  *   CUENTAS  := CLAUSULA ((y | , | , y) CLAUSULA)*                                     hasta 6, cada destino una vez
- *   CLAUSULA := [tengo|traigo|hay|me quedan|me queda] MONTO0 (en|de) DESTINO
- *             | en DESTINO [tengo|traigo|hay] MONTO0
+ *   CLAUSULA := [VERBO] MONTO0 (en|de) DESTINO | en DESTINO [VERBO] MONTO0
+ *   VERBO    := tengo | traigo | hay | me quedan | me queda | son | eran      ("son": corrección, «no, son 4 mil en BBVA»)
  *   DESTINO  := LUGAR                                                                  → efectivo
  *             | [mi|la] [cuenta de | tarjeta de débito de | la de] INSTITUCION          → débito o billetera (catálogo)
  *             | [mi|la] [cuenta de] ahorro(s) de INSTITUCION                            → ahorro
@@ -47,6 +47,9 @@ const VERBOS_CUENTA: readonly (readonly string[])[] = [
   ['tengo'],
   ['traigo'],
   ['hay'],
+  // Corrección en la tarjeta «Entendí» del onboarding: «no, son 4 mil en BBVA».
+  ['son'],
+  ['eran'],
 ];
 const PREFIJOS_AHORRO: readonly (readonly string[])[] = [
   ['mi', 'cuenta', 'de', 'ahorro', 'de'],

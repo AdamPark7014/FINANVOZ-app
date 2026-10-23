@@ -36,6 +36,22 @@ export {
   type PagoFijoDicho,
 } from './reglas/campos';
 export type { LecturaMonto } from './reglas/montos';
+export {
+  leerConfirmacion,
+  EsquemaLecturaConfirmacion,
+  FILAS_CONFIRMABLES,
+  type CambioConfirmacion,
+  type ContextoConfirmacion,
+  type FilaConfirmable,
+  type LecturaConfirmacion,
+} from './pasos/confirmacion';
+export {
+  sugerirReparacion,
+  MAX_OPCIONES_REPARACION,
+  TIPOS_REPARACION,
+  type OpcionReparacion,
+  type TipoReparacion,
+} from './pasos/reparacion';
 export { compararInterpretacion } from './eval/comparar';
 export * from './cliente';
 export * from './explicar';

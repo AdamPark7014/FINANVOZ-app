@@ -5,7 +5,14 @@
 import type { Interpretacion } from '../esquema';
 import { leerCategoriaConsulta } from './categorias';
 import type { Entorno } from './entorno';
-import { esteAnio, esteMesContraElPasado, leerPeriodo, ultimosTreintaDias, type Rango } from './fechas';
+import {
+  esteAnio,
+  esteMes,
+  esteMesContraElPasado,
+  leerPeriodo,
+  ultimosTreintaDias,
+  type Rango,
+} from './fechas';
 import { Lector } from './lector';
 import type { Tokens } from './tokens';
 
@@ -22,6 +29,16 @@ const GASTADO: readonly (readonly string[])[] = [
   ['he', 'gastado'],
   ['gaste'],
   ['llevo'],
+];
+/**
+ * Las formas con «llevo» hablan de lo que va: sin periodo, el mes en curso [1, hoy] (`06 §9.2`). «Llevo» a secas
+ * además pide categoría: «¿cuánto llevo?» sin más también es «cuánto efectivo traigo» y se deja al nivel 2.
+ */
+const LLEVO_GASTADO: readonly (readonly string[])[] = [
+  ['llevo', 'gastado'],
+  ['llevo', 'gastados'],
+  ['llevo', 'de', 'gasto'],
+  ['llevo', 'de', 'gastos'],
 ];
 const HOY_PUEDES: readonly (readonly string[])[] = [
   ['cuanto', 'puedo', 'gastar', 'hoy'],
@@ -171,8 +188,11 @@ export function consulta(tokens: Tokens, env: Entorno): Interpretacion | null {
       const periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso) ?? esteAnio(env.hoy);
       return l.fin ? consultar({ tipo: 'deducciones', ...rango(periodo) }) : null;
     }
-    // ¿cuánto gasté [en CAT] PERIODO? / ¿cuánto gasté PERIODO [en CAT]?
+    // ¿cuánto gasté [en CAT] PERIODO? / ¿cuánto gasté PERIODO [en CAT]? / ¿cuánto llevo en CAT [PERIODO]?
     l.volver(despuesDeCuanto);
+    const conGastado = l.alguna(...LLEVO_GASTADO);
+    l.volver(despuesDeCuanto);
+    const llevo = l.ver() === 'llevo';
     if (l.alguna(...GASTADO)) {
       let categoria: ReturnType<typeof leerCategoriaConsulta> = null;
       let periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso);
@@ -181,6 +201,7 @@ export function consulta(tokens: Tokens, env: Entorno): Interpretacion | null {
         if (!categoria) return null;
       }
       if (!periodo) periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso);
+      if (!periodo && llevo && (conGastado || categoria)) periodo = esteMes(env.hoy);
       if (!periodo || !l.fin) return null;
       return categoria
         ? consultar({ tipo: 'gasto_por_categoria', ...rango(periodo), categoria })

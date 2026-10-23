@@ -40,6 +40,43 @@ export function cargarGoldenPasos(): CasoPaso[] {
     .map((linea) => JSON.parse(linea) as CasoPaso);
 }
 
+const leerJsonl = <T>(ruta: string): T[] =>
+  readFileSync(raiz(ruta), 'utf8')
+    .split('\n')
+    .filter((linea) => linea.trim() !== '')
+    .map((linea) => JSON.parse(linea) as T);
+
+/**
+ * Caso de `fixtures/nlu/golden-confirmacion.jsonl`: la respuesta hablada a una tarjeta «Entendí»
+ * (`pasos/confirmacion.ts`). `tarjeta` acota filas y movimiento; `esperado: null` = no hay lectura segura.
+ */
+export interface CasoConfirmacion {
+  id: string;
+  texto: string;
+  tarjeta?: { filas?: string[]; movimiento?: 'gasto' | 'ingreso' };
+  esperado: Record<string, unknown> | null;
+  nota?: string;
+}
+
+export function cargarGoldenConfirmacion(): CasoConfirmacion[] {
+  return leerJsonl<CasoConfirmacion>('fixtures/nlu/golden-confirmacion.jsonl');
+}
+
+/**
+ * Caso de `fixtures/nlu/golden-reparacion.jsonl`: lo que el nivel 0 no entendió y las opciones esperadas, en orden,
+ * con la frase reescrita cuando la hay (`pasos/reparacion.ts`).
+ */
+export interface CasoReparacion {
+  id: string;
+  texto: string;
+  esperado: { tipo: string; frase?: string }[];
+  nota?: string;
+}
+
+export function cargarGoldenReparacion(): CasoReparacion[] {
+  return leerJsonl<CasoReparacion>('fixtures/nlu/golden-reparacion.jsonl');
+}
+
 /** `fixtures/nlu/contexto-onboarding.json`: la persona en el onboarding, sin cuentas todavía. */
 export function cargarContextoOnboarding(): ContextoInterprete {
   const f = leerJson('fixtures/nlu/contexto-onboarding.json') as ContextoInterprete;

@@ -20,6 +20,9 @@ const CAMPOS = [
   'interpretacion',
   'tokens_entrada',
   'tokens_salida',
+  // Opcionales: las grabaciones viejas no los traen (el costo las cobra a precio de entrada).
+  'tokens_cache_leidos',
+  'tokens_cache_escritos',
   'latencia_ms',
 ] as const;
 

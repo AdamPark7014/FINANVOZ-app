@@ -40,7 +40,12 @@ describe('reproducción offline de grabaciones (CA-M3-06)', () => {
       completo: { aciertos: 1, total: 5 },
     });
     expect(r.latencia).toEqual({ p50: 1200, p95: 8000 });
-    expect(r.tokens).toEqual({ entrada_promedio: 1000, salida_promedio: 50 });
+    expect(r.tokens).toEqual({
+      entrada_promedio: 1000,
+      salida_promedio: 50,
+      cache_leida_promedio: 0,
+      cache_escrita_promedio: 0,
+    });
     expect(r.costo_total).toBeCloseTo(0.0044, 10);
     expect(r.costo_por_correcto).toBeCloseTo(0.0044, 10);
     expect(r.cumple).toBe(false);
@@ -117,5 +122,29 @@ describe('precios y percentiles', () => {
         95,
       ),
     ).toBe(95);
+  });
+});
+
+describe('costo con caché (lectura 0.1×, escritura 1.25×)', () => {
+  it('cobra la entrada leída y escrita en caché con su factor, no a precio lleno', () => {
+    const caso = casos.find((c) => c.id === 'G01');
+    if (!caso) throw new Error('falta G01');
+    const g = {
+      id: 'G01',
+      proveedor: 'anthropic',
+      modelo: 'claude-haiku-5-5',
+      codigo: 'ok',
+      interpretacion: caso.esperado,
+      tokens_entrada: 10_000,
+      tokens_cache_leidos: 8_000,
+      tokens_cache_escritos: 1_000,
+      tokens_salida: 100,
+      latencia_ms: 900,
+    };
+    const r = evaluarNube([caso], [g], { entrada: 0.1, salida: 0.5 });
+    // 1,000 sin caché × 0.1 + 8,000 × 0.01 + 1,000 × 0.125 + 100 × 0.5, por millón.
+    expect(r.costo_total).toBeCloseTo((100 + 80 + 125 + 50) / 1_000_000, 12);
+    expect(r.tokens).toMatchObject({ cache_leida_promedio: 8_000, cache_escrita_promedio: 1_000 });
+    expect(formatearReporte(r)).toContain('caché leída 8000 · escrita 1000');
   });
 });

@@ -1,11 +1,18 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-22
+- **Fecha:** 2026-10-23
 - **Rama:** main
 
 ## Hecho en este turno
 
+- **Ola 7 · intérprete (`feat(nlu)`)**: `leerConfirmacion` (sí / no / cambio de fila, `pasos/confirmacion.ts`) y
+  `sugerirReparacion` («No entendí» con la frase reescrita que el nivel 0 sí entiende, `pasos/reparacion.ts`), con golden
+  propio (`fixtures/nlu/golden-confirmacion.jsonl` 123 casos, `golden-reparacion.jsonl` 52) y `pnpm eval:nlu
+  --confirmacion | --reparacion` (umbral 100 %); «traigo 300» a secas es arqueo; «¿cuánto llevo en antojos?» /
+  «en comida» / «gastado» sin periodo = lo que va del mes («¿cuánto llevo?» a secas sigue en `null`), con pruebas en
+  `reglas.test.ts` sin tocar el golden; 4 correcciones dichas en `golden-pasos` (104 / 90); herramientas de
+  «explicar» con periodos con nombre y `me_alcanza` (O-1).
 - **IA de FinanVoz optimizada (O-1)**: el modo `json_schema` del intérprete daba 400 en cada llamada (78 parámetros
   opcionales contra 24 permitidos en salida estricta): ahora `herramienta` por omisión, esfuerzo `low`, thinking
   apagado, API `2026-10-21`, `ANTHROPIC_BASE_URL` configurable, reparación del JSON con llave de más. Golden 164:
