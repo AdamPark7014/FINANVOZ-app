@@ -50,9 +50,11 @@ describe('Finanvoz te contesta en voz', () => {
     expect(Speech.stop).toHaveBeenCalled();
     expect(Speech.speak).toHaveBeenCalledTimes(1);
     const [texto, opciones] = jest.mocked(Speech.speak).mock.calls[0] ?? [];
-    expect(texto).toMatch(/^Registré: Coca veinticinco pesos, .+\. Hoy puedes gastar .+ pesos\.$/);
+    // La frase hablada corta de V-2 (`fraseHablada`): qué se registró y cuánto queda hoy, sin cifras escritas.
+    expect(texto).toBe('Listo, coca de veinticinco con tu Cartera. Te quedan doscientos siete para hoy.');
     expect(texto).not.toMatch(/\$|\d/);
-    expect(opciones).toEqual({ language: 'es-MX' });
+    // La voz (V-2) agrega ritmo, tono y avisos de fin: basta con que hable en es-MX.
+    expect(opciones).toEqual(expect.objectContaining({ language: 'es-MX' }));
   });
 
   it('no habla con el ajuste apagado ni con TalkBack encendido', async () => {

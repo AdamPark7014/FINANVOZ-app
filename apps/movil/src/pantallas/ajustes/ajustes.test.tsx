@@ -3,6 +3,7 @@ import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testi
 import { Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
+import Tu from '../../../app/(tabs)/tu';
 import Ayuda from '../../../app/ayuda';
 import AvisoPrivacidad from '../../../app/aviso-privacidad';
 import Inicio from '../../../app/index';
@@ -88,6 +89,7 @@ const RUTAS = {
   'onboarding/_layout': OnboardingLayout,
   'onboarding/index': Bienvenida,
   '(tabs)/hoy': () => <Text testID="pestana-hoy">Hoy</Text>,
+  '(tabs)/tu': Tu,
   'persona/[id]': () => <Detalle testID="detalle-persona" />,
   'tandas/[id]': () => <Detalle testID="detalle-tanda" />,
   'tarjetas/[id]': () => <Detalle testID="detalle-tarjeta" />,
@@ -200,6 +202,13 @@ describe('ajustes', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     fireEvent.press(screen.getByTestId('ajustes-volver'));
     expect(r.getPathname()).toBe('/hoy');
+  });
+
+  it('en la pestaña Tú no hay «Volver»: la barra de pestañas es la salida (Ola 7 §2)', () => {
+    renderRouter(RUTAS, { initialUrl: '/tu' });
+    expect(screen.getByTestId('tab-tu')).toBeTruthy();
+    expect(screen.getByTestId('ajustes-titulo')).toBeTruthy();
+    expect(screen.queryByTestId('ajustes-volver')).toBeNull();
   });
 
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {

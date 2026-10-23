@@ -1,5 +1,4 @@
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
-import { ScrollView } from 'react-native';
 import { listarMovimientos } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
@@ -45,7 +44,8 @@ describe('Registrar con voz desde Hoy (P0/P1 de la auditoría UX)', () => {
     expect(motor.iniciar).toHaveBeenCalledTimes(1);
     expect(motor.detener).not.toHaveBeenCalled();
     expect(boton().props.accessibilityLabel).toBe('Escuchando. Toca para terminar');
-    expect(screen.getByText('Toca para terminar')).toBeTruthy();
+    // Ola 7: el orbe cambia de forma al escuchar y sube la hoja «Te escucho…» con la onda.
+    expect(screen.getByTestId('hoja-escuchando')).toBeTruthy();
     emitir({ tipo: 'resultado', texto: 'coca 25', final: false });
     expect(screen.getByTestId('transcripcion-en-vivo')).toHaveTextContent('coca 25');
 
@@ -90,11 +90,12 @@ describe('Registrar con voz desde Hoy (P0/P1 de la auditoría UX)', () => {
     await tocar();
     emitir({ tipo: 'resultado', texto: RECHAZADA, final: true });
 
-    expect(
-      await screen.findByText(
-        `Esto oí: «${RECHAZADA}». ¿Lo arreglas? Corrígelo aquí abajo y toca Registrar.`,
-      ),
-    ).toBeTruthy();
+    // Ola 7: «No entendí» repite lo oído; «Corregir lo que oí» lo pone en el teclado para arreglarlo.
+    const turno = await screen.findByTestId('no-entendi');
+    expect(within(turno).getByTestId('no-entendi-texto')).toHaveTextContent(
+      `Oí «${RECHAZADA}», pero no supe qué pasó.`,
+    );
+    fireEvent.press(within(turno).getByTestId('no-entendi-corregir'));
     expect(screen.getByTestId('campo-registrar').props.value).toBe(RECHAZADA);
 
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
@@ -103,31 +104,32 @@ describe('Registrar con voz desde Hoy (P0/P1 de la auditoría UX)', () => {
     expect(listarMovimientos(p.ctx)[0]?.movimientos[0]?.origen).toBe('texto');
   });
 
-  it('lo escrito que no se entiende muestra "No te entendí" sin "Esto oí"', async () => {
+  it('lo escrito que no se entiende también lleva a «No entendí» con reparación en un toque', async () => {
     const f = nubeFalsa({ [RECHAZADA]: { tipo: 'error', codigo: 'peticion_invalida', status: 400 } });
     montarHoy(f.nube);
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), RECHAZADA);
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    expect(await screen.findByText('No te entendí. Prueba así: «tacos 80 en efectivo».')).toBeTruthy();
+    const turno = await screen.findByTestId('no-entendi');
+    expect(within(turno).getAllByTestId(/^no-entendi-opcion-/).length).toBeGreaterThanOrEqual(3);
     expect(screen.queryByText(/^Esto oí/)).toBeNull();
   });
 
-  it('"Hablar" y "Escribir" están fijos al pie, fuera del desplazamiento, y el aviso sube sobre ellos', () => {
+  it('el micrófono y el teclado van fijos al pie, fuera de la conversación que se desplaza', () => {
     montarHoy();
-    const pie = screen.getByTestId('hoy-pie-registrar');
-    expect(within(pie).getByTestId('boton-hablar')).toBeTruthy();
-    expect(within(pie).getByTestId('boton-escribir')).toBeTruthy();
-    const [desplazable] = screen.UNSAFE_getAllByType(ScrollView);
-    if (!desplazable) throw new Error('Hoy sin desplazamiento');
-    expect(within(desplazable).getByTestId('hoy-puedes')).toBeTruthy();
-    expect(within(desplazable).queryByTestId('boton-hablar')).toBeNull();
-
-    fireEvent(pie, 'layout', { nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 80 } } });
+    // Sin turnos: el micrófono enorme al centro (Hoy C) y el teclado al pie.
+    expect(within(screen.getByTestId('estado-vacio-mic')).getByTestId('boton-hablar')).toBeTruthy();
+    const pie = () => screen.getByTestId('hoy-pie-registrar');
+    expect(within(pie()).getByTestId('boton-escribir')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    // 16 de margen + 80 del pie + 2 × 12 de su relleno.
-    expect(screen.getByTestId('aviso')).toHaveStyle({ bottom: 16 + 80 + 24 });
+    // Con turnos: el micrófono de 72 pt al pie; la conversación (que se desplaza) no lo contiene.
+    expect(within(pie()).getByTestId('boton-hablar')).toBeTruthy();
+    const conversacion = screen.getByTestId('conversacion');
+    expect(within(conversacion).getByTestId('aviso')).toBeTruthy();
+    expect(within(conversacion).queryByTestId('boton-hablar')).toBeNull();
+    // La cabecera con la cifra queda fija arriba, fuera de la conversación.
+    expect(within(conversacion).queryByTestId('hoy-puedes')).toBeNull();
   });
 });

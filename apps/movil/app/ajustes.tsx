@@ -53,6 +53,14 @@ const TOQUES_MENU_DEV = 7;
  * tocar 7 veces la versión abre el menú de escenarios semilla.
  */
 export default function Ajustes() {
+  return <PantallaAjustes />;
+}
+
+/**
+ * `enPestana`: montada en la pestaña Tú (`app/(tabs)/tu.tsx`). Ahí no hay «Volver» (la barra de pestañas es la
+ * salida) ni borde inferior propio (la barra ya cubre el área segura de abajo).
+ */
+export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) {
   const router = useRouter();
   const control = useControlApp();
   // Sin nube (build sin Supabase), la tarjeta no habla de la nube: invita a exportar el archivo.
@@ -72,15 +80,20 @@ export default function Ajustes() {
   };
 
   return (
-    <Pantalla testID="ajustes" bordes={['top', 'left', 'right', 'bottom']}>
-      <Boton
-        testID="ajustes-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        pista={PISTA_VOLVER}
-        alPresionar={volver}
-      />
+    <Pantalla
+      testID="ajustes"
+      bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
+    >
+      {enPestana ? null : (
+        <Boton
+          testID="ajustes-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          pista={PISTA_VOLVER}
+          alPresionar={volver}
+        />
+      )}
       <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
         {TITULO}
       </Texto>

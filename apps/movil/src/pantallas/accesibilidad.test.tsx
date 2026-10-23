@@ -1,14 +1,14 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import { cargarEscenario, registrarMovimiento } from '../servicios';
 import { auditar, ordenDeLectura } from './__pruebas__/accesibilidad';
 import { PantallaArqueo } from './arqueo/PantallaArqueo';
+import { PantallaR2 } from './asistente/PantallaR2';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './principal/__pruebas__/arnes';
 import { abrirPruebaPantalla, conEscenario, escenario } from './principal/__pruebas__/base';
 import { PantallaHoy } from './principal/PantallaHoy';
-import { PantallaRegistrar } from './principal/PantallaRegistrar';
 
 /**
  * CA-M7-05 (`02 §15`, RNF-08): Hoy, registro y arqueo se pueden recorrer con TalkBack (cada cifra en palabras,
@@ -48,13 +48,14 @@ describe('accesibilidad (CA-M7-05)', () => {
 
     const orden = ordenDeLectura(screen.toJSON());
     const i = (t: string | RegExp) => orden.findIndex((x) => (typeof t === 'string' ? x === t : t.test(x)));
-    expect(i('Dom 11 oct')).toBe(0);
-    expect(i('Hoy puedes gastar doscientos catorce pesos')).toBeGreaterThan(i('Dom 11 oct'));
-    expect(i('4 días para tu quincena (jue 15)')).toBeGreaterThan(
-      i('Hoy puedes gastar doscientos catorce pesos'),
-    );
-    expect(i(/^Ocultar desglose$/)).toBeGreaterThan(i('4 días para tu quincena (jue 15)'));
-    expect(i('Libre: ochocientos cincuenta y seis pesos')).toBeGreaterThan(i(/^Ocultar desglose$/));
+    // Ola 7 (cabecera del asistente): la cifra principal va primero, después la fecha y los días; la barra del día
+    // (que abre y cierra el desglose) se lee entera, con sus tres partes en palabras.
+    expect(i('Hoy puedes gastar doscientos catorce pesos')).toBe(0);
+    expect(i('Dom 11 oct')).toBeGreaterThan(i('Hoy puedes gastar doscientos catorce pesos'));
+    expect(i('4 días para tu quincena (jue 15)')).toBeGreaterThan(i('Dom 11 oct'));
+    const barra = i(/^Reservado .*, libre ochocientos cincuenta y seis pesos$/);
+    expect(barra).toBeGreaterThan(i('4 días para tu quincena (jue 15)'));
+    expect(i('Libre: ochocientos cincuenta y seis pesos')).toBeGreaterThan(barra);
     expect(i('Toca para hablar')).toBeGreaterThan(i('Libre: ochocientos cincuenta y seis pesos'));
     // Cada fila del desglose es un solo elemento: concepto y monto juntos, sin repetir.
     expect(orden.filter((x) => x.startsWith('Colchón'))).toHaveLength(1);
@@ -91,27 +92,43 @@ describe('accesibilidad (CA-M7-05)', () => {
     p.cerrar();
   });
 
-  it('registro: panel, formulario, confirmación de monto alto y aviso de "Deshacer"', () => {
+  it('registro: conversación, «Entendí» de monto alto, pregunta de la cuenta, turno con "Deshacer" y R2', async () => {
     const p = conEscenario('e4-01');
-    renderConSesion(p.ctx, <PantallaRegistrar alCerrar={jest.fn()} motor={crearMotorFalso().motor} />);
+    renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
+    sinHallazgos();
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    const decir = async (frase: string) => {
+      fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
+      await act(async () => {
+        fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+      });
+    };
+
+    await decir('renta 6000 en efectivo');
+    expect(screen.getByTestId('entendi')).toBeTruthy();
     sinHallazgos();
 
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'renta 6000 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    expect(screen.getByTestId('confirmacion-registro')).toBeTruthy();
+    await decir('tacos 80 con tarjeta');
+    expect(screen.getByTestId('pregunta')).toBeTruthy();
     sinHallazgos();
-    fireEvent.press(screen.getByTestId('boton-cancelar-confirmacion'));
 
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 80 con tarjeta');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    sinHallazgos();
-    fireEvent.press(screen.getByTestId('boton-cancelar-confirmacion'));
-
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    expect(screen.getByTestId('aviso')).toBeTruthy();
+    await decir('coca 25 en efectivo');
+    expect(screen.getByTestId('aviso-deshacer')).toBeTruthy();
     sinHallazgos();
     p.cerrar();
+
+    // R2: el formulario completo prellenado que abre «Cambiar».
+    const q = conEscenario('e4-01');
+    renderConSesion(
+      q.ctx,
+      <PantallaR2
+        prellenado={{ tipo: 'gasto', monto: 8_000, descripcion: 'tacos' }}
+        alCerrar={jest.fn()}
+        alGuardado={jest.fn()}
+      />,
+    );
+    sinHallazgos();
+    q.cerrar();
   });
 
   it('arqueo: paso 1 con casillas, cifra esperada, reparto del faltante y sobrante', () => {

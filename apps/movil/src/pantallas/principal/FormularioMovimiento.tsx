@@ -73,6 +73,44 @@ const TIPOS: readonly TipoFormulario[] = [
 /** Días que se ofrecen como chips al elegir la fecha: hoy y los seis anteriores. */
 const DIAS_ELEGIBLES = 7;
 
+/**
+ * Lo que ya se dijo, para abrir el formulario lleno (R2 de la Ola 7, «Cambiar» en la tarjeta «Entendí»). Nada se
+ * guarda hasta tocar «Guardar».
+ */
+export interface PrellenadoMovimiento {
+  readonly tipo?: TipoMovimiento;
+  readonly monto?: Centavos;
+  readonly descripcion?: string;
+  /** La cuenta de la que salió (gasto, pagos, préstamo otorgado) o a la que llegó (ingreso, cobros). */
+  readonly cuentaId?: string;
+  /** Con dos cuentas (pago de tarjeta, transferencia, retiro): a la que llegó. */
+  readonly destinoId?: string;
+  /** Slug de la categoría. */
+  readonly categoria?: string;
+  readonly fecha?: PlainDate;
+}
+
+/** Lo que guardó el formulario, para quien lo abrió (el asistente muestra el turno «Registré…» con Deshacer). */
+export interface MovimientoGuardado {
+  /** «Registré: Luz $450». */
+  readonly mensaje: string;
+  readonly deshacer: string;
+  readonly transaccionId: string;
+}
+
+/** Cuentas que se llenan con lo dicho según los campos del tipo. */
+function cuentasPrellenadas(
+  tipo: TipoMovimiento,
+  p: PrellenadoMovimiento | undefined,
+): { origenId: string | null; destinoId: string | null } {
+  if (!p) return { origenId: null, destinoId: null };
+  const campos = CAMPOS_FORMULARIO_MOVIMIENTO[tipo];
+  if (campos.origen) {
+    return { origenId: p.cuentaId ?? null, destinoId: campos.destino ? (p.destinoId ?? null) : null };
+  }
+  return { origenId: null, destinoId: campos.destino ? (p.cuentaId ?? p.destinoId ?? null) : null };
+}
+
 type Cuenta = { id: string; nombre: string; clase: 'efectivo' | 'liquida' | 'tarjeta' };
 
 const TIPOS_CORREGIBLES = new Set<string>(Object.keys(CAMPOS_FORMULARIO_MOVIMIENTO));
@@ -97,6 +135,8 @@ export function FormularioMovimiento({
   corregir,
   alCorregido,
   alCancelar,
+  prellenado,
+  alRegistrado,
 }: {
   alGuardar?: () => void;
   alVerMovimiento?: (transaccionId: string) => void;
@@ -106,6 +146,13 @@ export function FormularioMovimiento({
   alCorregido?: (transaccionId: string) => void;
   /** "Cancelar" en modo corregir. */
   alCancelar?: () => void;
+  /** Lo que ya se dijo (R2): tipo, monto, descripción, cuenta, categoría y fecha. */
+  prellenado?: PrellenadoMovimiento;
+  /**
+   * Quien abrió el formulario muestra el registro (el asistente, con Deshacer en su turno): sin esto sale el aviso
+   * inferior de siempre.
+   */
+  alRegistrado?: (g: MovimientoGuardado) => void;
 }) {
   const { ctx, refrescar } = useSesion();
   const registrarEvento = useAnalitica();
@@ -145,13 +192,19 @@ export function FormularioMovimiento({
     };
   });
 
-  const [tipoElegido, setTipo] = useState<TipoFormulario>(corregir?.tipo ?? 'gasto');
+  const [tipoElegido, setTipo] = useState<TipoFormulario>(corregir?.tipo ?? prellenado?.tipo ?? 'gasto');
   const tipo: TipoMovimiento = tipoElegido === 'cuenta_dividida' ? 'gasto' : tipoElegido;
-  const [monto, setMonto] = useState<Centavos | null>(corregir?.monto ?? null);
-  const [descripcion, setDescripcion] = useState(inicial?.descripcion ?? '');
-  const [categoria, setCategoria] = useState<string | null>(inicial?.categoria ?? null);
-  const [origenId, setOrigenId] = useState<string | null>(inicial?.origenId ?? null);
-  const [destinoId, setDestinoId] = useState<string | null>(null);
+  const [cuentasDichas] = useState(() => cuentasPrellenadas(tipo, corregir ? undefined : prellenado));
+  const montoInicial = corregir?.monto ?? prellenado?.monto ?? null;
+  const [monto, setMonto] = useState<Centavos | null>(montoInicial);
+  const [descripcion, setDescripcion] = useState(
+    inicial?.descripcion ?? (corregir ? '' : (prellenado?.descripcion ?? '')),
+  );
+  const [categoria, setCategoria] = useState<string | null>(
+    inicial?.categoria ?? (corregir ? null : (prellenado?.categoria ?? null)),
+  );
+  const [origenId, setOrigenId] = useState<string | null>(inicial?.origenId ?? cuentasDichas.origenId);
+  const [destinoId, setDestinoId] = useState<string | null>(cuentasDichas.destinoId);
   const [personaId, setPersonaId] = useState<string | null>(null);
   const [nuevaPersona, setNuevaPersona] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -159,7 +212,8 @@ export function FormularioMovimiento({
   const [clave, setClave] = useState(0);
 
   // Fecha (`02 §5.3`): "Hoy · Ayer · Elegir"; Elegir ofrece los últimos 7 días y un campo para otra fecha.
-  const fechaInicial = corregir?.fecha ?? hoy;
+  const fechaDicha = prellenado?.fecha && compararFechas(prellenado.fecha, hoy) <= 0 ? prellenado.fecha : hoy;
+  const fechaInicial = corregir?.fecha ?? fechaDicha;
   const dias = Array.from({ length: DIAS_ELEGIBLES }, (_, i) => sumarDias(hoy, -i));
   const [fecha, setFecha] = useState<PlainDate>(fechaInicial);
   const [eligiendoFecha, setEligiendoFecha] = useState(fechaInicial !== hoy && fechaInicial !== ayer);
@@ -266,10 +320,13 @@ export function FormularioMovimiento({
       const nombre = descripcion.trim() || NOMBRE_TIPO[tipo];
       const cuando = fecha !== hoy ? ` · ${etiquetaDiaMes(fecha)}` : '';
       const registrado = `Registré: ${nombre} ${formatearCentavos(monto)}${cuando}`;
-      avisarRegistro(r.avisoDeducible ? `${registrado}. ${AVISO_DEDUCIBLE_EFECTIVO}` : registrado, {
-        deshacer: r.deshacer,
-        transaccionId: r.transaccionId,
-      });
+      const mensaje = r.avisoDeducible ? `${registrado}. ${AVISO_DEDUCIBLE_EFECTIVO}` : registrado;
+      if (alRegistrado) {
+        refrescar();
+        alRegistrado({ mensaje, deshacer: r.deshacer, transaccionId: r.transaccionId });
+      } else {
+        avisarRegistro(mensaje, { deshacer: r.deshacer, transaccionId: r.transaccionId });
+      }
       setMonto(null);
       setDescripcion('');
       setFecha(hoy);
@@ -386,7 +443,7 @@ export function FormularioMovimiento({
         <CampoMonto
           key={`monto-${clave}`}
           etiqueta={ETIQUETA_MONTO}
-          valorInicial={corregir?.monto ?? null}
+          valorInicial={clave === 0 ? montoInicial : null}
           alCambiar={setMonto}
           error={intentado && (monto === null || monto <= 0) ? ERROR_MONTO_CERO : null}
           testID="campo-monto"

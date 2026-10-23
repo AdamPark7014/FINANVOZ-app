@@ -11,9 +11,12 @@ import {
   MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
   MENSAJE_LIMITE_EXPLICAR_TOPE,
   mensajeLimiteExplicar,
+  respuestaMeAlcanza,
 } from './explicar';
 import { registrarMovimiento } from './formulario';
+import type { VistaMeAlcanza } from './me-alcanza';
 import { listarMovimientos } from './movimientos';
+import { MENSAJE_DATOS_INSUFICIENTES } from './probabilidad';
 import type { NivelNube } from './nube';
 import { sincronizarPlan } from './plan';
 import { registrarTexto } from './registrar';
@@ -341,5 +344,84 @@ describe('modo explicar: límites y fallas', () => {
     expect(await explicar(p.ctx, '¿cuánto debo?', { nube: inicio.nube })).toEqual({ tipo: 'error' });
     const sinRed = conTurnos([{ tipo: 'sin_red' }]);
     expect(await explicar(p.ctx, '¿cuánto debo?', { nube: sinRed.nube })).toEqual({ tipo: 'sin_red' });
+  });
+});
+
+describe('¿puedo gastar…? y periodos con nombre (06 §6)', () => {
+  const sinEspera = { ceder: () => Promise.resolve() };
+
+  it('una cifra que dijo la persona en la pregunta se acepta; la misma sin estar en la pregunta, no', async () => {
+    const p = semilla();
+    const t = conTurnos([pide(['hoy']), responde('Esos $500 quedan arriba de lo que puedes gastar hoy.')]);
+    const r = await explicar(p.ctx, '¿puedo gastar 500 en unos tenis?', { nube: t.nube });
+    expect(r).toMatchObject({ tipo: 'explicacion' });
+    const otra = conTurnos([pide(['hoy']), responde('Esos $500 quedan arriba de lo que puedes gastar hoy.')]);
+    expect((await explicar(p.ctx, '¿puedo comprar unos tenis?', { nube: otra.nube })).tipo).toBe('plantilla');
+  });
+
+  it('me_alcanza corre «¿Me alcanza?» sobre el libro y le pasa al modelo el precio que dijo', async () => {
+    const p = semilla();
+    const t = conTurnos([
+      pide(['me_alcanza', { precio: 500, descripcion: 'unos tenis' }]),
+      responde('Para unos tenis de $500 necesito 2 semanas de tus gastos para estimar si llegas.'),
+    ]);
+    const r = await explicar(p.ctx, '¿me alcanzan unos tenis?', { nube: t.nube, bloques: sinEspera });
+    expect(t.resultados()).toEqual([
+      JSON.stringify({ texto: `Unos tenis de $500: ${MENSAJE_DATOS_INSUFICIENTES}`, lineas: [] }),
+    ]);
+    expect(r).toMatchObject({ tipo: 'explicacion' });
+    // Solo lee: no registra la compra.
+    expect(listarMovimientos(p.ctx)).toHaveLength(p.movimientos);
+  });
+
+  it('me_alcanza con un precio inválido no corre nada', async () => {
+    const p = semilla();
+    const t = conTurnos([pide(['me_alcanza', { precio: 0 }]), responde('No pude revisarlo.')]);
+    await explicar(p.ctx, '¿me alcanza?', { nube: t.nube, bloques: sinEspera });
+    expect(t.resultados()).toEqual(['{"error":"argumentos_invalidos"}']);
+  });
+
+  it('el resultado de me_alcanza lleva título con precio, frase con nivel y probabilidad por opción', () => {
+    const escenario = (tipo: string, etiqueta: string, porcentaje: string, detalle: string | null) =>
+      ({ tipo, etiqueta, porcentaje, detalle }) as never;
+    const vista = {
+      estado: 'ok',
+      titulo: 'Unos tenis de $1,500',
+      fraseCompleta: 'Puedes. Lo más seguro: a 3 MSI con la Oro (89 %)',
+      etiqueta: 'estimación inicial',
+      notas: [{ tipo: 'uso_alto', texto: 'Con la Oro quedarías en 71 % de uso.' }],
+      escenarios: [
+        escenario('contado_hoy', 'Hoy, de contado', '< 1 %', 'Te quedas corto antes del jueves'),
+        escenario('msi', 'A 3 MSI con la Oro', '89 %', 'Comprometes $500 al mes hasta enero'),
+        escenario('base', 'Sin comprarlos', '90 %', null),
+      ],
+    } as unknown as VistaMeAlcanza;
+    expect(respuestaMeAlcanza(vista)).toEqual({
+      plantilla: 'me_alcanza',
+      texto:
+        'Unos tenis de $1,500: Puedes. Lo más seguro: a 3 MSI con la Oro (89 %) (estimación inicial). Con la Oro quedarías en 71 % de uso.',
+      lineas: [
+        {
+          etiqueta: 'Hoy, de contado',
+          valor: '< 1 % de no quedarte corto · Te quedas corto antes del jueves',
+        },
+        {
+          etiqueta: 'A 3 MSI con la Oro',
+          valor: '89 % de no quedarte corto · Comprometes $500 al mes hasta enero',
+        },
+      ],
+      filtro: {},
+    });
+  });
+
+  it('periodo esta_quincena: el teléfono pone las fechas desde su último ingreso', async () => {
+    const p = semilla();
+    const t = conTurnos([
+      pide(['gasto', { periodo: 'esta_quincena', categoria: 'comida' }]),
+      responde('Desde tu quincena del 30 sep llevas $2,300 en comida.'),
+    ]);
+    const r = await explicar(p.ctx, '¿cuánto llevo en comida esta quincena?', { nube: t.nube });
+    expect(t.resultados()[0]).toContain('Desde tu quincena del 30 sep llevas $2,300 en comida');
+    expect(r).toMatchObject({ tipo: 'explicacion', filtro: { desde: '2026-09-30', hasta: '2026-10-11' } });
   });
 });

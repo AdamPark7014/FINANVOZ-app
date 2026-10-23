@@ -1,4 +1,5 @@
 import {
+  compraDeHerramienta,
   consultaDeHerramienta,
   HERRAMIENTAS_EXPLICAR,
   LLAMADAS_HERRAMIENTA_MAX,
@@ -8,7 +9,15 @@ import {
   type LlamadaHerramienta,
   type MensajeTurno,
 } from '@cartera/nlu';
-import { responderConsulta, type LineaConsulta, type RespuestaConsulta } from './consultas';
+import type { OpcionesBloques } from './bloques';
+import {
+  responderConsulta,
+  type LineaConsulta,
+  type PlantillaConsulta,
+  type RespuestaConsulta,
+} from './consultas';
+import { resolverPeriodos } from './explicar-periodos';
+import { meAlcanza, type VistaMeAlcanza } from './me-alcanza';
 import type { EventoAnalitica } from '../analitica/eventos';
 import type { Contexto } from './contexto';
 import type { FiltroMovimientos } from './movimientos';
@@ -58,6 +67,14 @@ const PLANTILLA_POR_OMISION: readonly ConsultaHerramienta[] = [
   { tipo: 'mayores_gastos' },
 ];
 
+/**
+ * Lo que devolvió una herramienta, en la forma de una respuesta de consulta (`texto` + `lineas`). `me_alcanza`
+ * no es una consulta tipada: su resultado sale de "¿Me alcanza?" (`02 §9`).
+ */
+export type RespuestaHerramienta = Omit<RespuestaConsulta, 'plantilla' | 'soloPlus'> & {
+  readonly plantilla: PlantillaConsulta | 'me_alcanza';
+};
+
 export type RespuestaExplicar =
   /** La explicación del modelo, con todas sus cifras verificadas. */
   | {
@@ -70,7 +87,7 @@ export type RespuestaExplicar =
   | {
       readonly tipo: 'plantilla';
       readonly aviso: typeof AVISO_SIN_EXPLICACION;
-      readonly respuestas: readonly RespuestaConsulta[];
+      readonly respuestas: readonly RespuestaHerramienta[];
       readonly filtro: FiltroMovimientos;
       readonly vueltas: number;
     }
@@ -83,10 +100,12 @@ export type RespuestaExplicar =
 export interface OpcionesExplicar {
   readonly nube?: NivelNube | null;
   readonly registrarEvento?: (evento: EventoAnalitica) => void;
+  /** Cómo cede el hilo la simulación de `me_alcanza` (las pruebas no esperan). */
+  readonly bloques?: OpcionesBloques;
 }
 
 /** Resultado que viaja al modelo: la frase y las filas de la plantilla, sin ids ni filtros. */
-function serializar(r: RespuestaConsulta): string {
+function serializar(r: RespuestaHerramienta): string {
   const lineas: LineaConsulta[] = [...r.lineas];
   let texto = JSON.stringify({ texto: r.texto, lineas });
   while (texto.length > RESULTADO_MAXIMO && lineas.length > 0) {
@@ -96,7 +115,7 @@ function serializar(r: RespuestaConsulta): string {
   return texto.slice(0, RESULTADO_MAXIMO);
 }
 
-const filtroDe = (respuestas: readonly RespuestaConsulta[]): FiltroMovimientos =>
+const filtroDe = (respuestas: readonly RespuestaHerramienta[]): FiltroMovimientos =>
   respuestas.find((r) => Object.keys(r.filtro).length > 0)?.filtro ?? {};
 
 function emitirModoExplicar(
@@ -112,11 +131,11 @@ function emitirModoExplicar(
 
 function plantilla(
   ctx: Contexto,
-  respuestas: readonly RespuestaConsulta[],
+  respuestas: readonly RespuestaHerramienta[],
   vueltas: number,
   opciones: OpcionesExplicar,
 ): RespuestaExplicar {
-  const lista =
+  const lista: readonly RespuestaHerramienta[] =
     respuestas.length > 0 ? respuestas : PLANTILLA_POR_OMISION.map((c) => responderConsulta(ctx, c));
   emitirModoExplicar(opciones, 'plantilla', vueltas);
   return {
@@ -128,14 +147,45 @@ function plantilla(
   };
 }
 
+/**
+ * Resultado de `me_alcanza` para el modelo: el precio que dijo (en el título), el nivel y la probabilidad de no
+ * quedarse corto de cada opción, ya redactados por la vista de "¿Me alcanza?" (ninguna cifra se calcula aquí).
+ */
+export function respuestaMeAlcanza(v: VistaMeAlcanza): RespuestaHerramienta {
+  if (v.estado !== 'ok') {
+    return { plantilla: 'me_alcanza', texto: `${v.titulo}: ${v.mensaje}`, lineas: [], filtro: {} };
+  }
+  const etiqueta = v.etiqueta ? ` (${v.etiqueta})` : '';
+  const notas = v.notas.map((n) => ` ${n.texto}`).join('');
+  return {
+    plantilla: 'me_alcanza',
+    texto: `${v.titulo}: ${v.fraseCompleta}${etiqueta}.${notas}`,
+    lineas: v.escenarios
+      .filter((e) => e.tipo !== 'base')
+      .map((e) => ({
+        etiqueta: e.etiqueta,
+        valor: `${e.porcentaje} de no quedarte corto${e.detalle ? ` · ${e.detalle}` : ''}`,
+      })),
+    filtro: {},
+  };
+}
+
 /** Ejecuta una llamada del modelo. Argumentos inválidos o una herramienta desconocida no ejecutan nada. */
-function ejecutar(
+async function ejecutar(
   ctx: Contexto,
   l: LlamadaHerramienta,
-): { resultado: string; respuesta: RespuestaConsulta | null } {
-  const consulta = consultaDeHerramienta(l.nombre, l.argumentos);
-  if (!consulta) return { resultado: '{"error":"argumentos_invalidos"}', respuesta: null };
+  opciones: OpcionesExplicar,
+): Promise<{ resultado: string; respuesta: RespuestaHerramienta | null }> {
+  const invalidos = { resultado: '{"error":"argumentos_invalidos"}', respuesta: null };
   try {
+    if (l.nombre === 'me_alcanza') {
+      const compra = compraDeHerramienta(l.nombre, l.argumentos);
+      if (!compra) return invalidos;
+      const respuesta = respuestaMeAlcanza(await meAlcanza(ctx, compra, opciones.bloques));
+      return { resultado: serializar(respuesta), respuesta };
+    }
+    const consulta = consultaDeHerramienta(l.nombre, l.argumentos, resolverPeriodos(ctx));
+    if (!consulta) return invalidos;
     const respuesta = responderConsulta(ctx, consulta);
     return { resultado: serializar(respuesta), respuesta };
   } catch {
@@ -161,9 +211,10 @@ export async function explicar(
     return { tipo: 'sin_red' };
   }
 
-  const mensajes: MensajeTurno[] = [{ rol: 'usuario', texto: pregunta.trim().slice(0, PREGUNTA_MAXIMA) }];
+  const texto = pregunta.trim().slice(0, PREGUNTA_MAXIMA);
+  const mensajes: MensajeTurno[] = [{ rol: 'usuario', texto }];
   const resultados: string[] = [];
-  const respuestas: RespuestaConsulta[] = [];
+  const respuestas: RespuestaHerramienta[] = [];
   let vueltas = 0;
 
   // Una vuelta por llamada como máximo, más la respuesta final.
@@ -182,7 +233,8 @@ export async function explicar(
     }
 
     if (r.salida.tipo === 'respuesta') {
-      const v = validarCifras(r.salida.texto, resultados);
+      // Las cifras salen de los resultados o de la pregunta (el monto que dijo la persona no lo calculó nadie).
+      const v = validarCifras(r.salida.texto, [...resultados, texto]);
       if (v.ok) {
         emitirModoExplicar(opciones, 'explicacion', vueltas);
         return {
@@ -202,7 +254,7 @@ export async function explicar(
     if (llamadas.length === 0) break;
     mensajes.push({ rol: 'asistente', llamadas });
     for (const l of llamadas) {
-      const e = ejecutar(ctx, l);
+      const e = await ejecutar(ctx, l, opciones);
       resultados.push(e.resultado);
       if (e.respuesta) respuestas.push(e.respuesta);
       mensajes.push({ rol: 'herramienta', id: l.id, nombre: l.nombre, resultado: e.resultado });

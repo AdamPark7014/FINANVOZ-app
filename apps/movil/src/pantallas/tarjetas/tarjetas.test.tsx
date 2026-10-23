@@ -19,6 +19,7 @@ import {
   type Contexto,
   type NivelNube,
 } from '../../servicios';
+import { tomarPrellenado } from '../../asistente/flujos/prellenado';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { formatearCentavos } from '../../ui';
@@ -60,7 +61,6 @@ import {
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   TEXTO_TARJETA_NO_ENCONTRADA,
-  TITULO_CONFIRMAR_MSI,
   TITULO_DESDE_ULTIMO_CORTE,
   TITULO_ESTADOS_CUENTA,
   VACIO_MSI_TARJETA,
@@ -186,7 +186,16 @@ describe('Hoy · cobertura', () => {
 });
 
 describe('Registrar', () => {
-  it('CA-M4-06 · "compré una tele de 12 mil a 12 meses…" por texto: confirmación, plan con 12 meses visible en la tarjeta', async () => {
+  /** Escribe la frase en el asistente (la barra abre el campo la primera vez) y la manda. */
+  async function escribir(frase: string) {
+    if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+  }
+
+  it('CA-M4-06 · "compré una tele de 12 mil a 12 meses…" por texto: «Entendí» con meses y mensualidad, plan con 12 meses visible en la tarjeta', async () => {
     const caso = golden('S01');
     const p = e510();
     activarPlus(p.ctx); // el compromiso de 12 meses es de Plus (M7)
@@ -204,31 +213,27 @@ describe('Registrar', () => {
     ).toBeTruthy();
     expect(screen.queryByTestId('compromiso-12-meses')).toBeNull();
 
-    fireEvent.press(screen.getByTestId('boton-escribir'));
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), caso.texto);
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    const tarjeta = await screen.findByTestId('confirmacion-msi');
-    expect(within(tarjeta).getByText(TITULO_CONFIRMAR_MSI.monto_alto)).toBeTruthy();
-    expect(within(tarjeta).getByTestId('confirmacion-msi-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(within(tarjeta).getByText('Compra a 12 meses sin intereses')).toBeTruthy();
+    await escribir(caso.texto);
+    // Ola 7 (flujo de compra a meses, §6): la tarjeta «oro» ya se dijo; «Entendí» muestra meses, mensualidad (E6.1)
+    // y tarjeta como filas, y nada se guarda hasta el «Sí».
+    const entendi = await screen.findByTestId('entendi');
+    expect(within(entendi).getByTestId('entendi-monto')).toHaveTextContent('$12,000');
+    expect(within(entendi).getByTestId('entendi-fila-meses')).toHaveTextContent(/12 meses/);
+    expect(within(entendi).getByTestId('entendi-fila-mensualidad')).toHaveTextContent(/\$1,000/);
+    expect(within(entendi).getByTestId('entendi-fila-tarjeta')).toHaveTextContent(/Banamex Oro ••8812/);
     expect(listarMovimientos(p.ctx)).toEqual([]);
+    await act(async () => {
+      fireEvent.press(within(entendi).getByTestId('entendi-confirmar'));
+    });
 
-    fireEvent.press(within(tarjeta).getByTestId('msi-categoria-hogar'));
-    fireEvent.changeText(within(tarjeta).getByTestId('msi-descripcion'), 'tele');
-    fireEvent.press(screen.getByTestId('boton-guardar-msi'));
-
-    const aviso = screen.getByTestId('aviso');
-    expect(
-      within(aviso).getByText(
-        'Registré: Tele $12,000 a 12 meses sin intereses · Banamex Oro ••8812\n12 meses de $1,000',
-      ),
-    ).toBeTruthy();
-    expect(within(aviso).getByText('Deshacer')).toBeTruthy();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      /\$12,000 a 12 meses con tu Banamex Oro ••8812\.$/,
+    );
+    expect(screen.getByTestId('aviso-deshacer')).toBeTruthy();
 
     // El plan en el detalle de la tarjeta: cuota, 12 cuotas restantes y los 12 meses de compromiso.
     const [plan] = listarPlanesMsi(p.ctx, p.oro);
     if (!plan) throw new Error('sin plan');
-    expect(within(screen.getByTestId(`plan-${plan.id}`)).getByText('tele')).toBeTruthy();
     expect(textoDe(`plan-${plan.id}-cuotas`)).toBe('$1,000 al mes · faltan 12 de 12');
     const compromiso = screen.getByTestId('compromiso-12-meses');
     const meses = detalleTarjeta(p.ctx, p.oro).compromiso12Meses;
@@ -239,18 +244,20 @@ describe('Registrar', () => {
     }
     expect(textoDe('compromiso-2026-11-monto')).toBe('$1,000');
     expect(textoDe('tarjeta-deuda-meses')).toBe('De eso, $12,000 son meses sin intereses.');
-    // El gasto completo una sola vez, en Hogar.
+    // El gasto completo una sola vez.
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toEqual([
-      expect.objectContaining({ tipo: 'compra_msi', monto: 1_200_000, categoria: 'Hogar' }),
+      expect.objectContaining({ tipo: 'compra_msi', monto: 1_200_000 }),
     ]);
 
     // Deshacer: la compra y su plan desaparecen.
-    fireEvent.press(within(aviso).getByText('Deshacer'));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('aviso-deshacer'));
+    });
     expect(screen.getByText('No tienes compras a meses en esta tarjeta.')).toBeTruthy();
     expect(screen.queryByTestId('compromiso-12-meses')).toBeNull();
   });
 
-  it('CA-M4-06 · también dictado: al soltar llega la misma confirmación', async () => {
+  it('CA-M4-06 · también dictado: al soltar llega el mismo «Entendí»', async () => {
     const caso = golden('S01');
     const p = e510();
     const f = nubeFalsa({ [caso.texto]: caso.esperado });
@@ -261,45 +268,66 @@ describe('Registrar', () => {
     });
     fireEvent(screen.getByTestId('boton-hablar'), 'pressOut');
     emitir({ tipo: 'resultado', texto: caso.texto, final: true });
-    expect(await screen.findByTestId('confirmacion-msi')).toBeTruthy();
+    expect(await screen.findByTestId('entendi-fila-meses')).toHaveTextContent(/12 meses/);
   });
 
-  it('"mi Nu corta el 28 y pago el 18" cambia el ciclo con Deshacer; una tarjeta que no existe abre el formulario prellenado', async () => {
+  it('"mi Nu corta el 28 y pago el 18" cambia el ciclo con Deshacer; una tarjeta que no existe pregunta lo que falta y «Cambiar algo» deja el formulario prellenado', async () => {
     const k01 = golden('K01');
     const k05 = golden('K05');
     const p = conEscenario('e4-01');
     const nu = p.e.cuentas.nu as string;
     const f = nubeFalsa({ [k01.texto]: k01.esperado, [k05.texto]: k05.esperado });
-    montar(p.ctx, hoy(), { nube: f.nube });
-    fireEvent.press(screen.getByTestId('boton-escribir'));
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), k01.texto);
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    const alAbrirRuta = jest.fn();
+    montar(
+      p.ctx,
+      <PantallaHoy navegacion={{ ...navegacionFalsa(), alAbrirRuta }} motor={crearMotorFalso().motor} />,
+      { nube: f.nube },
+    );
+    await escribir(k01.texto);
     expect(await screen.findByText(/^Listo: tu Nu ••4410 corta el 28 y pagas el 18\.$/)).toBeTruthy();
     expect(detalleTarjeta(p.ctx, nu).ciclo).toEqual({ diaCorte: 28, diaLimitePago: 18 });
 
-    fireEvent.changeText(screen.getByTestId('campo-registrar'), k05.texto);
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    const tarjeta = await screen.findByTestId('tarjeta-por-agregar');
-    expect(within(tarjeta).getByText('No tengo una tarjeta «oro». ¿La agrego?')).toBeTruthy();
+    // Ola 7 (flujo de tarjeta, §6): nombre y ciclo ya se dijeron; solo pregunta cuánto debes y si la pagas completa.
+    await escribir(k05.texto);
+    expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿Cuánto debes hoy en la Oro?');
+    expect(listarTarjetas(p.ctx).find((t) => t.nombre === 'Oro')).toBeUndefined();
+    await escribir('1,200');
+    expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿La pagas completa cada mes?');
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('pregunta-chip-totalero'));
+    });
+    const entendi = screen.getByTestId('entendi');
+    expect(within(entendi).getByTestId('entendi-fila-tarjeta')).toHaveTextContent(/Oro · crédito/);
+    expect(within(entendi).getByTestId('entendi-fila-ciclo')).toHaveTextContent(
+      /corta el 10 · pagas 20 días después/,
+    );
+    expect(within(entendi).getByTestId('entendi-fila-saldo')).toHaveTextContent(/\$1,200/);
+
+    // «Cambiar algo» abre el formulario largo; lo dicho viaja en memoria, no en la ruta (se revisa al final).
+    fireEvent.press(within(entendi).getByTestId('entendi-cambiar'));
+    expect(alAbrirRuta).toHaveBeenCalledWith({ pathname: '/tarjetas/nueva', params: { desde: 'asistente' } });
+
+    // «Sí, agrégala» la crea con lo dicho.
+    await act(async () => {
+      fireEvent.press(within(screen.getByTestId('entendi')).getByTestId('entendi-confirmar'));
+    });
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent('Listo: agregué tu Oro.');
+    expect(listarTarjetas(p.ctx).find((t) => t.nombre === 'Oro')).toMatchObject({ saldoRevolvente: 120_000 });
+
+    // El formulario largo que abrió «Cambiar algo» llega con todo lo dicho.
+    const prellenado = tomarPrellenado('tarjeta');
+    render(
+      <ProveedorSesion ctx={p.ctx} nube={null}>
+        <FormularioTarjetaNueva prellenado={prellenado} alGuardar={jest.fn()} alCancelar={jest.fn()} />
+      </ProveedorSesion>,
+    );
     expect(screen.getByTestId('tarjeta-nombre').props.value).toBe('Oro');
     expect(screen.getByTestId('tarjeta-corte').props.value).toBe('10');
     expect(screen.getByTestId('tarjeta-limite-pago').props.value).toBe('20');
     expect(screen.getByTestId('tarjeta-modo-limite-dias').props.accessibilityState).toMatchObject({
       selected: true,
     });
-    // Sin saldo no se agrega.
-    fireEvent.changeText(screen.getByTestId('tarjeta-limite-credito'), '30,000');
-    fireEvent.press(screen.getByTestId('tarjeta-completa-si'));
-    fireEvent.press(screen.getByTestId('tarjeta-guardar'));
-    expect(
-      screen.getByText('Escribe cuánto debes hoy. Si no lo tienes a la mano, agrégala después.'),
-    ).toBeTruthy();
-    fireEvent.changeText(screen.getByTestId('tarjeta-saldo'), '1,200');
-    fireEvent.press(screen.getByTestId('tarjeta-guardar'));
-    expect(screen.queryByTestId('tarjeta-por-agregar')).toBeNull();
-    // El aviso puede seguir con "Tu día pasa de $X a $Y" (paquete B-1).
-    expect(screen.getByText(/^Listo: agregué tu tarjeta\./)).toBeTruthy();
-    expect(listarTarjetas(p.ctx).find((t) => t.nombre === 'Oro')).toMatchObject({ saldoRevolvente: 120_000 });
+    expect(screen.getByTestId('tarjeta-saldo').props.value).toBe('1,200');
   });
 });
 

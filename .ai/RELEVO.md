@@ -6,6 +6,15 @@
 
 ## Hecho en este turno
 
+- **Asistente por voz (A-1 + A-2 y O-1 en la app)**: pestañas Asistente · Movimientos · Cuentas · Tú (`barraPestanas`
+  con 4; los textos de pestañas salieron de `app/(tabs)` a `src/rutas/` para que Expo Router no los vuelva rutas),
+  `/registrar` modal R2 declarado en la raíz, Tú sin «Volver», `PantallaAsistente` (cabecera, barra del día,
+  conversación, chips, estado vacío), `asistente/registro.ts` para todo `ResultadoTexto`, «Entendí» con
+  `confirmar.deshabilitado` + motivo visible (propuesta sin cuenta) y filas ≥ 48 dp, confirmación por voz, «No
+  entendí» con reparación, «¿puedo gastar…?» en la conversación y «explicar» con periodos. **Arreglo**: el «Sí» de un
+  flujo o de un ajuste dicho no refrescaba la cabecera ni Cuentas (`AccionesRegistro.refrescar`). Pruebas migradas a la
+  UI nueva (ninguna borrada sin reemplazo): tarjetas 3, me-alcanza 2, personas 1, plan 4, deducciones 2, tandas 1,
+  accesibilidad 2, analítica 1.
 - **Flujos conversacionales (A-3)**: `src/asistente/flujos/` (tarjeta, compra a meses, tanda, cuenta dividida, pagar
   tarjeta y arqueo) sobre `PasoFlujo` / `FlujoConversacional`; funciones nuevas en los servicios de tarjetas, MSI,
   tandas, cuenta dividida y arqueo; «Cambiar algo» deja lo dicho en memoria (`flujos/prellenado.ts`) y

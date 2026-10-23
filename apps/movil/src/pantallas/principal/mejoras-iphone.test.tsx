@@ -184,7 +184,8 @@ describe('Hoy más claro', () => {
     });
   });
 
-  it('Ajustes en la cabecera de Hoy, sin emoji; sin ingreso dice "Configurar mi ingreso"', () => {
+  // Ola 7: Ajustes es la pestaña Tú; la cabecera del asistente no lleva botón de Ajustes.
+  it('Ajustes vive en la pestaña Tú (sin emoji); la cabecera del asistente no lo repite', () => {
     const p = conEscenario('e4-01');
     const alAbrirAjustes = jest.fn();
     renderConSesion(
@@ -193,8 +194,8 @@ describe('Hoy más claro', () => {
     );
     expect(BTN_AJUSTES_CUENTAS).toBe(BTN_AJUSTES);
     expect(BTN_AJUSTES).not.toMatch(/⚙/);
-    fireEvent.press(screen.getByTestId('boton-ajustes-hoy'));
-    expect(alAbrirAjustes).toHaveBeenCalled();
+    expect(screen.queryByTestId('boton-ajustes-hoy')).toBeNull();
+    expect(alAbrirAjustes).not.toHaveBeenCalled();
     p.cerrar();
   });
 
@@ -207,6 +208,7 @@ describe('Hoy más claro', () => {
     p.cerrar();
   });
 
+  // Ola 7: el candado y «¿Me alcanza?» viven en el desglose que abre la barra del día.
   it('en Gratis sin pantalla del plan (abrirPlan null) no hay candado ni "¿Me alcanza?"; con ella, sí', () => {
     const p = conEscenario('e4-01');
     const nav = { ...navegacionFalsa(), alAbrirMeAlcanza: jest.fn() };
@@ -214,6 +216,7 @@ describe('Hoy más claro', () => {
       p.ctx,
       <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />,
     );
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.queryByTestId('candado-probabilidad')).toBeNull();
     expect(screen.queryByTestId('boton-me-alcanza')).toBeNull();
     unmount();
@@ -224,6 +227,7 @@ describe('Hoy más claro', () => {
         <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />
       </ProveedorPlan>,
     );
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.getByTestId('candado-probabilidad')).toBeTruthy();
     expect(screen.getByTestId('boton-me-alcanza')).toBeTruthy();
     p.cerrar();

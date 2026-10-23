@@ -84,6 +84,7 @@ import {
   TEXTO_RECORDATORIO_PROGRAMADO,
   TITULO,
 } from './textos';
+import { BTN_VER_OPCIONES } from '../asistente/textos';
 
 /** En pruebas no hace falta ceder el hilo de verdad. */
 const sinEspera = { ceder: () => Promise.resolve() };
@@ -624,7 +625,7 @@ describe('¿Me alcanza?', () => {
     await waitFor(() => expect(calcular).toHaveBeenCalledTimes(2));
   });
 
-  it('"¿me alcanza para unos tenis de 1500?" escrito en Hoy abre "¿Me alcanza?" con la consulta en memoria', async () => {
+  it('"¿me alcanza para unos tenis de 1500?" escrito en el asistente responde ahí y «Ver opciones» abre "¿Me alcanza?" con la consulta en memoria', async () => {
     const p = e401();
     // «¿Me alcanza?» es de Plus: sin tienda ni pantalla del plan, Hoy no muestra el botón en Gratis.
     activarPlus(p.ctx);
@@ -643,13 +644,17 @@ describe('¿Me alcanza?', () => {
       </ProveedorPlan>,
       { nube: nube.nube },
     );
-    // El botón de Hoy abre el formulario vacío.
+    // El botón vive en el desglose del día (Ola 7: se abre tocando la barra) y abre el formulario vacío.
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     fireEvent.press(screen.getByTestId('boton-me-alcanza'));
     expect(alAbrirMeAlcanza).toHaveBeenLastCalledWith();
 
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    // Ola 7: la respuesta llega como turno de la conversación (qué pasa con tu día y, con Plus, cada opción); el
+    // detalle completo se abre con «Ver opciones» cuando las opciones ya se calcularon.
+    fireEvent.press(await screen.findByText(BTN_VER_OPCIONES, {}, { timeout: 20000 }));
     await waitFor(() => expect(alAbrirMeAlcanza).toHaveBeenCalledTimes(2));
     const consulta = alAbrirMeAlcanza.mock.calls[1]?.[0];
     expect(consulta).toEqual({ precio: 150_000, descripcion: 'unos tenis' });
@@ -666,6 +671,8 @@ describe('¿Me alcanza?', () => {
 
 describe('Hoy · probabilidad de llegar', () => {
   const hoy = () => <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />;
+  /** Ola 7: la probabilidad vive en el desglose que abre la barra del día. */
+  const abrirDesglose = () => fireEvent.press(screen.getByTestId('boton-desglose'));
 
   it('CA-M6-05 · con 13 días dice "Necesito 2 semanas…"; con 20, la etiqueta "estimación inicial"', async () => {
     const p = e401();
@@ -673,6 +680,7 @@ describe('Hoy · probabilidad de llegar', () => {
     gastosDiarios(p, '2026-10-11', '2026-11-25');
     p.reloj.fijar('2026-10-24');
     const { unmount } = montar(p.ctx, hoy());
+    abrirDesglose();
     // Se sabe sin calcular: se pinta de inmediato.
     expect(textoDe('probabilidad-mensaje')).toBe('Necesito 2 semanas de tus gastos para estimar si llegas.');
     expect(screen.queryByTestId('probabilidad-texto')).toBeNull();
@@ -680,6 +688,7 @@ describe('Hoy · probabilidad de llegar', () => {
 
     p.reloj.fijar('2026-10-31');
     const segunda = montar(p.ctx, hoy());
+    abrirDesglose();
     // Sin caché se calcula por bloques en segundo plano con un indicador discreto.
     expect(screen.getByTestId('probabilidad-calculando')).toBeTruthy();
     expect(screen.getByTestId('hoy-puedes')).toBeTruthy();
@@ -696,6 +705,7 @@ describe('Hoy · probabilidad de llegar', () => {
 
     // CA-M6-06 en pantalla: al volver a abrir Hoy el mismo día sale lo mismo, al instante.
     montar(p.ctx, hoy());
+    abrirDesglose();
     expect(screen.queryByTestId('probabilidad-calculando')).toBeNull();
     expect(textoDe('probabilidad-texto')).toBe(texto);
   });

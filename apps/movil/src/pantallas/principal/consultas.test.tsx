@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { registrarMovimiento, listarCuentas } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { activarPlus, conEscenario, golden } from './__pruebas__/base';
@@ -25,11 +25,12 @@ function preparar({ plus = true }: { plus?: boolean } = {}) {
   return { ...p, ...f, navegacion };
 }
 
-describe('consultas tipadas en Hoy (RF-CON-01, CA-M7-03)', () => {
+// Ola 7: la respuesta es un turno de texto del asistente (`respuesta`) con «Ver movimientos» filtrado (criterio 4).
+describe('consultas tipadas en el asistente (RF-CON-01, CA-M7-03)', () => {
   it('Q01 responde al instante con la plantilla de Hoy puedes', async () => {
     const p = preparar();
     await escribir(golden('Q01').texto);
-    expect(screen.getByTestId('respuesta-consulta-texto')).toHaveTextContent(
+    expect(screen.getByTestId('respuesta-texto')).toHaveTextContent(
       'Hoy puedes gastar $214; faltan 4 días para tu quincena.',
     );
     expect(p.recibidas).toHaveLength(0);
@@ -38,34 +39,28 @@ describe('consultas tipadas en Hoy (RF-CON-01, CA-M7-03)', () => {
   it('en Gratis una consulta de Plus lo dice sin cifras ni "Ver movimientos"', async () => {
     preparar({ plus: false });
     await escribir(golden('Q04').texto);
-    expect(await screen.findByTestId('respuesta-consulta-texto')).toHaveTextContent(
+    expect(await screen.findByTestId('respuesta-texto')).toHaveTextContent(
       'Responder preguntas sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.',
     );
-    expect(screen.queryByTestId('boton-ver-movimientos-consulta')).toBeNull();
+    expect(screen.queryByTestId('respuesta-ver-movimientos')).toBeNull();
   });
 
   it('Q04 responde el saldo y "Ver movimientos" abre Movimientos filtrado por la cuenta', async () => {
     const p = preparar();
     await escribir(golden('Q04').texto);
-    expect(await screen.findByTestId('respuesta-consulta-texto')).toHaveTextContent(
-      'En BBVA Débito tienes $3,590.',
-    );
-    fireEvent.press(screen.getByTestId('boton-ver-movimientos-consulta'));
+    expect(await screen.findByTestId('respuesta-texto')).toHaveTextContent('En BBVA Débito tienes $3,590.');
+    fireEvent.press(screen.getByTestId('respuesta-ver-movimientos'));
     const bbva = listarCuentas(p.ctx).tienes.find((c) => c.nombre.startsWith('BBVA'))?.id;
     expect(p.navegacion.alVerMovimientos).toHaveBeenCalledWith({ cuentaId: bbva });
   });
 
-  it('Q06 lista los pagos con su fecha; "Listo" cierra la respuesta', async () => {
+  it('Q06 lista los pagos con su fecha, uno por renglón', async () => {
     preparar();
     await escribir(golden('Q06').texto);
-    expect(await screen.findByTestId('respuesta-consulta-texto')).toHaveTextContent(
-      'En los próximos 7 días tienes 2 pagos por $1,174.',
+    const respuesta = await screen.findByTestId('respuesta-texto');
+    expect(respuesta.props.children).toBe(
+      'En los próximos 7 días tienes 2 pagos por $1,174.\ntanda · mar 13 oct: $500\ninternet · mié 14 oct: $674',
     );
-    const lineas = screen.getByTestId('respuesta-consulta-lineas');
-    expect(within(lineas).getByText('tanda · mar 13 oct')).toBeTruthy();
-    expect(within(lineas).getByText('$674')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('boton-cerrar-consulta'));
-    expect(screen.queryByTestId('respuesta-consulta')).toBeNull();
   });
 });
 

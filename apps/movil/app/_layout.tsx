@@ -251,6 +251,11 @@ function AppProtegida({
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
           <Stack.Screen name="ajustes" />
+          {/*
+            R2 (Ola 7 §2): la presentación se declara aquí y no solo dentro de la ruta, porque la pila nativa decide
+            la animación al empujar la pantalla; un `presentation` que llega desde la pantalla ya montada no la cambia.
+          */}
+          <Stack.Screen name="registrar" options={{ presentation: 'modal' }} />
           <Stack.Screen name="tarjetas/[id]" />
           <Stack.Screen name="tarjetas/nueva" />
           <Stack.Screen name="cuentas/nueva" />

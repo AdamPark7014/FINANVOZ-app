@@ -1,15 +1,17 @@
-import type { ComponentProps } from 'react';
+import { useContext, type ComponentProps } from 'react';
 import { useRouter } from 'expo-router';
-
-type Router = ReturnType<typeof useRouter>;
+import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacion';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
 import { PantallaCuentas, useMostrarAviso } from '../../src/pantallas/principal';
+import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { funcionesPlan } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { usePlanTienda } from '../../src/suscripciones/ProveedorPlan';
-import { propsContenedorPestana } from './pestanas-textos';
+import { propsContenedorPestana } from '../../src/rutas/pestanas-textos';
+
+type Router = ReturnType<typeof useRouter>;
 
 /** Qué secciones tienen a dónde llevar en esta build: sin entrada que termine en una pantalla sin salida. */
 export interface DisponiblesCuentas {
@@ -51,6 +53,8 @@ export function navegacionDesdeCuentas(
 export default function Cuentas() {
   const router = useRouter();
   const mostrar = useMostrarAviso();
+  // «Listo: agregué…» va sobre la barra real (en iPhone mide más que el token, `ProveedorAvisos`).
+  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   useConfirmacionAlVolver((mensaje) => mostrar({ mensaje }));
   const { nube } = useSesion();
   const { compras } = usePlanTienda();

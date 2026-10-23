@@ -26,6 +26,13 @@ export interface AccionEntendi {
   /** «Sí, regístralo» · «Sí, agrégala» · «Cambiar algo». */
   readonly etiqueta: string;
   readonly accion: () => void | Promise<void>;
+  /**
+   * Todavía falta algo para poder hacerlo (p. ej. elegir la cuenta): el botón se ve y se anuncia inactivo, la
+   * tarjeta dice por qué y un «sí» dicho no lo dispara. Solo tiene efecto en `confirmar`.
+   */
+  readonly deshabilitado?: boolean;
+  /** Por qué no se puede todavía, visible bajo el botón: «Elige la cuenta para registrarlo». */
+  readonly motivoDeshabilitado?: string;
 }
 
 export interface PropuestaEntendi {

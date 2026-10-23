@@ -379,19 +379,22 @@ describe('Aviso preventivo (02 §24, CA-M12-04)', () => {
     });
   }
 
-  it('registrar "consulta médica de 800 en efectivo" sin internet muestra el aviso; otro gasto lo quita', async () => {
+  it('registrar "consulta médica de 800 en efectivo" sin internet lo dice en la conversación; otro gasto no lo repite', async () => {
     const ctx = preparar({ plus: false, config: false });
     renderConSesion(ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     await escribir(CONSULTA_MEDICA);
-    const aviso = await screen.findByTestId('aviso-deducible');
-    expect(within(aviso).getByText(AVISO_DEDUCIBLE_EFECTIVO)).toHaveTextContent(
+    // Ola 7: el aviso es un turno del asistente justo después del «Registré…» (antes, una tarjeta con «Entendido»).
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré/);
+    expect(screen.getByTestId('respuesta-texto')).toHaveTextContent(AVISO_DEDUCIBLE_EFECTIVO);
+    expect(AVISO_DEDUCIBLE_EFECTIVO).toBe(
       'Si lo pagas con tarjeta o transferencia y pides factura, lo puedes deducir.',
     );
     await escribir('coca 25 en efectivo');
-    expect(screen.queryByTestId('aviso-deducible')).toBeNull();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Coca/);
+    expect(screen.getAllByText(AVISO_DEDUCIBLE_EFECTIVO)).toHaveLength(1);
   });
 
-  it('"Entendido" lo cierra (frase que interpreta la nube)', async () => {
+  it('también con la frase que interpreta la nube', async () => {
     const ctx = preparar();
     const f = nubeFalsa({ [CONSULTA_MEDICA_NUBE.texto]: CONSULTA_MEDICA_NUBE.interpretacion });
     renderConSesion(
@@ -400,7 +403,6 @@ describe('Aviso preventivo (02 §24, CA-M12-04)', () => {
       f.nube,
     );
     await escribir(CONSULTA_MEDICA_NUBE.texto);
-    fireEvent.press(await screen.findByTestId('aviso-deducible-cerrar'));
-    expect(screen.queryByTestId('aviso-deducible')).toBeNull();
+    expect(await screen.findByTestId('respuesta-texto')).toHaveTextContent(AVISO_DEDUCIBLE_EFECTIVO);
   });
 });

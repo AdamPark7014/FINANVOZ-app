@@ -112,35 +112,35 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
 
-    const tarjeta = screen.getByTestId('confirmacion-division');
-    expect(within(tarjeta).getByText('¿Con quién dividiste la cuenta?')).toBeTruthy();
-    expect(textoDe('division-partes')).toBe('Entre 4');
-    expect(textoDe('division-tu-parte')).toBe('$300');
-    expect(textoDe('division-te-deben')).toBe('$900');
-    expect(screen.getByTestId('division-reparto-detalle')).toHaveProp('accessibilityLiveRegion', 'polite');
-    expect(textoDe('division-faltan')).toBe('Elige 3 personas (llevas 0).');
-    expect(screen.getByTestId('division-faltan')).toHaveProp('accessibilityLiveRegion', 'polite');
-    expect(screen.getByTestId('division-partes')).toHaveProp('accessibilityLiveRegion', 'polite');
-    expect(screen.getByTestId('division-menos')).toHaveProp('accessibilityHint', PISTA_MENOS_PARTES);
-    expect(screen.getByTestId('division-mas')).toHaveProp('accessibilityHint', PISTA_MAS_PARTES);
-    expect(screen.getByTestId(`division-origen-${p.nu}`).props.accessibilityState).toMatchObject({
-      selected: true,
-    });
-    // Sin las tres personas no se guarda nada.
-    fireEvent.press(screen.getByTestId('boton-guardar-division'));
-    expect(screen.getAllByText('Elige 3 personas (llevas 0).')).toHaveLength(2);
+    // Ola 7 (flujo conversacional, §6): entre 4 y con la Nu ya se dijeron; solo pregunta con quién, una persona a
+    // la vez, con un chip por contacto. Mientras falte alguien no se guarda nada.
+    expect(textoDe('pregunta-texto')).toBe('¿Con quién fue? Faltan 3.');
+    for (const [i, id] of [p.caro, p.juan, p.ana].entries()) {
+      expect(listarMovimientos(p.ctx)).toEqual([]);
+      if (i === 2) expect(textoDe('pregunta-texto')).toBe('¿Con quién más fue?');
+      // Un contacto ya elegido no vuelve a salir como chip (no se repite persona por toque).
+      expect(screen.queryByTestId(`pregunta-chip-${p.caro}`) === null).toBe(i > 0);
+      await act(async () => {
+        fireEvent.press(screen.getByTestId(`pregunta-chip-${id}`));
+      });
+    }
+
+    // «Entendí»: tu parte y la de cada persona (E12.1, caso 8) y con qué pagaste.
+    const entendi = screen.getByTestId('entendi');
+    expect(within(entendi).getByTestId('entendi-fila-partes')).toHaveTextContent(/4, contándote/);
+    expect(within(entendi).getByTestId('entendi-fila-tu_parte')).toHaveTextContent(/\$300/);
+    for (const k of [1, 2, 3]) {
+      expect(within(entendi).getByTestId(`entendi-fila-persona-${k}`)).toHaveTextContent(/te debe \$300/);
+    }
+    expect(within(entendi).getByTestId('entendi-fila-origen')).toHaveTextContent(/Nu/);
     expect(listarMovimientos(p.ctx)).toEqual([]);
-
-    // Selección múltiple: TalkBack anuncia casillas, no opciones de radio (pendiente 35, pase de M13).
-    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityRole', 'checkbox');
-    for (const id of [p.caro, p.juan, p.ana]) fireEvent.press(screen.getByTestId(`division-persona-${id}`));
-    expect(screen.getByTestId(`division-persona-${p.caro}`).props.accessibilityState).toMatchObject({
-      checked: true,
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('entendi-confirmar'));
     });
-    fireEvent.press(screen.getByTestId('boton-guardar-division'));
 
-    // El nivel 0 (06 §9) trae la descripción («cena»): el aviso la usa, como documenta `textos.ts`.
-    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: cena \$1,200 · te deben \$900/);
+    // El nivel 0 (06 §9) trae la descripción («cena»): el turno la usa.
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent('Registré Cena $1,200 entre 4.');
+    expect(screen.getByTestId('aviso-detalle')).toHaveTextContent('Te deben $900.');
     const [mov] = listarMovimientos(p.ctx).flatMap((d) => d.movimientos);
     expect(p.ctx.libro.obtener(mov?.id as string)?.asientos.map((a) => [a.cuentaId, a.monto])).toEqual([
       ['cat:personal:comida_fuera', 30_000],
@@ -160,6 +160,12 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
     fireEvent.changeText(screen.getByTestId('division-descripcion'), 'las pizzas');
     fireEvent.press(screen.getByTestId('division-mas'));
     expect(textoDe('division-partes')).toBe('Entre 3');
+    // TalkBack (antes se revisaba en la tarjeta de confirmación de Hoy; el formulario es el mismo): pistas de ±,
+    // partes como región viva y selección múltiple con casillas (pendiente 35, pase de M13).
+    expect(screen.getByTestId('division-menos')).toHaveProp('accessibilityHint', PISTA_MENOS_PARTES);
+    expect(screen.getByTestId('division-mas')).toHaveProp('accessibilityHint', PISTA_MAS_PARTES);
+    expect(screen.getByTestId('division-partes')).toHaveProp('accessibilityLiveRegion', 'polite');
+    expect(screen.getByTestId(`division-persona-${p.caro}`)).toHaveProp('accessibilityRole', 'checkbox');
     fireEvent.press(screen.getByTestId(`division-persona-${p.caro}`));
     fireEvent.changeText(screen.getByTestId('division-nueva-persona'), 'Pepe');
     fireEvent.press(screen.getByTestId('division-boton-agregar'));

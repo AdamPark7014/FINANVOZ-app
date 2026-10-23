@@ -1,16 +1,18 @@
 import { Tabs, type BottomTabNavigationOptions } from 'expo-router/js-tabs';
-import { IconoPestana, ProveedorAvisos } from '../../src/pantallas/principal';
-import { barraPestanas, estiloBarraPestanas, useTema } from '../../src/ui';
+import { IconoPestana } from '../../src/pantallas/asistente/IconoPestana';
+import { ProveedorAvisos } from '../../src/pantallas/principal';
+import { estiloBarraPestanas, useTema } from '../../src/ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
+  ETIQUETA_PESTANA,
   testIdBotonPestana,
   type RutaPestanaVisible,
-} from './pestanas-textos';
+} from '../../src/rutas/pestanas-textos';
 
-export { ETIQUETA_ACCESIBILIDAD_PESTANA } from './pestanas-textos';
+export { ETIQUETA_ACCESIBILIDAD_PESTANA } from '../../src/rutas/pestanas-textos';
 
 function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
-  const etiqueta = barraPestanas.pestanas.find((p) => p.ruta === ruta)?.etiqueta ?? ruta;
+  const etiqueta = ETIQUETA_PESTANA[ruta];
   return {
     title: etiqueta,
     tabBarLabel: etiqueta,
@@ -21,9 +23,9 @@ function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
 }
 
 /**
- * Tres pestañas: Hoy · Movimientos · Cuentas (02-UX §2). "Registrar" (dictado, texto y formulario) es una ruta
- * de este grupo sin pestaña propia: se abre desde el botón de voz de Hoy y desde Movimientos. El aviso con
- * "Deshacer" vive aquí para sobrevivir al cambio de pantalla.
+ * Cuatro pestañas (Ola 7 §2): Asistente (ruta `hoy`) · Movimientos · Cuentas · Tú. Registrar ya no es pestaña:
+ * `/registrar` es la hoja modal R2 (`app/registrar.tsx`). El aviso con "Deshacer" vive aquí para sobrevivir al
+ * cambio de pantalla.
  */
 export default function LayoutPestanas() {
   const { c } = useTema();
@@ -41,10 +43,7 @@ export default function LayoutPestanas() {
         <Tabs.Screen name="hoy" options={opcionesPestana('hoy')} />
         <Tabs.Screen name="movimientos" options={opcionesPestana('movimientos')} />
         <Tabs.Screen name="cuentas" options={opcionesPestana('cuentas')} />
-        <Tabs.Screen
-          name="registrar"
-          options={{ href: null, title: 'Registrar', tabBarLabel: 'Registrar' }}
-        />
+        <Tabs.Screen name="tu" options={opcionesPestana('tu')} />
       </Tabs>
     </ProveedorAvisos>
   );

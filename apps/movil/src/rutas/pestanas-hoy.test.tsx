@@ -3,14 +3,14 @@ import { aceptarConsentimiento, agregarCuenta } from '../servicios';
 import { renderConSesion } from '../pantallas/principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../pantallas/principal/__pruebas__/base';
 import Hoy from '../../app/(tabs)/hoy';
-import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from '../../app/(tabs)/pestanas-textos';
+import { ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA } from './pestanas-textos';
 import {
   PISTA_CONFIGURAR_INGRESO_HOY,
   SUBTITULO_SIN_INGRESO,
   TEST_ID_HOY_SIN_INGRESO,
   TEST_ID_TAB_HOY,
   TITULO_SIN_INGRESO,
-} from '../../app/(tabs)/hoy-textos';
+} from './hoy-textos';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({

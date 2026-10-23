@@ -181,7 +181,9 @@ describe('pantalla del plan', () => {
       { compras: tienda, abrirPlan },
     );
     expect(textoDe(ID.titulo)).toBe(TITULO_PLAN_GRATIS);
-    // Hoy en Gratis: candado discreto en lugar de la probabilidad y sin tarjeta del día (`02 §4`).
+    // Hoy en Gratis: candado discreto en lugar de la probabilidad y sin tarjeta del día (`02 §4`). Ola 7: la
+    // probabilidad (o su candado) vive en el desglose que abre la barra del día.
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.getByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeTruthy();
     expect(screen.queryByTestId('tarjeta-del-dia')).toBeNull();
     fireEvent.press(screen.getByTestId('candado-probabilidad'));
@@ -310,6 +312,7 @@ describe('sin tienda y sin Plus de prueba: ningún candado lleva a un callejón'
     montar(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />, {
       abrirPlan,
     });
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     const candado = screen.getByTestId('candado-probabilidad');
     expect(screen.getByText(etiquetaCandadoPlusPronto('Ver probabilidad'))).toBeTruthy();
     expect(screen.queryByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeNull();
@@ -436,16 +439,16 @@ describe('CA-M7-02 · al agotar las 30 interpretaciones del mes', () => {
     });
 
     await escribir(COMPLEJA);
-    const aviso = screen.getByTestId('mensaje-registro');
-    expect(aviso).toHaveTextContent(MENSAJE_LIMITE_MENSUAL_GRATIS);
-    expect(aviso.props.accessibilityRole).toBe('alert');
+    // Ola 7: el mensaje es la pregunta del asistente sobre la frase guardada («¿Es un gasto?»…), que se anuncia como
+    // todo turno nuevo (antes, un aviso con rol de alerta).
+    expect(textoDe('pregunta-texto')).toBe(MENSAJE_LIMITE_MENSUAL_GRATIS);
     expect(MENSAJE_LIMITE_MENSUAL_GRATIS).toContain('30 frases');
     expect(listarPorInterpretar(p.ctx)).toHaveLength(1);
     const llamadas = f.recibidas.length;
 
     // Nivel de reglas: sin llamar al proxy.
     await escribir('tacos 80 en efectivo');
-    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: Tacos \$80/);
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Tacos \$80/);
     expect(f.recibidas).toHaveLength(llamadas);
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(1);
   });
@@ -459,10 +462,10 @@ describe('CA-M7-02 · al agotar las 30 interpretaciones del mes', () => {
       nube: f.nube,
     });
     await escribir(COMPLEJA);
-    expect(textoDe('mensaje-registro')).toBe(MENSAJE_LIMITE_MENSUAL_PLUS);
+    expect(textoDe('pregunta-texto')).toBe(MENSAJE_LIMITE_MENSUAL_PLUS);
     f.fallar({ tipo: 'limite', codigo: 'limite_diario' });
     await escribir(COMPLEJA);
-    expect(textoDe('mensaje-registro')).toBe(MENSAJE_LIMITE_DIARIO);
+    expect(textoDe('pregunta-texto')).toBe(MENSAJE_LIMITE_DIARIO);
   });
 });
 
@@ -504,7 +507,8 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     const resumenGratis = resumenPlan(obtenerPlan(p.ctx));
     expect(textoDe(ID.titulo)).toBe(resumenGratis.titulo);
     expect(textoDe(ID.detalle)).toBe(resumenGratis.detalle);
-    // Solo se ocultan las funciones de Plus.
+    // Solo se ocultan las funciones de Plus (la probabilidad, en el desglose de la barra del día).
+    fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.getByText(etiquetaCandadoPlus('Ver probabilidad'))).toBeTruthy();
     expect(screen.queryByTestId('tarjeta-del-dia')).toBeNull();
     // Los datos siguen ahí y se pueden seguir registrando.
@@ -514,7 +518,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     expect(textoDe('tarjeta-deuda-meses')).toBe('De eso, $12,000 son meses sin intereses.');
     expect(listarMovimientos(p.ctx)).toEqual(movimientosEnPlus);
     await escribir('coca 25 en efectivo');
-    expect(screen.getByTestId('aviso')).toHaveTextContent(/Registré: Coca \$25/);
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Coca \$25/);
   });
 });
 

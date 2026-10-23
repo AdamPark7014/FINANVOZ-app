@@ -88,20 +88,18 @@ describe('Registrar con la nube', () => {
 
     await escribir(TACOS_Y_COCA);
     // Causa y efecto: la segunda línea dice cómo cambió la cifra de Hoy ($214 de E4-01).
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        `Registré: Tacos $80 · Comida fuera · Nu ••4410; Coca $25 · Antojos · Cartera\n${lineaCambioDia('$214', '$187')}`,
-      ),
-    ).toBeTruthy();
+    // Ola 7: el registro es un turno del asistente («Registré…» y debajo cómo cambió tu día).
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      'Registré Tacos $80 · Comida fuera · Nu ••4410; Coca $25 · Antojos · Cartera.',
+    );
+    expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', '$187'));
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
 
     await escribir(TACOS_EN_EFECTIVO);
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        'Corregí: Tacos $80 · Comida fuera · Cartera. Antes: Nu ••4410',
-      ),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      'Corregí: Tacos $80 · Comida fuera · Cartera. Antes: Nu ••4410.',
+    );
     expect(within(screen.getByTestId('aviso')).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,000');
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$535');
@@ -132,7 +130,7 @@ describe('Registrar con la nube', () => {
     fireEvent.press(within(tarjeta).getByTestId(`elegir-movimiento-${viejo?.id}`));
     fireEvent.press(screen.getByTestId('boton-guardar-eleccion'));
     expect(screen.queryByTestId('tarjeta-elegir')).toBeNull();
-    expect(within(screen.getByTestId('aviso')).getByText(/^Corregí: Tacos \$80/)).toBeTruthy();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Corregí: Tacos \$80/);
   });
 
   it('aclarar: una pregunta con opciones; elegir una vuelve a interpretar la frase', async () => {
@@ -150,23 +148,26 @@ describe('Registrar con la nube', () => {
       ],
     });
     await escribir('gasté dos cincuenta en un chicle');
-    const tarjeta = screen.getByTestId('tarjeta-aclarar');
-    expect(within(tarjeta).getByText('¿Fueron $2.50 o $250?')).toBeTruthy();
+    // Ola 7: «aclarar» es una pregunta del asistente con las opciones como chips.
+    expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿Fueron $2.50 o $250?');
     await act(async () => {
-      fireEvent.press(within(tarjeta).getByTestId('aclarar-$2.50'));
+      fireEvent.press(screen.getByTestId('pregunta-chip-$2.50'));
     });
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        `Registré: Chicle $2.50 · Otros gastos · Cartera\n${lineaCambioDia('$214', '$213')}`,
-      ),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      'Registré Chicle $2.50 · Otros gastos · Cartera.',
+    );
+    expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', '$213'));
   });
 
   it('CA-M3-05 · sin internet la frase espera con un indicador discreto y se procesa al reconectar', async () => {
     const p = preparar();
     p.desconectar();
     await escribir(TACOS_Y_COCA);
-    expect(textoDe('mensaje-registro')).toMatch(/^Lo guardé; lo interpreto cuando tengas internet\./);
+    // Con intérprete en internet y sin red: el texto honesto con chips para resolverlo ya (Ola 7).
+    expect(screen.getByTestId('pregunta-texto')).toHaveTextContent(
+      /^Lo guardé; lo interpreto cuando tengas internet\./,
+    );
+    expect(screen.getByTestId('pregunta-chip-gasto')).toBeTruthy();
     expect(textoDe('indicador-esperando-conexion')).toBe('1 frase espera internet para interpretarla.');
     expect(listarMovimientos(p.ctx)).toEqual([]);
 
@@ -214,12 +215,17 @@ describe('Registrar con la nube', () => {
       <PantallaRegistrar alCerrar={jest.fn()} fraseRevision={frase?.id as string} />,
       p.nube,
     );
-    await screen.findByTestId('confirmacion-registro');
-    expect(screen.getByText('Es un monto alto. Revísalo antes de guardar.')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('boton-guardar-confirmacion'));
-    expect(
-      within(screen.getByTestId('aviso')).getByText('Registré: Tele $6,000 · Otros gastos · Nu ••4410'),
-    ).toBeTruthy();
+    // Ola 7: la frase revisada llega como «Entendí» (monto alto) y «Sí, regístralo» la guarda.
+    await screen.findByTestId('entendi');
+    expect(screen.getByTestId('entendi-efecto')).toHaveTextContent(
+      'Es un monto alto. Revísalo antes de guardar.',
+    );
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('entendi-confirmar'));
+    });
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      'Registré Tele $6,000 · Otros gastos · Nu ••4410.',
+    );
     expect(listarPorInterpretar(p.ctx)).toEqual([]);
   });
 
@@ -227,13 +233,13 @@ describe('Registrar con la nube', () => {
     const p = preparar();
     p.responder('transfiéreme 500 a juan', { intencion: 'fuera_de_alcance', motivo: 'mueve_dinero' });
     await escribir('transfiéreme 500 a juan');
-    expect(textoDe('mensaje-registro')).toBe('No muevo dinero por ti: solo llevo la cuenta de lo que pasa.');
+    expect(textoDe('respuesta-texto')).toBe('No muevo dinero por ti: solo llevo la cuenta de lo que pasa.');
     p.responder('cuánto puedo deducir', {
       intencion: 'consultar',
       consulta: { tipo: 'deducciones' },
     });
     await escribir('cuánto puedo deducir');
-    expect(textoDe('mensaje-registro')).toBe('Todavía no sé responder esa pregunta.');
+    expect(textoDe('respuesta-texto')).toBe('Todavía no sé responder esa pregunta.');
     expect(listarMovimientos(p.ctx)).toEqual([]);
   });
 });

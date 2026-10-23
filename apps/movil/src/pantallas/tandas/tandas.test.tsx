@@ -20,7 +20,6 @@ import { PantallaTandas } from './PantallaTandas';
 import {
   EJEMPLO_NOMBRE_TANDA,
   ETIQUETA_GUARDAR_TANDA,
-  MENSAJE_TANDA_GUARDADA,
   MENSAJE_TODAVIA_NO_APORTACION,
   MENSAJE_TODAVIA_NO_COBRO,
   PREGUNTA_HOY_COBRO,
@@ -65,6 +64,7 @@ import {
   textoPorAportar,
   textoYaEmpezoCompleto,
 } from './textos';
+import { MENSAJE_TANDA } from '../../asistente/flujos/textos';
 
 interface RondaVector {
   t: number;
@@ -458,7 +458,7 @@ describe('Tandas (02 §18)', () => {
     expect(screen.queryByTestId('tanda-ya-la-di')).toBeNull();
   });
 
-  it('TK01 · la frase dictada abre el formulario prellenado y "Guardar tanda" la crea', async () => {
+  it('TK01 · la frase dictada llega como «Entendí · ¿la agrego?» con todo lo dicho y «Sí» la crea', async () => {
     const p = preparar('2026-10-11');
     const caso = golden('TK01');
     const f = nubeFalsa({ [caso.texto]: caso.esperado });
@@ -472,15 +472,20 @@ describe('Tandas (02 §18)', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
-    const tarjeta = screen.getByTestId('tanda-por-crear');
-    expect(within(tarjeta).getByTestId('tanda-participantes').props.value).toBe('10');
-    expect(within(tarjeta).getByTestId('tanda-turno').props.value).toBe('4');
-    expect(within(tarjeta).getByTestId('tanda-inicio').props.value).toBe('15/10/2026');
+    // Ola 7 (flujo conversacional de tanda, §6): todo se dijo, así que no pregunta nada y llega el «Entendí» con el
+    // calendario de E11 (antes, el formulario prellenado; sigue detrás de «Cambiar algo»).
+    const tarjeta = screen.getByTestId('entendi');
+    expect(within(tarjeta).getByTestId('entendi-fila-aportacion')).toHaveTextContent(/\$500 cada quincena/);
+    expect(within(tarjeta).getByTestId('entendi-fila-participantes')).toHaveTextContent(/10 personas/);
+    expect(within(tarjeta).getByTestId('entendi-fila-turno')).toHaveTextContent(/El 4/);
+    expect(within(tarjeta).getByTestId('entendi-fila-inicio')).toHaveTextContent(/15 oct/);
     expect(listarTandas(p.ctx)).toEqual([]);
-    fireEvent.press(within(tarjeta).getByTestId('tanda-guardar'));
+    await act(async () => {
+      fireEvent.press(within(tarjeta).getByTestId('entendi-confirmar'));
+    });
     const [t] = listarTandas(p.ctx);
     expect(t).toMatchObject({ aportacion: 50_000, participantes: 10, turno: 4 });
-    expect(screen.getByTestId('aviso')).toHaveTextContent(empiezaCon(MENSAJE_TANDA_GUARDADA));
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(MENSAJE_TANDA);
   });
 });
 

@@ -10,8 +10,9 @@ const ACCESIBILIDAD_CERRAR_REGISTRAR = 'Cerrar registro';
 const PISTA_CERRAR_REGISTRAR = 'Vuelve a la pantalla anterior; lo que no guardaste no se registra';
 
 /**
- * Registrar (02-UX §5): dictado o texto arriba (la vía rápida) y el formulario completo abajo, para los tipos
- * que origina el usuario. Al guardar regresa a la pantalla anterior con el aviso "Deshacer".
+ * Registrar de antes (dictado arriba y formulario completo abajo). Desde la Ola 7 ya no tiene ruta: la vía rápida es
+ * el asistente y `/registrar` abre R2 (`pantallas/asistente/PantallaR2`). Queda como envoltura mínima para las
+ * pruebas de otras pantallas que todavía la montan.
  */
 export function PantallaRegistrar({
   alCerrar,
@@ -24,18 +25,12 @@ export function PantallaRegistrar({
   dictarAlAbrir = false,
 }: {
   alCerrar: () => void;
-  /** "Ver movimientos" de una consulta: abre Movimientos con su filtro. */
   alVerMovimientos?: (filtro: FiltroMovimientos) => void;
-  /** Tocar el aviso "Registré…" abre el detalle del movimiento. */
   alVerMovimiento?: (transaccionId: string) => void;
-  /** "Traigo 300": abre el arqueo. */
   alArqueo?: (efectivoReal: number) => void;
-  /** "¿Me alcanza para…?": abre "¿Me alcanza?". */
   alMeAlcanza?: (consulta: ConsultaMeAlcanza) => void;
-  /** Frase de "Por revisar" que se abre para confirmarla. */
   fraseRevision?: string;
   motor?: MotorDictado;
-  /** Abierta desde el micrófono del widget: empieza a escuchar. */
   dictarAlAbrir?: boolean;
 }) {
   return (

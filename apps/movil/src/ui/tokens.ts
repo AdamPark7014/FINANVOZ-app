@@ -171,12 +171,16 @@ export type VarianteTexto = keyof typeof tipo;
 /** Las cifras usan números tabulares para que no "bailen" al cambiar (02-UX §16). */
 export const NUMEROS_TABULARES = ['tabular-nums'] as const;
 
-/** Tokens de la barra de pestañas: Hoy · Movimientos · Cuentas (02-UX §2). */
+/**
+ * Tokens de la barra de pestañas (Ola 7 §2): Asistente · Movimientos · Cuentas · Tú. La ruta del asistente sigue
+ * siendo `hoy` (enlaces, widget y Maestro).
+ */
 export const barraPestanas = {
   pestanas: [
-    { ruta: 'hoy', etiqueta: 'Hoy' },
+    { ruta: 'hoy', etiqueta: 'Asistente' },
     { ruta: 'movimientos', etiqueta: 'Movimientos' },
     { ruta: 'cuentas', etiqueta: 'Cuentas' },
+    { ruta: 'tu', etiqueta: 'Tú' },
   ],
   alto: 64,
   tamanoIcono: 24,

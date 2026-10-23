@@ -471,9 +471,9 @@ export function etiquetaConfirmarAnularMovimiento(): string {
 
 // ——— Cuentas (`02 §11`) ———
 
-/** Tienes: sin efectivo, débito, billetera ni ahorro. */
+/** Tienes: sin efectivo, débito, billetera ni ahorro (el botón «Agregar cuenta» va justo debajo, B-2b). */
 export const TEXTO_CUENTAS_TIENES_VACIO =
-  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrega una aquí abajo o cuando captures un movimiento.';
+  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrega una cuenta aquí abajo.';
 
 /** Debes: sin tarjetas ni deudas con personas. */
 export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamos con personas.';

@@ -15,7 +15,7 @@ import { Texto } from './Texto';
  * se queda en la tarjeta y se puede reintentar.
  *
  * testIDs: `entendi`, `entendi-monto`, `entendi-fila-<clave>`, `entendi-opcion-<clave>-<valor>`, `entendi-efecto`,
- * `entendi-confirmar`, `entendi-cambiar`, `entendi-error`.
+ * `entendi-confirmar`, `entendi-motivo` (por qué «Sí» está inactivo), `entendi-cambiar`, `entendi-error`.
  */
 export function TarjetaEntendi({
   propuesta,
@@ -31,8 +31,9 @@ export function TarjetaEntendi({
   const [error, setError] = useState<string | null>(null);
   const [abierta, setAbierta] = useState<string | null>(null);
 
+  const inactivo = propuesta.confirmar.deshabilitado === true;
   const confirmar = async () => {
-    if (guardando) return;
+    if (guardando || inactivo) return;
     setGuardando(true);
     setError(null);
     try {
@@ -81,8 +82,18 @@ export function TarjetaEntendi({
         etiqueta={propuesta.confirmar.etiqueta}
         alPresionar={() => void confirmar()}
         cargando={guardando}
+        deshabilitado={inactivo}
+        {...(inactivo && propuesta.confirmar.motivoDeshabilitado
+          ? { pista: propuesta.confirmar.motivoDeshabilitado }
+          : {})}
         testID={`${testID}-confirmar`}
       />
+      {inactivo && propuesta.confirmar.motivoDeshabilitado ? (
+        // El motivo también se ve: un botón inactivo sin razón visible confunde (PLAN-UX-VOZ 1.13).
+        <Texto variante="secundario" tono="secundario" testID={`${testID}-motivo`}>
+          {propuesta.confirmar.motivoDeshabilitado}
+        </Texto>
+      ) : null}
       {propuesta.cambiar ? (
         <Boton
           etiqueta={propuesta.cambiar.etiqueta}
@@ -145,6 +156,8 @@ function Fila({
           accessibilityLabel={`${fila.etiqueta}: ${fila.valor}`}
           accessibilityHint="Toca para cambiarlo"
           accessibilityState={{ expanded: abierta }}
+          // El área de toque es la fila completa (≥ 48 dp), no solo el texto (criterio 9 de la Ola 7).
+          style={{ minHeight: OBJETIVO_TACTIL_MIN }}
         >
           {contenido}
         </Pressable>

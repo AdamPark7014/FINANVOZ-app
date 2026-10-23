@@ -50,6 +50,7 @@ import {
   PISTA_MOSTRAR_DETALLE_MOVIMIENTO,
   PISTA_REGISTRAR_MOVIMIENTO,
   PISTA_VER_DESGLOSE,
+  PISTA_VER_QUE_VIENE,
   PISTA_VER_TODOS_MOVIMIENTOS,
   etiquetaConfirmarAnularMovimiento,
   PISTA_AGREGAR_TARJETA_CREDITO,
@@ -116,8 +117,9 @@ describe('Hoy', () => {
     );
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_DESGLOSE);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: false });
-    expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
     fireEvent.press(screen.getByTestId('boton-desglose'));
+    // Ola 7: «¿Me alcanza?» vive en el desglose que abre la barra del día.
+    expect(screen.getByTestId('boton-me-alcanza')).toHaveProp('accessibilityHint', PISTA_ME_ALCANZA_HOY);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_OCULTAR_DESGLOSE);
     expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityState', { expanded: true });
     p.cerrar();
@@ -262,7 +264,7 @@ describe('Hoy', () => {
     expect(textoDe('hoy-secundario')).toBe(
       `Te faltan ${formatearCentavos(hoy.faltante)} para cubrir lo que viene antes del jue 15.`,
     );
-    expect(screen.getByText('Ver qué viene')).toBeTruthy();
+    expect(screen.getByTestId('boton-desglose')).toHaveProp('accessibilityHint', PISTA_VER_QUE_VIENE);
   });
 
   it('sin ingreso configurado pide la frecuencia y lleva a configurarla', () => {
@@ -315,7 +317,7 @@ describe('Hoy', () => {
 });
 
 describe('Registrar', () => {
-  it('CA-M2-02 · escribir "coca 25 en efectivo" registra, el efectivo baja $25 y Deshacer lo regresa', () => {
+  it('CA-M2-02 · escribir "coca 25 en efectivo" registra, el efectivo baja $25 y Deshacer lo regresa', async () => {
     const p = conEscenario('e4-01');
     const nav = navegacionFalsa();
     const efectivo = p.e.cuentas.efectivo as string;
@@ -339,20 +341,23 @@ describe('Registrar', () => {
     const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
     expect(despues).not.toBe('$214');
     expect(textoDe('hoy-puedes')).toBe(despues);
-    // Las consultas de texto normalizan el salto de línea a un espacio.
-    const linea = lineaCambioDia('$214', despues).replace(/[$.]/g, '\\$&');
-    const registrado = new RegExp(`^Registré: Coca \\$25 · .+ · Cartera\\s${linea}$`);
-    expect(within(aviso).getByText(registrado)).toBeTruthy();
+    // Ola 7: el registro es un turno del asistente; la segunda línea dice cómo cambió tu día.
+    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent(
+      /^Registré Coca \$25 · .+ · Cartera\.$/,
+    );
+    expect(within(aviso).getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
     expect(within(aviso).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
     expect(textoDe(`monto-${mov?.id}`)).toBe('−$25');
 
-    fireEvent.press(within(aviso).getByText(registrado));
+    fireEvent.press(within(aviso).getByRole('button', { name: /^Registré Coca/ }));
     expect(nav.alVerMovimiento).toHaveBeenCalledWith(mov?.id);
 
-    fireEvent.press(within(aviso).getByText('Deshacer'));
-    expect(screen.queryByTestId('aviso')).toBeNull();
+    await act(async () => {
+      fireEvent.press(within(aviso).getByText('Deshacer'));
+    });
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent('Deshice el registro.');
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
     expect(screen.getByTestId('movimientos-vacio')).toBeTruthy();
   });
@@ -383,60 +388,66 @@ describe('Registrar', () => {
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    await screen.findByTestId('mensaje-registro');
-    // Sin intérprete en internet no se promete "cuando tengas internet" (sí hay internet): se dice qué hacer.
-    expect(textoDe('mensaje-registro')).toContain(MENSAJE_SIN_NUBE);
-    expect(textoDe('mensaje-registro')).not.toMatch(/cuando tengas internet/);
+    // Ola 7 (criterio 12): sin intérprete en internet no se promete «cuando tengas internet»: «No entendí» con
+    // lo oído y reparación en un toque; la frase queda en Por revisar.
+    const turno = await screen.findByTestId('no-entendi');
+    expect(within(turno).getByTestId('no-entendi-texto')).toHaveTextContent(
+      'Oí «ayer fui al súper con mi prima y pagó ella», pero no supe qué pasó.',
+    );
+    expect(screen.queryByText(/cuando tengas internet/)).toBeNull();
     expect(MENSAJE_GUARDADA.sin_red).toMatch(/cuando tengas internet/);
-    expect(screen.getByText('«ayer fui al súper con mi prima y pagó ella»')).toBeTruthy();
+    expect(MENSAJE_SIN_NUBE).not.toMatch(/cuando tengas internet/);
     expect(screen.getByText('Tienes 1 frase por revisar.')).toBeTruthy();
   });
 
-  it('con tarjeta ambigua pide elegirla con chips antes de guardar', () => {
+  it('con tarjeta ambigua pregunta cuál con chips y después muestra «Entendí»', async () => {
     const p = conEscenario('e4-01');
     const nu = p.e.cuentas.nu as string;
     todas(p.ctx);
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 80 con tarjeta');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    const tarjeta = screen.getByTestId('confirmacion-registro');
-    expect(within(tarjeta).getByText('Confirma la cuenta.')).toBeTruthy();
-    expect(within(tarjeta).getByText('¿De qué cuenta salió?')).toBeTruthy();
-    expect(screen.getByTestId('boton-guardar-confirmacion').props.accessibilityState).toMatchObject({
-      disabled: true,
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
+    // Una pregunta a la vez (02 §1.2): primero la cuenta, con chips.
+    expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿De qué cuenta salió?');
     expect(screen.queryByTestId('aviso')).toBeNull();
-
-    const chipNu = within(tarjeta).getByTestId(`elegir-0-origenId-${nu}`);
+    const chipNu = screen.getByTestId(`pregunta-chip-${nu}`);
     expect(chipNu.props.accessibilityLabel).toBe('Nu ••4410');
     expect(chipNu.props.accessibilityRole).toBe('radio');
-    expect(screen.getByLabelText('¿De qué cuenta salió?')).toBeTruthy();
-
     fireEvent.press(chipNu);
-    expect(chipNu.props.accessibilityState).toMatchObject({ selected: true });
-    fireEvent.press(screen.getByTestId('boton-guardar-confirmacion'));
-    expect(screen.queryByTestId('confirmacion-registro')).toBeNull();
+    // La respuesta queda como turno y llega «Entendí» con la cuenta elegida.
+    expect(screen.getByTestId('entendi-fila-cuenta')).toHaveTextContent(/Nu ••4410/);
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('entendi-confirmar'));
+    });
+    expect(screen.queryByTestId('entendi')).toBeNull();
     // Una compra con la tarjeta que pagas completa se aparta: la cifra de Hoy baja y el aviso lo dice.
     const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
-    expect(
-      within(screen.getByTestId('aviso')).getByText(
-        `Registré: Tacos $80 · Comida fuera · Nu ••4410\n${lineaCambioDia('$214', despues)}`,
-      ),
-    ).toBeTruthy();
+    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
+      'Registré Tacos $80 · Comida fuera · Nu ••4410.',
+    );
+    expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
   });
 
-  it('un monto mayor a $5,000 no se guarda hasta confirmarlo', () => {
+  it('un monto mayor a $5,000 no se guarda hasta confirmarlo', async () => {
     const p = conEscenario('e4-01');
     todas(p.ctx);
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'renta 6000 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    expect(screen.getByText('Es un monto alto. Revísalo antes de guardar.')).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+    expect(screen.getByTestId('entendi-efecto')).toHaveTextContent(
+      'Es un monto alto. Revísalo antes de guardar.',
+    );
     expect(listarMovimientos(p.ctx)).toEqual([]);
-    fireEvent.press(screen.getByTestId('boton-cancelar-confirmacion'));
-    expect(screen.queryByTestId('confirmacion-registro')).toBeNull();
-    expect(listarMovimientos(p.ctx)).toEqual([]);
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('entendi-confirmar'));
+    });
+    expect(screen.queryByTestId('entendi')).toBeNull();
+    expect(listarMovimientos(p.ctx)[0]?.movimientos[0]?.monto).toBe(600_000);
   });
 
   it('el formulario registra un préstamo recibido con persona nueva', () => {
@@ -698,7 +709,7 @@ describe('Movimientos', () => {
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'ayer fui al súper con mi prima y pagó ella');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    await screen.findByTestId('mensaje-registro');
+    await screen.findByTestId('no-entendi');
     screen.unmount();
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     const [frase] = listarPorInterpretar(p.ctx);

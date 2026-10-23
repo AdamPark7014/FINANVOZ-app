@@ -3,6 +3,7 @@ import type { NivelNube } from '../../servicios';
 import {
   MENSAJE_LIMITE_EXPLICAR_DIARIO,
   MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS,
+  PIE_EXPLICAR,
 } from '../../servicios/explicar';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { pide, responde, turnoGuionado, type PasoGuion } from '../../servicios/__pruebas__/turno';
@@ -32,71 +33,61 @@ function preparar(guion: PasoGuion[], { plus = true }: { plus?: boolean } = {}) 
 
 const CONSULTAS: PasoGuion = pide(['hoy'], ['compromisos', { desde: '2026-10-11', hasta: '2026-10-17' }]);
 
-describe('modo explicar en el panel Registrar (02 §22, RF-CON-02)', () => {
-  it('Q13 muestra la explicación con sus cifras, "Ver movimientos ›" y el pie fijo', async () => {
+// Ola 7: el modo explicar contesta en la conversación (turno de texto `respuesta`), con el pie de «no es asesoría».
+describe('modo explicar en el asistente (02 §22, RF-CON-02)', () => {
+  it('Q13 muestra la explicación con sus cifras, el pie y «Ver movimientos» filtrado', async () => {
     const p = preparar([
       CONSULTAS,
       responde('Hoy puedes gastar $214 porque en los próximos 7 días tienes 2 pagos por $1,174.'),
     ]);
     await escribir(golden('Q13').texto);
-    expect(await screen.findByTestId('explicacion-texto')).toHaveTextContent(
+    const texto = await screen.findByTestId('respuesta-texto');
+    expect(texto).toHaveTextContent(
       'Hoy puedes gastar $214 porque en los próximos 7 días tienes 2 pagos por $1,174.',
+      { exact: false },
     );
-    expect(screen.getByTestId('explicacion-pie')).toHaveTextContent(
-      'Responde con tus datos; no es asesoría financiera.',
-    );
-    fireEvent.press(screen.getByTestId('boton-ver-movimientos-explicar'));
+    expect(texto).toHaveTextContent(PIE_EXPLICAR, { exact: false });
+    fireEvent.press(screen.getByTestId('respuesta-ver-movimientos'));
     expect(p.navegacion.alVerMovimientos).toHaveBeenCalledWith({ desde: '2026-10-11', hasta: '2026-10-17' });
-    fireEvent.press(screen.getByRole('button', { name: 'Listo' }));
-    expect(screen.queryByTestId('respuesta-explicar')).toBeNull();
   });
 
-  it('con una cifra inventada muestra "No pude explicarlo mejor" y las respuestas en plantilla', async () => {
+  it('con una cifra inventada dice «No pude explicarlo mejor» y las respuestas en plantilla', async () => {
     preparar([CONSULTAS, responde('Hoy puedes gastar $300 porque tus pagos suben.')]);
     await escribir(golden('Q13').texto);
-    const plantilla = await screen.findByTestId('explicacion-plantilla');
-    expect(plantilla).toHaveTextContent('No pude explicarlo mejor', { exact: false });
-    expect(plantilla).toHaveTextContent('Hoy puedes gastar $214; faltan 4 días para tu quincena.', {
+    const texto = await screen.findByTestId('respuesta-texto');
+    expect(texto).toHaveTextContent('No pude explicarlo mejor', { exact: false });
+    expect(texto).toHaveTextContent('Hoy puedes gastar $214; faltan 4 días para tu quincena.', {
       exact: false,
     });
-    expect(plantilla).toHaveTextContent('En los próximos 7 días tienes 2 pagos por $1,174.', {
-      exact: false,
-    });
+    expect(texto).toHaveTextContent('En los próximos 7 días tienes 2 pagos por $1,174.', { exact: false });
     expect(screen.queryByText(/\$300/)).toBeNull();
-    expect(screen.getByTestId('explicacion-pie')).toBeTruthy();
   });
 
-  it('en Gratis ofrece Plus sin preguntarle nada al modelo', async () => {
+  it('en Gratis lo dice sin preguntarle nada al modelo', async () => {
     const p = preparar([], { plus: false });
     await escribir(golden('Q13').texto);
-    expect(await screen.findByTestId('explicacion-solo-plus')).toHaveTextContent(
+    expect(await screen.findByTestId('respuesta-texto')).toHaveTextContent(
       'Preguntarme lo que quieras sobre tu dinero es parte de Plus. Tu «hoy puedes» sigue en tu plan.',
     );
     expect(p.vueltas).toHaveLength(0);
-    expect(screen.queryByTestId('explicacion-pie')).toBeNull();
   });
 
   it('sin internet lo dice', async () => {
     preparar([{ tipo: 'sin_red' }]);
     await escribir(golden('Q13').texto);
-    const aviso = await screen.findByTestId('mensaje-registro');
-    expect(aviso).toHaveTextContent(
+    expect(await screen.findByTestId('respuesta-texto')).toHaveTextContent(
       'Necesito internet para responderte eso. Pregúntame de nuevo cuando tengas conexión.',
     );
-    expect(aviso.props.accessibilityLiveRegion).toBe('polite');
-    expect(aviso.props.accessibilityRole).toBe('alert');
   });
 
   it.each([
     ['limite_mensual', MENSAJE_LIMITE_EXPLICAR_MENSUAL_PLUS],
     ['limite_diario', MENSAJE_LIMITE_EXPLICAR_DIARIO],
-  ] as const)('con cupo %s agotado muestra el mensaje en explicacion-limite', async (codigo, mensaje) => {
+  ] as const)('con cupo %s agotado dice el mensaje del cupo', async (codigo, mensaje) => {
     preparar([{ tipo: 'limite', codigo }]);
     await escribir(golden('Q13').texto);
-    const limite = await screen.findByTestId('explicacion-limite');
-    expect(limite).toHaveTextContent(mensaje);
-    expect(limite.props.accessibilityRole).toBe('alert');
-    expect(limite).not.toHaveTextContent('Por revisar');
-    expect(screen.queryByTestId('explicacion-pie')).toBeNull();
+    const texto = await screen.findByTestId('respuesta-texto');
+    expect(texto).toHaveTextContent(mensaje);
+    expect(texto).not.toHaveTextContent('Por revisar');
   });
 });

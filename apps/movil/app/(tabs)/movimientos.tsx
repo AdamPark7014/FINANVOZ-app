@@ -9,7 +9,7 @@ import {
   type ParamsMovimientos,
 } from '../../src/pantallas/principal';
 import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
-import { propsContenedorPestana } from './pestanas-textos';
+import { propsContenedorPestana } from '../../src/rutas/pestanas-textos';
 
 /** Pestaña Movimientos (`02 §10`): filtro y detalle solo vía parámetros de ruta (regla 9). */
 export default function Movimientos() {

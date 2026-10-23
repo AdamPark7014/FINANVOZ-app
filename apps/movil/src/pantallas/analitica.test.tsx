@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { crearAnalitica, type EnvioAnalitica } from '../analitica/cliente';
 import { fijarEstadisticas, type Contexto } from '../servicios';
@@ -53,7 +53,7 @@ describe('analítica en pantallas (03 §8, RNF-05)', () => {
     p.cerrar();
   });
 
-  it('con el opt-in, registrar envía solo origen, nivel, si preguntó, latencia y espacio', () => {
+  it('con el opt-in, registrar envía solo origen, nivel, si preguntó, latencia y espacio', async () => {
     const p = conEscenario('e4-01');
     fijarEstadisticas(p.ctx, true);
     const enviados = conAnalitica(
@@ -62,7 +62,10 @@ describe('analítica en pantallas (03 §8, RNF-05)', () => {
     );
     registrar('coca 25 en efectivo');
     registrar('renta 6000 en efectivo');
-    fireEvent.press(screen.getByTestId('boton-guardar-confirmacion'));
+    // Ola 7: el monto alto se confirma con el «Sí» de la tarjeta «Entendí».
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('entendi-confirmar'));
+    });
     expect(enviados.map((e) => [e.evento, e.propiedades])).toEqual([
       [
         'movimiento_registrado',
