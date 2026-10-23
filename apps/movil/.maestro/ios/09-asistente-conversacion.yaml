@@ -1,0 +1,83 @@
+# Capturas del asistente con conversación (auditoría de UI, 23-10): registro directo, una consulta, «¿puedo gastar?»,
+# una frase que el nivel 0 no entiende y Movimientos / Cuentas con datos. Sin nube en esta build: lo que el nivel 0
+# no resuelve queda en «Por revisar». Solo ASCII en inputText (Maestro en iOS). No bloquea por textos exactos: espera
+# cualquier turno nuevo del asistente y toma la captura.
+appId: com.finanvoz.app
+name: iOS · 09 Asistente con conversación
+tags:
+  - ios
+  - capturas
+---
+- runFlow: subflujos/onboarding-rapido.yaml
+- takeScreenshot: asistente-vacio
+# 1 · registro directo
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'coca 25 en efectivo' } }
+- extendedWaitUntil:
+    visible:
+      id: '(aviso|entendi|pregunta|respuesta|no-entendi)'
+    timeout: 10000
+- takeScreenshot: asistente-registro
+# 2 · otro gasto con categoría
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'tacos 180 en efectivo' } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: asistente-dos-registros
+# 3 · consulta del mes
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'cuanto llevo en comida' } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: asistente-consulta
+# 4 · ¿puedo gastar?
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'puedo gastar 800 en unos tenis' } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: asistente-puedo-gastar
+# 5 · colchón dicho (se guarda con «Sí»)
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'mi colchon es de 2000' } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: asistente-colchon
+# 6 · algo que el nivel 0 no entiende
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'lo de ayer con mi primo' } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: asistente-no-entendi
+# Desglose con datos
+- tapOn:
+    id: boton-desglose
+- extendedWaitUntil:
+    visible:
+      id: desglose
+    timeout: 5000
+- takeScreenshot: asistente-desglose-con-datos
+- tapOn:
+    id: boton-desglose
+# Movimientos, Cuentas y Tú con datos
+- tapOn:
+    id: pestana-movimientos
+- extendedWaitUntil:
+    visible:
+      id: pantalla-movimientos
+    timeout: 10000
+- takeScreenshot: movimientos-con-datos
+- tapOn:
+    id: pestana-cuentas
+- extendedWaitUntil:
+    visible:
+      id: pantalla-cuentas
+    timeout: 10000
+- takeScreenshot: cuentas-con-datos
+- tapOn:
+    id: pestana-tu
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+- takeScreenshot: tu-con-datos
+- tapOn:
+    id: pestana-hoy
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 10000
+- takeScreenshot: asistente-al-volver

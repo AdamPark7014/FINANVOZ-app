@@ -36,9 +36,22 @@ tags:
       id: onb-casilla-datos
 - tapOn:
     id: onb-casilla-datos
+- waitForAnimationToEnd:
+    timeout: 3000
 - takeScreenshot: o2-consentimiento
 - tapOn:
     id: onb-aceptar
+# Tras el toque con el botón inactivo, el siguiente toque a veces cae mientras el desplazamiento sigue frenando y
+# el Pressable se queda «presionado» sin soltar: un segundo toque si seguimos en O2.
+- runFlow:
+    when:
+      visible:
+        id: onb-consentimiento
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - tapOn:
+          id: onb-aceptar
 # O3
 - extendedWaitUntil:
     visible:

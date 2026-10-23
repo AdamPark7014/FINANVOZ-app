@@ -1,9 +1,20 @@
-# Cierra el teclado de iOS tocando un elemento fijo de arriba (título o fecha; nunca un campo ni un botón).
+# Cierra el teclado de iOS. Con teclado numérico, la barra «Listo» (testID `<campo>-listo`) lo cierra de un toque.
+# Si no hay barra, toca un elemento fijo de arriba (título o fecha; nunca un campo ni un botón).
 # hideKeyboard de Maestro en iOS solo desliza en el centro y no cierra nada aquí; un toque dentro del ScrollView sí
-# (keyboardShouldPersistTaps="handled"). Variables: ANCLA.
+# (keyboardShouldPersistTaps="handled"). Con el teclado abierto y un pie fijo («Continuar») el centro de la pantalla
+# cae sobre el pie y deslizar no mueve el contenido: por eso primero «Listo». Variables: ANCLA.
 appId: com.finanvoz.app
 name: Subflujo · cerrar el teclado
 ---
+- runFlow:
+    when:
+      visible:
+        id: '.*-listo'
+    commands:
+      - tapOn:
+          id: '.*-listo'
+      - waitForAnimationToEnd:
+          timeout: 2000
 - scrollUntilVisible:
     element:
       id: ${ANCLA}

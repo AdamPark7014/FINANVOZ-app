@@ -1,0 +1,30 @@
+# Escribe una frase al asistente, la manda con la tecla «Enviar» del teclado y cierra el campo (el botón del teclado
+# lo alterna), para que la captura muestre la conversación sin teclado. Variables: FRASE (solo ASCII).
+appId: com.finanvoz.app
+name: Subflujo · decir por texto
+---
+- runFlow:
+    when:
+      notVisible:
+        id: campo-registrar
+    commands:
+      - tapOn:
+          id: boton-escribir
+      - extendedWaitUntil:
+          visible:
+            id: campo-registrar
+          timeout: 5000
+- runFlow: intro-teclado.yaml
+- inputText: ${FRASE}
+- pressKey: Enter
+- waitForAnimationToEnd:
+    timeout: 3000
+- runFlow:
+    when:
+      visible:
+        id: campo-registrar
+    commands:
+      - tapOn:
+          id: boton-escribir
+      - waitForAnimationToEnd:
+          timeout: 2000
