@@ -26,6 +26,13 @@ export const TIEMPO_MAXIMO_MS = 8000;
 export const PRESUPUESTO_TOTAL_MS = 7000;
 /** Si lo que queda del presupuesto es menor, no se inicia otro intento. */
 export const TIEMPO_MINIMO_INTENTO_MS = 1500;
+/**
+ * Tope de cada intento del intérprete (`interpretar`): con el presupuesto de 7 s caben un intento de 4 s y un segundo
+ * de hasta 3 s (con el alterno o, sin alterno, con el mismo proveedor). Con el tope de 8 s el primer intento se
+ * llevaba todo el presupuesto: en la medición del 22-10, 3 de ~190 llamadas pasaron de 7 s y terminaron en tiempo
+ * agotado sin reintento. El modo explicar (`llm/turno.ts`) conserva `TIEMPO_MAXIMO_MS`.
+ */
+export const TIEMPO_INTENTO_INTERPRETAR_MS = 4000;
 const TOKENS_SALIDA_MAXIMOS = 2048;
 
 /**

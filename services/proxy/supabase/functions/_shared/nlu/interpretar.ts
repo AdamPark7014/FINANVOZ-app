@@ -1,9 +1,9 @@
 // Orquestación del nivel nube (docs/06-NLU.md §2 y §10.1; 03 §6):
-//   proveedor principal → si 5xx/429/red/tiempo, un intento con el alterno
+//   proveedor principal → si 5xx/429/red/tiempo, un intento con el alterno (sin alterno, otro con el mismo proveedor)
 //   → quitar null (variante nulable) → validar con Zod → si falla, un reintento con el error → si vuelve a fallar,
 //   aclarar/no_entendi.
-// Todos los intentos descuentan de un presupuesto total (`PRESUPUESTO_TOTAL_MS`) menor que el tiempo máximo del
-// cliente: un intento que ya no cabe no se inicia.
+// Cada intento tiene su tope (`TIEMPO_INTENTO_INTERPRETAR_MS`, ~4 s) y todos descuentan de un presupuesto total
+// (`PRESUPUESTO_TOTAL_MS`) menor que el tiempo máximo del cliente: un intento que ya no cabe no se inicia.
 // No registra nada: devuelve metadatos para que el manejador los registre (regla 9).
 import type { ContextoMinimo } from './contrato.ts';
 import { construirPrompt, mensajeCorreccion, type Prompt } from './prompt.ts';
@@ -12,6 +12,7 @@ import {
   FallaProveedor,
   type NombreProveedor,
   PRESUPUESTO_TOTAL_MS,
+  TIEMPO_INTENTO_INTERPRETAR_MS,
   TIEMPO_MAXIMO_MS,
   TIEMPO_MINIMO_INTENTO_MS,
 } from './proveedores.ts';
@@ -20,7 +21,7 @@ import {
 export type Validador = (valor: unknown) => { ok: true; valor: unknown } | { ok: false; error: string };
 
 export interface OpcionesTiempo {
-  /** Tope de cada llamada a un proveedor. */
+  /** Tope de cada llamada a un proveedor (`interpretar`: `TIEMPO_INTENTO_INTERPRETAR_MS`; `turno`: `TIEMPO_MAXIMO_MS`). */
   tiempoMaximoMs?: number;
   /** Presupuesto total de la petición, del que descuenta cada intento. */
   presupuestoMs?: number;
@@ -30,7 +31,10 @@ export interface OpcionesTiempo {
 }
 
 export interface OpcionesInterpretar extends OpcionesTiempo {
-  /** Principal primero, alterno después (se usa como mucho uno alterno). */
+  /**
+   * Principal primero, alterno después (se usa como mucho uno alterno). Con uno solo, el segundo intento tras un
+   * tiempo agotado, 5xx, 429 o falla de red es con el mismo proveedor.
+   */
   adaptadores: readonly Adaptador[];
   validar: Validador;
 }
@@ -161,9 +165,14 @@ export async function interpretar(
   opciones: OpcionesInterpretar,
 ): Promise<ResultadoInterpretar> {
   const inicio = opciones.ahora();
-  const plazo = crearPresupuesto(opciones, inicio);
+  const plazo = crearPresupuesto(
+    { ...opciones, tiempoMaximoMs: opciones.tiempoMaximoMs ?? TIEMPO_INTENTO_INTERPRETAR_MS },
+    inicio,
+  );
   const prompt: Prompt = construirPrompt(texto, contexto);
-  const candidatos = opciones.adaptadores.slice(0, 2);
+  const [principal, alterno] = opciones.adaptadores;
+  // Sin alterno (p. ej. `NLU_PROVEEDORES=anthropic`), el segundo intento es con el mismo proveedor.
+  const candidatos = principal ? [principal, alterno ?? principal] : [];
   const uso = usoVacio();
   let llamadas = 0;
   let ultimaFalla: FallaProveedor | undefined;

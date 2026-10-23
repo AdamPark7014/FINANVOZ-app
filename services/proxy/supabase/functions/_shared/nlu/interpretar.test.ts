@@ -17,6 +17,7 @@ import {
   FallaProveedor,
   type NombreProveedor,
   PRESUPUESTO_TOTAL_MS,
+  TIEMPO_INTENTO_INTERPRETAR_MS,
   TIEMPO_MAXIMO_MS,
   TIEMPO_MINIMO_INTENTO_MS,
 } from './proveedores.ts';
@@ -163,7 +164,7 @@ describe('presupuesto total de la petición (P1: el teléfono no se rinde antes 
   // Cada paso avanza el reloj inyectado `ms` (lo que "tardó" el proveedor) y responde o falla.
   type Paso = { ms: number; texto?: string; falla?: FallaProveedor };
 
-  function armar(principal: Paso[], alterno: Paso[] = []) {
+  function armar(principal: Paso[], alterno: Paso[] | null = []) {
     const reloj = { t: 0 };
     const llamadas: NombreProveedor[] = [];
     const adaptador = (nombre: NombreProveedor, pasos: Paso[]): Adaptador => ({
@@ -180,7 +181,9 @@ describe('presupuesto total de la petición (P1: el teléfono no se rinde antes 
       },
     });
     const opciones = {
-      adaptadores: [adaptador('anthropic', principal), adaptador('openai', alterno)],
+      adaptadores: alterno
+        ? [adaptador('anthropic', principal), adaptador('openai', alterno)]
+        : [adaptador('anthropic', principal)],
       validar: validarInterpretacion,
       ahora: () => reloj.t,
     };
@@ -205,6 +208,90 @@ describe('presupuesto total de la petición (P1: el teléfono no se rinde antes 
     t = 5501;
     expect(plazo()).toBeNull();
     expect(crearPresupuesto({ ahora: () => 0 }, 0)()).toBe(Math.min(TIEMPO_MAXIMO_MS, PRESUPUESTO_TOTAL_MS));
+  });
+
+  it('cada intento tiene un tope de ~4 s: una llamada colgada deja tiempo para otra, sin pasar del presupuesto', async () => {
+    vi.useFakeTimers();
+    try {
+      const inicios: number[] = [];
+      const colgado: Adaptador = {
+        nombre: 'anthropic',
+        modelo: 'anthropic-x',
+        nulable: false,
+        llamar: () => {
+          inicios.push(Date.now());
+          return new Promise<never>(() => undefined);
+        },
+      };
+      const promesa = interpretar('x', CONTEXTO, {
+        adaptadores: [colgado],
+        validar: validarInterpretacion,
+        ahora: () => Date.now(),
+      });
+      await vi.advanceTimersByTimeAsync(PRESUPUESTO_TOTAL_MS + 1000);
+      const r = await promesa;
+      expect(r).toMatchObject({ ok: false, codigo: 'tiempo_agotado', llamadas: 2 });
+      expect(inicios).toHaveLength(2);
+      expect((inicios[1] ?? 0) - (inicios[0] ?? 0)).toBe(TIEMPO_INTENTO_INTERPRETAR_MS);
+      expect(r.latencia_ms).toBeLessThanOrEqual(PRESUPUESTO_TOTAL_MS);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('sin alterno: tiempo agotado del principal → un reintento con el mismo proveedor, que responde', async () => {
+    const { opciones, llamadas } = armar(
+      [
+        { ms: TIEMPO_INTENTO_INTERPRETAR_MS, falla: new FallaProveedor('tiempo') },
+        { ms: 1200, texto: salida(INTERPRETACION) },
+      ],
+      null,
+    );
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: true,
+      proveedor: 'anthropic',
+      interpretacion: INTERPRETACION,
+      desenlace: 'ok',
+      llamadas: 2,
+      latencia_ms: TIEMPO_INTENTO_INTERPRETAR_MS + 1200,
+    });
+    expect(llamadas).toEqual(['anthropic', 'anthropic']);
+  });
+
+  it('sin alterno: un 5xx rápido también se reintenta una vez; un 4xx no', async () => {
+    const cinco = armar(
+      [
+        { ms: 200, falla: new FallaProveedor('servidor', 529) },
+        { ms: 800, texto: salida(INTERPRETACION) },
+      ],
+      null,
+    );
+    expect(await interpretar('x', CONTEXTO, cinco.opciones)).toMatchObject({ ok: true, llamadas: 2 });
+    expect(cinco.llamadas).toEqual(['anthropic', 'anthropic']);
+
+    const cuatro = armar([{ ms: 200, falla: new FallaProveedor('cliente', 400) }], null);
+    expect(await interpretar('x', CONTEXTO, cuatro.opciones)).toMatchObject({
+      ok: false,
+      codigo: 'proveedor_fallo',
+      llamadas: 1,
+    });
+    expect(cuatro.llamadas).toEqual(['anthropic']);
+  });
+
+  it('sin alterno: si el reintento tampoco responde, tiempo_agotado con dos llamadas (nunca tres)', async () => {
+    const { opciones, llamadas } = armar(
+      [
+        { ms: TIEMPO_INTENTO_INTERPRETAR_MS, falla: new FallaProveedor('tiempo') },
+        { ms: PRESUPUESTO_TOTAL_MS - TIEMPO_INTENTO_INTERPRETAR_MS, falla: new FallaProveedor('tiempo') },
+      ],
+      null,
+    );
+    expect(await interpretar('x', CONTEXTO, opciones)).toMatchObject({
+      ok: false,
+      codigo: 'tiempo_agotado',
+      llamadas: 2,
+    });
+    expect(llamadas).toEqual(['anthropic', 'anthropic']);
   });
 
   it('principal lento que agota el presupuesto → no se llama al alterno; tiempo_agotado (cupo devuelto)', async () => {

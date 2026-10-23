@@ -6,6 +6,10 @@
 
 ## Hecho en este turno
 
+- **Intérprete del proxy (`fix(proxy)`)**: tope de 4 s por intento (`TIEMPO_INTENTO_INTERPRETAR_MS`) dentro del
+  presupuesto de 7 s y un reintento con el mismo proveedor cuando no hay alterno (tiempo, 5xx, 429 o red; nunca tras un
+  4xx); +4 pruebas en `interpretar.test.ts`. **Falta redesplegar** las funciones en el Hetzner
+  (`scripts/desplegar-funciones.sh`).
 - **Onboarding por voz (A-4)**: `DecirloPaso` sobre `interpretarPaso` con «Entendí» en O3, O4, O5 y O7; «Sí» guarda en
   O3 / O7 y lo completo en O4 / O5; lo incompleto llena el formulario con el foco en el primer dato que falta; la voz dice
   la tarjeta y, al terminar (`await decirTurno`), el micrófono escucha un turno (`useConfirmacionPorVoz`; un toque lo

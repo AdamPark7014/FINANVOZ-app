@@ -184,7 +184,7 @@ Acceso: las funciones de `/compartido/*` (`§6`) verifican la pertenencia y el e
 - **Autenticación:** JWT de Supabase (sesión anónima creada en el primer arranque; el respaldo en la nube enlaza esa sesión a un correo).
 - **Límites:** Gratis 30 interpretaciones/mes y 20/día; Plus 300/mes y 60/día; tope global diario con alerta. Respaldo: 4 archivos y 50 MB por usuario.
 - **Registro:** solo metadatos (hash de usuario, endpoint, proveedor, modelo, tokens, latencia, código). **Nunca** cuerpos de petición o respuesta.
-- **Proveedores LLM:** sin entrenamiento con datos del usuario y retención mínima según la configuración contractual disponible de cada proveedor; tiempo máximo 8 s; un reintento con proveedor alterno ante 5xx.
+- **Proveedores LLM:** sin entrenamiento con datos del usuario y retención mínima según la configuración contractual disponible de cada proveedor; tiempo máximo 8 s por llamada (el intérprete, ~4 s por intento) y presupuesto total de 7 s por petición; un reintento con proveedor alterno ante 5xx, 429, red o tiempo agotado (sin alterno, con el mismo proveedor).
 - **Secretos:** llaves de proveedores solo en variables del proyecto de Supabase. La llave privada de plantillas, fuera del proyecto (gestor de secretos de quien publica).
 
 ## 7. Seguridad
