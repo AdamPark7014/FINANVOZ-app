@@ -219,6 +219,42 @@ export function calcularArqueo(ctx: Contexto, entrada: EntradaArqueo): CalculoAr
   };
 }
 
+/**
+ * «Deberías traer» y el hueco con la vista ya abierta, sin leer la base (Ola 7, arqueo por voz): con los gastos
+ * marcados, E7 dice cuánto se espera y, si ya se sabe cuánto traes, cuánto falta (> 0) o sobra (< 0). El reparto
+ * del faltante sale de `calcularArqueo`.
+ */
+export function resumenArqueo(
+  vista: Pick<VistaArqueo, 'saldo' | 'porAsignar'>,
+  marcados: readonly string[],
+  efectivoReal: Centavos | null,
+): { readonly esperado: Centavos; readonly hueco: Centavos | null } {
+  const elegidos = new Set(marcados);
+  const r = calcularE7({
+    saldo_contable: vista.saldo,
+    efectivo_real: efectivoReal ?? 0,
+    historial: [],
+    marcados: vista.porAsignar.filter((g) => elegidos.has(g.transaccionId)).map((g) => g.monto),
+  });
+  return { esperado: vista.saldo - r.reasignado, hueco: efectivoReal === null ? null : r.hueco };
+}
+
+/**
+ * «Toca una línea para moverle» (Ola 7): pasa lo de `categoria` a `destino` dentro de la propuesta de E7. El total
+ * no cambia (sigue sumando el faltante); si alguna de las dos no está en la propuesta, la devuelve igual.
+ */
+export function moverEnPropuestaArqueo(
+  propuesta: readonly PropuestaArqueo[],
+  categoria: string,
+  destino: string,
+): PropuestaArqueo[] {
+  const de = propuesta.find((p) => p.categoria === categoria);
+  if (!de || categoria === destino || !propuesta.some((p) => p.categoria === destino)) return [...propuesta];
+  return propuesta
+    .filter((p) => p.categoria !== categoria)
+    .map((p) => (p.categoria === destino ? { ...p, monto: p.monto + de.monto } : p));
+}
+
 /** "Traes $15 más de lo esperado. ¿De dónde salió?" (E7-09). Nunca se registra sin respuesta. */
 export type RespuestaSobrante =
   | { readonly tipo: 'me_dieron' }

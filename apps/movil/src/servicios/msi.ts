@@ -7,9 +7,11 @@ import {
   corteDe,
   ErrorDominio,
   esFecha,
+  planMsi as calendarioMsi,
   siguienteCorte,
   sumarMeses,
   type Centavos,
+  type CuotaMsi,
   type PlainDate,
 } from '@cartera/core';
 import { esquema } from '@cartera/datos';
@@ -199,6 +201,25 @@ export function registrarCompraMsi(
     ponerAlCorriente(ctx, t.cuentaId, fecha);
     return registrada(ctx, planId, tx.id);
   });
+}
+
+/**
+ * Calendario de una compra a meses **antes** de guardarla (E6.1, el mismo de `registrarCompraMsi`): cuánto vale
+ * cada cuota y cuándo vence, sin escribir nada. Lo usa la tarjeta «Entendí» del asistente (Ola 7) para decir la
+ * mensualidad y el primer pago con cifras del motor (regla 4).
+ */
+export function previsualizarCompraMsi(
+  ctx: Contexto,
+  e: {
+    readonly tarjetaId: string;
+    readonly monto: Centavos;
+    readonly meses: number;
+    readonly fecha?: PlainDate;
+    readonly mesesDiferimiento?: number;
+  },
+): CuotaMsi[] {
+  const t = exigirTarjeta(ctx, e.tarjetaId);
+  return calendarioMsi(e.monto, e.meses, e.fecha ?? ctx.reloj.hoy(), t.ciclo, e.mesesDiferimiento ?? 0);
 }
 
 // ——— Pasar a meses (E6.2, caso 6d) ———

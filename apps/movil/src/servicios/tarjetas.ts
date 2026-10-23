@@ -247,3 +247,17 @@ export function msiPorPagar(ctx: Contexto, tarjetaId: string): Centavos {
     .all()
     .reduce((s, c) => s - ctx.libro.saldo(c.id), 0);
 }
+
+// ——— Alta por voz sin límite dicho (Ola 7, `src/asistente/flujos/tarjeta.ts`) ———
+
+/** Lo mínimo que acepta la base como límite (`CHECK (limite_credito > 0)`): $1. */
+export const LIMITE_MINIMO_SIN_DATO: Centavos = 100;
+
+/**
+ * Límite de crédito de una tarjeta agregada por voz cuando la persona no lo dijo (CA-O7 6: dos preguntas). La base
+ * exige uno: se guarda lo que debe hoy (mínimo $1). Así no se inventa crédito disponible: el uso queda al 100 % y
+ * `recomendarTarjeta` (E5.2) no la sugiere para compras hasta que la persona lo corrija en Editar. No entra en E4.
+ */
+export function limiteSinDato(saldo: Centavos): Centavos {
+  return Math.max(saldo, LIMITE_MINIMO_SIN_DATO);
+}

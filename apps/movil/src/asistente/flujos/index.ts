@@ -1,55 +1,89 @@
-import type { PropuestaEntendi } from '../../ui/entendi';
-import type { ChipRespuesta, IdFlujo, PasoFlujo, Respuesta } from '../tipos';
+import type { IdFlujo, Respuesta } from '../tipos';
+import { flujoArqueo } from './arqueo';
+import type { FlujoConversacional, PreguntaFlujo } from './contrato';
+import { flujoCuentaDividida } from './cuenta-dividida';
+import { flujoMsi } from './msi';
+import { flujoPagarTarjeta } from './pagar-tarjeta';
+import { flujoTanda } from './tanda';
+import { flujoTarjeta } from './tarjeta';
+import { ERROR_PASO } from './textos';
 
 /**
- * Formularios largos como conversación (Ola 7 §6). **Esqueleto del coordinador**: A-3 registra aquí cada flujo
- * (tarjeta, msi, tanda, cuenta_dividida, arqueo, pagar_tarjeta) y escribe `avanzar`; A-1 lo usa desde la pantalla
- * sin saber de cada flujo. El contexto (`ctx`) y el origen se pasan como `unknown` para no atar este módulo a
- * servicios; cada flujo los tipa por dentro.
+ * Formularios largos como conversación (Ola 7 §6): tarjeta, compra a meses, tanda, cuenta dividida, arqueo y pagar
+ * tarjeta. La pantalla (A-1) los usa sin saber de cada uno:
+ *
+ * 1. `iniciarFlujo(id, ctx, origen)` (o `flujoDeResultado(r)` para saber cuál abre un `ResultadoTexto`).
+ * 2. Mientras `siguientePregunta(flujo, e)` no sea `null`: turno `pregunta` con sus chips y campo; la respuesta pasa
+ *    por `responderPaso` (estado nuevo o `{ error }` que se muestra en la misma pregunta).
+ * 3. `flujo.entendi(ctx, e, { guardar, cambiar, actualizar })` → turno `entendi`. «Sí» → `flujo.guardar(ctx, e)` →
+ *    turno `registro` con `MensajeFlujo`; «Cambiar algo» → `router.push(flujo.formularioLargo(e))`.
  */
-export interface FlujoConversacional<E> {
-  readonly id: IdFlujo;
-  /** Estado inicial desde lo que ya se dijo (`ResultadoTexto`, `LecturaPaso`) o `null` (chip). */
-  readonly inicial: (ctx: unknown, origen: unknown) => E;
-  readonly pasos: readonly PasoFlujo<E>[];
-  /** «Entendí · ¿la agrego?» con `confirmar` → `guardar` y `cambiar` → `formularioLargo`. */
-  readonly entendi: (ctx: unknown, e: E, acciones: AccionesFlujo) => PropuestaEntendi;
-  readonly guardar: (ctx: unknown, e: E) => Promise<MensajeFlujo>;
-  /** Ruta de expo-router del formulario largo prellenado («Cambiar algo»). */
-  readonly formularioLargo: (e: E) => string | { pathname: string; params: Record<string, string> };
+export type {
+  AccionesFlujo,
+  FlujoConversacional,
+  MensajeFlujo,
+  OrigenFlujo,
+  PreguntaFlujo,
+} from './contrato';
+export { tomarPrellenado, type PrellenadosFlujo, type PrellenadoTarjeta } from './prellenado';
+export type { EstadoArqueo } from './arqueo';
+export type { EstadoDivision } from './cuenta-dividida';
+export type { EstadoMsi } from './msi';
+export type { EstadoPagoTarjeta } from './pagar-tarjeta';
+export type { EstadoTanda } from './tanda';
+export type { EstadoTarjeta } from './tarjeta';
+
+/** Cada flujo guarda su propio estado; el registro lo borra a `unknown` para que la pantalla no sepa de cada uno. */
+function registrar<E>(flujo: FlujoConversacional<E>): FlujoConversacional<unknown> {
+  return flujo as unknown as FlujoConversacional<unknown>;
 }
 
-export interface AccionesFlujo {
-  readonly guardar: () => Promise<void>;
-  readonly cambiar: () => void;
+export const FLUJOS: Readonly<Record<IdFlujo, FlujoConversacional<unknown>>> = {
+  tarjeta: registrar(flujoTarjeta),
+  msi: registrar(flujoMsi),
+  tanda: registrar(flujoTanda),
+  cuenta_dividida: registrar(flujoCuentaDividida),
+  arqueo: registrar(flujoArqueo),
+  pagar_tarjeta: registrar(flujoPagarTarjeta),
+};
+
+/** Resultados de `registrarTexto` que se contestan con un flujo en vez de un formulario. */
+const POR_RESULTADO: Readonly<Record<string, IdFlujo>> = {
+  tarjeta_por_agregar: 'tarjeta',
+  confirmar_msi: 'msi',
+  tanda_por_crear: 'tanda',
+  confirmar_division: 'cuenta_dividida',
+  arqueo: 'arqueo',
+};
+
+/** Qué flujo abre un `ResultadoTexto` («traigo 300» → arqueo), o `null` si no abre ninguno. */
+export function flujoDeResultado(r: { readonly resultado: string } | null): IdFlujo | null {
+  return r ? (POR_RESULTADO[r.resultado] ?? null) : null;
 }
 
-/** Lo que el asistente dice al guardar: «Listo: agregué tu Nu.» y, si aplica, Deshacer. */
-export interface MensajeFlujo {
-  readonly texto: string;
-  readonly cambioDia?: string;
-  readonly deshacer?: string;
-}
+export type FlujoIniciado =
+  | { readonly flujo: FlujoConversacional<unknown>; readonly estado: unknown }
+  | { readonly noDisponible: string };
 
-/** Siguiente paso a preguntar, o `null` si ya está todo para la tarjeta «Entendí». */
-export interface PreguntaFlujo {
-  readonly paso: string;
-  readonly texto: string;
-  readonly ayuda?: string;
-  readonly chips: readonly ChipRespuesta[];
-  readonly campo?: 'monto' | 'texto' | 'fecha';
-  readonly admiteCero?: boolean;
+/**
+ * Arranca un flujo con lo que ya se dijo (`OrigenFlujo`). Si no se puede (sin efectivo, sin tarjetas), devuelve el
+ * porqué para decirlo como turno de texto.
+ */
+export function iniciarFlujo(id: IdFlujo, ctx: unknown, origen: unknown = null): FlujoIniciado {
+  const flujo = FLUJOS[id];
+  const motivo = flujo.noDisponible?.(ctx) ?? null;
+  if (motivo !== null) return { noDisponible: motivo };
+  return { flujo, estado: flujo.inicial(ctx, origen) };
 }
-
-export const FLUJOS: Partial<Record<IdFlujo, FlujoConversacional<unknown>>> = {};
 
 export function siguientePregunta<E>(flujo: FlujoConversacional<E>, e: E): PreguntaFlujo | null {
   for (const p of flujo.pasos) {
     if (p.omitirSi?.(e)) continue;
+    const ayuda = p.ayuda?.(e);
     return {
       paso: p.id,
       texto: p.pregunta(e),
-      ...(p.ayuda ? { ayuda: p.ayuda(e) } : {}),
+      ...(ayuda ? { ayuda } : {}),
       chips: p.chips?.(e) ?? [],
       ...(p.campo ? { campo: p.campo } : {}),
       ...(p.admiteCero ? { admiteCero: true } : {}),
@@ -66,6 +100,6 @@ export function responderPaso<E>(
   r: Respuesta,
 ): E | { readonly error: string } {
   const p = flujo.pasos.find((x) => x.id === paso);
-  if (!p) return { error: 'Ese paso ya no aplica.' };
+  if (!p) return { error: ERROR_PASO };
   return p.aplicar(e, r);
 }

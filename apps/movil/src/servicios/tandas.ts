@@ -2,8 +2,10 @@ import { and, asc, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import {
   calendarioTanda,
+  conDia,
   construirAportacionTanda,
   construirCobroTanda,
+  diasDelMes,
   diaSemana,
   ErrorDominio,
   esFecha,
@@ -49,6 +51,34 @@ export function reglaDeFrecuencia(frecuencia: FrecuenciaTanda, inicio: PlainDate
     case 'mensual':
       return { tipo: 'mensual', dia: partes(inicio).dia };
   }
+}
+
+/** Lo contrario de `reglaDeFrecuencia`: "cada cuándo" de una regla ya armada (`null` si no es de tanda). */
+export function frecuenciaDeRegla(regla: Regla): FrecuenciaTanda | null {
+  switch (regla.tipo) {
+    case 'semanal':
+      return 'semanal';
+    case 'quincenal_15_ultimo':
+    case 'quincenal_dias':
+      return 'quincenal';
+    case 'catorcenal':
+      return 'catorcenal';
+    case 'mensual':
+      return 'mensual';
+    default:
+      return null;
+  }
+}
+
+/**
+ * Fechas para la primera ronda sin teclear (asistente, Ola 7): hoy, el próximo 15 y el último día del mes (las de
+ * pago de quincena más comunes), sin repetir y en orden. Mismo criterio que el formulario de tanda.
+ */
+export function fechasPrimeraRonda(hoy: PlainDate): PlainDate[] {
+  const { anio, mes, dia } = partes(hoy);
+  const quince = dia <= 15 ? conDia(anio, mes, 15) : conDia(anio, mes + 1, 15);
+  const ultimo = conDia(anio, mes, diasDelMes(anio, mes));
+  return [...new Set([hoy, quince, ultimo])].sort();
 }
 
 const Fecha = z.string().refine(esFecha, 'fecha inválida');

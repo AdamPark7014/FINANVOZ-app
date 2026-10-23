@@ -6,6 +6,11 @@
 
 ## Hecho en este turno
 
+- **Flujos conversacionales (A-3)**: `src/asistente/flujos/` (tarjeta, compra a meses, tanda, cuenta dividida, pagar
+  tarjeta y arqueo) sobre `PasoFlujo` / `FlujoConversacional`; funciones nuevas en los servicios de tarjetas, MSI,
+  tandas, cuenta dividida y arqueo; «Cambiar algo» deja lo dicho en memoria (`flujos/prellenado.ts`) y
+  `app/tarjetas/nueva.tsx` / `app/arqueo.tsx` lo toman con `tomarPrellenado`; `FormularioTarjetaNueva` recibe nombre,
+  últimos 4, saldo, modo y límite y los muestra escritos.
 - **Formularios de cuenta y pago fijo + sobras de U-1**: `FormularioCuenta` / `FormularioPagoFijo` con `prellenado`,
   `conDecirlo` y `enfocar` (primer dato que falta: `primerHuecoCuenta` / `primerHuecoPago`); el «O dímelo» del pago fijo
   lee con `interpretarPaso` (`pagos-fijos/prellenado.ts`); `app.json` con el plugin `expo-background-task`; la raíz

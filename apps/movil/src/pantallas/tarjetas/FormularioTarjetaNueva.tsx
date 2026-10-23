@@ -21,6 +21,19 @@ import {
 
 type ModoLimite = 'dia' | 'dias';
 type SiNo = 'si' | 'no';
+
+/**
+ * Lo ya dicho: el ciclo de `tarjeta_por_agregar` y, desde el flujo conversacional de tarjeta («Cambiar algo»,
+ * `asistente/flujos`) y desde «Dímelo» de O4, también nombre, últimos 4, saldo, si la paga completa y límite de crédito.
+ */
+export type PrellenadoFormularioTarjeta = TarjetaPorAgregar & {
+  readonly nombre?: string | null;
+  /** Dichos en O4 («la Nu terminación 4410»). */
+  readonly ultimos4?: string | null;
+  readonly saldo?: Centavos | null;
+  readonly modo?: 'totalero' | 'plan' | null;
+  readonly limiteCredito?: Centavos | null;
+};
 type Incluye = 'si' | 'no' | 'no_se';
 /** Campo que falta o está mal: se marca ahí mismo, además del mensaje junto al botón. */
 type CampoTarjeta = 'nombre' | 'ultimos4' | 'corte' | 'limitePago' | 'limiteCredito' | 'saldo' | 'msi';
@@ -66,14 +79,14 @@ export function useFormularioTarjeta({
   alGuardar,
   errorAparte = false,
 }: {
-  prellenado?: TarjetaPorAgregar | null;
+  prellenado?: PrellenadoFormularioTarjeta | null;
   alGuardar: (t: TarjetaCreada) => void;
   /** `true` si la pantalla muestra `error` junto a su botón fijo (al fondo del formulario no se ve al tocar). */
   errorAparte?: boolean;
 }): { campos: ReactNode; guardar: () => void; error: string | null } {
   const { ctx, refrescar } = useSesion();
-  const [nombre, setNombre] = useState(nombreSugerido(prellenado?.alias ?? null));
-  const [ultimos4, setUltimos4] = useState('');
+  const [nombre, setNombre] = useState(prellenado?.nombre || nombreSugerido(prellenado?.alias ?? null));
+  const [ultimos4, setUltimos4] = useState(prellenado?.ultimos4 ?? '');
   const [corte, setCorte] = useState(prellenado?.diaCorte ? String(prellenado.diaCorte) : '');
   const [modoLimite, setModoLimite] = useState<ModoLimite>(
     prellenado?.diasParaPagar && !prellenado.diaLimitePago ? 'dias' : 'dia',
@@ -85,9 +98,11 @@ export function useFormularioTarjeta({
         ? String(prellenado.diasParaPagar)
         : '',
   );
-  const [limiteCredito, setLimiteCredito] = useState<Centavos | null>(null);
-  const [completa, setCompleta] = useState<SiNo | null>(null);
-  const [saldo, setSaldo] = useState<Centavos | null>(null);
+  const [limiteCredito, setLimiteCredito] = useState<Centavos | null>(prellenado?.limiteCredito ?? null);
+  const [completa, setCompleta] = useState<SiNo | null>(
+    prellenado?.modo === 'totalero' ? 'si' : prellenado?.modo === 'plan' ? 'no' : null,
+  );
+  const [saldo, setSaldo] = useState<Centavos | null>(prellenado?.saldo ?? null);
   const [conMeses, setConMeses] = useState<SiNo>('no');
   const [filas, setFilas] = useState<FilaMsi[]>([{ clave: 0, mensualidad: null, restantes: '' }]);
   const [incluye, setIncluye] = useState<Incluye | null>(null);
@@ -237,6 +252,8 @@ export function useFormularioTarjeta({
       <CampoMonto
         testID="tarjeta-limite-credito"
         etiqueta="¿Hasta cuánto te presta esta tarjeta?"
+        // Lo dicho se ve escrito: el estado ya lo tiene y un campo vacío haría creer que falta.
+        valorInicial={prellenado?.limiteCredito ?? null}
         alCambiar={(m) => {
           corregido('limiteCredito');
           setLimiteCredito(m);
@@ -257,6 +274,7 @@ export function useFormularioTarjeta({
         testID="tarjeta-saldo"
         etiqueta="¿Cuánto debes hoy en esta tarjeta?"
         ayuda="Es el saldo actual de la app de tu banco, no el pago mínimo."
+        valorInicial={prellenado?.saldo ?? null}
         alCambiar={(m) => {
           corregido('saldo');
           setSaldo(m);
@@ -356,7 +374,7 @@ export function FormularioTarjetaNueva({
   alCancelar,
   etiquetaCancelar = BTN_CANCELAR,
 }: {
-  prellenado?: TarjetaPorAgregar | null;
+  prellenado?: PrellenadoFormularioTarjeta | null;
   alGuardar: (t: TarjetaCreada) => void;
   alCancelar: () => void;
   etiquetaCancelar?: string;

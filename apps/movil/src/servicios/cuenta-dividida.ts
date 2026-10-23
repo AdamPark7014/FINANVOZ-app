@@ -139,3 +139,27 @@ export function resolverParticipantes(
   }
   return { personaIds, sinResolver };
 }
+
+/** Una persona con sus alias normalizados (el nombre incluido), para reconocerla al dictar. */
+export interface PersonaConAlias {
+  readonly cuentaId: string;
+  readonly nombre: string;
+  readonly alias: readonly string[];
+}
+
+/**
+ * Personas con sus alias (asistente, Ola 7): la cuenta dividida por voz pregunta «¿Con quién fue?» y reconoce la
+ * respuesta («Caro» → Carolina Pérez) sin volver a leer la base en cada turno. Mismo criterio que
+ * `resolverParticipantes`.
+ */
+export function personasConAlias(ctx: Contexto): PersonaConAlias[] {
+  const aliasPorContacto = new Map<string, string[]>();
+  for (const a of ctx.db.select().from(aliasContacto).all()) {
+    aliasPorContacto.set(a.contactoId, [...(aliasPorContacto.get(a.contactoId) ?? []), a.aliasNormalizado]);
+  }
+  return listarPersonas(ctx).map((p) => ({
+    cuentaId: p.cuentaId,
+    nombre: p.nombre,
+    alias: normalizarAliases([p.nombre, ...(p.contactoId ? (aliasPorContacto.get(p.contactoId) ?? []) : [])]),
+  }));
+}
