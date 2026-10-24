@@ -126,7 +126,11 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   // ofertas ni "Restaurar", y sin nombrar tiendas ni precios.
   if (vista.plusDePrueba) {
     return (
-      <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID={ID.pantalla}
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           etiqueta={ETIQUETA_VOLVER}
           variante="texto"
@@ -176,7 +180,11 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   // ofrecer compras, aunque una build de desarrollo traiga la tienda simulada.
   if (Platform.OS === 'ios') {
     return (
-      <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID={ID.pantalla}
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           etiqueta={ETIQUETA_VOLVER}
           variante="texto"
@@ -212,7 +220,11 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
   }
 
   return (
-    <Pantalla testID={ID.pantalla} bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID={ID.pantalla}
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         etiqueta={ETIQUETA_VOLVER}
         variante="texto"

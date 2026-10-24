@@ -112,7 +112,11 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
   });
   if (!existe) {
     return (
-      <Pantalla testID="pantalla-grupo-compartido" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-grupo-compartido"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           testID="grupo-volver"
           etiqueta={ETIQUETA_VOLVER}
@@ -229,7 +233,11 @@ function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () 
   };
 
   return (
-    <Pantalla testID="pantalla-grupo-compartido" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-grupo-compartido"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       {/* "Volver" siempre regresa a tus grupos (como el gesto de iPhone); cada panel tiene su propio cierre. */}
       <Boton
         testID="grupo-volver"

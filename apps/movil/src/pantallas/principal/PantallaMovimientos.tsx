@@ -142,7 +142,7 @@ export function PantallaMovimientos({
   useAnuncio(filtro ? TEXTO_MOVIMIENTOS_FILTRO_ACTIVO : null);
 
   return (
-    <Pantalla testID="pantalla-movimientos">
+    <Pantalla testID="pantalla-movimientos" contenidoStyle={{ gap: espacio.xl }}>
       <View
         style={{
           flexDirection: 'row',

@@ -53,7 +53,11 @@ export function PantallaDetalleCuenta({
 
   if (!c) {
     return (
-      <Pantalla testID="cuenta-detalle" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="cuenta-detalle"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Encabezado titulo={ETIQUETA_TIENES} alVolver={alVolver} testID="cuenta-detalle" />
         <EstadoVacio texto={TEXTO_CUENTA_NO_ENCONTRADA} testID="cuenta-detalle-no-encontrada" />
       </Pantalla>
@@ -82,7 +86,11 @@ export function PantallaDetalleCuenta({
   ].filter((x): x is string => x !== null);
 
   return (
-    <Pantalla testID="cuenta-detalle" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="cuenta-detalle"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Encabezado titulo={c.nombre} alVolver={alVolver} testID="cuenta-detalle">
         {subtitulo.length > 0 ? (
           <Texto

@@ -88,7 +88,7 @@ function FilaPlan({ p }: { p: PlanMsiVista }) {
         accessibilityLabel={
           activo ? etiquetaAccesiblePlanMsi(p.descripcion, cuota, p.cuotasRestantes, p.meses) : undefined
         }
-        style={{ gap: espacio.xxs }}
+        style={{ gap: espacio.xs }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
           <Texto variante="cuerpoFuerte" style={{ flex: 1 }} importantForAccessibility="no">
@@ -322,7 +322,7 @@ export function CompromisoMeses({ meses }: { meses: readonly MesCompromiso[] }) 
       {meses.map((m) => {
         const etiqueta = etiquetaMes(m.mes);
         return (
-          <View key={m.mes} testID={`compromiso-${m.mes}`} style={{ gap: espacio.xxs }}>
+          <View key={m.mes} testID={`compromiso-${m.mes}`} style={{ gap: espacio.xs }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
               <Texto variante="secundario" style={{ flex: 1 }}>
                 {etiqueta}

@@ -156,7 +156,11 @@ export function PantallaArqueo({
   });
   return (
     // Pantalla sin pestañas debajo: el pie necesita el área segura (barra de inicio del iPhone).
-    <Pantalla testID="pantalla-arqueo" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-arqueo"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <View
         style={{
           flexDirection: 'row',

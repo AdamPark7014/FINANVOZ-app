@@ -64,7 +64,7 @@ export function TarjetaEntendi({
       ) : null}
       <View
         style={{
-          gap: espacio.xxs,
+          gap: espacio.xs,
           backgroundColor: c.superficieAlterna,
           borderRadius: radio.l,
           paddingHorizontal: espacio.m,

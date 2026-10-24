@@ -18,7 +18,11 @@ export default function AvisoPrivacidad() {
   // se abre desde O2, antes de terminar el onboarding.
   const volver = () => (router.canGoBack() ? router.back() : router.replace('/'));
   return (
-    <Pantalla testID="aviso-privacidad" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="aviso-privacidad"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="aviso-privacidad-volver"
         variante="texto"

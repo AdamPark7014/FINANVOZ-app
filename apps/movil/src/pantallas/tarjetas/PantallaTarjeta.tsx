@@ -83,7 +83,11 @@ export function PantallaTarjeta({
   const existe = useVista((ctx) => listarTarjetas(ctx).some((t) => t.id === tarjetaId));
   if (!existe) {
     return (
-      <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-tarjeta"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           testID="tarjeta-volver"
           etiqueta={BTN_VOLVER}

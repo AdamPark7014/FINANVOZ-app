@@ -193,7 +193,7 @@ function Fila({
 }) {
   return (
     <View testID={testID} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-      <View style={{ flex: 1, gap: espacio.xxs }}>
+      <View style={{ flex: 1, gap: espacio.xs }}>
         <Texto variante="cuerpoFuerte">{titulo}</Texto>
         <Texto variante="secundario" tono="secundario">
           {detalle}

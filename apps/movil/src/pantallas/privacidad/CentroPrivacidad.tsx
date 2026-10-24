@@ -133,7 +133,7 @@ export function CentroPrivacidad({
   };
 
   return (
-    <>
+    <View style={{ gap: espacio.xl }}>
       <Boton
         testID="privacidad-volver"
         variante="texto"
@@ -181,7 +181,7 @@ export function CentroPrivacidad({
           {SECCION_SALE}
         </Texto>
         {saleDelTelefono().map((s) => (
-          <View key={s.que} style={{ gap: espacio.xxs }}>
+          <View key={s.que} style={{ gap: espacio.xs }}>
             <Texto variante="cuerpo">{s.que}</Texto>
             <Texto variante="secundario" tono="secundario">
               {s.quien}
@@ -236,7 +236,7 @@ export function CentroPrivacidad({
           {SECCION_PERMISOS}
         </Texto>
         {permisosTelefono().map((p) => (
-          <View key={p.nombre} style={{ gap: espacio.xxs }}>
+          <View key={p.nombre} style={{ gap: espacio.xs }}>
             <Texto variante="cuerpo">{p.nombre}</Texto>
             <Texto variante="secundario" tono="secundario">
               {p.para}
@@ -357,6 +357,6 @@ export function CentroPrivacidad({
           />
         )}
       </Tarjeta>
-    </>
+    </View>
   );
 }

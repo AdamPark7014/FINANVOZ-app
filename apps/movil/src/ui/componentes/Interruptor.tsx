@@ -47,7 +47,7 @@ export function Interruptor({
       <View
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
-        style={{ flex: 1, gap: espacio.xxs }}
+        style={{ flex: 1, gap: espacio.xs }}
       >
         <Texto variante="cuerpo">{etiqueta}</Texto>
         {descripcion ? (

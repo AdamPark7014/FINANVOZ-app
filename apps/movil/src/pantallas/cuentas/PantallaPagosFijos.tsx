@@ -33,6 +33,7 @@ export function PantallaPagosFijos({
     <Pantalla
       testID="pagos-fijos"
       bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
       pie={
         <Boton
           testID="pagos-fijos-agregar"
@@ -68,7 +69,7 @@ export function PantallaPagosFijos({
                   testID={`pago-fijo-${p.id}-abrir`}
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-                    <View style={{ flex: 1, gap: espacio.xxs }}>
+                    <View style={{ flex: 1, gap: espacio.xs }}>
                       <Texto variante="cuerpoFuerte">{titulo}</Texto>
                       <Texto variante="secundario" tono="secundario">
                         {regla}

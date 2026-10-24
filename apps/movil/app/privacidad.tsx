@@ -3,7 +3,7 @@ import { CentroPrivacidad, TIP_SOLO_LECTURA } from '../src/pantallas/privacidad'
 import { enSoloLectura } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
-import { Pantalla, Texto } from '../src/ui';
+import { espacio, Pantalla, Texto } from '../src/ui';
 
 /** Centro de privacidad (RF-PRI-03), desde Ajustes. */
 export default function Privacidad() {
@@ -13,7 +13,11 @@ export default function Privacidad() {
   const control = useControlApp();
   const soloLectura = useVista(enSoloLectura);
   return (
-    <Pantalla testID="privacidad" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="privacidad"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       {soloLectura ? (
         <Texto
           testID="privacidad-solo-lectura-tip"

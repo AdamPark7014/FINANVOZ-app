@@ -116,7 +116,7 @@ export function PantallaCuentas({
   const tarjetas = useVista(listarTarjetas);
   const hayPersonas = useVista((ctx) => listarPersonas(ctx).length > 0);
   return (
-    <Pantalla testID="pantalla-cuentas">
+    <Pantalla testID="pantalla-cuentas" contenidoStyle={{ gap: espacio.xl }}>
       <View
         style={{
           flexDirection: 'row',

@@ -10,7 +10,7 @@ import {
   unirseConQr,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, EstadoVacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, EstadoVacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
 import { useAnunciarEnIos } from '../avisos/anunciar';
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
@@ -134,7 +134,11 @@ export function PantallaCompartidos({
   };
 
   return (
-    <Pantalla testID="pantalla-compartidos" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-compartidos"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       {/* "Volver" siempre sale de la pantalla (como el gesto de iPhone); cada paso se cierra con su "Cancelar". */}
       <Boton
         testID="compartidos-volver"

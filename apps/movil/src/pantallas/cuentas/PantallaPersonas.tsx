@@ -25,7 +25,11 @@ export function PantallaPersonas({
 }) {
   const personas = useVista(listarPersonas);
   return (
-    <Pantalla testID="personas" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="personas"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Encabezado titulo={TITULO_PERSONAS} alVolver={alVolver} testID="personas" />
       <Texto variante="secundario" tono="secundario">
         {INTRO_PERSONAS}
@@ -33,7 +37,7 @@ export function PantallaPersonas({
       {personas.length === 0 ? (
         <EstadoVacio texto={TEXTO_PERSONAS_VACIO} testID="personas-vacio" />
       ) : (
-        <View accessibilityRole="list" testID="personas-lista" style={{ gap: espacio.s }}>
+        <View accessibilityRole="list" testID="personas-lista" style={{ gap: espacio.m }}>
           {personas.map((p) => (
             <View key={p.cuentaId} role="listitem" testID={`persona-${p.cuentaId}`}>
               <Tarjeta
@@ -43,7 +47,7 @@ export function PantallaPersonas({
                 testID={`persona-${p.cuentaId}-abrir`}
               >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-                  <View style={{ flex: 1, gap: espacio.xxs }}>
+                  <View style={{ flex: 1, gap: espacio.xs }}>
                     <Texto variante="cuerpoFuerte">{p.nombre}</Texto>
                     <Texto variante="secundario" tono="secundario">
                       {estadoPersona(p.saldo)}

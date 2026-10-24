@@ -244,7 +244,7 @@ function ComoSuena({
 
   return (
     <View testID="ajustes-voz-como-suena" style={{ gap: espacio.s, paddingVertical: espacio.s }}>
-      <View style={{ gap: espacio.xxs }}>
+      <View style={{ gap: espacio.xs }}>
         <Texto variante="cuerpo" accessibilityRole="header">
           {ETIQUETA_VOZ}
         </Texto>

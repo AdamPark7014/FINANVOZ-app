@@ -142,7 +142,11 @@ export function PantallaDeducciones({
 
   const pedirPerfil = v.estado === 'sin_perfil' || editando;
   return (
-    <Pantalla testID="pantalla-deducciones" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-deducciones"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="deducciones-volver"
         etiqueta={ETIQUETA_VOLVER}
@@ -443,7 +447,7 @@ function FilaFactura({ f, v, plus }: { f: FacturaVista; v: VistaDeducciones; plu
           [f.textoFecha, f.textoTotal, f.tipo ?? ''],
           estado,
         )}
-        style={{ gap: espacio.xxs }}
+        style={{ gap: espacio.xs }}
       >
         <Texto
           variante="cuerpoFuerte"
@@ -548,7 +552,7 @@ function FilaFactura({ f, v, plus }: { f: FacturaVista; v: VistaDeducciones; plu
         </Texto>
       ) : null}
       {v.estado !== 'sin_perfil' ? (
-        <View style={{ gap: espacio.xxs }}>
+        <View style={{ gap: espacio.xs }}>
           <Boton
             etiqueta={f.marcadaCancelada ? BTN_NO_CANCELADA_SAT : BTN_CANCELADA_SAT}
             variante="texto"
@@ -642,7 +646,11 @@ export function ImportarCompartidas({
       .catch(() => setEstado({ tipo: 'error' }));
   }, [ctx, leer, refrescar]);
   return (
-    <Pantalla testID="importar-compartidas" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="importar-compartidas"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Texto variante="titulo" testID="importar-titulo" accessibilityRole="header">
         {TITULO_IMPORTAR_COMPARTIDAS}
       </Texto>

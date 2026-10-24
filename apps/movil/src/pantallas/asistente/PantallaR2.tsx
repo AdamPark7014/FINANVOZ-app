@@ -30,7 +30,11 @@ export function PantallaR2({
   return (
     // Fuera de las pestañas: el aviso de errores del formulario vive aquí mismo.
     <ProveedorAvisos>
-      <Pantalla testID="pantalla-registrar" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-registrar"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <View
           style={{
             flexDirection: 'row',

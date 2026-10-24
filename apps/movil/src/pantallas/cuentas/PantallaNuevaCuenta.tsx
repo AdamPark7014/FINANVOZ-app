@@ -1,4 +1,4 @@
-import { Boton, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
 import { Encabezado, MensajeEnLinea } from './Encabezado';
 import { useFormularioCuenta } from './FormularioCuenta';
 import {
@@ -30,6 +30,7 @@ export function PantallaNuevaCuenta({
     <Pantalla
       testID="cuenta-nueva"
       bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
       pie={
         <Boton
           testID="cuenta-nueva-guardar"

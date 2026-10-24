@@ -6,10 +6,9 @@
 
 ## Hecho en este turno
 
-- Personas / cuenta dividida / Te deben (`77742d0`).
-- Respaldo + Bloqueo (`610d25b`).
-- **Restaurar + historial de movimientos:** pantalla Restaurar con más aire; tarjeta del paso holgada; historial de un movimiento menos apretado.
-- Jest respaldo + movimientos en verde.
+- **Cierre del pulido UI restante:** cero `gap: espacio.xxs` en `apps/movil`; `contenidoStyle={{ gap: espacio.xl }}` en pantallas que faltaban (deducciones, suscripciones, compartidos, cuentas/detalle/nueva/pagos, arqueo, Movimientos/Cuentas, R2/formulario largo, privacidad, reconsentimiento, plan, ayuda, términos, aviso, tarjeta nueva, tandas/tarjeta vacías).
+- Kit UI: `Interruptor` y `TarjetaEntendi` con un poco más de aire.
+- Jest amplio (deducciones/suscripciones/compartido/cuentas/privacidad/ayuda/plan/arqueo/UI) en verde.
 
 ## A medias
 
@@ -18,9 +17,8 @@
 
 ## Siguiente
 
-1. Build TestFlight 4 / Play 2; Adam prueba en teléfono — el pulido visual ya cubre casi todos los flujos.
-2. Si el teléfono pide más: deducciones / privacidad residual.
-3. Adam — M0, dominio, legal.
+1. Build TestFlight 4 / Play 2; Adam prueba en teléfono — el pulido visual de pantallas ya está cerrado en código.
+2. Adam — M0, dominio, legal.
 
 ## No tocar
 
@@ -31,4 +29,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI post-Ola-7 muy extendida; camino tienda ~70 %.
+FinanVoz código ~95 %; UI post-Ola-7 cubierta en prácticamente todas las pantallas; camino tienda ~70 %.

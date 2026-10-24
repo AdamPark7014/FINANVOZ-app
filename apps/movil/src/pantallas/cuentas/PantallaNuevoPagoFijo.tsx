@@ -1,4 +1,4 @@
-import { Boton, Pantalla, Tarjeta } from '../../ui';
+import { Boton, espacio, Pantalla, Tarjeta } from '../../ui';
 import { useFormularioPagoFijo } from '../pagos-fijos/FormularioPagoFijo';
 import { Encabezado, MensajeEnLinea } from './Encabezado';
 import { confirmacionPagoAgregado, PISTA_GUARDAR_PAGO, TITULO_NUEVO_PAGO } from './textos';
@@ -24,6 +24,7 @@ export function PantallaNuevoPagoFijo({
     <Pantalla
       testID="pago-nuevo"
       bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
       {...(f.clave !== null
         ? {
             pie: (

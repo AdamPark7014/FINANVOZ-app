@@ -86,7 +86,11 @@ export function Reconsentimiento({ alBorrarTodo }: { alBorrarTodo: () => Promise
   };
 
   return (
-    <Pantalla testID="reconsentimiento" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="reconsentimiento"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Texto testID="reconsent-titulo" variante="titulo" accessibilityRole="header">
         {TITULO_RECONSENTIMIENTO}
       </Texto>

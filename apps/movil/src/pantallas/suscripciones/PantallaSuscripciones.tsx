@@ -91,7 +91,11 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
     refrescar();
   };
   return (
-    <Pantalla testID="pantalla-suscripciones" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-suscripciones"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="suscripciones-volver"
         etiqueta={ETIQUETA_VOLVER}
@@ -261,7 +265,7 @@ function Fila({
   return (
     <View testID={id} role="listitem">
       <Tarjeta>
-        <View style={{ gap: espacio.xxs }}>
+        <View style={{ gap: espacio.xs }}>
           {editandoNombre ? (
             <CampoTexto
               etiqueta={ETIQUETA_NOMBRE}

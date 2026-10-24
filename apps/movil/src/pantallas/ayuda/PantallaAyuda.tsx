@@ -53,7 +53,7 @@ export function PantallaAyuda({
   };
 
   return (
-    <>
+    <View style={{ gap: espacio.xl }}>
       <Boton
         testID="ayuda-volver"
         variante="texto"
@@ -125,7 +125,7 @@ export function PantallaAyuda({
           </Texto>
         ) : null}
       </Tarjeta>
-    </>
+    </View>
   );
 }
 

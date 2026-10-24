@@ -64,7 +64,11 @@ export function PantallaDetallePagoFijo({
 
   if (!p) {
     return (
-      <Pantalla testID="pago-detalle" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pago-detalle"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Encabezado titulo={TITULO_PAGOS_FIJOS} alVolver={alVolver} testID="pago-detalle" />
         <EstadoVacio texto={TEXTO_PAGO_NO_ENCONTRADO} testID="pago-detalle-no-encontrado" />
       </Pantalla>
@@ -119,7 +123,11 @@ export function PantallaDetallePagoFijo({
           : null;
 
   return (
-    <Pantalla testID="pago-detalle" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pago-detalle"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Encabezado titulo={titulo} alVolver={alVolver} testID="pago-detalle" />
       <Tarjeta testID="pago-detalle-resumen">
         <Texto

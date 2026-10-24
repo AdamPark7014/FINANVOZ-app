@@ -61,7 +61,11 @@ export function PantallaFormularioLargo({
   });
   return (
     <ProveedorAvisos>
-      <Pantalla testID="pantalla-formulario-largo" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-formulario-largo"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <View
           style={{
             flexDirection: 'row',

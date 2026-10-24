@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { obtenerAjustes } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, Pantalla, Texto } from '../../ui';
+import { Boton, espacio, Pantalla, Texto } from '../../ui';
 import { ERROR_GUARDAR, MensajeError } from '../onboarding/componentes';
 import { CamposIngreso, useFormularioIngreso } from './FormularioIngreso';
 import {
@@ -46,6 +46,7 @@ export function EditarIngreso({
     <Pantalla
       testID="editar-ingreso"
       bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
       pie={
         <Boton
           testID="editar-ingreso-guardar"

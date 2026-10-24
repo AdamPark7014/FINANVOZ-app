@@ -71,7 +71,11 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
   const existe = useVista((ctx) => existeTanda(ctx, tandaId));
   if (!existe) {
     return (
-      <Pantalla testID="pantalla-tanda" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-tanda"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           testID="tanda-volver"
           etiqueta={ETIQUETA_VOLVER}
