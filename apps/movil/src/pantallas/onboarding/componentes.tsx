@@ -94,9 +94,10 @@ export function Chips<T extends string | number>({
                 minHeight: OBJETIVO_TACTIL_MIN,
                 justifyContent: 'center',
                 paddingHorizontal: espacio.l,
+                paddingVertical: espacio.s,
                 borderRadius: radio.pastilla,
                 borderWidth: activo ? 2 : 1,
-                borderColor: activo ? c.acentoTexto : c.bordeControl,
+                borderColor: activo ? c.acentoTexto : c.borde,
                 backgroundColor: activo ? c.superficieAlterna : c.superficie,
               }}
             >
@@ -203,26 +204,29 @@ export function PasoOnboarding({
       vigente = false;
     };
   }, [paso, titulo]);
+  const { c } = useTema();
   return (
     <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} pie={pie}>
-      <Texto
-        variante="secundario"
-        tono="secundario"
-        testID="onb-progreso"
-        accessibilityRole="text"
-        accessibilityLabel={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
-        accessibilityHint={PISTA_PROGRESO_ONB}
-      >
-        {textoProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
-      </Texto>
-      {/* La barra repite lo que dice el texto de arriba: el lector no la lee dos veces. */}
-      <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-        <Barra
-          testID="onb-progreso-barra"
-          llenoBp={progresoOnboardingBp(paso, PASOS_VISIBLES_ONB)}
-          etiquetaAccesible={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
-          alto={6}
-        />
+      <View style={{ gap: espacio.s }}>
+        <Texto
+          variante="pequeno"
+          tono="acento"
+          testID="onb-progreso"
+          accessibilityRole="text"
+          accessibilityLabel={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
+          accessibilityHint={PISTA_PROGRESO_ONB}
+        >
+          {textoProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
+        </Texto>
+        {/* La barra repite lo que dice el texto de arriba: el lector no la lee dos veces. */}
+        <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+          <Barra
+            testID="onb-progreso-barra"
+            llenoBp={progresoOnboardingBp(paso, PASOS_VISIBLES_ONB)}
+            etiquetaAccesible={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
+            alto={8}
+          />
+        </View>
       </View>
       <View
         ref={refTitulo}
@@ -230,6 +234,7 @@ export function PasoOnboarding({
         accessible
         accessibilityRole="header"
         accessibilityLabel={etiquetaTituloPasoOnboarding(titulo)}
+        style={{ marginTop: espacio.s }}
       >
         <Texto variante="titulo" accessible={false}>
           {titulo}
@@ -246,15 +251,21 @@ export function PasoOnboarding({
         </Texto>
       ) : null}
       {tip ? (
-        <Texto
-          variante="secundario"
-          tono="secundario"
+        <View
           testID="onb-tip"
+          accessible
           accessibilityRole="text"
           accessibilityLabel={etiquetaTipOnboarding(tip)}
+          style={{
+            padding: espacio.l,
+            borderRadius: radio.l,
+            backgroundColor: c.superficieAlterna,
+          }}
         >
-          {tip}
-        </Texto>
+          <Texto variante="secundario" tono="secundario" accessible={false}>
+            {tip}
+          </Texto>
+        </View>
       ) : null}
       {children}
     </Pantalla>

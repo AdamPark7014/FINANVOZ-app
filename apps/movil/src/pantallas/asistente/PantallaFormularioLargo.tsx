@@ -68,6 +68,7 @@ export function PantallaFormularioLargo({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: espacio.s,
+            paddingBottom: espacio.xs,
           }}
         >
           <Boton
@@ -79,7 +80,12 @@ export function PantallaFormularioLargo({
             pista={PISTA_CERRAR_R2}
             testID="boton-cerrar-registrar"
           />
-          <Texto variante="subtitulo" accessibilityRole="header" style={{ flexShrink: 1 }}>
+          <Texto
+            variante="subtitulo"
+            accessibilityRole="header"
+            style={{ flex: 1, textAlign: 'center' }}
+            numberOfLines={2}
+          >
             {TITULO[flujo]}
           </Texto>
           <View style={{ width: 64 }} />

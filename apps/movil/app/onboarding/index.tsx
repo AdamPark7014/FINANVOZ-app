@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { View } from 'react-native';
 import { PasoOnboarding } from '../../src/pantallas/onboarding/componentes';
 import {
   AYUDA_BIENVENIDA,
@@ -12,7 +13,7 @@ import {
 import { BTN_ONBOARDING_RESTAURAR, PISTA_ONBOARDING_RESTAURAR } from '../../src/pantallas/respaldo';
 import { obtenerConsentimiento } from '../../src/servicios';
 import { useVista } from '../../src/sesion/ProveedorSesion';
-import { Boton, Texto } from '../../src/ui';
+import { Boton, espacio, radio, Texto, useTema } from '../../src/ui';
 
 /**
  * O1 · Bienvenida: la promesa en una frase. Si ya aceptó el aviso (volvió a abrir a medias), sigue en O3. Quien
@@ -46,7 +47,23 @@ export default function Bienvenida() {
         </>
       }
     >
-      <Texto variante="cuerpo">{CUERPO_BIENVENIDA}</Texto>
+      <CuerpoBienvenida />
     </PasoOnboarding>
+  );
+}
+
+function CuerpoBienvenida() {
+  const { c } = useTema();
+  return (
+    <View
+      style={{
+        padding: espacio.l,
+        borderRadius: radio.xl,
+        backgroundColor: c.superficieAlterna,
+        gap: espacio.s,
+      }}
+    >
+      <Texto variante="cuerpo">{CUERPO_BIENVENIDA}</Texto>
+    </View>
   );
 }

@@ -29,9 +29,13 @@ describe('R2 · formulario corto con lo dicho (criterio 2)', () => {
       />,
     );
     expect(screen.getByTestId('pantalla-registrar')).toBeTruthy();
-    expect(screen.getByTestId('r2-esto-oi')).toHaveTextContent(
+    expect(screen.getByTestId('r2-esto-oi')).toHaveProp(
+      'accessibilityLabel',
       'Esto oí: «pagué la luz 450 con la BBVA». Revisa y registra.',
     );
+    expect(screen.getByTestId('r2-esto-oi')).toHaveTextContent(/Esto oí/);
+    expect(screen.getByTestId('r2-esto-oi')).toHaveTextContent(/pagué la luz 450 con la BBVA/);
+    expect(screen.getByTestId('r2-esto-oi')).toHaveTextContent(/Revisa y registra/);
     expect(screen.getByTestId('campo-descripcion').props.value).toBe('luz');
     expect(screen.getByTestId(`origen-${bbva}`).props.accessibilityState).toMatchObject({ selected: true });
     expect(screen.getByTestId('categoria-servicios').props.accessibilityState).toMatchObject({

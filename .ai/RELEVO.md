@@ -6,18 +6,21 @@
 
 ## Hecho en este turno
 
-- **Renovación UI/UX del sistema de diseño (post Ola 7 de Claude):** tokens más cálidos (fondo menta, radios 8/14/20/28, tipografía más aireada, `sombra.tarjeta` / `sombra.aviso`), barra de pestañas sin borde duro con elevación suave, botones/chips con scale al tocar, tarjetas y burbujas del asistente con sombra y esquinas más amables, avisos redondeados, estados vacíos en pastilla, campos más holgados, cabecera del asistente con más aire y barra del día un poco más gruesa.
-- Contraste AA: `tokens.test.ts` 59/59. Jest UI + Aviso + oscuro 37/37; asistente smoke en verde.
+- **Onboarding más agradable:** tip en pastilla suave (`superficieAlterna`), barra de progreso más gruesa (alto 8), chips con más padding y borde suave; bienvenida con bloque de cuerpo en pastilla.
+- **Registrar R2:** bloque «Esto oí» tipográfico (etiqueta + cita + «Revisa y registra»), cabecera con más aire; `accessibilityLabel` conserva el copy completo para lectores.
+- **Formulario largo:** título centrado y cabecera alineada con R2.
+- Jest: `onboarding.test` + `componentes` + `r2` en verde (17).
 
 ## A medias
 
-- La Ola 7 sigue **sin probar en teléfono** (TestFlight 4 / Play código 2). Este pulido visual tampoco se ha visto en dispositivo.
+- La Ola 7 + renovación UI siguen **sin probar en teléfono** (TestFlight 4 / Play código 2).
 - Proxy con reintento: **falta redesplegar** en Hetzner.
+- Densidad de `FormularioMovimiento` y pasos O2–O7 aún pueden pedir más aire.
 
 ## Siguiente
 
-1. Build TestFlight 4 / Play 2 con Ola 7 + esta renovación visual; Adam prueba en teléfono.
-2. Segunda pasada UI: Movimientos/Cuentas/Tú y formularios largos si el teléfono pide más aire.
+1. Pulir densidad de `FormularioMovimiento` / pasos de onboarding restantes si Adam pide «continua».
+2. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
 3. Adam — M0, dominio, legal.
 
 ## No tocar
@@ -29,4 +32,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI base renovada post-Ola-7; camino tienda ~70 %.
+FinanVoz código ~95 %; UI onboarding+R2 alineada al sistema post-Ola-7; camino tienda ~70 %.

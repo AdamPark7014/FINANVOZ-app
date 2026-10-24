@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import type { PrellenadoR2 } from '../../asistente/registro';
 import { descartarPorInterpretar } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Pantalla, Texto } from '../../ui';
+import { Boton, espacio, Pantalla, radio, Texto, useTema } from '../../ui';
 import { FormularioMovimiento, type MovimientoGuardado } from '../principal/FormularioMovimiento';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { ACCESIBILIDAD_CERRAR_R2, BTN_CERRAR_R2, PISTA_CERRAR_R2, textoEstoOiR2, TITULO_R2 } from './textos';
@@ -24,6 +24,7 @@ export function PantallaR2({
   alGuardado: (g: MovimientoGuardado) => void;
 }) {
   const { ctx } = useSesion();
+  const { c } = useTema();
   const [inicial] = useState(prellenado);
   const { oido, porInterpretarId, ...datos } = inicial ?? {};
   return (
@@ -35,7 +36,8 @@ export function PantallaR2({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: espacio.s,
+            gap: espacio.m,
+            marginBottom: espacio.xs,
           }}
         >
           <Boton
@@ -53,9 +55,28 @@ export function PantallaR2({
           <View style={{ width: 64 }} />
         </View>
         {oido ? (
-          <Texto variante="secundario" tono="secundario" testID="r2-esto-oi">
-            {textoEstoOiR2(oido)}
-          </Texto>
+          <View
+            testID="r2-esto-oi"
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={textoEstoOiR2(oido)}
+            style={{
+              padding: espacio.l,
+              borderRadius: radio.l,
+              backgroundColor: c.superficieAlterna,
+              gap: espacio.xs,
+            }}
+          >
+            <Texto variante="etiqueta" tono="acento" accessible={false}>
+              Esto oí
+            </Texto>
+            <Texto variante="cuerpo" accessible={false}>
+              «{oido}»
+            </Texto>
+            <Texto variante="pequeno" tono="secundario" accessible={false}>
+              Revisa y registra.
+            </Texto>
+          </View>
         ) : null}
         <FormularioMovimiento
           prellenado={datos}
