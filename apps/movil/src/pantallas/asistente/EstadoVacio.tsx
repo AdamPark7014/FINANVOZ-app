@@ -10,8 +10,8 @@ import { MicrofonoAsistente } from './MicrofonoAsistente';
 import { saludoDelDia, SUGERENCIA_DECIR, TEXTO_MANTEN_O_TOCA, TITULO_ULTIMO_ENTENDIDO } from './textos';
 import { TurnoRegistro } from './turnos/TurnoRegistro';
 
-/** Tamaño del micrófono cuando todavía no hay turnos (maqueta Hoy C: 120 pt). */
-export const TAMANO_MICROFONO_VACIO = 120;
+/** Tamaño del micrófono cuando todavía no hay turnos: el orbe manda; el teclado es secundario. */
+export const TAMANO_MICROFONO_VACIO = 136;
 
 /**
  * Sin turnos todavía (Hoy C dentro de Hoy A, decisión 1): el micrófono enorme al centro, cómo se dice el primer
@@ -49,9 +49,9 @@ export function EstadoVacio({
       keyboardShouldPersistTaps="handled"
     >
       {encabezado ? <View style={{ gap: espacio.m }}>{encabezado}</View> : <View />}
-      <View style={{ alignItems: 'center', gap: espacio.l }}>
+      <View style={{ alignItems: 'center', gap: espacio.xl }}>
         {/* El saludo del día: la cifra de hoy y qué decir, como un asistente que habla primero. */}
-        <Texto variante="subtitulo" alinear="center" testID="estado-vacio-saludo" accessibilityRole="header">
+        <Texto variante="titulo" alinear="center" testID="estado-vacio-saludo" accessibilityRole="header">
           {saludoDelDia(hoyPuedes)}
         </Texto>
         {primerUso ? (
@@ -59,13 +59,19 @@ export function EstadoVacio({
             {TITULO_PRIMER_USO}
           </Texto>
         ) : null}
-        <View testID="estado-vacio-mic" style={{ paddingVertical: espacio.s }}>
+        <View testID="estado-vacio-mic" style={{ paddingVertical: espacio.m }}>
           <MicrofonoAsistente escuchando={escuchando} boton={boton} tamano={TAMANO_MICROFONO_VACIO} />
         </View>
-        <Texto variante="secundario" tono="secundario" alinear="center">
+        <Texto variante="etiqueta" tono="acento" alinear="center">
           {TEXTO_MANTEN_O_TOCA}
         </Texto>
-        <Texto variante="cuerpo" alinear="center" testID="estado-vacio-texto" style={{ maxWidth: 360 }}>
+        <Texto
+          variante="cuerpo"
+          tono="secundario"
+          alinear="center"
+          testID="estado-vacio-texto"
+          style={{ maxWidth: 340 }}
+        >
           {primerUso ? TEXTO_PRIMER_USO : SUGERENCIA_DECIR}
         </Texto>
       </View>

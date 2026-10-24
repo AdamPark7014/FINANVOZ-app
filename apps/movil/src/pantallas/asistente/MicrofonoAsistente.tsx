@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { IconoMicrofono, useTema } from '../../ui';
+import { IconoMicrofono, sombra, useTema } from '../../ui';
 import {
   ETIQUETA_ESCUCHANDO,
   PISTA_ESCUCHANDO,
@@ -10,14 +10,14 @@ import {
 import { AnilloEscucha } from './movimiento';
 
 /**
- * El orbe del asistente (72 pt en la barra, 120 en el estado vacío): mantener o tocar (`useBotonHablar`), acción
+ * El orbe del asistente (80 pt en la barra, ~136 en el estado vacío): toca o mantén (`useBotonHablar`), acción
  * «activar» de VoiceOver/TalkBack y etiqueta hablada que cambia al escuchar. Escuchando cambia de forma (anillo que
  * late y cuadro de terminar), no solo de color (`02 §15`); sin movimiento si se pidió «Reducir movimiento».
  */
 export function MicrofonoAsistente({
   escuchando,
   boton,
-  tamano = 72,
+  tamano = 80,
   testID = 'boton-hablar',
 }: {
   escuchando: boolean;
@@ -25,8 +25,8 @@ export function MicrofonoAsistente({
   tamano?: number;
   testID?: string;
 }) {
-  const { c } = useTema();
-  const halo = Math.round(tamano * 1.28);
+  const { c, esquema } = useTema();
+  const halo = Math.round(tamano * 1.36);
   return (
     <View style={{ width: halo, height: halo, alignItems: 'center', justifyContent: 'center' }}>
       {/* Halo suave del orbe (superficie alterna del tema: nunca blanco puro en oscuro). */}
@@ -38,7 +38,7 @@ export function MicrofonoAsistente({
           height: halo,
           borderRadius: halo / 2,
           backgroundColor: c.superficieAlterna,
-          opacity: escuchando ? 1 : 0.7,
+          opacity: escuchando ? 1 : 0.75,
         }}
       />
       <AnilloEscucha activo={escuchando} tamano={tamano} />
@@ -59,8 +59,9 @@ export function MicrofonoAsistente({
           backgroundColor: c.acento,
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: pressed ? 0.85 : 1,
-          transform: [{ scale: pressed ? 0.96 : 1 }],
+          opacity: pressed ? 0.9 : 1,
+          transform: [{ scale: pressed ? 0.95 : 1 }],
+          ...sombra.tarjeta[esquema],
         })}
       >
         {escuchando ? (

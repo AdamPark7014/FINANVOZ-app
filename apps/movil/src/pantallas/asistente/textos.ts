@@ -92,7 +92,8 @@ export const CHIP_ESCRIBIRLO = 'Escribirlo';
 // ——— Estado vacío (Hoy C cuando todavía no hay turnos) ———
 
 export const TEXTO_PRUEBA_DECIR = 'Prueba decir «tacos 80 en efectivo».';
-export const TEXTO_MANTEN_O_TOCA = 'Mantén para hablar · toca para escribir';
+/** Cómo se usa el orbe: toque corto o mantener; el teclado es el ícono aparte, no el orbe. */
+export const TEXTO_MANTEN_O_TOCA = 'Toca o mantén para hablar';
 export const TITULO_ULTIMO_ENTENDIDO = 'Lo último que entendí';
 
 // ——— Barra de voz ———

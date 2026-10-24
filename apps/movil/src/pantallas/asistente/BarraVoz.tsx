@@ -7,6 +7,7 @@ import {
   hitSlopTactil,
   OBJETIVO_TACTIL_MIN,
   radio,
+  sombra,
   Texto,
   useAnunciar,
   useTema,
@@ -39,8 +40,8 @@ import {
 } from './textos';
 import type { Asistente } from './useAsistente';
 
-/** Tamaño del micrófono en la barra (maqueta Hoy A: 72 pt). */
-export const TAMANO_MICROFONO = 72;
+/** Tamaño del micrófono en la barra: un poco más grande que la maqueta (72) para que mande la voz. */
+export const TAMANO_MICROFONO = 80;
 
 /**
  * Pie del asistente (maqueta Hoy A): chips de intención, el micrófono de 72 pt al centro (mantener o tocar) y el
@@ -48,23 +49,24 @@ export const TAMANO_MICROFONO = 72;
  * Sin micrófono (estado vacío: el grande está al centro de la pantalla) quedan los chips y el teclado.
  */
 export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofono?: boolean }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const m = a.microfono;
   // VoiceOver no lee regiones vivas: el error del dictado se anuncia en iPhone.
   useAnunciar(m.aviso);
   return (
     <View style={{ gap: espacio.s }} testID="barra-voz">
       {m.escuchando || a.escuchandoConfirmacion ? (
-        // Maqueta «escuchando»: «Te escucho…», la onda viva y lo que se va oyendo; el orbe es «Terminar».
+        // Hoja «escuchando»: «Te escucho…», la onda viva y lo que se va oyendo; el orbe es «Terminar».
         <View
           testID="hoja-escuchando"
           style={{
-            gap: espacio.s,
+            gap: espacio.m,
             padding: espacio.l,
-            borderRadius: radio.l,
+            borderRadius: radio.xl,
             backgroundColor: c.superficie,
-            borderWidth: 1,
-            borderColor: c.borde,
+            borderWidth: 1.5,
+            borderColor: c.acentoTexto,
+            ...sombra.tarjeta[esquema],
           }}
         >
           <View
@@ -233,13 +235,14 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
             height: OBJETIVO_TACTIL_MIN,
             borderRadius: radio.pastilla,
             borderWidth: 1,
-            borderColor: c.bordeControl,
-            backgroundColor: a.escribiendo || pressed ? c.superficieAlterna : c.superficie,
+            borderColor: a.escribiendo ? c.acentoTexto : c.borde,
+            backgroundColor: a.escribiendo || pressed ? c.superficieAlterna : 'transparent',
             alignItems: 'center',
             justifyContent: 'center',
+            opacity: a.escribiendo ? 1 : 0.72,
           })}
         >
-          <IconoTeclado color={c.acentoTexto} />
+          <IconoTeclado color={a.escribiendo ? c.acentoTexto : c.textoSecundario} />
         </Pressable>
       </View>
     </View>

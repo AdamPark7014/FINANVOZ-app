@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { espacio, margenPantalla, useTema } from '../../ui';
+import { espacio, margenPantalla, radio, sombra, useTema } from '../../ui';
 import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { EnlaceAnaliticaCorreccion } from '../principal/ConfirmacionRegistro';
@@ -102,7 +102,7 @@ function Cuerpo({
   props: OpcionesAsistente;
   enPanel?: boolean;
 }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const nav = props.navegacion;
   // «Hablar» y el teclado van fijos al pie (sobre las pestañas): el aviso inferior sube para no taparlos.
   const [altoPie, setAltoPie] = useState(0);
@@ -154,9 +154,12 @@ function Cuerpo({
         onLayout={(e) => setAltoPie(Math.round(e.nativeEvent.layout.height) + espacio.m)}
         style={{
           paddingHorizontal: enPanel ? 0 : margenPantalla,
-          paddingTop: espacio.xs,
-          paddingBottom: espacio.s,
-          backgroundColor: c.fondo,
+          paddingTop: espacio.s,
+          paddingBottom: espacio.m,
+          backgroundColor: c.superficie,
+          borderTopLeftRadius: radio.xl,
+          borderTopRightRadius: radio.xl,
+          ...(!enPanel ? sombra.tarjeta[esquema] : null),
         }}
       >
         <BarraVoz a={a} conMicrofono={!sinTurnos} />
