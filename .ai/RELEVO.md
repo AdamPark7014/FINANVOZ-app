@@ -6,9 +6,9 @@
 
 ## Hecho en este turno
 
-- **Onboarding + R2 (0ae2f0b):** tips en pastilla, barra gruesa, «Esto oí» tipográfico, cabeceras R2/formulario largo.
-- **Oleada siguiente:** más aire en `FormularioMovimiento` (gap `xl` / secciones `s`); casillas del onboarding más suaves al tocar; consentimiento con más espacio entre aviso y casilla opcional; «Dímelo» (`DecirloPaso`) con más aire alrededor del micrófono.
-- Jest: FormularioMovimiento + onboarding (+ voz/confirmar) + r2 en verde (44).
+- Onboarding/R2/formulario (commits previos del día): tips, «Esto oí», aire en FormularioMovimiento, casillas, Dímelo.
+- **O3–O7 visual:** `PasoOnboarding` con `gap: xl` entre bloques; pie de `Pantalla` con más padding y gap entre botones; lista de pagos fijos en tarjetas + total en tarjeta; lista de cuentas con más separación.
+- Jest onboarding + UI componentes: 96 en verde.
 
 ## A medias
 
@@ -17,7 +17,7 @@
 
 ## Siguiente
 
-1. Si Adam pide «continua»: pulir pasos O3–O7 (ingreso/cuentas/tarjeta) o pestaña Hoy / avisos.
+1. Si Adam pide «continua»: Hoy / avisos / ActivarCaptura o densidad restante en Tú.
 2. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
 3. Adam — M0, dominio, legal.
 
@@ -30,4 +30,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI onboarding/R2/formulario alineada al sistema; camino tienda ~70 %.
+FinanVoz código ~95 %; onboarding O1–O7 visualmente alineado al sistema; camino tienda ~70 %.

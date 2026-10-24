@@ -199,7 +199,7 @@ export default function Cuentas() {
       )}
 
       {vista.tienes.length + tarjetas.length > 0 ? (
-        <View style={{ gap: espacio.s }} testID="onb-cuentas-lista">
+        <View style={{ gap: espacio.m }} testID="onb-cuentas-lista">
           {vista.tienes.map((c) => (
             <Tarjeta key={c.id}>
               <Texto variante="cuerpoFuerte">{c.nombre}</Texto>

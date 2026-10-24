@@ -48,7 +48,7 @@ import {
 import { etiquetaFecha, listarCuentas, PAGOS_FIJOS_SUGERIDOS, quitarPagoFijo } from '../../src/servicios';
 import { agregarPagosFijosDichos, contextoPasoOnboarding } from '../../src/servicios/onboarding';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
-import { Boton, Cifra, cifraEnPalabras, espacio, etiquetaHablada, Texto } from '../../src/ui';
+import { Boton, Cifra, cifraEnPalabras, espacio, etiquetaHablada, Tarjeta, Texto } from '../../src/ui';
 
 type ClavePago = (typeof PAGOS_FIJOS_SUGERIDOS)[number]['clave'];
 
@@ -212,7 +212,7 @@ export default function PagosFijos() {
               .filter((x): x is string => x !== null)
               .join(' · ');
             return (
-              <View key={p.id} style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+              <Tarjeta key={p.id} style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
                 <View
                   testID={`onb-pago-agregado-${p.id}`}
                   accessible
@@ -248,7 +248,7 @@ export default function PagosFijos() {
                   pista={pistaQuitarPago(p.concepto)}
                   alPresionar={() => quitar(p)}
                 />
-              </View>
+              </Tarjeta>
             );
           })}
           <View
@@ -257,14 +257,16 @@ export default function PagosFijos() {
             accessibilityRole="text"
             accessibilityLabel={etiquetaHablada(etiquetaPagosSuman(cifraEnPalabras(total)))}
           >
-            <View
-              importantForAccessibility="no-hide-descendants"
-              accessibilityElementsHidden
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-            >
-              <Texto variante="etiqueta">{TEXTO_PAGOS_SUMAN}</Texto>
-              <Cifra centavos={total} contexto={TEXTO_PAGOS_SUMAN} />
-            </View>
+            <Tarjeta>
+              <View
+                importantForAccessibility="no-hide-descendants"
+                accessibilityElementsHidden
+                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <Texto variante="etiqueta">{TEXTO_PAGOS_SUMAN}</Texto>
+                <Cifra centavos={total} contexto={TEXTO_PAGOS_SUMAN} />
+              </View>
+            </Tarjeta>
           </View>
         </View>
       ) : null}

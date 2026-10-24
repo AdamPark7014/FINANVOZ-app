@@ -65,7 +65,9 @@ export function Pantalla({
         <View
           style={{
             paddingHorizontal: margenPantalla,
-            paddingVertical: espacio.m,
+            paddingTop: espacio.l,
+            paddingBottom: espacio.m,
+            gap: espacio.s,
             borderTopWidth: 1,
             borderTopColor: c.borde,
             backgroundColor: c.fondo,

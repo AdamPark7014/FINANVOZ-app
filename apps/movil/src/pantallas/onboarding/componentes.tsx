@@ -214,7 +214,12 @@ export function PasoOnboarding({
   }, [paso, titulo]);
   const { c } = useTema();
   return (
-    <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} pie={pie}>
+    <Pantalla
+      testID={testID}
+      bordes={['top', 'left', 'right', 'bottom']}
+      pie={pie}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <View style={{ gap: espacio.s }}>
         <Texto
           variante="pequeno"
