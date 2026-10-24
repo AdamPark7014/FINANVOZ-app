@@ -22,6 +22,7 @@ import {
   espacio,
   EstadoVacio,
   formatearCentavos,
+  Tarjeta,
   Texto,
 } from '../../ui';
 import { useAnunciarEnIos } from '../avisos/anunciar';
@@ -176,7 +177,7 @@ export function FormularioCuentaDividida({
   };
 
   return (
-    <View style={{ gap: espacio.l }} testID="formulario-cuenta-dividida">
+    <View style={{ gap: espacio.xl }} testID="formulario-cuenta-dividida">
       <CampoMonto
         etiqueta="¿Cuánto fue en total?"
         valorInicial={prellenado?.total ?? null}
@@ -190,7 +191,7 @@ export function FormularioCuentaDividida({
         ejemplo="la cena"
         testID="division-descripcion"
       />
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_ENTRE_CUANTOS}
         </Texto>
@@ -224,7 +225,7 @@ export function FormularioCuentaDividida({
         </View>
       </View>
       {reparto ? (
-        <View style={{ gap: espacio.xxs }} testID="division-reparto">
+        <Tarjeta testID="division-reparto" style={{ gap: espacio.s }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Texto variante="cuerpo" {...OCULTAR_ETIQUETA_VISIBLE}>
               {ETIQUETA_TU_PARTE}
@@ -251,9 +252,9 @@ export function FormularioCuentaDividida({
               ? `Cada quien te debe ${formatearCentavos(reparto.partesOtros[0] ?? 0)}. No cuenta como ingreso.`
               : `Cada quien te debe ${reparto.partesOtros.map((x) => formatearCentavos(x)).join(', ')}, en el orden en que los eliges. No cuenta como ingreso.`}
           </Texto>
-        </View>
+        </Tarjeta>
       ) : null}
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_CON_QUIEN}
         </Texto>
@@ -320,7 +321,7 @@ export function FormularioCuentaDividida({
           />
         </View>
       </View>
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_CATEGORIA_PARTE}
         </Texto>
@@ -332,7 +333,7 @@ export function FormularioCuentaDividida({
           etiqueta={ETIQUETA_CATEGORIA_PARTE}
         />
       </View>
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_ORIGEN_DIVISION}
         </Texto>

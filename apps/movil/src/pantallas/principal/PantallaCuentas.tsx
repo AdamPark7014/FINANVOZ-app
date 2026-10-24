@@ -238,7 +238,7 @@ export function PantallaCuentas({
 
       {v.teDeben.length > 0 ? (
         <Seccion titulo="Te deben" testID="seccion-te-deben">
-          <View accessibilityRole="list" testID="seccion-te-deben-lista" style={{ gap: espacio.s }}>
+          <View accessibilityRole="list" testID="seccion-te-deben-lista" style={{ gap: espacio.m }}>
             {v.teDeben.map((p) => (
               <Fila
                 key={p.id}
@@ -544,7 +544,7 @@ function PersonaDebes({
         <View
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-          style={{ flex: 1, gap: espacio.xxs }}
+          style={{ flex: 1, gap: espacio.xs }}
         >
           <Texto variante="cuerpoFuerte">{d.nombre}</Texto>
           <Texto variante="secundario" tono="secundario">

@@ -56,7 +56,7 @@ export function FormularioDatosCobro({
   };
 
   return (
-    <View style={{ gap: espacio.m }} testID="formulario-datos-cobro">
+    <View style={{ gap: espacio.l }} testID="formulario-datos-cobro">
       <Texto variante="secundario" tono="secundario">
         {AYUDA_DATOS_COBRO}
       </Texto>

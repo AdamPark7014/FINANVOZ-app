@@ -99,7 +99,11 @@ export function PantallaPersona({
   const existe = useVista((ctx) => listarPersonas(ctx).some((p) => p.cuentaId === personaId));
   if (!existe) {
     return (
-      <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="pantalla-persona"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Boton
           testID="persona-volver"
           etiqueta={ETIQUETA_VOLVER}
@@ -148,7 +152,11 @@ function Detalle({
   };
 
   return (
-    <Pantalla testID="pantalla-persona" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-persona"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="persona-volver"
         etiqueta={ETIQUETA_VOLVER}
@@ -246,7 +254,7 @@ function Detalle({
 
       {d.saldo > 0 ? <Recordatorio personaId={personaId} fecha={d.recordatorio} /> : null}
 
-      <View style={{ gap: espacio.s }}>
+      <View style={{ gap: espacio.m }}>
         <Texto variante="subtitulo" testID="persona-movimientos-titulo" accessibilityRole="header">
           {TITULO_MOVIMIENTOS}
         </Texto>
@@ -258,14 +266,14 @@ function Detalle({
           />
         ) : null}
         {d.movimientos.length > 0 ? (
-          <View accessibilityRole="list" testID="persona-movimientos-lista" style={{ gap: espacio.s }}>
+          <View accessibilityRole="list" testID="persona-movimientos-lista" style={{ gap: espacio.m }}>
             {d.movimientos.map((m) => (
               <Tarjeta key={m.id} testID={`persona-mov-${m.id}`} style={{ gap: espacio.s }}>
                 <View
                   role="listitem"
                   style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
                 >
-                  <View style={{ flex: 1, gap: espacio.xxs }}>
+                  <View style={{ flex: 1, gap: espacio.xs }}>
                     <Texto variante="cuerpoFuerte">{m.descripcion ?? nombreTipoLibro(m.tipo)}</Texto>
                     <Texto variante="secundario" tono="secundario">
                       {`${nombreTipoLibro(m.tipo)} · ${etiquetaDiaMes(m.fecha)}`}
