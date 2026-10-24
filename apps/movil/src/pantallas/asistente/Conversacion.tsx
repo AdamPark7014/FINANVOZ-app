@@ -219,7 +219,7 @@ export function Conversacion({
       renderItem={({ item }) => animado(item, pintar(item))}
       ListHeaderComponent={encabezado ?? null}
       ItemSeparatorComponent={Separador}
-      contentContainerStyle={{ padding: margenPantalla, paddingBottom: espacio.l }}
+      contentContainerStyle={{ padding: margenPantalla, paddingBottom: espacio.xl }}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       // Pocas decenas de turnos: se pintan todos (el lector y las pruebas los alcanzan sin desplazar).

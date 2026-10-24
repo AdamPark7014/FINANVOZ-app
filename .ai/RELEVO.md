@@ -6,9 +6,8 @@
 
 ## Hecho en este turno
 
-- **Cierre del pulido UI restante:** cero `gap: espacio.xxs` en `apps/movil`; `contenidoStyle={{ gap: espacio.xl }}` en pantallas que faltaban (deducciones, suscripciones, compartidos, cuentas/detalle/nueva/pagos, arqueo, Movimientos/Cuentas, R2/formulario largo, privacidad, reconsentimiento, plan, ayuda, términos, aviso, tarjeta nueva, tandas/tarjeta vacías).
-- Kit UI: `Interruptor` y `TarjetaEntendi` con un poco más de aire.
-- Jest amplio (deducciones/suscripciones/compartido/cuentas/privacidad/ayuda/plan/arqueo/UI) en verde.
+- Tras el cierre de pantallas (`fd0fd8b`): **kit + Hoy/voz** — `Pantalla` por defecto `gap: xl`; `Tarjeta` y campos de texto más holgados; barra de voz y cabecera del asistente con más aire; chips/conversación sin `xxs`; `FlujoCorreo` en bloques con gap.
+- Cero `espacio.xxs` en `apps/movil`. Jest UI/asistente/respaldo/principal en verde (116).
 
 ## A medias
 
@@ -17,8 +16,8 @@
 
 ## Siguiente
 
-1. Build TestFlight 4 / Play 2; Adam prueba en teléfono — el pulido visual de pantallas ya está cerrado en código.
-2. Adam — M0, dominio, legal.
+1. **Adam:** build TestFlight 4 / Play 2 y probar en teléfono — el pulido visual en código ya no tiene oleadas obvias.
+2. Adam — M0 (dominio/lista de espera), legal, proxy en Hetzner.
 
 ## No tocar
 
@@ -29,4 +28,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI post-Ola-7 cubierta en prácticamente todas las pantallas; camino tienda ~70 %.
+FinanVoz código ~95 %; UI post-Ola-7 cerrada en pantallas y kit; camino tienda ~70 %.

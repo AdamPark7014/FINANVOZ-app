@@ -45,7 +45,7 @@ export function Pantalla({
   const { c } = useTema();
   const ios = Platform.OS === 'ios';
   const evitarTeclado = ios && (Boolean(pie) || !desplazable);
-  const contenido: ViewStyle = { padding: margenPantalla, gap: espacio.l };
+  const contenido: ViewStyle = { padding: margenPantalla, gap: espacio.xl };
   const cuerpo = (
     <>
       {desplazable ? (

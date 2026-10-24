@@ -36,7 +36,7 @@ export function Tarjeta({
     borderWidth: 1,
     borderRadius: radio.xl,
     padding: espacio.l,
-    gap: espacio.s,
+    gap: espacio.m,
     ...sombra.tarjeta[esquema],
   };
   const ripple = { color: c.borde, borderless: false };
@@ -67,7 +67,7 @@ export function Tarjeta({
           pressed ? { backgroundColor: c.superficieAlterna } : null,
         ]}
       >
-        <View style={{ gap: espacio.s }}>{children}</View>
+        <View style={{ gap: espacio.m }}>{children}</View>
       </Pressable>
     );
   }

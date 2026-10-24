@@ -232,7 +232,7 @@ export function PantallaMovimientos({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: espacio.xxs }}
+          contentContainerStyle={{ paddingVertical: espacio.xs }}
           testID="movimientos-chips"
         >
           <GrupoChips

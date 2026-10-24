@@ -129,7 +129,7 @@ export function CampoTexto({
     </Texto>
   ) : null;
   return (
-    <View style={{ gap: espacio.xs }}>
+    <View style={{ gap: espacio.s }}>
       <Texto variante="etiqueta" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {etiqueta}
       </Texto>

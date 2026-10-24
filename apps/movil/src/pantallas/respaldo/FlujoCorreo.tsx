@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { View } from 'react-native';
 import {
   confirmarCodigoRespaldo,
   mensajeErrorNube,
@@ -6,7 +7,7 @@ import {
   type ModoCodigo,
 } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Texto } from '../../ui';
 import {
   BTN_CONFIRMAR,
   BTN_ENVIAR_CODIGO,
@@ -77,7 +78,7 @@ export function FlujoCorreo({
   };
 
   return modo === null ? (
-    <>
+    <View style={{ gap: espacio.m }}>
       <CampoTexto
         testID="respaldo-correo"
         etiqueta={ETIQUETA_CORREO}
@@ -96,9 +97,9 @@ export function FlujoCorreo({
         alPresionar={() => void pedir()}
       />
       {error ? <MensajeError texto={error} /> : null}
-    </>
+    </View>
   ) : (
-    <>
+    <View style={{ gap: espacio.m }}>
       <Texto variante="secundario" tono="secundario" testID="respaldo-codigo-enviado">
         {textoCodigoEnviado(correo)}
       </Texto>
@@ -132,7 +133,7 @@ export function FlujoCorreo({
         }}
       />
       {error ? <MensajeError texto={error} /> : null}
-    </>
+    </View>
   );
 }
 

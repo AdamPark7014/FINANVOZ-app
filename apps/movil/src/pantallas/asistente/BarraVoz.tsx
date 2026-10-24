@@ -54,7 +54,7 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
   // VoiceOver no lee regiones vivas: el error del dictado se anuncia en iPhone.
   useAnunciar(m.aviso);
   return (
-    <View style={{ gap: espacio.s }} testID="barra-voz">
+    <View style={{ gap: espacio.m }} testID="barra-voz">
       {m.escuchando || a.escuchandoConfirmacion ? (
         // Hoja «escuchando»: «Te escucho…», la onda viva y lo que se va oyendo; el orbe es «Terminar».
         <View
@@ -193,7 +193,7 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           accessibilityLabel={ETIQUETA_CHIPS_INTENCION}
-          contentContainerStyle={{ gap: espacio.s, paddingVertical: espacio.xxs }}
+          contentContainerStyle={{ gap: espacio.s, paddingVertical: espacio.xs }}
           testID="chips-intencion"
         >
           {a.chips.map((chip) => (
