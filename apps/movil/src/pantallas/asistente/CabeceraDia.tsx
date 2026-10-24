@@ -33,7 +33,7 @@ export function CabeceraDia({
   const fecha = encabezadoFecha(etiquetaFecha(vista.hoy), etiquetaDiaMes(vista.hoy));
   if (vista.estado === 'sin_ingreso') {
     return (
-      <View style={{ gap: espacio.xs }} testID="hoy-sin-ingreso">
+      <View style={{ gap: espacio.s }} testID="hoy-sin-ingreso">
         <Texto variante="secundario" tono="secundario" testID="hoy-fecha">
           {fecha}
         </Texto>

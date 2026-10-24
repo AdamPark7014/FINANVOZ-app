@@ -6,9 +6,9 @@
 
 ## Hecho en este turno
 
-- Onboarding/R2/formulario (commits previos del día): tips, «Esto oí», aire en FormularioMovimiento, casillas, Dímelo.
-- **O3–O7 visual:** `PasoOnboarding` con `gap: xl` entre bloques; pie de `Pantalla` con más padding y gap entre botones; lista de pagos fijos en tarjetas + total en tarjeta; lista de cuentas con más separación.
-- Jest onboarding + UI componentes: 96 en verde.
+- Oleada UI del día: onboarding/R2/formulario/O3–O7 (commits `0ae2f0b`…`2b48506`).
+- **Captura + cabecera Hoy:** `ActivarCaptura` con más aire y apps bancarias en tarjeta; cabecera «sin ingreso» un poco más holgada.
+- Jest captura + asistente: 194 en verde.
 
 ## A medias
 
@@ -17,7 +17,7 @@
 
 ## Siguiente
 
-1. Si Adam pide «continua»: Hoy / avisos / ActivarCaptura o densidad restante en Tú.
+1. Si Adam pide «continua»: avisos / Ajustes / estados vacíos restantes.
 2. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
 3. Adam — M0, dominio, legal.
 
@@ -30,4 +30,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; onboarding O1–O7 visualmente alineado al sistema; camino tienda ~70 %.
+FinanVoz código ~95 %; UI onboarding + captura + cabecera alineadas; camino tienda ~70 %.

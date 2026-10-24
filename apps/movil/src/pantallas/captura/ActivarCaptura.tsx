@@ -146,7 +146,7 @@ export function ActivarCaptura({
   );
 
   return (
-    <View style={{ gap: espacio.m }}>
+    <View style={{ gap: espacio.l }}>
       {paso.tipo === 'no_disponible' ? (
         <>
           <Tarjeta testID={`${testID}-pronto`}>
@@ -263,17 +263,19 @@ export function ActivarCaptura({
             <Texto variante="secundario" tono="secundario">
               {INTRO_ELEGIR_APPS}
             </Texto>
-            {paso.apps.map((a) => (
-              <Casilla
-                key={a.paquete}
-                etiqueta={a.nombre}
-                valor={marcadas.includes(a.paquete)}
-                alCambiar={(v) =>
-                  setMarcadas((m) => (v ? [...m, a.paquete] : m.filter((p) => p !== a.paquete)))
-                }
-                testID={`${testID}-app-${a.banco}`}
-              />
-            ))}
+            <Tarjeta style={{ gap: espacio.m }}>
+              {paso.apps.map((a) => (
+                <Casilla
+                  key={a.paquete}
+                  etiqueta={a.nombre}
+                  valor={marcadas.includes(a.paquete)}
+                  alCambiar={(v) =>
+                    setMarcadas((m) => (v ? [...m, a.paquete] : m.filter((p) => p !== a.paquete)))
+                  }
+                  testID={`${testID}-app-${a.banco}`}
+                />
+              ))}
+            </Tarjeta>
             <View style={{ gap: espacio.s }}>
               <Boton
                 etiqueta="Activar captura"
