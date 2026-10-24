@@ -6,24 +6,25 @@
 
 ## Hecho en este turno
 
-- Deep research competencia → `docs/spikes/RESEARCH-COMPETENCIA-2026-10.md`.
-- Conclusión: el hueco dominante es el del PRD §6 (notificaciones sin clave + MSI/quincena/efectivo + Hoy puedes + libro), no “facturar/planeta/web ERP”. Errores ajenos a no repetir: sync Mentiroso, YNAB-método, voz-juguete, Rocket-confianza, Mint-gratis+ads, Contalink-ERP.
+- Flota + greps: **no hay oleada UI de padding pendiente** (solo `gap: 4` decorativo en IndicadorVoz/IconoPestana). Sin TODO/FIXME reales. Sin onboarding que pida clave de banco.
+- **Oleada día-1 (research → copy):** O1 + divulgación captura + tip O6 dejan explícito voz y **cero clave/usuario de banco**.
+- Inventario: el resto de “perfecto” está en **externos** (teléfono, M0 dominio, legal, proxy Hetzner, contador fiscal) — ver `docs/ESTADO.md` pendientes; no se cierra con más aire en pantallas.
 
 ## A medias
 
-- Ola 7 + UI sin probar en teléfono (TestFlight 4 / Play 2).
-- Proxy Hetzner; M0 externos (dominio, lista, aviso).
+- Validación en TestFlight 4 / Play 2.
+- Proxy Hetzner; M0 (dominio, lista, aviso); revisión legal; `config/fiscal` contador.
 
 ## Siguiente
 
-1. Adam valida en teléfono el loop voz+captura+Hoy.
-2. Checklist “día 1 sin errores ajenos” del spike (onboarding cero claves, un número, primera captura, MSI humano, arqueo, sin dark patterns).
-3. Cerrar salida v1; no abrir facturar/web global sin Claude Max + legal.
+1. Adam en teléfono: loop voz + captura + Hoy.
+2. Externos M0/M13 (no otra pasada de UI).
+3. Solo más código si el teléfono revela un bug concreto.
 
 ## No tocar
 
-- Solo `main`. Emitir CFDI / declaraciones / open banking con password sin spec. Credenciales fuera del repo.
+- Solo `main`. Facturar / planeta / open banking con password sin spec. Credenciales fuera del repo.
 
 ## Estimación rápida
 
-Research de competencia cerrado en docs. Código UI ~listo; cuello = validación real + tienda.
+Código UI/voz ~cerrado para v1. Perfecto de producto = validación real + tienda, no más oleadas de padding.

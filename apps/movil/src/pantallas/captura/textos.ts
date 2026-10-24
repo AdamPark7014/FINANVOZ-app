@@ -75,6 +75,7 @@ export const DIVULGACION_CAPTURA = {
   titulo: 'Registrar tus compras automáticamente',
   parrafos: [
     'Finanvoz puede leer las notificaciones de las apps de banco que elijas para registrar tus compras, retiros y transferencias sin que tengas que anotarlas.',
+    'No te pido la clave ni el usuario de tu banco. Solo leo los avisos de las apps que marques.',
     'Solo leemos las apps que marques. Las demás notificaciones se ignoran en tu teléfono y no se guardan.',
     'El contenido se procesa en tu teléfono y no se envía a nuestros servidores.',
     'Puedes desactivarlo cuando quieras en Ajustes.',

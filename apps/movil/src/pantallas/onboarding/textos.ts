@@ -17,9 +17,9 @@ export const ERROR_GUARDAR = 'No pude guardar eso. Revisa los datos e intenta de
 /** O1 · Bienvenida */
 export const TITULO_BIENVENIDA = 'Sabe cada día cuánto puedes gastar';
 export const AYUDA_BIENVENIDA =
-  'Sin quedarte corto antes de tu próximo pago. Te toma unos 4 minutos y todo se queda en tu teléfono.';
+  'Sin quedarte corto antes de tu próximo pago. Habla o escribe; te toma unos 4 minutos y todo se queda en tu teléfono.';
 export const CUERPO_BIENVENIDA =
-  'Anota lo que tienes, lo que debes y tus pagos fijos. Finanvoz hace las cuentas por ti.';
+  'Dime lo que tienes, lo que debes y tus pagos fijos. No te pido la clave de tu banco: anoto lo que ya te avisa tu banco y hago las cuentas por ti.';
 export const BTN_ONB_EMPEZAR = 'Empezar';
 export const BTN_ONB_CONTINUAR = 'Continuar';
 export const PISTA_ONB_EMPEZAR = 'Inicia el recorrido de configuración';

@@ -21,7 +21,7 @@ export const TIP_PAGOS_SALTAR =
 
 /** O6 · Captura automática: permiso de notificaciones — salir del flujo sin activarlo hoy. */
 export const TIP_CAPTURA_AHORA_NO =
-  'Si hoy no quieres dar acceso a notificaciones, toca «Ahora no»; activas la captura cuando quieras en Ajustes › Captura.';
+  'Si hoy no quieres dar acceso a notificaciones, toca «Ahora no». Nunca pedimos la clave de tu banco; la captura lee avisos. La activas cuando quieras en Ajustes › Captura.';
 
 /** O7 · Colchón: terminar el onboarding sin apartar monto hoy. */
 export const TIP_COLCHON_SIN_POR_AHORA =
