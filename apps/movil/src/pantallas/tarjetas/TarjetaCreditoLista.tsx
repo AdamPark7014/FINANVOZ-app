@@ -33,7 +33,7 @@ export function TarjetaCreditoLista({
         : {})}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <View style={{ flex: 1, gap: espacio.xxs }}>
+        <View style={{ flex: 1, gap: espacio.xs }}>
           <Texto variante="cuerpoFuerte">{d.nombre}</Texto>
           <Texto variante="secundario" tono="secundario">
             {aFavor ? 'Saldo a favor' : 'Tarjeta de crédito'}

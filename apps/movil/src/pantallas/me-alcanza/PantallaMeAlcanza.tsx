@@ -247,16 +247,17 @@ export function PantallaMeAlcanza({
   };
 
   return (
-    <Pantalla testID="pantalla-me-alcanza">
+    <Pantalla testID="pantalla-me-alcanza" contenidoStyle={{ gap: espacio.xl }}>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: espacio.s,
+          gap: espacio.m,
+          paddingBottom: espacio.xs,
         }}
       >
-        <Texto variante="titulo" testID="me-alcanza-encabezado" accessibilityRole="header">
+        <Texto variante="titulo" testID="me-alcanza-encabezado" accessibilityRole="header" style={{ flex: 1 }}>
           {TITULO}
         </Texto>
         <Boton
@@ -270,7 +271,7 @@ export function PantallaMeAlcanza({
       </View>
 
       {estado.tipo === 'formulario' ? (
-        <View style={{ gap: espacio.m }} testID="me-alcanza-formulario">
+        <View style={{ gap: espacio.l }} testID="me-alcanza-formulario">
           {estado.aviso ? (
             <Texto
               variante="secundario"
@@ -500,13 +501,13 @@ function Resultado({
   };
 
   return (
-    <View style={{ gap: espacio.m }} testID="me-alcanza-resultado">
+    <View style={{ gap: espacio.l }} testID="me-alcanza-resultado">
       <View
         accessible
         accessibilityLiveRegion="polite"
         accessibilityLabel={anuncioResultadoOk(vista.titulo, vista.frase, vista.etiqueta ?? null)}
         testID="me-alcanza-anuncio"
-        style={{ gap: espacio.xs }}
+        style={{ gap: espacio.s }}
       >
         <Texto variante="subtitulo" testID="me-alcanza-titulo" importantForAccessibility="no">
           {vista.titulo}

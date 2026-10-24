@@ -6,9 +6,9 @@
 
 ## Hecho en este turno
 
-- Oleada UI continua: onboarding/R2/formulario/O3–O7/captura/cabecera (`0ae2f0b`…`c01caa7`).
-- **Ajustes (Tú):** más aire entre secciones (`gap: xl`); grupos menos apretados; chips de horario silencioso y aviso de permiso con más espacio.
-- Jest ajustes/avisos/voz: 34 en verde.
+- Oleada UI del día en `main` (`0ae2f0b`…`2097374`): onboarding, R2, formulario, O3–O7, captura, Ajustes.
+- **Me alcanza / vacíos / tarjetas en lista:** más aire en cabecera y resultado de Me alcanza; `EstadoVacio` más holgado; filas de tarjeta de crédito menos apretadas.
+- Jest me-alcanza + componentes + tarjetas: 81 en verde.
 
 ## A medias
 
@@ -18,7 +18,7 @@
 ## Siguiente
 
 1. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
-2. Si el teléfono pide más: estados vacíos / Me alcanza / tarjetas.
+2. Si el teléfono pide más: detalle de tarjeta / tandas / personas.
 3. Adam — M0, dominio, legal.
 
 ## No tocar
@@ -30,4 +30,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI principal + onboarding + Tú pulidos post-Ola-7; camino tienda ~70 %.
+FinanVoz código ~95 %; UI post-Ola-7 muy extendida; camino tienda ~70 %.

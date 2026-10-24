@@ -27,11 +27,11 @@ export function EstadoVacio({
   return (
     <View
       style={{
-        paddingVertical: espacio.xl,
-        paddingHorizontal: espacio.l,
+        paddingVertical: espacio.xxl,
+        paddingHorizontal: espacio.xl,
         borderRadius: radio.xl,
         backgroundColor: c.superficieAlterna,
-        gap: espacio.s,
+        gap: espacio.m,
       }}
     >
       <Texto
