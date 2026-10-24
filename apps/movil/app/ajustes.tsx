@@ -95,8 +95,13 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         />
       )}
       <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
-        {TITULO}
+        {enPestana ? 'Tú' : TITULO}
       </Texto>
+      {enPestana ? (
+        <Texto variante="secundario" tono="secundario">
+          Tu ingreso, la app y tu privacidad.
+        </Texto>
+      ) : null}
 
       <Grupo titulo={GRUPO_DINERO} />
       <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
@@ -196,8 +201,13 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
 /** Encabezado de un grupo de Ajustes (`02 §12`): separa lo de tu dinero, la app, la seguridad y la ayuda. */
 function Grupo({ titulo }: { titulo: string }) {
   return (
-    <Texto variante="etiqueta" tono="secundario" accessibilityRole="header" style={{ marginTop: espacio.m }}>
-      {titulo.toUpperCase()}
+    <Texto
+      variante="etiqueta"
+      tono="acento"
+      accessibilityRole="header"
+      style={{ marginTop: espacio.xl }}
+    >
+      {titulo}
     </Texto>
   );
 }

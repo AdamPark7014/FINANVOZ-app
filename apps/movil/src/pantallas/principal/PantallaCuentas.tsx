@@ -122,7 +122,8 @@ export function PantallaCuentas({
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: espacio.s,
+          gap: espacio.m,
+          marginBottom: espacio.xs,
         }}
       >
         <Texto variante="titulo" testID="cuentas-titulo" accessibilityRole="header">
@@ -396,9 +397,10 @@ function Seccion({
   testID: string;
 }) {
   return (
-    <View style={{ gap: espacio.s }} testID={testID}>
+    <View style={{ gap: espacio.m, marginTop: espacio.s }} testID={testID}>
       <Texto
         variante="subtitulo"
+        tono="acento"
         testID={`${testID}-titulo`}
         accessibilityRole="header"
         {...(tituloAccesible ? { accessibilityLabel: tituloAccesible } : {})}
@@ -448,15 +450,22 @@ function Fila({
   abrir?: { pista: string; alPresionar: () => void; etiquetaVer?: string };
 }) {
   const contenido = (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: espacio.m,
+      }}
+    >
       <View
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
-        style={{ flex: 1, gap: espacio.xxs }}
+        style={{ flex: 1, gap: espacio.xs }}
       >
         <Texto variante="cuerpoFuerte">{titulo}</Texto>
         {subtitulo ? (
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="pequeno" tono="secundario">
             {subtitulo}
           </Texto>
         ) : null}

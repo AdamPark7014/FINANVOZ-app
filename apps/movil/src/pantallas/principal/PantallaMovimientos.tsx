@@ -25,6 +25,7 @@ import {
   Pantalla,
   Tarjeta,
   Texto,
+  useTema,
 } from '../../ui';
 import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
@@ -147,7 +148,8 @@ export function PantallaMovimientos({
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: espacio.s,
+          gap: espacio.m,
+          marginBottom: espacio.xs,
         }}
       >
         <Texto variante="titulo" testID="movimientos-titulo" accessibilityRole="header">
@@ -294,17 +296,17 @@ export function PantallaMovimientos({
       ) : null}
 
       {dias.map((d) => (
-        <View key={d.fecha} style={{ gap: espacio.s }}>
+        <View key={d.fecha} style={{ gap: espacio.m, marginTop: espacio.s }}>
           <Texto
             variante="etiqueta"
-            tono="secundario"
+            tono="acento"
             accessibilityRole="header"
             accessibilityLabel={etiquetaEncabezadoDiaMovimientos(d.etiqueta)}
             testID={`movimientos-dia-${d.fecha}`}
           >
             {d.etiqueta}
           </Texto>
-          <View accessibilityRole="list" testID={`movimientos-lista-${d.fecha}`} style={{ gap: espacio.s }}>
+          <View accessibilityRole="list" testID={`movimientos-lista-${d.fecha}`} style={{ gap: espacio.m }}>
             {d.movimientos.map((m) => (
               <View key={m.id} role="listitem" testID={`movimiento-fila-${m.id}`}>
                 <FilaMovimiento
@@ -457,6 +459,7 @@ function FilaMovimiento({
   const [corrigiendo, setCorrigiendo] = useState(false);
   // VoiceOver: la pregunta de borrar se anuncia como en TalkBack (`accessibilityRole="alert"`).
   useAnuncio(abierto && confirmando ? TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO : null);
+  const { c } = useTema();
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
   const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
   const etiquetaAccesible = etiquetaHablada(
@@ -464,11 +467,11 @@ function FilaMovimiento({
   );
   const ocupado = pasando || confirmando || corrigiendo;
   const encabezado = (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-      <View style={{ flex: 1, gap: espacio.xxs }}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: espacio.m }}>
+      <View style={{ flex: 1, gap: espacio.xs }}>
         <Texto variante="cuerpoFuerte">{titulo(m)}</Texto>
         {subtitulo ? (
-          <Texto variante="secundario" tono="secundario">
+          <Texto variante="pequeno" tono="secundario">
             {subtitulo}
           </Texto>
         ) : null}
@@ -503,7 +506,16 @@ function FilaMovimiento({
         encabezado
       )}
       {abierto ? (
-        <View style={{ gap: espacio.xs }} testID={`detalle-${m.id}`}>
+        <View
+          style={{
+            gap: espacio.s,
+            marginTop: espacio.xs,
+            paddingTop: espacio.m,
+            borderTopWidth: 1,
+            borderTopColor: c.borde,
+          }}
+          testID={`detalle-${m.id}`}
+        >
           {m.saleDe.length > 0 ? (
             <Texto variante="secundario">{`Salió de: ${m.saleDe.join(', ')}`}</Texto>
           ) : null}
