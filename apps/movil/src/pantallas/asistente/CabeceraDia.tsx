@@ -61,9 +61,9 @@ export function CabeceraDia({
   return (
     <View style={{ gap: espacio.m }} testID="cabecera-dia">
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.m }}>
-        <View style={{ flexShrink: 0, gap: espacio.xxs }}>
+        <View style={{ flexShrink: 0, gap: espacio.xs }}>
           <Texto
-            variante="etiqueta"
+            variante="pequeno"
             tono="secundario"
             testID={negativo ? 'hoy-libre-negativo-etiqueta' : 'hoy-puedes-etiqueta'}
             {...OCULTAR_ETIQUETA_VISIBLE}

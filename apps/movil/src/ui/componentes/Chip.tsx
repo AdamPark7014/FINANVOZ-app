@@ -81,10 +81,15 @@ export function Chip({
         alignItems: 'center',
         borderRadius: radio.pastilla,
         borderWidth: seleccionado ? 2 : 1,
-        borderColor: deshabilitado ? c.bordeControl : seleccionado ? c.acentoTexto : c.bordeControl,
+        borderColor: deshabilitado ? c.bordeControl : seleccionado ? c.acentoTexto : c.borde,
         opacity: deshabilitado ? 0.55 : pressed ? 0.9 : 1,
-        backgroundColor: seleccionado ? c.superficieAlterna : pressed ? c.superficieAlterna : c.superficie,
+        backgroundColor: seleccionado
+          ? c.superficieAlterna
+          : pressed
+            ? c.superficieAlterna
+            : c.superficie,
         transform: [{ scale: pressed && !deshabilitado ? 0.97 : 1 }],
+        paddingVertical: espacio.s,
       })}
     >
       <Texto

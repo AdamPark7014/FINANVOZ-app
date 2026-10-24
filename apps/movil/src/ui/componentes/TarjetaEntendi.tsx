@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import type { FilaEntendi, PropuestaEntendi } from '../entendi';
-import { espacio, OBJETIVO_TACTIL_MIN } from '../tokens';
+import { espacio, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
 import { useTema } from '../tema';
 import { Boton } from './Boton';
 import { Chip } from './Chip';
@@ -27,6 +27,7 @@ export function TarjetaEntendi({
   /** Texto si `confirmar` lanza (quien conoce el error puede pasar uno más claro). */
   mensajeError?: string;
 }) {
+  const { c } = useTema();
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [abierta, setAbierta] = useState<string | null>(null);
@@ -46,20 +47,37 @@ export function TarjetaEntendi({
   };
 
   return (
-    <Tarjeta testID={testID} accionesAnidadas>
+    <Tarjeta
+      testID={testID}
+      accionesAnidadas
+      style={{
+        borderColor: inactivo ? c.borde : c.acentoTexto,
+        borderWidth: inactivo ? 1 : 1.5,
+        gap: espacio.m,
+      }}
+    >
       <Texto variante="etiqueta" tono="acento">
         {propuesta.titulo}
       </Texto>
       {propuesta.monto !== undefined ? (
         <Cifra centavos={propuesta.monto} tamano="grande" testID={`${testID}-monto`} />
       ) : null}
-      <View style={{ gap: espacio.xxs }}>
-        {propuesta.filas.map((fila) => (
+      <View
+        style={{
+          gap: espacio.xxs,
+          backgroundColor: c.superficieAlterna,
+          borderRadius: radio.l,
+          paddingHorizontal: espacio.m,
+          paddingVertical: espacio.xs,
+        }}
+      >
+        {propuesta.filas.map((fila, i) => (
           <Fila
             key={fila.clave}
             fila={fila}
             prefijo={testID}
             abierta={abierta === fila.clave}
+            ultima={i === propuesta.filas.length - 1}
             alTocar={() => setAbierta(abierta === fila.clave ? null : fila.clave)}
             alElegir={(valor) => {
               fila.alCambiar?.(valor);
@@ -89,7 +107,6 @@ export function TarjetaEntendi({
         testID={`${testID}-confirmar`}
       />
       {inactivo && propuesta.confirmar.motivoDeshabilitado ? (
-        // El motivo también se ve: un botón inactivo sin razón visible confunde (PLAN-UX-VOZ 1.13).
         <Texto variante="secundario" tono="secundario" testID={`${testID}-motivo`}>
           {propuesta.confirmar.motivoDeshabilitado}
         </Texto>
@@ -97,14 +114,14 @@ export function TarjetaEntendi({
       {propuesta.cambiar ? (
         <Boton
           etiqueta={propuesta.cambiar.etiqueta}
-          variante="secundario"
+          variante="texto"
           alPresionar={() => void propuesta.cambiar?.accion()}
           deshabilitado={guardando}
           testID={`${testID}-cambiar`}
         />
       ) : null}
       {propuesta.pista ? (
-        <Texto variante="secundario" tono="secundario" style={{ textAlign: 'center' }}>
+        <Texto variante="pequeno" tono="secundario" style={{ textAlign: 'center' }}>
           {propuesta.pista}
         </Texto>
       ) : null}
@@ -116,12 +133,14 @@ function Fila({
   fila,
   prefijo,
   abierta,
+  ultima,
   alTocar,
   alElegir,
 }: {
   fila: FilaEntendi;
   prefijo: string;
   abierta: boolean;
+  ultima: boolean;
   alTocar: () => void;
   alElegir: (valor: string) => void;
 }) {
@@ -135,14 +154,18 @@ function Fila({
         alignItems: 'center',
         gap: espacio.s,
         minHeight: OBJETIVO_TACTIL_MIN,
-        borderBottomWidth: 1,
+        borderBottomWidth: ultima && !abierta ? 0 : 1,
         borderBottomColor: c.borde,
       }}
     >
       <Texto variante="secundario" tono="secundario">
         {fila.etiqueta}
       </Texto>
-      <Texto variante="cuerpoFuerte" style={{ flexShrink: 1, textAlign: 'right' }}>
+      <Texto
+        variante="cuerpoFuerte"
+        tono={editable ? 'acento' : 'normal'}
+        style={{ flexShrink: 1, textAlign: 'right' }}
+      >
         {editable ? `${fila.valor}  ›` : fila.valor}
       </Texto>
     </View>
@@ -156,7 +179,6 @@ function Fila({
           accessibilityLabel={`${fila.etiqueta}: ${fila.valor}`}
           accessibilityHint="Toca para cambiarlo"
           accessibilityState={{ expanded: abierta }}
-          // El área de toque es la fila completa (≥ 48 dp), no solo el texto (criterio 9 de la Ola 7).
           style={{ minHeight: OBJETIVO_TACTIL_MIN }}
         >
           {contenido}

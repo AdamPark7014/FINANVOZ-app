@@ -33,7 +33,7 @@ export const PISTA_DESHACER = 'Borra lo que acabo de registrar';
 export const TEXTO_DESHICE = 'Deshice el registro.';
 export const BTN_VER_MOVIMIENTOS = 'Ver movimientos';
 export const PISTA_VER_MOVIMIENTOS = 'Abre Movimientos con los movimientos de esta respuesta';
-export const TEXTO_INTERPRETANDO = 'Déjame entenderlo…';
+export const TEXTO_INTERPRETANDO = 'Un segundo…';
 export const TEXTO_EXPLICANDO = 'Revisando tus datos…';
 
 /** Filas de la tarjeta «Entendí» (R1). */
@@ -78,11 +78,11 @@ export const BTN_CORREGIR_OIDO = 'Corregir lo que oí';
 export const PISTA_CORREGIR_OIDO = 'Abre lo que oí en el teclado para corregirlo';
 
 export function textoNoEntendi(oido: string): string {
-  return `Oí «${oido}», pero no supe qué pasó.`;
+  return `Oí «${oido}». ¿Cuál de estas es?`;
 }
 
 export const TEXTO_NO_ENTENDI_VACIO = 'No te entendí. Dímelo otra vez o escríbelo.';
-export const TEXTO_FRASE_LARGA = 'Es una frase muy larga. Dímelo en una más corta.';
+export const TEXTO_FRASE_LARGA = 'Eso fue muy largo. Dímelo en una frase más corta.';
 
 /** Chips cuando la frase quedó por interpretar (sin red, sin cupo o error). */
 export const CHIP_ES_GASTO = 'Es un gasto';
@@ -180,15 +180,14 @@ export function textoPuedoGastar(d: {
 
 /** «Hola. Hoy puedes gastar $214.» */
 export function saludoDelDia(hoy: string | null): string {
-  return hoy ? `Hola. Hoy puedes gastar ${hoy}.` : 'Hola. Soy tu asistente de dinero.';
+  return hoy ? `Hola. Hoy puedes gastar ${hoy}.` : 'Hola. Dime qué quieres registrar.';
 }
 
-export const SUGERENCIA_DECIR =
-  'Pregúntame «¿puedo gastar 500 en unos tenis?» o dime un gasto, como «tacos 80 en efectivo».';
+export const SUGERENCIA_DECIR = 'Di un gasto, como «tacos 80 en efectivo».';
 
 // ——— Escuchando ———
 
-export const TEXTO_TERMINO_SOLO = 'Cuando dejes de hablar, termino solo.';
+export const TEXTO_TERMINO_SOLO = 'Al callarte, termino solo.';
 export const BTN_CANCELAR_ESCUCHA = 'Cancelar';
 export const PISTA_CANCELAR_ESCUCHA = 'Deja de escuchar sin registrar nada';
 

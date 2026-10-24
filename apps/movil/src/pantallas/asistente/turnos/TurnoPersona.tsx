@@ -19,25 +19,27 @@ export function TurnoPersona({
       accessibilityLabel={etiquetaTurnoPersona(turno.texto, turno.porVoz)}
       style={{
         alignSelf: 'flex-end',
-        maxWidth: '86%',
+        maxWidth: '88%',
         flexDirection: 'row',
         alignItems: 'center',
         gap: espacio.s,
         backgroundColor: c.superficieAlterna,
-        borderTopLeftRadius: radio.l,
-        borderTopRightRadius: radio.l,
-        borderBottomLeftRadius: radio.l,
-        borderBottomRightRadius: espacio.xs,
-        paddingVertical: espacio.xs + 1,
-        paddingHorizontal: espacio.m,
+        borderWidth: 1,
+        borderColor: c.borde,
+        borderTopLeftRadius: radio.xl,
+        borderTopRightRadius: radio.xl,
+        borderBottomLeftRadius: radio.xl,
+        borderBottomRightRadius: radio.s,
+        paddingVertical: espacio.s,
+        paddingHorizontal: espacio.l,
       }}
     >
       {turno.porVoz ? (
-        <View style={{ transform: [{ scale: 0.7 }] }} testID={`${testID}-voz`}>
+        <View style={{ transform: [{ scale: 0.75 }] }} testID={`${testID}-voz`}>
           <IconoMicrofono color={c.acentoTexto} />
         </View>
       ) : null}
-      <Texto variante="secundario" style={{ flexShrink: 1 }} importantForAccessibility="no">
+      <Texto variante="cuerpo" style={{ flexShrink: 1 }} importantForAccessibility="no">
         {turno.texto}
       </Texto>
     </View>
