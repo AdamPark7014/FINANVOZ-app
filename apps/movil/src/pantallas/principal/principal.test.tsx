@@ -392,7 +392,7 @@ describe('Registrar', () => {
     // lo oído y reparación en un toque; la frase queda en Por revisar.
     const turno = await screen.findByTestId('no-entendi');
     expect(within(turno).getByTestId('no-entendi-texto')).toHaveTextContent(
-      'Oí «ayer fui al súper con mi prima y pagó ella», pero no supe qué pasó.',
+      'Oí «ayer fui al súper con mi prima y pagó ella». ¿Cuál de estas es?',
     );
     expect(screen.queryByText(/cuando tengas internet/)).toBeNull();
     expect(MENSAJE_GUARDADA.sin_red).toMatch(/cuando tengas internet/);

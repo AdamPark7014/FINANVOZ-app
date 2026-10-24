@@ -194,7 +194,7 @@ describe('Asistente · no entendí y sin nube (criterios 3 y 12)', () => {
     await escribir('los 300 del Beto');
     const turno = screen.getByTestId('no-entendi');
     expect(within(turno).getByTestId('no-entendi-texto')).toHaveTextContent(
-      'Oí «los 300 del Beto», pero no supe qué pasó.',
+      'Oí «los 300 del Beto». ¿Cuál de estas es?',
     );
     expect(within(turno).getAllByTestId(/^no-entendi-opcion-/).length).toBeGreaterThanOrEqual(3);
     // Nunca «cuando tengas internet» en la build sin nube.

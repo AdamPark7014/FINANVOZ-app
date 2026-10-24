@@ -121,6 +121,6 @@ describe('Asistente · VoiceOver y TalkBack (criterio 9)', () => {
         elegir: () => {},
         corregir: () => {},
       }),
-    ).toBe('Oí «los 300», pero no supe qué pasó.');
+    ).toBe('Oí «los 300». ¿Cuál de estas es?');
   });
 });

@@ -93,7 +93,7 @@ describe('Registrar con voz desde Hoy (P0/P1 de la auditoría UX)', () => {
     // Ola 7: «No entendí» repite lo oído; «Corregir lo que oí» lo pone en el teclado para arreglarlo.
     const turno = await screen.findByTestId('no-entendi');
     expect(within(turno).getByTestId('no-entendi-texto')).toHaveTextContent(
-      `Oí «${RECHAZADA}», pero no supe qué pasó.`,
+      `Oí «${RECHAZADA}». ¿Cuál de estas es?`,
     );
     fireEvent.press(within(turno).getByTestId('no-entendi-corregir'));
     expect(screen.getByTestId('campo-registrar').props.value).toBe(RECHAZADA);

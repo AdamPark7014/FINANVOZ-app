@@ -56,7 +56,7 @@ describe('asistente/textos · redacción (Ola 7 §1.4)', () => {
     expect(T.TITULO_ENTENDI_REGISTRO).toBe('Entendí · ¿lo registro?');
     expect(T.BTN_SI_REGISTRALO).toBe('Sí, regístralo');
     expect(T.pistaDecirSi('la Nu')).toBe('También puedes decir «sí» o «no, fue con la Nu».');
-    expect(T.textoNoEntendi('los 300 del Beto')).toBe('Oí «los 300 del Beto», pero no supe qué pasó.');
+    expect(T.textoNoEntendi('los 300 del Beto')).toBe('Oí «los 300 del Beto». ¿Cuál de estas es?');
     expect(T.BTN_CORREGIR_OIDO).toBe('Corregir lo que oí');
     expect(T.valorCuando('Dom 11 oct', 'hoy')).toBe('Hoy, dom 11 oct');
     expect(T.tituloEntendiDe('¿Ajusto el saldo?')).toBe('Entendí · ¿ajusto el saldo?');
