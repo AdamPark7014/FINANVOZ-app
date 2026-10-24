@@ -87,7 +87,7 @@ export function SeccionAvisos() {
         {SECCION_AVISOS}
       </Texto>
       {permiso !== null && permiso !== 'concedido' && notificaciones ? (
-        <View style={{ gap: espacio.xs }}>
+        <View style={{ gap: espacio.s }}>
           <Texto
             variante="secundario"
             tono="secundario"
@@ -197,7 +197,7 @@ export function SeccionAvisos() {
       >
         {DESC_HORARIO_SILENCIOSO}
       </Texto>
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
           {PREGUNTA_SILENCIO_DESDE}
         </Texto>
@@ -211,7 +211,7 @@ export function SeccionAvisos() {
           }
         />
       </View>
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
           {PREGUNTA_SILENCIO_HASTA}
         </Texto>

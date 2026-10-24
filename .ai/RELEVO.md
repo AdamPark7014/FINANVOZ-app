@@ -6,9 +6,9 @@
 
 ## Hecho en este turno
 
-- Oleada UI del día: onboarding/R2/formulario/O3–O7 (commits `0ae2f0b`…`2b48506`).
-- **Captura + cabecera Hoy:** `ActivarCaptura` con más aire y apps bancarias en tarjeta; cabecera «sin ingreso» un poco más holgada.
-- Jest captura + asistente: 194 en verde.
+- Oleada UI continua: onboarding/R2/formulario/O3–O7/captura/cabecera (`0ae2f0b`…`c01caa7`).
+- **Ajustes (Tú):** más aire entre secciones (`gap: xl`); grupos menos apretados; chips de horario silencioso y aviso de permiso con más espacio.
+- Jest ajustes/avisos/voz: 34 en verde.
 
 ## A medias
 
@@ -17,8 +17,8 @@
 
 ## Siguiente
 
-1. Si Adam pide «continua»: avisos / Ajustes / estados vacíos restantes.
-2. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
+1. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
+2. Si el teléfono pide más: estados vacíos / Me alcanza / tarjetas.
 3. Adam — M0, dominio, legal.
 
 ## No tocar
@@ -30,4 +30,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI onboarding + captura + cabecera alineadas; camino tienda ~70 %.
+FinanVoz código ~95 %; UI principal + onboarding + Tú pulidos post-Ola-7; camino tienda ~70 %.

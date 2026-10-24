@@ -83,6 +83,7 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
     <Pantalla
       testID="ajustes"
       bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
     >
       {enPestana ? null : (
         <Boton
@@ -205,7 +206,7 @@ function Grupo({ titulo }: { titulo: string }) {
       variante="etiqueta"
       tono="acento"
       accessibilityRole="header"
-      style={{ marginTop: espacio.xl }}
+      style={{ marginTop: espacio.s }}
     >
       {titulo}
     </Texto>
