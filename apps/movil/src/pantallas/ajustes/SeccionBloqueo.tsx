@@ -3,7 +3,7 @@ import { Linking } from 'react-native';
 import { fijarBloqueo, obtenerBloqueo } from '../../servicios';
 import { autenticadorExpo, comprobarParaActivar, type Autenticador } from '../../seguridad';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Interruptor, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import {
   BTN_ABRIR_AJUSTES_SISTEMA,
@@ -113,7 +113,7 @@ export function SeccionBloqueo({ autenticador = autenticadorExpo }: { autenticad
   };
 
   return (
-    <Tarjeta testID="ajustes-seccion-bloqueo">
+    <Tarjeta testID="ajustes-seccion-bloqueo" style={{ gap: espacio.m }}>
       <Texto variante="subtitulo" accessibilityRole="header">
         {SECCION_BLOQUEO}
       </Texto>

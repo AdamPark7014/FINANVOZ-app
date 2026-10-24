@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { View } from 'react-native';
 import { fijarContrasenaRespaldo, validarContrasenaNueva, type DependenciasRespaldo } from '../../servicios';
-import { Boton, CampoTexto, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Texto } from '../../ui';
 import {
   AVISO_CONTRASENA,
   ayudaContrasena,
@@ -67,7 +68,7 @@ export function FormularioContrasena({
   };
 
   return (
-    <>
+    <View style={{ gap: espacio.m }} testID="respaldo-formulario-contrasena">
       <Texto variante="cuerpo" testID="respaldo-aviso-contrasena" accessibilityRole="alert">
         {AVISO_CONTRASENA}
       </Texto>
@@ -109,6 +110,6 @@ export function FormularioContrasena({
         alPresionar={alCancelar}
         pista={PISTA_CANCELAR_CONTRASENA}
       />
-    </>
+    </View>
   );
 }

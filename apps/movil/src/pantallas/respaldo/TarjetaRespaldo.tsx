@@ -7,7 +7,7 @@ import {
 } from '../../servicios';
 import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Tarjeta, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import { FormularioContrasena } from './FormularioContrasena';
 import {
@@ -77,7 +77,7 @@ export function TarjetaRespaldo({
   };
 
   return (
-    <Tarjeta testID="privacidad-respaldo">
+    <Tarjeta testID="privacidad-respaldo" style={{ gap: espacio.m }}>
       <Texto variante="subtitulo" testID="privacidad-respaldo-titulo" accessibilityRole="header">
         {SUBTITULO_ARCHIVO}
       </Texto>

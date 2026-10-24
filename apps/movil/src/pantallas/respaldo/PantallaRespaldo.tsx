@@ -10,7 +10,7 @@ import {
 import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
-import { Boton, Interruptor, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import { FlujoCorreo } from './FlujoCorreo';
 import { FormularioContrasena } from './FormularioContrasena';
@@ -218,7 +218,7 @@ function TarjetaNube({
   const pedirCorreo = cuenta.tipo === 'sin_correo' || vista.pedirCorreo;
 
   return (
-    <Tarjeta testID="respaldo-nube">
+    <Tarjeta testID="respaldo-nube" style={{ gap: espacio.m }}>
       <Texto variante="subtitulo" testID="respaldo-nube-titulo" accessibilityRole="header">
         {SUBTITULO_NUBE}
       </Texto>

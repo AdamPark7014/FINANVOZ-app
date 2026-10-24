@@ -6,8 +6,9 @@
 
 ## Hecho en este turno
 
-- **Personas / cuenta dividida / datos de cobro:** más aire en detalle de persona (`gap: xl`); lista de movimientos holgada; formulario de cuenta dividida con secciones `s`/`xl` y reparto en tarjeta; datos de cobro con más espacio; lista «Te deben» en Cuentas menos apretada.
-- Jest personas + cuentas: 45 en verde.
+- **Personas** (`77742d0`): detalle, cuenta dividida (reparto en tarjeta), datos de cobro, lista Te deben.
+- **Respaldo + bloqueo:** pantalla de respaldo con `gap: xl`; tarjetas nube/archivo y formulario de contraseña con más aire; sección Bloqueo holgada.
+- Jest personas/cuentas + respaldo/ajustes en verde.
 
 ## A medias
 
@@ -16,8 +17,8 @@
 
 ## Siguiente
 
-1. Si Adam pide «continua»: respaldo / bloqueo / movimientos densos restantes.
-2. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
+1. Build TestFlight 4 / Play 2; Adam prueba en teléfono.
+2. Si el teléfono pide más: restaurar / movimientos / deducciones.
 3. Adam — M0, dominio, legal.
 
 ## No tocar
@@ -29,4 +30,4 @@
 
 ## Estimación rápida
 
-FinanVoz código ~95 %; UI post-Ola-7 casi completa en flujos de dinero entre personas; camino tienda ~70 %.
+FinanVoz código ~95 %; UI post-Ola-7 cubierta también en personas y respaldo; camino tienda ~70 %.
