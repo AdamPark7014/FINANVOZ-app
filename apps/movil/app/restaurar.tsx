@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { Restaurar } from '../src/pantallas/respaldo/Restaurar';
 import { TITULO_RESTAURAR } from '../src/pantallas/respaldo/textos';
-import { Pantalla } from '../src/ui';
+import { espacio, Pantalla } from '../src/ui';
 
 /** Restaurar un respaldo `.cartera` (M9, `02 §19`): privacidad, respaldo o bienvenida en teléfono nuevo. */
 export default function RestaurarRespaldo() {
@@ -10,7 +10,11 @@ export default function RestaurarRespaldo() {
   return (
     <>
       <Stack.Screen options={{ title: TITULO_RESTAURAR, headerShown: false }} />
-      <Pantalla testID="restaurar" bordes={['top', 'left', 'right', 'bottom']}>
+      <Pantalla
+        testID="restaurar"
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <Restaurar alVolver={volver} />
       </Pantalla>
     </>

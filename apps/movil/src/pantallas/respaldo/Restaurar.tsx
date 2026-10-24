@@ -8,7 +8,7 @@ import {
 import { useControlApp } from '../../sesion/ControlApp';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
-import { Boton, CampoTexto, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Tarjeta, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import { FlujoCorreo, type CuentaConfirmada } from './FlujoCorreo';
 import {
@@ -148,7 +148,7 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
       {!respaldo ? (
         <Texto variante="cuerpo">{RESTAURAR_NO_DISPONIBLE}</Texto>
       ) : (
-        <Tarjeta testID="restaurar-paso">
+        <Tarjeta testID="restaurar-paso" style={{ gap: espacio.m }}>
           {paso.tipo === 'elegir' ? (
             <>
               {nube ? (

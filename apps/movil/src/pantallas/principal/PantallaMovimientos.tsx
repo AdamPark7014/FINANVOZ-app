@@ -649,7 +649,7 @@ function Historial({ id }: { id: string }) {
   const versiones = useVista((ctx) => historialMovimiento(ctx, id));
   if (versiones.length === 0) return null;
   return (
-    <View style={{ gap: espacio.xxs }} testID={`historial-${id}`}>
+    <View style={{ gap: espacio.xs }} testID={`historial-${id}`}>
       <Texto variante="secundario" tono="secundario">
         Lo corregiste. Antes:
       </Texto>
