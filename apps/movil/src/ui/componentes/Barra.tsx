@@ -16,7 +16,7 @@ export interface BarraProps {
 const acotar = (bp: number) => Math.max(0, Math.min(10000, bp)) / 100;
 
 /** Barra horizontal sobria (`02 §16`: las barras viven en Tarjetas y Cuentas). Solo dibuja lo que recibe. */
-export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 10, testID }: BarraProps) {
+export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, testID }: BarraProps) {
   const { c } = useTema();
   const porcentaje = Math.round(acotar(llenoBp));
   return (
@@ -30,12 +30,18 @@ export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 10, testID }
         height: alto,
         borderRadius: radio.pastilla,
         backgroundColor: c.superficieAlterna,
-        borderWidth: 1,
-        borderColor: c.borde,
+        borderWidth: 0,
         overflow: 'hidden',
       }}
     >
-      <View style={{ width: `${acotar(llenoBp)}%`, height: '100%', backgroundColor: c.acento }} />
+      <View
+        style={{
+          width: `${acotar(llenoBp)}%`,
+          height: '100%',
+          backgroundColor: c.acento,
+          borderRadius: radio.pastilla,
+        }}
+      />
       {marcaBp !== undefined ? (
         <View
           style={{

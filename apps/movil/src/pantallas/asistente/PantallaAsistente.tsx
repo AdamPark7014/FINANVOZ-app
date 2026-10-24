@@ -36,9 +36,10 @@ export function PantallaAsistente(props: OpcionesAsistente) {
         <View
           style={{
             paddingHorizontal: margenPantalla,
-            paddingTop: espacio.s,
-            paddingBottom: espacio.s,
+            paddingTop: espacio.m,
+            paddingBottom: espacio.m,
             gap: espacio.m,
+            backgroundColor: c.superficie,
             borderBottomWidth: a.verDesglose ? 0 : 1,
             borderBottomColor: c.borde,
           }}

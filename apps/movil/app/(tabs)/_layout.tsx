@@ -28,7 +28,7 @@ function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
  * cambio de pantalla.
  */
 export default function LayoutPestanas() {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   return (
     <ProveedorAvisos sobrePestanas>
       <Tabs
@@ -37,7 +37,7 @@ export default function LayoutPestanas() {
           headerShown: false,
           sceneStyle: { backgroundColor: c.fondo },
           tabBarAllowFontScaling: true,
-          ...estiloBarraPestanas(c),
+          ...estiloBarraPestanas(c, esquema),
         }}
       >
         <Tabs.Screen name="hoy" options={opcionesPestana('hoy')} />

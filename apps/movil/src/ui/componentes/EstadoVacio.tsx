@@ -1,4 +1,7 @@
+import { View } from 'react-native';
 import { etiquetaEstadoVacio } from '../formato';
+import { useTema } from '../tema';
+import { espacio, radio } from '../tokens';
 import { Texto } from './Texto';
 
 /**
@@ -20,17 +23,29 @@ export function EstadoVacio({
   /** Pista del CTA justo debajo (p. ej. «Más abajo, botón Nueva tanda»). */
   pistaCta?: string;
 }) {
+  const { c } = useTema();
   return (
-    <Texto
-      variante="cuerpo"
-      tono="secundario"
-      testID={testID}
-      accessibilityRole="text"
-      accessibilityLiveRegion="polite"
-      accessibilityLabel={etiquetaAccesible ?? etiquetaEstadoVacio(texto)}
-      {...(pistaCta === undefined ? {} : { accessibilityHint: pistaCta })}
+    <View
+      style={{
+        paddingVertical: espacio.xl,
+        paddingHorizontal: espacio.l,
+        borderRadius: radio.xl,
+        backgroundColor: c.superficieAlterna,
+        gap: espacio.s,
+      }}
     >
-      {texto}
-    </Texto>
+      <Texto
+        variante="cuerpo"
+        tono="secundario"
+        alinear="center"
+        testID={testID}
+        accessibilityRole="text"
+        accessibilityLiveRegion="polite"
+        accessibilityLabel={etiquetaAccesible ?? etiquetaEstadoVacio(texto)}
+        {...(pistaCta === undefined ? {} : { accessibilityHint: pistaCta })}
+      >
+        {texto}
+      </Texto>
+    </View>
   );
 }

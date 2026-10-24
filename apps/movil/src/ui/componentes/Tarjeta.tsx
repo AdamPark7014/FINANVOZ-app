@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTema } from '../tema';
-import { espacio, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
+import { espacio, OBJETIVO_TACTIL_MIN, radio, sombra } from '../tokens';
 
 export interface TarjetaProps {
   children: ReactNode;
@@ -29,14 +29,15 @@ export function Tarjeta({
   style,
   testID,
 }: TarjetaProps) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const base: ViewStyle = {
     backgroundColor: c.superficie,
     borderColor: c.borde,
     borderWidth: 1,
-    borderRadius: radio.l,
+    borderRadius: radio.xl,
     padding: espacio.l,
     gap: espacio.s,
+    ...sombra.tarjeta[esquema],
   };
   const ripple = { color: c.borde, borderless: false };
   const estadoAccesible = expandida === undefined ? undefined : ({ expanded: expandida } as const);

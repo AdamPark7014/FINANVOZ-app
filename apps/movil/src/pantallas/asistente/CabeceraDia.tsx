@@ -59,9 +59,9 @@ export function CabeceraDia({
     ? `Te faltan ${formatearCentavos(vista.faltante)} para cubrir lo que viene ${cuando}.`
     : (vista.textoDias ?? vista.mensaje);
   return (
-    <View style={{ gap: espacio.xs + 2 }} testID="cabecera-dia">
+    <View style={{ gap: espacio.m }} testID="cabecera-dia">
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.m }}>
-        <View style={{ flexShrink: 0 }}>
+        <View style={{ flexShrink: 0, gap: espacio.xxs }}>
           <Texto
             variante="etiqueta"
             tono="secundario"

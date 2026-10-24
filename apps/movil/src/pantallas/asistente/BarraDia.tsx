@@ -4,8 +4,8 @@ import { espacio, formatearCentavos, radio, Texto, useTema } from '../../ui';
 import { PISTA_OCULTAR_DESGLOSE, PISTA_VER_DESGLOSE, PISTA_VER_QUE_VIENE } from '../principal/textos';
 import { etiquetaBarraDia, LEYENDA_COLCHON, LEYENDA_LIBRE, LEYENDA_RESERVADO } from './textos';
 
-/** Alto de la línea (maqueta: 6 pt): es una línea con leyenda en texto, no una gráfica (decisión 6). */
-const ALTO_LINEA = 6;
+/** Alto de la línea (8 pt): sigue siendo una línea con leyenda, no una gráfica (decisión 6). */
+const ALTO_LINEA = 8;
 /** Amplía el toque a 48 sin hacer la cabecera más alta. */
 const AMPLIAR_TOQUE = { top: 12, bottom: 12, left: 0, right: 0 } as const;
 
@@ -70,7 +70,11 @@ export function BarraDia({
             : PISTA_VER_DESGLOSE
       }
       accessibilityState={{ expanded: expandido }}
-      style={({ pressed }) => ({ gap: espacio.xs + 2, opacity: pressed ? 0.85 : 1 })}
+      style={({ pressed }) => ({
+        gap: espacio.s,
+        opacity: pressed ? 0.9 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
       <View
         testID="barra-dia"

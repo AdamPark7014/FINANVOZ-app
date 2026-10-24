@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { View, type ViewProps } from 'react-native';
-import { Boton, espacio, radio, useTema } from '../../../ui';
+import { Boton, espacio, radio, sombra, useTema } from '../../../ui';
 
 /**
  * Burbuja de un turno del asistente (maqueta Hoy A): superficie con borde, esquina inferior izquierda casi recta.
@@ -16,21 +16,22 @@ export function Burbuja({
   resaltada?: boolean;
   testID?: string;
 } & Pick<ViewProps, 'accessible' | 'accessibilityLabel' | 'accessibilityRole'>) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   return (
     <View
       {...(testID ? { testID } : {})}
       {...accesibilidad}
       style={{
         backgroundColor: c.superficie,
-        borderWidth: 1,
+        borderWidth: resaltada ? 1.5 : 1,
         borderColor: resaltada ? c.acentoTexto : c.borde,
-        borderTopLeftRadius: radio.l,
-        borderTopRightRadius: radio.l,
-        borderBottomRightRadius: radio.l,
-        borderBottomLeftRadius: espacio.xs,
+        borderTopLeftRadius: radio.xl,
+        borderTopRightRadius: radio.xl,
+        borderBottomRightRadius: radio.xl,
+        borderBottomLeftRadius: radio.s,
         padding: espacio.l,
-        gap: espacio.s,
+        gap: espacio.m,
+        ...sombra.tarjeta[esquema],
       }}
     >
       {children}

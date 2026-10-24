@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { AccessibilityInfo, Pressable, Text, View } from 'react-native';
 import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
-import { DURACION_AVISO_MS, espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
+import { DURACION_AVISO_MS, espacio, OBJETIVO_TACTIL_MIN, radio, sombra, tipo } from '../tokens';
 
 export interface AccionAviso {
   /** "Deshacer" (02-UX §1.3). */
@@ -95,7 +95,7 @@ function useDuracionRecomendada(minimo: number): number {
  * pantalla no se cierra solo: muestra "Cerrar".
  */
 export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: AvisoProps) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const lector = useLectorPantalla();
   const duracion = useDuracionRecomendada(duracionMs);
   const reservado = useSyncExternalStore(suscribirReservas, espacioReservado, () => 0);
@@ -129,9 +129,10 @@ export function Aviso({ aviso, alCerrar, duracionMs = DURACION_AVISO_MS }: Aviso
         gap: espacio.s,
         paddingLeft: espacio.l,
         paddingRight: accion || lector ? espacio.xs : espacio.l,
-        paddingVertical: espacio.xs,
-        borderRadius: radio.m,
+        paddingVertical: espacio.s,
+        borderRadius: radio.l,
         backgroundColor: c.aviso,
+        ...sombra.aviso[esquema],
       }}
     >
       <Pressable

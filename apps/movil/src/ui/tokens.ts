@@ -66,9 +66,10 @@ export interface Colores {
 
 export const colores: Record<EsquemaColor, Colores> = {
   claro: {
-    fondo: '#F7F9F8',
+    /** Fondo menta muy suave: airea la pantalla sin bajar el contraste AA. */
+    fondo: '#F4F7F5',
     superficie: '#FFFFFF',
-    superficieAlterna: '#EDF2F0',
+    superficieAlterna: '#E8F0EC',
     borde: '#C9D3CF',
     bordeControl: '#7A8783',
     texto: '#111816',
@@ -85,9 +86,9 @@ export const colores: Record<EsquemaColor, Colores> = {
     velo: 'rgba(0,0,0,0.45)',
   },
   oscuro: {
-    fondo: '#0E1312',
-    superficie: '#171E1C',
-    superficieAlterna: '#212A27',
+    fondo: '#0C1210',
+    superficie: '#151C1A',
+    superficieAlterna: '#1F2926',
     borde: '#3A4643',
     bordeControl: '#6F7D79',
     texto: '#ECF1EF',
@@ -127,10 +128,51 @@ export const espacio = {
 export const margenPantalla = espacio.l;
 
 export const radio = {
-  s: 6,
-  m: 10,
-  l: 16,
+  s: 8,
+  m: 14,
+  l: 20,
+  /** Hojas, burbujas del asistente y tarjetas hero. */
+  xl: 28,
   pastilla: 999,
+} as const;
+
+/**
+ * Sombras suaves (iOS shadow* + Android elevation). Usar sobre `superficie` en modo claro;
+ * en oscuro, elevación ligera sin halo verde.
+ */
+export const sombra = {
+  tarjeta: {
+    claro: {
+      shadowColor: marca.oscuro,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 3,
+    },
+    oscuro: {
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.4,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+  },
+  aviso: {
+    claro: {
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.22,
+      shadowRadius: 16,
+      elevation: 6,
+    },
+    oscuro: {
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.45,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+  },
 } as const;
 
 /** Objetivo táctil mínimo (02-UX §15, RNF-08). */
@@ -155,15 +197,15 @@ export const DURACION_AVISO_MS = 10_000;
  * por eso ningún componente fija alto ni corta líneas de cifras.
  */
 export const tipo = {
-  cifraHeroe: { fontSize: 48, lineHeight: 56, fontWeight: '700' },
-  cifraGrande: { fontSize: 32, lineHeight: 40, fontWeight: '700' },
-  titulo: { fontSize: 24, lineHeight: 32, fontWeight: '700' },
-  subtitulo: { fontSize: 18, lineHeight: 26, fontWeight: '600' },
-  cuerpo: { fontSize: 16, lineHeight: 24, fontWeight: '400' },
-  cuerpoFuerte: { fontSize: 16, lineHeight: 24, fontWeight: '600' },
-  secundario: { fontSize: 14, lineHeight: 20, fontWeight: '400' },
-  etiqueta: { fontSize: 14, lineHeight: 20, fontWeight: '600' },
-  pequeno: { fontSize: 12, lineHeight: 16, fontWeight: '400' },
+  cifraHeroe: { fontSize: 48, lineHeight: 58, fontWeight: '700' as const, letterSpacing: -0.5 },
+  cifraGrande: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const, letterSpacing: -0.3 },
+  titulo: { fontSize: 24, lineHeight: 34, fontWeight: '700' as const, letterSpacing: -0.2 },
+  subtitulo: { fontSize: 18, lineHeight: 28, fontWeight: '600' as const },
+  cuerpo: { fontSize: 16, lineHeight: 26, fontWeight: '400' as const },
+  cuerpoFuerte: { fontSize: 16, lineHeight: 26, fontWeight: '600' as const },
+  secundario: { fontSize: 14, lineHeight: 22, fontWeight: '400' as const },
+  etiqueta: { fontSize: 14, lineHeight: 20, fontWeight: '600' as const },
+  pequeno: { fontSize: 12, lineHeight: 18, fontWeight: '400' as const },
 } as const;
 
 export type VarianteTexto = keyof typeof tipo;
@@ -191,15 +233,18 @@ export const barraPestanas = {
  * Opciones de estilo para `<Tabs screenOptions>` de Expo Router, sin importar Expo Router aquí.
  * La etiqueta siempre visible: la pestaña activa no se distingue solo por color.
  */
-export function estiloBarraPestanas(c: Colores) {
+export function estiloBarraPestanas(c: Colores, esquema: EsquemaColor = 'claro') {
+  const elevacion = sombra.tarjeta[esquema];
   return {
     tabBarActiveTintColor: c.acentoTexto,
     tabBarInactiveTintColor: c.textoSecundario,
     tabBarShowLabel: true,
     tabBarStyle: {
       backgroundColor: c.superficie,
-      borderTopColor: c.borde,
+      borderTopWidth: 0,
       minHeight: barraPestanas.alto,
+      paddingTop: espacio.xs,
+      ...elevacion,
     },
     tabBarLabelStyle: { fontSize: barraPestanas.etiqueta.fontSize, fontWeight: '600' as const },
     tabBarItemStyle: { minHeight: OBJETIVO_TACTIL_MIN },
