@@ -349,9 +349,9 @@ export function FormularioMovimiento({
   };
 
   return (
-    <View style={{ gap: espacio.l }} testID={corregir ? 'formulario-corregir' : 'formulario-movimiento'}>
+    <View style={{ gap: espacio.xl }} testID={corregir ? 'formulario-corregir' : 'formulario-movimiento'}>
       {corregir ? null : (
-        <View style={{ gap: espacio.xs }}>
+        <View style={{ gap: espacio.s }}>
           <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
             {ETIQUETA_QUE_PASO}
           </Texto>
@@ -388,7 +388,7 @@ export function FormularioMovimiento({
 
   function campoFecha() {
     return (
-      <View style={{ gap: espacio.xs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
           {ETIQUETA_FECHA}
         </Texto>
@@ -450,7 +450,7 @@ export function FormularioMovimiento({
         />
         {campoFecha()}
         {campos.categoria ? (
-          <View style={{ gap: espacio.xs }}>
+          <View style={{ gap: espacio.s }}>
             <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {ETIQUETA_CATEGORIA}
             </Texto>
@@ -464,7 +464,7 @@ export function FormularioMovimiento({
           </View>
         ) : null}
         {campos.persona && !corregir ? (
-          <View style={{ gap: espacio.xs }}>
+          <View style={{ gap: espacio.s }}>
             <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.persona}
             </Texto>
@@ -499,7 +499,7 @@ export function FormularioMovimiento({
           </View>
         ) : null}
         {campos.origen ? (
-          <View style={{ gap: espacio.xs }}>
+          <View style={{ gap: espacio.s }}>
             <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.origen.pregunta}
             </Texto>
@@ -518,7 +518,7 @@ export function FormularioMovimiento({
           </Texto>
         ) : null}
         {campos.destino && !corregir ? (
-          <View style={{ gap: espacio.xs }}>
+          <View style={{ gap: espacio.s }}>
             <Texto variante="etiqueta" {...OCULTAR_ETIQUETA_VISIBLE}>
               {campos.destino.pregunta}
             </Texto>

@@ -248,10 +248,10 @@ function DecirloConEntendi({ pasos, ejemplo, contexto, proponer, correccion, tes
         ? estado.texto
         : null;
   return (
-    <View style={{ gap: espacio.m }} testID={testID} onTouchStart={alTocar}>
-      <Tarjeta>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m }}>
-          <View style={{ flex: 1, gap: espacio.xs }}>
+    <View style={{ gap: espacio.l }} testID={testID} onTouchStart={alTocar}>
+      <Tarjeta style={{ gap: espacio.m }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.l }}>
+          <View style={{ flex: 1, gap: espacio.s }}>
             <Texto variante="subtitulo">{TITULO_DECIRLO}</Texto>
             <Texto variante="secundario" tono="secundario">
               {ejemploDecirlo(ejemplo)}
@@ -330,9 +330,9 @@ function DecirloCampos<T>({ ejemplo, interpretar, alEntender, testID }: PropsDec
   if (!dictado) return null;
   const { BotonDictar } = dictado;
   return (
-    <Tarjeta testID={testID}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m }}>
-        <View style={{ flex: 1, gap: espacio.xs }}>
+    <Tarjeta testID={testID} style={{ gap: espacio.m }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.l }}>
+        <View style={{ flex: 1, gap: espacio.s }}>
           <Texto variante="subtitulo">{TITULO_DECIRLO}</Texto>
           <Texto variante="secundario" tono="secundario">
             {ejemploDecirlo(ejemplo)}

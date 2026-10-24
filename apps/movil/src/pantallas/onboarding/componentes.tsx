@@ -133,16 +133,24 @@ export function Casilla({
       accessibilityLabel={etiquetaHablada(etiqueta)}
       accessibilityHint={PISTA_CASILLA_ONB}
       accessibilityState={{ checked: valor }}
-      style={{ minHeight: OBJETIVO_TACTIL_MIN, flexDirection: 'row', alignItems: 'center', gap: espacio.m }}
+      style={({ pressed }) => ({
+        minHeight: OBJETIVO_TACTIL_MIN,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: espacio.m,
+        paddingVertical: espacio.xs,
+        opacity: pressed ? 0.92 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
       <View
         style={{
-          width: 26,
-          height: 26,
-          borderRadius: radio.s,
-          borderWidth: 2,
-          borderColor: valor ? c.acento : c.textoSecundario,
-          backgroundColor: valor ? c.acento : 'transparent',
+          width: 28,
+          height: 28,
+          borderRadius: radio.m,
+          borderWidth: valor ? 0 : 2,
+          borderColor: c.borde,
+          backgroundColor: valor ? c.acento : c.superficieAlterna,
           alignItems: 'center',
           justifyContent: 'center',
         }}

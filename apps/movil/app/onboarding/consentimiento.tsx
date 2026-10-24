@@ -75,49 +75,51 @@ export default function Consentimiento() {
         </View>
       }
     >
-      <Tarjeta>
-        {/*
-          Solo el resumen se agrupa en un elemento: en iOS un contenedor `accessible` vuelve inalcanzables para
-          VoiceOver los botones que tenga dentro, así que «Leer el aviso completo» queda fuera del grupo (igual que
-          en `Reconsentimiento`).
-        */}
-        <View
-          testID="onb-aviso-simplificado"
-          accessible
-          accessibilityRole="summary"
-          accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(
-            TITULO_AVISO_SIMPLIFICADO,
-            AVISO_SIMPLIFICADO,
-          )}
-          style={{ gap: espacio.s }}
-        >
-          <Texto variante="subtitulo" accessibilityElementsHidden>
-            {TITULO_AVISO_SIMPLIFICADO}
-          </Texto>
-          <View style={{ gap: espacio.s }} importantForAccessibility="no-hide-descendants">
-            {AVISO_SIMPLIFICADO.map((punto) => (
-              <Texto key={punto} variante="secundario" accessibilityElementsHidden>
-                {`• ${punto}`}
-              </Texto>
-            ))}
+      <View style={{ gap: espacio.l }}>
+        <Tarjeta>
+          {/*
+            Solo el resumen se agrupa en un elemento: en iOS un contenedor `accessible` vuelve inalcanzables para
+            VoiceOver los botones que tenga dentro, así que «Leer el aviso completo» queda fuera del grupo (igual que
+            en `Reconsentimiento`).
+          */}
+          <View
+            testID="onb-aviso-simplificado"
+            accessible
+            accessibilityRole="summary"
+            accessibilityLabel={etiquetaAvisoSimplificadoOnboarding(
+              TITULO_AVISO_SIMPLIFICADO,
+              AVISO_SIMPLIFICADO,
+            )}
+            style={{ gap: espacio.m }}
+          >
+            <Texto variante="subtitulo" accessibilityElementsHidden>
+              {TITULO_AVISO_SIMPLIFICADO}
+            </Texto>
+            <View style={{ gap: espacio.s }} importantForAccessibility="no-hide-descendants">
+              {AVISO_SIMPLIFICADO.map((punto) => (
+                <Texto key={punto} variante="secundario" accessibilityElementsHidden>
+                  {`• ${punto}`}
+                </Texto>
+              ))}
+            </View>
           </View>
-        </View>
-        <Boton
-          testID="onb-aviso-completo"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_LEER_AVISO_COMPLETO}
-          pista={PISTA_LEER_AVISO_COMPLETO}
-          alPresionar={() => router.push('/aviso-privacidad')}
+          <Boton
+            testID="onb-aviso-completo"
+            variante="texto"
+            ancho="contenido"
+            etiqueta={BTN_LEER_AVISO_COMPLETO}
+            pista={PISTA_LEER_AVISO_COMPLETO}
+            alPresionar={() => router.push('/aviso-privacidad')}
+          />
+        </Tarjeta>
+        <Casilla
+          testID="onb-casilla-estadisticas"
+          etiqueta={CASILLA_ESTADISTICAS_OPCIONAL}
+          valor={estadisticas}
+          alCambiar={setEstadisticas}
         />
-      </Tarjeta>
-      <Casilla
-        testID="onb-casilla-estadisticas"
-        etiqueta={CASILLA_ESTADISTICAS_OPCIONAL}
-        valor={estadisticas}
-        alCambiar={setEstadisticas}
-      />
-      <MensajeError texto={error} />
+        <MensajeError texto={error} />
+      </View>
     </PasoOnboarding>
   );
 }
