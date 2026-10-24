@@ -100,7 +100,11 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
   const [cobrando, setCobrando] = useState(false);
   const ya = useYaLaDi(tandaId, d.proxima?.fecha ?? null, 'tanda-ya-la-di');
   return (
-    <Pantalla testID="pantalla-tanda" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-tanda"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="tanda-volver"
         etiqueta={ETIQUETA_VOLVER}
@@ -109,7 +113,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         alPresionar={alVolver}
         pista={PISTA_VOLVER_DETALLE}
       />
-      <View style={{ gap: espacio.xxs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="titulo" testID="tanda-titulo" accessibilityRole="header">
           {d.nombre}
         </Texto>
@@ -199,7 +203,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
               <View
                 accessible
                 accessibilityLabel={etiquetaAccesibleRondaTanda(r, !d.activa)}
-                style={{ gap: espacio.xxs }}
+                style={{ gap: espacio.s }}
               >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
                   <Texto
@@ -373,7 +377,7 @@ function Resumen({ d }: { d: DetalleTanda }) {
       <View
         accessible
         accessibilityLabel={etiquetaAccesibleResumenDetalleTanda(d)}
-        style={{ gap: espacio.xxs }}
+        style={{ gap: espacio.s }}
       >
         <Texto variante="cuerpo" testID="tanda-aportado" importantForAccessibility="no">
           {textoAportado(d.aportado)}

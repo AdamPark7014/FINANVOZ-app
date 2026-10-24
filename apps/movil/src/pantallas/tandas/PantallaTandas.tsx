@@ -38,7 +38,11 @@ export function PantallaTandas({
   const tandas = useVista(listarTandas);
   const [nueva, setNueva] = useState(nuevaAlInicio);
   return (
-    <Pantalla testID="pantalla-tandas" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-tandas"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="tandas-volver"
         etiqueta={ETIQUETA_VOLVER}
@@ -68,7 +72,7 @@ export function PantallaTandas({
               pistaCta={PISTA_VACIO_TANDAS}
             />
           ) : null}
-          <View accessibilityRole="list" testID="tandas-lista" style={{ gap: espacio.s }}>
+          <View accessibilityRole="list" testID="tandas-lista" style={{ gap: espacio.m }}>
             {/* Toda la tarjeta abre el detalle (antes solo "Ver calendario", abajo y pequeño). */}
             {tandas.map((t) => (
               <Tarjeta
@@ -78,7 +82,7 @@ export function PantallaTandas({
                 etiquetaAccesible={etiquetaAccesibleTandaEnLista(t)}
                 pista={PISTA_VER_CALENDARIO}
               >
-                <View style={{ gap: espacio.xxs }}>
+                <View style={{ gap: espacio.s }}>
                   <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
                   <Texto variante="secundario" tono="secundario">
                     {t.proxima

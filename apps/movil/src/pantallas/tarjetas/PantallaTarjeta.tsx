@@ -121,7 +121,11 @@ function Detalle({
   const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
 
   return (
-    <Pantalla testID="pantalla-tarjeta" bordes={['top', 'left', 'right', 'bottom']}>
+    <Pantalla
+      testID="pantalla-tarjeta"
+      bordes={['top', 'left', 'right', 'bottom']}
+      contenidoStyle={{ gap: espacio.xl }}
+    >
       <Boton
         testID="tarjeta-volver"
         etiqueta={BTN_VOLVER}
@@ -130,7 +134,7 @@ function Detalle({
         alPresionar={alVolver}
         pista={PISTA_VOLVER}
       />
-      <View style={{ gap: espacio.xxs }}>
+      <View style={{ gap: espacio.s }}>
         <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">
           {d.nombre}
         </Texto>
@@ -295,7 +299,7 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
           testID="tarjeta-saldo-a-favor"
           accessible
           accessibilityLabel={etiquetaAccesibleSaldoAFavorDetalle(d.saldoAFavor)}
-          style={{ gap: espacio.xxs }}
+          style={{ gap: espacio.s }}
         >
           <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
             <Dato etiqueta={ETIQUETA_SALDO_A_FAVOR} valor={formatearCentavos(d.saldoAFavor)} />
@@ -306,7 +310,7 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
         </View>
       ) : null}
       {d.ultimoCorte ? (
-        <View style={{ gap: espacio.xxs }}>
+        <View style={{ gap: espacio.s }}>
           <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(d.pngi)} testID="tarjeta-pngi" />
           <Texto variante="secundario" tono="secundario">
             {d.pngi > 0 ? textoPagarPngiAntesDe(d.etiquetaFechaLimite) : TEXTO_PNGI_CUBIERTO}
