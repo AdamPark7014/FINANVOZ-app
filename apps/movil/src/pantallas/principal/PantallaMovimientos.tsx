@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, SectionList, View } from 'react-native';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -143,8 +143,22 @@ export function PantallaMovimientos({
   // VoiceOver: el aviso de filtro activo se anuncia como en TalkBack (región viva).
   useAnuncio(filtro ? TEXTO_MOVIMIENTOS_FILTRO_ACTIVO : null);
 
-  return (
-    <Pantalla testID="pantalla-movimientos" contenidoStyle={{ gap: espacio.xl }}>
+  const secciones = useMemo(
+    () =>
+      dias.map((d) => ({
+        fecha: d.fecha,
+        etiqueta: d.etiqueta,
+        resumen: resumenDiaMovimientos(
+          d.salieron > 0 ? formatearCentavos(d.salieron) : null,
+          d.entraron > 0 ? formatearCentavos(d.entraron) : null,
+        ),
+        data: [...d.movimientos],
+      })),
+    [dias],
+  );
+
+  const encabezadoLista = (
+    <View style={{ gap: espacio.xl }}>
       <View
         style={{
           flexDirection: 'row',
@@ -179,7 +193,6 @@ export function PantallaMovimientos({
           >
             {TEXTO_POR_REVISAR}
           </Texto>
-          {/* Las que ya entendí pero necesitan que confirmes algo llevan "Revisar". */}
           {porRevisar.map((f) => (
             <Tarjeta key={f.id} testID={`por-revisar-${f.id}`}>
               <Texto variante="cuerpo">{`«${f.texto}»`}</Texto>
@@ -198,7 +211,6 @@ export function PantallaMovimientos({
                   testID={`revisar-${f.id}`}
                 />
               ) : alRegistrar ? (
-                // Sin intérprete disponible la frase no se resuelve sola: que pueda llenarla a mano.
                 <Boton
                   etiqueta="Llenar los datos"
                   variante="secundario"
@@ -238,7 +250,7 @@ export function PantallaMovimientos({
           testID="movimientos-chips"
         >
           <GrupoChips
-            opciones={chips.map((c) => ({ valor: c, etiqueta: ETIQUETA_CHIP_MOVIMIENTOS[c] }))}
+            opciones={chips.map((ch) => ({ valor: ch, etiqueta: ETIQUETA_CHIP_MOVIMIENTOS[ch] }))}
             valor={chip}
             alCambiar={setChip}
             prefijoTestID="movimientos-chip"
@@ -296,90 +308,103 @@ export function PantallaMovimientos({
           testID="boton-registrar-primer-movimiento"
         />
       ) : null}
+    </View>
+  );
 
-      {dias.map((d) => {
-        const resumen = resumenDiaMovimientos(
-          d.salieron > 0 ? formatearCentavos(d.salieron) : null,
-          d.entraron > 0 ? formatearCentavos(d.entraron) : null,
-        );
-        return (
-        <View key={d.fecha} style={{ gap: espacio.m, marginTop: espacio.s }}>
-          <View style={{ gap: espacio.xs }}>
+  return (
+    <Pantalla
+      testID="pantalla-movimientos"
+      desplazable={false}
+      contenidoStyle={{ gap: espacio.xl, flex: 1, paddingBottom: 0 }}
+    >
+      <SectionList
+        testID="movimientos-section-list"
+        accessibilityRole="list"
+        sections={secciones}
+        keyExtractor={(m) => m.id}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: espacio.xxxl }}
+        stickySectionHeadersEnabled={false}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={encabezadoLista}
+        renderSectionHeader={({ section }) => (
+          <View style={{ gap: espacio.xs, marginTop: espacio.s }}>
             <Texto
               variante="etiqueta"
               tono="acento"
               accessibilityRole="header"
-              accessibilityLabel={etiquetaEncabezadoDiaConTotales(d.etiqueta, resumen)}
-              testID={`movimientos-dia-${d.fecha}`}
+              accessibilityLabel={etiquetaEncabezadoDiaConTotales(section.etiqueta, section.resumen)}
+              testID={`movimientos-dia-${section.fecha}`}
             >
-              {d.etiqueta}
+              {section.etiqueta}
             </Texto>
-            {resumen ? (
+            {section.resumen ? (
               <Texto
                 variante="secundario"
-                testID={`movimientos-dia-total-${d.fecha}`}
+                testID={`movimientos-dia-total-${section.fecha}`}
                 accessibilityElementsHidden
                 importantForAccessibility="no"
               >
-                {resumen}
+                {section.resumen}
               </Texto>
             ) : null}
+            <View
+              accessibilityRole="list"
+              testID={`movimientos-lista-${section.fecha}`}
+              accessible
+              accessibilityLabel={`Lista del ${section.etiqueta}`}
+            />
           </View>
-          <View accessibilityRole="list" testID={`movimientos-lista-${d.fecha}`} style={{ gap: espacio.m }}>
-            {d.movimientos.map((m) => (
-              <View key={m.id} role="listitem" testID={`movimiento-fila-${m.id}`}>
-                <FilaMovimiento
-                  m={m}
-                  abierto={abierto === m.id}
-                  aMeses={conTarjeta.has(m.id)}
-                  {...(alAbrirPersona ? { alAbrirPersona } : {})}
-                  alAbrirDetalle={(id) => setAbierto(id)}
-                  alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
-                  alCerrar={() => setAbierto(null)}
-                  alAnular={() => {
-                    try {
-                      anularMovimiento(ctx, m.id);
-                      setAbierto(null);
-                      refrescar();
-                      mostrar({ mensaje: MENSAJE_ANULADO_MOVIMIENTO });
-                    } catch (e) {
-                      mostrar({ mensaje: mensajeError(e) });
-                    }
-                  }}
-                  alExtraordinario={() => {
-                    // "Fue algo extraordinario" (`04 §3`, `05 §E8.2`): no cuenta para estimar si llegas.
-                    const marcar = !m.extraordinaria;
-                    try {
-                      marcarExtraordinaria(ctx, m.id, marcar);
-                      refrescar();
-                      mostrar({
-                        mensaje: marcar
-                          ? 'Listo: no lo uso para estimar tus gastos de cada día.'
-                          : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
-                        accion: {
-                          etiqueta: 'Deshacer',
-                          alPresionar: () => {
-                            try {
-                              marcarExtraordinaria(ctx, m.id, !marcar);
-                              refrescar();
-                            } catch (e) {
-                              mostrarDespuesDeCerrar(mostrar, mensajeError(e));
-                            }
-                          },
-                        },
-                      });
-                    } catch (e) {
-                      mostrar({ mensaje: mensajeError(e) });
-                    }
-                  }}
-                />
-              </View>
-            ))}
+        )}
+        renderItem={({ item: m }) => (
+          <View role="listitem" testID={`movimiento-fila-${m.id}`} style={{ marginBottom: espacio.m }}>
+            <FilaMovimiento
+              m={m}
+              abierto={abierto === m.id}
+              aMeses={conTarjeta.has(m.id)}
+              {...(alAbrirPersona ? { alAbrirPersona } : {})}
+              alAbrirDetalle={(id) => setAbierto(id)}
+              alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
+              alCerrar={() => setAbierto(null)}
+              alAnular={() => {
+                try {
+                  anularMovimiento(ctx, m.id);
+                  setAbierto(null);
+                  refrescar();
+                  mostrar({ mensaje: MENSAJE_ANULADO_MOVIMIENTO });
+                } catch (e) {
+                  mostrar({ mensaje: mensajeError(e) });
+                }
+              }}
+              alExtraordinario={() => {
+                const marcar = !m.extraordinaria;
+                try {
+                  marcarExtraordinaria(ctx, m.id, marcar);
+                  refrescar();
+                  mostrar({
+                    mensaje: marcar
+                      ? 'Listo: no lo uso para estimar tus gastos de cada día.'
+                      : 'Listo: vuelvo a contarlo para estimar tus gastos de cada día.',
+                    accion: {
+                      etiqueta: 'Deshacer',
+                      alPresionar: () => {
+                        try {
+                          marcarExtraordinaria(ctx, m.id, !marcar);
+                          refrescar();
+                        } catch (e) {
+                          mostrarDespuesDeCerrar(mostrar, mensajeError(e));
+                        }
+                      },
+                    },
+                  });
+                } catch (e) {
+                  mostrar({ mensaje: mensajeError(e) });
+                }
+              }}
+            />
           </View>
-        </View>
-        );
-      })}
-      <View style={{ height: espacio.xxxl }} />
+        )}
+      />
     </Pantalla>
   );
 }
