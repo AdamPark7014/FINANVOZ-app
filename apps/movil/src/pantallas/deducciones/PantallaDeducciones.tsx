@@ -113,7 +113,8 @@ export function PantallaDeducciones({
   alVolver,
   archivos,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   archivos: ArchivosFacturas;
 }) {
   const { ctx, refrescar } = useSesion();
@@ -147,14 +148,16 @@ export function PantallaDeducciones({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="deducciones-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-      />
+      {alVolver ? (
+        <Boton
+          testID="deducciones-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
+      ) : null}
       <Texto variante="titulo" testID="deducciones-titulo-pantalla" accessibilityRole="header">
         {tituloPantallaDeducciones(v.ejercicio)}
       </Texto>

@@ -31,7 +31,8 @@ export function PantallaTandas({
   alAbrirTanda,
   nuevaAlInicio = false,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alAbrirTanda: (tandaId: string) => void;
   nuevaAlInicio?: boolean;
 }) {
@@ -43,14 +44,16 @@ export function PantallaTandas({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="tandas-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-      />
+      {alVolver ? (
+        <Boton
+          testID="tandas-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
+      ) : null}
       <Texto variante="titulo" testID="tandas-titulo" accessibilityRole="header">
         {TITULO_TANDAS}
       </Texto>

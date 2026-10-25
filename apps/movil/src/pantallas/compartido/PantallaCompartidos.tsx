@@ -57,7 +57,8 @@ export function PantallaCompartidos({
   alVolver,
   alAbrirGrupo,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alAbrirGrupo: (grupoId: string) => void;
 }) {
   const { ctx, refrescar } = useSesion();
@@ -139,15 +140,17 @@ export function PantallaCompartidos({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      {/* "Volver" siempre sale de la pantalla (como el gesto de iPhone); cada paso se cierra con su "Cancelar". */}
-      <Boton
-        testID="compartidos-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        pista={PISTA_VOLVER_CUENTAS}
-        alPresionar={alVolver}
-      />
+      {/* Barra nativa si no hay alVolver; si no, «Volver» en contenido (pruebas). */}
+      {alVolver ? (
+        <Boton
+          testID="compartidos-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          pista={PISTA_VOLVER_CUENTAS}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="compartidos-titulo" accessibilityRole="header">
         {TITULO_GASTOS_COMPARTIDOS}
       </Texto>

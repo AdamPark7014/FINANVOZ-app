@@ -1,16 +1,20 @@
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { ProveedorAvisos } from '../../src/pantallas/principal';
 import { PantallaTandas } from '../../src/pantallas/tandas';
+import { TITULO_TANDAS } from '../../src/pantallas/tandas/textos';
+import { opcionesBarraNativa } from '../../src/ui/navegacion';
 
 /** Cuentas → Tandas (`02 §18`). */
 export default function TandasRuta() {
   const router = useRouter();
   return (
-    <ProveedorAvisos>
-      <PantallaTandas
-        alVolver={() => (router.canGoBack() ? router.back() : router.replace('/cuentas'))}
-        alAbrirTanda={(id) => router.push({ pathname: '/tandas/[id]', params: { id } })}
-      />
-    </ProveedorAvisos>
+    <>
+      <Stack.Screen options={opcionesBarraNativa(TITULO_TANDAS)} />
+      <ProveedorAvisos>
+        <PantallaTandas
+          alAbrirTanda={(id) => router.push({ pathname: '/tandas/[id]', params: { id } })}
+        />
+      </ProveedorAvisos>
+    </>
   );
 }

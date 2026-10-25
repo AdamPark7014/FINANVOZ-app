@@ -1,12 +1,13 @@
-import { useRouter } from 'expo-router';
-import { PantallaSuscripciones } from '../src/pantallas/suscripciones';
+import { Stack } from 'expo-router';
+import { PantallaSuscripciones, TITULO_PANTALLA } from '../src/pantallas/suscripciones';
+import { opcionesBarraNativa } from '../src/ui/navegacion';
 
 /** Cuentas → Suscripciones (`02 §20`). */
 export default function SuscripcionesRuta() {
-  const router = useRouter();
   return (
-    <PantallaSuscripciones
-      alVolver={() => (router.canGoBack() ? router.back() : router.replace('/cuentas'))}
-    />
+    <>
+      <Stack.Screen options={opcionesBarraNativa(TITULO_PANTALLA)} />
+      <PantallaSuscripciones />
+    </>
   );
 }

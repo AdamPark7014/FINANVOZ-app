@@ -76,7 +76,7 @@ const HACER: Record<AccionSuscripcion, (ctx: Contexto, comercio: string) => unkn
  * $X al mes", el aumento de precio ("antes $115") y las que ya no se cobran. Por fila: Convertir en compromiso
  * (Hoy la aparta), Ya la cancelé y No es suscripción.
  */
-export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
+export function PantallaSuscripciones({ alVolver }: { alVolver?: () => void }) {
   const { ctx, refrescar } = useSesion();
   const v = useVista(listarSuscripciones);
   const [mensaje, setMensaje] = useState<{ texto: string; error: boolean } | null>(null);
@@ -96,14 +96,16 @@ export function PantallaSuscripciones({ alVolver }: { alVolver: () => void }) {
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="suscripciones-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-      />
+      {alVolver ? (
+        <Boton
+          testID="suscripciones-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
+      ) : null}
       <Texto
         testID="suscripciones-titulo"
         variante="titulo"

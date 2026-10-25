@@ -1,22 +1,21 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { PantallaGrupoCompartido } from '../../src/pantallas/compartido';
+import { TITULO_GASTOS_COMPARTIDOS } from '../../src/pantallas/compartido/textos';
+import { opcionesBarraNativa } from '../../src/ui/navegacion';
 
 /**
- * Detalle de un grupo compartido (`02 §27`). Solo el id del grupo viaja en la ruta (regla 9). "Volver" regresa
- * a la lista con la animación de regreso; si se abrió directo (sin historial), la reemplaza.
+ * Detalle de un grupo compartido (`02 §27`). Solo el id del grupo viaja en la ruta (regla 9).
  */
 export default function GrupoCompartidoRuta() {
-  const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
-    <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
-      <PantallaGrupoCompartido
-        key={id}
-        grupoId={String(id)}
-        alVolver={() => (router.canGoBack() ? router.back() : router.replace('/compartido'))}
-      />
-    </ProveedorCompartido>
+    <>
+      <Stack.Screen options={opcionesBarraNativa(TITULO_GASTOS_COMPARTIDOS)} />
+      <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
+        <PantallaGrupoCompartido key={id} grupoId={String(id)} />
+      </ProveedorCompartido>
+    </>
   );
 }

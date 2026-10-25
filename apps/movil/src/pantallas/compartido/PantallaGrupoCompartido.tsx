@@ -100,7 +100,14 @@ export const TEXTO_GRUPO_NO_ENCONTRADO =
  * Grupo compartido por su id. Un enlace viejo (`/compartido/<id>` de un grupo que ya no existe) antes tumbaba la app
  * (`grupo_inexistente`); ahora dice qué pasó y deja volver, como la tarjeta y la persona.
  */
-export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () => void }) {
+export function PantallaGrupoCompartido({
+  grupoId,
+  alVolver,
+}: {
+  grupoId: string;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
+}) {
   const deps = useCompartido();
   const existe = useVista((c) => {
     try {
@@ -117,24 +124,26 @@ export function PantallaGrupoCompartido({ grupoId, alVolver }: { grupoId: string
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          testID="grupo-volver"
-          etiqueta={ETIQUETA_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          pista={PISTA_VOLVER_GRUPO}
-          alPresionar={alVolver}
-        />
+        {alVolver ? (
+          <Boton
+            testID="grupo-volver"
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            pista={PISTA_VOLVER_GRUPO}
+            alPresionar={alVolver}
+          />
+        ) : null}
         <Texto variante="cuerpo" tono="secundario" testID="grupo-no-encontrado">
           {TEXTO_GRUPO_NO_ENCONTRADO}
         </Texto>
       </Pantalla>
     );
   }
-  return <GrupoCompartido grupoId={grupoId} alVolver={alVolver} />;
+  return <GrupoCompartido grupoId={grupoId} {...(alVolver ? { alVolver } : {})} />;
 }
 
-function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () => void }) {
+function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver?: () => void }) {
   const { ctx, refrescar } = useSesion();
   const deps = useCompartido();
   const g = useVista((c) => obtenerGrupoCompartido(c, deps.almacen, grupoId));
@@ -238,15 +247,16 @@ function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver: () 
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      {/* "Volver" siempre regresa a tus grupos (como el gesto de iPhone); cada panel tiene su propio cierre. */}
-      <Boton
-        testID="grupo-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        pista={PISTA_VOLVER_GRUPO}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="grupo-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          pista={PISTA_VOLVER_GRUPO}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="grupo-titulo" accessibilityRole="header">
         {g.nombre}
       </Texto>

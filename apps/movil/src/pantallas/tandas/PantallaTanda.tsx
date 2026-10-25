@@ -67,7 +67,14 @@ function existeTanda(ctx: Parameters<typeof detalleTanda>[0], id: string): boole
   }
 }
 
-export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver: () => void }) {
+export function PantallaTanda({
+  tandaId,
+  alVolver,
+}: {
+  tandaId: string;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
+}) {
   const existe = useVista((ctx) => existeTanda(ctx, tandaId));
   if (!existe) {
     return (
@@ -76,14 +83,16 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          testID="tanda-volver"
-          etiqueta={ETIQUETA_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alVolver}
-          pista={PISTA_VOLVER_DETALLE}
-        />
+        {alVolver ? (
+          <Boton
+            testID="tanda-volver"
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER_DETALLE}
+          />
+        ) : null}
         <Texto
           variante="cuerpo"
           tono="secundario"
@@ -96,10 +105,10 @@ export function PantallaTanda({ tandaId, alVolver }: { tandaId: string; alVolver
       </Pantalla>
     );
   }
-  return <Detalle tandaId={tandaId} alVolver={alVolver} />;
+  return <Detalle tandaId={tandaId} {...(alVolver ? { alVolver } : {})} />;
 }
 
-function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void }) {
+function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver?: () => void }) {
   const d = useVista((ctx) => detalleTanda(ctx, tandaId));
   const [cobrando, setCobrando] = useState(false);
   const ya = useYaLaDi(tandaId, d.proxima?.fecha ?? null, 'tanda-ya-la-di');
@@ -109,14 +118,16 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="tanda-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER_DETALLE}
-      />
+      {alVolver ? (
+        <Boton
+          testID="tanda-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER_DETALLE}
+        />
+      ) : null}
       <View style={{ gap: espacio.s }}>
         <Texto variante="titulo" testID="tanda-titulo" accessibilityRole="header">
           {d.nombre}
@@ -198,7 +209,9 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver: () => void 
         </Tarjeta>
       ) : null}
 
-      {d.activa ? <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver} /> : null}
+      {d.activa ? (
+        <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver ?? (() => undefined)} />
+      ) : null}
 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
         <View accessibilityRole="list" style={{ gap: espacio.s }}>
