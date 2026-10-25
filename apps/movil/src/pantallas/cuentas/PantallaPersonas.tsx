@@ -20,7 +20,8 @@ export function PantallaPersonas({
   alVolver,
   alAbrirPersona,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alAbrirPersona: (personaId: string) => void;
 }) {
   const personas = useVista(listarPersonas);
@@ -30,7 +31,7 @@ export function PantallaPersonas({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Encabezado titulo={TITULO_PERSONAS} alVolver={alVolver} testID="personas" />
+      <Encabezado titulo={TITULO_PERSONAS} {...(alVolver ? { alVolver } : {})} testID="personas" />
       <Texto variante="secundario" tono="secundario">
         {INTRO_PERSONAS}
       </Texto>

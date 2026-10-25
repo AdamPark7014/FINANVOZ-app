@@ -1,16 +1,14 @@
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import {
   BTN_TERMINOS,
-  ETIQUETA_VOLVER,
   PISTA_AYUDA,
   PISTA_PRIVACIDAD,
   PISTA_RESPALDO,
   PISTA_TERMINOS,
-  PISTA_VOLVER,
   SECCION_ACERCA,
   SECCION_AYUDA,
   GRUPO_APP,
@@ -43,6 +41,7 @@ import { obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, espacio, FilaAjuste, Pantalla, Tarjeta, Texto } from '../src/ui';
+import { opcionesBarraNativa } from '../src/ui/navegacion';
 
 const TOQUES_MENU_DEV = 7;
 
@@ -70,8 +69,6 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
 
   const [menuDev, setMenuDev] = useState(false);
   const toques = useRef(0);
-  // Abierto desde un aviso o un enlace no hay a dónde regresar: se va a Hoy.
-  const volver = () => (router.canGoBack() ? router.back() : router.replace('/hoy'));
 
   const tocarVersion = () => {
     if (!__DEV__ || !control.cargarEscenario) return;
@@ -80,21 +77,13 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
   };
 
   return (
-    <Pantalla
-      testID="ajustes"
-      bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
-      contenidoStyle={{ gap: espacio.xl }}
-    >
-      {enPestana ? null : (
-        <Boton
-          testID="ajustes-volver"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={ETIQUETA_VOLVER}
-          pista={PISTA_VOLVER}
-          alPresionar={volver}
-        />
-      )}
+    <>
+      {enPestana ? null : <Stack.Screen options={opcionesBarraNativa(TITULO)} />}
+      <Pantalla
+        testID="ajustes"
+        bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
       <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
         {enPestana ? 'Tú' : TITULO}
       </Texto>
@@ -179,6 +168,7 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         <MenuDesarrollo cargar={control.cargarEscenario} />
       ) : null}
     </Pantalla>
+    </>
   );
 }
 

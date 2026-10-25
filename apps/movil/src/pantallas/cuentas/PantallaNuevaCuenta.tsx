@@ -18,7 +18,8 @@ export function PantallaNuevaCuenta({
   alVolver,
   alGuardar,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   /** Recibe la confirmación ya redactada («Listo: agregué BBVA.»). */
   alGuardar: (confirmacion: string) => void;
 }) {
@@ -40,7 +41,7 @@ export function PantallaNuevaCuenta({
         />
       }
     >
-      <Encabezado titulo={TITULO_NUEVA_CUENTA} alVolver={alVolver} testID="cuenta-nueva" />
+      <Encabezado titulo={TITULO_NUEVA_CUENTA} {...(alVolver ? { alVolver } : {})} testID="cuenta-nueva" />
       <Texto variante="secundario" tono="secundario">
         {INTRO_NUEVA_CUENTA}
       </Texto>

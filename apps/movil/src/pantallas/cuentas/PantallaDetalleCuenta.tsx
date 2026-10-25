@@ -39,7 +39,8 @@ export function PantallaDetalleCuenta({
   alContarEfectivo,
 }: {
   cuentaId: string;
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alVerMovimientos: (cuentaId: string) => void;
   alContarEfectivo?: (cuentaId: string) => void;
 }) {
@@ -58,7 +59,7 @@ export function PantallaDetalleCuenta({
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Encabezado titulo={ETIQUETA_TIENES} alVolver={alVolver} testID="cuenta-detalle" />
+        <Encabezado titulo={ETIQUETA_TIENES} {...(alVolver ? { alVolver } : {})} testID="cuenta-detalle" />
         <EstadoVacio texto={TEXTO_CUENTA_NO_ENCONTRADA} testID="cuenta-detalle-no-encontrada" />
       </Pantalla>
     );
@@ -91,7 +92,7 @@ export function PantallaDetalleCuenta({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Encabezado titulo={c.nombre} alVolver={alVolver} testID="cuenta-detalle">
+      <Encabezado titulo={c.nombre} {...(alVolver ? { alVolver } : {})} testID="cuenta-detalle">
         {subtitulo.length > 0 ? (
           <Texto
             variante="secundario"

@@ -24,7 +24,8 @@ export function PantallaPagosFijos({
   alAgregar,
   alAbrir,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alAgregar: () => void;
   alAbrir: (programadoId: string) => void;
 }) {
@@ -43,7 +44,7 @@ export function PantallaPagosFijos({
         />
       }
     >
-      <Encabezado titulo={TITULO_PAGOS_FIJOS} alVolver={alVolver} testID="pagos-fijos" />
+      <Encabezado titulo={TITULO_PAGOS_FIJOS} {...(alVolver ? { alVolver } : {})} testID="pagos-fijos" />
       <Texto variante="secundario" tono="secundario">
         {INTRO_PAGOS_FIJOS}
       </Texto>

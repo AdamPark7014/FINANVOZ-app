@@ -1,14 +1,17 @@
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { PantallaPersonas } from '../../src/pantallas/cuentas';
+import { TITULO_PERSONAS } from '../../src/pantallas/cuentas/textos';
+import { opcionesBarraNativa } from '../../src/ui/navegacion';
 
 /** Cuentas › Personas (`02 §17`): todas, cada una abre su ficha. */
 export default function PersonasRuta() {
   const router = useRouter();
-  const volver = () => (router.canGoBack() ? router.back() : router.replace('/cuentas'));
   return (
-    <PantallaPersonas
-      alVolver={volver}
-      alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
-    />
+    <>
+      <Stack.Screen options={opcionesBarraNativa(TITULO_PERSONAS)} />
+      <PantallaPersonas
+        alAbrirPersona={(id) => router.push({ pathname: '/persona/[id]', params: { id } })}
+      />
+    </>
   );
 }

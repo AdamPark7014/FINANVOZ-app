@@ -29,7 +29,6 @@ import {
   mensajeBloqueoApagadoSinSeguridad,
   mensajeBloqueoSinSeguridad,
   PISTA_AYUDA,
-  PISTA_VOLVER,
 } from './textos';
 
 /**
@@ -198,10 +197,10 @@ describe('ajustes', () => {
     );
   });
 
-  it('«Volver» sin pantalla anterior lleva a Hoy', () => {
-    const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
-    fireEvent.press(screen.getByTestId('ajustes-volver'));
-    expect(r.getPathname()).toBe('/hoy');
+  it('barra nativa: sin «Volver» en el contenido de Ajustes (`PLAN-UX` 3.3)', () => {
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(screen.getByTestId('ajustes-titulo')).toBeTruthy();
+    expect(screen.queryByTestId('ajustes-volver')).toBeNull();
   });
 
   it('en la pestaña Tú no hay «Volver»: la barra de pestañas es la salida (Ola 7 §2)', () => {
@@ -214,7 +213,7 @@ describe('ajustes', () => {
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('ajustes-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+    expect(screen.queryByTestId('ajustes-volver')).toBeNull();
     expect(screen.getByTestId('ajustes-abrir-ayuda')).toHaveProp('accessibilityHint', PISTA_AYUDA);
     expect(screen.getByTestId('ajustes-version')).toHaveProp(
       'accessibilityLabel',

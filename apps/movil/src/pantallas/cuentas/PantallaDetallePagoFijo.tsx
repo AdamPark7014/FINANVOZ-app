@@ -47,7 +47,8 @@ export function PantallaDetallePagoFijo({
   alAbrirSuscripciones,
 }: {
   programadoId: string;
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   /** Tras quitarlo: recibe la confirmación («Listo: quité renta.») y regresa. */
   alQuitado: (confirmacion: string) => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
@@ -69,7 +70,11 @@ export function PantallaDetallePagoFijo({
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Encabezado titulo={TITULO_PAGOS_FIJOS} alVolver={alVolver} testID="pago-detalle" />
+        <Encabezado
+          titulo={TITULO_PAGOS_FIJOS}
+          {...(alVolver ? { alVolver } : {})}
+          testID="pago-detalle"
+        />
         <EstadoVacio texto={TEXTO_PAGO_NO_ENCONTRADO} testID="pago-detalle-no-encontrado" />
       </Pantalla>
     );
@@ -128,7 +133,7 @@ export function PantallaDetallePagoFijo({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Encabezado titulo={titulo} alVolver={alVolver} testID="pago-detalle" />
+      <Encabezado titulo={titulo} {...(alVolver ? { alVolver } : {})} testID="pago-detalle" />
       <Tarjeta testID="pago-detalle-resumen">
         <Texto
           variante="etiqueta"

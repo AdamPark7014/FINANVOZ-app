@@ -12,7 +12,8 @@ export function PantallaNuevoPagoFijo({
   alVolver,
   alGuardar,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   /** Recibe la confirmación ya redactada («Listo: agregué renta. Ya lo aparto.»). */
   alGuardar: (confirmacion: string) => void;
 }) {
@@ -38,7 +39,7 @@ export function PantallaNuevoPagoFijo({
           }
         : {})}
     >
-      <Encabezado titulo={TITULO_NUEVO_PAGO} alVolver={alVolver} testID="pago-nuevo" />
+      <Encabezado titulo={TITULO_NUEVO_PAGO} {...(alVolver ? { alVolver } : {})} testID="pago-nuevo" />
       {f.encabezado}
       {f.clave !== null ? (
         <Tarjeta key={f.llave} testID="pago-nuevo-formulario">

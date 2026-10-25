@@ -12,21 +12,24 @@ export function Encabezado({
   children,
 }: {
   titulo: string;
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   testID: string;
   pistaVolver?: string;
   children?: ReactNode;
 }) {
   return (
     <>
-      <Boton
-        testID={`${testID}-volver`}
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        pista={pistaVolver}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID={`${testID}-volver`}
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          pista={pistaVolver}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID={`${testID}-titulo`} accessibilityRole="header">
         {titulo}
       </Texto>
