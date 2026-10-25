@@ -1,17 +1,19 @@
 # RELEVO
 
 - **Último turno:** cursor
-- **Fecha:** 2026-10-24
+- **Fecha:** 2026-10-25
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Oleada PLAN-UX-VOZ §3.7:** `PantallaMovimientos` con `SectionList` + `Pantalla desplazable={false}` (lista virtualizada). Mantiene totales por día, chips, por revisar y testIDs. Jest `principal.test` 31/31.
+- **Oleada PLAN-UX-VOZ §3.6:** `FilaAjuste` (título + valor + ›) en Ajustes: Respaldo, Privacidad, Ayuda, Acerca/términos e Ingreso.
+- TalkBack: Ingreso usa `ETIQUETA_CAMBIAR/CONFIGURAR` (sin cifras); wrappers `ajustes-respaldo` / `ajustes-acerca` para tests.
+- Jest: `ingreso-colchon`, `ajustes`, `privacidad`, `respaldo-nube` en verde (32).
 
 ## A medias
 
 - Teléfono, M0, legal, proxy, contador, plantillas reales.
-- Plan UX restante: barra nativa, › en Ajustes, expo-symbols (haptics ya parcial).
+- Plan UX restante: barra nativa Stack, expo-symbols (haptics ya parcial).
 
 ## Siguiente
 
@@ -24,4 +26,4 @@
 
 ## Estimación rápida
 
-Movimientos ya virtualizado. Launch-ready sigue en externos.
+PLAN-UX 3.6 y 3.7 cerrados en código. Launch-ready sigue en externos.

@@ -118,13 +118,15 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
       <Grupo titulo={GRUPO_SEGURIDAD} />
       <SeccionBloqueo />
 
-      <FilaAjuste
-        testID="ajustes-abrir-respaldo"
-        titulo={SECCION_RESPALDO}
-        valor={respaldo.textoUltimo}
-        pista={PISTA_RESPALDO}
-        alPresionar={() => router.push('/respaldo')}
-      />
+      <View testID="ajustes-respaldo">
+        <FilaAjuste
+          testID="ajustes-abrir-respaldo"
+          titulo={SECCION_RESPALDO}
+          valor={respaldo.textoUltimo}
+          pista={PISTA_RESPALDO}
+          alPresionar={() => router.push('/respaldo')}
+        />
+      </View>
 
       <FilaAjuste
         testID="ajustes-privacidad"
@@ -144,14 +146,16 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         alPresionar={() => router.push('/ayuda')}
       />
 
-      <FilaAjuste
-        testID="ajustes-terminos"
-        titulo={SECCION_ACERCA}
-        valor={TEXTO_NO_ASESORIA}
-        pista={PISTA_TERMINOS}
-        etiquetaAccesible={`${SECCION_ACERCA}. ${BTN_TERMINOS}`}
-        alPresionar={() => router.push('/terminos')}
-      />
+      <View testID="ajustes-acerca">
+        <FilaAjuste
+          testID="ajustes-terminos"
+          titulo={SECCION_ACERCA}
+          valor={TEXTO_NO_ASESORIA}
+          pista={PISTA_TERMINOS}
+          etiquetaAccesible={`${SECCION_ACERCA}. ${BTN_TERMINOS}`}
+          alPresionar={() => router.push('/terminos')}
+        />
+      </View>
 
       <Pressable
         testID="ajustes-version"
