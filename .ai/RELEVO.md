@@ -6,25 +6,22 @@
 
 ## Hecho en este turno
 
-- Flota + greps: **no hay oleada UI de padding pendiente** (solo `gap: 4` decorativo en IndicadorVoz/IconoPestana). Sin TODO/FIXME reales. Sin onboarding que pida clave de banco.
-- **Oleada día-1 (research → copy):** O1 + divulgación captura + tip O6 dejan explícito voz y **cero clave/usuario de banco**.
-- Inventario: el resto de “perfecto” está en **externos** (teléfono, M0 dominio, legal, proxy Hetzner, contador fiscal) — ver `docs/ESTADO.md` pendientes; no se cierra con más aire en pantallas.
+- Inventario: flota idle; UI padding agotado; pendientes restantes = Adam/externos.
+- **Oleada código real (PLAN-UX-VOZ §3.7):** totales por día en Movimientos (`salieron`/`entraron` en `DiaMovimientos`, copy «Salieron $X · entraron $Y», TalkBack). Jest `principal.test` 31/31.
 
 ## A medias
 
-- Validación en TestFlight 4 / Play 2.
-- Proxy Hetzner; M0 (dominio, lista, aviso); revisión legal; `config/fiscal` contador.
+- Teléfono (TestFlight/Play), M0 dominio/Supabase, legal, proxy Hetzner, contador fiscal, plantillas reales.
 
 ## Siguiente
 
-1. Adam en teléfono: loop voz + captura + Hoy.
-2. Externos M0/M13 (no otra pasada de UI).
-3. Solo más código si el teléfono revela un bug concreto.
+1. Adam: teléfono + sentada 1 M0 (`docs/LANZAMIENTO.md`).
+2. Más código solo con bug del teléfono o ítem concreto del plan (barra nativa, SectionList, haptics/symbols).
 
 ## No tocar
 
-- Solo `main`. Facturar / planeta / open banking con password sin spec. Credenciales fuera del repo.
+- Solo `main`. Facturar/planeta/open banking con password sin spec.
 
 ## Estimación rápida
 
-Código UI/voz ~cerrado para v1. Perfecto de producto = validación real + tienda, no más oleadas de padding.
+Código v1 ~cerrado; esta oleada cierra un hueco UX de lista. Launch-ready sigue en externos.

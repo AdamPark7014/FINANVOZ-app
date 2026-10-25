@@ -40,6 +40,10 @@ export interface DiaMovimientos {
   /** "11 oct" */
   readonly etiqueta: string;
   readonly movimientos: readonly MovimientoVista[];
+  /** Suma de montos con sentido salida ese día (`02 §10` / PLAN-UX 3.7). */
+  readonly salieron: Centavos;
+  /** Suma de montos con sentido entrada ese día. */
+  readonly entraron: Centavos;
 }
 
 export interface FiltroMovimientos {
@@ -183,8 +187,23 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
   const dias: DiaMovimientos[] = [];
   for (const m of vistas) {
     const ultimo = dias[dias.length - 1];
-    if (ultimo && ultimo.fecha === m.fecha) (ultimo.movimientos as MovimientoVista[]).push(m);
-    else dias.push({ fecha: m.fecha, etiqueta: etiquetaDiaMes(m.fecha), movimientos: [m] });
+    if (ultimo && ultimo.fecha === m.fecha) {
+      (ultimo.movimientos as MovimientoVista[]).push(m);
+    } else {
+      dias.push({
+        fecha: m.fecha,
+        etiqueta: etiquetaDiaMes(m.fecha),
+        movimientos: [m],
+        salieron: 0 as Centavos,
+        entraron: 0 as Centavos,
+      });
+    }
+    const dia = dias[dias.length - 1]!;
+    if (m.sentido === 'salida') {
+      (dia as { salieron: Centavos }).salieron = (dia.salieron + m.monto) as Centavos;
+    } else if (m.sentido === 'entrada') {
+      (dia as { entraron: Centavos }).entraron = (dia.entraron + m.monto) as Centavos;
+    }
   }
   return dias;
 }

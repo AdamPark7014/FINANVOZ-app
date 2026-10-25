@@ -22,6 +22,7 @@ import {
   espacio,
   etiquetaHablada,
   cifraEnPalabras,
+  formatearCentavos,
   Pantalla,
   Tarjeta,
   Texto,
@@ -53,7 +54,8 @@ import {
   nombreTipoLibro,
   resumenMovimiento,
   PREGUNTA_PASAR_A_MESES,
-  etiquetaEncabezadoDiaMovimientos,
+  etiquetaEncabezadoDiaConTotales,
+  resumenDiaMovimientos,
   etiquetaFiltroMovimientosActivo,
   etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
@@ -295,17 +297,34 @@ export function PantallaMovimientos({
         />
       ) : null}
 
-      {dias.map((d) => (
+      {dias.map((d) => {
+        const resumen = resumenDiaMovimientos(
+          d.salieron > 0 ? formatearCentavos(d.salieron) : null,
+          d.entraron > 0 ? formatearCentavos(d.entraron) : null,
+        );
+        return (
         <View key={d.fecha} style={{ gap: espacio.m, marginTop: espacio.s }}>
-          <Texto
-            variante="etiqueta"
-            tono="acento"
-            accessibilityRole="header"
-            accessibilityLabel={etiquetaEncabezadoDiaMovimientos(d.etiqueta)}
-            testID={`movimientos-dia-${d.fecha}`}
-          >
-            {d.etiqueta}
-          </Texto>
+          <View style={{ gap: espacio.xs }}>
+            <Texto
+              variante="etiqueta"
+              tono="acento"
+              accessibilityRole="header"
+              accessibilityLabel={etiquetaEncabezadoDiaConTotales(d.etiqueta, resumen)}
+              testID={`movimientos-dia-${d.fecha}`}
+            >
+              {d.etiqueta}
+            </Texto>
+            {resumen ? (
+              <Texto
+                variante="secundario"
+                testID={`movimientos-dia-total-${d.fecha}`}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              >
+                {resumen}
+              </Texto>
+            ) : null}
+          </View>
           <View accessibilityRole="list" testID={`movimientos-lista-${d.fecha}`} style={{ gap: espacio.m }}>
             {d.movimientos.map((m) => (
               <View key={m.id} role="listitem" testID={`movimiento-fila-${m.id}`}>
@@ -358,7 +377,8 @@ export function PantallaMovimientos({
             ))}
           </View>
         </View>
-      ))}
+        );
+      })}
       <View style={{ height: espacio.xxxl }} />
     </Pantalla>
   );

@@ -30,7 +30,8 @@ import {
   etiquetaVacioCuentasCompromisos,
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
-  etiquetaEncabezadoDiaMovimientos,
+  etiquetaEncabezadoDiaConTotales,
+  resumenDiaMovimientos,
   etiquetaFiltroMovimientosActivo,
   etiquetaIntroPorRevisar,
   etiquetaVacioMovimientos,
@@ -668,10 +669,18 @@ describe('Movimientos', () => {
     const dia = listarMovimientos(p.ctx)[0]?.fecha;
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp('accessibilityRole', 'header');
+    const diaVista = listarMovimientos(p.ctx)[0]!;
+    const resumenDia = resumenDiaMovimientos(
+      diaVista.salieron > 0 ? formatearCentavos(diaVista.salieron) : null,
+      diaVista.entraron > 0 ? formatearCentavos(diaVista.entraron) : null,
+    );
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp(
       'accessibilityLabel',
-      etiquetaEncabezadoDiaMovimientos(listarMovimientos(p.ctx)[0]?.etiqueta ?? ''),
+      etiquetaEncabezadoDiaConTotales(diaVista.etiqueta, resumenDia),
     );
+    if (resumenDia) {
+      expect(screen.getByTestId(`movimientos-dia-total-${dia}`)).toHaveTextContent(resumenDia);
+    }
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`)).toHaveProp(
@@ -815,5 +824,14 @@ describe('Movimientos', () => {
     expect(alAbrirPersona).toHaveBeenCalledWith(caro);
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
     expect(mov?.personas).toEqual([{ id: caro, nombre: 'Caro' }]);
+  });
+});
+
+describe('resumenDiaMovimientos', () => {
+  it('arma salidas, entradas o ambas sin tecnicismos', () => {
+    expect(resumenDiaMovimientos('$80.00', null)).toBe('Salieron $80.00');
+    expect(resumenDiaMovimientos(null, '$1,200.00')).toBe('Entraron $1,200.00');
+    expect(resumenDiaMovimientos('$80.00', '$1,200.00')).toBe('Salieron $80.00 · entraron $1,200.00');
+    expect(resumenDiaMovimientos(null, null)).toBeNull();
   });
 });

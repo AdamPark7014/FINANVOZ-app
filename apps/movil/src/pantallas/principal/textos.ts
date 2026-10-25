@@ -473,6 +473,27 @@ export function etiquetaEncabezadoDiaMovimientos(etiquetaVisible: string): strin
   return etiquetaHablada(`Movimientos del ${etiquetaVisible}`);
 }
 
+/**
+ * Totales del día bajo el encabezado (PLAN-UX-VOZ §3.7): salidas y entradas en lenguaje llano.
+ * `null` si ese día solo tiene movimientos neutros (transferencias, conciliaciones).
+ */
+export function resumenDiaMovimientos(salieronFmt: string | null, entraronFmt: string | null): string | null {
+  if (salieronFmt && entraronFmt) return `Salieron ${salieronFmt} · entraron ${entraronFmt}`;
+  if (salieronFmt) return `Salieron ${salieronFmt}`;
+  if (entraronFmt) return `Entraron ${entraronFmt}`;
+  return null;
+}
+
+/** TalkBack del encabezado + totales del día. */
+export function etiquetaEncabezadoDiaConTotales(
+  etiquetaVisible: string,
+  resumen: string | null,
+): string {
+  return etiquetaHablada(
+    resumen ? `Movimientos del ${etiquetaVisible}. ${resumen}` : `Movimientos del ${etiquetaVisible}`,
+  );
+}
+
 /** Lista vacía en Movimientos: pestaña + copy para TalkBack (`02 §15`). */
 export function etiquetaVacioMovimientos(conFiltro: boolean): string {
   const copy = conFiltro ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO;
