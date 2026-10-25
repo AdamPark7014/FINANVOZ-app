@@ -228,8 +228,8 @@ describe('ajustes', () => {
     expect(r.getPathname()).toBe('/ayuda');
     expect(screen.getByText('¿Cómo calculas mi «hoy puedes»?')).toBeTruthy();
     expect(screen.getByTestId('ayuda-escribir')).toBeTruthy();
-    fireEvent.press(screen.getByTestId('ayuda-volver'));
-    expect(r.getPathname()).toBe('/ajustes');
+    // Barra nativa (`PLAN-UX` 3.3): ya no hay «Volver» en el contenido.
+    expect(screen.queryByTestId('ayuda-volver')).toBeNull();
   });
 
   it('los avisos de tanda, compromiso sin cubrir e ingreso que no llegó se apagan desde Ajustes › Avisos', () => {

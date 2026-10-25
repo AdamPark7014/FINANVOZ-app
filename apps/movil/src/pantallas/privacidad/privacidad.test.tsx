@@ -20,7 +20,6 @@ import { abrirSesion, borrarTodoApp } from '../../servicios/sesion';
 import { compartirArchivo } from '../ajustes/compartir';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import {
-  ACCESIBILIDAD_VOLVER,
   etiquetaAccesibleIntroPrivacidad,
   MENSAJE_NO_EXPORTAR,
   PISTA_BORRAR_CANCELAR,
@@ -30,7 +29,6 @@ import {
   PISTA_EXPORTAR_JSON,
   PISTA_LEER_AVISO,
   PISTA_LEER_TERMINOS,
-  PISTA_VOLVER,
 } from './textos';
 
 /** La raíz real con la apertura nativa sustituida (igual que `ajustes.test.tsx`). */
@@ -106,9 +104,8 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     fireEvent.press(screen.getByTestId('ajustes-privacidad'));
     expect(r.getPathname()).toBe('/privacidad');
     expect(screen.getByText('Tu privacidad')).toBeTruthy();
-    expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityRole', 'button');
-    expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityLabel', ACCESIBILIDAD_VOLVER);
-    expect(screen.getByTestId('privacidad-volver')).toHaveProp('accessibilityHint', PISTA_VOLVER);
+    // Barra nativa (`PLAN-UX` 3.3): ya no hay «Volver» en el contenido.
+    expect(screen.queryByTestId('privacidad-volver')).toBeNull();
     expect(screen.getByTestId('privacidad-intro')).toHaveProp(
       'accessibilityLabel',
       etiquetaAccesibleIntroPrivacidad(),

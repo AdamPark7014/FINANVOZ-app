@@ -36,7 +36,8 @@ export function PantallaAyuda({
   alVolver,
   abrirEnlace = (url) => Linking.openURL(url),
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   /** Inyectable en pruebas; por omisión `Linking.openURL`. */
   abrirEnlace?: (url: string) => Promise<unknown>;
 }) {
@@ -54,15 +55,17 @@ export function PantallaAyuda({
 
   return (
     <View style={{ gap: espacio.xl }}>
-      <Boton
-        testID="ayuda-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
-        pista={PISTA_VOLVER}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="ayuda-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+          pista={PISTA_VOLVER}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="ayuda-titulo" accessibilityRole="header">
         {TITULO}
       </Texto>

@@ -75,7 +75,8 @@ export function CentroPrivacidad({
   alBorrarTodo,
   alRestaurar,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alLeerAviso: () => void;
   alLeerTerminos: () => void;
   /** La raíz cierra la base, destruye la llave y vuelve al onboarding. */
@@ -134,15 +135,17 @@ export function CentroPrivacidad({
 
   return (
     <View style={{ gap: espacio.xl }}>
-      <Boton
-        testID="privacidad-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
-        pista={PISTA_VOLVER}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="privacidad-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+          pista={PISTA_VOLVER}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto testID="privacidad-titulo" variante="titulo" accessibilityRole="header">
         {TITULO_PRIVACIDAD}
       </Texto>

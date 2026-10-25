@@ -56,7 +56,8 @@ export function PantallaRespaldo({
   alVolver,
   alRestaurar,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alRestaurar: () => void;
 }) {
   const nube = useControlApp().respaldo?.nube ?? null;
@@ -65,15 +66,17 @@ export function PantallaRespaldo({
   const [desdeArchivo, setDesdeArchivo] = useState(0);
   return (
     <>
-      <Boton
-        testID="respaldo-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        etiquetaAccesible={ACCESIBILIDAD_VOLVER}
-        pista={PISTA_VOLVER}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="respaldo-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          etiquetaAccesible={ACCESIBILIDAD_VOLVER}
+          pista={PISTA_VOLVER}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="respaldo-titulo" accessibilityRole="header">
         {TITULO_RESPALDO}
       </Texto>
