@@ -141,11 +141,14 @@ export function PantallaArqueo({
   cuentaId,
   efectivoInicial,
   alCerrar,
+  mostrarCerrar = true,
 }: {
   cuentaId?: string;
   /** "Traigo 300": la cantidad dicha ya escrita. */
   efectivoInicial?: Centavos;
   alCerrar: () => void;
+  /** Si es false, la ruta usa la barra nativa (`PLAN-UX` 3.3); alCerrar sigue para Listo/confirm. */
+  mostrarCerrar?: boolean;
 }) {
   const vista = useVista((ctx) => {
     try {
@@ -172,15 +175,17 @@ export function PantallaArqueo({
         <Texto testID="arqueo-titulo" variante="titulo" accessibilityRole="header">
           {TITULO}
         </Texto>
-        <Boton
-          etiqueta={CERRAR}
-          etiquetaAccesible={ACCESIBILIDAD_CERRAR}
-          pista={PISTA_CERRAR}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alCerrar}
-          testID="boton-cerrar-arqueo"
-        />
+        {mostrarCerrar ? (
+          <Boton
+            etiqueta={CERRAR}
+            etiquetaAccesible={ACCESIBILIDAD_CERRAR}
+            pista={PISTA_CERRAR}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alCerrar}
+            testID="boton-cerrar-arqueo"
+          />
+        ) : null}
       </View>
       {vista ? (
         <Arqueo

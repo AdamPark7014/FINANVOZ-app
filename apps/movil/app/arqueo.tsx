@@ -1,7 +1,8 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { tomarPrellenado } from '../src/asistente/flujos';
-import { PantallaArqueo, tomarEfectivoPendiente } from '../src/pantallas/arqueo';
+import { PantallaArqueo, TITULO_ARQUEO, tomarEfectivoPendiente } from '../src/pantallas/arqueo';
+import { opcionesBarraNativa } from '../src/ui/navegacion';
 
 /** Arqueo de efectivo (`02 §7`): desde Hoy, desde Cuentas → Efectivo o diciendo "traigo 300". */
 export default function Arqueo() {
@@ -11,10 +12,14 @@ export default function Arqueo() {
   // «Cambiar algo» del arqueo por voz deja lo dicho; si no, la cantidad de «traigo 300» de siempre.
   const [inicial] = useState(() => tomarPrellenado('arqueo')?.efectivoReal ?? tomarEfectivoPendiente());
   return (
-    <PantallaArqueo
-      {...(typeof cuenta === 'string' && cuenta !== '' ? { cuentaId: cuenta } : {})}
-      {...(inicial !== null ? { efectivoInicial: inicial } : {})}
-      alCerrar={() => (router.canGoBack() ? router.back() : router.navigate('/hoy'))}
-    />
+    <>
+      <Stack.Screen options={opcionesBarraNativa(TITULO_ARQUEO)} />
+      <PantallaArqueo
+        {...(typeof cuenta === 'string' && cuenta !== '' ? { cuentaId: cuenta } : {})}
+        {...(inicial !== null ? { efectivoInicial: inicial } : {})}
+        alCerrar={() => (router.canGoBack() ? router.back() : router.navigate('/hoy'))}
+        mostrarCerrar={false}
+      />
+    </>
   );
 }

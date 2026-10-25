@@ -93,7 +93,8 @@ export function PantallaPersona({
   compartir = compartirSistema,
 }: {
   personaId: string;
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   compartir?: Compartir;
 }) {
   const existe = useVista((ctx) => listarPersonas(ctx).some((p) => p.cuentaId === personaId));
@@ -104,14 +105,16 @@ export function PantallaPersona({
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          testID="persona-volver"
-          etiqueta={ETIQUETA_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alVolver}
-          pista={PISTA_VOLVER}
-        />
+        {alVolver ? (
+          <Boton
+            testID="persona-volver"
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER}
+          />
+        ) : null}
         <EstadoVacio
           texto={TEXTO_PERSONA_NO_ENCONTRADA}
           testID="persona-no-encontrada"
@@ -120,7 +123,7 @@ export function PantallaPersona({
       </Pantalla>
     );
   }
-  return <Detalle personaId={personaId} alVolver={alVolver} compartir={compartir} />;
+  return <Detalle personaId={personaId} {...(alVolver ? { alVolver } : {})} compartir={compartir} />;
 }
 
 function Detalle({
@@ -129,7 +132,7 @@ function Detalle({
   compartir,
 }: {
   personaId: string;
-  alVolver: () => void;
+  alVolver?: () => void;
   compartir: Compartir;
 }) {
   const { ctx } = useSesion();
@@ -157,14 +160,16 @@ function Detalle({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="persona-volver"
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-      />
+      {alVolver ? (
+        <Boton
+          testID="persona-volver"
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
+      ) : null}
       <Texto variante="titulo" testID="persona-nombre" accessibilityRole="header">
         {d.nombre}
       </Texto>

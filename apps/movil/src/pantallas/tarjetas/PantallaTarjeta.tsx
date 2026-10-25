@@ -75,7 +75,8 @@ export function PantallaTarjeta({
   alLeerEstadoPdf,
 }: {
   tarjetaId: string;
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   /** "Leer el PDF de tu banco" (`02 §26`); sin él no se ofrece. */
   alLeerEstadoPdf?: (() => void) | undefined;
 }) {
@@ -88,14 +89,16 @@ export function PantallaTarjeta({
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          testID="tarjeta-volver"
-          etiqueta={BTN_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alVolver}
-          pista={PISTA_VOLVER}
-        />
+        {alVolver ? (
+          <Boton
+            testID="tarjeta-volver"
+            etiqueta={BTN_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER}
+          />
+        ) : null}
         <Texto
           variante="cuerpo"
           tono="secundario"
@@ -107,7 +110,13 @@ export function PantallaTarjeta({
       </Pantalla>
     );
   }
-  return <Detalle tarjetaId={tarjetaId} alVolver={alVolver} alLeerEstadoPdf={alLeerEstadoPdf} />;
+  return (
+    <Detalle
+      tarjetaId={tarjetaId}
+      {...(alVolver ? { alVolver } : {})}
+      alLeerEstadoPdf={alLeerEstadoPdf}
+    />
+  );
 }
 
 function Detalle({
@@ -116,7 +125,7 @@ function Detalle({
   alLeerEstadoPdf,
 }: {
   tarjetaId: string;
-  alVolver: () => void;
+  alVolver?: () => void;
   alLeerEstadoPdf: (() => void) | undefined;
 }) {
   const d = useVista((ctx) => detalleTarjeta(ctx, tarjetaId));
@@ -130,14 +139,16 @@ function Detalle({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        testID="tarjeta-volver"
-        etiqueta={BTN_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-      />
+      {alVolver ? (
+        <Boton
+          testID="tarjeta-volver"
+          etiqueta={BTN_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+        />
+      ) : null}
       <View style={{ gap: espacio.s }}>
         <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">
           {d.nombre}

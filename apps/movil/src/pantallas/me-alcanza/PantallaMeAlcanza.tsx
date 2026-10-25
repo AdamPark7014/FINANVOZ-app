@@ -132,6 +132,7 @@ function useAnunciarEstado(estado: Estado) {
 export function PantallaMeAlcanza({
   consultaInicial,
   alCerrar,
+  mostrarCerrar = true,
   alVerMovimientos,
   calcular = meAlcanza,
   bloques,
@@ -139,6 +140,8 @@ export function PantallaMeAlcanza({
   /** La consulta dicha ("¿me alcanza para unos tenis de 1,500?"): se calcula al abrir. */
   consultaInicial?: ConsultaMeAlcanza;
   alCerrar: () => void;
+  /** Si es false, la ruta usa la barra nativa (`PLAN-UX` 3.3); alCerrar sigue para Listo/confirm. */
+  mostrarCerrar?: boolean;
   /** "Cómo lo calculé" → los movimientos que usé. */
   alVerMovimientos?: () => void;
   calcular?: CalcularMeAlcanza;
@@ -260,14 +263,16 @@ export function PantallaMeAlcanza({
         <Texto variante="titulo" testID="me-alcanza-encabezado" accessibilityRole="header" style={{ flex: 1 }}>
           {TITULO}
         </Texto>
-        <Boton
-          etiqueta={BTN_CERRAR}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alCerrar}
-          etiquetaAccesible={ACCESIBILIDAD_CERRAR}
-          testID="boton-cerrar-me-alcanza"
-        />
+        {mostrarCerrar ? (
+          <Boton
+            etiqueta={BTN_CERRAR}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alCerrar}
+            etiquetaAccesible={ACCESIBILIDAD_CERRAR}
+            testID="boton-cerrar-me-alcanza"
+          />
+        ) : null}
       </View>
 
       {estado.tipo === 'formulario' ? (
