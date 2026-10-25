@@ -4,12 +4,12 @@ import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import {
-  BTN_AYUDA,
-  BTN_PRIVACIDAD,
-  BTN_RESPALDAR_RESTAURAR,
   BTN_TERMINOS,
   ETIQUETA_VOLVER,
   PISTA_AYUDA,
+  PISTA_PRIVACIDAD,
+  PISTA_RESPALDO,
+  PISTA_TERMINOS,
   PISTA_VOLVER,
   SECCION_ACERCA,
   SECCION_AYUDA,
@@ -42,7 +42,7 @@ import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
 import { obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
-import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../src/ui';
+import { Boton, espacio, FilaAjuste, Pantalla, Tarjeta, Texto } from '../src/ui';
 
 const TOQUES_MENU_DEV = 7;
 
@@ -118,61 +118,40 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
       <Grupo titulo={GRUPO_SEGURIDAD} />
       <SeccionBloqueo />
 
-      <Tarjeta testID="ajustes-respaldo">
-        <Texto variante="subtitulo">{SECCION_RESPALDO}</Texto>
-        <Texto variante="secundario" tono={respaldo.pendiente ? 'faltante' : 'secundario'}>
-          {respaldo.textoUltimo}
-        </Texto>
-        <Boton
-          testID="ajustes-abrir-respaldo"
-          variante="secundario"
-          etiqueta={BTN_RESPALDAR_RESTAURAR}
-          alPresionar={() => router.push('/respaldo')}
-        />
-      </Tarjeta>
+      <FilaAjuste
+        testID="ajustes-abrir-respaldo"
+        titulo={SECCION_RESPALDO}
+        valor={respaldo.textoUltimo}
+        pista={PISTA_RESPALDO}
+        alPresionar={() => router.push('/respaldo')}
+      />
 
-      <Tarjeta>
-        <Texto variante="subtitulo">{SECCION_PRIVACIDAD}</Texto>
-        <Texto variante="secundario" tono="secundario">
-          {TEXTO_PRIVACIDAD}
-        </Texto>
-        <Boton
-          testID="ajustes-privacidad"
-          variante="secundario"
-          etiqueta={BTN_PRIVACIDAD}
-          alPresionar={() => router.push('/privacidad')}
-        />
-      </Tarjeta>
+      <FilaAjuste
+        testID="ajustes-privacidad"
+        titulo={SECCION_PRIVACIDAD}
+        valor={TEXTO_PRIVACIDAD}
+        pista={PISTA_PRIVACIDAD}
+        alPresionar={() => router.push('/privacidad')}
+      />
 
       <Grupo titulo={GRUPO_AYUDA} />
       <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
-      <Tarjeta testID="ajustes-ayuda">
-        <Texto variante="subtitulo">{SECCION_AYUDA}</Texto>
-        <Texto variante="secundario" tono="secundario">
-          {TEXTO_AYUDA}
-        </Texto>
-        <Boton
-          testID="ajustes-abrir-ayuda"
-          variante="secundario"
-          etiqueta={BTN_AYUDA}
-          pista={PISTA_AYUDA}
-          alPresionar={() => router.push('/ayuda')}
-        />
-      </Tarjeta>
+      <FilaAjuste
+        testID="ajustes-abrir-ayuda"
+        titulo={SECCION_AYUDA}
+        valor={TEXTO_AYUDA}
+        pista={PISTA_AYUDA}
+        alPresionar={() => router.push('/ayuda')}
+      />
 
-      <Tarjeta testID="ajustes-acerca">
-        <Texto variante="subtitulo">{SECCION_ACERCA}</Texto>
-        <Texto variante="secundario" tono="secundario">
-          {TEXTO_NO_ASESORIA}
-        </Texto>
-        <Boton
-          testID="ajustes-terminos"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_TERMINOS}
-          alPresionar={() => router.push('/terminos')}
-        />
-      </Tarjeta>
+      <FilaAjuste
+        testID="ajustes-terminos"
+        titulo={SECCION_ACERCA}
+        valor={TEXTO_NO_ASESORIA}
+        pista={PISTA_TERMINOS}
+        etiquetaAccesible={`${SECCION_ACERCA}. ${BTN_TERMINOS}`}
+        alPresionar={() => router.push('/terminos')}
+      />
 
       <Pressable
         testID="ajustes-version"

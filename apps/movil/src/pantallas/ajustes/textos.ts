@@ -86,6 +86,9 @@ export const SECCION_PRIVACIDAD = 'Privacidad';
 export const TEXTO_PRIVACIDAD =
   'Qué se guarda, qué sale de tu teléfono y a quién, tus permisos, descargar o borrar tus datos.';
 export const BTN_PRIVACIDAD = 'Abrir el centro de privacidad';
+export const PISTA_PRIVACIDAD = 'Abre el centro de privacidad';
+export const PISTA_RESPALDO = 'Abre respaldar y restaurar';
+export const PISTA_TERMINOS = 'Abre los términos de uso';
 
 export {
   BTN_ABRIR_DESDE_AJUSTES as BTN_AYUDA,
