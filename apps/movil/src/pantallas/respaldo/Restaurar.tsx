@@ -57,7 +57,7 @@ type Paso =
  * Antes de tocar la base, el respaldo se descifra, se valida y se ensaya en memoria; contraseña equivocada y
  * archivo dañado dan el mismo mensaje, a propósito.
  */
-export function Restaurar({ alVolver }: { alVolver: () => void }) {
+export function Restaurar({ alVolver }: { alVolver?: () => void }) {
   const respaldo = useControlApp().respaldo;
   const nube = respaldo?.nube ?? null;
   const { reidentificar } = usePlanTienda();
@@ -129,16 +129,18 @@ export function Restaurar({ alVolver }: { alVolver: () => void }) {
 
   return (
     <>
-      <Boton
-        testID="restaurar-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        etiquetaAccesible={ACCESIBILIDAD_VOLVER_RESTAURAR}
-        pista={PISTA_VOLVER_RESTAURAR}
-        deshabilitado={trabajando}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="restaurar-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          etiquetaAccesible={ACCESIBILIDAD_VOLVER_RESTAURAR}
+          pista={PISTA_VOLVER_RESTAURAR}
+          deshabilitado={trabajando}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="restaurar-titulo" accessibilityRole="header">
         {TITULO_RESTAURAR}
       </Texto>

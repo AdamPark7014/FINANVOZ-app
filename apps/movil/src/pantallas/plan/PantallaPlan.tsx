@@ -56,7 +56,7 @@ type Ofertas = { tipo: 'cargando' } | { tipo: 'listas'; ofertas: readonly Oferta
  * vistas se refrescan. En Gratis nada se bloquea: aquí solo se ofrece el análisis de Plus. En una build de prueba
  * sin tienda («Plus de prueba») solo dice que es una prueba sin cobro y lo que incluye.
  */
-export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
+export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
   const { ctx, refrescar } = useSesion();
   const { compras } = usePlanTienda();
   const vista = useVista(obtenerPlan);
@@ -131,14 +131,16 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          etiqueta={ETIQUETA_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alVolver}
-          pista={PISTA_VOLVER}
-          testID={ID.volver}
-        />
+        {alVolver ? (
+          <Boton
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER}
+            testID={ID.volver}
+          />
+        ) : null}
         <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
           {TITULO_PANTALLA}
         </Texto>
@@ -185,14 +187,16 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Boton
-          etiqueta={ETIQUETA_VOLVER}
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alVolver}
-          pista={PISTA_VOLVER}
-          testID={ID.volver}
-        />
+        {alVolver ? (
+          <Boton
+            etiqueta={ETIQUETA_VOLVER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVolver}
+            pista={PISTA_VOLVER}
+            testID={ID.volver}
+          />
+        ) : null}
         <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
           {TITULO_PANTALLA}
         </Texto>
@@ -225,14 +229,16 @@ export function PantallaPlan({ alVolver }: { alVolver: () => void }) {
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Boton
-        etiqueta={ETIQUETA_VOLVER}
-        variante="texto"
-        ancho="contenido"
-        alPresionar={alVolver}
-        pista={PISTA_VOLVER}
-        testID={ID.volver}
-      />
+      {alVolver ? (
+        <Boton
+          etiqueta={ETIQUETA_VOLVER}
+          variante="texto"
+          ancho="contenido"
+          alPresionar={alVolver}
+          pista={PISTA_VOLVER}
+          testID={ID.volver}
+        />
+      ) : null}
       <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
         {TITULO_PANTALLA}
       </Texto>

@@ -23,7 +23,8 @@ export function EditarIngreso({
   alVolver,
   alGuardar,
 }: {
-  alVolver: () => void;
+  /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
+  alVolver?: () => void;
   alGuardar: (confirmacion: string) => void;
 }) {
   const { ctx, refrescar } = useSesion();
@@ -57,14 +58,16 @@ export function EditarIngreso({
         />
       }
     >
-      <Boton
-        testID="editar-ingreso-volver"
-        variante="texto"
-        ancho="contenido"
-        etiqueta={ETIQUETA_VOLVER}
-        pista={PISTA_VOLVER}
-        alPresionar={alVolver}
-      />
+      {alVolver ? (
+        <Boton
+          testID="editar-ingreso-volver"
+          variante="texto"
+          ancho="contenido"
+          etiqueta={ETIQUETA_VOLVER}
+          pista={PISTA_VOLVER}
+          alPresionar={alVolver}
+        />
+      ) : null}
       <Texto variante="titulo" testID="editar-ingreso-titulo" accessibilityRole="header">
         {TITULO_EDITAR}
       </Texto>

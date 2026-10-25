@@ -231,15 +231,15 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     );
   });
 
-  it('Volver sale sin guardar', () => {
+  it('barra nativa: sin Volver en contenido; cambiar sin guardar deja lo anterior', () => {
     mockPreparar = conQuincena;
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     const ctx = ctxInicial();
     const antes = obtenerAjustes(ctx).ingreso;
     tocar('ajustes-cambiar-ingreso');
     tocar('editar-ingreso-frecuencia-varia');
-    tocar('editar-ingreso-volver');
-    expect(r.getPathname()).toBe('/ajustes');
+    expect(screen.queryByTestId('editar-ingreso-volver')).toBeNull();
+    expect(r.getPathname()).toBe('/ajustes/ingreso');
     expect(obtenerAjustes(ctx).ingreso).toEqual(antes);
     expect(screen.queryByTestId('ajustes-ingreso-confirmacion')).toBeNull();
   });

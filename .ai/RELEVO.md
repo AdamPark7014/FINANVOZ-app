@@ -6,17 +6,17 @@
 
 ## Hecho en este turno
 
-- **PLAN-UX §3.6** `FilaAjuste` (Ajustes).
-- **PLAN-UX §3.3** barra nativa en: `terminos`, `aviso-privacidad`, `ayuda`, `privacidad`, `respaldo` (`opcionesBarraNativa`; `alVolver` opcional en pantallas). Jest 53 verdes en suites tocadas.
+- **PLAN-UX §3.3** más pantallas con `opcionesBarraNativa`: `plan`, `restaurar`, `ajustes/ingreso` (además de términos, aviso, ayuda, privacidad, respaldo).
+- `alVolver` opcional en `PantallaPlan`, `Restaurar`, `EditarIngreso`. Jest ingreso-colchon / plan / respaldo-ui en verde.
 
 ## A medias
 
-- Barra nativa: plan, persona, tandas, compartido, deducciones, suscripciones, restaurar, ingreso, etc. Fallback sin historial.
+- Barra nativa restante: persona, tandas, compartido, deducciones, suscripciones, tarjetas, cuentas, me-alcanza, arqueo, etc. Fallback sin historial en header.
 - Teléfono, M0, legal, proxy, contador, plantillas; expo-symbols.
 
 ## Siguiente
 
-1. Seguir migrando pantallas restantes a barra nativa.
+1. Seguir migrando pantallas con Volver a barra nativa.
 2. Adam en teléfono + LANZAMIENTO sentada 1.
 
 ## No tocar
@@ -25,4 +25,4 @@
 
 ## Estimación rápida
 
-Ajustes lista + 5 pantallas con header nativo. Launch-ready sigue en externos.
+~8 pantallas con header nativo. Launch-ready sigue en externos.
