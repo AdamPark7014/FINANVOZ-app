@@ -6,19 +6,18 @@
 
 ## Hecho en este turno
 
-- **Oleada PLAN-UX-VOZ §3.6:** `FilaAjuste` (título + valor + ›) en Ajustes: Respaldo, Privacidad, Ayuda, Acerca/términos e Ingreso.
-- TalkBack: Ingreso usa `ETIQUETA_CAMBIAR/CONFIGURAR` (sin cifras); wrappers `ajustes-respaldo` / `ajustes-acerca` para tests.
-- Jest: `ingreso-colchon`, `ajustes`, `privacidad`, `respaldo-nube` en verde (32).
+- **PLAN-UX §3.6** cerrado: `FilaAjuste` en Ajustes (Ingreso, Respaldo, Privacidad, Ayuda, Acerca). Jest 32 verdes; push `775ec5f`.
+- **PLAN-UX §3.3 arranque:** `opcionesBarraNativa` + header nativo en `terminos` y `aviso-privacidad` (sin «Volver» en contenido). PLAN-UX §6 anotado como hecho.
 
 ## A medias
 
-- Teléfono, M0, legal, proxy, contador, plantillas reales.
-- Plan UX restante: barra nativa Stack, expo-symbols (haptics ya parcial).
+- Barra nativa: falta el resto de pantallas con Volver (privacidad, respaldo, ayuda, plan, persona, tandas, etc.) y fallback si no hay historial.
+- Teléfono, M0, legal, proxy, contador, plantillas; expo-symbols.
 
 ## Siguiente
 
-1. Adam en teléfono + LANZAMIENTO sentada 1.
-2. Código: barra nativa / symbols si lo pide; si no, externos.
+1. Seguir migrando pantallas a `opcionesBarraNativa` (prioridad: privacidad, respaldo, ayuda).
+2. Adam en teléfono + LANZAMIENTO sentada 1.
 
 ## No tocar
 
@@ -26,4 +25,4 @@
 
 ## Estimación rápida
 
-PLAN-UX 3.6 y 3.7 cerrados en código. Launch-ready sigue en externos.
+3.6/3.7 listos. Barra nativa a medias (2 pantallas). Launch-ready sigue en externos.
