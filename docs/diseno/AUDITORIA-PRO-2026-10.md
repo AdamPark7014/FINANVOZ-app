@@ -49,9 +49,9 @@ Después (CI del 25-10, `7265774`; iPhone en oscuro y Android en claro):
 | H5 | Cuentas: «Efectivo / Efectivo», acciones como enlaces sueltos, vacío de «Debes» casi tan alto como una cuenta | Cuentas | Baja | Diseño | Lista con › como Ajustes, total por sección, acciones en chips. Mockup 5 |
 | H6 | Movimientos: día en verde y total en otra línea; «Por revisar» ocupa más que dos movimientos | Movimientos | Baja | Diseño | Día con total a la derecha, «Por revisar · n» en una fila. Mockup 6 |
 | H7 | «¿Cuánto llevo en comida?» contesta «es parte de Plus» aunque el nivel 0 ya lo calcula sin nube | Asistente | Media | Producto | Decidir si las consultas del nivel 0 son gratis (no cuestan IA) |
-| H8 | O3: el monto se escribe sin separador de miles («13000») y en Ajustes sale «13,000» | Onboarding | Baja | Error | Formato en vivo de `CampoMonto` también en O3 |
+| H8 | O3: el monto se escribe sin separador de miles («13000») y en Ajustes sale «13,000» | Onboarding | Baja | Error | **Corregido el 26-10**: `CampoMonto` separa los miles en vivo en los 26 campos de monto (ver ESTADO) |
 | H9 | Íconos de sistema (`expo-symbols`) pendientes (PLAN-UX 3.5) | Todo | Baja | Diseño | Lista de íconos por pantalla para aprobar |
-| H10 | Maestro de iPhone nunca ha estado en verde (flujos atrás de la Ola 7) | CI | Media | Pruebas | Flujos al día (25-10: `tocar` centrado, «¿Me alcanza?» opcional, 05 con «Enviar»); seguir hasta verde |
+| H10 | Maestro de iPhone nunca ha estado en verde (flujos atrás de la Ola 7) | CI | Media | Pruebas | 26-10: `tocar` despacio y centrado opcional (01, 03), y la app cierra el campo al mandar lo escrito (06, error de la app) |
 
 Capturas (CI del 25-10, `286f14f`; las pantallas no cambiaron el 25-10 salvo Ajustes y la bienvenida):
 

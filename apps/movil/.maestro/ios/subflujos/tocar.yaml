@@ -1,4 +1,12 @@
 # Toca un elemento con el teclado cerrado para que nunca caiga sobre una tecla. Variables: ANCLA, ID.
+#
+# Tres pasos, por lo que enseñaron las corridas de Maestro del 25 y 26-10:
+# 1. Buscar despacio (speed 20): a la velocidad por omisión el deslizamiento con inercia de iOS 26 se pasaba de largo
+#    (la tarjeta de «Debes» quedaba arriba, fuera de la pantalla).
+# 2. Centrar si se puede (opcional): en pantallas con pie fijo («Continuar»), un elemento recién aparecido abajo
+#    queda detrás del pie y el toque cae en el pie. Al final del contenido no se puede centrar: por eso es opcional
+#    (con `centerElement` obligatorio fallaban «Leer los términos de uso» y el último campo de la tarjeta).
+# 3. Si al centrar se pasó hacia arriba, volver (opcional).
 appId: com.finanvoz.app
 name: Subflujo · tocar sin teclado encima
 ---
@@ -6,11 +14,24 @@ name: Subflujo · tocar sin teclado encima
     file: cerrar-teclado.yaml
     env:
       ANCLA: ${ANCLA}
-# Centrado: si el elemento queda al borde, el pie fijo («Continuar») lo tapa y el toque cae en el pie.
+- scrollUntilVisible:
+    element:
+      id: ${ID}
+    speed: 20
+    timeout: 30000
 - scrollUntilVisible:
     element:
       id: ${ID}
     centerElement: true
-    timeout: 30000
+    speed: 20
+    timeout: 8000
+    optional: true
+- scrollUntilVisible:
+    element:
+      id: ${ID}
+    direction: UP
+    speed: 20
+    timeout: 8000
+    optional: true
 - tapOn:
     id: ${ID}

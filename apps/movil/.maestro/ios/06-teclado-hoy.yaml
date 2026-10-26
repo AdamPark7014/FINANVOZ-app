@@ -1,10 +1,10 @@
 # Toca «Registrar» SIN cerrar el teclado, como lo haría Adam. Fallaba en la 1.0.0 (3) porque el toque caía en el
-# teclado; con el arreglo de teclado de la Ola 1 debe pasar. Cuando pase en verde, quitar la etiqueta bug-conocido.
+# teclado (arreglado en la Ola 1). Después fallaba porque, con el teclado arriba, la conversación se quedaba sin alto
+# y «Registré…» no se veía: desde el 26-10 mandar lo escrito cierra el campo (BarraVoz). Ya no es fallo conocido.
 appId: com.finanvoz.app
 name: iOS · 06 Teclado no tapa «Registrar» en Hoy
 tags:
   - ios
-  - bug-conocido
 ---
 - runFlow: subflujos/onboarding-rapido.yaml
 - tapOn:
@@ -22,3 +22,5 @@ tags:
     visible:
       id: aviso
     timeout: 10000
+- assertNotVisible:
+    id: campo-registrar

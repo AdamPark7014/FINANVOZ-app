@@ -45,12 +45,15 @@ name: Subflujo · onboarding rápido
     file: cerrar-teclado.yaml
     env: { ANCLA: onb-titulo-paso }
 - takeScreenshot: o3-ingreso
+# El teclado acaba de cerrarse: se espera a que termine la animación antes de tocar el pie.
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: onb-ingreso-continuar
 - extendedWaitUntil:
     visible:
       id: onb-cuentas
-    timeout: 10000
+    timeout: 20000
 - runFlow:
     file: escribir.yaml
     env: { ANCLA: onb-titulo-paso, CAMPO: onb-efectivo, TEXTO: '600' }
@@ -58,12 +61,15 @@ name: Subflujo · onboarding rápido
     file: cerrar-teclado.yaml
     env: { ANCLA: onb-titulo-paso }
 - takeScreenshot: o4-cuentas
+# El teclado acaba de cerrarse: se espera a que termine la animación antes de tocar el pie.
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: onb-cuentas-continuar
 - extendedWaitUntil:
     visible:
       id: onb-pagos-fijos
-    timeout: 10000
+    timeout: 20000
 - takeScreenshot: o5-pagos-fijos
 - tapOn:
     id: onb-pagos-continuar

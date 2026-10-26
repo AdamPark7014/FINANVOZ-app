@@ -6,6 +6,20 @@
 
 ## Hecho en este turno
 
+- **H8 (26-10)**: `CampoMonto` separa los miles mientras se teclea en los 26 campos de monto (O3 incluido):
+  `formatearMontoTecleado` en `ui/formato.ts`; las comas que escribe la persona se respetan (nunca «12,50» → $1,250).
+  Pruebas en `formato.test.ts` (fast-check: el monto leído no cambia), `CampoMonto.test.tsx` y O3 en
+  `onboarding.test.tsx`.
+- **H10, Maestro de iPhone (26-10)**, causa de cada fallo:
+  - **06 (error de la app)**: con el teclado arriba, campo + chips + micrófono dejaban a la conversación unos 17 pt;
+    «Registrar» sí registraba, pero «Registré…» (y la tarjeta «Entendí») no se veían. Ahora mandar lo escrito cierra
+    el campo y el teclado (`BarraVoz`, prueba en `asistente.test.tsx`); 06 deja de ser fallo conocido.
+  - **03 (flujo)**: `tocar.yaml` con `centerElement` obligatorio no puede centrar lo que está al final del contenido
+    («Leer los términos de uso»): esperaba 30 s y fallaba aunque el elemento se veía.
+  - **01 (flujo)**: la tarjeta de «Debes» quedaba arriba, fuera de la pantalla: el deslizamiento a la velocidad por
+    omisión, con la inercia de iOS 26, se pasaba de largo.
+  - `tocar.yaml`: buscar despacio (speed 20), centrar si se puede (opcional) y volver hacia arriba si se pasó; el
+    onboarding rápido espera la animación del teclado antes de «Continuar».
 - **H1 de la auditoría corregido (26-10, Adam: «corrige ya el fallo… y publica un TestFlight nuevo»)**: la barra de voz
   tapaba el final de la conversación. La lista solo bajaba al cambiar el contenido; cuando la barra crecía (vuelven
   chips y micrófono tras escuchar) el alto visible se achicaba sin volver a bajar y las opciones de «No entendí»

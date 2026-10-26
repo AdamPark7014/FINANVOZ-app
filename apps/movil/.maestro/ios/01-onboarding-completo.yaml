@@ -210,12 +210,23 @@ tags:
     visible:
       id: pantalla-cuentas
     timeout: 10000
+# Despacio: a la velocidad por omisión la inercia dejaba la tarjeta arriba, fuera de la pantalla (corridas del 26-10)
 - scrollUntilVisible:
     element:
       id: 'cuenta-[0-9a-f-]{36}'
       childOf:
         id: seccion-debes-lista
-    centerElement: true
+    speed: 20
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: 'cuenta-[0-9a-f-]{36}'
+      childOf:
+        id: seccion-debes-lista
+    direction: UP
+    speed: 20
+    timeout: 8000
+    optional: true
 - tapOn:
     id: 'cuenta-[0-9a-f-]{36}'
     childOf:
