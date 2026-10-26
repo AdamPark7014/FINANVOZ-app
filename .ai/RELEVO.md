@@ -50,10 +50,12 @@
   (consultado por API). Trae la revisión de este turno salvo la flecha de Android, que no aplica a iPhone. Grupo
   interno «Equipo Finanvoz (interno)» con Adam invitado; la API con la llave de Gestor de apps no asigna testers: se
   agregan desde la consola. `ios-testflight.yml` usa el número de corrida como build.
-- **Play**: AAB 1.0.0 (versionCode 3) compilado y firmado con la llave de subida desde `343269f` (corrida
-  40287086804); copia en `C:\dev\builds\FINANVOZ\1.0.0-3\`. **No hay cuenta de servicio de Play**: subirlo a la
-  prueba interna es a mano en la consola (o crear la cuenta de servicio). La prueba interna publicada sigue siendo la
-  versión 1 del 22-10; el versionCode 2 del 23-10 se compiló pero no consta que se subiera.
+- **Play**: el que se sube es el AAB 1.0.0 (versionCode 4), con el arreglo H1, compilado y firmado con la llave de
+  subida desde `d4a140d` (corrida 40358034821, huella SHA-256 8F:67:…:05:00 comprobada); copia en
+  `C:\dev\builds\FINANVOZ\1.0.0-4\bundle\release\app-release.aab`. El 3 (`343269f`) queda superado: no subirlo.
+  **No hay cuenta de servicio de Play**: subirlo a la prueba interna es a mano en la consola (o crear la cuenta de
+  servicio). La prueba interna publicada sigue siendo la versión 1 del 22-10; los versionCode 2 y 3 se compilaron
+  pero no consta que se subieran.
 - **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
   `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
 - Secretos de firma de iOS y Android cargados en GitHub el 22-10 (nombres en `docs/tienda/`; los valores viven fuera
