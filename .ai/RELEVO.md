@@ -26,6 +26,11 @@
     Android. `compartido.test.tsx` espera hasta 10 s la sincronización (fallaba solo con la suite completa).
   - **Auditoría** en `docs/diseno/AUDITORIA-PRO-2026-10.md` + `mockups-auditoria-2026-10.html`: 6 propuestas sin
     construir, esperan el visto bueno de Adam.
+  - **Flecha de atrás en Android**: `headerTitle` como función montaba en Android una vista izquierda que escondía la
+    flecha; ahora es cadena vacía (`5518eae`).
+  - **Maestro de iPhone** (corrida 40281636346 de `e494379`): pasan 02, 04, 05, 07, 08 y 09; fallaban 01 (la tarjeta
+    de Debes quedaba a medias en pantalla) y 03 (ya no existe «Guardar horario»), corregidos después; 06 sigue
+    marcado como fallo conocido.
   - **Maestro**: `tocar.yaml` centra el elemento (el pie fijo tapaba «Agregar tarjeta» en O4), «¿Me alcanza?» es
     opcional en 02 (la build del simulador no trae compras), 05 manda la frase con «Enviar». Las capturas de tienda
     de Android usan el onboarding corto (el largo quedó atrás de la Ola 7) y toman Ajustes › Ingreso con la barra.

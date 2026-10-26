@@ -63,7 +63,8 @@ tags:
           notVisible:
             id: ajustes-avisos-permitir
           timeout: 10000
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-guardar-horario } }
+# El horario de silencio se guarda al tocar el chip (B-2b): ya no hay botón «Guardar horario»
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: 'ajustes-silencio-inicio-23:00' } }
 - extendedWaitUntil:
     visible:
       id: ajustes-avisos-mensaje

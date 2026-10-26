@@ -215,6 +215,7 @@ tags:
       id: 'cuenta-[0-9a-f-]{36}'
       childOf:
         id: seccion-debes-lista
+    centerElement: true
 - tapOn:
     id: 'cuenta-[0-9a-f-]{36}'
     childOf:
