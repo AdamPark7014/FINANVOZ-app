@@ -18,9 +18,10 @@ export const PISTA_SALIDA_SIN_HISTORIAL = 'Sale de esta pantalla';
 export function opcionesBarraNativa(c: Colores) {
   return {
     headerShown: true,
-    // Sin título en la barra (ni en iOS ni en Android): el encabezado vive en el contenido.
+    // Sin título en la barra (ni en iOS ni en Android): el encabezado vive en el contenido. Texto vacío y no una
+    // función: en Android un `headerTitle` función monta una vista a la izquierda que esconde la flecha de atrás.
     title: '',
-    headerTitle: () => null,
+    headerTitle: '',
     headerLargeTitle: false,
     headerTransparent: false,
     headerShadowVisible: false,

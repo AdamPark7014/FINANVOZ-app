@@ -68,7 +68,9 @@ export function auditar(raiz: Nodo | Nodo[] | null, opciones: OpcionesAuditoria 
     const texto = textoDe(n);
 
     if (n.type === 'Text') {
-      if (p.numberOfLines !== undefined && p.numberOfLines !== 0)
+      // Un texto vacío no tiene nada que cortar (p. ej. el título vacío que React Navigation monta en la barra de
+      // Android junto a un botón propio de atrás).
+      if (p.numberOfLines !== undefined && p.numberOfLines !== 0 && texto.trim() !== '')
         agregar('texto truncado (numberOfLines)', texto);
       if (p.ellipsizeMode !== undefined) agregar('texto truncado (ellipsizeMode)', texto);
       if (p.adjustsFontSizeToFit) agregar('texto que se encoge (adjustsFontSizeToFit)', texto);

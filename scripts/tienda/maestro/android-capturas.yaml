@@ -140,6 +140,8 @@ tags:
 - scrollUntilVisible:
     element:
       id: ajustes-privacidad
+    centerElement: true
+    timeout: 30000
 - tapOn:
     id: ajustes-privacidad
 - extendedWaitUntil:

@@ -18,7 +18,8 @@ describe('barra nativa del Stack (`PLAN-UX-VOZ` 3.3)', () => {
       expect(o.headerLargeTitle).toBe(false);
       expect(o.headerTransparent).toBe(false);
       expect(o.title).toBe('');
-      expect(o.headerTitle()).toBeNull();
+      // Cadena vacía, no función: en Android una función monta una vista izquierda que esconde la flecha.
+      expect(o.headerTitle).toBe('');
     },
   );
 

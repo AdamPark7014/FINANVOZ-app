@@ -60,8 +60,8 @@ else
   adb install -r -g "$APK"
 fi
 
-correr() { # tema
-  local tema="$1"
+correr() { # tema · devuelve el estado de Maestro (las capturas se listan aunque falle)
+  local tema="$1" estado=0
   mkdir -p "$SALIDA/$tema"
   (
     cd "$SALIDA/$tema"
@@ -69,15 +69,18 @@ correr() { # tema
     "$MAESTRO" ${ANDROID_SERIAL:+--device "$ANDROID_SERIAL"} test --include-tags capturas \
       --format junit --output "junit-$tema.xml" \
       --test-output-dir "fallos" --debug-output "registro" "$FLUJO" 2>&1 | tee "maestro-$tema.log"
-  )
+  ) || estado=$?
   echo "Capturas en $SALIDA/$tema:"
   ls -1 "$SALIDA/$tema"/*.png 2>/dev/null || echo "(ninguna)"
+  return "$estado"
 }
 
 echo "== Tema claro"
 adb shell cmd uimode night no >/dev/null
 barra_demo
-correr claro
+# Si el claro falla, el oscuro corre igual (sus capturas también sirven) y el script sale con error al final.
+estado_claro=0
+correr claro || estado_claro=$?
 
 echo "== Tema oscuro"
 adb shell cmd uimode night yes >/dev/null
@@ -87,3 +90,4 @@ correr oscuro || echo "AVISO: el lote oscuro falló (no bloquea)"
 adb shell cmd uimode night no >/dev/null
 adb shell am broadcast -a com.android.systemui.demo -e command exit >/dev/null || true
 echo "== Listo: $SALIDA"
+exit "$estado_claro"
