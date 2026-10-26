@@ -163,7 +163,9 @@ jobs:
           set -o pipefail
           xcrun simctl ui "$UDID" appearance dark
           cd "$SALIDA/oscuro"
-          maestro --device "$UDID" test --include-tags capturas --exclude-tags "bug-conocido,voz" \
+          # La app es clara aunque el teléfono esté en oscuro (02 §16): con TEMA=oscuro el onboarding rápido elige
+          # «Oscuro» en Tú › Apariencia (subflujos/tema-oscuro.yaml).
+          maestro --device "$UDID" test -e TEMA=oscuro --include-tags capturas --exclude-tags "bug-conocido,voz" \
             --format junit --output "$SALIDA/junit-oscuro.xml" \
             --test-output-dir "$SALIDA/oscuro-fallos" --debug-output "$SALIDA/oscuro-registro" \
             "$FLUJOS/ios" 2>&1 | tee "$SALIDA/maestro-oscuro.log"

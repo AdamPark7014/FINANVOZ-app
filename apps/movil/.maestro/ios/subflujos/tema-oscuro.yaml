@@ -1,0 +1,33 @@
+# Lote «oscuro» de las capturas (`maestro test -e TEMA=oscuro`). Desde el 26-10-2026 la app se ve en claro aunque el
+# teléfono esté en oscuro (02 §16): para que esas capturas sean oscuras se elige «Oscuro» en Tú › Apariencia y se
+# vuelve a Hoy, donde termina el onboarding rápido; el resto de cada flujo sigue igual que en claro.
+# El botón que cierra las opciones no termina en `-listo`: cerrar-teclado.yaml tocaría cualquier `.*-listo` visible.
+appId: com.finanvoz.app
+name: Subflujo · elegir el tema oscuro
+---
+- tapOn:
+    id: pestana-tu
+- extendedWaitUntil:
+    visible:
+      id: ajustes-titulo
+    timeout: 10000
+- runFlow: { file: tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-cambiar-apariencia } }
+- runFlow: { file: tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-apariencia-oscuro } }
+- waitForAnimationToEnd:
+    timeout: 3000
+- runFlow: { file: tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-apariencia-cerrar } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-cambiar-apariencia
+    timeout: 5000
+- scrollUntilVisible:
+    element:
+      id: ajustes-titulo
+    direction: UP
+    timeout: 30000
+- tapOn:
+    id: pestana-hoy
+- extendedWaitUntil:
+    visible:
+      id: pantalla-hoy
+    timeout: 10000

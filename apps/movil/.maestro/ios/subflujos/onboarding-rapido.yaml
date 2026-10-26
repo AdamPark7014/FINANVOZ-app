@@ -112,3 +112,9 @@ name: Subflujo · onboarding rápido
     commands:
       - tapOn:
           id: boton-aviso-entendido
+# Lote «oscuro» de las capturas (`-e TEMA=oscuro`): la app es clara aunque el teléfono esté en oscuro (02 §16), así
+# que se elige «Oscuro» en Ajustes. Sin TEMA (o con TEMA=claro) no cambia nada.
+- runFlow:
+    when:
+      true: ${typeof TEMA !== 'undefined' && TEMA === 'oscuro'}
+    file: tema-oscuro.yaml

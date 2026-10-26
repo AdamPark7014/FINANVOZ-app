@@ -6,6 +6,16 @@
 
 ## Hecho en este turno
 
+- **Tema claro por omisión (26-10, decisión de Adam para todas sus apps)**: la app se ve en claro aunque el teléfono
+  esté en oscuro; el oscuro solo si se elige. Ajustes › Apariencia (grupo «Voz y avisos», tras Widget) es una
+  `FilaAjuste` que abre aquí mismo tres chips: «Claro», «Oscuro», «Como el teléfono»; cada toque se guarda
+  (`servicios/apariencia.ts`, ajuste `apariencia`, pide consentimiento como el resto) y se aplica al momento con
+  `Appearance.setColorScheme` (`aplicarApariencia` en `ui/tema.ts`; `sistema` → `unspecified`). La raíz
+  (`app/_layout.tsx`) fija claro al cargar y aplica lo guardado al abrir la base, antes del primer render: sin
+  destello oscuro. `app.json` sigue con `userInterfaceStyle: "automatic"` (para que «Como el teléfono» funcione en
+  iOS); la pantalla de arranque ya era clara. Pruebas en `apariencia.test.ts` y `ajustes.test.tsx`; decisión en
+  `docs/ESTADO.md` y `02 §12`/`§16`. Capturas «oscuro» (Android y las dos de iOS) pasan `-e TEMA=oscuro` y el
+  onboarding rápido elige «Oscuro» (`.maestro/ios/subflujos/tema-oscuro.yaml`); sin probar todavía en Maestro real.
 - **H8 (26-10)**: `CampoMonto` separa los miles mientras se teclea en los 26 campos de monto (O3 incluido):
   `formatearMontoTecleado` en `ui/formato.ts`; las comas que escribe la persona se respetan (nunca «12,50» → $1,250).
   Pruebas en `formato.test.ts` (fast-check: el monto leído no cambia), `CampoMonto.test.tsx` y O3 en

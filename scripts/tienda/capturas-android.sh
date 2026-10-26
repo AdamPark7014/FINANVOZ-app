@@ -66,7 +66,9 @@ correr() { # tema · devuelve el estado de Maestro (las capturas se listan aunqu
   (
     cd "$SALIDA/$tema"
     # Con varios dispositivos conectados (esta PC), ANDROID_SERIAL también elige el de Maestro.
-    "$MAESTRO" ${ANDROID_SERIAL:+--device "$ANDROID_SERIAL"} test --include-tags capturas \
+    # TEMA=oscuro: la app es clara aunque el teléfono esté en oscuro (02 §16); el onboarding rápido elige «Oscuro»
+    # en Tú › Apariencia (apps/movil/.maestro/ios/subflujos/tema-oscuro.yaml).
+    "$MAESTRO" ${ANDROID_SERIAL:+--device "$ANDROID_SERIAL"} test --include-tags capturas -e TEMA="$tema" \
       --format junit --output "junit-$tema.xml" \
       --test-output-dir "fallos" --debug-output "registro" "$FLUJO" 2>&1 | tee "maestro-$tema.log"
   ) || estado=$?
