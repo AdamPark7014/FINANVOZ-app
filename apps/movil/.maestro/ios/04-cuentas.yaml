@@ -53,65 +53,83 @@ tags:
     visible:
       id: pantalla-cuentas
     timeout: 10000
-# Gastos compartidos (sin servidor en esta build: debe decir por qué)
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-compartidos } }
-- extendedWaitUntil:
-    visible:
-      id: pantalla-compartidos
-    timeout: 10000
-- takeScreenshot: compartidos
+# Gastos compartidos: sin cliente de la nube la entrada no se muestra (PLAN-UX 1.5); si está, debe decir por qué
+- runFlow: { file: subflujos/cerrar-teclado.yaml, env: { ANCLA: cuentas-titulo } }
+- scrollUntilVisible:
+    element:
+      id: boton-compartidos
+    centerElement: true
+    timeout: 8000
+    optional: true
 - runFlow:
     when:
       visible:
-        id: compartidos-escanear
+        id: boton-compartidos
     commands:
-      - tapOn:
-          id: compartidos-escanear
-      - runFlow:
-          {
-            file: subflujos/escribir.yaml,
-            env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
-          }
-      - runFlow:
-          { file: subflujos/tocar.yaml, env: { ANCLA: compartidos-titulo, ID: compartidos-abrir-escaner } }
+      - runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-compartidos } }
       - extendedWaitUntil:
           visible:
-            id: escaner-qr
+            id: pantalla-compartidos
           timeout: 10000
-      - takeScreenshot: compartidos-escaner
-      - tapOn:
-          id: escaner-cancelar
-- runFlow:
-    when:
-      visible:
-        id: compartidos-crear
-    commands:
-      - tapOn:
-          id: compartidos-crear
+      - takeScreenshot: compartidos
       - runFlow:
-          {
-            file: subflujos/escribir.yaml,
-            env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
-          }
+          when:
+            visible:
+              id: compartidos-escanear
+          commands:
+            - tapOn:
+                id: compartidos-escanear
+            - runFlow:
+                {
+                  file: subflujos/escribir.yaml,
+                  env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
+                }
+            - runFlow:
+                {
+                  file: subflujos/tocar.yaml,
+                  env: { ANCLA: compartidos-titulo, ID: compartidos-abrir-escaner },
+                }
+            - extendedWaitUntil:
+                visible:
+                  id: escaner-qr
+                timeout: 10000
+            - takeScreenshot: compartidos-escaner
+            - tapOn:
+                id: escaner-cancelar
       - runFlow:
-          { file: subflujos/tocar.yaml, env: { ANCLA: compartidos-titulo, ID: compartidos-crear-codigo } }
+          when:
+            visible:
+              id: compartidos-crear
+          commands:
+            - tapOn:
+                id: compartidos-crear
+            - runFlow:
+                {
+                  file: subflujos/escribir.yaml,
+                  env: { ANCLA: compartidos-titulo, CAMPO: compartidos-nombre, TEXTO: 'Ana' },
+                }
+            - runFlow:
+                {
+                  file: subflujos/tocar.yaml,
+                  env: { ANCLA: compartidos-titulo, ID: compartidos-crear-codigo },
+                }
+            - extendedWaitUntil:
+                visible:
+                  id: '(error-formulario|compartidos-qr)'
+                timeout: 20000
+            - takeScreenshot: compartidos-crear
+      - runFlow: subflujos/atras.yaml
+      - waitForAnimationToEnd
+      - runFlow:
+          when:
+            visible:
+              id: pantalla-compartidos
+          commands:
+            - runFlow: subflujos/atras.yaml
       - extendedWaitUntil:
           visible:
-            id: '(error-formulario|compartidos-qr)'
-          timeout: 20000
-      - takeScreenshot: compartidos-crear
-- runFlow: subflujos/atras.yaml
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      visible:
-        id: pantalla-compartidos
-    commands:
-      - runFlow: subflujos/atras.yaml
-- extendedWaitUntil:
-    visible:
-      id: pantalla-cuentas
-    timeout: 10000
+            id: pantalla-cuentas
+          timeout: 10000
 # Suscripciones
 - runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-suscripciones } }
 - extendedWaitUntil:

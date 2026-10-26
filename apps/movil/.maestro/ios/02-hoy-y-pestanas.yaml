@@ -108,6 +108,16 @@ tags:
     visible:
       id: pantalla-hoy
     timeout: 10000
+# Al cerrar R2 el campo de texto vuelve con el teclado abierto y tapa las pestañas: se cierra con el mismo botón
+- runFlow:
+    when:
+      visible:
+        id: campo-registrar
+    commands:
+      - tapOn:
+          id: boton-escribir
+      - waitForAnimationToEnd:
+          timeout: 2000
 # Pestañas
 - tapOn:
     id: pestana-movimientos

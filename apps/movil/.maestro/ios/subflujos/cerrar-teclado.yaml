@@ -19,6 +19,6 @@ name: Subflujo · cerrar el teclado
     element:
       id: ${ANCLA}
     direction: UP
-    timeout: 10000
+    timeout: 30000
 - tapOn:
     id: ${ANCLA}
