@@ -69,10 +69,14 @@ tags:
     visible:
       id: ajustes-avisos-mensaje
     timeout: 5000
-# Captura y widget: en iPhone no ofrecen nada
+# Captura y widget: en iPhone no se muestran (#31, 02 §25); se revisa junto a Bloqueo, que sí está
 - scrollUntilVisible:
     element:
-      id: ajustes-captura-estado
+      id: ajustes-seccion-bloqueo
+    centerElement: true
+    timeout: 30000
+- assertNotVisible:
+    id: ajustes-captura-estado
 - assertNotVisible:
     id: ajustes-captura-activar
 - assertNotVisible:
