@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 0 · Reglas | Teléfono (`packages/nlu/src/reglas`) | Siempre primero. Responde solo si está seguro; si no, devuelve `null` | 0 |
 | 1 · Modelo en el dispositivo | Teléfono | v2 (iOS: Foundation Models; Android: modelo del sistema donde exista) | 0 |
-| 2 · Nube | Proxy → LLM | Cuando el nivel 0 devuelve `null` y hay red | Por token: Claude Haiku 5.5 con caché, ~0.26 USD por 1,000 frases (medido 22-10-2026, `services/proxy/README.md` → Costos medidos) |
+| 2 · Nube | Proxy → LLM | Cuando el nivel 0 devuelve `null` y hay red | Por token: Claude Haiku 5.5 con caché, ~0.27 USD por 1,000 frases que llegan a la nube; con el nivel 0 del 26-10-2026 llega el 1.2 % del golden: ~0.003 USD por 1,000 frases dichas (`services/proxy/README.md` → Medición del 26-10-2026) |
 
 Requisito del nivel 0: **precisión 100 %** (si responde, acierta) y cobertura total de los casos marcados `reglas: true` del golden set.
 
@@ -138,25 +138,29 @@ type Motivo = 'monto_faltante' | 'monto_ambiguo' | 'tipo_ambiguo' | 'fecha_ambig
 
 | Categoría | Palabras |
 |---|---|
-| `comida_fuera` | tacos, torta, comida, cena, desayuno, restaurante, fonda, garnachas, pizza, hamburguesa, sushi, quesadillas, tamales, pozole, birria |
-| `antojos` | coca, refresco, café, chicle, botana, papas, dulces, galletas, helado, nieve, elote, esquite |
-| `super` | súper, despensa, mandado, mercado, abarrotes, verdura, fruta, carne |
-| `transporte` | uber, didi, taxi, camión, metro, metrobús, pasaje, estacionamiento, caseta, combi |
+| `comida_fuera` | tacos, taco, torta(s), comida, cena, desayuno, almuerzo, restaurante, fonda, garnachas, pizza(s), hamburguesa(s), sushi, ramen, quesadilla(s), tamal(es), pozole, birria, gorditas, sopes, tlayudas, chilaquiles, enchiladas, flautas, huaraches, pambazos, tlacoyos, molletes, cemitas, mariscos, carnitas, barbacoa, burritos, alitas |
+| `antojos` | coca, refresco(s), café, cafecito, frappé, malteada, chicle, botana, papas, palomitas, chicharrones, dulces, gomitas, chocolate(s), galletas, donas, churros, helado(s), nieve, paleta(s), raspado, elote, esquite |
+| `super` | súper, despensa, mandado, mercado, abarrotes, verdura(s), fruta(s), carne, carnicería, tortillas, tortillería, leche |
+| `transporte` | uber(s), didi, taxi(s), camión, autobús, metro, metrobús, tren, pasaje(s), estacionamiento, parquímetro, caseta, peaje, combi |
 | `gasolina` | gasolina, diésel, magna, premium |
-| `servicios` | luz, internet, cable, recarga, teléfono, "el agua"/"de agua" como recibo |
-| `vivienda` | renta |
-| `salud` | farmacia, medicinas, doctor, doctora, médico, médica, consulta, dentista, laboratorio, análisis, hospital |
-| `educacion` | colegiatura, inscripción, libros, útiles, curso |
-| `entretenimiento` | cine, concierto, boletos, antro |
-| `suscripciones` | netflix, spotify, disney, max, prime, youtube premium, icloud |
-| `ropa` | tenis, ropa, chamarra, playera, pantalón, zapatos |
-| `cuidado_personal` | corte de pelo, peluquería, barbería, uñas |
-| `mascotas` | croquetas, veterinario |
-| `deporte` | gimnasio, gym |
-| `regalos` | regalo |
-| `tecnologia` | audífonos, cargador |
+| `servicios` | luz, CFE, internet, cable, recarga(s), teléfono, Telmex, Telcel, Izzi, Totalplay, Megacable, "el agua"/"de agua" como recibo |
+| `vivienda` | renta, hipoteca |
+| `salud` | farmacia, medicinas, medicina, medicamentos, pastillas, vitaminas, doctor, doctora, médico, médica, consulta, dentista, pediatra, ginecólogo(a), oculista, psicólogo(a), terapia, vacuna(s), laboratorio, análisis, ultrasonido, radiografía, hospital |
+| `educacion` | colegiatura(s), inscripción, escuela, universidad, diplomado, libros, cuaderno(s), útiles, curso |
+| `entretenimiento` | cine, concierto, boletos, antro, teatro, museo, boliche, karaoke, videojuego(s) |
+| `suscripciones` | netflix, spotify, disney, max, hbo, paramount, crunchyroll, prime, youtube premium, icloud |
+| `ropa` | tenis, ropa, chamarra, sudadera, playera(s), camisa(s), blusa, vestido, falda, pantalón(es), jeans, pants, calcetines, gorra, zapatos |
+| `cuidado_personal` | corte de pelo, peluquería, barbería, estética, uñas, manicure, pedicure, shampoo, desodorante, maquillaje, perfume |
+| `mascotas` | croquetas, veterinario, veterinaria; y lo que es para la mascota ("comida para el perro", "consulta del gato") |
+| `deporte` | gimnasio, gym, crossfit, yoga, pilates |
+| `regalos` | regalo(s) |
+| `tecnologia` | audífonos, cargador, tele, televisión, pantalla, laptop, computadora, tablet, impresora, bocina |
+| `hogar` | muebles, sillón, sábanas, cobija, cortinas, focos, ferretería, lavadora, refri, refrigerador, estufa, licuadora, microondas |
+| `apoyo_familiar` | dinero que se le da o se le pasa a un familiar (mamá o jefa, papá o jefe, hermano, abuela, tío, hijo, primo…) |
 
-Palabras deliberadamente fuera del diccionario por ambiguas: gas (LP o gasolina), chelas, pastel, celular (equipo o plan), mantenimiento.
+Ampliado el 26-10-2026 con palabras de un solo sentido. Los nombres de tiendas que venden de todo (Walmart, Oxxo, Soriana) no están: son COMERCIO y la categoría sale de lo que se compró.
+
+Palabras deliberadamente fuera del diccionario por ambiguas: gas (LP o gasolina), chelas, pastel, celular (equipo o plan), mantenimiento. Desde el 26-10-2026 las que sin duda son una compra (chela(s), cerveza(s), caguama(s), pastel, gas, celular, propina, enganche, pan, pollo, jugo) son **conocidas sin categoría**: "unas chelas, 340" es un gasto sin categoría y nunca sirven para una consulta por categoría. "agua" a secas y "mantenimiento" siguen fuera.
 
 **Correcciones y configuración**
 
@@ -321,9 +325,14 @@ PERSONA   := [mi|la|el] [don|doña] NOMBRE — NOMBRE: alias de contacto o clien
              artículo, pronombre, palabra del diccionario, de las que DESCARTAN ni alias de cuenta ("la vecina", "mi primo")
 DESC      := [art] 1 a 3 palabras de letras, sin palabras de enlace (por con en de del para a al y que me te se le nos) ni de las que
              DESCARTAN, sin nombres ni alias; categoría por diccionario (§3.1) si sus palabras del diccionario son de una sola categoría
-DESC_CONOCIDA := DESC con todas sus palabras en el diccionario (sin categoría si son de dos: "tacos coca")
+DESC_CONOCIDA := DESC con todas sus palabras en el diccionario o conocidas sin categoría (sin categoría si son de dos
+                 categorías, "tacos coca", o de ninguna, "unas chelas")
 DESC (compuesta) := A (con|de|del|en) [art] B, ≤ 3 palabras, todas del diccionario y de una sola categoría    "consulta con el médico"
                   | A en [art] COMERCIO, con A conocida                                                      "despensa en Soriana"
+                  | A (de|del|para|al) [art|mi|mis|su|sus|tu|tus] B, ≤ 3 palabras, B sin nombres, alias ni DESCARTAN;
+                    sin verbo A debe ser DESC_CONOCIDA. Categoría: mascotas si B es una mascota (perro, gato, mascota…);
+                    si no, la única del diccionario entre A y B; con dos o ninguna, sin categoría (26-10-2026)
+                    "croquetas para el perro" "regalo para mi sobrina" "tacos al pastor" "enganche del coche"
 FRASE_CONOCIDA := corte de pelo | corte de cabello | me cortaron el pelo | me corté el pelo | el agua | recibo de (agua|luz)  (vale como DESC_CONOCIDA)
 COMERCIO  := 1 o 2 palabras con mayúscula inicial en el texto (nunca la primera de la frase) que no son alias, nombre, palabra del
              diccionario ni de enlace                                                                           "Oxxo" "Soriana" "Liverpool"
@@ -331,6 +340,7 @@ DESCARTAN := hoy ayer anoche antier anteayer hace mañana lunes…domingo semana
              efectivo cash billetes débito crédito tarjeta cajero transferencia depósito mínimo mensualidad meses msi préstamo deuda abono
              tanda nómina sueldo ingreso ingresos retiro venta ventas cobro pago pagos reembolso devolución premio bono aguinaldo beca
              rendimientos saldo colchón cuenta cuentas medio media entre tienda negocio caja cliente clientes mercancía local insumos fiado
+           prestado prestada prestados prestadas
 ```
 
 ### 9.2 Producciones
@@ -342,13 +352,22 @@ GASTO     := [FECHA [,]] PARTE ((y | ,) PARTE)* [, [todo|todos|ambos|los dos] ME
 PARTE     := NUCLEO [en [art] COMERCIO] [METODO]
 NUCLEO    := VERBO [yo] [(en|a) [art]] DESC [,] [de|por|en] [fueron|fue|costó|salió] MONTO          "pagué la luz, fueron 410" "comí en un restaurante, 640"
            | DESC_CONOCIDA [,] [de|por|en] [fueron|fue] MONTO                                        "uber 120" "tacos, 80" "me cortaron el pelo, 150"
-           | VERBO MONTO (de|en|por) [art] DESC                                                     "gasté 450 de gasolina" "pagué 380 de agua" (→ servicios)
-           | MONTO (de|del|en|por) [art] DESC_CONOCIDA                                              "800 de la consulta con el médico" "1.5k en el súper"
+           | VERBO [con] MONTO (de|en|por|para) [art] LISTA                                         "gasté 450 de gasolina" "pagué 380 de agua" (→ servicios)
+                                                                                                    "cooperé con 150 para el pastel" ("con" solo tras "cooperé")
+           | MONTO (de|del|en|por) [art] LISTA_CONOCIDA                                             "800 de la consulta con el médico" "1.5k en el súper"
            | (me costó | me salió) [en] MONTO [art] DESC                                            "me costó un kilo la chamarra"
-           | (registra | anota | apunta) MONTO                                                      "registra 50" (gasto sin categoría ni descripción)
+           | (registra | anota | apunta | cooperé [con]) MONTO                                      "registra 50" (gasto sin categoría ni descripción)
            | le (puse | eché | cargué) MONTO de (gasolina|diésel|magna|premium) [al coche|al carro|al auto|a la camioneta|a la moto]
-VERBO     := me compré | compré | me eché | me gasté | gasté | pagué | comí | cené | desayuné | registra | anota | apunta
+VERBO     := me compré | compré | me eché | me gasté | gasté | pagué | me comí | comí | cené | desayuné | almorcé | me tomé | tomé
+           | cargué | cooperé | registra | anota | apunta
+LISTA     := DESC | DESC ((y|,) DESC){1,2}       un solo monto dicho ANTES para 2 o 3 cosas → un gasto por el total; categoría solo
+                                                  si todas son de la misma ("gasté 90 en estampitas y un refresco", G26)
 ```
+
+- Con el monto **al final** de varias cosas ("unos tenis y una playera, 1,200") no se sabe si es el total o el de la última: `null`.
+- **Parte sin monto** (`gastoSinMonto`, después de GASTO): una lista cuya primera parte trae su monto y alguna de las siguientes es
+  una DESC sin cifra → `aclarar/monto_faltante` con la pregunta "¿Cuánto costó la coca?" ("¿Cuánto costaron la coca y las
+  papas?"). No registra nada (X06). Si la primera parte no trae monto, la cifra puede ser el total: `null`.
 
 - El METODO final con "todo" vale para todas las partes; una parte con método propio lo conserva ("gasolina 500 con la Nu y un café de 60 en efectivo"); "todo" junto a un método propio → `null`. El VERBO de la primera parte vale para las siguientes ("pagué netflix 219 y la plomería 300"). Una parte sin monto ("unos tacos de 80 y una coca") → `null`.
 - Con negocio activo, DESC "mercancía" o "insumos" [para la tienda|para el negocio] → esa categoría con `espacio: 'negocio'` ("compré mercancía para la tienda, 2,300 con la de Banorte"); sin negocio → `null`.
@@ -371,6 +390,9 @@ INGRESO   := [FECHA] ( me cayó la quincena [,] MONTO                           
                      | [PERSONA] me regaló MONTO | me regalaron MONTO                            → regalo_recibido
                      | me reembolsaron MONTO [(de|por) TEXTO] [(a|en) [PREFIJO] ALIAS_DEB]       → reembolso
                      | [me cayeron|me depositaron|me pagaron|me llegaron] [los] rendimientos [de TEXTO] [,] MONTO   → rendimientos
+                     | me pagaron MONTO por [art|mi] TRABAJO [(de|del|para) TEXTO] [,] [METODO]  → honorarios (METODO = destino)
+                       TRABAJO := trabajo | chamba | jale | diseño | proyecto | logo | clase(s) | asesoría | consultoría | tutoría
+                                | servicio | traducción | reparación | arreglo | sesión         "me pagaron 3,500 por un diseño" (I03)
                      | vendí MONTO [en la tienda|en el negocio]                                  → ventas, espacio negocio (solo con negocio activo)
                      | vendí (mi|el|la|un|una|unos|unas) TEXTO (en|por) MONTO [, me [lo|la] pagaron METODO]   → ventas (personal, METODO = destino) )
 TEXTO     := 1 a 6 palabras de letras sin las que DESCARTAN, sin alias ni nombres ("de la comida de trabajo", "de cetes")
@@ -388,17 +410,24 @@ PRESTAMOS := [FECHA] ( le (presté|fié) MONTO a PERSONA                        
                      | PERSONA [ya] me (regresó|devolvió) [los|las] MONTO [CLAUSULA_DEBIA]     → cobro_prestamo
                      | PERSONA [ya] me (pagó|depositó) [los|las] MONTO CLAUSULA_DEBIA          → cobro_prestamo (depositó → destino débito)
                      | PERSONA me prestó MONTO                                                 → prestamo_recibido
-                     | le pagué [a PERSONA] MONTO [a PERSONA] CLAUSULA_PRESTO )                → pago_prestamo
+                     | le pagué [a PERSONA] MONTO [a PERSONA] CLAUSULA_PRESTO                  → pago_prestamo
+                     | le (di|pasé|mandé|deposité|transferí) MONTO (a|al) PERSONA [METODO] )    → gasto con contraparte (§3.1);
+                       un familiar (parentesco dicho o contacto con alias de parentesco) → apoyo_familiar; un cliente → null
+                                                                                "le di dos lucas al mecánico" "le pasé 200 a mi jefa"
 CLAUSULA_DEBIA  := [de lo] que le presté | que le había prestado | [de lo] que me debía | [de lo] que me debe
 CLAUSULA_PRESTO := [de lo] que me prestó | que me había prestado | [de lo] que le debía | [de lo] que le debo
 TANDA     := [FECHA] ( (di|pagué|aboné|puse|deposité) (mi|la) tanda [METODO] [,] MONTO | (di|pagué) MONTO (de|a) (mi|la) tanda [METODO]  → aportacion_tanda
                      | [ya] (me tocó|cobré) la tanda [,] [me dieron|fueron|fue|son] MONTO [METODO] )                                 → cobro_tanda (METODO = destino)
 MSI       := [FECHA] [VERBO|saqué] [art] DESC ( (de|por) MONTO a N (meses|msi) [sin intereses|msi] [con [PREFIJO] ALIAS_CRED | con la de crédito]
                                               | a N (meses|msi) [sin intereses|msi] [con …] [,] MONTO )     N = 2..48; origen crédito si no dijo tarjeta
-DIVIDIDA  := [FECHA] (VERBO|dividimos) [art] DESC [(de|por) MONTO] entre N [,] [yo pagué MONTO] [METODO]      N = 2..50, un solo monto
+DIVIDIDA  := [FECHA] [yo] (VERBO|dividimos) [art] DESC [(de|por|,) MONTO] entre (N | todos [,] (éramos|fuimos|somos) N) [,]
+             [yo pagué MONTO] [METODO]                                                  N = 2..50, un solo monto; "la cuenta" es la del
+                                                                                        restaurante ("yo pagué la cuenta, 1,800 entre todos, éramos 6", D04)
+           | [FECHA] GASTO [,] [y] PERSONA ((y|,) PERSONA)* (me deben|me debe) su parte → partes = nombrados + 1, participantes =
+                                                                                        los nombres (D03); sin clientes ni "los demás"
 ```
 
-- Una `PERSONA` que es cliente del contexto, o "fié" con negocio activo, ponen `espacio: 'negocio'`. "Juan me pagó 300" sin cláusula → `null` (podría ser un ingreso); "le pagué 200 a mi jefa" sin cláusula → `null` (gasto con contraparte y categoría por juicio).
+- Una `PERSONA` que es cliente del contexto, o "fié" con negocio activo, ponen `espacio: 'negocio'`. "Juan me pagó 300" sin cláusula → `null` (podría ser un ingreso); "le pagué 200 a mi jefa" sin cláusula → `null` (puede ser el pago de un préstamo). "Le di / le pasé" sí es gasto: darle dinero a alguien sin decir préstamo (§3.1), como lo resuelve la nube.
 - `MSI` sin verbo exige DESC_CONOCIDA o artículo ("la lavadora de 8,499 a 6 msi" sí; "debo 4,200 a 6 meses" → `null`); con débito o efectivo → `null`.
 - `INGRESO` y `RETIRO` con "me depositaron"/"saqué … del cajero" producen `destino`/`origen` `{tipo: 'debito'}` sin alias, como antes.
 
@@ -473,14 +502,23 @@ aclaraciones obvias: gasto dicho como hecho sin ninguna cifra → `monto_faltant
 `fecha_ambigua`, sueldo «bruto» → `monto_ambiguo` y «¿me alcanza?» sin precio (y sin hablar de la quincena) →
 `monto_faltante`. Nada de esto registra. Golden: 147 de 164 con `reglas: true` (X05, P05, S04, Q13, Z05, B01, B02,
 F01–F04 y V08 cambiaron solo la bandera). La app contesta además la charla corta («hola», «gracias», «¿qué puedes
-hacer?») sin intérprete (`apps/movil/src/asistente/charla.ts`). Lo de abajo sigue en `null`:
+hacer?») sin intérprete (`apps/movil/src/asistente/charla.ts`).
 
-- Sin verbo, una DESC desconocida se registraría como gasto; por eso "una devolución de 500", "anoche unas chelas, 340 en efectivo" o "mil quinientos de la tele en efectivo" → `null`. Las frases que esa regla protegía ("tengo 4,200 en BBVA", "me quedan 85 pesos en efectivo") hoy tienen producción propia (`saldo_cuenta`, `ARQUEO`); los falsos positivos de la primera implementación de referencia (cobertura 16/16, precisión 17/17) siguen cubiertos por pruebas.
-- Montos ambiguos ("dos cincuenta"), pesos ("un kilo de carne", "medio kilo de despensa"), fechas futuras o "la semana pasada" al registrar, dos fechas o dos montos en una parte.
+**Cambio del 26-10-2026 («perfecciona el modelo», Adam: más rápido, gratis y sin red):** pasaron al nivel 0, con
+reglas explícitas y pruebas de lo que sigue en `null`, 15 de los 17 casos que iban a la nube: conocidas sin categoría
+(chelas, gas, pastel…), DESC de destino ("croquetas para el perro", "regalo para mi sobrina", "enganche del coche"),
+verbos nuevos (cargué, cooperé, me tomé, almorcé), un solo monto para varias cosas (G26), parte sin monto → aclarar (X06),
+"dos cincuenta" → `aclarar/monto_ambiguo` con las dos opciones (M11, solo con un verbo de gasto o de costo al inicio y
+ninguna otra cifra; nunca tras "a las"), dar dinero a alguien → gasto con contraparte y `apoyo_familiar` para un familiar
+(M03, L05), honorarios por un trabajo (I03) y cuentas divididas con "éramos N" o "Caro y Juan me deben su parte"
+(D03, D04). Lo de abajo sigue en `null`:
+
+- Sin verbo, una DESC desconocida se registraría como gasto; por eso "una devolución de 500" o "plomería 300" → `null`. Las frases que esa regla protegía ("tengo 4,200 en BBVA", "me quedan 85 pesos en efectivo") hoy tienen producción propia (`saldo_cuenta`, `ARQUEO`); los falsos positivos de la primera implementación de referencia (cobertura 16/16, precisión 17/17) siguen cubiertos por pruebas.
+- Pesos ("un kilo de carne 150" sin verbo, "medio kilo de despensa en la tienda", M02), "dos cincuenta" sin verbo de gasto, fechas futuras o "la semana pasada" al registrar, dos fechas o dos montos en una parte.
 - Montos que el nivel 0 todavía no lee: "millón", "y medio" ("ocho mil y medio"), "N mil M" con otra cifra detrás ("8 mil 500 600") o con decimales en N ("1.5 mil 200"), "un" suelto tras "N mil" y centavos sin "pesos" antes ("85 con 50 centavos").
-- Lo que exige juicio: "le di dos lucas al mecánico", "cooperé con 150 para el pastel", "le pasé 200 a mi jefa" (categoría `apoyo_familiar` por contexto), "me pagaron 3,500 por un diseño" (honorarios o venta), "Juan me pagó 300" (ingreso o cobro), "croquetas para el perro" y cualquier "X para Y" (la categoría de Y no se infiere), "cargué gas" (LP o gasolina), participantes de una cuenta dividida ("Caro y Juan me deben su parte", "éramos 6") y lo fuera de alcance que no es evidente: eso lo decide el nivel 2 o la persona.
+- Lo que exige juicio: "Juan me pagó 300" (ingreso o cobro), "me pagaron 3,500" a secas o "por la bici" (venta), "le pagué 200 a mi jefa" (puede ser un préstamo), "le di 500 a doña Mari" (un cliente: puede ser fiado), "X para Juan" (un nombre), varias cosas con el monto al final ("unos tenis y una playera, 1,200": total o la última), "los demás me deben su parte" (no dice cuántos), "la renta son 4,500 el día primero" (V09, puede ser una fecha única), "pagué con 500" (no dice cuánto costó) y lo fuera de alcance que no es evidente: eso lo decide el nivel 2 o la persona.
 
-Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-23 (sin cambio desde el 22-10; «traigo 300» y «¿cuánto llevo en CAT?» se probaron con pruebas unitarias, no en el golden): cobertura 135/135 y precisión 135/135 sobre los 164 casos (el 2026-10-21, 128/128 sobre 155; antes 25/25 y 27/27). Los 29 casos restantes están en `null` por las razones de §9.3. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V08 y V09 son `reglas: false`. La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
+Medido con `pnpm eval:nlu --nivel reglas` el 2026-10-26: cobertura 162/162 y precisión 162/162 sobre los 164 casos (89.6 % → 98.8 % del golden resuelto en el teléfono). Antes: el 2026-10-23, 147/147 (con `sin-nube.ts`); 135/135 el 22-10; 128/128 sobre 155 el 21-10; al principio 25/25 y 27/27. Los 2 casos restantes (M02, V09) están en `null` por las razones de arriba. Los nueve casos V01–V09 cubren A0–A2 y D1 ("me pagan 8 mil 500 cada quincena", "quiero treinta y un mil de colchón", "me quedan 85 pesos con 50 centavos en efectivo", "mi Nu corta el 28, pago el 18"…); V09 sigue `reglas: false` (V08 lo contesta `sin-nube.ts` desde el 23-10). La ida y vuelta de A0 está probada para todo n < 1,000,000 escrito en palabras (`montos.test.ts`).
 
 ### 9.4 Monto dictado en un campo
 
@@ -555,7 +593,7 @@ La salida estructurada se exige con el mecanismo nativo de cada proveedor (herra
 
 ## 11. Elección de modelo (M3)
 
-Candidatos iniciales: Claude Haiku 5.5 (`claude-haiku-5-5`), el modelo "Flash" vigente de Google y el modelo "mini" vigente de OpenAI. Se elige el de **menor costo por caso completo correcto** que cumpla todos los umbrales y tenga latencia p95 < 5 s. La decisión, con el reporte, se registra en `docs/ESTADO.md`. El adaptador permite cambiar de proveedor sin tocar la app. Medición del 22-10-2026 (Anthropic): Haiku 5.5 con la herramienta forzada, esfuerzo `low` y sin razonamiento cumple todos los umbrales (97.6 % de casos completos, p95 1.9 s) a ~0.26 USD por 1,000 frases; la salida estructurada estricta (`json_schema`) rechaza la proyección actual (más de 24 parámetros opcionales).
+Candidatos iniciales: Claude Haiku 5.5 (`claude-haiku-5-5`), el modelo "Flash" vigente de Google y el modelo "mini" vigente de OpenAI. Se elige el de **menor costo por caso completo correcto** que cumpla todos los umbrales y tenga latencia p95 < 5 s. La decisión, con el reporte, se registra en `docs/ESTADO.md`. El adaptador permite cambiar de proveedor sin tocar la app. Medición del 22-10-2026 (Anthropic): Haiku 5.5 con la herramienta forzada, esfuerzo `low` y sin razonamiento cumple todos los umbrales (97.6 % de casos completos, p95 1.9 s) a ~0.26 USD por 1,000 frases; la salida estructurada estricta (`json_schema`) rechaza la proyección actual (más de 24 parámetros opcionales). Medición del 26-10-2026 con el prompt afinado: 163/164 casos completos (99.4 %), p50 1.2 s y p95 1.9 s, 0.000265 USD por frase con caché caliente; sigue Haiku (los fallos varían entre corridas y desaparecen al repetir).
 
 ## 12. Aprendizaje local
 

@@ -263,10 +263,11 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
 
   it('en la cola "por interpretar" queda para revisar (necesita a la persona)', async () => {
     const p = base();
-    // D03 sigue en la nube (06 §9.3: quién debe qué se decide con la persona).
+    // «los demás» no dice cuántos son: el nivel 0 la deja a la nube (06 §9.3). La nube contesta como en D03.
     const D03 = golden('D03');
-    const f = nubeFalsa({ [D03.texto]: D03.esperado });
-    const r = await registrarTexto(p.ctx, D03.texto, 'voz', { nube: null });
+    const texto = 'pagué la cena, 1,800, y los demás me deben su parte';
+    const f = nubeFalsa({ [texto]: D03.esperado });
+    const r = await registrarTexto(p.ctx, texto, 'voz', { nube: null });
     expect(r.resultado).toBe('por_interpretar');
     expect(await procesarPorInterpretar(p.ctx, f.nube)).toEqual({
       aplicadas: 0,

@@ -38,11 +38,11 @@ describe('CA-M1-05 · golden set con reglas: true', () => {
     });
   }
 
-  it('cobertura 147/147 y precisión 100 % sobre los 164 casos', () => {
+  it('cobertura 162/162 y precisión 100 % sobre los 164 casos', () => {
     const reporte = evaluarReglas(golden, contexto);
-    expect(reporte.marcados).toBe(147);
-    expect(reporte.marcadosCubiertos).toBe(147);
-    expect(reporte.respondidos).toBe(147);
+    expect(reporte.marcados).toBe(162);
+    expect(reporte.marcadosCubiertos).toBe(162);
+    expect(reporte.respondidos).toBe(162);
     expect(reporte.respondidosCorrectos).toBe(reporte.respondidos);
     expect(reporte.aprobado).toBe(true);
   });
@@ -98,7 +98,6 @@ describe('nivel 0 · montos', () => {
   it('ambiguos y mal formados → null', () => {
     for (const texto of [
       'dos cincuenta de pizza',
-      'me salió en dos cincuenta el estacionamiento',
       'ciento de uber',
       'cien veinte de uber',
       'tacos 80.505',
@@ -107,6 +106,31 @@ describe('nivel 0 · montos', () => {
       'un peso de chicle',
     ]) {
       expect(reglas(texto), texto).toBeNull();
+    }
+  });
+
+  it('«dos cincuenta» en un gasto: se pregunta cuál de las dos lecturas fue (M11, sin nube)', () => {
+    expect(reglas('me salió en dos cincuenta el estacionamiento')).toEqual({
+      intencion: 'aclarar',
+      motivo: 'monto_ambiguo',
+      pregunta: '¿Fueron $2.50 o $250?',
+      opciones: ['$2.50', '$250'],
+    });
+    expect(reglas('me costó doce cincuenta')).toMatchObject({ opciones: ['$12.50', '$1,250'] });
+    expect(reglas('me salió en tres treinta y cinco el pasaje')).toMatchObject({
+      opciones: ['$3.35', '$335'],
+    });
+    expect(reglas('pagué dos cincuenta de pan')).toMatchObject({ motivo: 'monto_ambiguo' });
+    expect(reglas('me salió en dos cincuenta pesos')).toMatchObject({ motivo: 'monto_ambiguo' });
+    // Una hora, otra cifra o una frase que no es un gasto: no se pregunta.
+    for (const texto of [
+      'pagué el uber a las dos treinta',
+      'me salió dos mil cincuenta',
+      'tengo dos cincuenta',
+      'no, fue dos cincuenta',
+      'me salió en dos cincuenta y el uber 80',
+    ]) {
+      expect(reglas(texto)?.intencion, texto).not.toBe('aclarar');
     }
   });
 
@@ -168,10 +192,11 @@ describe('nivel 0 · fechas relativas al registrar', () => {
       'la semana pasada tacos 80',
       'ayer tacos 80 hoy',
       'ayer y antier tacos 80',
-      'el lunes cargué gas, 520',
+      'el lunes y el martes cargué gas, 520',
     ]) {
       expect(reglas(texto), texto).toBeNull();
     }
+    expect(gasto('el lunes cargué gas, 520')).toMatchObject({ fecha: '2026-10-05', monto: 52000 });
     // Con verbo de gasto, «la semana pasada» sin día ya no va a la nube: se pregunta el día (sin-nube.ts).
     expect(reglas('gasté 500 la semana pasada en la farmacia')).toMatchObject({
       intencion: 'aclarar',
@@ -208,8 +233,81 @@ describe('nivel 0 · gasto', () => {
     expect(gasto('pagué la plomería 300')).not.toHaveProperty('categoria');
     expect(reglas('plomería 300')).toBeNull();
     expect(reglas('coca light 25')).toBeNull();
-    expect(reglas('anoche unas chelas, 340 en efectivo')).toBeNull();
-    expect(reglas('mil quinientos de la tele en efectivo')).toBeNull();
+  });
+
+  it('conocidas sin categoría (chelas, gas, pastel, celular): gasto sin categoría, también sin verbo', () => {
+    expect(gasto('anoche unas chelas, 340 en efectivo')).toEqual({
+      tipo: 'gasto',
+      monto: 34000,
+      fecha: '2026-10-10',
+      descripcion: 'chelas',
+      origen: { tipo: 'efectivo' },
+    });
+    for (const texto of ['gas 450', 'pastel 350', 'celular 5,000', 'unas cervezas 200', 'propina 50']) {
+      expect(gasto(texto), texto).toMatchObject({ tipo: 'gasto' });
+      expect(gasto(texto), texto).not.toHaveProperty('categoria');
+    }
+    // Nunca sirven para una consulta por categoría.
+    expect(reglas('cuánto llevo en chelas este mes')).toBeNull();
+  });
+
+  it('diccionario ampliado (26-10): platillos, plurales, servicios y tecnología', () => {
+    expect(gasto('mil quinientos de la tele en efectivo')).toMatchObject({
+      monto: 150000,
+      categoria: 'tecnologia',
+      origen: { tipo: 'efectivo' },
+    });
+    expect(gasto('sudadera 450 con la Nu')).toMatchObject({ categoria: 'ropa', origen: { alias: 'nu' } });
+    expect(gasto('chilaquiles 95')).toMatchObject({ categoria: 'comida_fuera' });
+    expect(gasto('frappé 75')).toMatchObject({ categoria: 'antojos' });
+    expect(gasto('pagué la CFE 450')).toMatchObject({ categoria: 'servicios' });
+    expect(gasto('me tomé un café de 45')).toMatchObject({ categoria: 'antojos', monto: 4500 });
+    expect(gasto('almorcé tortas 120')).toMatchObject({ categoria: 'comida_fuera' });
+    expect(gasto('cargué gasolina, 700')).toMatchObject({ categoria: 'gasolina' });
+    // Las tiendas que venden de todo siguen siendo COMERCIO: la categoría sale de lo que se compró.
+    expect(gasto('tacos de 80 en Walmart')).toMatchObject({ categoria: 'comida_fuera' });
+  });
+
+  it('DESC de destino «A de/para/al B»: A conocida; una mascota en B gana', () => {
+    expect(gasto('croquetas para el perro 640 con la oro')).toMatchObject({
+      categoria: 'mascotas',
+      descripcion: 'croquetas para el perro',
+      origen: { tipo: 'credito', alias: 'oro' },
+    });
+    expect(gasto('comida para el perro 300')).toMatchObject({ categoria: 'mascotas' });
+    expect(gasto('consulta del gato 600')).toMatchObject({ categoria: 'mascotas' });
+    expect(gasto('quinientos pesitos de regalo para mi sobrina')).toMatchObject({
+      monto: 50000,
+      categoria: 'regalos',
+    });
+    expect(gasto('tacos al pastor 90')).toMatchObject({ categoria: 'comida_fuera' });
+    expect(gasto('me compré unos tacos al pastor de 80')).toMatchObject({
+      monto: 8000,
+      descripcion: 'tacos al pastor',
+    });
+    expect(gasto('veinticinco mil del enganche del coche por transferencia')).toEqual({
+      tipo: 'gasto',
+      monto: 2500000,
+      fecha: HOY,
+      descripcion: 'enganche del coche',
+      origen: { tipo: 'debito' },
+    });
+    // Dos categorías: sin categoría. Sin verbo, A desconocida: null.
+    expect(gasto('boletos del metro 20')).not.toHaveProperty('categoria');
+    expect(gasto('cooperé con 150 para el pastel de la oficina')).toMatchObject({
+      monto: 15000,
+      descripcion: 'pastel de la oficina',
+    });
+    for (const texto of [
+      'cuota del gimnasio 500',
+      'regalo para Juan 300',
+      'tacos para la tienda 80',
+      'regalo para mi sobrina el lunes de la semana 300',
+      'medio kilo de carne 80',
+      'un kilo de carne 150',
+    ]) {
+      expect(reglas(texto), texto).toBeNull();
+    }
   });
 
   it('entradas de varias palabras ganan sobre las sueltas', () => {
@@ -349,10 +447,54 @@ describe('nivel 0 · gasto', () => {
     ]);
   });
 
+  it('un solo monto para varias cosas, dicho antes: un gasto por el total (G26)', () => {
+    expect(movimientos('gasté 90 en estampitas y un refresco')).toEqual([
+      {
+        tipo: 'gasto',
+        monto: 9000,
+        fecha: HOY,
+        descripcion: 'estampitas y refresco',
+        origen: { tipo: 'desconocido' },
+      },
+    ]);
+    expect(gasto('gasté 400 en el súper, la verdura y la fruta')).toMatchObject({
+      monto: 40000,
+      categoria: 'super',
+    });
+    expect(gasto('90 de tacos y coca')).not.toHaveProperty('categoria');
+    // Con el monto al final no se sabe si es el total o el de la última: no se registra.
+    expect(reglas('me compré unos tenis y una playera, 1,200')).toBeNull();
+    expect(reglas('tacos y coca 80')).toBeNull();
+    // Dos montos siguen siendo dos gastos.
+    expect(movimientos('gasté 500 en tacos y 200 en coca')).toMatchObject([
+      { monto: 50000 },
+      { monto: 20000 },
+    ]);
+  });
+
+  it('a una parte le falta su cifra: se pregunta, no se registra nada a medias (X06)', () => {
+    expect(reglas('unos tacos de 80 y una coca')).toEqual({
+      intencion: 'aclarar',
+      motivo: 'monto_faltante',
+      pregunta: '¿Cuánto costó la coca?',
+    });
+    expect(reglas('compré tacos de 80, una coca y unas papas')).toMatchObject({
+      motivo: 'monto_faltante',
+      pregunta: '¿Cuánto costaron la coca y las papas?',
+    });
+    // La cifra al final puede ser el total, y un nombre o una palabra desconocida sin verbo no son una cosa.
+    for (const texto of [
+      'una coca y unos tacos de 80',
+      'me compré unos tenis y una playera de 1,200',
+      'tacos 80 y juan',
+      'tacos 80 y plomería',
+    ]) {
+      expect(reglas(texto)?.intencion, texto).not.toBe('aclarar');
+    }
+  });
+
   it('una parte sin monto, dos métodos contradictorios o un ingreso en medio → null', () => {
     for (const texto of [
-      'unos tacos de 80 y una coca',
-      'gasté 90 en estampitas y un refresco',
       'tacos 80 con la nu, todo en efectivo',
       'tacos 80 y me depositaron 500',
       'tacos 80 y juan 200',
@@ -511,11 +653,29 @@ describe('nivel 0 · ingresos', () => {
     expect(gasto('vendí mi bici en 2 mil')).not.toHaveProperty('espacio');
   });
 
+  it('«me pagaron MONTO por un trabajo» es honorarios (I03)', () => {
+    expect(gasto('me pagaron 3,500 por un diseño')).toEqual({
+      tipo: 'ingreso',
+      monto: 350000,
+      fecha: HOY,
+      categoria: 'honorarios',
+    });
+    expect(gasto('me pagaron 800 por una clase de inglés en efectivo')).toMatchObject({
+      categoria: 'honorarios',
+      destino: { tipo: 'efectivo' },
+    });
+    expect(gasto('me pagaron 2 mil por el trabajo, por transferencia')).toMatchObject({
+      destino: { tipo: 'debito' },
+    });
+  });
+
   it('ingresos que necesitan juicio → null', () => {
     for (const texto of [
       'me depositaron 0',
       'me depositaron 500 en la Nu',
-      'me pagaron 3,500 por un diseño',
+      'me pagaron 3,500',
+      'me pagaron 3,500 por la bici',
+      'me pagaron 3,500 por un diseño de Juan',
       'mi abuela me prestó 500 y me regaló 200',
       'me reembolsaron 320 a Juan',
       'vendí mi tanda en 500',
@@ -627,9 +787,44 @@ describe('nivel 0 · préstamos, tandas, meses y cuentas divididas', () => {
     for (const texto of [
       'Juan me pagó 300',
       'le pagué 200 a mi jefa',
-      'le pasé 200 a mi jefa',
       'le presté 500 a la tanda',
       'le presté 500 a Juan y a Caro',
+    ]) {
+      expect(reglas(texto), texto).toBeNull();
+    }
+  });
+
+  it('darle dinero a alguien sin decir préstamo es gasto con contraparte; a un familiar, apoyo familiar', () => {
+    expect(gasto('le pasé 200 a mi jefa')).toEqual({
+      tipo: 'gasto',
+      monto: 20000,
+      fecha: HOY,
+      categoria: 'apoyo_familiar',
+      contraparte: 'jefa',
+      origen: { tipo: 'desconocido' },
+    });
+    expect(gasto('le di dos lucas al mecánico')).toEqual({
+      tipo: 'gasto',
+      monto: 200000,
+      fecha: HOY,
+      contraparte: 'mecánico',
+      origen: { tipo: 'desconocido' },
+    });
+    expect(gasto('le mandé 1,000 a mi hermano por transferencia')).toMatchObject({
+      categoria: 'apoyo_familiar',
+      origen: { tipo: 'debito' },
+    });
+    // «mamá» es el contacto con alias «jefa»: también es familia.
+    expect(gasto('le deposité 500 a mamá')).toMatchObject({ categoria: 'apoyo_familiar' });
+    expect(gasto('le di 300 a mi esposa')).not.toHaveProperty('categoria');
+    for (const texto of [
+      'le di 500 a doña Mari',
+      'le di 500 a la Nu',
+      'le di 500 a la tanda',
+      'le di 500 a Juan de lo que le debía',
+      'le di 500 a Juan para la renta',
+      'le deposité 500 a BBVA',
+      'tomé prestados 500',
     ]) {
       expect(reglas(texto), texto).toBeNull();
     }
@@ -688,7 +883,7 @@ describe('nivel 0 · préstamos, tandas, meses y cuentas divididas', () => {
       motivo: 'monto_faltante',
     });
     for (const texto of [
-      'lavadora de 8,499 a 6 msi',
+      'secadora de 8,499 a 6 msi',
       'debo 4,200 a 6 meses',
       'la deuda de 4,200 a 6 meses',
       'una tele de 12 mil a 12 meses con débito',
@@ -713,7 +908,41 @@ describe('nivel 0 · préstamos, tandas, meses y cuentas divididas', () => {
     });
     expect(reglas('pagué la cena entre 4')).toBeNull();
     expect(reglas('pagué la cena de 1,200 entre todos')).toBeNull();
-    expect(reglas('pagué las pizzas, 650, y Caro y Juan me deben su parte')).toBeNull();
+  });
+
+  it('cuentas divididas: «entre todos, éramos N», «la cuenta» y quienes «me deben su parte» (D03, D04)', () => {
+    expect(gasto('yo pagué la cuenta, 1,800 entre todos, éramos 6')).toEqual({
+      tipo: 'cuenta_dividida',
+      monto: 180000,
+      fecha: HOY,
+      descripcion: 'cuenta',
+      origen: { tipo: 'desconocido' },
+      division: { partes: 6 },
+    });
+    expect(gasto('pagué la cena, 1,200 entre 4')).toMatchObject({ division: { partes: 4 } });
+    expect(gasto('pagué las pizzas, 650, y Caro y Juan me deben su parte')).toEqual({
+      tipo: 'cuenta_dividida',
+      monto: 65000,
+      fecha: HOY,
+      descripcion: 'pizzas',
+      categoria: 'comida_fuera',
+      origen: { tipo: 'desconocido' },
+      division: { partes: 3, participantes: ['caro', 'juan'] },
+    });
+    expect(gasto('ayer pagué la cena de 900 con la Nu y Caro me debe su parte')).toMatchObject({
+      fecha: '2026-10-10',
+      origen: { alias: 'nu' },
+      division: { partes: 2, participantes: ['caro'] },
+    });
+    for (const texto of [
+      'pagué las pizzas, 650, y doña Mari me debe su parte',
+      'pagué las pizzas, 650, y los demás me deben su parte',
+      'pagué la cuenta de 900 entre todos',
+    ]) {
+      expect(reglas(texto), texto).toBeNull();
+    }
+    // Sin cifra se pregunta cuánto fue, sin registrar nada.
+    expect(reglas('pagué las pizzas y Caro me debe su parte')).toMatchObject({ motivo: 'monto_faltante' });
   });
 });
 
@@ -1094,15 +1323,14 @@ describe('nivel 0 · responde null ante la duda', () => {
   const NULOS = [
     'gasté 300 en efectivo',
     'pagué juan 200',
-    'me compré unos tacos al pastor de 80',
     'me compré unos tacos muy muy ricos de 80',
-    'cooperé con 150 para el pastel de la oficina',
-    'croquetas para el perro 640 con la oro',
-    'le di dos lucas al mecánico',
-    'quinientos pesitos de regalo para mi sobrina',
-    'veinticinco mil del enganche del coche por transferencia',
     'una devolución de 500',
-    'comida para el perro 300',
+    'medio kilo de despensa en la tienda',
+    'la renta son 4,500 el día primero',
+    'pagué con 500 el súper',
+    'cargué 500 a la tarjeta',
+    'cargué saldo, 100',
+    'tomé 300 de la caja',
     '',
     '   ',
     ',',

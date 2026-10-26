@@ -17,8 +17,8 @@ import { PantallaRegistrar } from './PantallaRegistrar';
  * Pendiente 30 (voz): `correccion {campo}` al aplicar una corrección dictada. Solo el campo del catálogo, nunca
  * monto, comercio ni texto de la frase (regla 9).
  */
-// Sin verbo y con «chelas» (fuera del diccionario): el nivel 0 la deja a la nube (06 §9.3).
-const TACOS_Y_COCA = 'unas chelas de 80 con la Nu y una coca de 25 en efectivo';
+// Sin verbo y con «micheladas» (fuera del diccionario): el nivel 0 la deja a la nube (06 §9.3).
+const TACOS_Y_COCA = 'unas micheladas de 80 con la Nu y una coca de 25 en efectivo';
 const TACOS_EN_EFECTIVO = 'no, los tacos fueron en efectivo';
 
 const RESPUESTAS = {

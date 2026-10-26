@@ -5,13 +5,13 @@
  */
 import type { Centavos } from '@cartera/core';
 import type { Interpretacion, Movimiento, RefCuenta } from '../esquema';
-import { leerDesc } from './desc';
+import { type Desc, leerDesc } from './desc';
 import type { Entorno } from './entorno';
 import { leerFechaRegistro } from './fechas';
 import { Lector } from './lector';
 import { leerEntero, leerMonto } from './montos';
-import { ARTICULOS, SEP, type Tokens } from './tokens';
-import { VERBOS } from './gasto';
+import { ARTICULOS, SEP, type Tokens, recortar } from './tokens';
+import { leerGastoSimple, VERBOS } from './gasto';
 
 const FUERON: readonly (readonly string[])[] = [
   ['fueron'],
@@ -48,6 +48,34 @@ const DE_LA_CAJA: readonly (readonly string[])[] = [
   ['de', 'la', 'caja'],
   ['de', 'la', 'tienda'],
   ['del', 'negocio'],
+];
+/** Lo que se cobra como trabajo propio: "me pagaron 3,500 por un diseño" es honorarios, no venta ni cobro. */
+const TRABAJOS: readonly string[] = [
+  'trabajo',
+  'trabajito',
+  'chamba',
+  'chambita',
+  'jale',
+  'diseño',
+  'diseños',
+  'proyecto',
+  'logo',
+  'clase',
+  'clases',
+  'asesoria',
+  'asesorias',
+  'consultoria',
+  'tutoria',
+  'servicio',
+  'traduccion',
+  'reparacion',
+  'arreglo',
+  'sesion',
+];
+/** "… y Caro y Juan me deben su parte": quienes deben su parte de una cuenta que pagó el usuario. */
+const DEBEN_SU_PARTE: readonly (readonly string[])[] = [
+  ['me', 'deben', 'su', 'parte'],
+  ['me', 'debe', 'su', 'parte'],
 ];
 
 type Resultado = Interpretacion | null;
@@ -171,6 +199,23 @@ export function ingreso(tokens: Tokens, env: Entorno): Resultado {
       if (l.palabra('de', 'del') && !textoLibre(l, env, [SEP, 'fueron', 'fue', 'son'])) return null;
       const m = montoFinal(l);
       return m ? base(m, { categoria: 'rendimientos' }) : null;
+    }
+  }
+  // me pagaron MONTO por [art|mi] TRABAJO [de|del|para TEXTO] [METODO] → honorarios (I03). "Me pagaron 300" a secas
+  // (ingreso o cobro de un préstamo) o "por la bici" (venta) siguen en la nube.
+  l.volver(inicio);
+  if (l.secuencia('me', 'pagaron')) {
+    const m = monto(l);
+    if (m && l.palabra('por')) {
+      l.palabra('un', 'una', 'el', 'la', 'unos', 'unas', 'los', 'las', 'mi', 'mis');
+      if (l.palabra(...TRABAJOS)) {
+        const conTexto = !l.palabra('de', 'del', 'para') || textoLibre(l, env, ['en', 'con', 'por', SEP]);
+        l.sep();
+        const destino = env.metodo(l);
+        if (conTexto && l.fin) {
+          return base(m, { categoria: 'honorarios', ...(destino ? { destino } : {}) });
+        }
+      }
     }
   }
   l.volver(inicio);
@@ -412,6 +457,26 @@ export function prestamos(tokens: Tokens, env: Entorno): Resultado {
       if (!persona || !l.alguna(...CLAUSULA_ME_PRESTO) || !l.fin) return null;
       return movimiento('pago_prestamo', m, persona.contraparte, env.negocio && persona.cliente);
     }
+    // DAR := le (di|pasé|mandé|deposité|transferí) MONTO (a|al) PERSONA [METODO] → gasto con contraparte (06 §3.1:
+    // darle dinero a alguien sin decir préstamo). Un familiar → apoyo_familiar. A un cliente del fiado puede ser
+    // fiado: lo decide la nube.
+    if (l.palabra('di', 'pase', 'mande', 'deposite', 'transferi')) {
+      const m = monto(l);
+      if (!m || !l.palabra('a', 'al')) return null;
+      const persona = env.persona(l);
+      if (!persona || persona.cliente) return null;
+      const origen = env.metodo(l) ?? { tipo: 'desconocido' as const };
+      if (!l.fin) return null;
+      return registrar({
+        tipo: 'gasto',
+        monto: m.monto,
+        fecha,
+        ...(env.esFamiliar(persona.contraparte) ? { categoria: 'apoyo_familiar' as const } : {}),
+        contraparte: persona.contraparte,
+        origen,
+        ...(m.aproximado ? { aproximado: true } : {}),
+      });
+    }
     return null;
   }
   l.volver(inicio);
@@ -549,12 +614,68 @@ export function compraMsi(tokens: Tokens, env: Entorno): Resultado {
   return null;
 }
 
+/** PERSONA ((y|,) PERSONA)* en todo `tokens` (sin clientes): los que deben su parte. */
+function listaDePersonas(tokens: Tokens, env: Entorno): string[] | null {
+  const l = new Lector(tokens);
+  const nombres: string[] = [];
+  for (;;) {
+    const persona = env.persona(l);
+    if (!persona || persona.cliente) return null;
+    nombres.push(persona.contraparte);
+    if (l.fin) return nombres;
+    const separado = l.sep();
+    if (!l.palabra('y') && !separado) return null;
+  }
+}
+
 /**
- * DIVIDIDA := (VERBO|dividimos) [art] DESC [(de|por) MONTO] entre N [,] [yo pagué MONTO] [METODO]
+ * DIVIDIDA_DEUDORES := [FECHA] GASTO [,] [y] PERSONA ((y|,) PERSONA)* (me deben|me debe) su parte   (D03)
+ * El gasto lo pagó el usuario; `partes` = los nombrados + el usuario (06 §3.1: "Ana y Beto me deben su parte" → 3).
+ */
+function divididaConDeudores(tokens: Tokens, env: Entorno): Resultado {
+  const t = tokens.t;
+  for (const cola of DEBEN_SU_PARTE) {
+    const finPersonas = t.length - cola.length;
+    if (finPersonas < 3 || !cola.every((p, k) => t[finPersonas + k] === p)) continue;
+    for (let desde = 2; desde < finPersonas; desde++) {
+      if (t[desde - 1] !== SEP && t[desde - 1] !== 'y') continue;
+      const participantes = listaDePersonas(recortar(tokens, desde, finPersonas), env);
+      if (!participantes) continue;
+      let finGasto = desde - 1;
+      if (t[finGasto - 1] === SEP && t[finGasto] === 'y') finGasto--;
+      const { l, fecha } = conFecha(recortar(tokens, 0, finGasto), env);
+      const gasto = leerGastoSimple(recortar(l.tokens, l.pos, l.largo), env);
+      if (!gasto || gasto.desc?.espacio) continue;
+      return registrar({
+        tipo: 'cuenta_dividida',
+        monto: gasto.monto,
+        fecha,
+        ...(gasto.desc ? { descripcion: gasto.desc.descripcion } : {}),
+        ...(gasto.desc?.categoria ? { categoria: gasto.desc.categoria } : {}),
+        origen: gasto.origen ?? { tipo: 'desconocido' },
+        division: { partes: participantes.length + 1, participantes },
+        ...(gasto.aproximado ? { aproximado: true } : {}),
+      });
+    }
+  }
+  return null;
+}
+
+/** "la cuenta" de un restaurante: en una cuenta dividida no es una cuenta de banco. */
+const esLaCuenta = (palabras: readonly string[]) =>
+  palabras.join(' ') === 'la cuenta' || palabras.join(' ') === 'cuenta';
+
+/**
+ * DIVIDIDA := [yo] (VERBO|dividimos) [art] DESC [(de|por|,) MONTO] entre (N | todos [,] (éramos|fuimos|somos) N) [,]
+ *             [yo pagué MONTO] [METODO]
+ *           | DIVIDIDA_DEUDORES
  * `partes` cuenta al usuario; exactamente un monto.
  */
 export function cuentaDividida(tokens: Tokens, env: Entorno): Resultado {
+  const conDeudores = divididaConDeudores(tokens, env);
+  if (conDeudores) return conDeudores;
   const { l, fecha } = conFecha(tokens, env);
+  l.palabra('yo');
   const verbo = [...VERBOS, ['dividimos']].find((v) => v.every((p, k) => l.ver(k) === p));
   if (!verbo) return null;
   l.pos += verbo.length;
@@ -565,9 +686,21 @@ export function cuentaDividida(tokens: Tokens, env: Entorno): Resultado {
     if (l.palabra('de', 'por')) {
       total = monto(l);
       if (!total) continue;
+    } else if (l.sep()) {
+      // "yo pagué la cuenta, 1,800 entre todos": el monto tras la coma.
+      total = monto(l);
+      if (!total) continue;
     }
     if (!l.palabra('entre')) continue;
-    const partes = leerEntero(l, 50);
+    let partes = leerEntero(l, 50);
+    if (partes === null) {
+      // "entre todos, éramos 6": sin el número no se adivina.
+      if (!l.palabra('todos')) return null;
+      l.sep();
+      l.palabra('y');
+      if (!l.palabra('eramos', 'fuimos', 'somos')) return null;
+      partes = leerEntero(l, 50);
+    }
     if (partes === null || partes < 2) return null;
     l.sep();
     if (l.secuencia('yo', 'pague')) {
@@ -577,7 +710,9 @@ export function cuentaDividida(tokens: Tokens, env: Entorno): Resultado {
     }
     const origen = env.metodo(l) ?? { tipo: 'desconocido' as const };
     if (!total || !l.fin) return null;
-    const desc = leerDesc(tokens, inicioDesc, finDesc, env, { conocida: false });
+    const desc: Desc | null = esLaCuenta(tokens.t.slice(inicioDesc, finDesc))
+      ? { descripcion: 'cuenta' }
+      : leerDesc(tokens, inicioDesc, finDesc, env, { conocida: false });
     if (!desc || desc.espacio) return null;
     return registrar({
       tipo: 'cuenta_dividida',

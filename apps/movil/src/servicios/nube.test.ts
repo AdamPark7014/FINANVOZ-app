@@ -26,9 +26,9 @@ import { z } from 'zod';
 
 const HOY = '2026-10-11';
 
-// Sin verbo y con «chelas» (fuera del diccionario), el nivel 0 la deja a la nube (06 §9.3); el proxy falso
+// Sin verbo y con «micheladas» (fuera del diccionario), el nivel 0 la deja a la nube (06 §9.3); el proxy falso
 // contesta lo mismo que para X01 (tacos y coca).
-const TACOS_Y_COCA = 'unas chelas de 80 con la Nu y una coca de 25 en efectivo';
+const TACOS_Y_COCA = 'unas micheladas de 80 con la Nu y una coca de 25 en efectivo';
 const TACOS_EN_EFECTIVO = 'no, los tacos fueron en efectivo';
 
 /** Lo que devolvería el proxy para cada frase (mismas reglas que el golden set: X01, G04, C01). */
@@ -491,20 +491,20 @@ describe('cola "por interpretar"', () => {
   it('lo que necesita a la persona queda "por revisar" y se revisa después', async () => {
     const p = conCuentas();
     p.desconectar();
-    // Sin verbo y con «chelas»: el nivel 0 la deja a la nube (06 §9.3); la nube contesta un monto alto.
-    p.responder('anoche unas chelas de 6,000 con la morada', {
+    // Sin verbo y con «micheladas»: el nivel 0 la deja a la nube (06 §9.3); la nube contesta un monto alto.
+    p.responder('anoche unas micheladas de 6,000 con la morada', {
       intencion: 'registrar',
       movimientos: [
         {
           tipo: 'gasto',
           monto: 600_000,
           fecha: HOY,
-          descripcion: 'chelas',
+          descripcion: 'micheladas',
           origen: { tipo: 'credito', alias: 'morada' },
         },
       ],
     });
-    await registrarTexto(p.ctx, 'anoche unas chelas de 6,000 con la morada', 'voz', { nube: p.nube });
+    await registrarTexto(p.ctx, 'anoche unas micheladas de 6,000 con la morada', 'voz', { nube: p.nube });
     p.reconectar();
     expect(await procesarPorInterpretar(p.ctx, p.nube)).toEqual({
       aplicadas: 0,

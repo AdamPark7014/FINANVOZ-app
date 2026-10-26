@@ -5,7 +5,7 @@
 import type { ContextoInterprete, CuentaContexto } from '../contexto';
 import type { Categoria, RefCuenta } from '../esquema';
 import { normalizarAlias } from '../normalizar';
-import { buscarEnDiccionario } from './diccionario';
+import { buscarEnDiccionario, FAMILIA } from './diccionario';
 import type { Lector } from './lector';
 import {
   ARTICULOS,
@@ -54,10 +54,13 @@ export class Entorno {
   readonly negocio: boolean;
   readonly ultimoIngreso: string | undefined;
   readonly proximoIngreso: string | undefined;
+  /** Alias de cada contacto en forma simple (un arreglo por contacto). */
+  private readonly contactos: readonly (readonly string[])[];
 
   constructor(contexto: ContextoInterprete) {
     this.hoy = contexto.fecha_referencia;
     this.cuentas = contexto.cuentas;
+    this.contactos = (contexto.contactos ?? []).map((alias) => alias.map((a) => formaSimple(a)));
     this.clientes = new Set((contexto.clientes ?? []).flat().map((a) => formaSimple(a)));
     this.nombres = new Set([
       ...(contexto.contactos ?? []).flat().map((a) => formaSimple(a)),
@@ -182,6 +185,16 @@ export class Entorno {
     }
     l.volver(inicio);
     return null;
+  }
+
+  /**
+   * La persona es un familiar: un parentesco dicho ("mi tía", "mi jefa") o un contacto que tiene un alias de
+   * parentesco (el contacto Mamá con alias "jefa"). Para `apoyo_familiar` (06 §3.1).
+   */
+  esFamiliar(contraparte: string): boolean {
+    const dicho = formaSimple(contraparte);
+    if (dicho.split(' ').some((p) => FAMILIA.has(p))) return true;
+    return this.contactos.some((alias) => alias.includes(dicho) && alias.some((a) => FAMILIA.has(a)));
   }
 
   /** Categoría del negocio para una palabra, solo con negocio activo. */

@@ -14,7 +14,7 @@ import { configurarFrase } from './configurar';
 import { consulta } from './consultas';
 import { anular, corregirFrase, duplicados } from './correcciones';
 import { Entorno } from './entorno';
-import { gastos } from './gasto';
+import { gastos, gastoSinMonto } from './gasto';
 import { aclaracionLocal, fueraDeAlcance, preguntaPorQue } from './sin-nube';
 import { simular } from './simular';
 import {
@@ -49,7 +49,10 @@ const PRODUCCIONES: readonly Produccion[] = [
   compraMsi,
   cuentaDividida,
   gastos,
-  // Al final: solo pregunta lo obvio (gasto sin cifra, sueldo bruto, «la semana pasada», «¿me alcanza?» sin precio).
+  // Una lista de gastos donde a una parte le falta su cifra ("unos tacos de 80 y una coca") → monto_faltante.
+  gastoSinMonto,
+  // Al final: solo pregunta lo obvio (gasto sin cifra, sueldo bruto, «la semana pasada», «¿me alcanza?» sin precio,
+  // «dos cincuenta»).
   (t) => aclaracionLocal(t),
 ];
 

@@ -66,7 +66,7 @@ const PALABRAS_NUMERO = new Set([
   'nada',
 ]);
 
-const tieneCifra = (t: readonly string[]) =>
+export const tieneCifra = (t: readonly string[]) =>
   t.some((p) => /\d/.test(p) || PALABRAS_NUMERO.has(p) || /^veinti/.test(p));
 
 const contiene = (t: readonly string[], ...secuencia: readonly string[]) =>
@@ -92,6 +92,100 @@ function empiezaConGasto(t: readonly string[]): boolean {
   while (i < t.length && PREVIOS.has(t[i] ?? '')) i++;
   return VERBOS_GASTO.some((v) => v.every((p, k) => t[i + k] === p));
 }
+
+/** Primera cifra de un monto dicho como "dos cincuenta" ($2.50 o $250): de 2 a 29. */
+const PRIMERA_AMBIGUA: Readonly<Record<string, number>> = {
+  dos: 2,
+  tres: 3,
+  cuatro: 4,
+  cinco: 5,
+  seis: 6,
+  siete: 7,
+  ocho: 8,
+  nueve: 9,
+  diez: 10,
+  once: 11,
+  doce: 12,
+  trece: 13,
+  catorce: 14,
+  quince: 15,
+  dieciseis: 16,
+  diecisiete: 17,
+  dieciocho: 18,
+  diecinueve: 19,
+  veinte: 20,
+  veintiuno: 21,
+  veintidos: 22,
+  veintitres: 23,
+  veinticuatro: 24,
+  veinticinco: 25,
+  veintiseis: 26,
+  veintisiete: 27,
+  veintiocho: 28,
+  veintinueve: 29,
+};
+/** Segunda cifra: de 10 a 99 en palabras ("cincuenta", "treinta y cinco", "quince"). */
+const DECENAS_AMBIGUAS: Readonly<Record<string, number>> = {
+  treinta: 30,
+  cuarenta: 40,
+  cincuenta: 50,
+  sesenta: 60,
+  setenta: 70,
+  ochenta: 80,
+  noventa: 90,
+};
+const UNIDADES_SUELTAS: Readonly<Record<string, number>> = {
+  uno: 1,
+  dos: 2,
+  tres: 3,
+  cuatro: 4,
+  cinco: 5,
+  seis: 6,
+  siete: 7,
+  ocho: 8,
+  nueve: 9,
+};
+/** Inicios con el costo: "me salió en dos cincuenta el estacionamiento". */
+const VERBOS_COSTO: readonly (readonly string[])[] = [['me', 'salio'], ['me', 'costo'], ['salio'], ['costo']];
+
+/** "$250", "$1,250" (n < 1,000,000); sin `Intl` para que el teléfono y Node den lo mismo. */
+const pesos = (n: number) =>
+  n < 1000 ? `$${n}` : `$${Math.floor(n / 1000)},${String(n % 1000).padStart(3, '0')}`;
+const MONEDA = new Set(['pesos', 'peso', 'pesitos', 'varos', 'varo', 'baros', 'baro']);
+
+/**
+ * "dos cincuenta", "doce cincuenta", "tres treinta y cinco": dos cifras pegadas que el nivel 0 no lee (`montos.ts`)
+ * porque pueden ser centavos o cientos. Con la frase de un gasto y ninguna otra cifra, se pregunta cuál fue (M11),
+ * igual que la nube (06 §3.1 Montos). Nunca tras "a las" o "las" (es una hora).
+ */
+function montoAmbiguo(t: readonly string[]): Interpretacion | null {
+  for (let i = 0; i < t.length - 1; i++) {
+    const primera = PRIMERA_AMBIGUA[t[i] ?? ''];
+    if (primera === undefined || t[i - 1] === 'las') continue;
+    const siguiente = t[i + 1] ?? '';
+    let segunda = DECENAS_AMBIGUAS[siguiente] ?? PRIMERA_AMBIGUA[siguiente] ?? 0;
+    if (segunda < 10) continue;
+    let fin = i + 2;
+    const unidad = UNIDADES_SUELTAS[t[i + 3] ?? ''];
+    if (DECENAS_AMBIGUAS[siguiente] !== undefined && t[i + 2] === 'y' && unidad !== undefined) {
+      segunda += unidad;
+      fin = i + 4;
+    }
+    if (tieneCifra([...t.slice(0, i), ...t.slice(fin)].filter((p) => !MONEDA.has(p)))) return null;
+    const centavos = `$${primera}.${String(segunda).padStart(2, '0')}`;
+    const cientos = pesos(primera * 100 + segunda);
+    return {
+      intencion: 'aclarar',
+      motivo: 'monto_ambiguo',
+      pregunta: `¿Fueron ${centavos} o ${cientos}?`,
+      opciones: [centavos, cientos],
+    };
+  }
+  return null;
+}
+
+const empiezaConCosto = (t: readonly string[]) =>
+  empiezaConGasto(t) || VERBOS_COSTO.some((v) => v.every((p, k) => t[k] === p));
 
 /** Imperativos de mover dinero: la app solo lleva la cuenta (`08 §1`). */
 const MOVER_DINERO = new Set([
@@ -167,7 +261,8 @@ export function preguntaPorQue(tokens: Tokens): Interpretacion | null {
  * - un gasto dicho como hecho sin ninguna cifra («me compré una coca», «pagué la tarjeta») → monto_faltante;
  * - «la semana pasada» sin día al registrar → fecha_ambigua;
  * - un sueldo «bruto» → monto_ambiguo (se pregunta cuánto le llega);
- * - «¿me alcanza?» o «¿me alcanza para…?» sin precio → monto_faltante.
+ * - «¿me alcanza?» o «¿me alcanza para…?» sin precio → monto_faltante;
+ * - un gasto con un monto como «dos cincuenta» ($2.50 o $250) → monto_ambiguo con las dos opciones (26-10-2026).
  */
 export function aclaracionLocal(tokens: Tokens): Interpretacion | null {
   const t = tokens.t.filter((p) => p !== SEP);
@@ -188,6 +283,10 @@ export function aclaracionLocal(tokens: Tokens): Interpretacion | null {
       motivo: 'monto_faltante',
       pregunta: '¿Cuánto cuesta lo que quieres comprar?',
     };
+  }
+  if (empiezaConCosto(t)) {
+    const ambiguo = montoAmbiguo(t);
+    if (ambiguo) return ambiguo;
   }
   if (!empiezaConGasto(t)) return null;
   if (!cifra) return { intencion: 'aclarar', motivo: 'monto_faltante', pregunta: '¿Cuánto fue?' };

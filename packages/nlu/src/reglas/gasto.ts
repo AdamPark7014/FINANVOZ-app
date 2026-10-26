@@ -9,6 +9,7 @@ import type { Entorno } from './entorno';
 import { leerFechaRegistro } from './fechas';
 import { Lector } from './lector';
 import { leerMonto } from './montos';
+import { tieneCifra } from './sin-nube';
 import { ARTICULOS, SEP, type Tokens, recortar } from './tokens';
 
 const MAX_MOVIMIENTOS = 10;
@@ -20,13 +21,24 @@ export const VERBOS: readonly (readonly string[])[] = [
   ['me', 'gaste'],
   ['gaste'],
   ['pague'],
+  ['me', 'comi'],
   ['comi'],
   ['cene'],
   ['desayune'],
+  ['almorce'],
+  ['me', 'tome'],
+  ['tome'],
+  ['cargue'],
+  ['coopere'],
   ['registra'],
   ['anota'],
   ['apunta'],
 ];
+/** "cooperé con 150 para el pastel": solo tras "cooperé" el "con" va antes del monto ("pagué con 500" no dice cuánto costó). */
+const VERBOS_CON_MONTO: readonly string[] = ['coopere'];
+/** Tras "VERBO MONTO": "gasté 450 de gasolina", "pagué 300 por la consulta", "cooperé con 150 para el pastel". */
+const CONECTORES_MONTO = ['de', 'del', 'en', 'por'];
+const CONECTORES_MONTO_CON_VERBO = [...CONECTORES_MONTO, 'para'];
 const VERBOS_MONTO_SUELTO: readonly string[] = ['registra', 'anota', 'apunta'];
 const VERBOS_COSTO: readonly (readonly string[])[] = [['me', 'costo'], ['me', 'salio'], ['costo'], ['salio']];
 const VERBOS_GASOLINA: readonly (readonly string[])[] = [
@@ -91,6 +103,46 @@ function verbo(l: Lector): number {
   if (!encontrado) return 0;
   l.pos += encontrado.length;
   return encontrado.length;
+}
+
+/**
+ * Varias cosas con un solo monto dicho antes ("gasté 90 en estampitas y un refresco"): 2 o 3 DESC separadas por "y"
+ * o coma. Es un solo gasto por el total (06 §3.1); categoría solo si todas son de la misma.
+ */
+function listaDeDescs(
+  tokens: Tokens,
+  inicio: number,
+  fin: number,
+  env: Entorno,
+  opciones: { conocida: boolean; recibo?: boolean },
+): Desc | null {
+  const tramos: [number, number][] = [];
+  let desde = inicio;
+  for (let i = inicio; i <= fin; i++) {
+    const p = tokens.t[i];
+    if (i < fin && p !== 'y' && p !== SEP) continue;
+    if (i === desde) return null;
+    tramos.push([desde, i]);
+    desde = i + 1;
+    if (p === SEP && tokens.t[desde] === 'y') {
+      desde++;
+      i++;
+    }
+  }
+  if (tramos.length < 2 || tramos.length > 3) return null;
+  const descs: Desc[] = [];
+  for (const [a, b] of tramos) {
+    const desc = leerDesc(tokens, a, b, env, opciones);
+    if (!desc || desc.espacio) return null;
+    descs.push(desc);
+  }
+  const [primera] = descs;
+  const categoria = primera?.categoria;
+  const nombres = descs.map((d) => d.descripcion);
+  const descripcion = `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1] ?? ''}`;
+  return categoria && descs.every((d) => d.categoria === categoria)
+    ? { descripcion, categoria }
+    : { descripcion };
 }
 
 /** Primera posición `p` en `[desde, fin)` tal que un MONTO leído en `p` termina exactamente en `fin`. */
@@ -165,23 +217,26 @@ class GastoSimple {
   }
 
   /**
-   * VERBO MONTO (de|en|por) [art] DESC
+   * VERBO [con] MONTO (de|en|por|para) [art] DESC          ("con" solo tras "cooperé")
    * MONTO (de|del|en|por) [art] DESC_CONOCIDA
+   * Y con varias cosas: "gasté 90 en estampitas y un refresco" (un gasto por el total).
    */
   private montoYDesc(fin: number): Parcial | null {
     const l = new Lector(this.tokens);
     const largoVerbo = verbo(l);
     const conVerbo = largoVerbo > 0 || this.heredaVerbo;
+    if (largoVerbo > 0 && VERBOS_CON_MONTO.includes(this.tokens.t[l.pos - 1] ?? '')) l.palabra('con');
     const lectura = leerMonto(l);
     if (!lectura || lectura.monto <= 0 || l.pos >= fin) return null;
     const conector = l.ver();
-    if (conector === undefined || !['de', 'del', 'en', 'por'].includes(conector)) return null;
+    const conectores = conVerbo ? CONECTORES_MONTO_CON_VERBO : CONECTORES_MONTO;
+    if (conector === undefined || !conectores.includes(conector)) return null;
     l.pos++;
     if (l.pos >= fin) return null;
-    const desc = leerDesc(this.tokens, l.pos, fin, this.env, {
-      conocida: !conVerbo,
-      recibo: conector === 'de',
-    });
+    const opciones = { conocida: !conVerbo, recibo: conector === 'de' };
+    const desc =
+      leerDesc(this.tokens, l.pos, fin, this.env, opciones) ??
+      listaDeDescs(this.tokens, l.pos, fin, this.env, opciones);
     return desc ? { monto: lectura.monto, aproximado: lectura.aproximado, desc, conVerbo } : null;
   }
 
@@ -196,10 +251,11 @@ class GastoSimple {
     return desc ? { monto: lectura.monto, aproximado: lectura.aproximado, desc, conVerbo: true } : null;
   }
 
-  /** (registra | anota | apunta) MONTO: monto suelto, gasto sin categoría. */
+  /** (registra | anota | apunta | cooperé [con]) MONTO: monto suelto, gasto sin categoría. */
   private montoSuelto(fin: number): Parcial | null {
     const l = new Lector(this.tokens);
-    if (!l.palabra(...VERBOS_MONTO_SUELTO)) return null;
+    if (l.palabra(...VERBOS_CON_MONTO)) l.palabra('con');
+    else if (!l.palabra(...VERBOS_MONTO_SUELTO)) return null;
     const lectura = leerMonto(l);
     if (!lectura || lectura.monto <= 0 || l.pos !== fin) return null;
     return { monto: lectura.monto, aproximado: lectura.aproximado, conVerbo: true };
@@ -266,6 +322,88 @@ function fechaYCuerpo(tokens: Tokens, env: Entorno): { fecha: string; cuerpo: To
     }
   }
   return { fecha: env.hoy, cuerpo: tokens };
+}
+
+/** Un solo gasto (sin fecha ni método compartido) en todos los `tokens`, o `null`. Lo usa DIVIDIDA ("…me deben su parte"). */
+export function leerGastoSimple(
+  tokens: Tokens,
+  env: Entorno,
+): { monto: Centavos; aproximado: boolean; desc?: Desc; origen?: RefCuenta } | null {
+  const parcial = new GastoSimple(tokens, env, false).leer();
+  return parcial?.conVerbo ? parcial : null;
+}
+
+const DEFINIDO: Readonly<Record<string, string>> = {
+  un: 'el',
+  una: 'la',
+  unos: 'los',
+  unas: 'las',
+  el: 'el',
+  la: 'la',
+  los: 'los',
+  las: 'las',
+};
+
+/**
+ * Una lista de gastos donde a una parte le falta su cifra: "unos tacos de 80 y una coca" (X06). No se registra nada
+ * a medias: se pregunta cuánto costó lo que falta (06 §3.1 Montos). Solo si la primera parte trae su monto: en "unos
+ * tenis y una playera de 1,200" la cifra puede ser el total, y eso lo decide la nube.
+ */
+export function gastoSinMonto(tokens: Tokens, env: Entorno): Interpretacion | null {
+  const conFecha = fechaYCuerpo(tokens, env);
+  if (!conFecha) return null;
+  let cuerpo = conFecha.cuerpo;
+  const metodo = inicioMetodoFinal(cuerpo, 0, cuerpo.t.length, env, true);
+  if (metodo) cuerpo = recortar(cuerpo, 0, metodo.desde);
+  const tramos: [number, number][] = [];
+  let desde = 0;
+  for (let i = 0; i <= cuerpo.t.length; i++) {
+    const p = cuerpo.t[i];
+    if (i < cuerpo.t.length && p !== 'y' && p !== SEP) continue;
+    if (i === desde) {
+      if (p === 'y' && cuerpo.t[i - 1] === SEP) {
+        desde = i + 1;
+        continue;
+      }
+      return null;
+    }
+    tramos.push([desde, i]);
+    desde = i + 1;
+  }
+  if (tramos.length < 2 || tramos.length > MAX_MOVIMIENTOS) return null;
+  let heredaVerbo = false;
+  const faltan: { nombre: string; plural: boolean }[] = [];
+  for (const [indice, [a, b]] of tramos.entries()) {
+    const parte = recortar(cuerpo, a, b);
+    const leido = new GastoSimple(parte, env, heredaVerbo).leer();
+    if (leido) {
+      heredaVerbo ||= leido.conVerbo;
+      continue;
+    }
+    if (indice === 0 || tieneCifra(parte.t)) return null;
+    const l = new Lector(parte);
+    const conVerbo = verbo(l) > 0;
+    const desc = leerDesc(parte, l.pos, parte.t.length, env, { conocida: !(conVerbo || heredaVerbo) });
+    if (!desc || desc.espacio) return null;
+    heredaVerbo ||= conVerbo;
+    const articulo = DEFINIDO[parte.t[l.pos] ?? ''];
+    faltan.push({
+      nombre: articulo ? `${articulo} ${desc.descripcion}` : desc.descripcion,
+      plural: articulo === 'los' || articulo === 'las' || (!articulo && /s$/.test(desc.descripcion)),
+    });
+  }
+  const [unico] = faltan;
+  if (!unico) return null;
+  const nombres = faltan.map((f) => f.nombre);
+  const lista = `${nombres.slice(0, -1).join(', ')}${nombres.length > 1 ? ' y ' : ''}${nombres[nombres.length - 1]}`;
+  const plural = faltan.length > 1 || unico.plural;
+  const pregunta = `¿Cuánto ${plural ? 'costaron' : 'costó'} ${lista}?`;
+  // La pregunta del esquema mide a lo más 120 caracteres.
+  return {
+    intencion: 'aclarar',
+    motivo: 'monto_faltante',
+    pregunta: pregunta.length <= 120 ? pregunta : '¿Cuánto costó cada cosa?',
+  };
 }
 
 /** GASTO := [FECHA] PARTE (("y" | ",") PARTE)* [, [todo] METODO] [FECHA] */

@@ -66,7 +66,7 @@ describe('nivel 0 sin nube: lo que antes se mandaba solo para que la nube pregun
     expect(reglas('no, fue con la Nu')?.intencion).not.toBe('aclarar');
     expect(reglas('¿cuánto gasté la semana pasada?')?.intencion).not.toBe('aclarar');
     expect(reglas('hola')).toBeNull();
-    expect(reglas('le pasé 200 a mi jefa')).toBeNull();
+    expect(reglas('le pagué 200 a mi jefa')).toBeNull();
   });
 
   it('todo lo que devuelve cumple el esquema', () => {

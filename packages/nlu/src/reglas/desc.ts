@@ -4,7 +4,7 @@
  * el pelo", "el agua"); y, con negocio activo, "mercancía" e "insumos".
  */
 import type { Categoria } from '../esquema';
-import { buscarEnDiccionario } from './diccionario';
+import { buscarEnDiccionario, MASCOTAS_DESTINO, sonConocidas } from './diccionario';
 import type { Entorno } from './entorno';
 import {
   ARTICULOS,
@@ -29,7 +29,14 @@ export interface OpcionesDesc {
 }
 
 /** Unen dos partes de una DESC compuesta ("consulta con el médico", "medicinas de la farmacia"). */
-const CONECTORES_DESC = new Set(['con', 'de', 'del', 'en']);
+const CONECTORES_DESC = new Set(['con', 'de', 'del', 'en', 'para', 'al']);
+/**
+ * Conectores de pertenencia o destino ("pastel de la oficina", "croquetas para el perro", "tacos al pastor"): basta
+ * con que A sea conocida; B solo cambia la categoría si es una mascota o si trae otra palabra del diccionario.
+ */
+const CONECTORES_DESTINO = new Set(['de', 'del', 'para', 'al']);
+/** Tras "de", "del" o "para" la B puede llevar posesivo: "regalo para mi sobrina". */
+const POSESIVOS = new Set(['mi', 'mis', 'su', 'sus', 'tu', 'tus']);
 
 /** Frases del diccionario de §3.1 que llevan artículo o preposición y por eso no entran palabra por palabra. */
 const FRASES_CONOCIDAS: readonly (readonly [string, Categoria])[] = [
@@ -84,6 +91,23 @@ function categoriaUnica(palabras: readonly string[], exigirTodas: boolean): Cate
   return categorias.size === 1 && categoria ? categoria : null;
 }
 
+/**
+ * Categoría de "A de/para/al B" (06 §9.1, DESC compuesta de destino, 26-10-2026). Sin verbo, A debe ser conocida.
+ * Una mascota en B gana ("comida para el perro" es de la mascota, no comida fuera); si no, la categoría es la única
+ * del diccionario entre A y B ("regalo para mi sobrina" → regalos; "boletos del metro" → ninguna).
+ */
+function compraConDestino(
+  antes: readonly string[],
+  despues: readonly string[],
+  conocida: boolean,
+): { categoria?: Categoria } | null {
+  if (conocida && !sonConocidas(antes)) return null;
+  if (despues.some((p) => MASCOTAS_DESTINO.has(p))) return { categoria: 'mascotas' };
+  const { categorias } = buscarEnDiccionario([...antes, ...despues]);
+  const [unica] = categorias;
+  return categorias.size === 1 && unica ? { categoria: unica } : {};
+}
+
 /** Palabras sueltas (sin conector): todas aptas y sin nombres ni alias. */
 function palabrasSimples(palabras: readonly string[], env: Entorno): boolean {
   if (palabras.length < 1 || palabras.length > 3) return false;
@@ -132,9 +156,13 @@ export function leerDesc(
   }
   const conector = palabras.findIndex((p) => CONECTORES_DESC.has(p));
   if (conector !== -1) {
+    const union = palabras[conector] ?? '';
     const antes = palabras.slice(0, conector);
     const despuesCrudo = palabras.slice(conector + 1);
-    const conArticulo = despuesCrudo.length > 1 && ARTICULOS.has(despuesCrudo[0] ?? '');
+    const primera = despuesCrudo[0] ?? '';
+    const conArticulo =
+      despuesCrudo.length > 1 &&
+      (ARTICULOS.has(primera) || (CONECTORES_DESTINO.has(union) && POSESIVOS.has(primera)));
     const despues = conArticulo ? despuesCrudo.slice(1) : despuesCrudo;
     if (antes.length < 1 || despues.length < 1 || antes.length + despues.length > 3) return null;
     if (!palabrasSimples(antes, env)) return null;
@@ -142,6 +170,11 @@ export function leerDesc(
     if (palabrasSimples(despues, env)) {
       const categoria = categoriaUnica([...antes, ...despues], true);
       if (categoria) return { descripcion, categoria };
+      // "A de/para/al B": A conocida (o con verbo, cualquiera); B nunca es un nombre ni un alias.
+      if (CONECTORES_DESTINO.has(union)) {
+        const destino = compraConDestino(antes, despues, opciones.conocida);
+        if (destino) return { descripcion, ...destino };
+      }
     }
     // "A en COMERCIO": A conocida y B un comercio con mayúscula.
     const inicioComercio = desde + conector + 1 + (conArticulo ? 1 : 0);
@@ -154,9 +187,9 @@ export function leerDesc(
   if (!palabrasSimples(palabras, env)) return null;
   const categoria = categoriaUnica(palabras, opciones.conocida);
   if (opciones.conocida && !categoria) {
-    // Todas conocidas pero de dos categorías ("tacos coca") sigue siendo DESC_CONOCIDA, sin categoría.
-    const { cubiertas } = buscarEnDiccionario(palabras);
-    return cubiertas.every(Boolean) ? { descripcion } : null;
+    // Todas conocidas pero de dos categorías ("tacos coca") o sin categoría ("unas chelas") sigue siendo
+    // DESC_CONOCIDA, sin categoría.
+    return sonConocidas(palabras) ? { descripcion } : null;
   }
   return categoria ? { descripcion, categoria } : { descripcion };
 }
