@@ -129,18 +129,11 @@ jobs:
           emulator-boot-timeout: 900
           disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -timezone America/Mexico_City
+          # android-emulator-runner corre cada línea de `script` por separado con sh: nada de if/for de varias líneas
+          # (el bloque que había aquí terminaba en «Syntax error: end of file unexpected»). Todo vive en el script.
           script: |
             export MAESTRO_CLI_NO_ANALYTICS=1
-            # Flujos de la app que ya toman capturas, si los hay (los de la raíz de .maestro son los de Android).
-            EXTRA="$(grep -l takeScreenshot apps/movil/.maestro/*.yaml 2>/dev/null || true)"
             APK="$APK" SALIDA="$SALIDA" bash scripts/tienda/capturas-android.sh
-            if [ -n "$EXTRA" ]; then
-              mkdir -p "$SALIDA/claro"
-              adb shell cmd uimode night no
-              for f in $EXTRA; do
-                (cd "$SALIDA/claro" && maestro test "$GITHUB_WORKSPACE/$f") || echo "AVISO: $f falló (no bloquea)"
-              done
-            fi
 
       - name: Enmarcar para la tienda
         if: ${{ !cancelled() }}
