@@ -6,7 +6,7 @@
  * (campos vs umbral, latencia, tokens, costo). Progreso largo va a stderr (`eval:nlu: N casos…`).
  *
  *   --nivel reglas                                   nivel 0, sin red
- *   --nivel nube --proveedor X [--modelo M] [--grabar] [--limite N] [--concurrencia N]
+ *   --nivel nube --proveedor X [--modelo M] [--grabar] [--limite N] [--concurrencia N] [--por-minuto N]
  *       Con NLU_PROXY_URL y NLU_PROXY_JWT llama al proxy (local o desplegado); si no, llama directo al proveedor
  *       con su llave del entorno (ANTHROPIC_API_KEY, OPENAI_API_KEY o GOOGLE_API_KEY; nunca en el repositorio).
  *       --grabar escribe fixtures/nlu/grabaciones/<proveedor>/<modelo>.jsonl.
@@ -61,7 +61,7 @@ function opcion(argumentos: readonly string[], nombre: string): string | undefin
 const porcentaje = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(1)} %`);
 
 const USO =
-  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] [--solo-nube] [--solo G01,G02] [--permitir-caro] | --offline | --pasos | --confirmacion | --reparacion';
+  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] [--concurrencia N] [--por-minuto N] [--solo-nube] [--solo G01,G02] [--permitir-caro] | --offline | --pasos | --confirmacion | --reparacion';
 
 interface ReporteCobertura {
   casos: ResultadoCaso[];
@@ -225,12 +225,23 @@ function llamadaProxy(url: string, jwt: string, proveedor: string, modelo: strin
   };
 }
 
-async function enParalelo<T, R>(lista: readonly T[], n: number, fn: (x: T) => Promise<R>): Promise<R[]> {
+async function enParalelo<T, R>(
+  lista: readonly T[],
+  n: number,
+  fn: (x: T) => Promise<R>,
+  porMinuto = 0,
+): Promise<R[]> {
   const salida: R[] = new Array(lista.length);
   let siguiente = 0;
+  // `--por-minuto`: la puerta limita las peticiones por minuto de cada proyecto (pruebas: 60, compartidas con otros
+  // evals); cada inicio espera su turno para no recibir 429 (que el adaptador reintenta y se cuenta como falla).
+  const inicio = performance.now();
+  const espaciado = porMinuto > 0 ? 60_000 / porMinuto : 0;
   const trabajador = async () => {
     while (siguiente < lista.length) {
       const i = siguiente++;
+      const espera = inicio + i * espaciado - performance.now();
+      if (espera > 0) await new Promise((r) => setTimeout(r, espera));
       salida[i] = await fn(lista[i] as T);
       if ((i + 1) % 20 === 0) console.error(`  ${i + 1}/${lista.length}`);
     }
@@ -293,7 +304,13 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
   const base = nombre === 'anthropic' ? process.env.ANTHROPIC_BASE_URL?.trim() : undefined;
   const via = url && jwt ? 'proxy' : (base ?? 'API directa');
   console.error(`eval:nlu: ${casos.length} casos con ${nombre}/${modelo} vía ${via}`);
-  const grabaciones = await enParalelo(casos, concurrencia, (c) => llamar(c, solicitud.contexto_min));
+  const porMinuto = Number(opcion(argumentos, '--por-minuto') ?? '0');
+  const grabaciones = await enParalelo(
+    casos,
+    concurrencia,
+    (c) => llamar(c, solicitud.contexto_min),
+    porMinuto,
+  );
 
   const reporte = evaluarNube(casos, grabaciones, precioDe(nombre, modelo));
   console.log(formatearReporte(reporte));
