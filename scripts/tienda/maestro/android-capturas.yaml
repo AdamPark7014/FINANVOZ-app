@@ -16,7 +16,9 @@ tags:
     visible:
       id: onb-bienvenida
     timeout: 90000
-- runFlow: ../../../apps/movil/.maestro/onboarding.yaml
+# El onboarding largo de `.maestro/onboarding.yaml` quedó atrás de la Ola 7 (ids de O4); el camino corto de iPhone
+# también sirve en Android (O6 «Ahora no»).
+- runFlow: ../../../apps/movil/.maestro/ios/subflujos/onboarding-rapido.yaml
 - takeScreenshot: hoy
 # Desglose de «hoy puedes»
 - runFlow:
@@ -122,6 +124,19 @@ tags:
       id: ajustes
     timeout: 10000
 - takeScreenshot: ajustes
+# Barra nativa (PLAN-UX 3.3): Ajustes › Ingreso con el chevron y de regreso con «atrás»
+- tapOn:
+    id: ajustes-cambiar-ingreso
+- extendedWaitUntil:
+    visible:
+      id: editar-ingreso
+    timeout: 10000
+- takeScreenshot: ajustes-ingreso
+- back
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
 - scrollUntilVisible:
     element:
       id: ajustes-privacidad

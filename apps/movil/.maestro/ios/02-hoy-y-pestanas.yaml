@@ -36,38 +36,46 @@ tags:
           visible:
             id: pantalla-hoy
           timeout: 10000
-# ¿Me alcanza? → puerta de Plus o pantalla
+# ¿Me alcanza? → puerta de Plus o pantalla. Solo existe con tienda o Plus de prueba (PLAN-UX 1.4): la build del
+# simulador no trae compras y el botón no se muestra.
 - scrollUntilVisible:
     element:
       id: boton-me-alcanza
-- tapOn:
-    id: boton-me-alcanza
-- extendedWaitUntil:
-    visible:
-      id: '(puerta-plus|pantalla-me-alcanza)'
-    timeout: 10000
-- takeScreenshot: me-alcanza
+    timeout: 5000
+    optional: true
 - runFlow:
     when:
       visible:
-        id: puerta-plus-conocer
+        id: boton-me-alcanza
     commands:
       - tapOn:
-          id: puerta-plus-conocer
+          id: boton-me-alcanza
       - extendedWaitUntil:
           visible:
-            id: pantalla-plan
+            id: '(puerta-plus|pantalla-me-alcanza)'
           timeout: 10000
+      - takeScreenshot: me-alcanza
+      - runFlow:
+          when:
+            visible:
+              id: puerta-plus-conocer
+          commands:
+            - tapOn:
+                id: puerta-plus-conocer
+            - extendedWaitUntil:
+                visible:
+                  id: pantalla-plan
+                timeout: 10000
+            - runFlow: subflujos/atras.yaml
+            - extendedWaitUntil:
+                visible:
+                  id: puerta-plus
+                timeout: 10000
       - runFlow: subflujos/atras.yaml
       - extendedWaitUntil:
           visible:
-            id: puerta-plus
+            id: pantalla-hoy
           timeout: 10000
-- runFlow: subflujos/atras.yaml
-- extendedWaitUntil:
-    visible:
-      id: pantalla-hoy
-    timeout: 10000
 # El desglose se cierra con la misma barra
 - tapOn:
     id: boton-desglose

@@ -21,6 +21,9 @@
   - **Textos**: «Finanvoz» de vuelta en la bienvenida, con texto propio para iPhone (sin prometer los avisos del
     banco); «Cuando dejes de hablar, termino solo.» como en el mockup aprobado.
   - Decisiones en `docs/ESTADO.md` (25-10) y `docs/PLAN-UX-VOZ.md` §3.3 y §3.6.
+  - **Maestro**: `tocar.yaml` centra el elemento (el pie fijo tapaba «Agregar tarjeta» en O4), «¿Me alcanza?» es
+    opcional en 02 (la build del simulador no trae compras), 05 manda la frase con «Enviar». Las capturas de tienda
+    de Android usan el onboarding corto (el largo quedó atrás de la Ola 7) y toman Ajustes › Ingreso con la barra.
 - `0f5a01c` («WIP: rescate») era trabajo de Cursor a medio hacer (`FilaAjuste`), no de Claude: lo de Claude del 23-10
   (nivel 0 sin nube, chips de Movimientos) ya estaba en `790e3fd` y `bef69db` y sigue intacto.
 

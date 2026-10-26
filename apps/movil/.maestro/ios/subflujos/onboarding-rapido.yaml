@@ -67,10 +67,10 @@ name: Subflujo · onboarding rápido
 - takeScreenshot: o5-pagos-fijos
 - tapOn:
     id: onb-pagos-continuar
-# O6 solo existe mientras el iPhone no lo salte (Ola 3)
+# O6 solo existe mientras el iPhone no lo salte (Ola 3); en Android (capturas de tienda) es la captura: «Ahora no».
 - extendedWaitUntil:
     visible:
-      id: '(onb-captura-pronto|onb-colchon)'
+      id: '(onb-captura-pronto|onb-captura-ahora-no|onb-colchon)'
     timeout: 10000
 - runFlow:
     when:
@@ -80,6 +80,14 @@ name: Subflujo · onboarding rápido
       - takeScreenshot: o6-captura-iphone
       - tapOn:
           id: onb-captura-continuar
+- runFlow:
+    when:
+      visible:
+        id: onb-captura-ahora-no
+    commands:
+      - takeScreenshot: o6-captura-android
+      - tapOn:
+          id: onb-captura-ahora-no
 - extendedWaitUntil:
     visible:
       id: onb-colchon

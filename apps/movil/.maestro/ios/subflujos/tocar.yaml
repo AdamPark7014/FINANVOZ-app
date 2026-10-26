@@ -6,9 +6,11 @@ name: Subflujo · tocar sin teclado encima
     file: cerrar-teclado.yaml
     env:
       ANCLA: ${ANCLA}
+# Centrado: si el elemento queda al borde, el pie fijo («Continuar») lo tapa y el toque cae en el pie.
 - scrollUntilVisible:
     element:
       id: ${ID}
-    timeout: 15000
+    centerElement: true
+    timeout: 30000
 - tapOn:
     id: ${ID}

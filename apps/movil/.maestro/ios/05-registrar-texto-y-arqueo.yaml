@@ -6,20 +6,9 @@ tags:
   - recorrido
 ---
 - runFlow: subflujos/onboarding-rapido.yaml
-# El campo ya tiene el foco: se escribe sin tocarlo y se cierra el teclado con la fecha
-- tapOn:
-    id: boton-escribir
-- extendedWaitUntil:
-    visible:
-      id: campo-registrar
-    timeout: 5000
-- runFlow: subflujos/intro-teclado.yaml
-- inputText: 'coca 25 en efectivo'
-- runFlow:
-    file: subflujos/cerrar-teclado.yaml
-    env: { ANCLA: hoy-fecha }
-- tapOn:
-    id: boton-enviar-registro
+# Se escribe y se manda con «Enviar» del teclado, como en el flujo 09 (tocar la fecha para cerrar el teclado dejaba
+# el campo vacío desde que el orbe es lo principal, b6fecc7)
+- runFlow: { file: subflujos/decir-por-texto.yaml, env: { FRASE: 'coca 25 en efectivo' } }
 - extendedWaitUntil:
     visible:
       id: aviso
