@@ -10,6 +10,7 @@ import {
   respuestaOpenAI,
 } from './__pruebas__/dobles.ts';
 import { crearPresupuesto, interpretar, NO_ENTENDI } from './interpretar.ts';
+import { MENSAJE_CORTADA } from './prompt.ts';
 import {
   type Adaptador,
   crearAnthropic,
@@ -134,6 +135,21 @@ describe('interpretar (06 §2, §10.1; 03 §6)', () => {
     expect(en(mensajes, 2).content).toContain('movimientos.0.monto');
     expect(en(mensajes, 2).content).toContain('movimientos.0.fecha');
     expect(en(mensajes, 2).content).not.toContain('80.5');
+  });
+
+  it('respuesta cortada por max_tokens → el reintento pide una respuesta más corta', async () => {
+    const cortada = {
+      ...respuestaAnthropic('{"interpretacion": {"intencion": "regis'),
+      stop_reason: 'max_tokens',
+    };
+    const { opciones, principal } = preparar([
+      json(cortada),
+      json(respuestaAnthropic(salida(INTERPRETACION))),
+    ]);
+    const r = await interpretar('x', CONTEXTO, opciones);
+    expect(r).toMatchObject({ ok: true, desenlace: 'reintento_validacion', interpretacion: INTERPRETACION });
+    const mensajes = en(principal.peticiones, 1).cuerpo.messages as { role: string; content: string }[];
+    expect(en(mensajes, 2).content).toBe(MENSAJE_CORTADA);
   });
 
   it('dos respuestas inválidas (o que no son JSON) → aclarar/no_entendi', async () => {

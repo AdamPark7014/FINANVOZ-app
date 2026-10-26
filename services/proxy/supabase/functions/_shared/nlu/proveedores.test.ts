@@ -183,6 +183,26 @@ describe('Anthropic (Messages API)', () => {
     await expect(a.llamar({ prompt, senal: senal() })).rejects.toMatchObject({ tipo: 'servidor' });
   });
 
+  it('stop_reason max_tokens marca la respuesta como cortada; las demás no', async () => {
+    const f = fetchFalso([
+      json({ ...herramienta({ interpretacion: {} }), stop_reason: 'max_tokens' }),
+      json(herramienta({ interpretacion: INTERPRETACION })),
+    ]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch });
+    expect(await a.llamar({ prompt, senal: senal() })).toMatchObject({ cortada: true });
+    expect(await a.llamar({ prompt, senal: senal() })).not.toHaveProperty('cortada');
+  });
+
+  it('una salida anterior vacía va al reintento con un marcador (la API rechaza el turno vacío)', async () => {
+    const f = fetchFalso([json(respuestaAnthropic(salida))]);
+    const a = crearAnthropic({ llave: 'k', fetch: f.fetch });
+    await a.llamar({ prompt, reintento: { salidaAnterior: '  ', correccion: 'corrige' }, senal: senal() });
+    expect(en(f.peticiones, 0).cuerpo.messages).toContainEqual({
+      role: 'assistant',
+      content: '(sin respuesta)',
+    });
+  });
+
   it('el reintento agrega la salida anterior y la corrección, y termina en un turno del usuario', async () => {
     const f = fetchFalso([json(respuestaAnthropic(salida))]);
     const a = crearAnthropic({ llave: 'k', fetch: f.fetch });

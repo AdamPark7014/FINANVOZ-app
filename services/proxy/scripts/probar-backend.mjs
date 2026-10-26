@@ -153,7 +153,7 @@ async function main() {
     const nlu = await http('POST', '/functions/v1/nlu-interpretar', {
       token: a.token,
       cuerpo: {
-        texto: 'unas chelas de 80 con la Nu y una coca de 25 en efectivo',
+        texto: 'unas micheladas de 80 con la Nu y una coca de 25 en efectivo',
         contexto_min: {
           fecha_referencia: hoy,
           dia_semana: dia,

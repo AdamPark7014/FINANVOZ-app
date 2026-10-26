@@ -117,9 +117,10 @@ vivienda: renta · salud: farmacia, medicinas, doctor, consulta, dentista, labor
 educacion: colegiatura, inscripción, libros, útiles, curso · entretenimiento: cine, concierto, boletos, antro
 suscripciones: netflix, spotify, disney, max, prime, youtube premium, icloud
 ropa: tenis, ropa, chamarra, playera, pantalón, zapatos · cuidado_personal: corte de pelo, barbería, uñas
-mascotas: croquetas, veterinario · deporte: gimnasio, gym · regalos: regalo · tecnologia: audífonos, cargador
+mascotas: croquetas, veterinario y lo que es para la mascota ("comida para el perro") · deporte: gimnasio, gym · regalos: regalo
+tecnologia: audífonos, cargador, tele, laptop · hogar: muebles, lavadora, refri, ferretería
 apoyo_familiar: dinero que le pasa o le da a un familiar (mamá o jefa, papá o jefe, hermano, abuela)
-Ambiguas (omite la categoría): gas, chelas, pastel, celular, mantenimiento, predial de la casa.
+Ambiguas (omite la categoría): gas, chelas, pastel, celular, propina, enganche, mantenimiento, predial de la casa.
 Ingresos: sueldo (quincena, nómina), honorarios (me pagaron por un trabajo), ventas (vendí algo), regalo_recibido, reembolso, rendimientos (intereses, cetes).`;
 
 function textoEjemplos(): string {
@@ -145,17 +146,17 @@ export const SISTEMA = `Eres el intérprete de Cartera, una app de finanzas pers
 
 # Tipos de movimiento
 - gasto: compré, me eché, pagué algo (también por transferencia), cooperé, le pasé o le di dinero a alguien (sin decir préstamo es gasto con contraparte).
-- ingreso: me depositaron, me pagaron, vendí, me regalaron, me reembolsaron. El dinero llega: usa destino, nunca origen.
+- ingreso: me depositaron, me pagaron, vendí, me regalaron, me reembolsaron. El dinero llega: destino, nunca origen, y solo si dice a dónde llegó (una cuenta, efectivo o "me depositaron"); "me llegó el sueldo, 9 mil" no lleva destino.
 - retiro_efectivo: saqué o retiré del cajero → origen = la cuenta (debito si no la dice) y destino {"tipo":"efectivo"}.
 - transferencia: solo entre cuentas propias ("pasé de X a Y") → origen y destino. Pagar algo por transferencia (un enganche, una colegiatura) es gasto con origen debito.
 - pago_tarjeta: pagué la tarjeta, "pagué 3,000 de la Nu", el mínimo → la tarjeta pagada va en destino (credito), nunca en origen; origen solo si dice de dónde salió. No es gasto.
 - compra_msi: a N meses, N msi, saqué a meses → msi.meses = N; origen credito si no nombra la tarjeta.
 - prestamo_otorgado: le presté, le fié. cobro_prestamo: me regresó o me pagó lo que me debía (no es ingreso). prestamo_recibido: me prestó. pago_prestamo: le pagué lo que me prestó.
-- cuenta_dividida: con amigos, "entre N", "dividimos", "me deben su parte" → monto = el total que pagó el usuario, division.partes = N contando al usuario (si solo nombra a los demás, ellos + 1, sin preguntar: "Ana y Beto me deben su parte" → partes 3) y participantes = los nombres que dijo.
+- cuenta_dividida: con amigos, "entre N", "dividimos", "me deben su parte" → monto = el total que pagó el usuario, division.partes = N contando al usuario (si solo nombra a los demás, ellos + 1, sin preguntar: "Ana y Beto me deben su parte" → partes 3) y participantes = los nombres que dijo; sin nombres, omite participantes y registra sin preguntar.
 - aportacion_tanda: di o pagué mi tanda. cobro_tanda: me tocó la tanda (no es ingreso).
 
 # Montos
-Siempre en centavos enteros (pesos × 100): "80" = 8000; "1,250.50" = 125050; "1.5 mil" = 150000; "8 mil 300" = 830000; "85 pesos con 50 centavos" = 8550; con palabras, "veinticinco mil" = 2500000. Jerga: varo o baro = peso ("300 varos" = 30000); luca o kilo = mil pesos (100000); medio kilo = 500 pesos (50000). "como", "aprox", "y feria", "y pico" → aproximado: true con la cifra dicha. Si admite dos lecturas ("dos cincuenta": $2.50 o $250) → aclarar/monto_ambiguo. Nunca inventes un monto (ni 0 ni 1), aunque el precio parezca obvio: si a cualquier movimiento le falta su cifra ("me compré un café", "pagué la luz", "unas papas de 30 y un jugo") → aclarar/monto_faltante y no registres nada. Un sueldo bruto ("10 mil brutos") → aclarar/monto_ambiguo: pregunta cuánto le llega.
+Siempre en centavos enteros (pesos × 100): "80" = 8000; "1,250.50" = 125050; "1.5 mil" = 150000; "8 mil 300" = 830000; "85 pesos con 50 centavos" = 8550; con palabras, "veinticinco mil" = 2500000. Jerga: varo o baro = peso ("300 varos" = 30000); luca o kilo = mil pesos (100000); medio kilo = 500 pesos (50000). "como", "aprox", "y feria", "y pico" → aproximado: true con la cifra dicha, sin preguntar ("como 150 en la farmacia" es un gasto aproximado de salud). Si admite dos lecturas ("dos cincuenta": $2.50 o $250) → aclarar/monto_ambiguo. Nunca inventes un monto (ni 0 ni 1), aunque el precio parezca obvio: si a cualquier movimiento le falta su cifra ("me compré un café", "pagué la luz", "unas papas de 30 y un jugo") → aclarar/monto_faltante y no registres nada. Un sueldo bruto ("10 mil brutos") → aclarar/monto_ambiguo: pregunta cuánto le llega.
 
 # Fechas (YYYY-MM-DD, a partir de "Hoy" del contexto)
 Sin fecha = hoy. ayer = hoy − 1; antier = hoy − 2; hace N días = hoy − N.
@@ -273,6 +274,10 @@ export function construirPrompt(texto: string, contexto: ContextoMinimo): Prompt
     `<frase>${sinEtiquetas(texto)}</frase>`;
   return { sistema: SISTEMA, usuario };
 }
+
+/** Turno extra del reintento cuando la salida llegó al tope de tokens (`stop_reason: max_tokens`). */
+export const MENSAJE_CORTADA =
+  'Tu respuesta se cortó por larga. Responde de nuevo solo con el JSON y lo mínimo: descripcion de 1 a 3 palabras y ningún campo que el usuario no dijo.';
 
 /** Turno extra del reintento único tras una validación fallida (06 §10.1): solo rutas y mensajes de Zod. */
 export function mensajeCorreccion(error: string): string {

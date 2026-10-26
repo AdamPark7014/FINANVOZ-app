@@ -6,7 +6,7 @@
 // (`PRESUPUESTO_TOTAL_MS`) menor que el tiempo máximo del cliente: un intento que ya no cabe no se inicia.
 // No registra nada: devuelve metadatos para que el manejador los registre (regla 9).
 import type { ContextoMinimo } from './contrato.ts';
-import { construirPrompt, mensajeCorreccion, type Prompt } from './prompt.ts';
+import { construirPrompt, MENSAJE_CORTADA, mensajeCorreccion, type Prompt } from './prompt.ts';
 import {
   type Adaptador,
   FallaProveedor,
@@ -216,7 +216,10 @@ export async function interpretar(
     if (tiempoReintento !== null) {
       try {
         llamadas += 1;
-        const reintento = { salidaAnterior: respuesta.texto, correccion: mensajeCorreccion(primera.error) };
+        const reintento = {
+          salidaAnterior: respuesta.texto,
+          correccion: respuesta.cortada ? MENSAJE_CORTADA : mensajeCorreccion(primera.error),
+        };
         const r = await conTiempo(tiempoReintento, (senal) => adaptador.llamar({ prompt, reintento, senal }));
         sumarUso(uso, r);
         segunda = leer(r.texto, adaptador, opciones.validar);

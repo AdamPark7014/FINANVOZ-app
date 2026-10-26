@@ -93,7 +93,15 @@ export interface RespuestaProveedor {
   /** De la entrada, cuántos se leyeron de caché (0.1×) y cuántos se escribieron (1.25×), si el proveedor lo dice. */
   tokens_cache_leidos?: number;
   tokens_cache_escritos?: number;
+  /** La salida llegó al tope de tokens (`stop_reason: max_tokens`): el JSON viene incompleto. */
+  cortada?: boolean;
 }
+
+/**
+ * Turno del asistente para el reintento: la API rechaza un contenido vacío (400), así que una salida vacía (sin
+ * herramienta ni texto) se manda con un marcador.
+ */
+export const salidaParaReintento = (salida: string) => salida.trim() || '(sin respuesta)';
 
 export type TipoFalla = 'servidor' | 'tiempo' | 'cliente';
 
@@ -289,7 +297,7 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
     async llamar({ prompt, reintento, senal }) {
       const mensajes: unknown[] = [{ role: 'user', content: prompt.usuario }];
       if (reintento) {
-        mensajes.push({ role: 'assistant', content: reintento.salidaAnterior });
+        mensajes.push({ role: 'assistant', content: salidaParaReintento(reintento.salidaAnterior) });
         mensajes.push({ role: 'user', content: reintento.correccion });
       }
       const cuerpo: Objeto = {
@@ -350,7 +358,9 @@ export function crearAnthropic(c: ConfiguracionAdaptador): Adaptador {
               .map((b) => b.text as string)
               .join(''),
           );
-      return { texto, ...usoAnthropic(datos.usage) };
+      // Con `max_tokens` el JSON llega incompleto: lo dice para que el reintento pida una respuesta más corta.
+      const cortada = datos.stop_reason === 'max_tokens';
+      return { texto, ...usoAnthropic(datos.usage), ...(cortada ? { cortada } : {}) };
     },
   };
 }
@@ -367,7 +377,7 @@ export function crearOpenAI(c: ConfiguracionAdaptador): Adaptador {
         { role: 'user', content: prompt.usuario },
       ];
       if (reintento) {
-        mensajes.push({ role: 'assistant', content: reintento.salidaAnterior });
+        mensajes.push({ role: 'assistant', content: salidaParaReintento(reintento.salidaAnterior) });
         mensajes.push({ role: 'user', content: reintento.correccion });
       }
       const datos = await enviar(
@@ -409,7 +419,7 @@ export function crearGoogle(c: ConfiguracionAdaptador): Adaptador {
     async llamar({ prompt, reintento, senal }) {
       const contenidos: unknown[] = [{ role: 'user', parts: [{ text: prompt.usuario }] }];
       if (reintento) {
-        contenidos.push({ role: 'model', parts: [{ text: reintento.salidaAnterior }] });
+        contenidos.push({ role: 'model', parts: [{ text: salidaParaReintento(reintento.salidaAnterior) }] });
         contenidos.push({ role: 'user', parts: [{ text: reintento.correccion }] });
       }
       const datos = await enviar(
