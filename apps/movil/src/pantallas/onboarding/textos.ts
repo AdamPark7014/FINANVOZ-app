@@ -1,4 +1,5 @@
 /** Copy y TalkBack del onboarding O1–O7 (`02 §3`, `02 §14`, tuteo). */
+import { segunPlataforma } from '../ajustes/plataforma';
 
 export {
   TIP_CAPTURA_AHORA_NO,
@@ -18,8 +19,20 @@ export const ERROR_GUARDAR = 'No pude guardar eso. Revisa los datos e intenta de
 export const TITULO_BIENVENIDA = 'Sabe cada día cuánto puedes gastar';
 export const AYUDA_BIENVENIDA =
   'Sin quedarte corto antes de tu próximo pago. Habla o escribe; te toma unos 4 minutos y todo se queda en tu teléfono.';
-export const CUERPO_BIENVENIDA =
-  'Dime lo que tienes, lo que debes y tus pagos fijos. No te pido la clave de tu banco: anoto lo que ya te avisa tu banco y hago las cuentas por ti.';
+/**
+ * Cuerpo de O1 con la marca. Solo Android lee los avisos del banco (captura, `02 §25`): en iPhone no se promete.
+ * En ninguna se pide la clave del banco.
+ */
+export function cuerpoBienvenida(os?: string): string {
+  return segunPlataforma(
+    {
+      ios: 'Dime lo que tienes, lo que debes y tus pagos fijos. Finanvoz hace las cuentas por ti y nunca te pide la clave de tu banco.',
+      android:
+        'Dime lo que tienes, lo que debes y tus pagos fijos. Finanvoz hace las cuentas por ti y, si quieres, anota los avisos de tu banco sin pedirte su clave.',
+    },
+    os,
+  );
+}
 export const BTN_ONB_EMPEZAR = 'Empezar';
 export const BTN_ONB_CONTINUAR = 'Continuar';
 export const PISTA_ONB_EMPEZAR = 'Inicia el recorrido de configuración';

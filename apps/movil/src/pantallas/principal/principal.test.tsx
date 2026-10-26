@@ -669,18 +669,20 @@ describe('Movimientos', () => {
     const dia = listarMovimientos(p.ctx)[0]?.fecha;
     const id = listarMovimientos(p.ctx)[0]?.movimientos[0]?.id as string;
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp('accessibilityRole', 'header');
-    const diaVista = listarMovimientos(p.ctx)[0]!;
+    const diaVista = listarMovimientos(p.ctx)[0];
+    if (!diaVista) throw new Error('Movimientos sin días');
+    // «coca 25 en efectivo» es una salida: el día siempre lleva «Salieron».
+    expect(diaVista.salieron).toBeGreaterThan(0);
     const resumenDia = resumenDiaMovimientos(
-      diaVista.salieron > 0 ? formatearCentavos(diaVista.salieron) : null,
+      formatearCentavos(diaVista.salieron),
       diaVista.entraron > 0 ? formatearCentavos(diaVista.entraron) : null,
     );
+    expect(resumenDia).not.toBeNull();
     expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveProp(
       'accessibilityLabel',
       etiquetaEncabezadoDiaConTotales(diaVista.etiqueta, resumenDia),
     );
-    if (resumenDia) {
-      expect(screen.getByTestId(`movimientos-dia-total-${dia}`)).toHaveTextContent(resumenDia);
-    }
+    expect(screen.getByTestId(`movimientos-dia-total-${dia}`)).toHaveTextContent(resumenDia ?? '');
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`)).toHaveProp(

@@ -209,9 +209,7 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver?: () => void
         </Tarjeta>
       ) : null}
 
-      {d.activa ? (
-        <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver ?? (() => undefined)} />
-      ) : null}
+      {d.activa ? <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver ?? (() => undefined)} /> : null}
 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
         <View accessibilityRole="list" style={{ gap: espacio.s }}>

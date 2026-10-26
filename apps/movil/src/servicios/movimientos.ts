@@ -184,26 +184,28 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     if (filtro.limite !== undefined && vistas.length >= filtro.limite) break;
   }
 
-  const dias: DiaMovimientos[] = [];
+  type DiaEnArmado = { -readonly [K in keyof DiaMovimientos]: DiaMovimientos[K] } & {
+    movimientos: MovimientoVista[];
+  };
+  const dias: DiaEnArmado[] = [];
   for (const m of vistas) {
     const ultimo = dias[dias.length - 1];
+    let dia: DiaEnArmado;
     if (ultimo && ultimo.fecha === m.fecha) {
-      (ultimo.movimientos as MovimientoVista[]).push(m);
+      dia = ultimo;
+      dia.movimientos.push(m);
     } else {
-      dias.push({
+      dia = {
         fecha: m.fecha,
         etiqueta: etiquetaDiaMes(m.fecha),
         movimientos: [m],
         salieron: 0 as Centavos,
         entraron: 0 as Centavos,
-      });
+      };
+      dias.push(dia);
     }
-    const dia = dias[dias.length - 1]!;
-    if (m.sentido === 'salida') {
-      (dia as { salieron: Centavos }).salieron = (dia.salieron + m.monto) as Centavos;
-    } else if (m.sentido === 'entrada') {
-      (dia as { entraron: Centavos }).entraron = (dia.entraron + m.monto) as Centavos;
-    }
+    if (m.sentido === 'salida') dia.salieron = (dia.salieron + m.monto) as Centavos;
+    else if (m.sentido === 'entrada') dia.entraron = (dia.entraron + m.monto) as Centavos;
   }
   return dias;
 }

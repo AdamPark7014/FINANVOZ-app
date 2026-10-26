@@ -8,7 +8,7 @@ import {
   BTN_SIN_COLCHON_POR_AHORA,
   CASILLA_DATOS_FINANCIEROS,
   CASILLA_ESTADISTICAS_OPCIONAL,
-  CUERPO_BIENVENIDA,
+  cuerpoBienvenida,
   ERROR_GUARDAR,
   ERROR_PAGO_FIJO_INCOMPLETO,
   etiquetaAyudaPasoOnboarding,
@@ -48,7 +48,8 @@ describe('textos de onboarding', () => {
     for (const texto of [
       TITULO_BIENVENIDA,
       AYUDA_BIENVENIDA,
-      CUERPO_BIENVENIDA,
+      cuerpoBienvenida('ios'),
+      cuerpoBienvenida('android'),
       ERROR_GUARDAR,
       TITULO_CONSENTIMIENTO,
       BTN_ACEPTAR_CONTINUAR,
@@ -69,6 +70,15 @@ describe('textos de onboarding', () => {
       expect(texto).not.toMatch(/por favor/i);
     }
     expect(AYUDA_BIENVENIDA).toMatch(/\btu\b/i);
+  });
+
+  it('O1 dice la marca y en iPhone no promete leer los avisos del banco (02 §25)', () => {
+    for (const os of ['ios', 'android']) {
+      expect(cuerpoBienvenida(os)).toMatch(/Finanvoz/);
+      expect(cuerpoBienvenida(os)).toMatch(/clave de tu banco|sin pedirte su clave/);
+    }
+    expect(cuerpoBienvenida('ios')).not.toMatch(/aviso/i);
+    expect(cuerpoBienvenida('android')).toMatch(/avisos de tu banco/);
   });
 
   it('TalkBack O3 antepone la etiqueta al próximo pago calculado', () => {

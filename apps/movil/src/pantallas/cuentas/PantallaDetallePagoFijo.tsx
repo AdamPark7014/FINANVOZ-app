@@ -70,11 +70,7 @@ export function PantallaDetallePagoFijo({
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Encabezado
-          titulo={TITULO_PAGOS_FIJOS}
-          {...(alVolver ? { alVolver } : {})}
-          testID="pago-detalle"
-        />
+        <Encabezado titulo={TITULO_PAGOS_FIJOS} {...(alVolver ? { alVolver } : {})} testID="pago-detalle" />
         <EstadoVacio texto={TEXTO_PAGO_NO_ENCONTRADO} testID="pago-detalle-no-encontrado" />
       </Pantalla>
     );

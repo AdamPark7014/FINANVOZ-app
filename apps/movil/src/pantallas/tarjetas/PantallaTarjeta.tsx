@@ -111,11 +111,7 @@ export function PantallaTarjeta({
     );
   }
   return (
-    <Detalle
-      tarjetaId={tarjetaId}
-      {...(alVolver ? { alVolver } : {})}
-      alLeerEstadoPdf={alLeerEstadoPdf}
-    />
+    <Detalle tarjetaId={tarjetaId} {...(alVolver ? { alVolver } : {})} alLeerEstadoPdf={alLeerEstadoPdf} />
   );
 }
 

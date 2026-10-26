@@ -84,12 +84,7 @@ export function PantallaFormularioLargo({
             pista={PISTA_CERRAR_R2}
             testID="boton-cerrar-registrar"
           />
-          <Texto
-            variante="subtitulo"
-            accessibilityRole="header"
-            style={{ flex: 1, textAlign: 'center' }}
-            numberOfLines={2}
-          >
+          <Texto variante="subtitulo" accessibilityRole="header" style={{ flex: 1, textAlign: 'center' }}>
             {TITULO[flujo]}
           </Texto>
           <View style={{ width: 64 }} />

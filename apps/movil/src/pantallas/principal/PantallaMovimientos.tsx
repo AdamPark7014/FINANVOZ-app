@@ -512,7 +512,9 @@ function FilaMovimiento({
   );
   const ocupado = pasando || confirmando || corrigiendo;
   const encabezado = (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: espacio.m }}>
+    <View
+      style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: espacio.m }}
+    >
       <View style={{ flex: 1, gap: espacio.xs }}>
         <Texto variante="cuerpoFuerte">{titulo(m)}</Texto>
         {subtitulo ? (

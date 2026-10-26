@@ -485,10 +485,7 @@ export function resumenDiaMovimientos(salieronFmt: string | null, entraronFmt: s
 }
 
 /** TalkBack del encabezado + totales del día. */
-export function etiquetaEncabezadoDiaConTotales(
-  etiquetaVisible: string,
-  resumen: string | null,
-): string {
+export function etiquetaEncabezadoDiaConTotales(etiquetaVisible: string, resumen: string | null): string {
   return etiquetaHablada(
     resumen ? `Movimientos del ${etiquetaVisible}. ${resumen}` : `Movimientos del ${etiquetaVisible}`,
   );

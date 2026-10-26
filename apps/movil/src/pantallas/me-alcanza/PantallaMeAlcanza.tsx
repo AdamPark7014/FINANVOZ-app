@@ -260,7 +260,12 @@ export function PantallaMeAlcanza({
           paddingBottom: espacio.xs,
         }}
       >
-        <Texto variante="titulo" testID="me-alcanza-encabezado" accessibilityRole="header" style={{ flex: 1 }}>
+        <Texto
+          variante="titulo"
+          testID="me-alcanza-encabezado"
+          accessibilityRole="header"
+          style={{ flex: 1 }}
+        >
           {TITULO}
         </Texto>
         {mostrarCerrar ? (

@@ -187,7 +187,7 @@ export const SUGERENCIA_DECIR = 'Di un gasto, como «tacos 80 en efectivo».';
 
 // ——— Escuchando ———
 
-export const TEXTO_TERMINO_SOLO = 'Al callarte, termino solo.';
+export const TEXTO_TERMINO_SOLO = 'Cuando dejes de hablar, termino solo.';
 export const BTN_CANCELAR_ESCUCHA = 'Cancelar';
 export const PISTA_CANCELAR_ESCUCHA = 'Deja de escuchar sin registrar nada';
 

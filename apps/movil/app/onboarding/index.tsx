@@ -5,7 +5,7 @@ import {
   AYUDA_BIENVENIDA,
   BTN_ONB_CONTINUAR,
   BTN_ONB_EMPEZAR,
-  CUERPO_BIENVENIDA,
+  cuerpoBienvenida,
   PISTA_ONB_CONTINUAR,
   PISTA_ONB_EMPEZAR,
   TITULO_BIENVENIDA,
@@ -63,7 +63,7 @@ function CuerpoBienvenida() {
         gap: espacio.s,
       }}
     >
-      <Texto variante="cuerpo">{CUERPO_BIENVENIDA}</Texto>
+      <Texto variante="cuerpo">{cuerpoBienvenida()}</Texto>
     </View>
   );
 }
