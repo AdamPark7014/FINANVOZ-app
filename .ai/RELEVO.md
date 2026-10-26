@@ -6,6 +6,12 @@
 
 ## Hecho en este turno
 
+- **H1 de la auditoría corregido (26-10, Adam: «corrige ya el fallo… y publica un TestFlight nuevo»)**: la barra de voz
+  tapaba el final de la conversación. La lista solo bajaba al cambiar el contenido; cuando la barra crecía (vuelven
+  chips y micrófono tras escuchar) el alto visible se achicaba sin volver a bajar y las opciones de «No entendí»
+  quedaban cortadas. `pantallas/asistente/seguirAlFinal.ts` (`useSeguirAlFinal`) también baja al cambiar el alto
+  visible, salvo que la persona haya subido a leer; el estado vacío lleva margen inferior `xxl`. Pruebas en
+  `seguirAlFinal.test.tsx`. TestFlight 1.0.0 (12).
 - **Revisión del trabajo de Cursor del 24 y 25-10** (32 commits, `0742b8c`…`286f14f`) y correcciones con el visto
   bueno de Adam:
   - **CI en verde otra vez**: llevaba 30 pushes en rojo en `pnpm lint` (Prettier en 13 archivos y dos `!` de ESLint

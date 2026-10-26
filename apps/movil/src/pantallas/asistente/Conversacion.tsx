@@ -6,6 +6,7 @@ import { anunciar, espacio, etiquetaHablada, margenPantalla } from '../../ui';
 import { Observaciones } from '../principal/Observaciones';
 import { TarjetasAccion } from '../principal/TarjetasAccion';
 import { EntradaTurno } from './movimiento';
+import { useSeguirAlFinal } from './seguirAlFinal';
 import { textoNoEntendi } from './textos';
 import { TurnoAviso } from './turnos/TurnoAviso';
 import { TurnoEntendi } from './turnos/TurnoEntendi';
@@ -134,6 +135,7 @@ export function Conversacion({
   alCancelarTarjeta: (id: string) => void;
 }) {
   const lista = useRef<FlatList<TurnoConversacion>>(null);
+  const seguir = useSeguirAlFinal(lista);
   const testIds = testIdsDeTurnos(turnos, idsSesion);
   const pregunta = [...turnos].reverse().find((t) => t.de === 'asistente');
   const preguntaActiva = pregunta?.de === 'asistente' && pregunta.clase === 'pregunta' ? pregunta.id : null;
@@ -224,7 +226,8 @@ export function Conversacion({
       keyboardDismissMode="interactive"
       // Pocas decenas de turnos: se pintan todos (el lector y las pruebas los alcanzan sin desplazar).
       initialNumToRender={Math.max(10, turnos.length)}
-      onContentSizeChange={() => lista.current?.scrollToEnd({ animated: true })}
+      // Siempre termina en lo último, también cuando la barra de voz cambia de alto (auditoría H1).
+      {...seguir}
     />
   );
 }

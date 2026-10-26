@@ -43,6 +43,8 @@ export function EstadoVacio({
       contentContainerStyle={{
         flexGrow: 1,
         padding: margenPantalla,
+        // La ayuda y «Lo último que entendí» no quedan pegados a la orilla redonda de la barra de voz (auditoría H1).
+        paddingBottom: espacio.xxl,
         gap: espacio.xl,
         justifyContent: 'space-between',
       }}

@@ -42,7 +42,7 @@ Después (CI del 25-10, `7265774`; iPhone en oscuro y Android en claro):
 
 | # | Hallazgo | Dónde | Severidad | Tipo | Propuesta |
 |---|---|---|---|---|---|
-| H1 | La barra de voz (chips + orbe) tapa el final de la conversación: en «No entendí» las últimas opciones quedan bajo los chips; en el estado vacío se corta la ayuda | Asistente | Alta | Error | Margen inferior del área de conversación = alto real de la barra; desplazar al último turno. Mockup 1 |
+| H1 | **Corregido el 26-10.** La barra de voz (chips + orbe) tapaba el final de la conversación: la lista solo bajaba al cambiar el contenido y, cuando la barra crecía (vuelven chips y micrófono tras escuchar), el alto visible se achicaba sin volver a bajar; en el estado vacío la ayuda quedaba pegada a la barra | Asistente | Alta | Error | `useSeguirAlFinal` (`pantallas/asistente/seguirAlFinal.ts`): baja también cuando cambia el alto visible, salvo que la persona haya subido a leer; estado vacío con margen inferior `xxl`. Adam lo aprobó el 26-10 |
 | H2 | El desglose se dibuja encima del orbe sin velo ni borde; parece un error y no es evidente cómo cerrarlo | Asistente | Media | Diseño | Hoja con velo, asa y «Cerrar», «¿Me alcanza?» al pie. Mockup 2 |
 | H3 | Cada «Registré…» es una tarjeta alta con «Deshacer» suelto; con tres registros la conversación se llena de aire | Asistente | Media | Diseño | Una fila: monto, qué, cuenta y «Deshacer» de 48 dp. Mockup 3 |
 | H4 | Cabecera: «$0» compite con un párrafo rojo a la derecha y una leyenda de tres colores | Asistente | Media | Diseño | Cifra, una línea de estado (solo el monto en rojo) y la barra como botón «Ver». Mockup 4 |
@@ -74,7 +74,7 @@ Capturas (CI del 25-10, `286f14f`; las pantallas no cambiaron el 25-10 salvo Aju
 
 ## 4. Decisión que se pide a Adam
 
-1. ¿Se corrige H1 (error, sin cambio de diseño)?
+1. ~~¿Se corrige H1 (error, sin cambio de diseño)?~~ Sí: corregido el 26-10.
 2. ¿Qué mockups (2 a 6) se construyen?
 3. H7: ¿las consultas que el nivel 0 contesta sin nube son gratis?
 
