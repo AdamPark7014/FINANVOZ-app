@@ -1,7 +1,7 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-25
+- **Fecha:** 2026-10-26
 - **Rama:** main
 
 ## Hecho en este turno
@@ -39,13 +39,14 @@
 
 ## Estado de tiendas
 
-- **TestFlight**: `ios-testflight.yml` usa el número de corrida como build; la última subida antes de este turno fue
-  1.0.0 (10) del 23-10. Grupo interno «Equipo Finanvoz (interno)» con Adam invitado. La API con la llave de Gestor de
-  apps no asigna testers: se agregan desde la consola.
-- **Play**: prueba interna publicada el 22-10 (versión 1, 1.0.0) con la lista «Equipo Finanvoz». `android-play.yml`
-  solo compila y firma el AAB (artefacto `finanvoz-aab`): **no hay cuenta de servicio de Play**, así que subirlo a la
-  prueba interna es a mano en la consola (o crear la cuenta de servicio). Los testers ven «com.finanvoz.app
-  (unreviewed)» hasta la primera revisión.
+- **TestFlight 1.0.0 (11)** subida el 26-10 desde `e494379` (corrida 40282099144) y **VALID** en App Store Connect
+  (consultado por API). Trae la revisión de este turno salvo la flecha de Android, que no aplica a iPhone. Grupo
+  interno «Equipo Finanvoz (interno)» con Adam invitado; la API con la llave de Gestor de apps no asigna testers: se
+  agregan desde la consola. `ios-testflight.yml` usa el número de corrida como build.
+- **Play**: AAB 1.0.0 (versionCode 3) compilado y firmado con la llave de subida desde `343269f` (corrida
+  40287086804); copia en `C:\dev\builds\FINANVOZ\1.0.0-3\`. **No hay cuenta de servicio de Play**: subirlo a la
+  prueba interna es a mano en la consola (o crear la cuenta de servicio). La prueba interna publicada sigue siendo la
+  versión 1 del 22-10; el versionCode 2 del 23-10 se compiló pero no consta que se subiera.
 - **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
   `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
 - Secretos de firma de iOS y Android cargados en GitHub el 22-10 (nombres en `docs/tienda/`; los valores viven fuera
@@ -69,15 +70,17 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 - **Ola 7 y la UI de Cursor sin probar en teléfono**: asistente, voz y onboarding por voz solo se han visto en jest y
   en el simulador de CI.
-- **Maestro de iPhone ya fallaba antes de Cursor** en flujos que no tocan la barra (`onb-tarjeta`,
-  `boton-me-alcanza`, `aviso`): revisar esos flujos aparte.
+- **Maestro de iPhone nunca había estado en verde**; desde este turno pasan 02, 04, 05, 07, 08 y 09. 01 y 03 se
+  corrigieron en `343269f` (falta ver su corrida); 06 sigue como fallo conocido (`bug-conocido`).
+- **Subir el AAB 1.0.0 (3) a la prueba interna de Play** (a mano, sin cuenta de servicio).
 - M0, dominio `finanvoz.com` y aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa).
 - Respaldar las llaves de Android fuera de la PC.
 
 ## Siguiente
 
-1. Ver la CI y las capturas de Maestro (claro y oscuro) de este turno; si están bien, TestFlight y Play.
-2. Adam prueba en sus teléfonos la Ola 7 y la barra nueva.
+1. Adam prueba TestFlight 1.0.0 (11) y, cuando se suba, Play 1.0.0 (3): Ola 7, barra nativa, Ajustes en filas.
+2. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): H1 es un error que se puede corregir ya; 2–6
+   son diseño y esperan su visto bueno.
 3. Ola 3.5 (`expo-symbols`) y 3.8 (onboarding más corto): con mockup y visto bueno de Adam antes de construir.
 
 ## No tocar
