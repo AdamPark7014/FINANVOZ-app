@@ -73,11 +73,14 @@ function conAnalitica(
   return enviados;
 }
 
+/** Escribe en Hoy (cuando Hoy y Registrar están montadas a la vez, la conversación es la de Hoy). */
 async function escribir(frase: string) {
-  if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
-  fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
+  const raiz = screen.queryByTestId('pantalla-hoy') ? within(screen.getByTestId('pantalla-hoy')) : screen;
+  // Al mandar, el campo se cierra para que se vea la respuesta: se reabre con el botón del teclado.
+  if (!raiz.queryByTestId('campo-registrar')) fireEvent.press(raiz.getByTestId('boton-escribir'));
+  fireEvent.changeText(raiz.getByTestId('campo-registrar'), frase);
   await act(async () => {
-    fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    fireEvent.press(raiz.getByTestId('boton-enviar-registro'));
   });
 }
 
@@ -104,7 +107,11 @@ describe('analítica de corrección por voz (03 §8, pendiente 30)', () => {
 
     await escribir(TACOS_Y_COCA);
     await escribir(TACOS_EN_EFECTIVO);
-    expect(within(screen.getByTestId('aviso')).getByText(/^Corregí: Tacos \$80/)).toBeTruthy();
+    expect(
+      within(within(screen.getByTestId('pantalla-hoy')).getByTestId('aviso')).getByText(
+        /^Corregí: Tacos \$80/,
+      ),
+    ).toBeTruthy();
     expect(propios(enviados).filter(([nombre]) => nombre === 'correccion')).toEqual([
       ['correccion', { campo: 'cuenta' }],
     ]);

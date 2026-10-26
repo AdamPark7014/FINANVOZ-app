@@ -80,6 +80,33 @@ describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
     p.cerrar();
   });
 
+  it('mandar lo escrito cierra el campo (y el teclado) para que la respuesta se vea; el teclado lo reabre', async () => {
+    const { p } = montar();
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+    expect(screen.getByTestId('aviso')).toBeTruthy();
+    expect(screen.queryByTestId('campo-registrar')).toBeNull();
+    // Con «Enviar» del teclado pasa lo mismo.
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    expect(screen.getByTestId('campo-registrar').props.value).toBe('');
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), 'tacos 80 en efectivo');
+    await act(async () => {
+      fireEvent(screen.getByTestId('campo-registrar'), 'submitEditing');
+    });
+    expect(screen.queryByTestId('campo-registrar')).toBeNull();
+    expect(movimientos(p.ctx)).toHaveLength(2);
+    // Vacío no manda ni cierra.
+    fireEvent.press(screen.getByTestId('boton-escribir'));
+    await act(async () => {
+      fireEvent(screen.getByTestId('campo-registrar'), 'submitEditing');
+    });
+    expect(screen.getByTestId('campo-registrar')).toBeTruthy();
+    p.cerrar();
+  });
+
   it('«coca 25 en efectivo» por texto: «Registré…», «Tu día pasa de $214 a $207.» y Deshacer que lo revierte', async () => {
     const { p } = montar();
     await escribir('coca 25 en efectivo');

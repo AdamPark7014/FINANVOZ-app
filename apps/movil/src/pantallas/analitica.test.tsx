@@ -36,6 +36,8 @@ const propiasDe = (enviados: EnvioAnalitica[]) =>
   enviados.map((e) => Object.entries(e.propiedades).filter(([k]) => !k.startsWith('$')));
 
 const registrar = (frase: string) => {
+  // Mandar lo escrito cierra el campo: se reabre para la siguiente frase.
+  if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
   fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
   fireEvent.press(screen.getByTestId('boton-enviar-registro'));
 };

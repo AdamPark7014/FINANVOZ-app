@@ -52,6 +52,8 @@ describe('Asistente en modo oscuro (criterio 11)', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));
     });
+    // Al mandar, el campo se cierra para que se vea la respuesta: se vuelve a abrir para la segunda frase.
+    fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'pagué la luz 6000 con la bbva');
     await act(async () => {
       fireEvent.press(screen.getByTestId('boton-enviar-registro'));

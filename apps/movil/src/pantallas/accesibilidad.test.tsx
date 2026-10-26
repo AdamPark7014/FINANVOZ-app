@@ -98,6 +98,8 @@ describe('accesibilidad (CA-M7-05)', () => {
     sinHallazgos();
     fireEvent.press(screen.getByTestId('boton-escribir'));
     const decir = async (frase: string) => {
+      // Mandar lo escrito cierra el campo para que la respuesta se vea: se reabre para la siguiente frase.
+      if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
       fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
       await act(async () => {
         fireEvent.press(screen.getByTestId('boton-enviar-registro'));

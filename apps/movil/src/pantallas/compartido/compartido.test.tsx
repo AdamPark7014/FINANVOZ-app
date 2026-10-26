@@ -360,6 +360,8 @@ describe('02 §27 · Gastos con tu pareja', () => {
     const A = telefono(servidor, 'usuario-a');
     en(A, <PanelRegistrar abiertoAlInicio motor={crearMotorFalso().motor} />);
     const dictar = async (frase: string) => {
+      // Mandar lo escrito cierra el campo: se reabre para la siguiente frase.
+      if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
       fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
       await act(async () => {
         fireEvent.press(screen.getByTestId('boton-enviar-registro'));

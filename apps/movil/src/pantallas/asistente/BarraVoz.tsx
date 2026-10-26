@@ -53,6 +53,14 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
   const m = a.microfono;
   // VoiceOver no lee regiones vivas: el error del dictado se anuncia en iPhone.
   useAnunciar(m.aviso);
+  // Lo escrito se manda y el campo se cierra: con el teclado arriba, el campo, los chips y el micrófono dejan a la
+  // conversación sin alto (unos 17 pt en un iPhone 16 Pro Max) y la respuesta («Registré…», «Entendí») no se veía
+  // (Maestro 06). Para escribir otra frase, el botón del teclado lo vuelve a abrir.
+  const enviarEscrito = () => {
+    if (a.texto.trim() === '' || a.interpretando) return;
+    a.enviar(a.texto, 'texto');
+    a.setEscribiendo(false);
+  };
   return (
     <View style={{ gap: espacio.m }} testID="barra-voz">
       {m.escuchando || a.escuchandoConfirmacion ? (
@@ -163,14 +171,14 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
             alCambiar={a.setTexto}
             ejemplo={EJEMPLO_CAMPO_REGISTRAR}
             autoFocus
-            alEnviar={() => a.enviar(a.texto, 'texto')}
+            alEnviar={enviarEscrito}
             nativo={{ returnKeyType: 'send', autoCorrect: false }}
             testID="campo-registrar"
           />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
             <Boton
               etiqueta={BTN_ENVIAR_REGISTRO}
-              alPresionar={() => a.enviar(a.texto, 'texto')}
+              alPresionar={enviarEscrito}
               deshabilitado={a.texto.trim() === '' || a.interpretando}
               testID="boton-enviar-registro"
               style={{ flex: 1 }}
