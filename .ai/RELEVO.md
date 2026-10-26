@@ -28,9 +28,10 @@
     construir, esperan el visto bueno de Adam.
   - **Flecha de atrás en Android**: `headerTitle` como función montaba en Android una vista izquierda que escondía la
     flecha; ahora es cadena vacía (`5518eae`).
-  - **Maestro de iPhone** (corrida 40281636346 de `e494379`): pasan 02, 04, 05, 07, 08 y 09; fallaban 01 (la tarjeta
-    de Debes quedaba a medias en pantalla) y 03 (ya no existe «Guardar horario»), corregidos después; 06 sigue
-    marcado como fallo conocido.
+  - **Maestro de iPhone**: en las tres últimas corridas (40281636346, 40290257913, 40302661246) pasan siempre 02,
+    04, 05, 07, 08 y 09. 01 y 03 fallan cada vez en un paso distinto (03: onboarding o Captura; 01: la tarjeta de
+    Debes o un campo de la tarjeta): se corrigió lo que estaba desactualizado (horario por chip, Captura oculta en
+    iPhone, tarjeta centrada) y lo que queda parece de tiempos en flujos largos. 06 sigue como fallo conocido.
   - **Maestro**: `tocar.yaml` centra el elemento (el pie fijo tapaba «Agregar tarjeta» en O4), «¿Me alcanza?» es
     opcional en 02 (la build del simulador no trae compras), 05 manda la frase con «Enviar». Las capturas de tienda
     de Android usan el onboarding corto (el largo quedó atrás de la Ola 7) y toman Ajustes › Ingreso con la barra.
@@ -70,8 +71,8 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 - **Ola 7 y la UI de Cursor sin probar en teléfono**: asistente, voz y onboarding por voz solo se han visto en jest y
   en el simulador de CI.
-- **Maestro de iPhone nunca había estado en verde**; desde este turno pasan 02, 04, 05, 07, 08 y 09. 01 y 03 se
-  corrigieron en `343269f` (falta ver su corrida); 06 sigue como fallo conocido (`bug-conocido`).
+- **Maestro de iPhone nunca ha estado en verde**: desde este turno pasan 02, 04, 05, 07, 08 y 09; 01 y 03 siguen
+  fallando por tiempos (un paso distinto cada corrida); 06 sigue como fallo conocido (`bug-conocido`).
 - **Subir el AAB 1.0.0 (3) a la prueba interna de Play** (a mano, sin cuenta de servicio).
 - M0, dominio `finanvoz.com` y aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa).
 - Respaldar las llaves de Android fuera de la PC.
