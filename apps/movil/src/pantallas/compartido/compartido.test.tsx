@@ -286,7 +286,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('compartido-guardar'));
     });
-    await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull());
+    await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull(), { timeout: 10_000 });
     expect(screen.getByTestId('grupo-saldo').props.children).toBe('Ana te debe $720');
     expect(screen.getByTestId('grupo-saldo').props.accessibilityLabel).not.toMatch(/\$|\d/);
     b.unmount();
@@ -535,7 +535,7 @@ describe('Compartido: botones que no llevaban a ningún lado (auditoría B-3 · 
   it('"Anular" pregunta antes; "Cancelar" lo deja y "Sí, anular" lo anula', async () => {
     const { A, grupoId, movId } = await grupoConGasto();
     en(A, <PantallaGrupoCompartido grupoId={grupoId} alVolver={jest.fn()} />);
-    await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull());
+    await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull(), { timeout: 10_000 });
     fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-anular`));
     expect(
       within(screen.getByTestId(`mov-compartido-${movId}-confirmacion`)).getByText(
@@ -564,7 +564,7 @@ describe('Compartido: botones que no llevaban a ningún lado (auditoría B-3 · 
     const anunciar = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
     try {
       en(A, <PantallaGrupoCompartido grupoId={grupoId} alVolver={jest.fn()} />);
-      await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull());
+      await waitFor(() => expect(screen.queryByTestId('grupo-pendientes')).toBeNull(), { timeout: 10_000 });
       fireEvent.press(screen.getByTestId(`mov-compartido-${movId}-anular`));
       expect(anunciar).toHaveBeenCalledWith(textoConfirmarAnular('Súper', 'Beto'));
     } finally {

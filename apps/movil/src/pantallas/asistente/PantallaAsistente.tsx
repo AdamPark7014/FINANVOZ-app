@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { espacio, margenPantalla, radio, sombra, useTema } from '../../ui';
 import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
@@ -83,9 +83,9 @@ export function PanelConversacion(props: OpcionesAsistente) {
 }
 
 function Contenedor({ children }: { children: ReactNode }) {
-  // En iPhone el teclado se dibuja encima: el contenedor se encoge y la barra de voz queda pegada a él. Android ya
-  // encoge la ventana (`adjustResize`).
-  if (Platform.OS !== 'ios') return <View style={{ flex: 1 }}>{children}</View>;
+  // El teclado se dibuja encima en los dos sistemas: en Android la app va de borde a borde y `adjustResize` ya no
+  // encoge la ventana (las capturas de CI del 25-10 mostraban «¿Qué registro?» bajo el teclado). El contenedor se
+  // encoge y la barra de voz queda pegada al teclado.
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {children}

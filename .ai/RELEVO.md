@@ -21,6 +21,11 @@
   - **Textos**: «Finanvoz» de vuelta en la bienvenida, con texto propio para iPhone (sin prometer los avisos del
     banco); «Cuando dejes de hablar, termino solo.» como en el mockup aprobado.
   - Decisiones en `docs/ESTADO.md` (25-10) y `docs/PLAN-UX-VOZ.md` §3.3 y §3.6.
+  - **Teclado en Android**: con borde a borde `adjustResize` ya no encoge la ventana y el campo del asistente quedaba
+    bajo el teclado (capturas de Android). `PantallaAsistente` y `Pantalla` usan `KeyboardAvoidingView` también en
+    Android. `compartido.test.tsx` espera hasta 10 s la sincronización (fallaba solo con la suite completa).
+  - **Auditoría** en `docs/diseno/AUDITORIA-PRO-2026-10.md` + `mockups-auditoria-2026-10.html`: 6 propuestas sin
+    construir, esperan el visto bueno de Adam.
   - **Maestro**: `tocar.yaml` centra el elemento (el pie fijo tapaba «Agregar tarjeta» en O4), «¿Me alcanza?» es
     opcional en 02 (la build del simulador no trae compras), 05 manda la frase con «Enviar». Las capturas de tienda
     de Android usan el onboarding corto (el largo quedó atrás de la Ola 7) y toman Ajustes › Ingreso con la barra.
@@ -29,10 +34,13 @@
 
 ## Estado de tiendas
 
-- **TestFlight**: última build válida 1.0.0 (3) del 22-10 (vence 20-01-2027), grupo interno «Equipo Finanvoz
-  (interno)» con Adam invitado. La API con la llave de Gestor de apps no asigna testers: se agregan desde la consola.
-- **Play**: prueba interna publicada el 22-10 (versión 1, 1.0.0) con la lista «Equipo Finanvoz». Los testers ven
-  «com.finanvoz.app (unreviewed)» hasta la primera revisión.
+- **TestFlight**: `ios-testflight.yml` usa el número de corrida como build; la última subida antes de este turno fue
+  1.0.0 (10) del 23-10. Grupo interno «Equipo Finanvoz (interno)» con Adam invitado. La API con la llave de Gestor de
+  apps no asigna testers: se agregan desde la consola.
+- **Play**: prueba interna publicada el 22-10 (versión 1, 1.0.0) con la lista «Equipo Finanvoz». `android-play.yml`
+  solo compila y firma el AAB (artefacto `finanvoz-aab`): **no hay cuenta de servicio de Play**, así que subirlo a la
+  prueba interna es a mano en la consola (o crear la cuenta de servicio). Los testers ven «com.finanvoz.app
+  (unreviewed)» hasta la primera revisión.
 - **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
   `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
 - Secretos de firma de iOS y Android cargados en GitHub el 22-10 (nombres en `docs/tienda/`; los valores viven fuera

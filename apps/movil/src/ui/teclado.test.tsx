@@ -22,9 +22,12 @@ function conPie() {
 }
 
 describe('Pantalla y el teclado', () => {
-  it('Android: la ventana ya se encoge (adjustResize); arrastrar cierra el teclado y los toques no se pierden', () => {
+  it('Android (de borde a borde, sin adjustResize): el pie sube con el teclado; arrastrar lo cierra y los toques no se pierden', () => {
     conPie();
-    expect(screen.UNSAFE_queryByType(KeyboardAvoidingView)).toBeNull();
+    const evitar = screen.UNSAFE_getByType(KeyboardAvoidingView);
+    expect(evitar.props.behavior).toBe('padding');
+    expect(evitar.findByType(ScrollView)).toBeTruthy();
+    expect(evitar.findByProps({ testID: 'continuar' })).toBeTruthy();
     const scroll = screen.UNSAFE_getByType(ScrollView);
     expect(scroll.props.keyboardShouldPersistTaps).toBe('handled');
     expect(scroll.props.keyboardDismissMode).toBe('on-drag');
@@ -44,6 +47,16 @@ describe('Pantalla y el teclado', () => {
     expect(scroll.props.keyboardShouldPersistTaps).toBe('handled');
     // No se suman dos ajustes al teclado.
     expect(scroll.props.automaticallyAdjustKeyboardInsets).toBe(false);
+  });
+
+  it('Android sin pie: también se encoge con el teclado (no hay ajuste automático del desplazamiento)', () => {
+    render(
+      <Pantalla>
+        <Texto>Ajustes</Texto>
+      </Pantalla>,
+    );
+    expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe('padding');
+    expect(screen.UNSAFE_getByType(ScrollView).props.automaticallyAdjustKeyboardInsets).toBe(false);
   });
 
   it('iPhone sin pie: el desplazamiento se ajusta al teclado y lleva el campo a la vista', () => {

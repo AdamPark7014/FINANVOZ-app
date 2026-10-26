@@ -30,11 +30,12 @@ export interface PantallaProps {
 /**
  * Contenedor con área segura, desplazamiento opcional y pie fijo fuera del scroll.
  *
- * Teclado: Android ya encoge la ventana (`adjustResize`). En iPhone el teclado se dibuja encima, así que:
- * - con pie fijo (o sin desplazamiento) todo va dentro de un `KeyboardAvoidingView` con `padding`: el área
- *   desplazable se encoge y el pie ("Continuar", "Registrar") queda justo arriba del teclado;
- * - sin pie, el `ScrollView` ajusta sus márgenes al teclado y desplaza el campo enfocado a la vista
- *   (`automaticallyAdjustKeyboardInsets`). No se combinan: los dos sumarían el alto del teclado.
+ * Teclado: se dibuja encima en los dos sistemas (en Android la app va de borde a borde y `adjustResize` ya no encoge
+ * la ventana), así que:
+ * - en Android, y en iPhone con pie fijo (o sin desplazamiento), todo va dentro de un `KeyboardAvoidingView` con
+ *   `padding`: el área desplazable se encoge y el pie ("Continuar", "Registrar") queda justo arriba del teclado;
+ * - en iPhone sin pie, el `ScrollView` ajusta sus márgenes al teclado y desplaza el campo enfocado a la vista
+ *   (`automaticallyAdjustKeyboardInsets`, solo existe en iOS). No se combinan: los dos sumarían el alto del teclado.
  * Arrastrar el contenido cierra el teclado (interactivo en iPhone) y un toque en un botón no se pierde
  * mientras el teclado está abierto (`keyboardShouldPersistTaps`).
  */
@@ -50,7 +51,7 @@ export function Pantalla({
   const conBarraNativa = useContext(HeaderShownContext);
   const bordesEfectivos = conBarraNativa ? bordes.filter((b) => b !== 'top') : bordes;
   const ios = Platform.OS === 'ios';
-  const evitarTeclado = ios && (Boolean(pie) || !desplazable);
+  const evitarTeclado = !ios || Boolean(pie) || !desplazable;
   const contenido: ViewStyle = { padding: margenPantalla, gap: espacio.xl };
   const cuerpo = (
     <>
