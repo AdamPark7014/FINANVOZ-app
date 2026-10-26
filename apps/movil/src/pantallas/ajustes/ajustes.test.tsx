@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
-import { Linking, Text } from 'react-native';
+import { Appearance, Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
 import Tu from '../../../app/(tabs)/tu';
@@ -13,7 +13,9 @@ import {
   aceptarConsentimiento,
   agregarEfectivo,
   completarOnboarding,
+  fijarApariencia,
   fijarBloqueo,
+  obtenerApariencia,
   obtenerBloqueo,
   obtenerPreferenciasAvisos,
   type Contexto,
@@ -24,6 +26,7 @@ import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ETIQUETA_ATRAS } from '../../ui/navegacion';
 import { TEXTO_NO_ASESORIA } from '../privacidad/legales';
 import { auditar } from '../__pruebas__/accesibilidad';
+import { PISTA_CAMBIAR_APARIENCIA } from './apariencia-textos';
 import {
   confirmacionBloqueoActivo,
   etiquetaAccesibilidadVersion,
@@ -263,6 +266,71 @@ describe('ajustes', () => {
   });
 
   // Exportar y borrar todo viven en el centro de privacidad (`pantallas/privacidad/privacidad.test.tsx`).
+});
+
+describe('apariencia (02 §16: claro por omisión, oscuro solo si se elige)', () => {
+  let esquemaNativo: jest.SpyInstance;
+  beforeEach(() => {
+    mockPreparar = conDatos;
+    esquemaNativo = jest.spyOn(Appearance, 'setColorScheme').mockImplementation(() => {});
+  });
+  afterEach(() => {
+    esquemaNativo.mockRestore();
+  });
+
+  it('la fila dice «Claro» por omisión y la raíz fija el claro sin mirar el tema del teléfono', () => {
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(esquemaNativo).toHaveBeenLastCalledWith('light');
+    expect(screen.getByTestId('ajustes-apariencia-valor')).toHaveTextContent('Claro');
+    const fila = screen.getByTestId('ajustes-cambiar-apariencia');
+    // Título, valor actual y acción para VoiceOver y TalkBack.
+    expect(fila).toHaveProp('accessibilityLabel', 'Apariencia. Claro. Cambiar la apariencia');
+    expect(fila).toHaveProp('accessibilityHint', PISTA_CAMBIAR_APARIENCIA);
+    expect(fila).toHaveProp('accessibilityRole', 'button');
+  });
+
+  it('elegir «Oscuro» lo guarda y lo aplica al momento; «Como el teléfono» sigue al sistema', () => {
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const ctx = ctxInicial();
+    fireEvent.press(screen.getByTestId('ajustes-cambiar-apariencia'));
+    expect(screen.getByTestId('ajustes-apariencia-claro')).toHaveProp('accessibilityState', {
+      selected: true,
+      disabled: false,
+    });
+    expect(screen.getByTestId('ajustes-apariencia-sistema')).toHaveProp(
+      'accessibilityLabel',
+      'Como el teléfono',
+    );
+
+    fireEvent.press(screen.getByTestId('ajustes-apariencia-oscuro'));
+    expect(obtenerApariencia(ctx)).toBe('oscuro');
+    expect(esquemaNativo).toHaveBeenLastCalledWith('dark');
+    expect(screen.getByTestId('ajustes-apariencia-oscuro')).toHaveProp('accessibilityState', {
+      selected: true,
+      disabled: false,
+    });
+
+    fireEvent.press(screen.getByTestId('ajustes-apariencia-sistema'));
+    expect(obtenerApariencia(ctx)).toBe('sistema');
+    expect(esquemaNativo).toHaveBeenLastCalledWith('unspecified');
+
+    fireEvent.press(screen.getByTestId('ajustes-apariencia-cerrar'));
+    expect(screen.getByTestId('ajustes-apariencia-valor')).toHaveTextContent('Como el teléfono');
+    expect(screen.getByTestId('ajustes-cambiar-apariencia')).toHaveProp(
+      'accessibilityLabel',
+      'Apariencia. Como el teléfono. Cambiar la apariencia',
+    );
+  });
+
+  it('al abrir la app aplica lo guardado (oscuro)', () => {
+    mockPreparar = (ctx) => {
+      conDatos(ctx);
+      fijarApariencia(ctx, 'oscuro');
+    };
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    expect(esquemaNativo).toHaveBeenLastCalledWith('dark');
+    expect(screen.getByTestId('ajustes-apariencia-valor')).toHaveTextContent('Oscuro');
+  });
 });
 
 describe('tocar un aviso (pendiente 33)', () => {

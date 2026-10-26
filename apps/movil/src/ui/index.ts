@@ -1,5 +1,5 @@
 export * from './tokens';
-export { useTema, type Tema } from './tema';
+export { aplicarApariencia, useTema, type PreferenciaApariencia, type Tema } from './tema';
 export {
   cifraEnPalabras,
   enteroEnPalabras,

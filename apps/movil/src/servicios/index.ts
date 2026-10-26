@@ -39,6 +39,13 @@ export {
   type TarjetaCreada,
 } from './onboarding';
 export {
+  APARIENCIA_POR_OMISION,
+  APARIENCIAS,
+  fijarApariencia,
+  obtenerApariencia,
+  type Apariencia,
+} from './apariencia';
+export {
   colchonSugerido,
   completarOnboarding,
   fijarBloqueo,

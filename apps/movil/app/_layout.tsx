@@ -27,22 +27,39 @@ import { crearComprasExpo } from '../src/suscripciones/expo';
 import { ProveedorPlan } from '../src/suscripciones/ProveedorPlan';
 import { mensajeBloqueoApagadoSinSeguridad } from '../src/pantallas/ajustes/textos';
 import {
+  APARIENCIA_POR_OMISION,
   cargarEscenario,
   fijarBloqueo,
   leerMontoDictado,
   mensajeRestaurado,
+  obtenerApariencia,
   obtenerBloqueo,
   relojFijo,
+  type Apariencia,
+  type Contexto,
   type PuertoEvidencia,
 } from '../src/servicios';
 import { abrirSesion, borrarTodoApp, restaurarSesion, type Sesion } from '../src/servicios/sesion';
 import { ProveedorAnalitica, useAnalitica } from '../src/sesion/ProveedorAnalitica';
 import { ProveedorControlApp, type ControlApp } from '../src/sesion/ControlApp';
 import { ProveedorSesion, useSesion, useVista } from '../src/sesion/ProveedorSesion';
-import { Aviso, Boton, etiquetaHablada, Pantalla, Texto, useAnunciar, useTema } from '../src/ui';
+import {
+  aplicarApariencia,
+  Aviso,
+  Boton,
+  etiquetaHablada,
+  Pantalla,
+  Texto,
+  useAnunciar,
+  useTema,
+} from '../src/ui';
 import { motorExpo, ProveedorDictado } from '../src/voz';
 
 iniciarSentry();
+
+// Claro por omisión aunque el teléfono esté en oscuro (Adam, 26-10-2026; `02 §16`). Se fija al cargar la raíz, antes
+// del primer render, para que no se vea un destello oscuro; lo guardado se aplica al abrir la base (`intentarAbrir`).
+aplicarApariencia(APARIENCIA_POR_OMISION);
 
 // Cualquier error al pintar una pantalla se queda en una pantalla amable con «Intentar de nuevo» (antes cerraba la app).
 export { PantallaError as ErrorBoundary } from '../src/pantallas/error/PantallaError';
@@ -52,10 +69,14 @@ type Estado =
   | { tipo: 'trabajando'; generacion: number }
   | { tipo: 'error'; generacion: number };
 
-/** Abre la base cifrada; si falla, la raíz muestra una pantalla amable con "Intentar de nuevo". */
+/**
+ * Abre la base cifrada y aplica la apariencia guardada antes de pintar nada; si la base falla, la raíz muestra una
+ * pantalla amable con "Intentar de nuevo". Tras borrar todo (base nueva) la app vuelve a claro.
+ */
 function intentarAbrir(generacion: number, preparar?: () => Sesion, aviso?: string): Estado {
   try {
     const sesion = preparar ? preparar() : abrirSesion();
+    aplicarAparienciaGuardada(sesion.ctx);
     return { tipo: 'lista', sesion, generacion, ...(aviso ? { aviso } : {}) };
   } catch {
     // El error no se muestra ni se registra con detalle: podría llevar rutas o datos (regla 9).
@@ -63,9 +84,21 @@ function intentarAbrir(generacion: number, preparar?: () => Sesion, aviso?: stri
   }
 }
 
+/** Si la apariencia no se puede leer, se queda en claro: nunca impide abrir la app. */
+function aplicarAparienciaGuardada(ctx: Contexto) {
+  let apariencia: Apariencia = APARIENCIA_POR_OMISION;
+  try {
+    apariencia = obtenerApariencia(ctx);
+  } catch {
+    // Claro, como sin nada guardado.
+  }
+  aplicarApariencia(apariencia);
+}
+
 export default function Raiz() {
-  const { esquema } = useTema();
+  // Primero la sesión: al abrirla se aplica la apariencia guardada, así `useTema` ya la lee en este render.
   const [estado, setEstado] = useState<Estado>(() => intentarAbrir(0));
+  const { esquema } = useTema();
   const sesion = estado.tipo === 'lista' ? estado.sesion : null;
   // Nivel 2 del intérprete; `null` si la build no trae `supabaseUrl` y `supabaseAnonKey` en `extra`.
   const nube = useMemo(() => crearNivelNubeExpo(), []);

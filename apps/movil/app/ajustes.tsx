@@ -27,6 +27,7 @@ import {
   lineaVersion,
   mensajeErrorCargarEscenario,
 } from '../src/pantallas/ajustes';
+import { SeccionApariencia } from '../src/pantallas/ajustes/SeccionApariencia';
 import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
 import { SeccionBloqueo } from '../src/pantallas/ajustes/SeccionBloqueo';
 import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
@@ -47,7 +48,7 @@ const TOQUES_MENU_DEV = 7;
 
 /**
  * Ajustes (`02 §12`, RF-CFG-03): bloqueo y ocultar en multitarea (`SeccionBloqueo`), avisos de tarjetas (M4),
- * captura y widget (solo Android, M10), respaldo (M9), privacidad (exportar, borrar todo y el aviso viven en el
+ * captura y widget (solo Android, M10), apariencia (`02 §16`), respaldo (M9), privacidad (exportar, borrar todo y el aviso viven en el
  * centro de privacidad, `app/privacidad.tsx`), ayuda (M13, `app/ayuda.tsx`) y versión. En builds de desarrollo,
  * tocar 7 veces la versión abre el menú de escenarios semilla.
  */
@@ -103,6 +104,7 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         <SeccionAvisos />
         <SeccionCaptura />
         <SeccionWidget />
+        <SeccionApariencia />
 
         <Grupo titulo={GRUPO_SEGURIDAD} />
         <SeccionBloqueo />
