@@ -4,6 +4,8 @@ Maquetas que Adam aprueba antes de construir (regla: nada visual grande se const
 
 | Archivo | Qué es |
 |---|---|
+| `AUDITORIA-PRO-2026-10.md` | Auditoría de la UI del 25-10-2026: lo corregido ese día (barra nativa, Ajustes, aviso legal, bienvenida), hallazgos abiertos con severidad y capturas de CI (`auditoria-2026-10/`), y las decisiones que se piden a Adam. |
+| `mockups-auditoria-2026-10.html` | Las seis propuestas de la auditoría (cómo se ve hoy y la propuesta, claro y oscuro). **Sin aprobar: no se construyen.** |
 | `mockups-asistente.html` | Mockups de alta fidelidad del asistente de voz en marcos de iPhone (390 × 844): Hoy A/B/C, Registrar R1/R2 (más R2 con teclado), estados «escuchando» y «no entendí», conversación en vez de formulario (tarjeta), onboarding por voz (2 pantallas), arqueo por voz, pestañas reducidas y vacíos, y la tabla «Qué elegir» con la recomendación. Un solo archivo, sin dependencias salvo Google Fonts (Inter como sustituto de la fuente del sistema en Windows). |
 
 ## Cómo verlo
