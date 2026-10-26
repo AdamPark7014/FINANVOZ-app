@@ -4,7 +4,7 @@ import { auditar } from '../../pantallas/__pruebas__/accesibilidad';
 import { crearMotorFalso, type OpcionesMotorFalso } from '../../voz/__pruebas__/motor-falso';
 import { ProveedorDictado, type LectorMonto } from '../../voz/ProveedorDictado';
 import { ETIQUETA_ESCUCHANDO, MENSAJES_DICTADO_CAMPO, PISTA_MICROFONO_CAMPO } from '../../voz/textos';
-import { CampoMonto, type CampoMontoProps } from './CampoMonto';
+import { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './CampoMonto';
 import {
   ContextoDictadoCampos,
   PISTA_CAMPO_ESCUCHANDO,
@@ -58,6 +58,32 @@ async function tocar(id = 'monto-microfono') {
   });
   fireEvent(microfono(id), 'pressOut');
 }
+
+describe('CampoMonto · miles en vivo (H8)', () => {
+  /** Como el teclado: una tecla a la vez sobre lo que el campo ya muestra. */
+  function teclear(texto: string) {
+    for (const letra of texto) fireEvent.changeText(campo(), `${campo().props.value as string}${letra}`);
+  }
+
+  it('«13000» se ve «13,000» mientras se teclea y avisa 13 mil pesos en centavos', () => {
+    const { alCambiar } = montar();
+    teclear('13000');
+    expect(campo().props.value).toBe('13,000');
+    expect(alCambiar).toHaveBeenLastCalledWith(1_300_000);
+    expect(screen.queryByText(ERROR_FORMATO_MONTO)).toBeNull();
+    // Borrar un dígito vuelve a agrupar.
+    fireEvent.changeText(campo(), '13,00');
+    expect(campo().props.value).toBe('1,300');
+    expect(alCambiar).toHaveBeenLastCalledWith(130_000);
+  });
+
+  it('una coma que escribe la persona no se reinterpreta: «12,50» enseña el error y no avisa monto', () => {
+    const { alCambiar } = montar();
+    teclear('12,50');
+    expect(campo().props.value).toBe('12,50');
+    expect(alCambiar).toHaveBeenLastCalledWith(null);
+  });
+});
 
 describe('CampoMonto · dictar la cifra', () => {
   it('sin ProveedorDictado no hay micrófono (pruebas y pantallas sueltas)', () => {

@@ -8,6 +8,7 @@ import {
   etiquetaHablada,
   pistaCampoMonto,
   formatearCentavos,
+  formatearMontoTecleado,
   leerPesos,
   tieneCifra,
   type ModoCifra,
@@ -71,6 +72,58 @@ describe('leerPesos', () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 99_999_999_999 }), (c) => {
         expect(leerPesos(formatearCentavos(c, 'centavos'))).toBe(c);
+      }),
+    );
+  });
+});
+
+describe('formatearMontoTecleado (H8: miles en vivo como en el resto de la app)', () => {
+  /** Teclea letra por letra como el teclado numérico, con el campo formateando entre cada tecla. */
+  function teclear(texto: string, inicial = ''): string {
+    let valor = inicial;
+    for (const letra of texto) valor = formatearMontoTecleado(valor + letra, valor);
+    return valor;
+  }
+
+  it.each([
+    ['13000', '13,000'],
+    ['1500.5', '1,500.5'],
+    ['1500.50', '1,500.50'],
+    ['250', '250'],
+    ['1234567', '1,234,567'],
+    ['.5', '.5'],
+    ['007', '7'],
+  ])('teclear "%s" deja "%s"', (tecleado, visto) => {
+    expect(teclear(tecleado)).toBe(visto);
+    expect(leerPesos(teclear(tecleado))).toBe(leerPesos(tecleado));
+  });
+
+  it('borrar un dígito vuelve a agrupar: «13,000» → «1,300»', () => {
+    expect(formatearMontoTecleado('13,00', '13,000')).toBe('1,300');
+    expect(formatearMontoTecleado('1,30', '1,300')).toBe('130');
+  });
+
+  it('una coma tecleada por la persona no se reinterpreta: «12,50» nunca se vuelve mil doscientos cincuenta', () => {
+    expect(teclear('12,50')).toBe('12,50');
+    expect(leerPesos(teclear('12,50'))).toBeNull();
+    // «1,500» escrito con su coma se respeta y sigue siendo $1,500; si ya quedó bien agrupado, el campo sigue.
+    expect(teclear('1,500')).toBe('1,500');
+    expect(leerPesos(teclear('1,500'))).toBe(150000);
+    expect(teclear('0', '1,500')).toBe('15,000');
+    // Pegar un monto ya escrito con comas también se respeta.
+    expect(formatearMontoTecleado('1,500.00', '')).toBe('1,500.00');
+  });
+
+  it('lo que no es monto se deja para que el campo enseñe el error', () => {
+    expect(formatearMontoTecleado('12a', '12')).toBe('12a');
+    expect(formatearMontoTecleado('1.2.3', '1.2')).toBe('1.2.3');
+    expect(formatearMontoTecleado('', '5')).toBe('');
+  });
+
+  it('nunca cambia el monto que lee leerPesos', () => {
+    fc.assert(
+      fc.property(fc.stringMatching(/^\d{1,12}(\.\d{0,2})?$/), (tecleado) => {
+        expect(leerPesos(teclear(tecleado))).toBe(leerPesos(tecleado));
       }),
     );
   });

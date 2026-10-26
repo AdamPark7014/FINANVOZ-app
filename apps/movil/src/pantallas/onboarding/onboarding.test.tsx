@@ -261,7 +261,9 @@ describe('onboarding', () => {
     expect(screen.getByTestId('onb-tip', { includeHiddenElements: false })).toHaveTextContent(
       TIP_INGRESO_SALTAR,
     );
-    escribir('onb-ingreso-monto', '13,000');
+    // H8: se teclea sin comas y el campo lo muestra con miles, como Ajustes › Ingreso.
+    escribir('onb-ingreso-monto', '13000');
+    expect(screen.getByTestId('onb-ingreso-monto').props.value).toBe('13,000');
     expect(screen.getByTestId('onb-proximo-pago')).toHaveTextContent(/jue 15/);
     expect(screen.getByTestId('onb-proximo-pago').props.accessibilityLabel).toBe(
       etiquetaHablada(etiquetaProximoPagoOnboarding('jue 15')),

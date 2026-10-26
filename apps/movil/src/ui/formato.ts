@@ -52,6 +52,31 @@ export function leerPesos(texto: string): Centavos | null {
   return Number(pesos || '0') * 100 + Number(fraccion.padEnd(2, '0'));
 }
 
+const contarComas = (t: string) => (t.match(/,/g) ?? []).length;
+/** Como lo deja el campo: comas solo entre grupos de tres dígitos. */
+const AGRUPADO_POR_EL_CAMPO = /^\d{1,3}(,\d{3})*(\.\d*)?$/;
+
+/**
+ * Formato en vivo de un monto mientras se teclea: separa los miles como se muestra en el resto de la app
+ * ("13000" → "13,000", "1300.5" → "1,300.5"). Las comas las pone el campo, no la persona: si la persona escribe
+ * una coma (o pega un monto con comas), el texto se deja tal cual y `leerPesos` decide; así «12,50» tecleado como
+ * decimal nunca se convierte en mil doscientos cincuenta (regla 12). Lo que no es un monto tampoco se toca: el
+ * campo enseña su error.
+ */
+export function formatearMontoTecleado(nuevo: string, anterior: string): string {
+  // Una coma nueva es de la persona; y mientras el texto anterior traiga comas que el campo no puso, siguen siendo
+  // suyas (p. ej. «12,» → «12,5» → «12,50»).
+  const comasDelCampo = contarComas(anterior) === 0 || AGRUPADO_POR_EL_CAMPO.test(anterior);
+  if (contarComas(nuevo) > contarComas(anterior)) return nuevo;
+  if (contarComas(nuevo) > 0 && !comasDelCampo) return nuevo;
+  const m = /^(\d*)(\.(\d*))?$/.exec(nuevo.replace(/,/g, ''));
+  if (!m) return nuevo;
+  const enteros = (m[1] ?? '').replace(/^0+(?=\d)/, '');
+  // Sobre el texto, no sobre `Number`: un monto larguísimo no pierde dígitos (y `leerPesos` lo rechaza igual).
+  const conComas = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return m[2] === undefined ? conComas : `${conComas}.${m[3] ?? ''}`;
+}
+
 const UNIDADES = [
   '',
   'uno',

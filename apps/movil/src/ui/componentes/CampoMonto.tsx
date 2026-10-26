@@ -2,7 +2,13 @@ import type { Centavos } from '@cartera/core';
 import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import { anunciar } from '../anunciar';
-import { etiquetaCampoMonto, formatearCentavos, leerPesos, pistaCampoMonto } from '../formato';
+import {
+  etiquetaCampoMonto,
+  formatearCentavos,
+  formatearMontoTecleado,
+  leerPesos,
+  pistaCampoMonto,
+} from '../formato';
 import { Boton } from './Boton';
 import { CampoTexto } from './CampoTexto';
 import {
@@ -125,10 +131,12 @@ export function CampoMonto({
       etiqueta={etiqueta}
       valor={texto}
       alCambiar={(nuevo) => {
-        setTexto(nuevo);
+        // Miles separados mientras se teclea, igual que donde la app muestra montos («13000» → «13,000»).
+        const formateado = formatearMontoTecleado(nuevo, texto);
+        setTexto(formateado);
         // Al teclear, lo que se oyó deja de ser la ayuda.
         setVoz((v) => (v.tipo === 'mensaje' ? SIN_VOZ : v));
-        alCambiar(leerPesos(nuevo));
+        alCambiar(leerPesos(formateado));
       }}
       ejemplo="0.00"
       teclado="decimal-pad"
