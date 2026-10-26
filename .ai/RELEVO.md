@@ -6,82 +6,44 @@
 
 ## Hecho en este turno
 
-- **Tema claro por omisión (26-10, decisión de Adam para todas sus apps)**: la app se ve en claro aunque el teléfono
-  esté en oscuro; el oscuro solo si se elige. Ajustes › Apariencia (grupo «Voz y avisos», tras Widget) es una
-  `FilaAjuste` que abre aquí mismo tres chips: «Claro», «Oscuro», «Como el teléfono»; cada toque se guarda
-  (`servicios/apariencia.ts`, ajuste `apariencia`, pide consentimiento como el resto) y se aplica al momento con
-  `Appearance.setColorScheme` (`aplicarApariencia` en `ui/tema.ts`; `sistema` → `unspecified`). La raíz
-  (`app/_layout.tsx`) fija claro al cargar y aplica lo guardado al abrir la base, antes del primer render: sin
-  destello oscuro. `app.json` sigue con `userInterfaceStyle: "automatic"` (para que «Como el teléfono» funcione en
-  iOS); la pantalla de arranque ya era clara. Pruebas en `apariencia.test.ts` y `ajustes.test.tsx`; decisión en
-  `docs/ESTADO.md` y `02 §12`/`§16`. Capturas «oscuro» (Android y las dos de iOS) pasan `-e TEMA=oscuro` y el
-  onboarding rápido elige «Oscuro» (`.maestro/ios/subflujos/tema-oscuro.yaml`); sin probar todavía en Maestro real.
-- **H8 (26-10)**: `CampoMonto` separa los miles mientras se teclea en los 26 campos de monto (O3 incluido):
-  `formatearMontoTecleado` en `ui/formato.ts`; las comas que escribe la persona se respetan (nunca «12,50» → $1,250).
-  Pruebas en `formato.test.ts` (fast-check: el monto leído no cambia), `CampoMonto.test.tsx` y O3 en
-  `onboarding.test.tsx`.
-- **H10, Maestro de iPhone (26-10)**, causa de cada fallo:
-  - **06 (error de la app)**: con el teclado arriba, campo + chips + micrófono dejaban a la conversación unos 17 pt;
-    «Registrar» sí registraba, pero «Registré…» (y la tarjeta «Entendí») no se veían. Ahora mandar lo escrito cierra
-    el campo y el teclado (`BarraVoz`, prueba en `asistente.test.tsx`); 06 deja de ser fallo conocido.
-  - **03 (flujo)**: `tocar.yaml` con `centerElement` obligatorio no puede centrar lo que está al final del contenido
-    («Leer los términos de uso»): esperaba 30 s y fallaba aunque el elemento se veía.
-  - **01 (flujo)**: la tarjeta de «Debes» quedaba arriba, fuera de la pantalla: el deslizamiento a la velocidad por
-    omisión, con la inercia de iOS 26, se pasaba de largo.
-  - `tocar.yaml`: buscar despacio (speed 20), centrar si se puede (opcional) y volver hacia arriba si se pasó; el
-    onboarding rápido espera la animación del teclado antes de «Continuar».
-- **H1 de la auditoría corregido (26-10, Adam: «corrige ya el fallo… y publica un TestFlight nuevo»)**: la barra de voz
-  tapaba el final de la conversación. La lista solo bajaba al cambiar el contenido; cuando la barra crecía (vuelven
-  chips y micrófono tras escuchar) el alto visible se achicaba sin volver a bajar y las opciones de «No entendí»
-  quedaban cortadas. `pantallas/asistente/seguirAlFinal.ts` (`useSeguirAlFinal`) también baja al cambiar el alto
-  visible, salvo que la persona haya subido a leer; el estado vacío lleva margen inferior `xxl`. Pruebas en
-  `seguirAlFinal.test.tsx`. TestFlight 1.0.0 (12).
-- **Revisión del trabajo de Cursor del 24 y 25-10** (32 commits, `0742b8c`…`286f14f`) y correcciones con el visto
-  bueno de Adam:
-  - **CI en verde otra vez**: llevaba 30 pushes en rojo en `pnpm lint` (Prettier en 13 archivos y dos `!` de ESLint
-    en `servicios/movimientos.ts` y `principal.test.tsx`), así que en GitHub no corrían typecheck, pruebas, evals ni
-    el escaneo de secretos. jest fallaba en 2: `numberOfLines` en `FilaAjuste` y `PantallaFormularioLargo`
-    (CA-M7-05) y la prueba de humo de la marca.
-  - **Barra nativa arreglada** (`src/ui/navegacion.tsx`, `BarraNativa` en 26 rutas): sin título grande encimado,
-    sin «(tabs)» en el botón de atrás, sin título repetido, colores del tema claro/oscuro, `Pantalla` sin el borde de
-    arriba bajo la barra, y salida `barra-salida` cuando la pantalla se abre sin historial. Pruebas de «atrás»
-    restauradas (Ajustes, Ingreso, Privacidad) y flujos de Maestro con `subflujos/atras.yaml` (`BackButton`).
-  - **Ajustes**: `FilaAjuste` sin truncar y con etiqueta hablada completa; Colchón y Datos para cobrar como filas;
-    tono «faltante» del respaldo pendiente; aviso legal completo y leído por VoiceOver; Ingreso se oye con su resumen.
-  - **Textos**: «Finanvoz» de vuelta en la bienvenida, con texto propio para iPhone (sin prometer los avisos del
-    banco); «Cuando dejes de hablar, termino solo.» como en el mockup aprobado.
-  - Decisiones en `docs/ESTADO.md` (25-10) y `docs/PLAN-UX-VOZ.md` §3.3 y §3.6.
-  - **Teclado en Android**: con borde a borde `adjustResize` ya no encoge la ventana y el campo del asistente quedaba
-    bajo el teclado (capturas de Android). `PantallaAsistente` y `Pantalla` usan `KeyboardAvoidingView` también en
-    Android. `compartido.test.tsx` espera hasta 10 s la sincronización (fallaba solo con la suite completa).
-  - **Auditoría** en `docs/diseno/AUDITORIA-PRO-2026-10.md` + `mockups-auditoria-2026-10.html`: 6 propuestas sin
-    construir, esperan el visto bueno de Adam.
-  - **Flecha de atrás en Android**: `headerTitle` como función montaba en Android una vista izquierda que escondía la
-    flecha; ahora es cadena vacía (`5518eae`).
-  - **Maestro de iPhone**: en las tres últimas corridas (40281636346, 40290257913, 40302661246) pasan siempre 02,
-    04, 05, 07, 08 y 09. 01 y 03 fallan cada vez en un paso distinto (03: onboarding o Captura; 01: la tarjeta de
-    Debes o un campo de la tarjeta): se corrigió lo que estaba desactualizado (horario por chip, Captura oculta en
-    iPhone, tarjeta centrada) y lo que queda parece de tiempos en flujos largos. 06 sigue como fallo conocido.
-  - **Maestro**: `tocar.yaml` centra el elemento (el pie fijo tapaba «Agregar tarjeta» en O4), «¿Me alcanza?» es
-    opcional en 02 (la build del simulador no trae compras), 05 manda la frase con «Enviar». Las capturas de tienda
-    de Android usan el onboarding corto (el largo quedó atrás de la Ola 7) y toman Ajustes › Ingreso con la barra.
-- `0f5a01c` («WIP: rescate») era trabajo de Cursor a medio hacer (`FilaAjuste`), no de Claude: lo de Claude del 23-10
-  (nivel 0 sin nube, chips de Movimientos) ya estaba en `790e3fd` y `bef69db` y sigue intacto.
+- **Intérprete «perfeccionado» (encargo de Adam: que entienda bien, rápido, sin trabarse y barato).** Números en
+  `docs/ESTADO.md` (Decisiones 26-10, M3) y `services/proxy/README.md` → Medición del 26-10-2026:
+
+  | Métrica | Antes (`fce19b9`) | Después |
+  |---|---|---|
+  | Nivel 0 (teléfono, sin red, gratis), precisión 100 % | 147/164 (89.6 %) | 162/164 (98.8 %) |
+  | Frases del golden que van a la nube | 17 (10.4 %) | 2 (1.2 %): M02, V09 |
+  | Nube, caso completo (golden completo, Haiku 5.5) | 161/164 (98.2 %) | 163/164 (99.4 %) |
+  | Nube p50 / p95 | 1.14 / 1.65 s | 1.18 / 1.89 s |
+  | p95 de una frase del golden (mezcla) | ~1.1 s | < 1 ms |
+  | USD por 1,000 frases dichas | 0.027 | ~0.003 |
+
+- **Nivel 0** (`packages/nlu/src/reglas/`, va dentro de la app: **hace falta otra build** para que llegue al teléfono):
+  diccionario ampliado y «conocidas sin categoría» (chelas, gas, pastel, celular, propina, enganche…), DESC de destino
+  («croquetas para el perro» → mascotas, «regalo para mi sobrina», «tacos al pastor», «enganche del coche»), verbos
+  cargué/cooperé/me tomé/almorcé, un monto dicho antes para varias cosas → un gasto, parte sin monto → pregunta,
+  «dos cincuenta» → pregunta con las dos opciones, «le di/pasé MONTO a PERSONA» → gasto (familiar → apoyo familiar),
+  «me pagaron X por un trabajo» → honorarios, cuentas divididas con «éramos N» y «Caro y Juan me deben su parte».
+  Ante la duda sigue preguntando o dejando la frase a la nube (regla 12). Spec en `06 §3.1` y `§9.1`–`§9.3`; 15 banderas
+  `reglas` del golden a `true`; pruebas de la app que forzaban la nube con «chelas» usan «micheladas».
+- **Nube** (`services/proxy/.../nlu/`): prompt afinado (destino solo si se dice, «como N» sin preguntar, dividida sin
+  nombres sin preguntar, diccionario igual al del nivel 0); `stop_reason: max_tokens` → reintento que pide respuesta
+  más corta; reintento sin turno vacío. Sigue Haiku 5.5 `low`: Sonnet no hace falta (fallos variables, 15/15 al repetir).
+- **Funciones del proxy desplegadas y probadas** (26-10, `services/proxy/scripts/desplegar-funciones.sh`):
+  `probar-backend.mjs` 31/31; `nlu-interpretar` 200 en 1.13 s. Nota: lo desplegado antes ya era idéntico a `fce19b9`
+  (el reintento de 4 s sí estaba en producción; la nota anterior del RELEVO estaba vieja).
+- **Grabaciones reales** de la nube en `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl`: `pnpm eval:nlu
+  --offline` reproduce 163/164 en CI (CA-M3-06 y CA-M3-01 cumplen con Anthropic).
+- `pnpm eval:nlu --por-minuto N`: espacia las llamadas (el proyecto `pruebas` de la puerta tiene 60/min, compartidas
+  con los evals de otras apps). Gasto de evals de este turno: ~0.12 USD.
 
 ## Estado de tiendas
 
-- **TestFlight 1.0.0 (11)** subida el 26-10 desde `e494379` (corrida 40282099144) y **VALID** en App Store Connect
-  (consultado por API). Trae la revisión de este turno salvo la flecha de Android, que no aplica a iPhone. Grupo
-  interno «Equipo Finanvoz (interno)» con Adam invitado; la API con la llave de Gestor de apps no asigna testers: se
-  agregan desde la consola. `ios-testflight.yml` usa el número de corrida como build.
-- **Play**: el que se sube es el AAB 1.0.0 (versionCode 4), con el arreglo H1, compilado y firmado con la llave de
-  subida desde `d4a140d` (corrida 40358034821, huella SHA-256 8F:67:…:05:00 comprobada); copia en
-  `C:\dev\builds\FINANVOZ\1.0.0-4\bundle\release\app-release.aab`. El 3 (`343269f`) queda superado: no subirlo.
-  **No hay cuenta de servicio de Play**: subirlo a la prueba interna es a mano en la consola (o crear la cuenta de
-  servicio). La prueba interna publicada sigue siendo la versión 1 del 22-10; los versionCode 2 y 3 se compilaron
-  pero no consta que se subieran.
+- **TestFlight y AAB** arrancaron desde `fce19b9` (antes de este turno): no traen el nivel 0 nuevo. La nube nueva sí
+  aplica a cualquier build porque vive en el backend.
 - **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
   `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
+- **Play**: no hay cuenta de servicio; subir a la prueba interna es a mano en la consola.
 - Secretos de firma de iOS y Android cargados en GitHub el 22-10 (nombres en `docs/tienda/`; los valores viven fuera
   del repo). Flujos: `ios-testflight.yml`, `android-play.yml`.
 
@@ -90,8 +52,11 @@
 - Backend propio en el Hetzner: `https://finanvoz-api.zynoratek.com` (Supabase mínimo; compose en
   `/opt/finanvoz-backend`, plantilla en `services/proxy/deploy/`). La IA va por la puerta única
   (`ANTHROPIC_BASE_URL=http://puerta-ia:8080`, token del proyecto en la carpeta local de secretos, nunca en el repo),
-  Haiku 5.5 en modo herramienta.
-- **Las funciones del proxy con el reintento de 4 s no están redesplegadas** (`scripts/desplegar-funciones.sh`).
+  Haiku 5.5 en modo herramienta, `NLU_PROVEEDORES=anthropic` (sin alterno: el 2.º intento es con Claude).
+- Funciones al día con este turno (26-10). Para redesplegar: `bash services/proxy/scripts/desplegar-funciones.sh` y
+  después `node services/proxy/scripts/probar-backend.mjs`.
+- Evals de la nube: por la puerta con el token de `pruebas` (Haiku; nunca Opus de juez), `--concurrencia 2
+  --por-minuto 30`. Al 26-10 el proyecto `pruebas` lleva ~3.6 de 4 USD del mes (también lo usan otras apps).
 - Respaldo en la nube apagado hasta tener SMTP; sin respaldos de la base (decisión de Adam).
 
 ## Norte de producto (Adam, voz)
@@ -101,20 +66,19 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 ## A medias — CUIDADO
 
+- **El nivel 0 nuevo no está en ninguna build**: hace falta otra de TestFlight y otro AAB para probarlo en teléfono.
 - **Ola 7 y la UI de Cursor sin probar en teléfono**: asistente, voz y onboarding por voz solo se han visto en jest y
   en el simulador de CI.
-- **Maestro de iPhone nunca ha estado en verde**: desde este turno pasan 02, 04, 05, 07, 08 y 09; 01 y 03 siguen
-  fallando por tiempos (un paso distinto cada corrida); 06 sigue como fallo conocido (`bug-conocido`).
-- **Subir el AAB 1.0.0 (3) a la prueba interna de Play** (a mano, sin cuenta de servicio).
+- **Maestro de iPhone nunca ha estado en verde**: pasan 02, 04, 05, 07, 08 y 09; 01 y 03 fallan por tiempos.
 - M0, dominio `finanvoz.com` y aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa).
 - Respaldar las llaves de Android fuera de la PC.
 
 ## Siguiente
 
-1. Adam prueba TestFlight 1.0.0 (11) y, cuando se suba, Play 1.0.0 (3): Ola 7, barra nativa, Ajustes en filas.
-2. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): H1 es un error que se puede corregir ya; 2–6
-   son diseño y esperan su visto bueno.
-3. Ola 3.5 (`expo-symbols`) y 3.8 (onboarding más corto): con mockup y visto bueno de Adam antes de construir.
+1. Nueva build (TestFlight y AAB) con el nivel 0 nuevo y probar en teléfono frases como «unas chelas, 340 en
+   efectivo», «le pasé 200 a mi jefa», «croquetas para el perro 640 con la oro» sin internet.
+2. Adam prueba la build de `fce19b9` (tema claro, H1, H8, H10).
+3. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): propuestas 2–6 esperan su visto bueno.
 
 ## No tocar
 

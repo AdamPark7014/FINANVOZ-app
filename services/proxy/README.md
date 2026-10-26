@@ -109,7 +109,7 @@ Registros: en Logs → Edge Functions cada petición deja una línea JSON solo c
 Lo corre Adam con sus llaves, en su máquina (las llaves nunca entran al repositorio):
 
 1. Contrato con el proveedor real (`06 §10.1` punto 3), 3 frases por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --limite 3` (igual con `openai` + `OPENAI_API_KEY` y `google` + `GOOGLE_API_KEY`). Mientras `packages/nlu/scripts/eval-nlu.ts` siga mandando `json_schema` cuando la variable no está, corre el eval con `NLU_ANTHROPIC_MODO=herramienta` (sin ella, Anthropic responde 400 en cada caso). Para usar otro modelo: `--modelo <id>`.
-2. Golden set completo y grabación, por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --grabar` → `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl`.
+2. Golden set completo y grabación, por proveedor: `ANTHROPIC_API_KEY=... pnpm eval:nlu --nivel nube --proveedor anthropic --grabar` → `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl`. Por la puerta con el token de pruebas: `ANTHROPIC_BASE_URL=https://ia.zynoratek.com` y `--concurrencia 2 --por-minuto 30` (límite de 60 por minuto del proyecto `pruebas`).
 3. Confirma los precios de `config/nlu/precios.json` y corre `pnpm eval:nlu --offline`: imprime el reporte de cada modelo grabado.
 4. Elige el de menor costo por caso completo correcto que cumpla todos los umbrales y p95 < 5 s (`06 §11`); registra el reporte y la decisión en `docs/ESTADO.md` (Reportes del intérprete y Decisiones), pon ese proveedor primero en `NLU_PROVEEDORES` y haz commit de las grabaciones.
 
@@ -152,7 +152,34 @@ con el token de pruebas, sin jueces. Gasto de la medición: ~0.08 USD.
 - El eval de nube ya no corre con Sonnet ni Opus sin `--permitir-caro`; `--solo G01,X06` y `--solo-nube` limitan los
   casos; `--ver` imprime lo que contestó el modelo en los que fallan.
 
-Hasta que existan las grabaciones, CA-M3-01 y CA-M3-06 quedan pendientes; `pnpm eval:nlu --offline` ya corre en CI y avisa "sin grabaciones".
+### Medición del 26-10-2026 («perfecciona el modelo»: más frases en el teléfono)
+
+Golden set completo (164 frases) por la puerta con el token de pruebas y Haiku 5.5 (`--concurrencia 2 --por-minuto 30`:
+la puerta limita `pruebas` a 60 peticiones por minuto, compartidas con otros evals). Gasto de toda la medición: ~0.12 USD.
+
+| Métrica | Antes (`fce19b9`) | Después |
+|---|---|---|
+| Nivel 0 resuelve en el teléfono (precisión 100 %) | 147/164 (89.6 %) | **162/164 (98.8 %)** |
+| Frases que van a la nube | 17/164 (10.4 %) | **2/164 (1.2 %)** (M02, V09) |
+| Nube: caso completo, golden completo | 161/164 (98.2 %) | **163/164 (99.4 %)**; intención, monto, fecha y categoría al 100 % |
+| Nube: p50 / p95 | 1,140 / 1,649 ms | 1,178 / 1,887 ms (misma configuración; variación de red) |
+| Nivel 0: p50 / p95 por frase (PC) | 0.09 / 0.23 ms | 0.09 / 0.23 ms |
+| p95 de una frase del golden (mezcla) | ~1.1 s (más del 5 % iba a la nube) | **< 1 ms** |
+| USD por frase en la nube, caché caliente | 0.000260 | 0.000265 (prompt ~60 tokens más) |
+| USD por 1,000 frases del golden (mezcla) | 0.027 | **0.003** |
+
+- Los fallos de la nube varían entre corridas (la API 2026-10-21 no acepta `temperature`): antes M09 («como 300» leído
+  como duda), I01 (destino supuesto) y D01 (preguntó los nombres); después G01 (efectivo supuesto). Repetidos 3 veces
+  con el prompt nuevo, los cuatro y G02 dieron 15/15. Los cinco los resuelve el nivel 0 en producción.
+- Prompt: destino solo si la frase dice a dónde llegó el dinero, «como N» registra sin preguntar, cuenta dividida sin
+  nombres no pregunta participantes, y el diccionario del sistema coincide con el del nivel 0 (mascota por destino,
+  tecnología, hogar, propina y enganche como ambiguas). Ejemplos nuevos fuera del golden (06 §8).
+- `stop_reason: max_tokens` ya no gasta el reintento a ciegas: el adaptador marca la respuesta `cortada` y el reintento
+  pide una respuesta más corta; un turno anterior vacío va como «(sin respuesta)» (la API rechaza el vacío con 400).
+- Grabaciones reales en `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl` (la corrida «después», con
+  `--grabar`): `pnpm eval:nlu --offline` reproduce 163/164 sin red ni llaves (CA-M3-06).
+- Desplegado el 26-10 con `scripts/desplegar-funciones.sh`; `probar-backend.mjs`: 31/31, `nlu-interpretar` 200 en
+  1,131 ms con Haiku (ya estaba en producción el reintento de 4 s: lo desplegado era idéntico a `fce19b9`).
 
 ## M7 · `webhooks-revenuecat` (`POST /webhooks/revenuecat`)
 
