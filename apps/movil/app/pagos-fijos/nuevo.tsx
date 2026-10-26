@@ -1,8 +1,7 @@
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { dejarConfirmacion } from '../../src/pantallas/ajustes/confirmacion';
 import { PantallaNuevoPagoFijo } from '../../src/pantallas/cuentas';
-import { TITULO_NUEVO_PAGO } from '../../src/pantallas/cuentas/textos';
-import { opcionesBarraNativa } from '../../src/ui/navegacion';
+import { BarraNativa } from '../../src/ui/navegacion';
 
 /** Cuentas › Compromisos › Agregar pago fijo (`02 §11`): al guardar regresa con «Listo: agregué…». */
 export default function NuevoPagoFijoRuta() {
@@ -10,7 +9,7 @@ export default function NuevoPagoFijoRuta() {
   const volver = () => (router.canGoBack() ? router.back() : router.replace('/cuentas'));
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_NUEVO_PAGO)} />
+      <BarraNativa salida="/cuentas" />
       <PantallaNuevoPagoFijo
         alGuardar={(confirmacion) => {
           dejarConfirmacion(confirmacion);

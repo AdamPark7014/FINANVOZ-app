@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { HeaderShownContext } from 'expo-router/react-navigation';
+import { useContext, type ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -15,7 +16,10 @@ export interface PantallaProps {
   children: ReactNode;
   /** `false` para pantallas con lista virtualizada propia. */
   desplazable?: boolean;
-  /** Bordes con área segura; las pestañas ya cubren el inferior. */
+  /**
+   * Bordes con área segura; las pestañas ya cubren el inferior. Con la barra nativa del Stack visible, el de arriba
+   * se ignora: la barra ya cubre la barra de estado y sumarlo dejaba un hueco.
+   */
   bordes?: readonly Edge[];
   /** Contenido fijo al pie (p. ej. "Guardar"), fuera del desplazamiento; sube con el teclado. */
   pie?: ReactNode;
@@ -43,6 +47,8 @@ export function Pantalla({
   testID,
 }: PantallaProps) {
   const { c } = useTema();
+  const conBarraNativa = useContext(HeaderShownContext);
+  const bordesEfectivos = conBarraNativa ? bordes.filter((b) => b !== 'top') : bordes;
   const ios = Platform.OS === 'ios';
   const evitarTeclado = ios && (Boolean(pie) || !desplazable);
   const contenido: ViewStyle = { padding: margenPantalla, gap: espacio.xl };
@@ -79,7 +85,7 @@ export function Pantalla({
     </>
   );
   return (
-    <SafeAreaView testID={testID} edges={bordes} style={{ flex: 1, backgroundColor: c.fondo }}>
+    <SafeAreaView testID={testID} edges={bordesEfectivos} style={{ flex: 1, backgroundColor: c.fondo }}>
       {evitarTeclado ? (
         // Dentro del área segura: el pie queda pegado al teclado sin el hueco del indicador de inicio.
         <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>

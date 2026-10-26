@@ -1,9 +1,8 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
 import { PantallaGrupoCompartido } from '../../src/pantallas/compartido';
-import { TITULO_GASTOS_COMPARTIDOS } from '../../src/pantallas/compartido/textos';
-import { opcionesBarraNativa } from '../../src/ui/navegacion';
+import { BarraNativa } from '../../src/ui/navegacion';
 
 /**
  * Detalle de un grupo compartido (`02 §27`). Solo el id del grupo viaja en la ruta (regla 9).
@@ -12,7 +11,7 @@ export default function GrupoCompartidoRuta() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_GASTOS_COMPARTIDOS)} />
+      <BarraNativa salida="/compartido" />
       <ProveedorCompartido deps={dependenciasCompartidoExpo()}>
         <PantallaGrupoCompartido key={id} grupoId={String(id)} />
       </ProveedorCompartido>

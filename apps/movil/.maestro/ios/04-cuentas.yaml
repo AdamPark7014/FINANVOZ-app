@@ -20,8 +20,7 @@ tags:
       id: pantalla-arqueo
     timeout: 10000
 - takeScreenshot: arqueo
-- tapOn:
-    id: boton-cerrar-arqueo
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas
@@ -49,8 +48,7 @@ tags:
       id: pantalla-tandas
     timeout: 10000
 - takeScreenshot: tandas
-- tapOn:
-    id: tandas-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas
@@ -102,16 +100,14 @@ tags:
             id: '(error-formulario|compartidos-qr)'
           timeout: 20000
       - takeScreenshot: compartidos-crear
-- tapOn:
-    id: compartidos-volver
+- runFlow: subflujos/atras.yaml
 - waitForAnimationToEnd
 - runFlow:
     when:
       visible:
         id: pantalla-compartidos
     commands:
-      - tapOn:
-          id: compartidos-volver
+      - runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas
@@ -123,8 +119,7 @@ tags:
       id: pantalla-suscripciones
     timeout: 10000
 - takeScreenshot: suscripciones
-- tapOn:
-    id: suscripciones-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas
@@ -136,8 +131,7 @@ tags:
       id: '(puerta-plus|pantalla-deducciones)'
     timeout: 10000
 - takeScreenshot: deducciones
-- tapOn:
-    id: '(plan-volver|deducciones-volver)'
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas

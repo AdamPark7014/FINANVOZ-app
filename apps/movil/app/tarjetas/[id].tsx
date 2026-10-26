@@ -1,8 +1,8 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import { ProveedorAvisos } from '../../src/pantallas/principal';
 import { PantallaTarjeta } from '../../src/pantallas/tarjetas';
-import { opcionesBarraNativa } from '../../src/ui/navegacion';
+import { BarraNativa } from '../../src/ui/navegacion';
 
 /** Detalle de una tarjeta (`02 §8`). Solo el id viaja en la ruta (regla 9). */
 export default function DetalleTarjetaRuta() {
@@ -10,7 +10,7 @@ export default function DetalleTarjetaRuta() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa('Tarjetas')} />
+      <BarraNativa salida="/cuentas" />
       <ProveedorAvisos>
         <PantallaTarjeta
           key={id}

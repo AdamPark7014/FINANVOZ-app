@@ -11,6 +11,8 @@ import {
   CampoMonto,
   CampoTexto,
   EstadoVacio,
+  etiquetaFilaAjuste,
+  FilaAjuste,
   Cifra,
   ERROR_FORMATO_MONTO,
   Interruptor,
@@ -19,6 +21,45 @@ import {
   Texto,
   useAviso,
 } from './index';
+
+describe('FilaAjuste (`PLAN-UX-VOZ` §3.6)', () => {
+  const largo =
+    'Finanvoz no es una institución financiera ni asesor de inversiones. Las cifras son estimaciones con la información que registras y no garantizan resultados.';
+
+  it('no corta el valor y el lector de pantalla lo oye completo con la acción', () => {
+    render(
+      <FilaAjuste
+        testID="f"
+        titulo="Acerca de"
+        valor={largo}
+        pista="Abre los términos"
+        alPresionar={() => {}}
+      />,
+    );
+    const valor = screen.getByText(largo, { includeHiddenElements: true });
+    expect(valor.props.numberOfLines).toBeUndefined();
+    expect(screen.getByTestId('f')).toHaveProp('accessibilityLabel', etiquetaFilaAjuste('Acerca de', largo));
+    const colchon = etiquetaFilaAjuste('Colchón', 'Apartas $1,300.', 'Cambiar mi colchón');
+    expect(colchon).toMatch(/^Colchón\. Apartas .+\. Cambiar mi colchón$/);
+    expect(colchon).not.toMatch(/\$/);
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+  });
+
+  it('el valor que pide atención usa el tono «faltante» (respaldo pendiente)', () => {
+    render(
+      <FilaAjuste
+        testID="f"
+        testIDValor="v"
+        titulo="Respaldo"
+        valor="Nunca has respaldado"
+        tonoValor="faltante"
+        pista="Abre respaldar y restaurar"
+        alPresionar={() => {}}
+      />,
+    );
+    expect(screen.getByTestId('v', { includeHiddenElements: true })).toHaveStyle({ color: '#B3261E' });
+  });
+});
 
 describe('Barra', () => {
   it('expone progreso en la etiqueta y el valor accesible', () => {

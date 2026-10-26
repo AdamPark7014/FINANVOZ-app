@@ -48,10 +48,12 @@ Siguiente build: iOS 1.0.0 (4) y Android versionCode 2.
 1. **Hoy con jerarquía:** cifra en un bloque destacado y tocable, desglose abierto en 4 filas, acciones antes que
    observaciones, Plus y «¿Me alcanza?» abajo. Hecho (el desglose sigue cerrado al abrir; tocar la cifra lo abre).
 2. **Registrar como hoja modal** (`presentation: 'modal'`), con «Hablar · Escribir · Formulario» y fecha Hoy/Ayer.
-3. **Barra de navegación nativa** (título grande y chevron en iOS), sin «Volver» dentro del contenido. Hecho.
+3. **Barra de navegación nativa** (chevron en iOS), sin «Volver» dentro del contenido. Hecho el 25-10 con `BarraNativa`: el
+   título grande nativo se encimaba con el contenido, así que el encabezado se queda en la pantalla (ver ESTADO).
 4. **«Agregar» en Cuentas** (débito, billetera, ahorro, pago fijo) fuera del onboarding: hoy en iPhone no se puede. Hecho.
 5. **Íconos de sistema y vibración** (`expo-symbols`, `expo-haptics`).
-6. **Ajustes como lista agrupada** con valor actual y ›. Hecho (`FilaAjuste`); Captura oculta en iPhone.
+6. **Ajustes como lista agrupada** con valor actual y ›. Hecho (`FilaAjuste` en Ingreso, Colchón, Datos para cobrar,
+   Respaldo, Privacidad, Ayuda y Términos; Voz, Avisos y Bloqueo siguen con sus interruptores); Captura oculta en iPhone.
 7. **Movimientos:** `SectionList` por día con total, chips de filtro, detalle en hoja, botón en el vacío.
 8. **Onboarding más corto:** barra de progreso, ‹ arriba, menos tips, «Más opciones» en O3/O5, tarjeta de primer uso
    en Hoy («Prueba decir «tacos 80 en efectivo»»).

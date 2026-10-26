@@ -1,16 +1,15 @@
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   DESCRIPCION_PUERTA_PLUS,
   INVITACION_PRUEBA_PLUS,
   PantallaMeAlcanza,
-  TITULO,
   TITULO_PUERTA_PLUS,
   tomarConsultaPendiente,
 } from '../src/pantallas/me-alcanza';
 import { PuertaPlus } from '../src/pantallas/plan';
 import { ProveedorAvisos } from '../src/pantallas/principal';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { BarraNativa } from '../src/ui/navegacion';
 
 /** "¿Me alcanza?" (`02 §9`): desde el botón de Hoy o diciendo "¿me alcanza para…?". */
 export default function MeAlcanza() {
@@ -20,7 +19,7 @@ export default function MeAlcanza() {
   const cerrar = () => (router.canGoBack() ? router.back() : router.navigate('/hoy'));
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO)} />
+      <BarraNativa salida="/hoy" />
       <ProveedorAvisos>
         {/* Plus (`02 §9`): en Gratis, qué hace y, solo si hay tienda, cómo probarlo. */}
         <PuertaPlus

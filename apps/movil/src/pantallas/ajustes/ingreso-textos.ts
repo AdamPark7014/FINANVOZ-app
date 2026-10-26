@@ -1,6 +1,6 @@
 import type { Centavos, DiaSemana, PlainDate, Regla } from '@cartera/core';
 import { etiquetaFecha } from '../../servicios';
-import { formatearCentavos } from '../../ui/formato';
+import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import { OPCIONES_DIA_SEMANA } from '../onboarding/ingreso';
 
 /**
@@ -14,6 +14,18 @@ export const ETIQUETA_CAMBIAR_INGRESO = 'Cambiar mi ingreso';
 export const ETIQUETA_CONFIGURAR_INGRESO = 'Configurar mi ingreso';
 export const PISTA_CAMBIAR_INGRESO = 'Abre el formulario para cambiar cuánto y cada cuándo te pagan';
 export const PISTA_CONFIGURAR_INGRESO = 'Abre el formulario para decir cuánto y cada cuándo te pagan';
+
+/**
+ * Lo que lee VoiceOver/TalkBack en la fila Ingreso de Ajustes: lo mismo que se ve (cuánto y cada cuándo te pagan)
+ * y después la acción, para que nadie tenga que abrir el formulario solo para oír su ingreso.
+ */
+export function etiquetaFilaIngreso(resumen: string, configurado: boolean): string {
+  const accion = configurado ? ETIQUETA_CAMBIAR_INGRESO : ETIQUETA_CONFIGURAR_INGRESO;
+  const sinPunto = resumen.trim().replace(/[.\s]+$/, '');
+  return etiquetaHablada(
+    sinPunto ? `${SECCION_INGRESO}. ${sinPunto}. ${accion}` : `${SECCION_INGRESO}. ${accion}`,
+  );
+}
 
 export const TITULO_EDITAR = 'Tu ingreso';
 export const INTRO_EDITAR = 'Con esto calculo cuánto puedes gastar cada día hasta tu próximo pago.';

@@ -1,9 +1,9 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { tomarPrellenado } from '../../src/asistente/flujos';
 import { FormularioTarjetaNueva } from '../../src/pantallas/tarjetas';
 import { espacio, Pantalla, Texto } from '../../src/ui';
-import { opcionesBarraNativa } from '../../src/ui/navegacion';
+import { BarraNativa } from '../../src/ui/navegacion';
 
 const TITULO_NUEVA_TARJETA = 'Tarjeta de crédito';
 
@@ -19,7 +19,7 @@ export default function NuevaTarjetaRuta() {
   const salir = () => (router.canGoBack() ? router.back() : router.replace('/cuentas'));
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_NUEVA_TARJETA)} />
+      <BarraNativa salida="/cuentas" />
       <Pantalla
         testID="pantalla-tarjeta-nueva"
         bordes={['top', 'left', 'right', 'bottom']}

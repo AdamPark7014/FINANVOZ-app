@@ -2,7 +2,8 @@ import type { Centavos } from '@cartera/core';
 import { useState } from 'react';
 import { colchonSugerido, fijarColchon, obtenerAjustes } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Tarjeta, Texto } from '../../ui';
+import { View } from 'react-native';
+import { Boton, CampoMonto, espacio, etiquetaFilaAjuste, FilaAjuste, Tarjeta, Texto } from '../../ui';
 import {
   ayudaColchon,
   AYUDA_SIN_SUGERENCIA,
@@ -58,59 +59,66 @@ export function SeccionColchon() {
     });
   };
 
+  const resumen = colchon > 0 ? resumenConColchon(colchon) : RESUMEN_SIN_COLCHON;
+  const accion = colchon > 0 ? BTN_CAMBIAR_COLCHON : BTN_APARTAR_COLCHON;
+  const textoMensaje = mensaje ? (
+    <Texto
+      variante="secundario"
+      tono={mensaje.error ? 'faltante' : 'acento'}
+      accessibilityLiveRegion="polite"
+      testID="ajustes-colchon-mensaje"
+    >
+      {mensaje.texto}
+    </Texto>
+  ) : null;
+
+  // Cerrado es una fila de Ajustes (`PLAN-UX-VOZ` §3.6): tocarla abre el campo aquí mismo.
+  if (!editando) {
+    return (
+      <View testID="ajustes-colchon" style={{ gap: espacio.s }}>
+        <FilaAjuste
+          testID="ajustes-cambiar-colchon"
+          testIDTitulo="ajustes-colchon-titulo"
+          testIDValor="ajustes-colchon-resumen"
+          tituloEsEncabezado
+          titulo={SECCION_COLCHON}
+          valor={resumen}
+          pista={colchon > 0 ? PISTA_CAMBIAR_COLCHON : PISTA_APARTAR_COLCHON}
+          etiquetaAccesible={etiquetaFilaAjuste(SECCION_COLCHON, resumen, accion)}
+          alPresionar={abrir}
+        />
+        {textoMensaje}
+      </View>
+    );
+  }
+
   return (
     <Tarjeta testID="ajustes-colchon">
       <Texto variante="subtitulo" testID="ajustes-colchon-titulo" accessibilityRole="header">
         {SECCION_COLCHON}
       </Texto>
-      {editando ? (
-        <>
-          <CampoMonto
-            testID="ajustes-colchon-monto"
-            etiqueta={ETIQUETA_MONTO_COLCHON}
-            valorInicial={inicial}
-            ayuda={sugerido > 0 ? ayudaColchon(sugerido) : AYUDA_SIN_SUGERENCIA}
-            alCambiar={setMonto}
-          />
-          <Boton
-            testID="ajustes-colchon-guardar"
-            etiqueta={BTN_GUARDAR}
-            pista={PISTA_GUARDAR_COLCHON}
-            deshabilitado={monto === null}
-            alPresionar={guardar}
-          />
-          <Boton
-            testID="ajustes-colchon-cancelar"
-            variante="texto"
-            ancho="contenido"
-            etiqueta={BTN_CANCELAR}
-            alPresionar={() => setEditando(false)}
-          />
-        </>
-      ) : (
-        <>
-          <Texto variante="secundario" tono="secundario" testID="ajustes-colchon-resumen">
-            {colchon > 0 ? resumenConColchon(colchon) : RESUMEN_SIN_COLCHON}
-          </Texto>
-          <Boton
-            testID="ajustes-cambiar-colchon"
-            variante="secundario"
-            etiqueta={colchon > 0 ? BTN_CAMBIAR_COLCHON : BTN_APARTAR_COLCHON}
-            pista={colchon > 0 ? PISTA_CAMBIAR_COLCHON : PISTA_APARTAR_COLCHON}
-            alPresionar={abrir}
-          />
-        </>
-      )}
-      {mensaje ? (
-        <Texto
-          variante="secundario"
-          tono={mensaje.error ? 'faltante' : 'acento'}
-          accessibilityLiveRegion="polite"
-          testID="ajustes-colchon-mensaje"
-        >
-          {mensaje.texto}
-        </Texto>
-      ) : null}
+      <CampoMonto
+        testID="ajustes-colchon-monto"
+        etiqueta={ETIQUETA_MONTO_COLCHON}
+        valorInicial={inicial}
+        ayuda={sugerido > 0 ? ayudaColchon(sugerido) : AYUDA_SIN_SUGERENCIA}
+        alCambiar={setMonto}
+      />
+      <Boton
+        testID="ajustes-colchon-guardar"
+        etiqueta={BTN_GUARDAR}
+        pista={PISTA_GUARDAR_COLCHON}
+        deshabilitado={monto === null}
+        alPresionar={guardar}
+      />
+      <Boton
+        testID="ajustes-colchon-cancelar"
+        variante="texto"
+        ancho="contenido"
+        etiqueta={BTN_CANCELAR}
+        alPresionar={() => setEditando(false)}
+      />
+      {textoMensaje}
     </Tarjeta>
   );
 }

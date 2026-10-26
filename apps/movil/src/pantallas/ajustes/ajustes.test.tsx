@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import { Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
@@ -21,6 +21,8 @@ import {
 import { abrirSesion } from '../../servicios/sesion';
 import { notificacionesEnMemoria } from '../avisos/notificaciones';
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
+import { ETIQUETA_ATRAS } from '../../ui/navegacion';
+import { TEXTO_NO_ASESORIA } from '../privacidad/legales';
 import { auditar } from '../__pruebas__/accesibilidad';
 import {
   confirmacionBloqueoActivo,
@@ -197,10 +199,25 @@ describe('ajustes', () => {
     );
   });
 
-  it('barra nativa: sin «Volver» en el contenido de Ajustes (`PLAN-UX` 3.3)', () => {
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+  it('sin pantalla anterior, la barra nativa ofrece «Atrás» y lleva a Hoy (`PLAN-UX` 1.10 y 3.3)', () => {
+    const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-titulo')).toBeTruthy();
+    // El «Volver» ya no vive en el contenido: lo pone la barra.
     expect(screen.queryByTestId('ajustes-volver')).toBeNull();
+    expect(screen.getByTestId('barra-salida')).toHaveProp('accessibilityLabel', ETIQUETA_ATRAS);
+    expect(screen.getByTestId('barra-salida')).toHaveProp('accessibilityRole', 'button');
+    fireEvent.press(screen.getByTestId('barra-salida'));
+    expect(r.getPathname()).toBe('/hoy');
+  });
+
+  it('Acerca de: el aviso legal se ve completo y lo oye el lector de pantalla (`08`)', () => {
+    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    const aviso = screen.getByTestId('ajustes-no-asesoria');
+    expect(aviso).toHaveTextContent(TEXTO_NO_ASESORIA);
+    expect(aviso.props.numberOfLines).toBeUndefined();
+    // Visible para VoiceOver/TalkBack: no queda escondido dentro de la fila de Términos.
+    expect(screen.getByText(TEXTO_NO_ASESORIA, { includeHiddenElements: false })).toBeTruthy();
+    expect(screen.getByTestId('ajustes-terminos')).toHaveProp('accessibilityRole', 'button');
   });
 
   it('en la pestaña Tú no hay «Volver»: la barra de pestañas es la salida (Ola 7 §2)', () => {
@@ -227,8 +244,12 @@ describe('ajustes', () => {
     expect(r.getPathname()).toBe('/ayuda');
     expect(screen.getByText('¿Cómo calculas mi «hoy puedes»?')).toBeTruthy();
     expect(screen.getByTestId('ayuda-escribir')).toBeTruthy();
-    // Barra nativa (`PLAN-UX` 3.3): ya no hay «Volver» en el contenido.
+    // Barra nativa (`PLAN-UX` 3.3): con historial regresa el chevron nativo; ni «Volver» en el contenido ni salida.
     expect(screen.queryByTestId('ayuda-volver')).toBeNull();
+    // Solo la salida de Ajustes (abierta sin historial, sigue montada debajo); esta pantalla no trae otra.
+    expect(screen.queryAllByTestId('barra-salida')).toHaveLength(1);
+    act(() => router.back());
+    expect(r.getPathname()).toBe('/ajustes');
   });
 
   it('los avisos de tanda, compromiso sin cubrir e ingreso que no llegó se apagan desde Ajustes › Avisos', () => {

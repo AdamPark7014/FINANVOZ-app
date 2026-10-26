@@ -1,4 +1,3 @@
-import { Stack } from 'expo-router';
 import { View } from 'react-native';
 import { AVISO_COMPLETO } from '../src/pantallas/onboarding/aviso';
 import {
@@ -8,18 +7,21 @@ import {
 } from '../src/pantallas/privacidad';
 import { VERSION_CONSENTIMIENTO } from '../src/servicios';
 import { espacio, Pantalla, Texto } from '../src/ui';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { BarraNativa } from '../src/ui/navegacion';
 
 /** Aviso de privacidad completo dentro de la app (`08 §2`), desde O2 y desde Ajustes. Solo lectura. */
 export default function AvisoPrivacidad() {
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_AVISO_PRIVACIDAD)} />
+      <BarraNativa salida="/" />
       <Pantalla
         testID="aviso-privacidad"
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
+        <Texto testID="aviso-privacidad-titulo" variante="titulo" accessibilityRole="header">
+          {TITULO_AVISO_PRIVACIDAD}
+        </Texto>
         <Texto variante="secundario" tono="secundario">
           {lineaVersionAviso(VERSION_CONSENTIMIENTO)}
         </Texto>

@@ -1,4 +1,3 @@
-import { Stack } from 'expo-router';
 import { View } from 'react-native';
 import {
   etiquetaAccesibilidadVersionTerminos,
@@ -8,18 +7,21 @@ import {
   VERSION_TERMINOS,
 } from '../src/pantallas/privacidad';
 import { espacio, Pantalla, Texto } from '../src/ui';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { BarraNativa } from '../src/ui/navegacion';
 
 /** Términos de uso (`08 §1`, checklist §7.1), desde el centro de privacidad y Ajustes. Solo lectura. */
 export default function Terminos() {
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_TERMINOS)} />
+      <BarraNativa salida="/hoy" />
       <Pantalla
         testID="terminos"
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
+        <Texto testID="terminos-titulo" variante="titulo" accessibilityRole="header">
+          {TITULO_TERMINOS}
+        </Texto>
         <Texto
           testID="terminos-version"
           variante="secundario"

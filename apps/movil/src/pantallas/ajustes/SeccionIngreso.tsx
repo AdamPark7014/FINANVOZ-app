@@ -4,8 +4,7 @@ import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { FilaAjuste, Texto } from '../../ui';
 import { useConfirmacionAlVolver } from './confirmacion';
 import {
-  ETIQUETA_CAMBIAR_INGRESO,
-  ETIQUETA_CONFIGURAR_INGRESO,
+  etiquetaFilaIngreso,
   PISTA_CAMBIAR_INGRESO,
   PISTA_CONFIGURAR_INGRESO,
   SECCION_INGRESO,
@@ -30,7 +29,7 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
         titulo={SECCION_INGRESO}
         valor={resumen}
         pista={configurado ? PISTA_CAMBIAR_INGRESO : PISTA_CONFIGURAR_INGRESO}
-        etiquetaAccesible={configurado ? ETIQUETA_CAMBIAR_INGRESO : ETIQUETA_CONFIGURAR_INGRESO}
+        etiquetaAccesible={etiquetaFilaIngreso(resumen, configurado)}
         alPresionar={alCambiar}
       />
       {confirmacion ? (

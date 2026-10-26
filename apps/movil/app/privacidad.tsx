@@ -1,10 +1,10 @@
-import { Stack, useRouter } from 'expo-router';
-import { CentroPrivacidad, TIP_SOLO_LECTURA, TITULO_PRIVACIDAD } from '../src/pantallas/privacidad';
+import { useRouter } from 'expo-router';
+import { CentroPrivacidad, TIP_SOLO_LECTURA } from '../src/pantallas/privacidad';
 import { enSoloLectura } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
 import { espacio, Pantalla, Texto } from '../src/ui';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { BarraNativa } from '../src/ui/navegacion';
 
 /** Centro de privacidad (RF-PRI-03), desde Ajustes. */
 export default function Privacidad() {
@@ -13,7 +13,7 @@ export default function Privacidad() {
   const soloLectura = useVista(enSoloLectura);
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_PRIVACIDAD)} />
+      <BarraNativa salida="/hoy" />
       <Pantalla
         testID="privacidad"
         bordes={['top', 'left', 'right', 'bottom']}

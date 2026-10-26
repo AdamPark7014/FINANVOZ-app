@@ -1,8 +1,8 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { tomarPrellenado } from '../src/asistente/flujos';
-import { PantallaArqueo, TITULO_ARQUEO, tomarEfectivoPendiente } from '../src/pantallas/arqueo';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { PantallaArqueo, tomarEfectivoPendiente } from '../src/pantallas/arqueo';
+import { BarraNativa } from '../src/ui/navegacion';
 
 /** Arqueo de efectivo (`02 §7`): desde Hoy, desde Cuentas → Efectivo o diciendo "traigo 300". */
 export default function Arqueo() {
@@ -13,7 +13,7 @@ export default function Arqueo() {
   const [inicial] = useState(() => tomarPrellenado('arqueo')?.efectivoReal ?? tomarEfectivoPendiente());
   return (
     <>
-      <Stack.Screen options={opcionesBarraNativa(TITULO_ARQUEO)} />
+      <BarraNativa salida="/hoy" />
       <PantallaArqueo
         {...(typeof cuenta === 'string' && cuenta !== '' ? { cuentaId: cuenta } : {})}
         {...(inicial !== null ? { efectivoInicial: inicial } : {})}

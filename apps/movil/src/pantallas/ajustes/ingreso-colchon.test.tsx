@@ -1,5 +1,5 @@
-import { Slot } from 'expo-router';
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { router, Slot } from 'expo-router';
+import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import Hoy from '../../../app/(tabs)/hoy';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
@@ -23,6 +23,7 @@ import {
   CONFIRMACION_INGRESO_VARIABLE,
   ETIQUETA_CAMBIAR_INGRESO,
   ETIQUETA_CONFIGURAR_INGRESO,
+  etiquetaFilaIngreso,
   etiquetaProximoPagoIngreso,
   fraseCuandoTePagan,
   lineaResumenIngreso,
@@ -132,13 +133,24 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
       'Sin colchón: todo tu dinero libre cuenta para lo que puedes gastar.',
     );
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp('accessibilityRole', 'button');
+    // VoiceOver oye lo mismo que se ve (el resumen) y la acción.
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityLabel',
+      etiquetaFilaIngreso(String(screen.getByTestId('ajustes-ingreso-resumen').props.children), true),
+    );
+    expect(String(screen.getByTestId('ajustes-cambiar-ingreso').props.accessibilityLabel)).toContain(
       ETIQUETA_CAMBIAR_INGRESO,
     );
-    expect(screen.getByTestId('ajustes-cambiar-colchon')).toHaveProp(
-      'accessibilityLabel',
+    // Las cifras se oyen en palabras (`02 §15`), no «$13,000».
+    expect(String(screen.getByTestId('ajustes-cambiar-ingreso').props.accessibilityLabel)).toMatch(
+      /Te pagan/,
+    );
+    expect(String(screen.getByTestId('ajustes-cambiar-ingreso').props.accessibilityLabel)).not.toMatch(/\$/);
+    expect(String(screen.getByTestId('ajustes-cambiar-colchon').props.accessibilityLabel)).toContain(
       'Apartar un colchón',
+    );
+    expect(String(screen.getByTestId('ajustes-cambiar-colchon').props.accessibilityLabel)).toContain(
+      'Sin colchón',
     );
     expect(screen.getByTestId('ajustes-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-colchon-titulo')).toHaveProp('accessibilityRole', 'header');
@@ -160,6 +172,9 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     expect(screen.getByTestId('ajustes-ingreso-resumen')).toHaveTextContent(RESUMEN_SIN_INGRESO);
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityLabel',
+      etiquetaFilaIngreso(RESUMEN_SIN_INGRESO, false),
+    );
+    expect(String(screen.getByTestId('ajustes-cambiar-ingreso').props.accessibilityLabel)).toContain(
       ETIQUETA_CONFIGURAR_INGRESO,
     );
     // Ajustes y Hoy dicen lo mismo.
@@ -231,15 +246,20 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     );
   });
 
-  it('barra nativa: sin Volver en contenido; cambiar sin guardar deja lo anterior', () => {
+  it('atrás (barra nativa) sale sin guardar y vuelve a Ajustes', () => {
     mockPreparar = conQuincena;
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     const ctx = ctxInicial();
     const antes = obtenerAjustes(ctx).ingreso;
     tocar('ajustes-cambiar-ingreso');
     tocar('editar-ingreso-frecuencia-varia');
-    expect(screen.queryByTestId('editar-ingreso-volver')).toBeNull();
     expect(r.getPathname()).toBe('/ajustes/ingreso');
+    // Con historial regresa el chevron nativo: ni «Volver» en el contenido ni botón de salida propio.
+    expect(screen.queryByTestId('editar-ingreso-volver')).toBeNull();
+    // Solo la salida de Ajustes (que se abrió sin historial y sigue montada debajo); Ingreso no trae otra.
+    expect(screen.queryAllByTestId('barra-salida')).toHaveLength(1);
+    act(() => router.back());
+    expect(r.getPathname()).toBe('/ajustes');
     expect(obtenerAjustes(ctx).ingreso).toEqual(antes);
     expect(screen.queryByTestId('ajustes-ingreso-confirmacion')).toBeNull();
   });

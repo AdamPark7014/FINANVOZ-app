@@ -262,18 +262,12 @@ tags:
           visible:
             id: pantalla-plan
           timeout: 10000
-      - tapOn:
-          id: plan-volver
+      - runFlow: subflujos/atras.yaml
       - extendedWaitUntil:
           visible:
             id: pantalla-tarjeta
           timeout: 10000
-- scrollUntilVisible:
-    element:
-      id: tarjeta-volver
-    direction: UP
-- tapOn:
-    id: tarjeta-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-cuentas

@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
@@ -41,7 +41,7 @@ import { obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, espacio, FilaAjuste, Pantalla, Tarjeta, Texto } from '../src/ui';
-import { opcionesBarraNativa } from '../src/ui/navegacion';
+import { BarraNativa } from '../src/ui/navegacion';
 
 const TOQUES_MENU_DEV = 7;
 
@@ -78,96 +78,102 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
 
   return (
     <>
-      {enPestana ? null : <Stack.Screen options={opcionesBarraNativa(TITULO)} />}
+      {enPestana ? null : <BarraNativa salida="/hoy" />}
       <Pantalla
         testID="ajustes"
         bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-      <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
-        {enPestana ? 'Tú' : TITULO}
-      </Texto>
-      {enPestana ? (
-        <Texto variante="secundario" tono="secundario">
-          Tu ingreso, la app y tu privacidad.
+        <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
+          {enPestana ? 'Tú' : TITULO}
         </Texto>
-      ) : null}
+        {enPestana ? (
+          <Texto variante="secundario" tono="secundario">
+            Tu ingreso, la app y tu privacidad.
+          </Texto>
+        ) : null}
 
-      <Grupo titulo={GRUPO_DINERO} />
-      <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
-      <SeccionColchon />
-      <SeccionDatosCobro />
+        <Grupo titulo={GRUPO_DINERO} />
+        <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
+        <SeccionColchon />
+        <SeccionDatosCobro />
 
-      <Grupo titulo={GRUPO_APP} />
-      <SeccionVoz />
-      <SeccionAvisos />
-      <SeccionCaptura />
-      <SeccionWidget />
+        <Grupo titulo={GRUPO_APP} />
+        <SeccionVoz />
+        <SeccionAvisos />
+        <SeccionCaptura />
+        <SeccionWidget />
 
-      <Grupo titulo={GRUPO_SEGURIDAD} />
-      <SeccionBloqueo />
+        <Grupo titulo={GRUPO_SEGURIDAD} />
+        <SeccionBloqueo />
 
-      <View testID="ajustes-respaldo">
+        <View testID="ajustes-respaldo">
+          <FilaAjuste
+            testID="ajustes-abrir-respaldo"
+            titulo={SECCION_RESPALDO}
+            valor={respaldo.textoUltimo}
+            tonoValor={respaldo.pendiente ? 'faltante' : 'secundario'}
+            pista={PISTA_RESPALDO}
+            alPresionar={() => router.push('/respaldo')}
+          />
+        </View>
+
         <FilaAjuste
-          testID="ajustes-abrir-respaldo"
-          titulo={SECCION_RESPALDO}
-          valor={respaldo.textoUltimo}
-          pista={PISTA_RESPALDO}
-          alPresionar={() => router.push('/respaldo')}
+          testID="ajustes-privacidad"
+          titulo={SECCION_PRIVACIDAD}
+          valor={TEXTO_PRIVACIDAD}
+          pista={PISTA_PRIVACIDAD}
+          alPresionar={() => router.push('/privacidad')}
         />
-      </View>
 
-      <FilaAjuste
-        testID="ajustes-privacidad"
-        titulo={SECCION_PRIVACIDAD}
-        valor={TEXTO_PRIVACIDAD}
-        pista={PISTA_PRIVACIDAD}
-        alPresionar={() => router.push('/privacidad')}
-      />
-
-      <Grupo titulo={GRUPO_AYUDA} />
-      <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
-      <FilaAjuste
-        testID="ajustes-abrir-ayuda"
-        titulo={SECCION_AYUDA}
-        valor={TEXTO_AYUDA}
-        pista={PISTA_AYUDA}
-        alPresionar={() => router.push('/ayuda')}
-      />
-
-      <View testID="ajustes-acerca">
+        <Grupo titulo={GRUPO_AYUDA} />
+        <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
         <FilaAjuste
-          testID="ajustes-terminos"
-          titulo={SECCION_ACERCA}
-          valor={TEXTO_NO_ASESORIA}
-          pista={PISTA_TERMINOS}
-          etiquetaAccesible={`${SECCION_ACERCA}. ${BTN_TERMINOS}`}
-          alPresionar={() => router.push('/terminos')}
+          testID="ajustes-abrir-ayuda"
+          titulo={SECCION_AYUDA}
+          valor={TEXTO_AYUDA}
+          pista={PISTA_AYUDA}
+          alPresionar={() => router.push('/ayuda')}
         />
-      </View>
 
-      <Pressable
-        testID="ajustes-version"
-        onPress={tocarVersion}
-        accessibilityRole="text"
-        accessibilityLabel={etiquetaAccesibilidadVersion(version)}
-        style={{ paddingVertical: espacio.s }}
-      >
-        <Texto
-          variante="secundario"
-          tono="secundario"
-          alinear="center"
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
+        {/* El aviso legal va completo y fuera de la fila: se ve entero y el lector de pantalla lo lee (`08`). */}
+        <View testID="ajustes-acerca" style={{ gap: espacio.s }}>
+          <Texto variante="subtitulo" accessibilityRole="header">
+            {SECCION_ACERCA}
+          </Texto>
+          <Texto variante="secundario" tono="secundario" testID="ajustes-no-asesoria">
+            {TEXTO_NO_ASESORIA}
+          </Texto>
+          <FilaAjuste
+            testID="ajustes-terminos"
+            titulo={BTN_TERMINOS}
+            pista={PISTA_TERMINOS}
+            alPresionar={() => router.push('/terminos')}
+          />
+        </View>
+
+        <Pressable
+          testID="ajustes-version"
+          onPress={tocarVersion}
+          accessibilityRole="text"
+          accessibilityLabel={etiquetaAccesibilidadVersion(version)}
+          style={{ paddingVertical: espacio.s }}
         >
-          {lineaVersion(version)}
-        </Texto>
-      </Pressable>
+          <Texto
+            variante="secundario"
+            tono="secundario"
+            alinear="center"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {lineaVersion(version)}
+          </Texto>
+        </Pressable>
 
-      {__DEV__ && menuDev && control.cargarEscenario ? (
-        <MenuDesarrollo cargar={control.cargarEscenario} />
-      ) : null}
-    </Pantalla>
+        {__DEV__ && menuDev && control.cargarEscenario ? (
+          <MenuDesarrollo cargar={control.cargarEscenario} />
+        ) : null}
+      </Pantalla>
     </>
   );
 }
@@ -175,12 +181,7 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
 /** Encabezado de un grupo de Ajustes (`02 §12`): separa lo de tu dinero, la app, la seguridad y la ayuda. */
 function Grupo({ titulo }: { titulo: string }) {
   return (
-    <Texto
-      variante="etiqueta"
-      tono="acento"
-      accessibilityRole="header"
-      style={{ marginTop: espacio.s }}
-    >
+    <Texto variante="etiqueta" tono="acento" accessibilityRole="header" style={{ marginTop: espacio.s }}>
       {titulo}
     </Texto>
   );

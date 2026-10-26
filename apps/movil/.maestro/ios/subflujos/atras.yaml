@@ -1,0 +1,11 @@
+# Regresa con el chevron de la barra nativa (PLAN-UX 3.3). UIKit expone el botón de atrás como «BackButton».
+appId: com.finanvoz.app
+name: Subflujo · atrás con la barra nativa
+---
+- extendedWaitUntil:
+    visible:
+      id: BackButton
+    timeout: 10000
+- tapOn:
+    id: BackButton
+- waitForAnimationToEnd

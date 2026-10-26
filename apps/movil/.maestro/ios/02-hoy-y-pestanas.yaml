@@ -31,8 +31,7 @@ tags:
             id: pantalla-plan
           timeout: 10000
       - takeScreenshot: plan-iphone
-      - tapOn:
-          id: plan-volver
+      - runFlow: subflujos/atras.yaml
       - extendedWaitUntil:
           visible:
             id: pantalla-hoy
@@ -59,14 +58,12 @@ tags:
           visible:
             id: pantalla-plan
           timeout: 10000
-      - tapOn:
-          id: plan-volver
+      - runFlow: subflujos/atras.yaml
       - extendedWaitUntil:
           visible:
             id: puerta-plus
           timeout: 10000
-- tapOn:
-    id: '(plan-volver|boton-cerrar-me-alcanza)'
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: pantalla-hoy

@@ -26,8 +26,7 @@ tags:
       id: editar-ingreso
     timeout: 10000
 - takeScreenshot: ajustes-ingreso
-- tapOn:
-    id: editar-ingreso-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: ajustes
@@ -95,18 +94,12 @@ tags:
       id: restaurar
     timeout: 10000
 - takeScreenshot: restaurar
-- tapOn:
-    id: restaurar-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: respaldo
     timeout: 10000
-- scrollUntilVisible:
-    element:
-      id: respaldo-volver
-    direction: UP
-- tapOn:
-    id: respaldo-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: ajustes
@@ -128,8 +121,7 @@ tags:
 - assertVisible:
     id: '(plan-solo-ios|plan-plus-de-prueba)'
 - takeScreenshot: plan
-- tapOn:
-    id: plan-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: ajustes
@@ -141,8 +133,7 @@ tags:
       id: ayuda
     timeout: 10000
 - takeScreenshot: ayuda
-- tapOn:
-    id: ayuda-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: ajustes
@@ -153,8 +144,7 @@ tags:
       id: terminos
     timeout: 10000
 - takeScreenshot: terminos
-- tapOn:
-    id: terminos-volver
+- runFlow: subflujos/atras.yaml
 - extendedWaitUntil:
     visible:
       id: ajustes

@@ -482,9 +482,10 @@ describe('Ajustes → Datos para cobrar', () => {
       'accessibilityHint',
       PISTA_AGREGAR_DATOS_COBRO,
     );
-    expect(screen.getByTestId('datos-cobro-resumen')).toHaveProp(
-      'accessibilityLabel',
-      etiquetaResumenDatosCobro(RESUMEN_VACIO),
+    expect(screen.getByTestId('datos-cobro-resumen')).toHaveTextContent(RESUMEN_VACIO);
+    // La fila se lee completa: el título, el resumen y la acción (`PLAN-UX-VOZ` §3.6).
+    expect(String(screen.getByTestId('boton-editar-datos-cobro').props.accessibilityLabel)).toContain(
+      etiquetaResumenDatosCobro(RESUMEN_VACIO).replace(/[.]$/, ''),
     );
   });
 

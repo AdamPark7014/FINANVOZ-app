@@ -1,4 +1,5 @@
-import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { router } from 'expo-router';
+import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import { Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
@@ -104,12 +105,23 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
     fireEvent.press(screen.getByTestId('ajustes-privacidad'));
     expect(r.getPathname()).toBe('/privacidad');
     expect(screen.getByText('Tu privacidad')).toBeTruthy();
-    // Barra nativa (`PLAN-UX` 3.3): ya no hay «Volver» en el contenido.
+    // Barra nativa (`PLAN-UX` 3.3): ya no hay «Volver» en el contenido; el chevron nativo regresa a Ajustes.
     expect(screen.queryByTestId('privacidad-volver')).toBeNull();
+    // Solo la salida de Ajustes (abierta sin historial, sigue montada debajo); esta pantalla no trae otra.
+    expect(screen.queryAllByTestId('barra-salida')).toHaveLength(1);
     expect(screen.getByTestId('privacidad-intro')).toHaveProp(
       'accessibilityLabel',
       etiquetaAccesibleIntroPrivacidad(),
     );
+    act(() => router.back());
+    expect(r.getPathname()).toBe('/ajustes');
+  });
+
+  it('abierto sin pantalla anterior, «Atrás» de la barra lleva a Hoy (`PLAN-UX` 1.10)', () => {
+    const r = renderRouter(RUTAS, { initialUrl: '/privacidad' });
+    expect(screen.getByTestId('barra-salida')).toHaveProp('accessibilityLabel', 'Atrás');
+    fireEvent.press(screen.getByTestId('barra-salida'));
+    expect(r.getPathname()).toBe('/hoy');
   });
 
   it('dice qué se guarda, qué sale y a quién, y qué permisos usa', () => {
