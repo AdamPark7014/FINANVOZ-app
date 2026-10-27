@@ -263,10 +263,20 @@ tags:
     direction: UP
     timeout: 15000
     optional: true
+# Sin tienda (la build de CI no trae llave de compras) el candado es solo texto, «· Plus, muy pronto», y no lleva a
+# ningún lado (CandadoPlus: nunca un botón hacia una oferta que no existe; corrida 40431985529). Con tienda abre el plan.
 - runFlow:
     when:
       visible:
         id: candado-compromiso-12-meses
+        text: '.*todavía no está disponible.*'
+    commands:
+      - takeScreenshot: tarjeta-candado-plus-pronto
+- runFlow:
+    when:
+      visible:
+        id: candado-compromiso-12-meses
+        text: '.*Disponible con Plus'
     commands:
       - tapOn:
           id: candado-compromiso-12-meses
