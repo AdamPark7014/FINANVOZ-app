@@ -6,36 +6,13 @@
 
 ## Hecho en este turno
 
-- **Intérprete «perfeccionado» (encargo de Adam: que entienda bien, rápido, sin trabarse y barato).** Números en
-  `docs/ESTADO.md` (Decisiones 26-10, M3) y `services/proxy/README.md` → Medición del 26-10-2026:
-
-  | Métrica | Antes (`fce19b9`) | Después |
-  |---|---|---|
-  | Nivel 0 (teléfono, sin red, gratis), precisión 100 % | 147/164 (89.6 %) | 162/164 (98.8 %) |
-  | Frases del golden que van a la nube | 17 (10.4 %) | 2 (1.2 %): M02, V09 |
-  | Nube, caso completo (golden completo, Haiku 5.5) | 161/164 (98.2 %) | 163/164 (99.4 %) |
-  | Nube p50 / p95 | 1.14 / 1.65 s | 1.18 / 1.89 s |
-  | p95 de una frase del golden (mezcla) | ~1.1 s | < 1 ms |
-  | USD por 1,000 frases dichas | 0.027 | ~0.003 |
-
-- **Nivel 0** (`packages/nlu/src/reglas/`, va dentro de la app: **hace falta otra build** para que llegue al teléfono):
-  diccionario ampliado y «conocidas sin categoría» (chelas, gas, pastel, celular, propina, enganche…), DESC de destino
-  («croquetas para el perro» → mascotas, «regalo para mi sobrina», «tacos al pastor», «enganche del coche»), verbos
-  cargué/cooperé/me tomé/almorcé, un monto dicho antes para varias cosas → un gasto, parte sin monto → pregunta,
-  «dos cincuenta» → pregunta con las dos opciones, «le di/pasé MONTO a PERSONA» → gasto (familiar → apoyo familiar),
-  «me pagaron X por un trabajo» → honorarios, cuentas divididas con «éramos N» y «Caro y Juan me deben su parte».
-  Ante la duda sigue preguntando o dejando la frase a la nube (regla 12). Spec en `06 §3.1` y `§9.1`–`§9.3`; 15 banderas
-  `reglas` del golden a `true`; pruebas de la app que forzaban la nube con «chelas» usan «micheladas».
-- **Nube** (`services/proxy/.../nlu/`): prompt afinado (destino solo si se dice, «como N» sin preguntar, dividida sin
-  nombres sin preguntar, diccionario igual al del nivel 0); `stop_reason: max_tokens` → reintento que pide respuesta
-  más corta; reintento sin turno vacío. Sigue Haiku 5.5 `low`: Sonnet no hace falta (fallos variables, 15/15 al repetir).
-- **Funciones del proxy desplegadas y probadas** (26-10, `services/proxy/scripts/desplegar-funciones.sh`):
-  `probar-backend.mjs` 31/31; `nlu-interpretar` 200 en 1.13 s. Nota: lo desplegado antes ya era idéntico a `fce19b9`
-  (el reintento de 4 s sí estaba en producción; la nota anterior del RELEVO estaba vieja).
-- **Grabaciones reales** de la nube en `fixtures/nlu/grabaciones/anthropic/claude-haiku-5-5.jsonl`: `pnpm eval:nlu
-  --offline` reproduce 163/164 en CI (CA-M3-06 y CA-M3-01 cumplen con Anthropic).
-- `pnpm eval:nlu --por-minuto N`: espacia las llamadas (el proyecto `pruebas` de la puerta tiene 60/min, compartidas
-  con los evals de otras apps). Gasto de evals de este turno: ~0.12 USD.
+- **Dirección B «Plática» (decisión de Adam del 26-10, en curso).** Adam eligió B del canvas «FinanVoz · 3
+  direcciones» con los chips de un toque de C en la tarjeta de registro. Decisión en `docs/ESTADO.md`; tableros B y C2
+  en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2` y `§4` reescritos (navegación arriba,
+  dock de voz, reposo, tarjeta de registro con chips, «¿Me alcanza?» con dos opciones). Fases: 1) navegación y dock,
+  2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
+- Turno anterior (mismo día): intérprete «perfeccionado» — nivel 0 162/164 del golden sin red, nube 163/164 con Haiku
+  5.5, ~0.003 USD por 1,000 frases; números en `docs/ESTADO.md` (Decisiones 26-10, M3) y `services/proxy/README.md`.
 
 ## Estado de tiendas
 
