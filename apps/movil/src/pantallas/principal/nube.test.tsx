@@ -112,7 +112,7 @@ describe('Registrar con la nube', () => {
     const tacos = listarMovimientos(p.ctx)
       .flatMap((d) => d.movimientos)
       .find((m) => m.descripcion === 'tacos');
-    expect(screen.getByText('Comida fuera · corregido')).toBeTruthy();
+    expect(screen.getByText('Comida fuera · Cartera · corregido')).toBeTruthy();
     fireEvent.press(screen.getByTestId(`movimiento-${tacos?.id}`));
     const historial = screen.getByTestId(`historial-${tacos?.id}`);
     expect(within(historial).getByText('Lo corregiste. Antes:')).toBeTruthy();
@@ -204,6 +204,7 @@ describe('Registrar con la nube', () => {
       p.reconectar();
     });
     const [frase] = listarPorInterpretar(p.ctx);
+    fireEvent.press(await screen.findByTestId('por-revisar-resumen'));
     expect(await screen.findByTestId(`revisar-${frase?.id}`)).toHaveProp(
       'accessibilityHint',
       PISTA_REVISAR_FRASE,

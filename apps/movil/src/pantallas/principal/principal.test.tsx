@@ -30,6 +30,7 @@ import {
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
   etiquetaEncabezadoDiaConTotales,
+  partesTotalesMes,
   resumenDiaMovimientos,
   etiquetaFiltroMovimientosActivo,
   etiquetaIntroPorRevisar,
@@ -484,7 +485,7 @@ describe('Registrar', () => {
     expect(alCerrar).toHaveBeenCalled();
     expect(screen.getByText('Registré: Me prestaron $2,000')).toBeTruthy();
     expect(textoDe(`cuenta-${bbva}-saldo`)).toBe('$5,590');
-    expect(screen.getByText('Mi jefa')).toBeTruthy();
+    expect(within(screen.getByTestId('seccion-debes')).getByText('Mi jefa')).toBeTruthy();
     expect(screen.getByText('Apartar lo que le debo')).toBeTruthy();
   });
 });
@@ -628,16 +629,29 @@ describe('Cuentas', () => {
 });
 
 describe('Movimientos', () => {
-  it('Registrar trae accessibilityHint para TalkBack (`02 §15`)', () => {
+  it('B4 · la frase del mes dice lo que salió y lo que entró, solo lo que hubo', () => {
+    const t = { mes: 'octubre', salieron: 412_000, entraron: 1_250_000, hayMovimientos: true };
+    expect(partesTotalesMes(t)).toEqual(['En octubre salieron ', '$4,120', ' y entraron ', '$12,500', '.']);
+    expect(partesTotalesMes({ ...t, entraron: 0 }).join('')).toBe('En octubre salieron $4,120.');
+    expect(partesTotalesMes({ ...t, salieron: 0 }).join('')).toBe('En octubre entraron $12,500.');
+    expect(partesTotalesMes({ ...t, hayMovimientos: false }).join('')).toBe(
+      'En octubre todavía no hay movimientos.',
+    );
+  });
+
+  // Dirección B (B4): no hay «Registrar» arriba (se registra con el dock); sin movimientos, el vacío lo ofrece.
+  it('sin movimientos, «Registrar tu primer movimiento» trae accessibilityHint (`02 §15`)', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     const alRegistrar = jest.fn();
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={alRegistrar} />);
-    expect(screen.getByTestId('boton-registrar-movimiento')).toHaveProp(
+    expect(screen.queryByTestId('boton-registrar-movimiento')).toBeNull();
+    expect(screen.getByTestId('movimientos-titulo')).toHaveTextContent(/todavía no hay movimientos\.$/);
+    expect(screen.getByTestId('boton-registrar-primer-movimiento')).toHaveProp(
       'accessibilityHint',
       PISTA_REGISTRAR_MOVIMIENTO,
     );
-    fireEvent.press(screen.getByTestId('boton-registrar-movimiento'));
+    fireEvent.press(screen.getByTestId('boton-registrar-primer-movimiento'));
     expect(alRegistrar).toHaveBeenCalled();
     p.cerrar();
   });
@@ -648,6 +662,13 @@ describe('Movimientos', () => {
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     const [frase] = listarPorInterpretar(p.ctx);
     expect(frase).toBeTruthy();
+    // B4: un renglón «1 frase por revisar» con la frase; abrirlo muestra sus botones.
+    expect(screen.getByTestId('por-revisar-resumen')).toHaveTextContent(
+      /^1 frase por revisar«ayer le pasé 200/,
+    );
+    expect(screen.queryByTestId(`descartar-${frase?.id}`)).toBeNull();
+    fireEvent.press(screen.getByTestId('por-revisar-resumen'));
+    expect(screen.getByTestId('por-revisar-resumen')).toHaveProp('accessibilityState', { expanded: true });
     expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveTextContent(TEXTO_POR_REVISAR);
     expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveProp(
@@ -684,7 +705,12 @@ describe('Movimientos', () => {
       'accessibilityLabel',
       etiquetaEncabezadoDiaConTotales(diaVista.etiqueta, resumenDia),
     );
-    expect(screen.getByTestId(`movimientos-dia-total-${dia}`)).toHaveTextContent(resumenDia ?? '');
+    // B4: a la derecha del día, lo que salió («−$25»); el lector oye «Salieron …» en el encabezado.
+    expect(screen.getByTestId(`movimientos-dia-total-${dia}`)).toHaveTextContent(
+      `−${formatearCentavos(diaVista.salieron)}`,
+    );
+    expect(screen.getByTestId(`movimientos-dia-${dia}`)).toHaveTextContent(/^Hoy, domingo 11$/);
+    expect(screen.getByTestId('movimientos-titulo')).toHaveTextContent(/^En octubre salieron \$25\.$/);
     expect(screen.getByTestId(`movimientos-lista-${dia}`)).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`movimiento-fila-${id}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`movimiento-${id}`)).toHaveProp(
@@ -726,6 +752,8 @@ describe('Movimientos', () => {
     screen.unmount();
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
     const [frase] = listarPorInterpretar(p.ctx);
+    // B4: las frases por revisar se abren desde su renglón.
+    fireEvent.press(screen.getByTestId('por-revisar-resumen'));
     expect(screen.getByTestId('movimientos-por-revisar-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId(`descartar-${frase?.id}`)).toHaveProp(
       'accessibilityHint',

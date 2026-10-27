@@ -124,3 +124,17 @@ export function listarCategorias(
       c.categoriaSlug ? [{ slug: c.categoriaSlug, nombre: c.nombre, tipoGasto: c.tipoGasto }] : [],
     );
 }
+
+/**
+ * «Tienes $5,224 y debes $1,850.» (dirección B, tablero B5): la suma de Tienes y de Debes como se ven en Cuentas. En
+ * lo que debes cuentan también los meses sin intereses que faltan; un saldo a favor no resta (regla 12: ante la
+ * duda, contar de más lo que se debe).
+ */
+export function totalesCuentas(v: Pick<VistaCuentas, 'tienes' | 'debes'>): {
+  readonly tienes: Centavos;
+  readonly debes: Centavos;
+} {
+  const tienes = v.tienes.reduce((s, c) => s + c.saldo, 0);
+  const debes = v.debes.reduce((s, d) => s + Math.max(0, d.saldo) + (d.tipo === 'tarjeta' ? d.meses : 0), 0);
+  return { tienes: tienes as Centavos, debes: debes as Centavos };
+}

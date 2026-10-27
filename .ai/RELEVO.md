@@ -1,7 +1,7 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-26
+- **Fecha:** 2026-10-27
 - **Rama:** main
 
 ## Hecho en este turno
@@ -10,6 +10,7 @@
   direcciones» con los chips de un toque de C en la tarjeta de registro. Decisión en `docs/ESTADO.md`; tableros B y C2
   en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2`, `§4`, `§10` y `§11` reescritos.
   Fases: 1) navegación y dock, 2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
+  Falta la fase 4 (repaso en oscuro contra B6) y comparar las capturas de «iOS · Maestro» contra los PNG de B.
 - **Fase 1 hecha:** navegación arriba (`src/pantallas/navegacion/NavegacionSuperior.tsx`, `tabBarPosition: 'top'`):
   segmentos `pestana-hoy|movimientos|cuentas` y el círculo «Tú» con testID `boton-ajustes` (la app no pide nombre: no
   hay inicial). Dock de voz (`DockVoz`, `DockSeccion`): en Asistente «Escribir» (`boton-escribir`), micrófono
@@ -25,6 +26,15 @@
   (dos opciones, «Cómo lo calculé», «Lo compré», «Recuérdamelo»). Servicios nuevos: `detalleRegistro`,
   `nombresLiquidez`. Pruebas: `fraseRegistro`/`oida` en `principal/__pruebas__/arnes.tsx` (la tarjeta dice la frase,
   no la muestra entera).
+- **Fase 3 hecha (Movimientos B4 y Cuentas B5):** arriba de Movimientos la frase del mes (`movimientos-titulo`,
+  servicio `totalesDelMes`); sin «Registrar» arriba (se registra con el dock; el vacío conserva
+  `boton-registrar-primer-movimiento`); las frases por revisar plegadas en `por-revisar-resumen` (al abrirlo salen
+  `revisar-*`/`descartar-*`); días en tarjetas con «−$25» a la derecha (`movimientos-dia-total-*`) e ícono por
+  categoría. En Cuentas la frase «Tienes … y debes …» (`cuentas-titulo`, servicio `totalesCuentas`: los MSI cuentan y
+  el saldo a favor no resta), secciones en tarjetas, «Lo que viene» (antes Compromisos) y, en cada tarjeta de crédito
+  con pago para no generar intereses, la caja `cuenta-<id>-pngi` con «Pagar» (`cuenta-<id>-pagar`), que abre
+  `/tarjetas/[id]?pagar=1` con el formulario de pago abierto (`pagarAlAbrir`). Chips de filtro con el estilo B.
+  `02 §10` y `§11` al día.
 - Maestro de iPhone en verde sobre `7f098a3` (fase 1); en las capturas «Movimientos» se partía en el segmento
   elegido: los segmentos ya no son tercios iguales.
 - **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de

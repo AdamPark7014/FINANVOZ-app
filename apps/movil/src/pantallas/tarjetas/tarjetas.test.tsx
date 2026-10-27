@@ -22,7 +22,7 @@ import {
 import { tomarPrellenado } from '../../asistente/flujos/prellenado';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
-import { formatearCentavos } from '../../ui';
+import { cifraEnPalabras, formatearCentavos } from '../../ui';
 import { SeccionAvisos } from '../ajustes/SeccionAvisos';
 import { reiniciarInvitacionAvisos } from '../avisos/InvitacionAvisos';
 import {
@@ -57,7 +57,9 @@ import {
   etiquetaAvisoNoSeIncluyeMsi,
   PISTA_ABRIR_DETALLE_TARJETA,
   PISTA_GUARDAR_PAGO_TARJETA,
+  PISTA_PAGAR_LISTA,
   PISTA_PAGAR_TARJETA,
+  textoPngiLista,
   etiquetaVacioEstadosTarjeta,
   etiquetaVacioMovimientosTarjeta,
   TEXTO_TARJETA_NO_ENCONTRADA,
@@ -502,6 +504,33 @@ describe('Tarjetas', () => {
     expect(textoDe('tarjeta-disponible')).toBe('$28,800');
     expect(textoDe('tarjeta-uso')).toBe('Usas 4 % de tu límite de $30,000. La marca es el 30 %.');
     expect(screen.getByTestId('tarjeta-sin-corte')).toBeTruthy();
+  });
+
+  it('B5 · con pago para no generar intereses, «Pagar» de Cuentas abre el detalle con el pago listo', () => {
+    const p = e510();
+    p.reloj.fijar('2026-11-28');
+    procesarApertura(p.ctx);
+    const t = listarTarjetas(p.ctx).find((x) => x.pngi > 0);
+    if (!t) throw new Error('e5-10 sin pago pendiente el 28-11');
+    const alPagarTarjeta = jest.fn();
+    montar(p.ctx, <PantallaCuentas alAbrirTarjeta={jest.fn()} alPagarTarjeta={alPagarTarjeta} />);
+    expect(screen.getByTestId(`cuenta-${t.id}-pngi`)).toHaveProp(
+      'accessibilityLabel',
+      `${textoPngiLista(t.etiquetaFechaLimite)}: ${cifraEnPalabras(t.pngi)}`,
+    );
+    expect(screen.queryByTestId(`cuenta-${t.id}-limite-pago`)).toBeNull();
+    const pagar = screen.getByTestId(`cuenta-${t.id}-pagar`);
+    expect(pagar).toHaveProp('accessibilityHint', PISTA_PAGAR_LISTA);
+    fireEvent.press(pagar);
+    expect(alPagarTarjeta).toHaveBeenCalledWith(t.id);
+
+    // Sin «Pagar» conectado se ve la cifra, pero no un botón que no lleva a ningún lado.
+    montar(p.ctx, <PantallaCuentas alAbrirTarjeta={jest.fn()} />);
+    expect(screen.getByTestId(`cuenta-${t.id}-pngi`)).toBeTruthy();
+    expect(screen.queryByTestId(`cuenta-${t.id}-pagar`)).toBeNull();
+
+    montar(p.ctx, <PantallaTarjeta tarjetaId={t.id} alVolver={jest.fn()} pagarAlAbrir />);
+    expect(screen.getByTestId('pagar-guardar')).toHaveProp('accessibilityHint', PISTA_GUARDAR_PAGO_TARJETA);
   });
 
   it('Pagar desde el detalle (cuenta de origen) y Deshacer devuelve la deuda', () => {

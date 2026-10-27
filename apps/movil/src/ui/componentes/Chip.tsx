@@ -80,21 +80,28 @@ export function Chip({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: radio.pastilla,
-        borderWidth: seleccionado ? 2 : 1,
-        borderColor: deshabilitado ? c.bordeControl : seleccionado ? c.acentoTexto : c.borde,
+        // Dirección B (tablero B4): el elegido va lleno de pino y en negritas; los demás, en blanco con filo. Cambia el
+        // relleno y el peso de la letra, no solo el color (`02 §15`).
+        borderWidth: 1,
+        borderColor: deshabilitado ? c.bordeControl : seleccionado ? c.acento : c.borde,
         opacity: deshabilitado ? 0.55 : pressed ? 0.9 : 1,
-        backgroundColor: seleccionado ? c.superficieAlterna : pressed ? c.superficieAlterna : c.superficie,
+        backgroundColor: seleccionado ? c.acento : pressed ? c.superficieAlterna : c.superficie,
         transform: [{ scale: pressed && !deshabilitado ? 0.97 : 1 }],
         paddingVertical: espacio.s,
       })}
     >
       <Texto
         variante="etiqueta"
-        tono={deshabilitado ? 'secundario' : seleccionado ? 'acento' : 'normal'}
+        tono={deshabilitado ? 'secundario' : 'normal'}
+        style={{
+          fontSize: 15,
+          fontWeight: seleccionado ? '700' : '600',
+          ...(seleccionado ? { color: c.sobreAcento } : null),
+        }}
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       >
-        {seleccionado ? `✓ ${etiqueta}` : etiqueta}
+        {etiqueta}
       </Texto>
     </Pressable>
   );

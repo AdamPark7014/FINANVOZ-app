@@ -35,6 +35,7 @@ export function navegacionDesdeCuentas(
 ): ComponentProps<typeof PantallaCuentas> {
   return {
     alAbrirTarjeta: (id) => router.push({ pathname: '/tarjetas/[id]', params: { id } }),
+    alPagarTarjeta: (id) => router.push({ pathname: '/tarjetas/[id]', params: { id, pagar: '1' } }),
     alAgregarTarjeta: () => router.push('/tarjetas/nueva'),
     alAbrirPersona: (id) => router.push({ pathname: '/persona/[id]', params: { id } }),
     alContarEfectivo: (cuentaId) => abrirArqueo(router, { cuentaId }),

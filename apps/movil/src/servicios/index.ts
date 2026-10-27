@@ -320,6 +320,7 @@ export { PREFIJO_RECORDATORIO_COBRO } from '../avisos/cobros';
 export {
   listarCategorias,
   listarCuentas,
+  totalesCuentas,
   type CompromisoProximo,
   type CuentaDebes,
   type CuentaTienes,
@@ -328,6 +329,8 @@ export {
 } from './cuentas';
 export {
   listarMovimientos,
+  totalesDelMes,
+  type TotalesMes,
   type DiaMovimientos,
   type FiltroMovimientos,
   type Insignia,

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, SectionList, View } from 'react-native';
+import { Pressable, ScrollView, SectionList, Text, View } from 'react-native';
 import {
   anularMovimiento,
   descartarPorInterpretar,
@@ -11,6 +11,7 @@ import {
   marcarExtraordinaria,
   mensajeError,
   pasarAMeses,
+  totalesDelMes,
   type FiltroMovimientos,
   type MovimientoVista,
 } from '../../servicios';
@@ -23,6 +24,8 @@ import {
   etiquetaHablada,
   cifraEnPalabras,
   formatearCentavos,
+  Icono,
+  iconoDeCategoria,
   Pantalla,
   Tarjeta,
   Texto,
@@ -66,6 +69,13 @@ import {
   EJEMPLO_BUSCAR_MOVIMIENTOS,
   ETIQUETA_BUSCAR_MOVIMIENTOS,
   TEXTO_BUSQUEDA_VACIA,
+  etiquetaDiaLista,
+  etiquetaPorRevisarResumen,
+  partesTotalesMes,
+  PISTA_ABRIR_POR_REVISAR,
+  PISTA_CERRAR_POR_REVISAR,
+  textoPorRevisarResumen,
+  totalDiaVisible,
   TITULO_POR_REVISAR,
   MENSAJE_ANULADO_MOVIMIENTO,
   PISTA_ANULAR_MOVIMIENTO,
@@ -118,6 +128,11 @@ export function PantallaMovimientos({
   // una consulta («Ver movimientos») si lo hay.
   const [chip, setChip] = useState<ChipMovimientos>('todos');
   const [busqueda, setBusqueda] = useState('');
+  // B4: la frase por revisar es un renglón que se abre; sus botones viven adentro.
+  const [revisarAbierto, setRevisarAbierto] = useState(false);
+  const totales = useVista(totalesDelMes);
+  const hoy = useVista((c) => c.reloj.hoy());
+  const { c } = useTema();
   const texto = buscando ? busqueda.trim() : '';
   const conTarjetas = useVista((c) => listarTarjetas(c).length > 0);
   const chips = CHIPS_MOVIMIENTOS.filter((c) => c !== 'tarjetas' || conTarjetas);
@@ -163,52 +178,113 @@ export function PantallaMovimientos({
       dias.map((d) => ({
         fecha: d.fecha,
         etiqueta: d.etiqueta,
+        visible: etiquetaDiaLista(d.fecha, hoy),
+        total: totalDiaVisible(
+          d.salieron > 0 ? formatearCentavos(d.salieron) : null,
+          d.entraron > 0 ? formatearCentavos(d.entraron) : null,
+        ),
         resumen: resumenDiaMovimientos(
           d.salieron > 0 ? formatearCentavos(d.salieron) : null,
           d.entraron > 0 ? formatearCentavos(d.entraron) : null,
         ),
         data: [...d.movimientos],
       })),
-    [dias],
+    [dias, hoy],
   );
 
   const encabezadoLista = (
-    <View style={{ gap: espacio.xl }}>
-      <View
+    <View style={{ gap: espacio.l, paddingBottom: espacio.s }}>
+      {/* B4: lo que salió y entró en el mes, en una frase (Registrar vive en el dock: Escribir o el micrófono). */}
+      <Text
+        testID="movimientos-titulo"
+        accessibilityRole="header"
+        accessibilityLabel={etiquetaHablada(partesTotalesMes(totales).join(''))}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: espacio.m,
-          marginBottom: espacio.xs,
+          fontSize: 24,
+          lineHeight: 32,
+          fontWeight: '600',
+          color: c.texto,
+          paddingHorizontal: espacio.s,
         }}
       >
-        <Texto variante="titulo" testID="movimientos-titulo" accessibilityRole="header">
-          Movimientos
-        </Texto>
-        <Boton
-          etiqueta="Registrar"
-          ancho="contenido"
-          alPresionar={alRegistrar}
-          pista={PISTA_REGISTRAR_MOVIMIENTO}
-          testID="boton-registrar-movimiento"
-        />
-      </View>
+        {partesTotalesMes(totales).map((parte, i) =>
+          i % 2 === 1 ? (
+            <Text key={i} style={{ fontWeight: '800' }}>
+              {parte}
+            </Text>
+          ) : (
+            parte
+          ),
+        )}
+      </Text>
 
       {porRevisar.length > 0 ? (
         <View style={{ gap: espacio.s }} testID="por-revisar">
-          <Texto variante="subtitulo" testID="movimientos-por-revisar-titulo" accessibilityRole="header">
-            {TITULO_POR_REVISAR}
-          </Texto>
-          <Texto
-            variante="secundario"
-            tono="secundario"
-            testID="movimientos-por-revisar-intro"
-            accessibilityLabel={etiquetaIntroPorRevisar()}
+          <Pressable
+            testID="por-revisar-resumen"
+            onPress={() => setRevisarAbierto((a) => !a)}
+            accessibilityRole="button"
+            accessibilityLabel={etiquetaPorRevisarResumen(porRevisar.length, porRevisar[0]?.texto ?? '')}
+            accessibilityHint={revisarAbierto ? PISTA_CERRAR_POR_REVISAR : PISTA_ABRIR_POR_REVISAR}
+            accessibilityState={{ expanded: revisarAbierto }}
+            style={({ pressed }) => ({
+              minHeight: 64,
+              borderRadius: 22,
+              backgroundColor: pressed ? c.superficieAlterna : c.superficie,
+              borderWidth: 1,
+              borderColor: c.borde,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: espacio.m,
+              paddingHorizontal: espacio.l,
+              paddingVertical: espacio.s,
+            })}
           >
-            {TEXTO_POR_REVISAR}
-          </Texto>
-          {porRevisar.map((f) => (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 14,
+                backgroundColor: c.atencion,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icono nombre="alerta" color={c.sobreAtencion} grosor={2} />
+            </View>
+            <View style={{ flex: 1, gap: 1 }}>
+              <Text style={{ fontSize: 16, lineHeight: 22, fontWeight: '700', color: c.texto }}>
+                {textoPorRevisarResumen(porRevisar.length)}
+              </Text>
+              <Text style={{ fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>
+                {`«${porRevisar[0]?.texto ?? ''}»`}
+              </Text>
+            </View>
+            <View style={{ transform: [{ rotate: revisarAbierto ? '90deg' : '0deg' }] }}>
+              <Icono nombre="chevronDerecha" color={c.textoSecundario} tamano={18} grosor={2.4} />
+            </View>
+          </Pressable>
+          {revisarAbierto ? (
+            <>
+              <Texto
+                variante="etiqueta"
+                tono="secundario"
+                testID="movimientos-por-revisar-titulo"
+                accessibilityRole="header"
+              >
+                {TITULO_POR_REVISAR}
+              </Texto>
+              <Texto
+                variante="secundario"
+                tono="secundario"
+                testID="movimientos-por-revisar-intro"
+                accessibilityLabel={etiquetaIntroPorRevisar()}
+              >
+                {TEXTO_POR_REVISAR}
+              </Texto>
+            </>
+          ) : null}
+          {(revisarAbierto ? porRevisar : []).map((f) => (
             <Tarjeta key={f.id} testID={`por-revisar-${f.id}`}>
               <Texto variante="cuerpo">{`«${f.texto}»`}</Texto>
               <Texto variante="secundario" tono="secundario">
@@ -350,7 +426,7 @@ export function PantallaMovimientos({
       // Arriba manda la navegación de la dirección B (ya cubre la barra de estado); abajo, el dock.
       bordes={['left', 'right']}
       desplazable={false}
-      contenidoStyle={{ gap: espacio.xl, flex: 1, paddingBottom: 0 }}
+      contenidoStyle={{ gap: espacio.xl, flex: 1, paddingBottom: 0, paddingTop: espacio.m }}
     >
       <SectionList
         testID="movimientos-section-list"
@@ -363,26 +439,54 @@ export function PantallaMovimientos({
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={encabezadoLista}
         renderSectionHeader={({ section }) => (
-          <View style={{ gap: espacio.xs, marginTop: espacio.s }}>
-            <Texto
-              variante="etiqueta"
-              tono="acento"
-              accessibilityRole="header"
-              accessibilityLabel={etiquetaEncabezadoDiaConTotales(section.etiqueta, section.resumen)}
-              testID={`movimientos-dia-${section.fecha}`}
+          // B4: cada día es una tarjeta; su encabezado (el día y lo que salió) es la parte de arriba.
+          <View
+            style={{
+              marginTop: espacio.m + 2,
+              backgroundColor: c.superficie,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              borderWidth: 1,
+              borderBottomWidth: 0,
+              borderColor: c.borde,
+              paddingHorizontal: espacio.l,
+              paddingTop: espacio.xs,
+            }}
+          >
+            <View
+              style={{
+                minHeight: 40,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: espacio.s,
+              }}
             >
-              {section.etiqueta}
-            </Texto>
-            {section.resumen ? (
-              <Texto
-                variante="secundario"
-                testID={`movimientos-dia-total-${section.fecha}`}
-                accessibilityElementsHidden
-                importantForAccessibility="no"
+              <Text
+                accessibilityRole="header"
+                accessibilityLabel={etiquetaEncabezadoDiaConTotales(section.etiqueta, section.resumen)}
+                testID={`movimientos-dia-${section.fecha}`}
+                style={{ flexShrink: 1, fontSize: 15, lineHeight: 20, fontWeight: '700', color: c.texto }}
               >
-                {section.resumen}
-              </Texto>
-            ) : null}
+                {section.visible}
+              </Text>
+              {section.total ? (
+                <Text
+                  testID={`movimientos-dia-total-${section.fecha}`}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  style={{
+                    fontSize: 15,
+                    lineHeight: 20,
+                    fontWeight: '600',
+                    color: c.textoSecundario,
+                    fontVariant: ['tabular-nums'],
+                  }}
+                >
+                  {section.total}
+                </Text>
+              ) : null}
+            </View>
             <View
               accessibilityRole="list"
               testID={`movimientos-lista-${section.fecha}`}
@@ -391,8 +495,29 @@ export function PantallaMovimientos({
             />
           </View>
         )}
-        renderItem={({ item: m }) => (
-          <View role="listitem" testID={`movimiento-fila-${m.id}`} style={{ marginBottom: espacio.m }}>
+        renderItem={({ item: m, index, section }) => (
+          <View
+            role="listitem"
+            testID={`movimiento-fila-${m.id}`}
+            style={{
+              backgroundColor: c.superficie,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
+              borderColor: c.borde,
+              paddingHorizontal: espacio.l,
+              ...(index === section.data.length - 1
+                ? {
+                    borderBottomWidth: 1,
+                    borderBottomLeftRadius: 24,
+                    borderBottomRightRadius: 24,
+                    paddingBottom: espacio.xs,
+                  }
+                : null),
+            }}
+          >
+            {index > 0 ? (
+              <View style={{ height: 1, backgroundColor: c.superficieAlterna, marginLeft: 52 }} />
+            ) : null}
             <FilaMovimiento
               m={m}
               abierto={abierto === m.id}
@@ -443,6 +568,9 @@ export function PantallaMovimientos({
     </Pantalla>
   );
 }
+
+/** Sin la sombra de `Tarjeta`: la fila vive dentro de la tarjeta del día. */
+const SIN_SOMBRA = { shadowOpacity: 0, elevation: 0 } as const;
 
 function titulo(m: MovimientoVista): string {
   return m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo);
@@ -541,19 +669,40 @@ function FilaMovimiento({
   useAnuncio(abierto && confirmando ? TEXTO_CONFIRMAR_ANULAR_MOVIMIENTO : null);
   const { c } = useTema();
   const centavos = m.sentido === 'salida' ? -m.monto : m.monto;
-  const subtitulo = [m.categoria, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
+  const cuenta = m.sentido === 'entrada' ? m.llegaA[0] : (m.saleDe[0] ?? m.llegaA[0]);
+  const subtitulo = [m.categoria, cuenta, ...m.insignias.map((i) => INSIGNIA[i])].filter(Boolean).join(' · ');
   const etiquetaAccesible = etiquetaHablada(
     [titulo(m), subtitulo, cifraEnPalabras(centavos)].filter(Boolean).join(', '),
   );
   const ocupado = pasando || confirmando || corrigiendo;
   const encabezado = (
     <View
-      style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: espacio.m }}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: espacio.m,
+        minHeight: 60,
+        paddingVertical: espacio.s,
+      }}
     >
-      <View style={{ flex: 1, gap: espacio.xs }}>
-        <Texto variante="cuerpoFuerte">{titulo(m)}</Texto>
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 14,
+          backgroundColor: c.iconoFondo,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icono nombre={iconoDeCategoria(m.categoriaSlug)} color={c.acento} />
+      </View>
+      <View style={{ flex: 1, gap: 1 }}>
+        <Texto variante="cuerpoFuerte" style={{ lineHeight: 22 }}>
+          {titulo(m)}
+        </Texto>
         {subtitulo ? (
-          <Texto variante="pequeno" tono="secundario">
+          <Texto variante="secundario" tono="secundario" style={{ lineHeight: 20 }}>
             {subtitulo}
           </Texto>
         ) : null}
@@ -569,6 +718,8 @@ function FilaMovimiento({
       expandida={abierto}
       etiquetaAccesible={etiquetaAccesible}
       pista={abierto ? PISTA_OCULTAR_DETALLE_MOVIMIENTO : PISTA_MOSTRAR_DETALLE_MOVIMIENTO}
+      // B4: la fila va dentro de la tarjeta del día, sin su propia caja.
+      style={{ backgroundColor: 'transparent', borderWidth: 0, padding: 0, ...SIN_SOMBRA }}
     >
       {abierto ? (
         // Con el detalle abierto, el fondo de la tarjeta queda detrás del texto: el encabezado también la cierra.

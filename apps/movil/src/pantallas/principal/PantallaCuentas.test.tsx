@@ -1,5 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { aceptarConsentimiento, crearPersona, listarCuentas, registrarPrestamo } from '../../servicios';
+import {
+  aceptarConsentimiento,
+  crearPersona,
+  listarCuentas,
+  registrarPrestamo,
+  totalesCuentas,
+} from '../../servicios';
 import { cifraEnPalabras } from '../../ui';
 import { auditar } from '../__pruebas__/accesibilidad';
 import {
@@ -17,7 +23,7 @@ import { abrirPruebaPantalla, conEscenario } from './__pruebas__/base';
 import { renderConSesion } from './__pruebas__/arnes';
 import { MenuAgregar } from '../cuentas/MenuAgregar';
 import { PantallaCuentas } from './PantallaCuentas';
-import { PISTA_CONTAR_EFECTIVO } from './textos';
+import { partesTotalesCuentas, PISTA_CONTAR_EFECTIVO } from './textos';
 
 /** Todas las salidas de Cuentas conectadas, como en la pestaña real (`app/(tabs)/cuentas.tsx`). */
 function navegacion() {
@@ -140,6 +146,30 @@ describe('Cuentas después del onboarding (auditoría de botones)', () => {
     fireEvent.press(screen.getByTestId('boton-ver-personas'));
     expect(nav.alVerPersonas).toHaveBeenCalledTimes(1);
     p.cerrar();
+  });
+
+  it('B5 · arriba, una frase con lo que tienes y lo que debes (de los servicios) que el lector oye en pesos', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(p.ctx, <PantallaCuentas {...navegacion()} />);
+    const t = totalesCuentas(listarCuentas(p.ctx));
+    const titulo = screen.getByTestId('cuentas-titulo');
+    expect(titulo).toHaveProp('accessibilityRole', 'header');
+    expect(titulo).toHaveTextContent(partesTotalesCuentas(t).join(''));
+    expect(titulo.props.accessibilityLabel).toContain(cifraEnPalabras(t.tienes));
+    p.cerrar();
+  });
+
+  it('la frase de Cuentas: con deuda dice cuánto; sin deuda, «no debes nada»', () => {
+    expect(partesTotalesCuentas({ tienes: 522_400, debes: 185_000 })).toEqual([
+      'Tienes ',
+      '$5,224',
+      ' y debes ',
+      '$1,850',
+      '.',
+    ]);
+    expect(partesTotalesCuentas({ tienes: 522_400, debes: 0 }).join('')).toBe(
+      'Tienes $5,224 y no debes nada.',
+    );
   });
 
   it('con todo conectado pasa la auditoría de accesibilidad', () => {

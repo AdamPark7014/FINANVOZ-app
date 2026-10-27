@@ -73,8 +73,11 @@ export function PantallaTarjeta({
   tarjetaId,
   alVolver,
   alLeerEstadoPdf,
+  pagarAlAbrir = false,
 }: {
   tarjetaId: string;
+  /** «Pagar» desde Cuentas (B5): abre con el formulario de pago a la vista. */
+  pagarAlAbrir?: boolean;
   /** Si no se pasa, la ruta usa la barra nativa (`PLAN-UX` 3.3). */
   alVolver?: () => void;
   /** "Leer el PDF de tu banco" (`02 §26`); sin él no se ofrece. */
@@ -111,7 +114,12 @@ export function PantallaTarjeta({
     );
   }
   return (
-    <Detalle tarjetaId={tarjetaId} {...(alVolver ? { alVolver } : {})} alLeerEstadoPdf={alLeerEstadoPdf} />
+    <Detalle
+      tarjetaId={tarjetaId}
+      {...(alVolver ? { alVolver } : {})}
+      alLeerEstadoPdf={alLeerEstadoPdf}
+      pagarAlAbrir={pagarAlAbrir}
+    />
   );
 }
 
@@ -119,14 +127,16 @@ function Detalle({
   tarjetaId,
   alVolver,
   alLeerEstadoPdf,
+  pagarAlAbrir,
 }: {
   tarjetaId: string;
   alVolver?: () => void;
   alLeerEstadoPdf: (() => void) | undefined;
+  pagarAlAbrir: boolean;
 }) {
   const d = useVista((ctx) => detalleTarjeta(ctx, tarjetaId));
   const plus = useVista(funcionesPlan);
-  const [panel, setPanel] = useState<Panel>(null);
+  const [panel, setPanel] = useState<Panel>(pagarAlAbrir ? 'pagar' : null);
   const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
 
   return (

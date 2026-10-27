@@ -1,4 +1,11 @@
-import { ErrorDominio, type TipoTransaccion } from '@cartera/core';
+import {
+  diaSemana,
+  ErrorDominio,
+  partes,
+  sumarDias,
+  type PlainDate,
+  type TipoTransaccion,
+} from '@cartera/core';
 import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import {
   MENSAJE_LIMITE_DIARIO,
@@ -579,3 +586,76 @@ export function contextoSaldoLeDebes(nombre: string): string {
 export function contextoSaldoCompromiso(concepto: string, fechaEtiqueta: string): string {
   return `Pago de ${concepto} el ${fechaEtiqueta}`;
 }
+
+// ——— Movimientos de la dirección B (tablero B4) ———
+
+/**
+ * «En octubre salieron $8,742 y entraron $13,000.» en partes: las pares van normales y las nones (las cifras) en
+ * negritas. Sin movimientos en el mes: «En octubre todavía no hay movimientos.».
+ */
+export function partesTotalesMes(t: {
+  mes: string;
+  salieron: number;
+  entraron: number;
+  hayMovimientos: boolean;
+}): string[] {
+  if (!t.hayMovimientos) return [`En ${t.mes} todavía no hay movimientos.`];
+  if (t.entraron === 0) return [`En ${t.mes} salieron `, formatearCentavos(t.salieron), '.'];
+  if (t.salieron === 0) return [`En ${t.mes} entraron `, formatearCentavos(t.entraron), '.'];
+  return [
+    `En ${t.mes} salieron `,
+    formatearCentavos(t.salieron),
+    ' y entraron ',
+    formatearCentavos(t.entraron),
+    '.',
+  ];
+}
+
+const DIAS_SEMANA_LARGOS = [
+  'lunes',
+  'martes',
+  'miércoles',
+  'jueves',
+  'viernes',
+  'sábado',
+  'domingo',
+] as const;
+
+/** «Hoy, lunes 26» · «Ayer, domingo 25» · «Sábado 24». */
+export function etiquetaDiaLista(fecha: PlainDate, hoy: PlainDate): string {
+  const dia = `${DIAS_SEMANA_LARGOS[diaSemana(fecha) - 1]} ${partes(fecha).dia}`;
+  if (fecha === hoy) return `Hoy, ${dia}`;
+  if (fecha === sumarDias(hoy, -1)) return `Ayer, ${dia}`;
+  return `${dia.charAt(0).toUpperCase()}${dia.slice(1)}`;
+}
+
+/** Lo que movió el día, a la derecha de su encabezado: «−$505», «+$13,000» o los dos. */
+export function totalDiaVisible(salieronFmt: string | null, entraronFmt: string | null): string | null {
+  const partesDia = [salieronFmt ? `−${salieronFmt}` : null, entraronFmt ? `+${entraronFmt}` : null].filter(
+    (x): x is string => x !== null,
+  );
+  return partesDia.length > 0 ? partesDia.join(' · ') : null;
+}
+
+/** «1 frase por revisar» · «3 frases por revisar». */
+export function textoPorRevisarResumen(n: number): string {
+  return n === 1 ? '1 frase por revisar' : `${n} frases por revisar`;
+}
+
+export function etiquetaPorRevisarResumen(n: number, primera: string): string {
+  return etiquetaHablada(`${textoPorRevisarResumen(n)}: «${primera}»`);
+}
+
+export const PISTA_ABRIR_POR_REVISAR = 'Muestra las frases para revisarlas, llenar los datos o descartarlas';
+export const PISTA_CERRAR_POR_REVISAR = 'Oculta las frases por revisar';
+
+// ——— Cuentas de la dirección B (tablero B5) ———
+
+/** «Tienes $5,224 y debes $1,850.» en partes (las nones, las cifras, en negritas). */
+export function partesTotalesCuentas(t: { tienes: number; debes: number }): string[] {
+  if (t.debes === 0) return ['Tienes ', formatearCentavos(t.tienes), ' y no debes nada.'];
+  return ['Tienes ', formatearCentavos(t.tienes), ' y debes ', formatearCentavos(t.debes), '.'];
+}
+
+/** Lo que viene en los próximos 30 días (antes «Compromisos»). */
+export const TITULO_LO_QUE_VIENE = 'Lo que viene';

@@ -4,10 +4,10 @@ import { ProveedorAvisos } from '../../src/pantallas/principal';
 import { PantallaTarjeta } from '../../src/pantallas/tarjetas';
 import { BarraNativa } from '../../src/ui/navegacion';
 
-/** Detalle de una tarjeta (`02 §8`). Solo el id viaja en la ruta (regla 9). */
+/** Detalle de una tarjeta (`02 §8`). Solo el id (y `pagar=1` desde «Pagar» de Cuentas) viaja en la ruta (regla 9). */
 export default function DetalleTarjetaRuta() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, pagar } = useLocalSearchParams<{ id: string; pagar?: string }>();
   return (
     <>
       <BarraNativa salida="/cuentas" />
@@ -15,6 +15,7 @@ export default function DetalleTarjetaRuta() {
         <PantallaTarjeta
           key={id}
           tarjetaId={String(id)}
+          pagarAlAbrir={pagar === '1'}
           alLeerEstadoPdf={
             // Solo Android lee PDF por ahora (M15); en iPhone sería PDFKit (`07 §8`).
             Platform.OS === 'android'

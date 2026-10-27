@@ -149,6 +149,8 @@ describe('Botones que no deben tumbar la app', () => {
     await registrarTexto(p.ctx, 'ayer le pasé 200 a mi jefa', 'voz');
     const [frase] = listarPorInterpretar(p.ctx);
     renderConSesion(p.ctx, <PantallaMovimientos alRegistrar={jest.fn()} />);
+    // B4: las frases por revisar se abren desde su renglón.
+    fireEvent.press(screen.getByTestId('por-revisar-resumen'));
     expect(screen.getByTestId('movimientos-por-revisar-intro')).toHaveTextContent(TEXTO_POR_REVISAR);
     mockFallar.descartar = true;
     fireEvent.press(screen.getByTestId(`descartar-${frase?.id}`));

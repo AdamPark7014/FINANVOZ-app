@@ -1,8 +1,8 @@
 import { and, desc, eq, gte, inArray, lte, ne, type SQL } from 'drizzle-orm';
-import type { Centavos, Origen, PlainDate, TipoTransaccion } from '@cartera/core';
+import { partes, type Centavos, type Origen, type PlainDate, type TipoTransaccion } from '@cartera/core';
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
 import type { Contexto } from './contexto';
-import { etiquetaDiaMes } from './formato';
+import { etiquetaDiaMes, mesLargo } from './formato';
 
 const { transaccionVigente: tv, asiento, cuenta } = esquema;
 
@@ -237,4 +237,36 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     else if (m.sentido === 'entrada') dia.entraron = (dia.entraron + m.monto) as Centavos;
   }
   return dias;
+}
+
+/** Lo que salió y entró en el mes en curso (dirección B, tablero B4: «En octubre salieron … y entraron …»). */
+export interface TotalesMes {
+  /** «octubre». */
+  readonly mes: string;
+  readonly salieron: Centavos;
+  readonly entraron: Centavos;
+  readonly hayMovimientos: boolean;
+}
+
+/**
+ * Suma de la lista de Movimientos del día 1 del mes a hoy, con el mismo criterio que los totales de cada día
+ * (`salieron`/`entraron`: las transferencias entre tus cuentas no cuentan).
+ */
+export function totalesDelMes(ctx: Contexto): TotalesMes {
+  const hoy = ctx.reloj.hoy();
+  const { anio, mes } = partes(hoy);
+  const desde = `${anio}-${String(mes).padStart(2, '0')}-01` as PlainDate;
+  const dias = listarMovimientos(ctx, { desde, hasta: hoy });
+  let salieron = 0;
+  let entraron = 0;
+  for (const d of dias) {
+    salieron += d.salieron;
+    entraron += d.entraron;
+  }
+  return {
+    mes: mesLargo(hoy),
+    salieron: salieron as Centavos,
+    entraron: entraron as Centavos,
+    hayMovimientos: dias.length > 0,
+  };
 }

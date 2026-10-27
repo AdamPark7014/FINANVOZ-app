@@ -1,15 +1,29 @@
-import type { ReactNode } from 'react';
-import { View } from 'react-native';
+import { Fragment, type ReactNode } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import {
   etiquetaFecha,
   fijarApartarDeuda,
   listarCuentas,
   listarPersonas,
   listarTarjetas,
+  totalesCuentas,
   type CuentaDebes,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, Interruptor, margenPantalla, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  Cifra,
+  espacio,
+  etiquetaHablada,
+  Icono,
+  Interruptor,
+  margenPantalla,
+  OBJETIVO_TACTIL_MIN,
+  Pantalla,
+  Texto,
+  useTema,
+  type NombreIcono,
+} from '../../ui';
 import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import {
@@ -44,7 +58,23 @@ import {
   etiquetaVacioCuentasCompromisos,
   etiquetaVacioCuentasDebes,
   etiquetaVacioCuentasTienes,
+  partesTotalesCuentas,
+  TITULO_LO_QUE_VIENE,
 } from './textos';
+
+/** Ícono de cada tipo de cuenta (B5). */
+const ICONO_SUBTIPO: Record<string, NombreIcono> = {
+  efectivo: 'billete',
+  debito: 'banco',
+  billetera: 'celular',
+  ahorro: 'banco',
+};
+
+/** «••2231» si el nombre no lo trae; si no, el tipo («Débito»). */
+function subtituloCuenta(c: { nombre: string; subtipo: string; ultimos4: string | null }): string | null {
+  if (c.ultimos4 && !c.nombre.includes(c.ultimos4)) return `••${c.ultimos4}`;
+  return NOMBRE_SUBTIPO[c.subtipo] ?? null;
+}
 
 const NOMBRE_SUBTIPO: Record<string, string> = {
   efectivo: 'Efectivo',
@@ -62,6 +92,7 @@ const NOMBRE_SUBTIPO: Record<string, string> = {
  */
 export function PantallaCuentas({
   alAbrirTarjeta,
+  alPagarTarjeta,
   alAgregarTarjeta,
   alContarEfectivo,
   alAbrirPersona,
@@ -81,6 +112,8 @@ export function PantallaCuentas({
   /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
   alAbrirPersona?: (personaId: string) => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
+  /** «Pagar» de la caja del pago para no generar intereses (B5): el detalle con el pago listo. */
+  alPagarTarjeta?: (tarjetaId: string) => void;
   alAgregarTarjeta?: () => void;
   /** Cuentas → Efectivo → arqueo (`02 §7`). */
   alContarEfectivo?: (cuentaId: string) => void;
@@ -108,16 +141,39 @@ export function PantallaCuentas({
   const v = useVista(listarCuentas);
   const tarjetas = useVista(listarTarjetas);
   const hayPersonas = useVista((ctx) => listarPersonas(ctx).length > 0);
+  const { c: tema } = useTema();
+  const partes = partesTotalesCuentas(totalesCuentas(v));
   return (
     <Pantalla
       testID="pantalla-cuentas"
       // Arriba manda la navegación de la dirección B (ya cubre la barra de estado); abajo, el dock.
       bordes={['left', 'right']}
-      contenidoStyle={{ gap: espacio.xl, paddingBottom: margenPantalla + espacioInferior }}
+      contenidoStyle={{ gap: 14, paddingTop: espacio.m, paddingBottom: margenPantalla + espacioInferior }}
     >
-      <Texto variante="titulo" testID="cuentas-titulo" accessibilityRole="header">
-        Cuentas
-      </Texto>
+      {/* B5: lo que tienes y lo que debes, en una frase. */}
+      <Text
+        testID="cuentas-titulo"
+        accessibilityRole="header"
+        accessibilityLabel={etiquetaHablada(partes.join(''))}
+        style={{
+          fontSize: 24,
+          lineHeight: 32,
+          fontWeight: '600',
+          color: tema.texto,
+          paddingHorizontal: espacio.s,
+          paddingBottom: espacio.xs,
+        }}
+      >
+        {partes.map((parte, i) =>
+          i % 2 === 1 ? (
+            <Text key={i} style={{ fontWeight: '800' }}>
+              {parte}
+            </Text>
+          ) : (
+            <Fragment key={i}>{parte}</Fragment>
+          ),
+        )}
+      </Text>
 
       <Seccion titulo="Tienes" testID="seccion-tienes">
         {v.tienes.length === 0 ? (
@@ -129,13 +185,15 @@ export function PantallaCuentas({
           />
         ) : null}
         {v.tienes.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-tienes-lista" style={{ gap: espacio.s }}>
-            {v.tienes.map((c) => (
+          <View accessibilityRole="list" testID="seccion-tienes-lista">
+            {v.tienes.map((c, i) => (
               <Fila
                 key={c.id}
+                primera={i === 0}
+                icono={ICONO_SUBTIPO[c.subtipo] ?? 'banco'}
                 testID={`cuenta-${c.id}`}
                 titulo={c.nombre}
-                subtitulo={NOMBRE_SUBTIPO[c.subtipo] ?? null}
+                subtitulo={subtituloCuenta(c)}
                 centavos={c.saldo}
                 contextoSaldo={contextoSaldoTienes(c.nombre)}
                 {...(c.subtipo === 'efectivo' && alContarEfectivo
@@ -173,18 +231,21 @@ export function PantallaCuentas({
           />
         ) : null}
         {v.debes.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-debes-lista" style={{ gap: espacio.s }}>
-            {v.debes.map((d) =>
+          <View accessibilityRole="list" testID="seccion-debes-lista">
+            {v.debes.map((d, i) =>
               d.tipo === 'tarjeta' ? (
                 <View key={d.id} role="listitem">
+                  {i > 0 ? <Separador /> : null}
                   <TarjetaCreditoLista
                     d={d}
                     t={tarjetas.find((t) => t.id === d.id) ?? null}
                     {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
+                    {...(alPagarTarjeta ? { alPagar: () => alPagarTarjeta(d.id) } : {})}
                   />
                 </View>
               ) : (
                 <View key={d.id} role="listitem">
+                  {i > 0 ? <Separador /> : null}
                   <PersonaDebes d={d} {...(alAbrirPersona ? { alAbrirPersona } : {})} />
                 </View>
               ),
@@ -195,10 +256,12 @@ export function PantallaCuentas({
 
       {v.teDeben.length > 0 ? (
         <Seccion titulo="Te deben" testID="seccion-te-deben">
-          <View accessibilityRole="list" testID="seccion-te-deben-lista" style={{ gap: espacio.m }}>
-            {v.teDeben.map((p) => (
+          <View accessibilityRole="list" testID="seccion-te-deben-lista">
+            {v.teDeben.map((p, i) => (
               <Fila
                 key={p.id}
+                primera={i === 0}
+                icono="personas"
                 testID={`te-debe-${p.id}`}
                 titulo={p.nombre}
                 subtitulo={null}
@@ -232,9 +295,8 @@ export function PantallaCuentas({
       ) : null}
 
       <Seccion
-        titulo="Compromisos"
-        subtitulo={SUBTITULO_CUENTAS_COMPROMISOS}
-        tituloAccesible={`Compromisos, ${SUBTITULO_CUENTAS_COMPROMISOS.toLowerCase()}`}
+        titulo={TITULO_LO_QUE_VIENE}
+        tituloAccesible={`${TITULO_LO_QUE_VIENE}, ${SUBTITULO_CUENTAS_COMPROMISOS.toLowerCase()}`}
         testID="seccion-compromisos"
       >
         {v.compromisos.length === 0 ? (
@@ -245,10 +307,12 @@ export function PantallaCuentas({
           />
         ) : null}
         {v.compromisos.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-compromisos-lista" style={{ gap: espacio.s }}>
-            {v.compromisos.map((c) => (
+          <View accessibilityRole="list" testID="seccion-compromisos-lista">
+            {v.compromisos.map((c, i) => (
               <Fila
                 key={`${c.programadoId}:${c.fecha}`}
+                primera={i === 0}
+                compacta
                 testID={`compromiso-${c.programadoId}`}
                 titulo={c.concepto}
                 subtitulo={etiquetaFecha(c.fecha)}
@@ -339,14 +403,34 @@ function Seccion({
   children: ReactNode;
   testID: string;
 }) {
+  const { c } = useTema();
   return (
-    <View style={{ gap: espacio.m, marginTop: espacio.s }} testID={testID}>
+    <View
+      testID={testID}
+      style={{
+        backgroundColor: c.superficie,
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: c.borde,
+        paddingHorizontal: espacio.l,
+        paddingTop: espacio.xs,
+        paddingBottom: espacio.s,
+        gap: espacio.xs,
+      }}
+    >
       <Texto
-        variante="subtitulo"
-        tono="acento"
+        variante="etiqueta"
+        tono="secundario"
         testID={`${testID}-titulo`}
         accessibilityRole="header"
         {...(tituloAccesible ? { accessibilityLabel: tituloAccesible } : {})}
+        style={{
+          fontSize: 15,
+          lineHeight: 20,
+          fontWeight: '700',
+          paddingTop: espacio.s,
+          paddingBottom: espacio.xs,
+        }}
       >
         {titulo}
       </Texto>
@@ -383,6 +467,9 @@ function Fila({
   testID,
   accion,
   abrir,
+  icono,
+  primera = false,
+  compacta = false,
 }: {
   titulo: string;
   subtitulo: string | null;
@@ -391,7 +478,14 @@ function Fila({
   testID?: string;
   accion?: { etiqueta: string; etiquetaAccesible?: string; pista?: string; alPresionar: () => void };
   abrir?: { pista: string; alPresionar: () => void; etiquetaVer?: string };
+  /** Cuadro con el ícono a la izquierda (Tienes, Te deben); sin él, la fila compacta de «Lo que viene». */
+  icono?: NombreIcono;
+  /** La primera de su lista no lleva separador arriba. */
+  primera?: boolean;
+  /** «Internet · mié 28» en un renglón de 50 (B5). */
+  compacta?: boolean;
 }) {
+  const { c } = useTema();
   const contenido = (
     <View
       style={{
@@ -399,16 +493,42 @@ function Fila({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: espacio.m,
+        minHeight: compacta ? 50 : 62,
       }}
     >
+      {icono ? (
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 14,
+            backgroundColor: c.iconoFondo,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icono nombre={icono} color={c.acento} />
+        </View>
+      ) : null}
       <View
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
-        style={{ flex: 1, gap: espacio.xs }}
+        style={compacta ? { flex: 1, flexDirection: 'row', flexWrap: 'wrap' } : { flex: 1, gap: 1 }}
       >
-        <Texto variante="cuerpoFuerte">{titulo}</Texto>
-        {subtitulo ? (
-          <Texto variante="pequeno" tono="secundario">
+        <Texto variante="cuerpoFuerte" style={{ lineHeight: 22, fontWeight: compacta ? '600' : '700' }}>
+          {titulo}
+        </Texto>
+        {subtitulo && compacta ? (
+          <>
+            <Texto variante="cuerpoFuerte" style={{ lineHeight: 22, fontWeight: '600' }}>
+              {' · '}
+            </Texto>
+            <Texto variante="cuerpoFuerte" style={{ lineHeight: 22, fontWeight: '600' }}>
+              {subtitulo}
+            </Texto>
+          </>
+        ) : subtitulo ? (
+          <Texto variante="secundario" tono="secundario" style={{ lineHeight: 20 }}>
             {subtitulo}
           </Texto>
         ) : null}
@@ -435,39 +555,43 @@ function Fila({
   if (abrir && !accion) {
     return (
       <View role="listitem" {...(testID ? { testID } : {})}>
-        <Tarjeta
-          alPresionar={abrir.alPresionar}
-          etiquetaAccesible={etiquetaFila({ titulo, subtitulo, contexto: contextoSaldo, centavos })}
-          pista={abrir.pista}
+        {primera ? null : <Separador sangria={icono ? 52 : 0} />}
+        <Pressable
+          onPress={abrir.alPresionar}
+          accessibilityRole="button"
+          accessibilityLabel={etiquetaFila({ titulo, subtitulo, contexto: contextoSaldo, centavos })}
+          accessibilityHint={abrir.pista}
           {...(testID ? { testID: `${testID}-abrir` } : {})}
+          style={({ pressed }) => ({ minHeight: OBJETIVO_TACTIL_MIN, opacity: pressed ? 0.7 : 1 })}
         >
-          {contenido}
-        </Tarjeta>
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {contenido}
+          </View>
+        </Pressable>
       </View>
     );
   }
 
   return (
     <View role="listitem" {...(testID ? { testID } : {})}>
-      <Tarjeta>
-        {contenido}
-        {abrir ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-            {botonAccion}
-            <Boton
-              etiqueta={BTN_VER}
-              variante="texto"
-              ancho="contenido"
-              alPresionar={abrir.alPresionar}
-              pista={abrir.pista}
-              {...(abrir.etiquetaVer ? { etiquetaAccesible: abrir.etiquetaVer } : {})}
-              {...(testID ? { testID: `${testID}-ver` } : {})}
-            />
-          </View>
-        ) : (
-          botonAccion
-        )}
-      </Tarjeta>
+      {primera ? null : <Separador sangria={icono ? 52 : 0} />}
+      {contenido}
+      {abrir ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s, marginLeft: icono ? 44 : 0 }}>
+          {botonAccion}
+          <Boton
+            etiqueta={BTN_VER}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={abrir.alPresionar}
+            pista={abrir.pista}
+            {...(abrir.etiquetaVer ? { etiquetaAccesible: abrir.etiquetaVer } : {})}
+            {...(testID ? { testID: `${testID}-ver` } : {})}
+          />
+        </View>
+      ) : botonAccion ? (
+        <View style={{ flexDirection: 'row', marginLeft: icono ? 44 : 0 }}>{botonAccion}</View>
+      ) : null}
     </View>
   );
 }
@@ -482,7 +606,7 @@ function PersonaDebes({
 }) {
   const { ctx, refrescar } = useSesion();
   return (
-    <Tarjeta testID={`cuenta-${d.id}`}>
+    <View testID={`cuenta-${d.id}`} style={{ gap: espacio.s, paddingVertical: espacio.s }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
         <View
           accessibilityElementsHidden
@@ -521,6 +645,12 @@ function PersonaDebes({
         }}
         testID={`apartar-${d.id}`}
       />
-    </Tarjeta>
+    </View>
   );
+}
+
+/** Línea entre renglones de una tarjeta de Cuentas (B5), con sangría bajo el ícono. */
+function Separador({ sangria = 52 }: { sangria?: number }) {
+  const { c } = useTema();
+  return <View style={{ height: 1, backgroundColor: c.superficieAlterna, marginLeft: sangria }} />;
 }

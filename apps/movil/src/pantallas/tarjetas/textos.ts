@@ -402,3 +402,30 @@ export const ERROR_INCLUYE_MSI = 'Dime si lo que debes ya incluye esos meses.';
 export function mensajeMesesAgregados(n: number): string {
   return n === 1 ? 'Agregué esa compra a meses.' : `Agregué esas ${n} compras a meses.`;
 }
+
+// ——— Renglón de la tarjeta en Cuentas (dirección B, tablero B5) ———
+
+export const BTN_PAGAR_LISTA = 'Pagar';
+export const PISTA_PAGAR_LISTA = 'Abre la tarjeta con el pago listo para registrarlo';
+
+/** «••4410 · la pagas completa» (sin repetir los últimos 4 si ya van en el nombre). */
+export function subtituloTarjetaLista(
+  d: Pick<CuentaDebes, 'nombre' | 'ultimos4'>,
+  t: Pick<TarjetaVista, 'modo'> | null,
+): string {
+  const partes = [
+    d.ultimos4 && !d.nombre.includes(d.ultimos4) ? `••${d.ultimos4}` : null,
+    t ? (t.modo === 'totalero' ? 'la pagas completa' : 'no la pagas completa') : 'Tarjeta de crédito',
+  ].filter((x): x is string => x !== null);
+  return partes.join(' · ');
+}
+
+/** «Usas 12 % de $15,000 · corte lun 9 nov». */
+export function textoUsoCorteLista(porcentaje: number, limite: string, corte: string): string {
+  return `Usas ${porcentaje} % de ${limite} · corte ${corte}`;
+}
+
+/** «Para no generar intereses, antes del jue 29». */
+export function textoPngiLista(fechaLimite: string): string {
+  return `Para no generar intereses, antes del ${fechaLimite}`;
+}

@@ -10,7 +10,11 @@ describe('Chip (TalkBack)', () => {
     expect(chip.props.accessibilityLabel).toBe('Efectivo');
     expect(chip.props.accessibilityHint).toBe('Selecciona esta opción');
     expect(chip.props.accessibilityState).toMatchObject({ selected: true });
-    const texto = screen.getByText('✓ Efectivo', { includeHiddenElements: true });
+    // Dirección B: el elegido se ve lleno de pino y en negritas (sin «✓»); el lector lo dice con «selected».
+    const texto = screen.getByText('Efectivo', { includeHiddenElements: true });
+    expect(texto.props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ fontWeight: '700' })]),
+    );
     expect(texto.props.accessibilityElementsHidden).toBe(true);
     expect(texto.props.importantForAccessibility).toBe('no-hide-descendants');
   });
