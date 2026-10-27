@@ -174,8 +174,18 @@ tags:
 - openLink:
     link: 'finanvoz://privacidad'
     optional: true
+# Desde Ajustes de iOS el enlace saca el aviso del sistema «¿Abrir en Finanvoz?». Si se queda abierto tapa la app en
+# los flujos que siguen aunque la relancen (corrida 40427630360: los 8 restantes fallaron en onb-bienvenida).
+- runFlow:
+    when:
+      visible:
+        text: '(Abrir|Open)'
+    commands:
+      - tapOn:
+          text: '(Abrir|Open)'
 - extendedWaitUntil:
     visible:
       id: privacidad
     timeout: 15000
-    optional: true
+- assertNotVisible:
+    text: '¿Abrir en Finanvoz\?'
