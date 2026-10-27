@@ -125,7 +125,8 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
           width: navegacionSuperior.alto,
           height: navegacionSuperior.alto,
           borderRadius: navegacionSuperior.alto / 2,
-          backgroundColor: enTu ? c.acento : c.segmentoActivo,
+          // B1/B6: el círculo es una tarjeta con filo (blanco en claro, `#13201C` en oscuro), no un segmento.
+          backgroundColor: enTu ? c.acento : c.superficie,
           borderWidth: 1,
           borderColor: enTu ? c.acento : c.borde,
           alignItems: 'center',

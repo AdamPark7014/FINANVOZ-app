@@ -10,7 +10,7 @@
   direcciones» con los chips de un toque de C en la tarjeta de registro. Decisión en `docs/ESTADO.md`; tableros B y C2
   en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2`, `§4`, `§10` y `§11` reescritos.
   Fases: 1) navegación y dock, 2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
-  Falta la fase 4 (repaso en oscuro contra B6) y comparar las capturas de «iOS · Maestro» contra los PNG de B.
+  Falta comparar las capturas de «iOS · Maestro» (claro y el lote oscuro) contra los PNG de B.
 - **Fase 1 hecha:** navegación arriba (`src/pantallas/navegacion/NavegacionSuperior.tsx`, `tabBarPosition: 'top'`):
   segmentos `pestana-hoy|movimientos|cuentas` y el círculo «Tú» con testID `boton-ajustes` (la app no pide nombre: no
   hay inicial). Dock de voz (`DockVoz`, `DockSeccion`): en Asistente «Escribir» (`boton-escribir`), micrófono
@@ -35,6 +35,11 @@
   con pago para no generar intereses, la caja `cuenta-<id>-pngi` con «Pagar» (`cuenta-<id>-pagar`), que abre
   `/tarjetas/[id]?pagar=1` con el formulario de pago abierto (`pagarAlAbrir`). Chips de filtro con el estilo B.
   `02 §10` y `§11` al día.
+- **Fase 4 hecha (oscuro, B6):** los tokens oscuros ya eran los de B6; el círculo de Tú pasa a `superficie` (en B1 y
+  B6 es una tarjeta con filo, no un segmento). Pruebas nuevas en oscuro: `asistente/oscuro-b6.test.tsx` (reposo,
+  botones de la tarjeta de pago, Movimientos y Cuentas sin colores del claro) y `rutas/pestanas-oscuro.test.tsx`
+  (riel, segmento sin sombra, círculo). Diferencia a propósito: el filo decorativo es `#3A4C45` y no el `#2A3C35`
+  del tablero (1.5:1 contra la tarjeta, `tokens.test.ts`). `02 §16` lo dice. El claro sigue de omisión.
 - Maestro de iPhone en verde sobre `7f098a3` (fase 1); en las capturas «Movimientos» se partía en el segmento
   elegido: los segmentos ya no son tercios iguales.
 - **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de

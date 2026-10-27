@@ -74,7 +74,7 @@ export interface Colores {
   sobreMicrofono: string;
   /** Riel del selector Asistente · Movimientos · Cuentas. */
   segmento: string;
-  /** Segmento elegido del selector (y el círculo de Tú sin elegir). */
+  /** Segmento elegido del selector (el círculo de Tú va en `superficie`, como en B1 y B6). */
   segmentoActivo: string;
   /** Cuadro del ícono de categoría o de cuenta; el ícono va en `acento` (≥ 3:1). */
   iconoFondo: string;
