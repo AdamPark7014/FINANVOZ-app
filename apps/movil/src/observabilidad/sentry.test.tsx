@@ -93,7 +93,11 @@ describe('Sentry con el SDK real (CA-M2-06)', () => {
 
     const eventos = eventosEnviados(sobres);
     expect(eventos).toHaveLength(3);
-    const json = JSON.stringify(eventos).toLowerCase();
+    // Fuera las marcas de tiempo y los ids del SDK (números o hex de 9+ caracteres): «1793043210» contiene «4321» y
+    // la prueba fallaba según la hora. Un monto o un dato sensible no llega a esa longitud.
+    const json = JSON.stringify(eventos)
+      .toLowerCase()
+      .replace(/[0-9a-f.]{9,}/g, '#');
     for (const s of SENSIBLES) expect(json).not.toContain(s);
     expect(json).not.toMatch(/\$\s?\d/);
     expect(json).toContain('monto_invalido');

@@ -39,8 +39,15 @@
 
 ## Estado de tiendas
 
-- **TestFlight y AAB** arrancaron desde `fce19b9` (antes de este turno): no traen el nivel 0 nuevo. La nube nueva sí
-  aplica a cualquier build porque vive en el backend.
+- **TestFlight 1.0.0 (14)** desde `dad15f2` (nivel 0 nuevo + tema claro + H1/H8/06): VALID e `IN_BETA_TESTING` en el
+  grupo interno «Equipo Finanvoz (interno)» (acceso a todas las builds, Adam es el único tester), consultado por API el
+  26-10. La 13 (`fce19b9`, tema claro sin el nivel 0 nuevo) queda superada.
+- **Play**: el AAB que se sube es el 1.0.0 (versionCode 5) desde `dad15f2` (corrida 40410380877), firmado con la llave
+  de subida (SHA-256 8F:67:…:05:00 comprobada); copia en `C:\dev\builds\FINANVOZ\1.0.0-5\bundle\release\app-release.aab`.
+  El 4 queda superado.
+- **Maestro de iPhone en `dad15f2`**: pasan 02, 04, 05, 06, 07, 08 y 09. Fallan 01 («Debes»: el desplazamiento deja la
+  tarjeta arriba, fuera de pantalla) y 03 (`ajustes-terminos` está en pantalla y en el árbol, pero Maestro no lo da por
+  visible al final de la lista): fallos del flujo, no de la app (capturas revisadas).
 - **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
   `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
 - **Play**: no hay cuenta de servicio; subir a la prueba interna es a mano en la consola.
