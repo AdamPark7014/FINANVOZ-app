@@ -14,7 +14,12 @@ import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { crearPersona } from '../../servicios/personas';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { activarPlus, conEscenario } from '../principal/__pruebas__/base';
-import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
+import {
+  crearMotorFalso,
+  navegacionFalsa,
+  renderConSesion,
+  fraseRegistro,
+} from '../principal/__pruebas__/arnes';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import type { ArchivosFacturas } from './archivos';
@@ -384,13 +389,13 @@ describe('Aviso preventivo (02 §24, CA-M12-04)', () => {
     renderConSesion(ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
     await escribir(CONSULTA_MEDICA);
     // Ola 7: el aviso es un turno del asistente justo después del «Registré…» (antes, una tarjeta con «Entendido»).
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré/);
+    expect(fraseRegistro()).toMatch(/^Registré/);
     expect(screen.getByTestId('respuesta-texto')).toHaveTextContent(AVISO_DEDUCIBLE_EFECTIVO);
     expect(AVISO_DEDUCIBLE_EFECTIVO).toBe(
       'Si lo pagas con tarjeta o transferencia y pides factura, lo puedes deducir.',
     );
     await escribir('coca 25 en efectivo');
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Coca/);
+    expect(fraseRegistro()).toMatch(/^Registré Coca/);
     expect(screen.getAllByText(AVISO_DEDUCIBLE_EFECTIVO)).toHaveLength(1);
   });
 

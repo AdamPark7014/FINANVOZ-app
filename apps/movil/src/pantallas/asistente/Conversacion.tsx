@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactElement } from 'react';
 import { FlatList, View } from 'react-native';
 import { indiceTarjetaAccion, MAX_OBSERVACIONES, type TurnoConversacion } from '../../asistente/conversacion';
 import type { FiltroMovimientos, Observacion, ResultadoTexto, TarjetaAccion } from '../../servicios';
-import { anunciar, espacio, etiquetaHablada, margenPantalla } from '../../ui';
+import { anunciar, espacio, etiquetaHablada, formatearCentavos, margenPantalla } from '../../ui';
 import { Observaciones } from '../principal/Observaciones';
 import { TarjetasAccion } from '../principal/TarjetasAccion';
 import { EntradaTurno } from './movimiento';
@@ -13,7 +13,7 @@ import { TurnoEntendi } from './turnos/TurnoEntendi';
 import { TurnoNoEntendi } from './turnos/TurnoNoEntendi';
 import { TurnoPersona } from './turnos/TurnoPersona';
 import { TurnoPregunta } from './turnos/TurnoPregunta';
-import { TurnoRegistro } from './turnos/TurnoRegistro';
+import { TurnoCompacto, TurnoRegistro } from './turnos/TurnoRegistro';
 import { TurnoTarjeta } from './turnos/TurnoTarjeta';
 import { TurnoTexto } from './turnos/TurnoTexto';
 
@@ -94,6 +94,27 @@ export function useTurnosNuevos(turnos: readonly TurnoConversacion[]): (id: stri
 }
 
 /**
+ * Cómo se dice un turno del día en chico (tablero B2): la frase sola. La tarjeta que vence dice además cuánto pagar.
+ */
+export function textoCompacto(t: TurnoConversacion, tarjetas: readonly TarjetaAccion[]): string {
+  if (t.de === 'persona') return t.texto;
+  if (t.clase === 'aviso' && t.origen === 'tarjeta_accion') {
+    const i = indiceTarjetaAccion(t.id);
+    const tarjeta = i === null ? undefined : tarjetas[i];
+    if (tarjeta?.tipo === 'pago_tarjeta')
+      return `${tarjeta.texto} Para no generar intereses, paga ${formatearCentavos(tarjeta.pngi)}.`;
+  }
+  return textoAnunciable(t) ?? '';
+}
+
+/**
+ * Cómo se pinta cada turno según dónde está la conversación (dirección B): en `reposo` (B1) lo pendiente se dice
+ * completo, con sus respuestas de un toque, y lo ya registrado hoy en chico; en `conversacion` (B2) todo lo del día va
+ * en chico y lo de esta sesión completo; en `panel` (dentro de otra pantalla) todo completo.
+ */
+export type ModoConversacion = 'reposo' | 'conversacion' | 'panel';
+
+/**
  * La conversación (§2): FlatList que siempre termina en lo último, con el teclado empujándola (el contenedor de la
  * pantalla) y toques que no se pierden con el teclado abierto.
  */
@@ -112,7 +133,10 @@ export function Conversacion({
   virtualizada = true,
   esNuevo,
   alEscribir,
+  modo = 'panel',
 }: {
+  /** Qué se dice completo y qué en chico (`ModoConversacion`). */
+  modo?: ModoConversacion;
   /** Abre el campo de la barra de voz (respuestas escritas a una pregunta). */
   alEscribir?: () => void;
   /** `false` dentro de otra pantalla desplazable (sin listas virtualizadas anidadas). */
@@ -147,9 +171,17 @@ export function Conversacion({
   const pintar = (t: TurnoConversacion): ReactElement | null => {
     const testID = testIds.get(t.id) ?? `turno-${t.id}`;
     if (t.de === 'persona') return <TurnoPersona turno={t} testID={testID} />;
+    const delDia = !idsSesion.has(t.id);
+    const enChico =
+      delDia &&
+      ((modo === 'conversacion' && t.clase !== 'tarjeta') || (modo === 'reposo' && t.clase === 'registro'));
+    if (enChico) {
+      const texto = textoCompacto(t, tarjetasAccion);
+      return texto ? <TurnoCompacto texto={texto} testID={testID} /> : null;
+    }
     switch (t.clase) {
       case 'registro':
-        return <TurnoRegistro turno={t} testID={testID} />;
+        return <TurnoRegistro turno={t} testID={testID} ultimo={testID === 'aviso'} />;
       case 'entendi':
         return <TurnoEntendi turno={t} testID={testID} />;
       case 'pregunta':

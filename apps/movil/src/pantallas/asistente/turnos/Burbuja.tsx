@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import { View, type ViewProps } from 'react-native';
-import { Boton, espacio, radio, sombra, useTema } from '../../../ui';
+import { Boton, espacio, useTema } from '../../../ui';
 
 /**
- * Burbuja de un turno del asistente (maqueta Hoy A): superficie con borde, esquina inferior izquierda casi recta.
- * `resaltada` es la de «Entendí» (borde de acento). Tokens de tema: en oscuro nunca hay blanco puro.
+ * Un turno del asistente (dirección B «Plática»): lo que dice va en texto grande, sin burbuja ni sombra; solo lo que
+ * dices tú lleva burbuja (`TurnoPersona`). `resaltada` (la de «Entendí») conserva un filo a la izquierda para que la
+ * pregunta se distinga del resto.
  */
 export function Burbuja({
   children,
@@ -16,22 +17,15 @@ export function Burbuja({
   resaltada?: boolean;
   testID?: string;
 } & Pick<ViewProps, 'accessible' | 'accessibilityLabel' | 'accessibilityRole'>) {
-  const { c, esquema } = useTema();
+  const { c } = useTema();
   return (
     <View
       {...(testID ? { testID } : {})}
       {...accesibilidad}
       style={{
-        backgroundColor: c.superficie,
-        borderWidth: resaltada ? 1.5 : 1,
-        borderColor: resaltada ? c.acentoTexto : c.borde,
-        borderTopLeftRadius: radio.xl,
-        borderTopRightRadius: radio.xl,
-        borderBottomRightRadius: radio.xl,
-        borderBottomLeftRadius: radio.s,
-        padding: espacio.l,
         gap: espacio.m,
-        ...sombra.tarjeta[esquema],
+        paddingRight: espacio.xl,
+        ...(resaltada ? { borderLeftWidth: 3, borderLeftColor: c.acento, paddingLeft: espacio.m } : null),
       }}
     >
       {children}
@@ -39,7 +33,7 @@ export function Burbuja({
   );
 }
 
-/** Acción en línea de un turno («Deshacer», «Ver movimientos»): `Boton` de texto, 48 dp y etiqueta hablada. */
+/** Acción en línea de un turno («Ver movimientos»): `Boton` de texto, 48 dp y etiqueta hablada. */
 export function AccionTexto({
   etiqueta,
   alPresionar,

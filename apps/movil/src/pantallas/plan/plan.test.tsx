@@ -16,7 +16,7 @@ import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorSesion } from '../../sesion/ProveedorSesion';
 import { crearComprasEnMemoria, type TiendaEnMemoria } from '../../suscripciones/memoria';
 import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
-import { crearMotorFalso, navegacionFalsa } from '../principal/__pruebas__/arnes';
+import { crearMotorFalso, navegacionFalsa, fraseRegistro, oidaDesde } from '../principal/__pruebas__/arnes';
 import { activarPlus, conEscenario } from '../principal/__pruebas__/base';
 import { PantallaHoy } from '../principal/PantallaHoy';
 import { PantallaMovimientos } from '../principal/PantallaMovimientos';
@@ -448,7 +448,7 @@ describe('CA-M7-02 · al agotar las 30 interpretaciones del mes', () => {
 
     // Nivel de reglas: sin llamar al proxy.
     await escribir('tacos 80 en efectivo');
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Tacos \$80/);
+    expect(fraseRegistro()).toMatch(oidaDesde('Registré Tacos $80'));
     expect(f.recibidas).toHaveLength(llamadas);
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(1);
   });
@@ -518,7 +518,7 @@ describe('CA-M7-07 · al terminar la prueba sin pagar', () => {
     expect(textoDe('tarjeta-deuda-meses')).toBe('De eso, $12,000 son meses sin intereses.');
     expect(listarMovimientos(p.ctx)).toEqual(movimientosEnPlus);
     await escribir('coca 25 en efectivo');
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Coca \$25/);
+    expect(fraseRegistro()).toMatch(oidaDesde('Registré Coca $25'));
   });
 });
 

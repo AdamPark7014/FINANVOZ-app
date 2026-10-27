@@ -17,6 +17,16 @@
   (`boton-buscar`, `FiltroMovimientos.texto`) y en Cuentas «Agregar» (`boton-agregar` → `menu-agregar` con los
   `boton-agregar-*` de antes). Paleta B0 en `ui/tokens.ts` (tokens nuevos `dock`, `microfono`, `segmento`…; AA en
   `tokens.test.ts`). Íconos de línea con `react-native-svg` 15.15.4 (dependencia nueva, la del SDK 57).
+- **Fase 2 hecha (Asistente B1–B3):** reposo (`Reposo.tsx`: saludo por hora en `hoy-fecha`, cifra `hoy-puedes`,
+  «Cómo lo calculé ›» = `boton-desglose`, lo pendiente y «Puedes decirme» con los `chip-intencion-*`); con turnos de
+  la sesión, la píldora (`PildoraDia`, también `boton-desglose`) y la conversación (lo del día en chico). Tarjeta de
+  registro B2 en `TurnoRegistro` (`aviso`, `aviso-chip-categoria|cuenta|dia` → `aviso-opcion-*`, corrigen con
+  `aplicarCorreccion`; «Deshacer» con anillo de 10 s; pista «Si oí mal…»). «¿Me alcanza?» B3 en `TurnoPuedoGastar`
+  (dos opciones, «Cómo lo calculé», «Lo compré», «Recuérdamelo»). Servicios nuevos: `detalleRegistro`,
+  `nombresLiquidez`. Pruebas: `fraseRegistro`/`oida` en `principal/__pruebas__/arnes.tsx` (la tarjeta dice la frase,
+  no la muestra entera).
+- Maestro de iPhone en verde sobre `7f098a3` (fase 1); en las capturas «Movimientos» se partía en el segmento
+  elegido: los segmentos ya no son tercios iguales.
 - **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de
   `expo-sqlite` con NTSTATUS 0xC0E90002 (política de integridad de código del proceso de Claude, igual que
   cursor-agent). La verificación visual es por las capturas de «iOS · Maestro» en GitHub.

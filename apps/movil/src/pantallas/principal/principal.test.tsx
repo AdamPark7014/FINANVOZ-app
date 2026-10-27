@@ -64,8 +64,16 @@ import {
   MENSAJE_SIN_NUBE,
 } from './textos';
 import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
-import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
+import {
+  crearMotorFalso,
+  navegacionFalsa,
+  renderConSesion,
+  fraseRegistro,
+  oida,
+  oidaDesde,
+} from './__pruebas__/arnes';
 import { MenuAgregar } from '../cuentas/MenuAgregar';
+import { saludoPorHora } from '../asistente/textos';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
@@ -135,7 +143,7 @@ describe('Hoy', () => {
     p.cerrar();
   });
 
-  it('CA-M2-03 · con la semilla e4-01 muestra $214, "4 días para tu quincena (jue 15)" y el desglose de E4-01', () => {
+  it('CA-M2-03 · con la semilla e4-01 muestra $214, "hasta tu quincena del jue 15, en 4 días." y el desglose de E4-01', () => {
     const p = conEscenario('e4-01');
     const v = vector<VectorE4>('E4-01');
     renderConSesion(p.ctx, <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />);
@@ -145,17 +153,20 @@ describe('Hoy', () => {
     expect(screen.getByTestId('hoy-puedes').props.accessibilityLabel).toBe(
       'Hoy puedes gastar doscientos catorce pesos',
     );
-    expect(textoDe('hoy-secundario')).toBe('4 días para tu quincena (jue 15)');
-    expect(textoDe('hoy-fecha')).toBe('Dom 11 oct');
+    // Dirección B (B1): hasta cuándo, en una frase; arriba, el saludo según la hora.
+    expect(textoDe('hoy-secundario')).toBe('hasta tu quincena del jue 15, en 4 días.');
+    expect(textoDe('hoy-fecha')).toBe(saludoPorHora(new Date(p.ctx.reloj.ahora()).getHours()));
     expect(screen.queryByTestId('desglose')).toBeNull();
 
+    // «Cómo lo calculé»: tienes − reservado − colchón = libre, entre los días que faltan.
     fireEvent.press(screen.getByTestId('boton-desglose'));
-    expect(textoDe('desglose-liquidez')).toBe(formatearCentavos(v.entrada.liquidez));
-    expect(textoDe('desglose-reservado')).toBe(formatearCentavos(-v.esperado.reservado));
-    expect(textoDe('desglose-colchon')).toBe(formatearCentavos(-v.entrada.colchon));
-    expect(textoDe('desglose-libre')).toBe(formatearCentavos(v.esperado.libre));
-    expect(textoDe('desglose-libre')).toBe('$856');
-    expect(screen.getByText('Reservado (Nu ••4410, tanda, internet)')).toBeTruthy();
+    expect(textoDe('desglose-liquidez-valor')).toBe(formatearCentavos(v.entrada.liquidez));
+    expect(textoDe('desglose-reservado-valor')).toBe(`−${formatearCentavos(v.esperado.reservado)}`);
+    expect(textoDe('desglose-colchon-valor')).toBe(`−${formatearCentavos(v.entrada.colchon)}`);
+    expect(screen.getByText(`Libre ${formatearCentavos(v.esperado.libre)} entre 4 días`)).toBeTruthy();
+    expect(screen.getByText('Libre $856 entre 4 días')).toBeTruthy();
+    expect(textoDe('desglose-libre-valor')).toBe('$214 al día');
+    expect(screen.getByText('Reservado: Nu ••4410, tanda y internet')).toBeTruthy();
     expect(screen.queryByTestId('tarjeta-accion-0')).toBeNull();
   });
 
@@ -198,7 +209,7 @@ describe('Hoy', () => {
     expect(within(tarjeta).getByText('Hoy es día de pago. ¿Ya te llegó tu quincena?')).toBeTruthy();
 
     fireEvent.press(within(tarjeta).getByText('Sí, ya llegó'));
-    expect(textoDe('hoy-secundario')).toBe('15 días para tu quincena (vie 30)');
+    expect(textoDe('hoy-secundario')).toBe('hasta tu quincena del vie 30, en 15 días.');
     const hoy = obtenerHoy(p.ctx);
     expect(hoy.finEfectivo).toBe('2026-10-30');
     expect(textoDe('hoy-puedes')).toBe(formatearCentavos(hoy.hoyPuedesCentavos, 'pesos'));
@@ -343,9 +354,8 @@ describe('Registrar', () => {
     expect(despues).not.toBe('$214');
     expect(textoDe('hoy-puedes')).toBe(despues);
     // Ola 7: el registro es un turno del asistente; la segunda línea dice cómo cambió tu día.
-    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent(
-      /^Registré Coca \$25 · .+ · Cartera\.$/,
-    );
+    expect(fraseRegistro()).toMatch(oidaDesde('Registré Coca $25 · '));
+    expect(fraseRegistro()).toMatch(/ · Cartera\.$/);
     expect(within(aviso).getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
     expect(within(aviso).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
@@ -425,9 +435,7 @@ describe('Registrar', () => {
     expect(screen.queryByTestId('entendi')).toBeNull();
     // Una compra con la tarjeta que pagas completa se aparta: la cifra de Hoy baja y el aviso lo dice.
     const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
-      'Registré Tacos $80 · Comida fuera · Nu ••4410.',
-    );
+    expect(fraseRegistro()).toBe(oida('Registré Tacos $80 · Comida fuera · Nu ••4410.'));
     expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
   });

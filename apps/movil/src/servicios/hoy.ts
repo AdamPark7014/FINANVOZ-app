@@ -207,6 +207,19 @@ export function liquidez(ctx: Contexto): Centavos {
   return l;
 }
 
+/**
+ * Nombres de las cuentas que suman a L (las líquidas activas del espacio personal), para «Tienes en efectivo y BBVA»
+ * de «Cómo lo calculé» (dirección B). El efectivo se nombra «efectivo»; las demás, como las llamó la persona.
+ */
+export function nombresLiquidez(ctx: Contexto): string[] {
+  return ctx.db
+    .select({ nombre: cuenta.nombre, subtipo: cuenta.subtipo })
+    .from(cuenta)
+    .where(and(eq(cuenta.liquida, 1), eq(cuenta.archivada, 0), eq(cuenta.espacio, 'personal')))
+    .all()
+    .map((c) => (c.subtipo === 'efectivo' ? 'efectivo' : c.nombre));
+}
+
 /** Lo que debes a personas (subtipos persona, cliente y pareja; las tandas no). */
 export function deudasConPersonas(ctx: Contexto) {
   return ctx.db

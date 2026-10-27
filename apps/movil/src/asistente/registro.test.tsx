@@ -322,7 +322,7 @@ const TABLA: readonly [string, ResultadoTexto, Clase | 'nada', string | RegExp |
     'me_alcanza',
     { resultado: 'me_alcanza', consulta: { precio: 150_000, descripcion: 'unos tenis' } },
     'aviso',
-    /^Si compras unos tenis de \$1,500 hoy, te faltarían \$644 para cubrir lo que viene antes de tu quincena \(jue 15\)\.$/,
+    /^No te alcanza\. Si compras unos tenis de \$1,500 hoy, te faltarían \$644 para cubrir lo que viene antes del jue 15\.$/,
   ],
   ['arqueo', { resultado: 'arqueo', efectivoReal: 30_000 }, 'nada', null],
   ['no_encontrado', { resultado: 'no_encontrado', accion: 'anular' }, 'texto', MENSAJE_NO_ENCONTRE],
@@ -789,7 +789,7 @@ describe('asistente/registro · consultas, explicar y pantallas (criterio 4)', (
     expect(t).toMatchObject({
       clase: 'aviso',
       origen: 'probabilidad',
-      texto: 'Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta tu quincena (jue 15).',
+      texto: 'Te alcanza. Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta el jue 15.',
       detalle: 'Calculando cómo llegas con cada opción…',
     });
     expect(calcular).toHaveBeenCalledWith(consulta, t?.id);

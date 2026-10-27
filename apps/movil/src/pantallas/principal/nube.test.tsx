@@ -3,7 +3,14 @@ import { useProcesarCola } from '../../nube/useProcesarCola';
 import { listarMovimientos, listarPorInterpretar } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { conEscenario } from './__pruebas__/base';
-import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
+import {
+  crearMotorFalso,
+  navegacionFalsa,
+  renderConSesion,
+  fraseRegistro,
+  oida,
+  oidaDesde,
+} from './__pruebas__/arnes';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
@@ -97,9 +104,7 @@ describe('Registrar con la nube', () => {
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
 
     await escribir(TACOS_EN_EFECTIVO);
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
-      'Corregí: Tacos $80 · Comida fuera · Cartera. Antes: Nu ••4410.',
-    );
+    expect(fraseRegistro()).toBe(oida('Corregí: Tacos $80 · Comida fuera · Cartera. Antes: Nu ••4410.'));
     expect(within(screen.getByTestId('aviso')).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,000');
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$535');
@@ -130,7 +135,7 @@ describe('Registrar con la nube', () => {
     fireEvent.press(within(tarjeta).getByTestId(`elegir-movimiento-${viejo?.id}`));
     fireEvent.press(screen.getByTestId('boton-guardar-eleccion'));
     expect(screen.queryByTestId('tarjeta-elegir')).toBeNull();
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Corregí: Tacos \$80/);
+    expect(fraseRegistro()).toMatch(oidaDesde('Corregí: Tacos $80'));
   });
 
   it('aclarar: una pregunta con opciones; elegir una vuelve a interpretar la frase', async () => {
@@ -153,9 +158,7 @@ describe('Registrar con la nube', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('pregunta-chip-$2.50'));
     });
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
-      'Registré Chicle $2.50 · Otros gastos · Cartera.',
-    );
+    expect(fraseRegistro()).toBe(oida('Registré Chicle $2.50 · Otros gastos · Cartera.'));
     expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', '$213'));
   });
 
@@ -223,9 +226,7 @@ describe('Registrar con la nube', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('entendi-confirmar'));
     });
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(
-      'Registré Tele $6,000 · Otros gastos · Nu ••4410.',
-    );
+    expect(fraseRegistro()).toBe(oida('Registré Tele $6,000 · Otros gastos · Nu ••4410.'));
     expect(listarPorInterpretar(p.ctx)).toEqual([]);
   });
 

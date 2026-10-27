@@ -6,25 +6,23 @@ import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
 import { useMedidasDock } from '../navegacion/DockVoz';
 import { EnlaceAnaliticaCorreccion } from '../principal/ConfirmacionRegistro';
-import { cifraHoyMostrada } from '../principal/useAvisoRegistro';
 import { AvisosUnaVez } from './AvisosUnaVez';
 import { BarraVoz } from './BarraVoz';
-import { CabeceraDia } from './CabeceraDia';
-import { Conversacion, useTurnosNuevos } from './Conversacion';
-import { EstadoVacio } from './EstadoVacio';
+import { Conversacion, useTurnosNuevos, type ModoConversacion } from './Conversacion';
 import { PanelDesglose } from './PanelDesglose';
+import { PildoraDia } from './PildoraDia';
+import { Reposo } from './Reposo';
 import { useAsistente, type Asistente, type OpcionesAsistente } from './useAsistente';
 
 /**
- * Pestaña Asistente (Ola 7, maqueta Hoy A «Conversación»; testID `pantalla-hoy` para Maestro): cabecera compacta
- * con la barra reservado · colchón · libre, la conversación del día y la barra de voz. Sin turnos todavía, el
- * micrófono enorme al centro (Hoy C). El teclado empuja la conversación; la barra de voz queda sobre él.
+ * El asistente (dirección B «Plática», tableros B1–B3; testID `pantalla-hoy` para Maestro). Mientras no hay turnos de
+ * esta sesión está en reposo (B1): el saludo, la cifra grande, lo pendiente y «Puedes decirme». Con conversación
+ * (B2), una píldora arriba con la cifra del día y la conversación debajo. Abajo, siempre, el dock de voz. El teclado
+ * empuja todo; el dock queda sobre él.
  */
 export function PantallaAsistente(props: OpcionesAsistente) {
   const a = useAsistente(props);
   const { c } = useTema();
-  const nav = props.navegacion;
-  const vista = a.vista;
   return (
     <SafeAreaView
       {...a.cortarAlTocar}
@@ -35,35 +33,6 @@ export function PantallaAsistente(props: OpcionesAsistente) {
     >
       <EnlaceAnaliticaCorreccion />
       <Contenedor>
-        <View
-          style={{
-            paddingHorizontal: margenPantalla,
-            paddingTop: espacio.l,
-            paddingBottom: espacio.l,
-            gap: espacio.l,
-            backgroundColor: c.superficie,
-            borderBottomWidth: a.verDesglose ? 0 : 1,
-            borderBottomColor: c.borde,
-          }}
-        >
-          <CabeceraDia
-            vista={vista}
-            desgloseAbierto={a.verDesglose}
-            alAlternarDesglose={() => a.setVerDesglose((v) => !v)}
-            alConfigurarIngreso={nav.alConfigurarIngreso}
-          />
-          {a.verDesglose && vista.estado !== 'sin_ingreso' ? (
-            <PanelDesglose
-              vista={vista}
-              probabilidad={a.plus.probabilidad}
-              conCandado={!a.plus.probabilidad && a.conTienda}
-              {...(props.bloques ? { bloques: props.bloques } : {})}
-              {...(nav.alAbrirMeAlcanza && (a.plus.meAlcanza || a.conTienda)
-                ? { alMeAlcanza: () => nav.alAbrirMeAlcanza?.() }
-                : {})}
-            />
-          ) : null}
-        </View>
         <Cuerpo a={a} props={props} />
       </Contenedor>
     </SafeAreaView>
@@ -71,8 +40,8 @@ export function PantallaAsistente(props: OpcionesAsistente) {
 }
 
 /**
- * La conversación con su barra de voz, sin cabecera: la usa la pantalla y la envoltura `PanelRegistrar` que
- * conservan las pantallas que dictan dentro de otra (pruebas de compartido, micrófonos).
+ * La conversación con su dock, sin reposo ni píldora: la usa la envoltura `PanelRegistrar` que conservan las
+ * pantallas que dictan dentro de otra (pruebas de compartido, micrófonos).
  */
 export function PanelConversacion(props: OpcionesAsistente) {
   const a = useAsistente({ ...props, soloSesion: true });
@@ -87,7 +56,7 @@ export function PanelConversacion(props: OpcionesAsistente) {
 function Contenedor({ children }: { children: ReactNode }) {
   // El teclado se dibuja encima en los dos sistemas: en Android la app va de borde a borde y `adjustResize` ya no
   // encoge la ventana (las capturas de CI del 25-10 mostraban «¿Qué registro?» bajo el teclado). El contenedor se
-  // encoge y la barra de voz queda pegada al teclado.
+  // encoge y el dock queda pegado al teclado.
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       {children}
@@ -109,9 +78,9 @@ function Cuerpo({
   // El dock de voz va fijo al pie: el aviso inferior sube para no taparlo.
   const [altoPie, setAltoPie] = useState(0);
   useReservarEspacioAviso(altoPie);
-  // En panel (dentro de otra pantalla) no hay estado vacío: la barra de voz siempre trae su micrófono.
-  const sinTurnos = !enPanel && a.turnos.length === 0;
-  // Cada turno nuevo del asistente se anuncia (también el primero, que llega con el estado vacío a la vista).
+  // Reposo (B1) mientras no hay turnos de esta sesión; en panel (dentro de otra pantalla) siempre conversación.
+  const enReposo = !enPanel && a.idsSesion.size === 0;
+  // Cada turno nuevo del asistente se anuncia (también los que llegan mientras se ve el reposo).
   const esNuevo = useTurnosNuevos(a.turnos);
   const encabezado = enPanel ? null : (
     <View style={{ gap: espacio.m }}>
@@ -120,33 +89,66 @@ function Cuerpo({
     </View>
   );
   const alAbrirArqueo = nav.alAbrirArqueo;
+  const desglose =
+    a.verDesglose && a.vista.estado !== 'sin_ingreso' ? (
+      <PanelDesglose
+        vista={a.vista}
+        probabilidad={a.plus.probabilidad}
+        conCandado={!a.plus.probabilidad && a.conTienda}
+        {...(props.bloques ? { bloques: props.bloques } : {})}
+        {...(nav.alAbrirMeAlcanza && (a.plus.meAlcanza || a.conTienda)
+          ? { alMeAlcanza: () => nav.alAbrirMeAlcanza?.() }
+          : {})}
+      />
+    ) : null;
+  const conversacion = (modo: ModoConversacion, virtualizada: boolean) => (
+    <Conversacion
+      virtualizada={virtualizada}
+      modo={modo}
+      esNuevo={esNuevo}
+      alEscribir={() => a.setEscribiendo(true)}
+      turnos={a.turnos}
+      idsSesion={a.idsSesion}
+      tarjetasAccion={a.vista.tarjetasAccion}
+      observaciones={a.observaciones}
+      alVerMovimientosFiltro={(filtro) => nav.alVerMovimientos(filtro)}
+      encabezado={enReposo ? null : encabezado}
+      alVerMovimientos={() => nav.alVerMovimientos()}
+      {...(alAbrirArqueo ? { alAbrirArqueo: () => alAbrirArqueo() } : {})}
+      alResultadoTarjeta={a.alResultadoTarjeta}
+      alListoTarjeta={a.alListoTarjeta}
+      alCancelarTarjeta={a.resolver}
+    />
+  );
   return (
     <>
-      {sinTurnos ? (
-        <EstadoVacio
-          primerUso={a.vista.primerUso}
-          hoyPuedes={cifraHoyMostrada(a.vista)}
-          encabezado={encabezado}
-          {...(nav.alVerMovimiento ? { alVerMovimiento: nav.alVerMovimiento } : {})}
+      {enReposo ? (
+        <Reposo
+          a={a}
+          alConfigurarIngreso={nav.alConfigurarIngreso}
+          desglose={desglose ? <View style={{ marginTop: espacio.m }}>{desglose}</View> : null}
+          pendientes={
+            <View style={{ gap: espacio.l }}>
+              {encabezado}
+              {a.turnos.length > 0 ? conversacion(enPanel ? 'panel' : 'reposo', false) : null}
+            </View>
+          }
         />
+      ) : enPanel ? (
+        conversacion(enPanel ? 'panel' : 'reposo', false)
       ) : (
-        <View style={enPanel ? undefined : { flex: 1 }}>
-          <Conversacion
-            virtualizada={!enPanel}
-            esNuevo={esNuevo}
-            alEscribir={() => a.setEscribiendo(true)}
-            turnos={a.turnos}
-            idsSesion={a.idsSesion}
-            tarjetasAccion={a.vista.tarjetasAccion}
-            observaciones={a.observaciones}
-            alVerMovimientosFiltro={(filtro) => nav.alVerMovimientos(filtro)}
-            encabezado={encabezado}
-            alVerMovimientos={() => nav.alVerMovimientos()}
-            {...(alAbrirArqueo ? { alAbrirArqueo: () => alAbrirArqueo() } : {})}
-            alResultadoTarjeta={a.alResultadoTarjeta}
-            alListoTarjeta={a.alListoTarjeta}
-            alCancelarTarjeta={a.resolver}
-          />
+        <View style={{ flex: 1, paddingTop: espacio.m }}>
+          {a.vista.estado !== 'sin_ingreso' ? (
+            <PildoraDia
+              vista={a.vista}
+              abierto={a.verDesglose}
+              alPresionar={() => a.setVerDesglose((v) => !v)}
+            />
+          ) : null}
+          {desglose ? (
+            <View style={{ paddingHorizontal: margenPantalla, paddingTop: espacio.m }}>{desglose}</View>
+          ) : null}
+          <View style={{ flex: 1 }}>{conversacion('conversacion', true)}</View>
         </View>
       )}
       <View

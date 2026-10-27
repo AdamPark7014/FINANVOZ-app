@@ -63,18 +63,42 @@ describe('asistente/puedo-gastar · cómo queda tu día (E4 de core)', () => {
     const p = conEscenario('e4-01');
     const vista = obtenerHoy(p.ctx);
     expect(vista.hoyPuedesPesos).toBe(214);
-    expect(simularCompraHoy(vista, 10_000)).toEqual({ hoyPuedes: 18_900, libre: 75_600, faltante: 0 });
-    expect(simularCompraHoy(vista, 150_000)).toEqual({ hoyPuedes: 0, libre: -64_400, faltante: 64_400 });
+    expect(simularCompraHoy(vista, 10_000)).toEqual({
+      hoyPuedes: 18_900,
+      libre: 75_600,
+      faltante: 0,
+      dias: 4,
+    });
+    expect(simularCompraHoy(vista, 150_000)).toEqual({
+      hoyPuedes: 0,
+      libre: -64_400,
+      faltante: 64_400,
+      dias: 4,
+    });
     p.cerrar();
   });
 
-  it('sin descripción dice «Si gastas…»; si cabe en lo de hoy lo dice sin juzgar', () => {
+  it('sin descripción dice «Si gastas…»; trae lo que pinta la tarjeta de B3, todo de E4', () => {
     const p = conEscenario('e4-01');
     const { o } = falsas();
     const t = turnoPuedoGastar(p.ctx, { precio: 30_000 }, o, 'x') as Extract<Turno, { clase: 'aviso' }>;
-    expect(t.texto).toBe('Si gastas $300 hoy, tu día pasa de $214 a $139 hasta tu quincena (jue 15).');
-    expect(t.detalle).toBe('Es más de lo que puedes gastar hoy ($214).');
-    expect(t.acciones.map((a) => a.etiqueta)).toEqual(['Regístralo']);
+    expect(t.texto).toBe('Te alcanza. Si gastas $300 hoy, tu día pasa de $214 a $139 hasta el jue 15.');
+    expect(t.detalle).toBeUndefined();
+    expect(t.acciones.map((a) => a.etiqueta)).toEqual(['Lo compré']);
+    const vista = obtenerHoy(p.ctx);
+    expect(t.puedoGastar).toMatchObject({
+      precio: 30_000,
+      que: null,
+      antes: vista.hoyPuedesCentavos,
+      despues: 13_900,
+      libreDespues: vista.libre - 30_000,
+      faltante: 0,
+      dias: 4,
+      proximo: { concepto: 'quincena', etiqueta: 'jue 15', fecha: '2026-10-15' },
+      tienes: { monto: vista.liquidez },
+      reservado: { monto: vista.reservado, nombres: vista.reservadoDetalle.map((r) => r.concepto) },
+      colchon: vista.colchon,
+    });
     p.cerrar();
   });
 
@@ -106,7 +130,7 @@ describe('asistente/puedo-gastar · cómo queda tu día (E4 de core)', () => {
     expect(t.detalle).toBe(
       'Hoy, de contado: 72 % de llegar sin tocar tu colchón.\nEl jue 15, con tu quincena: 95 % de llegar sin tocar tu colchón.',
     );
-    expect(t.acciones.map((a) => a.etiqueta)).toEqual(['Regístralo', 'Ver opciones']);
+    expect(t.acciones.map((a) => a.etiqueta)).toEqual(['Lo compré', 'Ver opciones']);
     void t.acciones[1]?.accion();
     expect(o.abrirMeAlcanza).toHaveBeenCalledWith(consulta);
     p.cerrar();
@@ -123,7 +147,7 @@ describe('asistente/puedo-gastar · cómo queda tu día (E4 de core)', () => {
     pregunta.responder({ tipo: 'monto', centavos: 15_000, aproximado: false });
     expect(agregados[0]).toMatchObject({ de: 'persona', texto: '$150' });
     expect((agregados[1] as Extract<Turno, { clase: 'aviso' }>).texto).toBe(
-      'Si compras el cine de $150 hoy, tu día pasa de $214 a $176 hasta tu quincena (jue 15).',
+      'Te alcanza. Si compras el cine de $150 hoy, tu día pasa de $214 a $176 hasta el jue 15.',
     );
     p.cerrar();
   });

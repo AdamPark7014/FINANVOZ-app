@@ -1,25 +1,15 @@
+import type { ChipIntencion, ClaveIntencion } from '../../asistente/chips';
+import type { DatosPuedoGastar } from '../../asistente/tipos';
+import type { VistaHoy } from '../../servicios';
 import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
+import type { FilaCalculo } from './TarjetaCalculo';
 
 /**
  * Redacción del asistente (Ola 7, `docs/diseno/OLA-7-ASISTENTE.md` §1.4): es-MX, tuteo, sin exclamaciones ni
  * consejos (`08 §1`), cada turno en dos líneas como máximo. Solo presenta lo que ya calculó `servicios/`.
  */
 
-// ——— Cabecera y barra del día ———
-
-export const LEYENDA_RESERVADO = 'Reservado';
-export const LEYENDA_COLCHON = 'Colchón';
-export const LEYENDA_LIBRE = 'Libre';
-
-/** Etiqueta hablada de la barra reservado · colchón · libre (las cifras en palabras, `02 §15`). */
-export function etiquetaBarraDia(reservado: number, colchon: number, libre: number): string {
-  return etiquetaHablada(
-    `${LEYENDA_RESERVADO} ${formatearCentavos(reservado)}, ${LEYENDA_COLCHON.toLowerCase()} ${formatearCentavos(colchon)}, ${LEYENDA_LIBRE.toLowerCase()} ${formatearCentavos(libre)}`,
-  );
-}
-
 export const BTN_ME_ALCANZA = '¿Me alcanza?';
-export const TITULO_DESGLOSE = 'De dónde sale';
 
 // ——— Conversación ———
 
@@ -89,13 +79,6 @@ export const CHIP_ES_GASTO = 'Es un gasto';
 export const CHIP_ES_INGRESO = 'Es un ingreso';
 export const CHIP_ESCRIBIRLO = 'Escribirlo';
 
-// ——— Estado vacío (Hoy C cuando todavía no hay turnos) ———
-
-export const TEXTO_PRUEBA_DECIR = 'Prueba decir «tacos 80 en efectivo».';
-/** Cómo se usa el orbe: toque corto o mantener; el teclado es el ícono aparte, no el orbe. */
-export const TEXTO_MANTEN_O_TOCA = 'Toca o mantén para hablar';
-export const TITULO_ULTIMO_ENTENDIDO = 'Lo último que entendí';
-
 // ——— Barra de voz ———
 
 export const ETIQUETA_TECLADO = 'Escribir';
@@ -105,7 +88,6 @@ export const ETIQUETA_CAMPO_REGISTRAR = '¿Qué registro?';
 export const BTN_ENVIAR_REGISTRO = 'Registrar';
 export const BTN_FORMULARIO = 'Registrar con formulario';
 export const PISTA_FORMULARIO = 'Abre el formulario corto para llenar los datos';
-export const ETIQUETA_CHIPS_INTENCION = 'Atajos para hablar';
 
 // ——— Dock de voz (dirección B, `02 §2`) ———
 
@@ -145,7 +127,6 @@ export const TEXTO_ESPERO_SI = 'Te escucho: di «sí» o «no».';
 export const PREGUNTA_CUANTO_CUESTA = '¿Cuánto cuesta?';
 export const TEXTO_PUEDO_SIN_INGRESO = 'Para decirte cómo queda tu día, dime cada cuándo te pagan.';
 export const TEXTO_CALCULANDO_OPCIONES = 'Calculando cómo llegas con cada opción…';
-export const BTN_REGISTRALO = 'Regístralo';
 export const BTN_VER_OPCIONES = 'Ver opciones';
 
 function enMinuscula(t: string): string {
@@ -162,15 +143,10 @@ export function lineaEscenario(etiqueta: string, porcentaje: string): string {
   return `${etiqueta}: ${porcentaje} de llegar sin tocar tu colchón.`;
 }
 
-/** «Cabe en lo que puedes gastar hoy ($214).» · «Es más de lo que puedes gastar hoy ($214).» */
-export function textoComparaHoy(cabe: boolean, hoy: string): string {
-  return cabe ? `Cabe en lo que puedes gastar hoy (${hoy}).` : `Es más de lo que puedes gastar hoy (${hoy}).`;
-}
-
 /**
- * «Si compras unos tenis de $500 hoy, tu día pasa de $214 a $180 hasta tu quincena (jue 15).» (sin qué: «Si gastas
- * $500 hoy, …») o, si no alcanza, «…, te faltarían $340 para cubrir lo que viene antes de tu quincena (jue 15).»
- * Las cifras ya vienen de `core`.
+ * «Te alcanza. Si compras unos tenis de $500 hoy, tu día pasa de $268 a $143 hasta el vie 30.» (B3; sin qué: «Si
+ * gastas $500 hoy, …») o, si no alcanza, «No te alcanza. …, te faltarían $340 para cubrir lo que viene antes del jue
+ * 15.» Describe qué pasa con tu dinero, no qué hacer (`08 §1`). Las cifras ya vienen de `core`.
  */
 export function textoPuedoGastar(d: {
   /** «Unos tenis de $500»; `null` sin descripción. */
@@ -183,25 +159,14 @@ export function textoPuedoGastar(d: {
 }): string {
   const si = d.titulo ? `Si compras ${enMinuscula(d.titulo)} hoy` : `Si gastas ${d.monto} hoy`;
   if (d.faltante) {
-    const cuando = d.proximo
-      ? `antes de tu ${d.proximo.concepto} (${d.proximo.etiqueta})`
-      : 'en los próximos días';
-    return `${si}, te faltarían ${d.faltante} para cubrir lo que viene ${cuando}.`;
+    const cuando = d.proximo ? `antes del ${d.proximo.etiqueta}` : 'en los próximos días';
+    return `No te alcanza. ${si}, te faltarían ${d.faltante} para cubrir lo que viene ${cuando}.`;
   }
-  const hasta = d.proximo ? ` hasta tu ${d.proximo.concepto} (${d.proximo.etiqueta})` : '';
+  const hasta = d.proximo ? ` hasta el ${d.proximo.etiqueta}` : '';
   return d.antes === d.despues
-    ? `${si}, tu día sigue en ${d.despues}${hasta}.`
-    : `${si}, tu día pasa de ${d.antes} a ${d.despues}${hasta}.`;
+    ? `Te alcanza. ${si}, tu día sigue en ${d.despues}${hasta}.`
+    : `Te alcanza. ${si}, tu día pasa de ${d.antes} a ${d.despues}${hasta}.`;
 }
-
-// ——— Saludo del estado vacío ———
-
-/** «Hola. Hoy puedes gastar $214.» */
-export function saludoDelDia(hoy: string | null): string {
-  return hoy ? `Hola. Hoy puedes gastar ${hoy}.` : 'Hola. Dime qué quieres registrar.';
-}
-
-export const SUGERENCIA_DECIR = 'Di un gasto, como «tacos 80 en efectivo».';
 
 // ——— Escuchando ———
 
@@ -214,3 +179,199 @@ export const PISTA_CANCELAR_ESCUCHA = 'Deja de escuchar sin registrar nada';
 export const TEXTO_DIMELO_RESPUESTA = 'Dímelo con el micrófono o escríbelo abajo.';
 export const CHIP_ESCRIBIR_RESPUESTA = 'Escribirlo';
 export const PISTA_ESCRIBIR_RESPUESTA = 'Abre el campo de abajo para escribir tu respuesta';
+
+// ——— Dirección B «Plática»: reposo, píldora, registro y «¿Me alcanza?» (`docs/diseno/direccion-b/`) ———
+
+/** «Buenos días» de 5 a 11:59, «Buenas tardes» de 12 a 18:59 y «Buenas noches» el resto. */
+export function saludoPorHora(hora: number): string {
+  if (hora >= 5 && hora < 12) return 'Buenos días';
+  if (hora >= 12 && hora < 19) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+function textoDias(n: number): string {
+  return n === 1 ? '1 día' : `${n} días`;
+}
+
+/** «hasta tu quincena del vie 30, en 4 días.» (B1); `null` si el día no se reparte hasta un ingreso conocido. */
+export function textoHastaIngreso(
+  v: Pick<VistaHoy, 'estadoHorizonte' | 'proximoIngreso' | 'dias'>,
+): string | null {
+  if (v.estadoHorizonte !== 'normal' || !v.proximoIngreso) return null;
+  return `hasta tu ${v.proximoIngreso.concepto} del ${v.proximoIngreso.etiqueta}, en ${textoDias(v.dias)}.`;
+}
+
+/** Libre negativo: «Te faltan $374 para cubrir lo que viene antes del jue 15.» */
+export function textoFaltanteHoy(faltante: string, etiqueta: string | null): string {
+  return `Te faltan ${faltante} para cubrir lo que viene ${etiqueta ? `antes del ${etiqueta}` : 'en los próximos días'}.`;
+}
+
+export const BTN_COMO_LO_CALCULE = 'Cómo lo calculé';
+export const TITULO_PUEDES_DECIRME = 'Puedes decirme';
+export const ETIQUETA_PUEDES_DECIRME = 'Frases que puedes decirme';
+
+/** Lo que se ve en «Puedes decirme» por intención (B1); tocarla escucha con su arranque. */
+export const EJEMPLO_INTENCION: Record<ClaveIntencion, string> = {
+  gaste: 'coca 25 en efectivo',
+  puedo_gastar: '¿me alcanza para unos tenis de 500?',
+  me_pagaron: 'ya me pagaron la quincena',
+  contar_efectivo: 'traigo 300 en efectivo',
+  pagar_tarjeta: 'ya pagué la tarjeta',
+};
+
+export function pistaEjemploIntencion(chip: Pick<ChipIntencion, 'pista'>): string {
+  return chip.pista;
+}
+
+/** La píldora de B2: «Hoy puedes gastar · hasta el vie 30». */
+export function textoPildoraDia(
+  v: Pick<VistaHoy, 'estado' | 'estadoHorizonte' | 'proximoIngreso' | 'faltante'>,
+): string {
+  if (v.estado === 'libre_negativo') return `Hoy te faltan ${formatearCentavos(v.faltante)}`;
+  return v.estadoHorizonte === 'normal' && v.proximoIngreso
+    ? `Hoy puedes gastar · hasta el ${v.proximoIngreso.etiqueta}`
+    : 'Hoy puedes gastar';
+}
+
+/** Lo que oye el lector en la píldora: la frase y la cifra en palabras («… doscientos sesenta y ocho pesos»). */
+export function etiquetaPildoraDia(texto: string, cifraEnPalabras: string): string {
+  return `${etiquetaHablada(texto.replace(' · ', ', '))}: ${cifraEnPalabras}`;
+}
+
+/** Encabezado de la tarjeta de registro (B2): genérico para cualquier movimiento. */
+export function tituloRegistro(corregido: boolean): string {
+  return corregido ? 'Listo, lo corregí.' : 'Listo, lo registré.';
+}
+
+/** Nombre de cada chip de la tarjeta de registro para el lector. */
+export const NOMBRE_CAMBIO_REGISTRO = { categoria: 'Categoría', cuenta: 'Cuenta', dia: 'Cuándo' } as const;
+
+/** «Categoría: Antojos. Cambiar» (como en C2). */
+export function etiquetaChipRegistro(nombre: string, actual: string): string {
+  return `${nombre}: ${actual}. Cambiar`;
+}
+
+/** «Si oí mal, solo dime «eran 30» o «fue con la Nu».» (B2), con otra de tus cuentas si la hay. */
+export function pistaCorregirRegistro(otraCuenta: string | null): string {
+  return otraCuenta
+    ? `Si oí mal, solo dime «eran 30» o «fue con ${otraCuenta}».`
+    : 'Si oí mal, solo dime «eran 30» o «fue ayer».';
+}
+
+/** «Tu día pasa de $275 a $268.» en tres partes para resaltar la cifra nueva; `null` si no tiene esa forma. */
+export function separarCambioDia(texto: string): { antes: string; despues: string; final: string } | null {
+  const m = /^(.* a )(\$[\d,]+(?:\.\d{2})?)(\.)$/.exec(texto);
+  return m && m[1] && m[2] && m[3] ? { antes: m[1], despues: m[2], final: m[3] } : null;
+}
+
+/** «Lo compré» de «¿Me alcanza?» (B3): abre el registro con la compra para guardarla. */
+export const BTN_LO_COMPRE = 'Lo compré';
+export const PISTA_LO_COMPRE = 'Abre el registro con la compra para guardarla';
+export const TITULO_CONTADO_HOY = 'Hoy, de contado';
+export const TEXTO_HOY_NO_CAMBIA = 'Hoy no cambia nada';
+export const TEXTO_AL_DIA = 'al día';
+export const TEXTO_NO_ES_ASESORIA_CORTO = 'Te digo qué pasa con tu dinero; no es asesoría financiera.';
+
+/** «El vie 30, con tu quincena». */
+export function tituloEsperarIngreso(etiqueta: string, concepto: string): string {
+  return `El ${etiqueta}, con tu ${concepto}`;
+}
+
+/** «Te quedan $575 libres». */
+export function textoTeQuedanLibres(libre: string): string {
+  return `Te quedan ${libre} libres`;
+}
+
+export function btnRecuerdamelo(etiqueta: string): string {
+  return `Recuérdamelo el ${etiqueta}`;
+}
+
+export function textoRecordatorioListo(etiqueta: string): string {
+  return `Te lo recuerdo el ${etiqueta}.`;
+}
+
+/** «Nu, internet y tanda». */
+export function unirConY(nombres: readonly string[]): string {
+  if (nombres.length <= 1) return nombres[0] ?? '';
+  return `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}`;
+}
+
+function menos(centavos: number): string {
+  return `−${formatearCentavos(Math.abs(centavos))}`;
+}
+
+interface DatosCalculo {
+  readonly tienes: { readonly monto: number; readonly nombres: readonly string[] };
+  readonly reservado: { readonly monto: number; readonly nombres: readonly string[] };
+  readonly colchon: number;
+  readonly compra?: { readonly que: string | null; readonly precio: number };
+  readonly libre: number;
+  readonly dias: number;
+  readonly alDia: number;
+}
+
+/** Las filas de «Cómo lo calculé» (B3), todas con cifras ya calculadas por `core`. */
+export function filasCalculo(d: DatosCalculo, prefijo = 'desglose'): FilaCalculo[] {
+  const filas: FilaCalculo[] = [
+    {
+      etiqueta: d.tienes.nombres.length > 0 ? `Tienes en ${unirConY(d.tienes.nombres)}` : 'Tienes',
+      valor: formatearCentavos(d.tienes.monto),
+      centavos: d.tienes.monto,
+      testID: `${prefijo}-liquidez`,
+    },
+    {
+      etiqueta: d.reservado.nombres.length > 0 ? `Reservado: ${unirConY(d.reservado.nombres)}` : 'Reservado',
+      valor: menos(d.reservado.monto),
+      centavos: -d.reservado.monto,
+      testID: `${prefijo}-reservado`,
+    },
+    { etiqueta: 'Colchón', valor: menos(d.colchon), centavos: -d.colchon, testID: `${prefijo}-colchon` },
+  ];
+  if (d.compra) {
+    const que = d.compra.que
+      ? `${d.compra.que.charAt(0).toUpperCase()}${d.compra.que.slice(1)}`
+      : 'La compra';
+    filas.push({
+      etiqueta: que,
+      valor: menos(d.compra.precio),
+      centavos: -d.compra.precio,
+      testID: `${prefijo}-compra`,
+    });
+  }
+  filas.push({
+    etiqueta: `Libre ${formatearCentavos(Math.max(0, d.libre))} entre ${textoDias(d.dias)}`,
+    valor: `${formatearCentavos(d.alDia, 'pesos')} ${TEXTO_AL_DIA}`,
+    centavos: d.alDia,
+    fuerte: true,
+    testID: `${prefijo}-libre`,
+  });
+  return filas;
+}
+
+/** «Cómo lo calculé» del día (B1): de `VistaHoy`, sin cálculos nuevos. */
+export function filasCalculoDia(vista: VistaHoy, nombresTienes: readonly string[]): FilaCalculo[] {
+  return filasCalculo({
+    tienes: { monto: vista.liquidez, nombres: nombresTienes },
+    reservado: { monto: vista.reservado, nombres: vista.reservadoDetalle.map((r) => r.concepto) },
+    colchon: vista.colchon,
+    libre: vista.libre,
+    dias: vista.dias,
+    alDia: vista.estado === 'libre_negativo' ? 0 : vista.hoyPuedesCentavos,
+  });
+}
+
+/** «Cómo lo calculé» de una compra (B3): lo del día con la compra restada (E4 de `core`). */
+export function filasCalculoCompra(d: DatosPuedoGastar): FilaCalculo[] {
+  return filasCalculo(
+    {
+      tienes: d.tienes,
+      reservado: d.reservado,
+      colchon: d.colchon,
+      compra: { que: d.que, precio: d.precio },
+      libre: d.libreDespues,
+      dias: d.dias,
+      alDia: d.despues,
+    },
+    'calculo',
+  );
+}

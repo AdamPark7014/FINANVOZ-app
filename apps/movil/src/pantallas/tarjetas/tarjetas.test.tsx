@@ -125,23 +125,26 @@ describe('Hoy', () => {
     if (primera?.tipo !== 'pago_tarjeta' || segunda?.tipo !== 'pago_tarjeta') throw new Error('sin pagos');
     montar(p.ctx, hoy());
     const tarjeta0 = screen.getByTestId('tarjeta-accion-0');
-    expect(within(tarjeta0).getByText(primera.texto)).toBeTruthy();
+    // Dirección B (B1): el asistente lo dice en una sola frase con lo que hay que pagar.
     expect(
-      within(tarjeta0).getByText(`Paga ${formatearCentavos(primera.pngi)} para no generar intereses.`),
+      within(tarjeta0).getByText(
+        `${primera.texto} Para no generar intereses, paga ${formatearCentavos(primera.pngi)}.`,
+      ),
     ).toBeTruthy();
+    const empieza = (texto: string) => new RegExp(`^${texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
 
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-todavia-no'));
-    expect(screen.queryByText(primera.texto)).toBeNull();
+    expect(screen.queryByText(empieza(primera.texto))).toBeNull();
     expect(screen.getByText('Lo sigo apartando. Te pregunto mañana.')).toBeTruthy();
 
     // Ahora la segunda tarjeta queda arriba: "Ya la pagué" pregunta la cuenta y registra el PNGI.
-    expect(within(screen.getByTestId('tarjeta-accion-0')).getByText(segunda.texto)).toBeTruthy();
+    expect(within(screen.getByTestId('tarjeta-accion-0')).getByText(empieza(segunda.texto))).toBeTruthy();
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-ya-la-pague'));
     fireEvent.press(screen.getByTestId(`tarjeta-accion-0-pago-origen-${p.efectivo}`));
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-pago-guardar'));
     const aviso = screen.getByTestId('aviso');
     expect(within(aviso).getByText(/^Registré: pago a tu .+ \$[\d,]+$/)).toBeTruthy();
-    expect(screen.queryByText(segunda.texto)).toBeNull();
+    expect(screen.queryByText(empieza(segunda.texto))).toBeNull();
     expect(listarTarjetas(p.ctx).find((t) => t.id === segunda.tarjetaId)?.pngi).toBe(0);
 
     fireEvent.press(within(aviso).getByText('Deshacer'));

@@ -2,6 +2,7 @@ import { dineroLibre, type Centavos } from '@cartera/core';
 import { interpretarMonto } from '@cartera/nlu';
 import {
   loCompre,
+  nombresLiquidez,
   obtenerHoy,
   type ConsultaMeAlcanza,
   type Contexto,
@@ -11,20 +12,20 @@ import {
 import { tituloConsulta } from '../servicios/me-alcanza';
 import { formatearCentavos, leerPesos } from '../ui/formato';
 import {
-  BTN_REGISTRALO,
+  BTN_LO_COMPRE,
   BTN_VER_OPCIONES,
   btnLoCompreA,
   lineaEscenario,
+  PISTA_LO_COMPRE,
   PREGUNTA_CUANTO_CUESTA,
   TEXTO_CALCULANDO_OPCIONES,
   TEXTO_PUEDO_SIN_INGRESO,
-  textoComparaHoy,
   textoPuedoGastar,
 } from '../pantallas/asistente/textos';
 import { BTN_CONFIGURAR_INGRESO_HOY } from '../pantallas/principal/textos';
 import type { TurnoConversacion } from './conversacion';
 import type { AccionesRegistro } from './registro';
-import type { AccionTurno, Respuesta } from './tipos';
+import type { AccionTurno, DatosPuedoGastar, Respuesta } from './tipos';
 
 /**
  * «¿Puedo gastar en esto?» dentro de la conversación (la función estrella del asistente): «¿puedo gastar 500 en
@@ -92,7 +93,12 @@ export function leerPuedoGastar(texto: string): LecturaPuedoGastar | null {
 export function simularCompraHoy(
   vista: VistaHoy,
   precio: Centavos,
-): { readonly hoyPuedes: Centavos; readonly libre: Centavos; readonly faltante: Centavos } {
+): {
+  readonly hoyPuedes: Centavos;
+  readonly libre: Centavos;
+  readonly faltante: Centavos;
+  readonly dias: number;
+} {
   const r = dineroLibre({
     hoy: vista.hoy,
     fin_horizonte: vista.finEfectivo,
@@ -102,7 +108,7 @@ export function simularCompraHoy(
     tarjetas: [],
     cuotas_msi_no_facturadas: [],
   });
-  return { hoyPuedes: r.hoy_puedes_centavos, libre: r.libre, faltante: r.faltante };
+  return { hoyPuedes: r.hoy_puedes_centavos, libre: r.libre, faltante: r.faltante, dias: r.dias };
 }
 
 type AccionesPuedo = Pick<
@@ -139,8 +145,29 @@ export function turnoPuedoGastar(
       origen: 'probabilidad',
     };
   }
-  const antes = formatearCentavos(vista.estado === 'libre_negativo' ? 0 : vista.hoyPuedesCentavos, 'pesos');
+  const hoyAntes = vista.estado === 'libre_negativo' ? 0 : vista.hoyPuedesCentavos;
+  const antes = formatearCentavos(hoyAntes, 'pesos');
   const despues = simularCompraHoy(vista, consulta.precio);
+  // Lo que pinta la tarjeta de B3: todo de E4 (`core`) con y sin la compra; aquí no se calcula nada nuevo.
+  const puedoGastar: DatosPuedoGastar = {
+    precio: consulta.precio,
+    que: consulta.descripcion ?? null,
+    antes: hoyAntes,
+    despues: despues.hoyPuedes,
+    libreDespues: despues.libre,
+    faltante: despues.faltante,
+    dias: despues.dias,
+    proximo: vista.proximoIngreso
+      ? {
+          concepto: vista.proximoIngreso.concepto,
+          etiqueta: vista.proximoIngreso.etiqueta,
+          fecha: vista.proximoIngreso.fecha,
+        }
+      : null,
+    tienes: { monto: vista.liquidez, nombres: nombresLiquidez(ctx) },
+    reservado: { monto: vista.reservado, nombres: vista.reservadoDetalle.map((r) => r.concepto) },
+    colchon: vista.colchon,
+  };
   const texto = textoPuedoGastar({
     titulo: consulta.descripcion ? titulo : null,
     monto: formatearCentavos(consulta.precio),
@@ -154,7 +181,8 @@ export function turnoPuedoGastar(
   const lineas: string[] = [];
   const acciones: AccionTurno[] = [
     {
-      etiqueta: BTN_REGISTRALO,
+      etiqueta: BTN_LO_COMPRE,
+      pista: PISTA_LO_COMPRE,
       accion: () =>
         o.abrirR2({
           tipo: 'gasto',
@@ -186,8 +214,6 @@ export function turnoPuedoGastar(
         testID: `${id}-meses`,
       });
     }
-  } else {
-    lineas.push(textoComparaHoy(consulta.precio <= vista.hoyPuedesCentavos, antes));
   }
   const abrirDetalle = o.abrirMeAlcanza;
   if (opciones !== undefined && opciones !== 'calculando' && abrirDetalle) {
@@ -205,6 +231,7 @@ export function turnoPuedoGastar(
     ...(lineas.length > 0 ? { detalle: lineas.join('\n') } : {}),
     acciones,
     origen: 'probabilidad',
+    puedoGastar,
   };
 }
 

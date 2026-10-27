@@ -1,4 +1,4 @@
-import type { Centavos } from '@cartera/core';
+import type { Centavos, PlainDate } from '@cartera/core';
 import type { PropuestaEntendi } from '../ui/entendi';
 
 /**
@@ -22,6 +22,8 @@ export interface AccionTurno {
   readonly etiqueta: string;
   readonly accion: () => void | Promise<void>;
   readonly testID?: string;
+  /** Qué pasa al tocarla, para el lector. */
+  readonly pista?: string;
 }
 
 export type OrigenAviso =
@@ -40,6 +42,13 @@ export type Turno =
       readonly cambioDia?: string;
       readonly deshacer?: () => Promise<void> | void;
       readonly abrir?: () => void;
+      /** Un solo movimiento simple: se pinta como la tarjeta de B2 (con sus chips de un toque). */
+      readonly movimiento?: MovimientoRegistrado;
+      readonly cambios?: readonly CambioRegistro[];
+      /** «Si oí mal, solo dime «eran 30» o «fue con la Nu».» (solo bajo el último registro). */
+      readonly pista?: string;
+      /** Viene de corregir: «Listo, lo corregí.». */
+      readonly corregido?: boolean;
     }
   | {
       readonly id: string;
@@ -67,6 +76,8 @@ export type Turno =
       readonly detalle?: string;
       readonly acciones: readonly AccionTurno[];
       readonly origen: OrigenAviso;
+      /** «¿Me alcanza?» contestado: se pinta como la tarjeta de B3. */
+      readonly puedoGastar?: DatosPuedoGastar;
     }
   | {
       readonly id: string;
@@ -102,4 +113,52 @@ export interface PasoFlujo<E> {
   readonly aplicar: (e: E, r: Respuesta) => E | { readonly error: string };
   /** Ya se dijo en la frase inicial: no se pregunta. */
   readonly omitirSi?: (e: E) => boolean;
+}
+
+/** Lo que se ve de un movimiento recién registrado en su tarjeta (tablero B2). Textos ya formateados. */
+export interface MovimientoRegistrado {
+  /** «Coca». */
+  readonly descripcion: string;
+  /** «$25» (gasto) o «+$13,000» (lo que entra). */
+  readonly montoTexto: string;
+  readonly categoria: string | null;
+  /** Para el ícono de la categoría. */
+  readonly categoriaSlug: string | null;
+  readonly cuenta: string | null;
+  /** «hoy», «ayer» o «vie 23». */
+  readonly cuando: string;
+}
+
+/** Un chip de un toque de la tarjeta de registro (de C2): categoría, cuenta o día. */
+export interface CambioRegistro {
+  readonly clave: 'categoria' | 'cuenta' | 'dia';
+  /** Lo que se ve en el chip: «Antojos», «Efectivo», «Hoy». */
+  readonly actual: string;
+  /** El valor de la opción vigente (slug, id de cuenta o fecha). */
+  readonly valor: string;
+  readonly opciones: readonly ChipRespuesta[];
+  /** Corrige el movimiento con la opción elegida (anula y registra, regla 2) y rehace el turno. */
+  readonly elegir: (valor: string) => void | Promise<void>;
+}
+
+/** «¿Me alcanza?» ya calculado para la tarjeta de B3 (cifras de `core`, regla 4). */
+export interface DatosPuedoGastar {
+  readonly precio: Centavos;
+  /** «unos tenis»; `null` si no se dijo en qué. */
+  readonly que: string | null;
+  /** Lo que puedes gastar hoy sin comprarlo. */
+  readonly antes: Centavos;
+  /** Lo que podrías gastar al día si lo compras hoy de contado. */
+  readonly despues: Centavos;
+  readonly libreDespues: Centavos;
+  readonly faltante: Centavos;
+  readonly dias: number;
+  readonly proximo: {
+    readonly concepto: string;
+    readonly etiqueta: string;
+    readonly fecha: PlainDate;
+  } | null;
+  readonly tienes: { readonly monto: Centavos; readonly nombres: readonly string[] };
+  readonly reservado: { readonly monto: Centavos; readonly nombres: readonly string[] };
+  readonly colchon: Centavos;
 }

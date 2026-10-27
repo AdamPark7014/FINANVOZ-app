@@ -14,6 +14,9 @@ import {
   type RutaPestanaVisible,
 } from '../../rutas/pestanas-textos';
 
+/** Ancho relativo de cada segmento (Asistente · Movimientos · Cuentas). */
+const PESO_SEGMENTO = { hoy: 1, movimientos: 1.2, cuentas: 0.9 } as const;
+
 /**
  * Navegación de arriba (dirección B, tablero B1; `02 §2`): el selector Asistente · Movimientos · Cuentas y el
  * círculo de Tú. Es la «barra de pestañas» del grupo `(tabs)` puesta arriba (`tabBarPosition: 'top'`): cambia de
@@ -76,7 +79,9 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
               // El segmento mide 42 dentro del riel de 48: el toque se amplía a 48.
               hitSlop={{ top: 3, bottom: 3, left: 0, right: 0 }}
               style={({ pressed }) => ({
-                ...(grande ? { flexGrow: 1 } : { flex: 1 }),
+                // «Movimientos» en negritas no cabía en un tercio con la letra del sistema (capturas de Maestro del
+                // 26-10): cada segmento crece según lo largo de su etiqueta.
+                ...(grande ? { flexGrow: 1 } : { flexGrow: PESO_SEGMENTO[ruta], flexBasis: 0 }),
                 minHeight: navegacionSuperior.alto - 6,
                 borderRadius: radioSegmento,
                 alignItems: 'center',

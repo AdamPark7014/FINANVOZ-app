@@ -1,9 +1,12 @@
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import type { Turno } from '../../../asistente/tipos';
-import { espacio, IconoMicrofono, radio, Texto, useTema } from '../../../ui';
+import { espacio, Icono, useTema } from '../../../ui';
 import { etiquetaTurnoPersona } from '../textos';
 
-/** Lo que dijiste o escribiste («dijiste», a la derecha); con micrófono si fue por voz. */
+/**
+ * Lo que dijiste o escribiste (dirección B, tablero B2): una burbuja verde pino a la derecha, con el micrófono menta
+ * si fue por voz. Lo que dice el asistente va sin burbuja; esto es lo único que la lleva.
+ */
 export function TurnoPersona({
   turno,
   testID,
@@ -19,29 +22,30 @@ export function TurnoPersona({
       accessibilityLabel={etiquetaTurnoPersona(turno.texto, turno.porVoz)}
       style={{
         alignSelf: 'flex-end',
-        maxWidth: '88%',
+        maxWidth: '82%',
         flexDirection: 'row',
         alignItems: 'center',
         gap: espacio.s,
-        backgroundColor: c.superficieAlterna,
-        borderWidth: 1,
-        borderColor: c.borde,
-        borderTopLeftRadius: radio.xl,
-        borderTopRightRadius: radio.xl,
-        borderBottomLeftRadius: radio.xl,
-        borderBottomRightRadius: radio.s,
-        paddingVertical: espacio.s,
+        backgroundColor: c.dock,
+        borderTopLeftRadius: 22,
+        borderTopRightRadius: 22,
+        borderBottomLeftRadius: 22,
+        borderBottomRightRadius: 6,
+        paddingVertical: espacio.m,
         paddingHorizontal: espacio.l,
       }}
     >
       {turno.porVoz ? (
-        <View style={{ transform: [{ scale: 0.75 }] }} testID={`${testID}-voz`}>
-          <IconoMicrofono color={c.acentoTexto} />
+        <View testID={`${testID}-voz`}>
+          <Icono nombre="microfono" color={c.microfono} tamano={16} grosor={2.2} />
         </View>
       ) : null}
-      <Texto variante="cuerpo" style={{ flexShrink: 1 }} importantForAccessibility="no">
+      <Text
+        importantForAccessibility="no"
+        style={{ flexShrink: 1, fontSize: 17, lineHeight: 23, fontWeight: '500', color: c.sobreDock }}
+      >
         {turno.texto}
-      </Texto>
+      </Text>
     </View>
   );
 }

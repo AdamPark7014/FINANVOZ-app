@@ -119,8 +119,10 @@ export {
 export { contextoNube, type Conectividad, type NivelNube } from './nube';
 export {
   aplicarCorreccion,
+  detalleRegistro,
   historialMovimiento,
   type CambiosResueltos,
+  type DetalleRegistro,
   type CompromisoConfigurado,
   type ResumenTransaccion,
   type VersionAnterior,
@@ -231,6 +233,7 @@ export {
   type RefOcurrencia,
 } from './ocurrencias';
 export {
+  nombresLiquidez,
   obtenerHoy,
   todaviaNoPagoTarjeta,
   type ConceptoReservado,

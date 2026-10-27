@@ -48,15 +48,17 @@ describe('accesibilidad (CA-M7-05)', () => {
 
     const orden = ordenDeLectura(screen.toJSON());
     const i = (t: string | RegExp) => orden.findIndex((x) => (typeof t === 'string' ? x === t : t.test(x)));
-    // Ola 7 (cabecera del asistente): la cifra principal va primero, después la fecha y los días; la barra del día
-    // (que abre y cierra el desglose) se lee entera, con sus tres partes en palabras.
-    expect(i('Hoy puedes gastar doscientos catorce pesos')).toBe(0);
-    expect(i('Dom 11 oct')).toBeGreaterThan(i('Hoy puedes gastar doscientos catorce pesos'));
-    expect(i('4 días para tu quincena (jue 15)')).toBeGreaterThan(i('Dom 11 oct'));
-    const barra = i(/^Reservado .*, libre ochocientos cincuenta y seis pesos$/);
-    expect(barra).toBeGreaterThan(i('4 días para tu quincena (jue 15)'));
-    expect(i('Libre: ochocientos cincuenta y seis pesos')).toBeGreaterThan(barra);
-    expect(i('Toca para hablar')).toBeGreaterThan(i('Libre: ochocientos cincuenta y seis pesos'));
+    // Dirección B (reposo, B1): el saludo y enseguida la cifra principal en palabras (la etiqueta visible «Hoy puedes
+    // gastar» no se lee aparte), hasta cuándo, «Cómo lo calculé» y sus filas, y al final el dock de voz.
+    const cifra = i('Hoy puedes gastar doscientos catorce pesos');
+    expect(cifra).toBe(1);
+    expect(orden.filter((x) => x === 'Hoy puedes gastar')).toHaveLength(0);
+    expect(i('hasta tu quincena del jue 15, en 4 días.')).toBeGreaterThan(cifra);
+    const comoLoCalcule = i('Cómo lo calculé');
+    expect(comoLoCalcule).toBeGreaterThan(i('hasta tu quincena del jue 15, en 4 días.'));
+    const libre = i('Libre ochocientos cincuenta y seis pesos entre 4 días: doscientos catorce pesos al día');
+    expect(libre).toBeGreaterThan(comoLoCalcule);
+    expect(i('Toca para hablar')).toBeGreaterThan(libre);
     // Cada fila del desglose es un solo elemento: concepto y monto juntos, sin repetir.
     expect(orden.filter((x) => x.startsWith('Colchón'))).toHaveLength(1);
     p.cerrar();

@@ -250,6 +250,8 @@ export const tipo = {
   cifraGrande: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const, letterSpacing: -0.3 },
   titulo: { fontSize: 24, lineHeight: 34, fontWeight: '700' as const, letterSpacing: -0.2 },
   subtitulo: { fontSize: 18, lineHeight: 28, fontWeight: '600' as const },
+  /** Lo que dice el asistente (dirección B): texto grande, sin burbuja. */
+  voz: { fontSize: 20, lineHeight: 28, fontWeight: '500' as const },
   cuerpo: { fontSize: 16, lineHeight: 26, fontWeight: '400' as const },
   cuerpoFuerte: { fontSize: 16, lineHeight: 26, fontWeight: '600' as const },
   secundario: { fontSize: 14, lineHeight: 22, fontWeight: '400' as const },

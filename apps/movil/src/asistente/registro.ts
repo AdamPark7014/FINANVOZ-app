@@ -1,8 +1,10 @@
 import { sumarDias, type Centavos, type PlainDate } from '@cartera/core';
 import type { TipoReparacion } from '@cartera/nlu';
 import {
+  aplicarCorreccion,
   AVISO_DEDUCIBLE_EFECTIVO,
   confirmarAjuste,
+  detalleRegistro,
   confirmarRegistro,
   etiquetaDiaMes,
   etiquetaFecha,
@@ -20,6 +22,7 @@ import {
   type RespuestaExplicar,
   type ResultadoTexto,
   type ResumenMovimiento,
+  type CambiosResueltos,
 } from '../servicios';
 import { PIE_EXPLICAR } from '../servicios/explicar';
 import { contextoInterprete } from '../servicios/registrar';
@@ -50,6 +53,7 @@ import {
   mensajePasarAMeses,
   mensajeSaldoDicho,
   NOMBRE_TIPO,
+  nombreTipoLibro,
   preguntaCuentaConfirmacionRegistro,
   resumenMovimiento,
   TEXTO_INGRESO_ANTES,
@@ -72,6 +76,7 @@ import {
   FILA_CUENTA,
   FILA_QUE,
   MOTIVO_ELIGE_CUENTA,
+  pistaCorregirRegistro,
   pistaDecirSi,
   TEXTO_DESHICE,
   TEXTO_EXPLICANDO,
@@ -91,7 +96,7 @@ import { chipQueNombra, idTurnoRegistro, type TurnoConversacion } from './conver
 import { FLUJOS, responderPaso, siguientePregunta, type FlujoConversacional } from './flujos';
 import { turnosPuedoGastar } from './puedo-gastar';
 import { sugerirReparacion } from './reparacion';
-import type { ChipRespuesta, IdFlujo, Respuesta, Turno } from './tipos';
+import type { CambioRegistro, ChipRespuesta, IdFlujo, Respuesta, Turno } from './tipos';
 
 /**
  * De `ResultadoTexto` a turnos del asistente (Ola 7 §3, §4): registrado → «Registré… · Deshacer»; confirmar* →
@@ -187,6 +192,8 @@ export function turnoRegistro(
     readonly deshacer?: string | null;
     readonly transaccionId?: string;
     readonly cambioDia?: string | null;
+    /** Lo de la tarjeta de B2 (`tarjetaRegistro`): movimiento, chips y pista. */
+    readonly tarjeta?: DatosTarjetaRegistro;
   },
 ): Extract<Turno, { clase: 'registro' }> {
   const cambio = datos.cambioDia === undefined ? o.cambioDia() : datos.cambioDia;
@@ -201,6 +208,7 @@ export function turnoRegistro(
     ...(datos.detalle ? { detalle: datos.detalle } : {}),
     ...(cambio ? { cambioDia: cambio } : {}),
     ...(ver && transaccion ? { abrir: () => ver(transaccion) } : {}),
+    ...(datos.tarjeta ?? {}),
   };
   if (!token) return base;
   return {
@@ -209,6 +217,96 @@ export function turnoRegistro(
       o.deshacer(token);
       o.reemplazar({ id: datos.id, de: 'asistente', clase: 'registro', texto: TEXTO_DESHICE });
     },
+  };
+}
+
+type TurnoRegistroB = Extract<Turno, { clase: 'registro' }>;
+type DatosTarjetaRegistro = Partial<Pick<TurnoRegistroB, 'movimiento' | 'cambios' | 'pista' | 'corregido'>>;
+
+/** «Hoy», «Ayer», «Antier» o «Vie 23». */
+function etiquetaDia(fecha: PlainDate, hoy: PlainDate): string {
+  if (fecha === hoy) return 'Hoy';
+  if (fecha === sumarDias(hoy, -1)) return 'Ayer';
+  if (fecha === sumarDias(hoy, -2)) return 'Antier';
+  return capitalizar(etiquetaFecha(fecha));
+}
+
+/**
+ * La tarjeta de un registro (tablero B2 con los chips de C2): qué y cuánto, categoría · cuenta · día y, para cada
+ * uno, sus opciones; elegir otra corrige el movimiento (`aplicarCorreccion`: anula y registra, regla 2) y el turno
+ * se rehace como «Listo, lo corregí.». Vacío si el movimiento no es simple (varios asientos) o no se pudo leer: ese
+ * turno se queda con su frase.
+ */
+export function tarjetaRegistro(
+  ctx: Contexto,
+  transaccionId: string,
+  o: Pick<AccionesRegistro, 'mostrar'>,
+  idTurno: string,
+  corregido = false,
+): DatosTarjetaRegistro {
+  let leido: ReturnType<typeof detalleRegistro>;
+  try {
+    leido = detalleRegistro(ctx, transaccionId);
+  } catch {
+    return {};
+  }
+  if (!leido) return {};
+  const d = leido;
+  const hoy = ctx.reloj.hoy();
+  const corregir = (cambios: CambiosResueltos) => {
+    const r = aplicarCorreccion(ctx, transaccionId, cambios, { origen: 'manual' });
+    o.mostrar({ resultado: 'corregido', ...r }, idTurno);
+  };
+  const cuentas = cuentasDe(ctx);
+  const cambios: CambioRegistro[] = [];
+  const categoria = d.categoria;
+  if (d.corregible.categoria && categoria) {
+    cambios.push({
+      clave: 'categoria',
+      actual: categoria.nombre,
+      valor: categoria.slug,
+      opciones: listarCategorias(ctx, categoria.naturaleza).map((c) => ({
+        valor: c.slug,
+        etiqueta: c.nombre,
+      })),
+      elegir: (slug) => corregir({ categoria: slug }),
+    });
+  }
+  if (d.corregible.cuenta && cuentas.length > 0) {
+    cambios.push({
+      clave: 'cuenta',
+      actual: d.cuenta?.nombre ?? 'Por asignar',
+      valor: d.cuenta?.id ?? '',
+      opciones: cuentas.map((c) => ({ valor: c.id, etiqueta: c.nombre })),
+      elegir: (id) => corregir({ origenId: id }),
+    });
+  }
+  if (d.corregible.fecha) {
+    const dias: PlainDate[] = [hoy, sumarDias(hoy, -1), sumarDias(hoy, -2)];
+    if (!dias.includes(d.fecha)) dias.push(d.fecha);
+    cambios.push({
+      clave: 'dia',
+      actual: etiquetaDia(d.fecha, hoy),
+      valor: d.fecha,
+      opciones: dias.map((fecha) => ({ valor: fecha, etiqueta: etiquetaDia(fecha, hoy) })),
+      elegir: (fecha) => corregir({ fecha: fecha as PlainDate }),
+    });
+  }
+  const otra =
+    cuentas.find((c) => c.id !== d.cuenta?.id && c.clase === 'tarjeta') ??
+    cuentas.find((c) => c.id !== d.cuenta?.id);
+  return {
+    movimiento: {
+      descripcion: capitalizar(d.descripcion ?? nombreTipoLibro(d.tipo).toLowerCase()),
+      montoTexto: `${d.sentido === 'entrada' ? '+' : ''}${formatearCentavos(d.monto)}`,
+      categoria: categoria?.nombre ?? null,
+      categoriaSlug: categoria?.slug ?? null,
+      cuenta: d.cuenta?.nombre ?? 'por asignar',
+      cuando: etiquetaDia(d.fecha, hoy).toLowerCase(),
+    },
+    cambios,
+    pista: pistaCorregirRegistro(otra?.nombre ?? null),
+    ...(corregido ? { corregido: true } : {}),
   };
 }
 
@@ -900,12 +998,15 @@ export function turnosDesdeResultado(
   switch (r.resultado) {
     case 'registrado': {
       const ids = r.movimientos.map((m) => m.transaccionId);
+      const id = idTurnoRegistro(ids);
+      const unico = ids.length === 1 ? ids[0] : undefined;
       const turnos: TurnoConversacion[] = [
         reg({
-          id: idTurnoRegistro(ids),
+          id,
           texto: textoRegistrado(r.movimientos),
           deshacer: r.deshacer,
           ...(ids[0] ? { transaccionId: ids[0] } : {}),
+          ...(unico ? { tarjeta: tarjetaRegistro(ctx, unico, o, id) } : {}),
         }),
       ];
       if (r.movimientos.some((m) => m.avisoDeducible)) {
@@ -913,15 +1014,18 @@ export function turnosDesdeResultado(
       }
       return turnos;
     }
-    case 'corregido':
+    case 'corregido': {
+      const id = idTurnoRegistro([r.despues.transaccionId]);
       return [
         reg({
-          id: idTurnoRegistro([r.despues.transaccionId]),
+          id,
           texto: conPunto(mensajeCorregido(r.antes, r.despues)),
           deshacer: r.deshacer,
           transaccionId: r.despues.transaccionId,
+          tarjeta: tarjetaRegistro(ctx, r.despues.transaccionId, o, id, true),
         }),
       ];
+    }
     case 'anulado':
       return [
         reg({

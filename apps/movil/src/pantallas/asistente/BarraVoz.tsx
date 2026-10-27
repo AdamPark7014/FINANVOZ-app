@@ -1,5 +1,5 @@
-import { ScrollView, View } from 'react-native';
-import { Boton, CampoTexto, Chip, espacio, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
+import { View } from 'react-native';
+import { Boton, CampoTexto, espacio, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
 import {
   IndicadorVoz,
   abrirAjustesDictado,
@@ -22,7 +22,6 @@ import {
   BTN_FORMULARIO,
   ETIQUETA_CAMPO_REGISTRAR,
   ETIQUETA_CERRAR_TECLADO,
-  ETIQUETA_CHIPS_INTENCION,
   ETIQUETA_TECLADO,
   PISTA_FORMULARIO,
   PISTA_TECLADO,
@@ -32,8 +31,9 @@ import {
 import type { Asistente } from './useAsistente';
 
 /**
- * Pie del asistente (dirección B): encima, lo que se va oyendo y el estado («Un segundo…»), el campo para escribir y
- * los chips de intención; abajo, el dock de voz verde pino con «Escribir», el micrófono y «¿Me alcanza?».
+ * Pie del asistente (dirección B): encima, lo que se va oyendo y el estado («Un segundo…») y el campo para escribir;
+ * abajo, el dock de voz verde pino con «Escribir», el micrófono y «¿Me alcanza?». Los atajos de intención viven en
+ * «Puedes decirme» del reposo.
  */
 export function BarraVoz({ a }: { a: Asistente }) {
   const { c, esquema } = useTema();
@@ -180,28 +180,6 @@ export function BarraVoz({ a }: { a: Asistente }) {
             />
           </View>
         </View>
-      ) : null}
-
-      {a.chips.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          accessibilityLabel={ETIQUETA_CHIPS_INTENCION}
-          contentContainerStyle={{ gap: espacio.s, paddingVertical: espacio.xs }}
-          testID="chips-intencion"
-        >
-          {a.chips.map((chip) => (
-            <Chip
-              key={chip.clave}
-              etiqueta={chip.etiqueta}
-              seleccionado={false}
-              pista={chip.pista}
-              alPresionar={() => a.tocarChip(chip)}
-              testID={`chip-intencion-${chip.clave}`}
-            />
-          ))}
-        </ScrollView>
       ) : null}
 
       {/* Mientras el asistente habla, la onda sobre el dock (tocar cualquier cosa lo calla). */}

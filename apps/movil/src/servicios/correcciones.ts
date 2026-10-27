@@ -90,6 +90,7 @@ interface Leida {
     naturaleza: string;
     subtipo: string;
     nombre: string;
+    categoriaSlug: string | null;
   }[];
 }
 
@@ -103,6 +104,7 @@ function leer(ctx: Contexto, id: string): Leida {
       naturaleza: cuenta.naturaleza,
       subtipo: cuenta.subtipo,
       nombre: cuenta.nombre,
+      categoriaSlug: cuenta.categoriaSlug,
     })
     .from(asiento)
     .innerJoin(cuenta, eq(cuenta.id, asiento.cuentaId))
@@ -462,4 +464,59 @@ export function deshacerCompromiso(ctx: Contexto, programadoId: string): void {
       .where(and(eq(ocurrencia.programadoId, programadoId), eq(ocurrencia.estado, 'pendiente')))
       .run();
   });
+}
+
+// ——— Tarjeta de registro (dirección B, chips de un toque) ———
+
+/** Lo que muestra la tarjeta de un movimiento recién registrado y qué se le puede cambiar de un toque. */
+export interface DetalleRegistro {
+  readonly transaccionId: string;
+  readonly tipo: string;
+  readonly fecha: PlainDate;
+  readonly descripcion: string | null;
+  readonly monto: Centavos;
+  readonly sentido: 'salida' | 'entrada';
+  readonly categoria: {
+    readonly slug: string;
+    readonly nombre: string;
+    readonly naturaleza: 'gasto' | 'ingreso';
+  } | null;
+  /** La cuenta propia del movimiento (de donde salió o a donde llegó); `null` si quedó por asignar. */
+  readonly cuenta: { readonly id: string; readonly nombre: string } | null;
+  /** Qué acepta `aplicarCorreccion` sin error de forma: categoría, cuenta de salida y fecha. */
+  readonly corregible: { readonly categoria: boolean; readonly cuenta: boolean; readonly fecha: boolean };
+}
+
+/**
+ * Detalle de un movimiento simple (dos asientos: una categoría y una cuenta) para su tarjeta y sus chips. `null` si
+ * no es de esa forma (varios asientos, transferencias, préstamos): esos se muestran con su frase.
+ */
+export function detalleRegistro(ctx: Contexto, transaccionId: string): DetalleRegistro | null {
+  const { fila, asientos } = leer(ctx, transaccionId);
+  if (asientos.length !== 2) return null;
+  const categoria = asientos.find((a) => esCategoria(a.naturaleza));
+  if (!categoria) return null;
+  const propia = asientos.find((a) => a !== categoria);
+  if (!propia) return null;
+  const naturaleza = categoria.naturaleza as 'gasto' | 'ingreso';
+  const porAsignar = PUENTES.has(propia.cuentaId);
+  const msi = fila.tipo === 'compra_msi';
+  return {
+    transaccionId,
+    tipo: fila.tipo,
+    fecha: fila.fecha,
+    descripcion: fila.descripcion,
+    monto: Math.abs(categoria.monto),
+    sentido: naturaleza === 'gasto' ? 'salida' : 'entrada',
+    categoria: categoria.categoriaSlug
+      ? { slug: categoria.categoriaSlug, nombre: categoria.nombre, naturaleza }
+      : null,
+    cuenta: porAsignar ? null : { id: propia.cuentaId, nombre: propia.nombre },
+    corregible: {
+      categoria: categoria.categoriaSlug !== null,
+      // `aplicarCorreccion` cambia la cuenta de la que salió el dinero; una compra a meses no cambia de tarjeta.
+      cuenta: !msi && propia.monto < 0,
+      fecha: !msi,
+    },
+  };
 }

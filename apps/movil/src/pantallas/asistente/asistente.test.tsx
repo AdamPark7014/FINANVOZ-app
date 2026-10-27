@@ -10,6 +10,8 @@ import {
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaAsistente } from './PantallaAsistente';
 import { avisarGuardadoR2, reiniciarR2 } from './r2';
+import { saludoPorHora } from './textos';
+import { etiquetaHablada } from '../../ui';
 import type { NavegacionAsistente } from './useAsistente';
 
 // La voz del teléfono termina al instante: la confirmación por voz abre el micrófono al terminar de hablar.
@@ -64,19 +66,30 @@ async function hablar(
 beforeEach(() => reiniciarR2());
 
 describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
-  it('recién instalada: cabecera compacta con la barra del día, el estado vacío y el micrófono en el dock', () => {
+  it('en reposo (B1): saludo, «Hoy puedes gastar», hasta cuándo, «Cómo lo calculé», «Puedes decirme» y el dock', () => {
     const { p } = montar();
     expect(screen.getByTestId('pantalla-hoy')).toBeTruthy();
+    expect(screen.getByTestId('reposo')).toBeTruthy();
+    expect(screen.getByTestId('hoy-fecha')).toHaveTextContent(
+      saludoPorHora(new Date(p.ctx.reloj.ahora()).getHours()),
+    );
+    expect(screen.getByTestId('hoy-puedes-etiqueta')).toHaveTextContent('Hoy puedes gastar');
     expect(screen.getByTestId('hoy-puedes')).toHaveTextContent('$214');
-    expect(screen.getByTestId('hoy-fecha')).toHaveTextContent('Dom 11 oct');
-    expect(screen.getByTestId('hoy-secundario')).toHaveTextContent('4 días para tu quincena (jue 15)');
-    expect(screen.getByTestId('leyenda-libre')).toHaveTextContent('Libre $856');
-    expect(screen.getByTestId('leyenda-reservado')).toHaveTextContent('Reservado $3,174');
-    expect(screen.getByTestId('leyenda-colchon')).toHaveTextContent('Colchón $200');
+    expect(screen.getByTestId('hoy-secundario')).toHaveTextContent(
+      'hasta tu quincena del jue 15, en 4 días.',
+    );
+    expect(screen.getByTestId('boton-desglose')).toHaveTextContent('Cómo lo calculé');
+    // «Puedes decirme»: tres frases que también se tocan (los atajos de intención de antes).
+    const ejemplos = within(screen.getByTestId('puedes-decirme')).getAllByTestId(/^chip-intencion-/);
+    expect(ejemplos.map((e) => e.props.testID)).toEqual([
+      'chip-intencion-gaste',
+      'chip-intencion-puedo_gastar',
+      'chip-intencion-me_pagaron',
+    ]);
+    expect(screen.getByText('«coca 25 en efectivo»')).toBeTruthy();
     // El micrófono vive en el dock de voz (dirección B) y es el único (Maestro toca `boton-hablar`).
     expect(within(screen.getByTestId('dock-voz')).getByTestId('boton-hablar')).toBeTruthy();
     expect(screen.getAllByTestId('boton-hablar')).toHaveLength(1);
-    expect(screen.getByTestId('estado-vacio-saludo')).toHaveTextContent('Hola. Hoy puedes gastar $214.');
     p.cerrar();
   });
 
@@ -110,11 +123,19 @@ describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
   it('«coca 25 en efectivo» por texto: «Registré…», «Tu día pasa de $214 a $207.» y Deshacer que lo revierte', async () => {
     const { p } = montar();
     await escribir('coca 25 en efectivo');
+    // B2: «Listo, lo registré.» y la tarjeta (qué, cuánto, categoría · cuenta · día); el lector oye la frase entera.
+    expect(screen.getByText('Listo, lo registré.')).toBeTruthy();
     const aviso = screen.getByTestId('aviso');
-    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent(
-      'Registré Coca $25 · Antojos · Cartera.',
+    expect(within(aviso).getByTestId('aviso-texto')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada('Registré Coca $25 · Antojos · Cartera.'),
     );
+    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent('CocaAntojos · Cartera · hoy$25');
+    expect(within(aviso).getByTestId('aviso-chip-categoria')).toHaveTextContent('Antojos');
+    expect(within(aviso).getByTestId('aviso-chip-cuenta')).toHaveTextContent('Cartera');
+    expect(within(aviso).getByTestId('aviso-chip-dia')).toHaveTextContent('Hoy');
     expect(within(aviso).getByTestId('aviso-cambio')).toHaveTextContent('Tu día pasa de $214 a $207.');
+    // La píldora de arriba ya dice la cifra nueva.
     expect(screen.getByTestId('hoy-puedes')).toHaveTextContent('$207');
     // Lo que dijiste queda como turno de la persona.
     expect(screen.getByText('coca 25 en efectivo')).toBeTruthy();
@@ -162,7 +183,9 @@ describe('Asistente · «Entendí» y R2 (criterio 2)', () => {
       fireEvent.press(screen.getByTestId('entendi-confirmar'));
     });
     expect(screen.queryByTestId('entendi')).toBeNull();
-    expect(screen.getByTestId('aviso-texto')).toHaveTextContent(/^Registré Luz \$6,000/);
+    expect(screen.getByTestId('aviso-texto').props.accessibilityLabel).toMatch(
+      new RegExp(`^${etiquetaHablada('Registré Luz $6,000')}`),
+    );
     expect(movimientos(p.ctx)).toHaveLength(1);
     p.cerrar();
   });
@@ -295,9 +318,15 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
     const turno = screen.getAllByTestId(/^turno-puedo-gastar-\d+$/)[0];
     expect(turno).toBeDefined();
     expect(within(turno as never).getByTestId(/-texto$/)).toHaveTextContent(
-      'Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta tu quincena (jue 15).',
+      'Te alcanza. Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta el jue 15.',
     );
-    expect(screen.getByText('Cabe en lo que puedes gastar hoy ($214).')).toBeTruthy();
+    // B3: las dos opciones (hoy de contado o con tu quincena) y «Cómo lo calculé» con la compra restada.
+    expect(within(turno as never).getByTestId(/-opcion-contado$/)).toHaveTextContent(/\$189/);
+    expect(within(turno as never).getByTestId(/-opcion-esperar$/)).toHaveTextContent(
+      /El jue 15, con tu quincena/,
+    );
+    expect(within(turno as never).getByTestId(/-opcion-esperar$/)).toHaveTextContent(/\$214/);
+    expect(within(turno as never).getByTestId('calculo-compra')).toHaveTextContent('Unos tenis−$100');
     await act(async () => {
       fireEvent.press(within(turno as never).getByTestId(/-registrar$/));
     });
@@ -311,7 +340,9 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
     const { p } = montar();
     await escribir('¿me alcanza para una tele de 12,000?');
     expect(
-      screen.getByText(/^Si compras una tele de \$12,000 hoy, te faltarían \$11,144 para cubrir/),
+      screen.getByText(
+        /^No te alcanza\. Si compras una tele de \$12,000 hoy, te faltarían \$11,144 para cubrir/,
+      ),
     ).toBeTruthy();
     expect(screen.queryByText(/deberías|te recomiendo|mejor/i)).toBeNull();
     p.cerrar();
@@ -322,14 +353,13 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
     await escribir('¿puedo comprarme unos tenis?');
     expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿Cuánto cuesta?');
     await escribir('500');
-    expect(screen.getByText(/^Si compras unos tenis de \$500 hoy/)).toBeTruthy();
+    expect(screen.getByText(/^Te alcanza\. Si compras unos tenis de \$500 hoy/)).toBeTruthy();
     p.cerrar();
   });
 
-  it('«¿Puedo gastar…?» es el primer chip; con el teclado abierto escribe el arranque', () => {
+  it('«Puedes decirme» trae «¿me alcanza…?»; con el teclado abierto escribe el arranque', () => {
     const { p } = montar();
-    const chips = within(screen.getByTestId('chips-intencion')).getAllByTestId(/^chip-intencion-/);
-    expect(chips[0]).toHaveProp('testID', 'chip-intencion-puedo_gastar');
+    expect(screen.getByText('«¿me alcanza para unos tenis de 500?»')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.press(screen.getByTestId('chip-intencion-puedo_gastar'));
     expect(screen.getByTestId('campo-registrar').props.value).toBe('puedo gastar ');
@@ -356,16 +386,17 @@ describe('Asistente · voz', () => {
 });
 
 describe('Asistente · desglose y Plus', () => {
-  it('la barra del día abre y cierra el desglose; ahí viven la probabilidad o su candado y «¿Me alcanza?»', () => {
+  it('«Cómo lo calculé» abre y cierra el desglose; ahí viven la probabilidad o su candado y «¿Me alcanza?»', () => {
     const p = conEscenario('e4-01');
     activarPlus(p.ctx);
     montar(p);
     const barra = screen.getByTestId('boton-desglose');
     expect(barra).toHaveProp('accessibilityState', { expanded: false });
-    expect(barra.props.accessibilityLabel).toMatch(/^Reservado/);
+    expect(barra.props.accessibilityLabel).toBe('Cómo lo calculé');
     fireEvent.press(barra);
     expect(screen.getByTestId('desglose')).toBeTruthy();
-    expect(screen.getByTestId('desglose-libre')).toHaveTextContent('$856');
+    expect(screen.getByTestId('desglose-libre')).toHaveTextContent('Libre $856 entre 4 días$214 al día');
+    expect(screen.getByTestId('desglose-colchon')).toHaveTextContent('Colchón−$200');
     expect(screen.getByTestId('boton-me-alcanza')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.queryByTestId('desglose')).toBeNull();

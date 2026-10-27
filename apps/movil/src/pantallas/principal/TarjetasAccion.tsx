@@ -19,7 +19,8 @@ import { TarjetaArqueo, TarjetaCapturaInactiva, TarjetaReactivarCaptura } from '
 import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, etiquetaHablada, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import { BotonPildora } from '../../ui/componentes/BotonPildora';
 import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
 import { codigoError, mensajeError, RESPUESTAS_OCURRENCIA } from './textos';
@@ -277,41 +278,50 @@ function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
     }
   };
   if (pregunta) return <PreguntaLiquidarMeses pregunta={pregunta} testID={`${testID}-liquidar`} />;
+  // Dirección B (tablero B1): el asistente lo dice en texto grande, sin tarjeta, con sus respuestas de un toque.
+  const pngi = formatearCentavos(t.pngi);
+  const frase = `${t.texto} Para no generar intereses, paga ${pngi}.`;
   return (
-    <Tarjeta testID={testID}>
-      <Texto variante="cuerpoFuerte">{t.texto}</Texto>
-      <Texto variante="secundario" tono="secundario">
-        {`Paga ${formatearCentavos(t.pngi)} para no generar intereses.`}
+    <View testID={testID} style={{ gap: espacio.m }}>
+      <Texto variante="voz" accessibilityLabel={etiquetaHablada(frase)}>
+        {`${t.texto} Para no generar intereses, paga `}
+        <Texto variante="voz" style={{ fontWeight: '800' }}>
+          {pngi}
+        </Texto>
+        .
       </Texto>
       {pagando ? (
-        <FormularioPago
-          testID={`${testID}-pago`}
-          tarjetaId={t.tarjetaId}
-          nombre={t.nombre}
-          montoSugerido={t.pngi}
-          alTerminar={(r) => {
-            setPagando(false);
-            setPregunta(r.preguntaLiquidar);
-          }}
-          alCancelar={() => setPagando(false)}
-        />
+        <Tarjeta>
+          <FormularioPago
+            testID={`${testID}-pago`}
+            tarjetaId={t.tarjetaId}
+            nombre={t.nombre}
+            montoSugerido={t.pngi}
+            alTerminar={(r) => {
+              setPagando(false);
+              setPregunta(r.preguntaLiquidar);
+            }}
+            alCancelar={() => setPagando(false)}
+          />
+        </Tarjeta>
       ) : (
-        <View style={{ gap: espacio.s }}>
-          <Boton
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+          <BotonPildora
             etiqueta="Ya la pagué"
+            pista="Te pregunto de qué cuenta salió el pago"
             alPresionar={() => setPagando(true)}
             testID={`${testID}-ya-la-pague`}
           />
-          <Boton
+          <BotonPildora
             etiqueta="Todavía no"
-            variante="secundario"
+            pista="Lo sigo apartando y te pregunto mañana"
             testID={`${testID}-todavia-no`}
             alPresionar={posponer}
           />
         </View>
       )}
       <ErrorTarjeta mensaje={error} />
-    </Tarjeta>
+    </View>
   );
 }
 

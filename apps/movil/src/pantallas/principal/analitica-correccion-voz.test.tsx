@@ -8,7 +8,13 @@ import { aplicarEleccion, listarMovimientos, registrarMovimiento, type Contexto 
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
 import { ProveedorAnalitica } from '../../sesion/ProveedorAnalitica';
 import { conEscenario } from './__pruebas__/base';
-import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
+import {
+  crearMotorFalso,
+  fraseRegistro,
+  navegacionFalsa,
+  oidaDesde,
+  renderConSesion,
+} from './__pruebas__/arnes';
 import { EnlaceAnaliticaCorreccion } from './ConfirmacionRegistro';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaRegistrar } from './PantallaRegistrar';
@@ -107,11 +113,9 @@ describe('analítica de corrección por voz (03 §8, pendiente 30)', () => {
 
     await escribir(TACOS_Y_COCA);
     await escribir(TACOS_EN_EFECTIVO);
-    expect(
-      within(within(screen.getByTestId('pantalla-hoy')).getByTestId('aviso')).getByText(
-        /^Corregí: Tacos \$80/,
-      ),
-    ).toBeTruthy();
+    // Dirección B: la corrección es la tarjeta «Listo, lo corregí.»; el lector oye la frase entera.
+    expect(within(screen.getByTestId('pantalla-hoy')).getByText('Listo, lo corregí.')).toBeTruthy();
+    expect(fraseRegistro()).toMatch(oidaDesde('Corregí: Tacos $80'));
     expect(propios(enviados).filter(([nombre]) => nombre === 'correccion')).toEqual([
       ['correccion', { campo: 'cuenta' }],
     ]);

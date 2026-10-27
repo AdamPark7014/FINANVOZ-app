@@ -10,7 +10,29 @@ const PROXIMO = { concepto: 'quincena', etiqueta: 'jue 15' };
 /** Todas las frases que puede decir el asistente con valores de ejemplo. */
 const FRASES: readonly string[] = [
   ...(Object.values(T) as unknown[]).filter((v): v is string => typeof v === 'string'),
-  T.etiquetaBarraDia(317_400, 20_000, 85_600),
+  T.etiquetaPildoraDia('Hoy puedes gastar · hasta el jue 15', 'doscientos catorce pesos'),
+  T.textoPildoraDia({
+    estado: 'normal',
+    estadoHorizonte: 'normal',
+    proximoIngreso: { concepto: 'quincena', etiqueta: 'jue 15', fecha: '2026-10-15' },
+    faltante: 0,
+  }),
+  T.textoHastaIngreso({
+    estadoHorizonte: 'normal',
+    proximoIngreso: { concepto: 'quincena', etiqueta: 'jue 15', fecha: '2026-10-15' },
+    dias: 4,
+  }) ?? '',
+  T.textoFaltanteHoy('$374', 'jue 15'),
+  T.saludoPorHora(8),
+  T.tituloRegistro(false),
+  T.tituloRegistro(true),
+  T.etiquetaChipRegistro('Categoría', 'Antojos'),
+  T.pistaCorregirRegistro('la Nu'),
+  T.pistaCorregirRegistro(null),
+  T.tituloEsperarIngreso('vie 30', 'quincena'),
+  T.textoTeQuedanLibres('$575'),
+  T.btnRecuerdamelo('vie 30'),
+  T.textoRecordatorioListo('vie 30'),
   T.valorCuando('Dom 11 oct', 'hoy'),
   T.valorCuando('Sáb 10 oct', 'ayer'),
   T.pistaDecirSi('Nu ••4410'),
@@ -21,8 +43,6 @@ const FRASES: readonly string[] = [
   T.textoEstoOiR2('pagué la luz 450 con la BBVA'),
   T.btnLoCompreA('A 3 MSI con la Oro'),
   T.lineaEscenario('Hoy, de contado', '87 %'),
-  T.textoComparaHoy(true, '$214'),
-  T.textoComparaHoy(false, '$214'),
   T.textoPuedoGastar({
     titulo: 'Unos tenis de $500',
     monto: '$500',
@@ -39,8 +59,6 @@ const FRASES: readonly string[] = [
     faltante: '$11,144',
     proximo: null,
   }),
-  T.saludoDelDia('$214'),
-  T.saludoDelDia(null),
 ];
 
 describe('asistente/textos · redacción (Ola 7 §1.4)', () => {
@@ -72,7 +90,7 @@ describe('asistente/textos · redacción (Ola 7 §1.4)', () => {
         faltante: null,
         proximo: PROXIMO,
       }),
-    ).toBe('Si compras unos tenis de $500 hoy, tu día pasa de $214 a $89 hasta tu quincena (jue 15).');
+    ).toBe('Te alcanza. Si compras unos tenis de $500 hoy, tu día pasa de $214 a $89 hasta el jue 15.');
     expect(
       T.textoPuedoGastar({
         titulo: null,
@@ -82,7 +100,7 @@ describe('asistente/textos · redacción (Ola 7 §1.4)', () => {
         faltante: null,
         proximo: null,
       }),
-    ).toBe('Si gastas $80 hoy, tu día sigue en $214.');
+    ).toBe('Te alcanza. Si gastas $80 hoy, tu día sigue en $214.');
     expect(
       T.textoPuedoGastar({
         titulo: null,
@@ -93,13 +111,13 @@ describe('asistente/textos · redacción (Ola 7 §1.4)', () => {
         proximo: PROXIMO,
       }),
     ).toBe(
-      'Si gastas $12,000 hoy, te faltarían $11,144 para cubrir lo que viene antes de tu quincena (jue 15).',
+      'No te alcanza. Si gastas $12,000 hoy, te faltarían $11,144 para cubrir lo que viene antes del jue 15.',
     );
   });
 
-  it('TalkBack: la barra del día dice las tres cifras en palabras, sin «$» ni dígitos', () => {
-    const e = T.etiquetaBarraDia(317_400, 20_000, 85_600);
-    expect(e).toMatch(/^Reservado tres mil ciento setenta y cuatro pesos/);
+  it('TalkBack: la píldora del día dice la cifra en palabras, sin «$» ni dígitos', () => {
+    const e = T.etiquetaPildoraDia('Hoy te faltan $374', 'cero pesos');
+    expect(e).toBe('Hoy te faltan trescientos setenta y cuatro pesos: cero pesos');
     expect(e).not.toMatch(/\$\d/);
   });
 });
