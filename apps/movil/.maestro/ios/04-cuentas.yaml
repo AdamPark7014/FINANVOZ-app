@@ -25,8 +25,16 @@ tags:
     visible:
       id: pantalla-cuentas
     timeout: 10000
-# Agregar tarjeta
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: cuentas-titulo, ID: boton-agregar-tarjeta } }
+# Agregar tarjeta: «Agregar» del dock de voz abre el menú (dirección B) y de ahí «Agregar tarjeta de crédito»
+- tapOn:
+    id: boton-agregar
+- extendedWaitUntil:
+    visible:
+      id: menu-agregar
+    timeout: 5000
+- takeScreenshot: cuentas-agregar
+- tapOn:
+    id: boton-agregar-tarjeta
 - extendedWaitUntil:
     visible:
       id: pantalla-tarjeta-nueva

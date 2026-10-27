@@ -64,7 +64,7 @@ function preparar() {
     <>
       <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />
       <PantallaMovimientos alRegistrar={jest.fn()} alRevisar={alRevisar} />
-      <PantallaCuentas alAbrirAjustes={jest.fn()} />
+      <PantallaCuentas />
       <ColaEnFondo />
     </>,
     f.nube,

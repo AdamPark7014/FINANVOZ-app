@@ -1,11 +1,18 @@
-import { useContext, type ComponentProps } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { useRouter } from 'expo-router';
-import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { useConfirmacionAlVolver } from '../../src/pantallas/ajustes/confirmacion';
 import { abrirArqueo } from '../../src/pantallas/arqueo';
+import {
+  BTN_DOCK_AGREGAR,
+  ETIQUETA_CERRAR_AGREGAR,
+  ETIQUETA_DOCK_HABLAR_CUENTAS,
+  PISTA_DOCK_AGREGAR,
+} from '../../src/pantallas/asistente/textos';
+import { MenuAgregar } from '../../src/pantallas/cuentas/MenuAgregar';
+import { DockSeccion } from '../../src/pantallas/navegacion/DockSeccion';
+import { useMedidasDock } from '../../src/pantallas/navegacion/DockVoz';
 import { PantallaCuentas, useMostrarAviso } from '../../src/pantallas/principal';
-import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { funcionesPlan } from '../../src/servicios';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { usePlanTienda } from '../../src/suscripciones/ProveedorPlan';
@@ -21,13 +28,12 @@ export interface DisponiblesCuentas {
   deducciones: boolean;
 }
 
-/** Callbacks de la pestaña Cuentas hacia el stack (`02 §11`). */
+/** Callbacks de la pantalla Cuentas hacia el stack (`02 §11`). */
 export function navegacionDesdeCuentas(
   router: Router,
   disponibles: DisponiblesCuentas = { compartidos: true, deducciones: true },
 ): ComponentProps<typeof PantallaCuentas> {
   return {
-    alAbrirAjustes: () => router.push('/ajustes'),
     alAbrirTarjeta: (id) => router.push({ pathname: '/tarjetas/[id]', params: { id } }),
     alAgregarTarjeta: () => router.push('/tarjetas/nueva'),
     alAbrirPersona: (id) => router.push({ pathname: '/persona/[id]', params: { id } }),
@@ -46,23 +52,47 @@ export function navegacionDesdeCuentas(
 }
 
 /**
- * Pestaña Cuentas (`02 §11`): Tienes · Debes · Compromisos. Sin datos, `PantallaCuentas` muestra
- * `TEXTO_CUENTAS_*_VACIO` (`cuentas-tienes-vacio`, `cuentas-debes-vacio`, `cuentas-compromisos-vacio`). Al volver de
- * agregar una cuenta o un pago fijo (o de quitarlo) muestra «Listo: …» en el aviso inferior.
+ * Cuentas (`02 §11`): Tienes · Debes · Compromisos. Sin datos, `PantallaCuentas` muestra `TEXTO_CUENTAS_*_VACIO`
+ * (`cuentas-tienes-vacio`, `cuentas-debes-vacio`, `cuentas-compromisos-vacio`). Al pie, el dock de voz con «Agregar»
+ * (cuenta, tarjeta de crédito o pago fijo, dirección B). Al volver de agregar una cuenta o un pago fijo (o de quitarlo)
+ * muestra «Listo: …» en el aviso inferior.
  */
 export default function Cuentas() {
   const router = useRouter();
   const mostrar = useMostrarAviso();
-  // «Listo: agregué…» va sobre la barra real (en iPhone mide más que el token, `ProveedorAvisos`).
-  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   useConfirmacionAlVolver((mensaje) => mostrar({ mensaje }));
   const { nube } = useSesion();
   const { compras } = usePlanTienda();
   const plus = useVista(funcionesPlan);
   const disponibles = { compartidos: nube !== null, deducciones: plus.deducciones || compras !== null };
+  const navegacion = navegacionDesdeCuentas(router, disponibles);
+  const [agregando, setAgregando] = useState(false);
+  const { abajo, ocupado } = useMedidasDock();
   return (
     <View style={{ flex: 1 }} {...propsContenedorPestana('cuentas')}>
-      <PantallaCuentas {...navegacionDesdeCuentas(router, disponibles)} />
+      <PantallaCuentas {...navegacion} espacioInferior={ocupado} />
+      {agregando ? (
+        <MenuAgregar
+          abajo={abajo}
+          alCerrar={() => setAgregando(false)}
+          {...(navegacion.alAgregarCuenta ? { alAgregarCuenta: navegacion.alAgregarCuenta } : {})}
+          {...(navegacion.alAgregarTarjeta ? { alAgregarTarjeta: navegacion.alAgregarTarjeta } : {})}
+          {...(navegacion.alAgregarPagoFijo ? { alAgregarPagoFijo: navegacion.alAgregarPagoFijo } : {})}
+        />
+      ) : null}
+      <DockSeccion
+        prefijoTestID="dock-cuentas"
+        etiquetaHablar={ETIQUETA_DOCK_HABLAR_CUENTAS}
+        derecha={{
+          etiqueta: BTN_DOCK_AGREGAR,
+          icono: 'mas',
+          alPresionar: () => setAgregando((a) => !a),
+          testID: 'boton-agregar',
+          etiquetaAccesible: agregando ? ETIQUETA_CERRAR_AGREGAR : BTN_DOCK_AGREGAR,
+          ...(agregando ? {} : { pista: PISTA_DOCK_AGREGAR }),
+          abierto: agregando,
+        }}
+      />
     </View>
   );
 }

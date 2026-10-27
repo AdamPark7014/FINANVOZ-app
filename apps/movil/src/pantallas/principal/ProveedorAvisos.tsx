@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
-import { anunciar, Aviso, barraPestanas, etiquetaHablada, useAviso, type DatosAviso } from '../../ui';
+import { anunciar, Aviso, etiquetaHablada, useAviso, type DatosAviso } from '../../ui';
 
 type Mostrar = (datos: Omit<DatosAviso, 'id'>) => void;
 
@@ -10,6 +10,8 @@ const AltoPestanasContexto = createContext<((alto: number) => void) | null>(null
 
 /** Alto de la barra de pestañas sin el área segura, como la calcula React Navigation (UIKit). */
 const ALTO_BARRA_NATIVA = 49;
+/** Mínimo de una barra de pestañas abajo (la de antes de la dirección B; hoy ninguna pantalla la usa). */
+const ALTO_MINIMO_PESTANAS = 64;
 
 /**
  * VoiceOver no lee `accessibilityLiveRegion` (solo existe en Android): en iOS cada mensaje que en Android anuncia la
@@ -57,7 +59,7 @@ export function ProveedorAvisos({
   const informarAlto = useCallback((alto: number) => setAltoMedido(alto), []);
   // Mientras ninguna pestaña informa su alto, se estima igual que React Navigation (con el mínimo del token).
   const abajo = sobrePestanas
-    ? (altoMedido ?? Math.max(barraPestanas.alto, ALTO_BARRA_NATIVA + inferior))
+    ? (altoMedido ?? Math.max(ALTO_MINIMO_PESTANAS, ALTO_BARRA_NATIVA + inferior))
     : inferior;
 
   const idAviso = aviso?.id;

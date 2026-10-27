@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import { KeyboardAvoidingView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { espacio, margenPantalla, radio, sombra, useTema } from '../../ui';
+import { dockVoz, espacio, margenPantalla, useTema } from '../../ui';
 import { useReservarEspacioAviso } from '../../ui/componentes/Aviso';
 import { InvitacionAvisos } from '../avisos/InvitacionAvisos';
+import { useMedidasDock } from '../navegacion/DockVoz';
 import { EnlaceAnaliticaCorreccion } from '../principal/ConfirmacionRegistro';
 import { cifraHoyMostrada } from '../principal/useAvisoRegistro';
 import { AvisosUnaVez } from './AvisosUnaVez';
@@ -28,7 +29,8 @@ export function PantallaAsistente(props: OpcionesAsistente) {
     <SafeAreaView
       {...a.cortarAlTocar}
       testID="pantalla-hoy"
-      edges={['top', 'left', 'right']}
+      // Arriba manda la navegación (`NavegacionSuperior`, que ya cubre la barra de estado); abajo, el dock.
+      edges={['left', 'right']}
       style={{ flex: 1, backgroundColor: c.fondo }}
     >
       <EnlaceAnaliticaCorreccion />
@@ -102,9 +104,9 @@ function Cuerpo({
   props: OpcionesAsistente;
   enPanel?: boolean;
 }) {
-  const { c, esquema } = useTema();
   const nav = props.navegacion;
-  // «Hablar» y el teclado van fijos al pie (sobre las pestañas): el aviso inferior sube para no taparlos.
+  const { abajo } = useMedidasDock();
+  // El dock de voz va fijo al pie: el aviso inferior sube para no taparlo.
   const [altoPie, setAltoPie] = useState(0);
   useReservarEspacioAviso(altoPie);
   // En panel (dentro de otra pantalla) no hay estado vacío: la barra de voz siempre trae su micrófono.
@@ -124,8 +126,6 @@ function Cuerpo({
         <EstadoVacio
           primerUso={a.vista.primerUso}
           hoyPuedes={cifraHoyMostrada(a.vista)}
-          escuchando={a.microfono.escuchando}
-          boton={a.microfono.boton}
           encabezado={encabezado}
           {...(nav.alVerMovimiento ? { alVerMovimiento: nav.alVerMovimiento } : {})}
         />
@@ -153,16 +153,12 @@ function Cuerpo({
         testID="hoy-pie-registrar"
         onLayout={(e) => setAltoPie(Math.round(e.nativeEvent.layout.height) + espacio.m)}
         style={{
-          paddingHorizontal: enPanel ? 0 : margenPantalla,
+          paddingHorizontal: enPanel ? 0 : dockVoz.margenLateral,
           paddingTop: espacio.s,
-          paddingBottom: espacio.m,
-          backgroundColor: c.superficie,
-          borderTopLeftRadius: radio.xl,
-          borderTopRightRadius: radio.xl,
-          ...(!enPanel ? sombra.tarjeta[esquema] : null),
+          paddingBottom: enPanel ? 0 : abajo,
         }}
       >
-        <BarraVoz a={a} conMicrofono={!sinTurnos} />
+        <BarraVoz a={a} />
       </View>
     </>
   );

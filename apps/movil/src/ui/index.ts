@@ -23,6 +23,7 @@ export {
   type CampoTextoProps,
 } from './componentes/CampoTexto';
 export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
+export { AnilloTiempo, Icono, iconoDeCategoria, type NombreIcono } from './componentes/Iconos';
 export { anunciar, useAnunciar } from './anunciar';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export {

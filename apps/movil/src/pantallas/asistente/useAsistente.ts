@@ -65,6 +65,7 @@ import {
   tomarGuardadosR2,
   tomarPedidoAsistente,
 } from './r2';
+import { PREFIJO_ME_ALCANZA, PREFIJO_ME_ALCANZA_ESCRITO } from './textos';
 import { useProbabilidadDelDia } from './useProbabilidadDelDia';
 
 /** Navegación que el asistente necesita de la ruta (`app/(tabs)/hoy.tsx`). */
@@ -126,6 +127,8 @@ export interface Asistente {
   readonly chips: readonly ChipIntencion[];
   readonly enviar: (frase: string, origen: OrigenDictado) => void;
   readonly tocarChip: (chip: ChipIntencion) => void;
+  /** «¿Me alcanza?» del dock: escucha (o escribe) con «me alcanza para…». */
+  readonly preguntarMeAlcanza: () => void;
   readonly abrirFormulario: () => void;
   /** Turnos de tarjeta: lo que guardó la tarjeta vuelve como resultado o como mensaje. */
   readonly alResultadoTarjeta: (id: string, r: ResultadoTexto) => void;
@@ -651,6 +654,7 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
       const p = tomarPedidoAsistente();
       if (!p) return;
       if (p.tipo === 'dictar') void iniciarMicrofono();
+      else if (p.tipo === 'escribir') setEscribiendo(true);
       else revisarFrase(p.frase);
     };
     atender();
@@ -715,6 +719,20 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
     [abrirR2, acciones, agregar, ctx, escribiendo, iniciarMicrofono],
   );
 
+  /**
+   * «¿Me alcanza?» del dock (dirección B): escucha con «me alcanza para…» (o lo escribe en el campo abierto), como el
+   * chip «¿Puedo gastar…?»; la respuesta llega a la conversación (`asistente/puedo-gastar`).
+   */
+  const preguntarMeAlcanza = useCallback(() => {
+    if (confirmacionRef.current) cancelarConfirmacion.current();
+    if (escribiendo) {
+      setTexto(PREFIJO_ME_ALCANZA_ESCRITO);
+      return;
+    }
+    prefijo.current = PREFIJO_ME_ALCANZA;
+    void iniciarMicrofono();
+  }, [escribiendo, iniciarMicrofono]);
+
   const alResultadoTarjeta = useCallback(
     (id: string, r: ResultadoTexto) => mostrar(r, 'texto', '', id),
     [mostrar],
@@ -754,6 +772,7 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
       enviar(frase, origen);
     },
     tocarChip,
+    preguntarMeAlcanza,
     abrirFormulario: () => navRef.current.alAbrirFormulario(),
     alResultadoTarjeta,
     alListoTarjeta,

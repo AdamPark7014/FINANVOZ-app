@@ -1,6 +1,6 @@
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { barraPestanas } from '../ui';
+import { navegacionSuperior } from '../ui';
 import {
   ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA,
   ETIQUETA_ACCESIBILIDAD_PESTANA,
@@ -9,17 +9,19 @@ import {
   propsContenedorRegistrar,
   ROL_ACCESIBILIDAD_BOTON_PESTANA,
   RUTAS_PESTANAS,
+  RUTAS_SEGMENTOS,
   TEST_ID_PANTALLA_PESTANA,
   TEST_ID_PANTALLA_REGISTRAR,
   testIdBotonPestana,
 } from './pestanas-textos';
 
 describe('pestanas-textos', () => {
-  it('alinea rutas visibles con barraPestanas, botones y contenedores', () => {
-    const rutasUi = barraPestanas.pestanas.map((p) => p.ruta);
+  it('alinea las rutas con la navegación de arriba (selector y Tú), los botones y los contenedores', () => {
+    const rutasUi = [...navegacionSuperior.segmentos.map((s) => s.ruta), navegacionSuperior.tu.ruta];
     expect(rutasUi).toEqual([...RUTAS_PESTANAS]);
+    expect(navegacionSuperior.segmentos.map((s) => s.ruta)).toEqual([...RUTAS_SEGMENTOS]);
     expect(Object.keys(ETIQUETA_ACCESIBILIDAD_PESTANA).sort()).toEqual([...rutasUi].sort());
-    for (const { ruta, etiqueta } of barraPestanas.pestanas) {
+    for (const { ruta, etiqueta } of [...navegacionSuperior.segmentos, navegacionSuperior.tu]) {
       expect(ETIQUETA_PESTANA[ruta]).toBe(etiqueta);
       expect(TEST_ID_PANTALLA_PESTANA[ruta]).toBe(`tab-${ruta}`);
       expect(testIdBotonPestana(ruta)).toBe(`pestana-${ruta}`);

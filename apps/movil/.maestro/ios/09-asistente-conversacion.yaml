@@ -68,7 +68,7 @@ tags:
     timeout: 10000
 - takeScreenshot: cuentas-con-datos
 - tapOn:
-    id: pestana-tu
+    id: boton-ajustes # el círculo de Tú, arriba a la derecha (dirección B)
 - extendedWaitUntil:
     visible:
       id: ajustes

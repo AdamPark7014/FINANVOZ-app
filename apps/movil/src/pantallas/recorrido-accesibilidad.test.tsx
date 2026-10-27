@@ -149,7 +149,6 @@ describe('recorrido de accesibilidad (M13, RNF-08)', () => {
     montar(
       p.ctx,
       <PantallaCuentas
-        alAbrirAjustes={jest.fn()}
         alAbrirTarjeta={jest.fn()}
         alAgregarTarjeta={jest.fn()}
         alAbrirPersona={jest.fn()}

@@ -43,6 +43,7 @@ function movimiento(parcial: Partial<MovimientoVista> & Pick<MovimientoVista, 'i
     llegaA: [],
     personas: [],
     categoria: 'Antojos',
+    categoriaSlug: 'antojos',
     porRevisar: false,
     extraordinaria: false,
     insignias: [],

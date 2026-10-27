@@ -8,9 +8,18 @@
 
 - **Dirección B «Plática» (decisión de Adam del 26-10, en curso).** Adam eligió B del canvas «FinanVoz · 3
   direcciones» con los chips de un toque de C en la tarjeta de registro. Decisión en `docs/ESTADO.md`; tableros B y C2
-  en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2` y `§4` reescritos (navegación arriba,
-  dock de voz, reposo, tarjeta de registro con chips, «¿Me alcanza?» con dos opciones). Fases: 1) navegación y dock,
-  2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
+  en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2`, `§4`, `§10` y `§11` reescritos.
+  Fases: 1) navegación y dock, 2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
+- **Fase 1 hecha:** navegación arriba (`src/pantallas/navegacion/NavegacionSuperior.tsx`, `tabBarPosition: 'top'`):
+  segmentos `pestana-hoy|movimientos|cuentas` y el círculo «Tú» con testID `boton-ajustes` (la app no pide nombre: no
+  hay inicial). Dock de voz (`DockVoz`, `DockSeccion`): en Asistente «Escribir» (`boton-escribir`), micrófono
+  (`boton-hablar`) y «¿Me alcanza?» (`dock-me-alcanza`, escucha con «me alcanza para…»); en Movimientos «Buscar»
+  (`boton-buscar`, `FiltroMovimientos.texto`) y en Cuentas «Agregar» (`boton-agregar` → `menu-agregar` con los
+  `boton-agregar-*` de antes). Paleta B0 en `ui/tokens.ts` (tokens nuevos `dock`, `microfono`, `segmento`…; AA en
+  `tokens.test.ts`). Íconos de línea con `react-native-svg` 15.15.4 (dependencia nueva, la del SDK 57).
+- **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de
+  `expo-sqlite` con NTSTATUS 0xC0E90002 (política de integridad de código del proceso de Claude, igual que
+  cursor-agent). La verificación visual es por las capturas de «iOS · Maestro» en GitHub.
 - Turno anterior (mismo día): intérprete «perfeccionado» — nivel 0 162/164 del golden sin red, nube 163/164 con Haiku
   5.5, ~0.003 USD por 1,000 frases; números en `docs/ESTADO.md` (Decisiones 26-10, M3) y `services/proxy/README.md`.
 

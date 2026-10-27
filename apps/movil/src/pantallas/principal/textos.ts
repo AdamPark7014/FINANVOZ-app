@@ -421,6 +421,11 @@ export const PISTA_VACIO_MOVIMIENTOS = 'Más abajo, botón Registrar un movimien
 /** Consulta filtrada sin resultados (`06 §6`). */
 export const TEXTO_MOVIMIENTOS_FILTRO_VACIO = 'No hay movimientos que coincidan.';
 
+/** «Buscar» del dock de Movimientos (dirección B). */
+export const ETIQUETA_BUSCAR_MOVIMIENTOS = 'Buscar en tus movimientos';
+export const EJEMPLO_BUSCAR_MOVIMIENTOS = 'Por ejemplo: tacos, BBVA o 250';
+export const TEXTO_BUSQUEDA_VACIA = 'No encontré movimientos con eso.';
+
 /** Chips de Movimientos (maqueta aprobada de la Ola 7, «Pestañas y vacíos»). */
 export const CHIPS_MOVIMIENTOS = ['todos', 'gastos', 'ingresos', 'efectivo', 'tarjetas'] as const;
 export type ChipMovimientos = (typeof CHIPS_MOVIMIENTOS)[number];
@@ -529,9 +534,9 @@ export function etiquetaConfirmarAnularMovimiento(): string {
 
 // ——— Cuentas (`02 §11`) ———
 
-/** Tienes: sin efectivo, débito, billetera ni ahorro (el botón «Agregar cuenta» va justo debajo, B-2b). */
+/** Tienes: sin efectivo, débito, billetera ni ahorro (se agregan con «Agregar» del dock, dirección B). */
 export const TEXTO_CUENTAS_TIENES_VACIO =
-  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Agrega una cuenta aquí abajo.';
+  'Todavía no tienes cuentas de efectivo, débito ni ahorro. Toca «Agregar», abajo, para sumar una.';
 
 /** Debes: sin tarjetas ni deudas con personas. */
 export const TEXTO_CUENTAS_DEBES_VACIO = 'No debes nada en tarjetas ni préstamos con personas.';

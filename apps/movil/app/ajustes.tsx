@@ -57,8 +57,8 @@ export default function Ajustes() {
 }
 
 /**
- * `enPestana`: montada en la pestaña Tú (`app/(tabs)/tu.tsx`). Ahí no hay «Volver» (la barra de pestañas es la
- * salida) ni borde inferior propio (la barra ya cubre el área segura de abajo).
+ * `enPestana`: montada en Tú (`app/(tabs)/tu.tsx`, el círculo de arriba). Ahí no hay «Volver»: el selector de arriba es
+ * la salida.
  */
 export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) {
   const router = useRouter();
@@ -82,7 +82,9 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
       {enPestana ? null : <BarraNativa salida="/hoy" />}
       <Pantalla
         testID="ajustes"
-        bordes={enPestana ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']}
+        // En Tú, la navegación de arriba ya cubre la barra de estado (dirección B) y no hay dock: el área segura de
+        // abajo la pone la pantalla.
+        bordes={enPestana ? ['left', 'right', 'bottom'] : ['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
         <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">

@@ -63,6 +63,9 @@ import {
   TEXTO_MOVIMIENTOS_FILTRO_VACIO,
   TEXTO_MOVIMIENTOS_VACIO,
   TEXTO_POR_REVISAR,
+  EJEMPLO_BUSCAR_MOVIMIENTOS,
+  ETIQUETA_BUSCAR_MOVIMIENTOS,
+  TEXTO_BUSQUEDA_VACIA,
   TITULO_POR_REVISAR,
   MENSAJE_ANULADO_MOVIMIENTO,
   PISTA_ANULAR_MOVIMIENTO,
@@ -92,8 +95,14 @@ export function PantallaMovimientos({
   alQuitarFiltro,
   alAbrirPersona,
   detalleInicial = null,
+  buscando = false,
+  espacioInferior = 0,
 }: {
   alRegistrar: () => void;
+  /** «Buscar» del dock (dirección B): muestra el campo de búsqueda arriba de la lista. */
+  buscando?: boolean;
+  /** Lo que tapa el dock al pie: la lista deja ese espacio para que lo último se pueda leer. */
+  espacioInferior?: number;
   /** Abre Registrar con una frase que la nube ya entendió pero necesita confirmación. */
   alRevisar?: (fraseId: string) => void;
   /** "Ver movimientos" de una consulta (`06 §6`): solo los movimientos que suman en la respuesta. */
@@ -108,9 +117,15 @@ export function PantallaMovimientos({
   // Chips de la maqueta aprobada (Ola 7 §5): Todos · Gastos · Ingresos · Efectivo · Tarjetas. Se suman al filtro de
   // una consulta («Ver movimientos») si lo hay.
   const [chip, setChip] = useState<ChipMovimientos>('todos');
+  const [busqueda, setBusqueda] = useState('');
+  const texto = buscando ? busqueda.trim() : '';
   const conTarjetas = useVista((c) => listarTarjetas(c).length > 0);
   const chips = CHIPS_MOVIMIENTOS.filter((c) => c !== 'tarjetas' || conTarjetas);
-  const filtroEfectivo: FiltroMovimientos = { ...(filtro ?? {}), ...FILTRO_DE_CHIP[chip] };
+  const filtroEfectivo: FiltroMovimientos = {
+    ...(filtro ?? {}),
+    ...FILTRO_DE_CHIP[chip],
+    ...(texto !== '' ? { texto } : {}),
+  };
   const claveFiltro = JSON.stringify(filtroEfectivo);
   const dias = useMemo(
     () => listarMovimientos(ctx, filtroEfectivo),
@@ -242,6 +257,18 @@ export function PantallaMovimientos({
 
       <PorRevisarCapturas alRegistrar={alRegistrar} />
 
+      {buscando ? (
+        <CampoTexto
+          etiqueta={ETIQUETA_BUSCAR_MOVIMIENTOS}
+          valor={busqueda}
+          alCambiar={setBusqueda}
+          ejemplo={EJEMPLO_BUSCAR_MOVIMIENTOS}
+          autoFocus
+          nativo={{ returnKeyType: 'search', autoCorrect: false }}
+          testID="campo-buscar-movimientos"
+        />
+      ) : null}
+
       {hayMovimientos ? (
         <ScrollView
           horizontal
@@ -284,9 +311,15 @@ export function PantallaMovimientos({
       {dias.length === 0 ? (
         <EstadoVacio
           testID="movimientos-vacio"
-          texto={filtro || chip !== 'todos' ? TEXTO_MOVIMIENTOS_FILTRO_VACIO : TEXTO_MOVIMIENTOS_VACIO}
-          etiquetaAccesible={etiquetaVacioMovimientos(filtro != null || chip !== 'todos')}
-          {...(filtro || chip !== 'todos' ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
+          texto={
+            texto !== ''
+              ? TEXTO_BUSQUEDA_VACIA
+              : filtro || chip !== 'todos'
+                ? TEXTO_MOVIMIENTOS_FILTRO_VACIO
+                : TEXTO_MOVIMIENTOS_VACIO
+          }
+          etiquetaAccesible={etiquetaVacioMovimientos(filtro != null || chip !== 'todos' || texto !== '')}
+          {...(filtro || chip !== 'todos' || texto !== '' ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
         />
       ) : null}
       {dias.length === 0 && chip !== 'todos' ? (
@@ -299,7 +332,7 @@ export function PantallaMovimientos({
           testID="movimientos-chip-ver-todos"
         />
       ) : null}
-      {dias.length === 0 && !filtro && chip === 'todos' ? (
+      {dias.length === 0 && !filtro && chip === 'todos' && texto === '' ? (
         <Boton
           etiqueta={BTN_REGISTRAR_PRIMER_MOVIMIENTO}
           variante="secundario"
@@ -314,6 +347,8 @@ export function PantallaMovimientos({
   return (
     <Pantalla
       testID="pantalla-movimientos"
+      // Arriba manda la navegación de la dirección B (ya cubre la barra de estado); abajo, el dock.
+      bordes={['left', 'right']}
       desplazable={false}
       contenidoStyle={{ gap: espacio.xl, flex: 1, paddingBottom: 0 }}
     >
@@ -323,7 +358,7 @@ export function PantallaMovimientos({
         sections={secciones}
         keyExtractor={(m) => m.id}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: espacio.xxxl }}
+        contentContainerStyle={{ paddingBottom: espacio.xxxl + espacioInferior }}
         stickySectionHeadersEnabled={false}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={encabezadoLista}

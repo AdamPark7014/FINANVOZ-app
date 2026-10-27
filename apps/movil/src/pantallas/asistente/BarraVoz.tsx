@@ -1,17 +1,5 @@
-import { Pressable, ScrollView, View } from 'react-native';
-import {
-  Boton,
-  CampoTexto,
-  Chip,
-  espacio,
-  hitSlopTactil,
-  OBJETIVO_TACTIL_MIN,
-  radio,
-  sombra,
-  Texto,
-  useAnunciar,
-  useTema,
-} from '../../ui';
+import { ScrollView, View } from 'react-native';
+import { Boton, CampoTexto, Chip, espacio, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
 import {
   IndicadorVoz,
   abrirAjustesDictado,
@@ -21,10 +9,13 @@ import {
   TEXTO_TE_ESCUCHO,
 } from '../../voz';
 import { EJEMPLO_CAMPO_REGISTRAR, mensajeEsperandoConexion } from '../principal/textos';
+import { DockVoz } from '../navegacion/DockVoz';
 import { MicrofonoAsistente } from './MicrofonoAsistente';
 import { OndaVoz, PuntosPensando } from './movimiento';
 import {
   BTN_CANCELAR_ESCUCHA,
+  BTN_ME_ALCANZA,
+  PISTA_DOCK_ME_ALCANZA,
   PISTA_CANCELAR_ESCUCHA,
   TEXTO_TERMINO_SOLO,
   BTN_ENVIAR_REGISTRO,
@@ -40,15 +31,11 @@ import {
 } from './textos';
 import type { Asistente } from './useAsistente';
 
-/** Tamaño del micrófono en la barra: un poco más grande que la maqueta (72) para que mande la voz. */
-export const TAMANO_MICROFONO = 80;
-
 /**
- * Pie del asistente (maqueta Hoy A): chips de intención, el micrófono de 72 pt al centro (mantener o tocar) y el
- * teclado a la derecha, que abre el campo en línea. Encima, lo que se va oyendo y el estado («Déjame entenderlo…»).
- * Sin micrófono (estado vacío: el grande está al centro de la pantalla) quedan los chips y el teclado.
+ * Pie del asistente (dirección B): encima, lo que se va oyendo y el estado («Un segundo…»), el campo para escribir y
+ * los chips de intención; abajo, el dock de voz verde pino con «Escribir», el micrófono y «¿Me alcanza?».
  */
-export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofono?: boolean }) {
+export function BarraVoz({ a }: { a: Asistente }) {
   const { c, esquema } = useTema();
   const m = a.microfono;
   // VoiceOver no lee regiones vivas: el error del dictado se anuncia en iPhone.
@@ -217,69 +204,30 @@ export function BarraVoz({ a, conMicrofono = true }: { a: Asistente; conMicrofon
         </ScrollView>
       ) : null}
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          minHeight: conMicrofono ? TAMANO_MICROFONO : OBJETIVO_TACTIL_MIN,
-        }}
-      >
-        {/* Mientras el asistente habla, la onda a la izquierda del micrófono (tocar cualquier cosa lo calla). */}
-        <View style={{ width: OBJETIVO_TACTIL_MIN, alignItems: 'center' }}>
-          {a.hablando ? <IndicadorVoz activo alto={20} testID="asistente-hablando" /> : null}
+      {/* Mientras el asistente habla, la onda sobre el dock (tocar cualquier cosa lo calla). */}
+      {a.hablando ? (
+        <View style={{ alignItems: 'center' }}>
+          <IndicadorVoz activo alto={20} testID="asistente-hablando" />
         </View>
-        {conMicrofono ? <MicrofonoAsistente escuchando={m.escuchando} boton={m.boton} /> : <View />}
-        <Pressable
-          testID="boton-escribir"
-          onPress={() => a.setEscribiendo((v) => !v)}
-          hitSlop={hitSlopTactil}
-          accessibilityRole="button"
-          accessibilityLabel={a.escribiendo ? ETIQUETA_CERRAR_TECLADO : ETIQUETA_TECLADO}
-          accessibilityHint={a.escribiendo ? undefined : PISTA_TECLADO}
-          accessibilityState={{ expanded: a.escribiendo }}
-          style={({ pressed }) => ({
-            width: OBJETIVO_TACTIL_MIN,
-            height: OBJETIVO_TACTIL_MIN,
-            borderRadius: radio.pastilla,
-            borderWidth: 1,
-            borderColor: a.escribiendo ? c.acentoTexto : c.borde,
-            backgroundColor: a.escribiendo || pressed ? c.superficieAlterna : 'transparent',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: a.escribiendo ? 1 : 0.72,
-          })}
-        >
-          <IconoTeclado color={a.escribiendo ? c.acentoTexto : c.textoSecundario} />
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
-/** Teclado dibujado con vistas (la app no usa fuentes de íconos). */
-function IconoTeclado({ color }: { color: string }) {
-  return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-      style={{
-        width: 22,
-        height: 15,
-        borderRadius: 3,
-        borderWidth: 2,
-        borderColor: color,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2,
-      }}
-    >
-      <View style={{ flexDirection: 'row', gap: 2 }}>
-        {[0, 1, 2, 3].map((i) => (
-          <View key={i} style={{ width: 2, height: 2, backgroundColor: color }} />
-        ))}
-      </View>
-      <View style={{ width: 10, height: 2, backgroundColor: color }} />
+      ) : null}
+      <DockVoz
+        izquierda={{
+          etiqueta: ETIQUETA_TECLADO,
+          icono: 'teclado',
+          alPresionar: () => a.setEscribiendo((v) => !v),
+          testID: 'boton-escribir',
+          etiquetaAccesible: a.escribiendo ? ETIQUETA_CERRAR_TECLADO : ETIQUETA_TECLADO,
+          ...(a.escribiendo ? {} : { pista: PISTA_TECLADO }),
+          abierto: a.escribiendo,
+        }}
+        centro={<MicrofonoAsistente escuchando={m.escuchando} boton={m.boton} />}
+        derecha={{
+          etiqueta: BTN_ME_ALCANZA,
+          alPresionar: a.preguntarMeAlcanza,
+          testID: 'dock-me-alcanza',
+          pista: PISTA_DOCK_ME_ALCANZA,
+        }}
+      />
     </View>
   );
 }

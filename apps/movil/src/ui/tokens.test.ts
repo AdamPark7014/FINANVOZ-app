@@ -20,6 +20,14 @@ const pares: [keyof Colores, keyof Colores][] = [
   ['textoSecundario', 'superficieAlterna'],
   ['acentoTexto', 'superficieAlterna'],
   ['faltante', 'superficieAlterna'],
+  // Dirección B: dock de voz, selector de arriba y la frase por revisar.
+  ['sobreDock', 'dock'],
+  ['sobreDock', 'dockBoton'],
+  ['sobreMicrofono', 'microfono'],
+  ['texto', 'segmentoActivo'],
+  ['textoSecundario', 'segmento'],
+  ['texto', 'iconoFondo'],
+  ['sobreAtencion', 'atencion'],
 ];
 
 /**
@@ -40,6 +48,9 @@ const paresControles: [keyof Colores, keyof Colores, string][] = [
   ['foco', 'superficie', 'anillo de foco sobre una tarjeta'],
   ['acento', 'superficieAlterna', 'lo lleno de una barra contra su fondo'],
   ['texto', 'superficieAlterna', 'marca del 30 % de una barra'],
+  ['microfono', 'dock', 'el micrófono contra el dock de voz'],
+  ['acento', 'iconoFondo', 'el ícono de categoría sobre su cuadro'],
+  ['acento', 'segmento', 'el círculo de Tú elegido sobre el riel'],
 ];
 
 describe.each(['claro', 'oscuro'] as const)('contraste AA en modo %s (RNF-08)', (esquema) => {

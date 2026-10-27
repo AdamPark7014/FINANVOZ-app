@@ -18,8 +18,10 @@ export const BTN_CANCELAR = 'Cancelar';
 export const BTN_AGREGAR_CUENTA = 'Agregar cuenta';
 export const PISTA_AGREGAR_CUENTA =
   'Abre el formulario para agregar una cuenta de débito, billetera o ahorro';
-/** VoiceOver y TalkBack en el vacío de Tienes: dónde está el botón. */
-export const PISTA_CTA_AGREGAR_CUENTA = `Más abajo, botón ${BTN_AGREGAR_CUENTA.toLowerCase()}`;
+/** VoiceOver y TalkBack en el vacío de Tienes: dónde está el botón (el «Agregar» del dock, dirección B). */
+export const PISTA_CTA_AGREGAR_CUENTA = 'Abajo, botón agregar';
+/** Encabezado del menú que abre «Agregar» en el dock de Cuentas. */
+export const TITULO_MENU_AGREGAR = '¿Qué quieres agregar?';
 export const PISTA_ABRIR_CUENTA = 'Abre la cuenta para corregir su saldo o ver sus movimientos';
 export const PISTA_ABRIR_EFECTIVO = 'Abre tu efectivo para contarlo o ver sus movimientos';
 export const BTN_VER = 'Ver';

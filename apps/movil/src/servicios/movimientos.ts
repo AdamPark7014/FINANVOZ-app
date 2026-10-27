@@ -27,6 +27,8 @@ export interface MovimientoVista {
   /** Personas del movimiento (cuenta `contraparte:persona`), sin repetir id. */
   readonly personas: readonly { readonly id: string; readonly nombre: string }[];
   readonly categoria: string | null;
+  /** Slug del catálogo (`04 §2.3`) para el ícono de la categoría; `null` sin categoría. */
+  readonly categoriaSlug: string | null;
   readonly porRevisar: boolean;
   /** Marcado como "Fue algo extraordinario": no cuenta para estimar el gasto diario (`05 §E8.2`). */
   readonly extraordinaria: boolean;
@@ -62,7 +64,30 @@ export interface FiltroMovimientos {
   readonly medio?: 'efectivo' | 'tarjeta';
   readonly porRevisar?: boolean;
   readonly estimados?: boolean;
+  /**
+   * «Buscar» del dock de Movimientos: texto contenido (sin acentos ni mayúsculas) en la descripción, el comercio, la
+   * categoría, las cuentas o las personas; si son solo dígitos, también en el monto en pesos.
+   */
+  readonly texto?: string;
   readonly limite?: number;
+}
+
+/** Texto comparable para la búsqueda: minúsculas, sin acentos ni espacios repetidos. */
+export function normalizarBusqueda(texto: string): string {
+  return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function coincideBusqueda(m: MovimientoVista, buscado: string): boolean {
+  const campos = [
+    m.descripcion,
+    m.comercio,
+    m.categoria,
+    ...m.saleDe,
+    ...m.llegaA,
+    ...m.personas.map((p) => p.nombre),
+  ];
+  if (campos.some((c) => c !== null && normalizarBusqueda(c).includes(buscado))) return true;
+  return /^\d+$/.test(buscado) && String(Math.floor(m.monto / 100)).includes(buscado);
 }
 
 const SALIDA = new Set<string>([
@@ -125,6 +150,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     porTransaccion.set(a.transaccionId, [...(porTransaccion.get(a.transaccionId) ?? []), a]);
 
   const vistas: MovimientoVista[] = [];
+  const buscado = filtro.texto ? normalizarBusqueda(filtro.texto) : '';
   for (const t of transacciones) {
     const suyos = porTransaccion.get(t.id) ?? [];
     if (filtro.cuentaId && !suyos.some((a) => a.c.id === filtro.cuentaId)) continue;
@@ -162,7 +188,7 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
     if (t.estimada === 1) insignias.push('estimado');
     if (suyos.some((a) => PUENTES.has(a.c.id))) insignias.push('por_asignar');
     if (t.reemplazaA) insignias.push('corregido');
-    vistas.push({
+    const vista: MovimientoVista = {
       id: t.id,
       fecha: t.fecha,
       tipo: t.tipo as TipoTransaccion,
@@ -176,11 +202,14 @@ export function listarMovimientos(ctx: Contexto, filtro: FiltroMovimientos = {})
       llegaA: propias.filter((a) => a.monto > 0).map((a) => a.c.nombre),
       personas,
       categoria: categoria?.nombre ?? null,
+      categoriaSlug: categoria?.categoriaSlug ?? null,
       porRevisar: t.porRevisar === 1,
       extraordinaria: t.extraordinaria === 1,
       insignias,
       reemplazaA: t.reemplazaA,
-    });
+    };
+    if (buscado && !coincideBusqueda(vista, buscado)) continue;
+    vistas.push(vista);
     if (filtro.limite !== undefined && vistas.length >= filtro.limite) break;
   }
 

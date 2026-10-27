@@ -23,7 +23,6 @@ import { cifraEnPalabras } from '../../ui/formato';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
 import {
-  BTN_AJUSTES_CUENTAS_ACCESIBLE,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
   TEXTO_CUENTAS_TIENES_VACIO,
@@ -66,6 +65,7 @@ import {
 } from './textos';
 import { ProveedorPlan } from '../../suscripciones/ProveedorPlan';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from './__pruebas__/arnes';
+import { MenuAgregar } from '../cuentas/MenuAgregar';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PantallaHoy } from './PantallaHoy';
 import { PantallaMovimientos } from './PantallaMovimientos';
@@ -100,7 +100,7 @@ function todas(ctx: Parameters<typeof renderConSesion>[0], motor = crearMotorFal
     <>
       <PantallaHoy navegacion={navegacionFalsa()} motor={motor} />
       <PantallaMovimientos alRegistrar={jest.fn()} />
-      <PantallaCuentas alAbrirAjustes={jest.fn()} />
+      <PantallaCuentas />
     </>,
   );
 }
@@ -327,7 +327,7 @@ describe('Registrar', () => {
       <>
         <PantallaHoy navegacion={nav} motor={crearMotorFalso().motor} />
         <PantallaMovimientos alRegistrar={jest.fn()} />
-        <PantallaCuentas alAbrirAjustes={jest.fn()} />
+        <PantallaCuentas />
       </>,
     );
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$640');
@@ -459,7 +459,7 @@ describe('Registrar', () => {
       p.ctx,
       <>
         <PantallaRegistrar alCerrar={alCerrar} motor={crearMotorFalso().motor} />
-        <PantallaCuentas alAbrirAjustes={jest.fn()} />
+        <PantallaCuentas />
       </>,
     );
     expect(screen.getByTestId('registrar-titulo')).toHaveProp('accessibilityRole', 'header');
@@ -485,7 +485,7 @@ describe('Cuentas', () => {
   it('sin cuentas muestra el copy vacío en Tienes, Debes y Compromisos', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    renderConSesion(p.ctx, <PantallaCuentas />);
     expect(screen.getByTestId('cuentas-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('seccion-tienes-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveTextContent(TEXTO_CUENTAS_TIENES_VACIO);
@@ -509,18 +509,14 @@ describe('Cuentas', () => {
   it('Agregar tarjeta, Contar efectivo y Cobrar traen accessibilityHint (`02 §15`)', () => {
     const p = conEscenario('e4-01');
     const efectivo = p.e.cuentas.efectivo as string;
-    renderConSesion(
-      p.ctx,
-      <PantallaCuentas
-        alAbrirAjustes={jest.fn()}
-        alContarEfectivo={jest.fn()}
-        alAgregarTarjeta={jest.fn()}
-      />,
-    );
+    renderConSesion(p.ctx, <PantallaCuentas alContarEfectivo={jest.fn()} alAgregarTarjeta={jest.fn()} />);
     expect(screen.getByTestId(`cuenta-${efectivo}-accion`)).toHaveProp(
       'accessibilityHint',
       PISTA_CONTAR_EFECTIVO,
     );
+    screen.unmount();
+    // «Agregar tarjeta de crédito» vive en el menú «Agregar» del dock (dirección B).
+    renderConSesion(p.ctx, <MenuAgregar abajo={0} alCerrar={jest.fn()} alAgregarTarjeta={jest.fn()} />);
     expect(screen.getByTestId('boton-agregar-tarjeta')).toHaveProp(
       'accessibilityHint',
       PISTA_AGREGAR_TARJETA_CREDITO,
@@ -537,7 +533,7 @@ describe('Cuentas', () => {
       categoria: 'comida_fuera',
       fecha: '2026-10-10',
     });
-    renderConSesion(q.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={jest.fn()} />);
+    renderConSesion(q.ctx, <PantallaCuentas alAbrirPersona={jest.fn()} />);
     expect(screen.getByTestId(`te-debe-${caro}-accion`)).toHaveProp(
       'accessibilityHint',
       PISTA_COBRAR_DESDE_CUENTAS,
@@ -583,7 +579,7 @@ describe('Cuentas', () => {
     const nu = vista.debes.find((d) => d.id === nuId);
     if (!bbva) throw new Error('e4-01 sin BBVA en Tienes');
     if (!nu) throw new Error('e4-01 sin Nu en Debes');
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    renderConSesion(p.ctx, <PantallaCuentas />);
     expect(screen.getByTestId('seccion-tienes-lista')).toHaveProp('accessibilityRole', 'list');
     expect(screen.getByTestId(`cuenta-${bbvaId}`)).toHaveProp('role', 'listitem');
     expect(screen.getByTestId(`cuenta-${bbvaId}-saldo`).props.accessibilityLabel).toBe(
@@ -600,23 +596,21 @@ describe('Cuentas', () => {
     p.cerrar();
   });
 
-  it('muestra Tienes, Debes con la tarjeta y Compromisos; el engrane abre Ajustes', () => {
+  // Dirección B: Ajustes se abre con el círculo de Tú de la navegación de arriba (`NavegacionSuperior`), no desde aquí.
+  it('muestra Tienes, Debes con la tarjeta y Compromisos, sin engrane propio', () => {
     const p = conEscenario('e4-01');
-    const alAbrirAjustes = jest.fn();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={alAbrirAjustes} />);
+    renderConSesion(p.ctx, <PantallaCuentas />);
     expect(textoDe(`cuenta-${p.e.cuentas.nu}-saldo`)).toBe('$2,000');
     expect(screen.getByText('internet')).toBeTruthy();
     expect(screen.getByText('mié 14')).toBeTruthy();
-    expect(screen.getByTestId('boton-ajustes').props.accessibilityLabel).toBe(BTN_AJUSTES_CUENTAS_ACCESIBLE);
-    fireEvent.press(screen.getByTestId('boton-ajustes'));
-    expect(alAbrirAjustes).toHaveBeenCalled();
+    expect(screen.queryByTestId('boton-ajustes')).toBeNull();
   });
 
   it('CTA Tandas en Cuentas usa copy centralizado y abre la ruta', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     const alAbrirTandas = jest.fn();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTandas={alAbrirTandas} />);
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirTandas={alAbrirTandas} />);
     expect(screen.getByTestId('boton-tandas').props.accessibilityLabel).toBe(BTN_TANDAS_CUENTAS);
     expect(screen.getByTestId('seccion-tandas-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('boton-tandas'));

@@ -1,16 +1,32 @@
 import type { ViewProps } from 'react-native';
 
 /**
- * Copy es-MX, testID y TalkBack/VoiceOver de la barra y rutas del grupo `(tabs)` (Ola 7 §2, 02-UX §2, §15): cuatro
- * pestañas Asistente · Movimientos · Cuentas · Tú. La ruta del asistente sigue siendo `hoy` (enlaces, widget, Maestro).
- * Vive fuera de `app/` a propósito: Expo Router vuelve ruta cada archivo de `app/`, y un archivo de textos ahí salía
- * como botón suelto en la barra.
+ * Copy es-MX, testID y TalkBack/VoiceOver de la navegación del grupo `(tabs)` (dirección B, 02-UX §2, §15): arriba,
+ * el selector Asistente · Movimientos · Cuentas y el círculo de Tú. La ruta del asistente sigue siendo `hoy` (enlaces,
+ * widget, Maestro). Vive fuera de `app/` a propósito: Expo Router vuelve ruta cada archivo de `app/`.
  */
 
-/** Rutas con pestaña, en orden. */
+/** Rutas del grupo de pestañas, en orden: las tres del selector y Tú (la abre el círculo). */
 export const RUTAS_PESTANAS = ['hoy', 'movimientos', 'cuentas', 'tu'] as const;
 
 export type RutaPestanaVisible = (typeof RUTAS_PESTANAS)[number];
+
+/** Las tres del selector de arriba. */
+export const RUTAS_SEGMENTOS = [
+  'hoy',
+  'movimientos',
+  'cuentas',
+] as const satisfies readonly RutaPestanaVisible[];
+
+export type RutaSegmento = (typeof RUTAS_SEGMENTOS)[number];
+
+/** El círculo de Tú: lo que se ve dentro (la app no pide tu nombre, así que no hay inicial) y su testID de Maestro. */
+export const TEXTO_CIRCULO_TU = 'Tú';
+export const TEST_ID_CIRCULO_TU = 'boton-ajustes';
+export const ETIQUETA_ACCESIBILIDAD_TU = 'Tú: tu ingreso, la app y tu privacidad';
+export const PISTA_CIRCULO_TU = 'Abre tus ajustes';
+/** Selector de arriba para el lector. */
+export const ETIQUETA_SELECTOR_SECCIONES = 'Secciones';
 
 /** Etiqueta visible de cada pestaña (siempre visible: la activa no se distingue solo por color). */
 export const ETIQUETA_PESTANA: Record<RutaPestanaVisible, string> = {
@@ -35,10 +51,10 @@ export const ETIQUETA_ACCESIBILIDAD_CONTENIDO_PESTANA = {
   tu: 'Tú, tu ingreso, tu colchón y ajustes',
 } as const satisfies Record<RutaPestanaVisible, string>;
 
-/** Rol TalkBack de cada botón en la barra inferior (no confundir con el contenedor de la pantalla). */
+/** Rol TalkBack de cada segmento del selector (no confundir con el contenedor de la pantalla). */
 export const ROL_ACCESIBILIDAD_BOTON_PESTANA = 'tab' as const;
 
-/** Botones de la barra inferior (Maestro: `pestana-hoy`, `pestana-tu`, etc.). */
+/** Segmentos del selector (Maestro: `pestana-hoy`, `pestana-movimientos`, `pestana-cuentas`). */
 export function testIdBotonPestana(ruta: RutaPestanaVisible): `pestana-${RutaPestanaVisible}` {
   return `pestana-${ruta}`;
 }

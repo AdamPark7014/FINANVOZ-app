@@ -62,47 +62,96 @@ export interface Colores {
   foco: string;
   /** Velo detrás de hojas y del bloqueo. */
   velo: string;
+  /** Dock de voz (dirección B): verde pino al pie de Asistente, Movimientos y Cuentas. */
+  dock: string;
+  /** Botones laterales del dock («Escribir», «¿Me alcanza?», «Buscar», «Agregar»). */
+  dockBoton: string;
+  /** Texto e íconos sobre `dock` y `dockBoton`; ≥ 4.5:1 (AA). */
+  sobreDock: string;
+  /** El micrófono del dock (menta); ≥ 3:1 contra `dock` (WCAG 1.4.11). */
+  microfono: string;
+  /** Ícono sobre `microfono`; ≥ 4.5:1. */
+  sobreMicrofono: string;
+  /** Riel del selector Asistente · Movimientos · Cuentas. */
+  segmento: string;
+  /** Segmento elegido del selector (y el círculo de Tú sin elegir). */
+  segmentoActivo: string;
+  /** Cuadro del ícono de categoría o de cuenta; el ícono va en `acento` (≥ 3:1). */
+  iconoFondo: string;
+  /** Fondo de lo que pide atención sin ser error (frase por revisar). */
+  atencion: string;
+  /** Texto e ícono sobre `atencion`; ≥ 4.5:1. */
+  sobreAtencion: string;
 }
 
+/**
+ * Paleta de la dirección B «Plática» (`docs/diseno/direccion-b/B0-ficha.png`): Niebla, Tarjeta, Tinta, Pino, Menta y
+ * Cifra en claro; en oscuro, el mismo pino y la menta sobre verdes casi negros. `acentoTexto` es la «Cifra» (la cifra
+ * del día y los enlaces); `acento` es el pino de los botones y los chips elegidos.
+ */
 export const colores: Record<EsquemaColor, Colores> = {
   claro: {
-    /** Fondo menta muy suave: airea la pantalla sin bajar el contraste AA. */
-    fondo: '#F4F7F5',
+    /** Niebla. */
+    fondo: '#F3F5F1',
     superficie: '#FFFFFF',
-    superficieAlterna: '#E8F0EC',
-    borde: '#C9D3CF',
+    superficieAlterna: '#E5EBE6',
+    borde: '#C9D1CC',
     bordeControl: '#7A8783',
-    texto: '#111816',
-    textoSecundario: '#4A5652',
+    /** Tinta. */
+    texto: '#12201B',
+    textoSecundario: '#52605A',
     textoDeshabilitado: '#9AA5A1',
-    acento: marca.oscuro,
+    /** Pino. */
+    acento: '#0F3D32',
     sobreAcento: '#FFFFFF',
-    acentoTexto: marca.oscuro,
+    /** Cifra. */
+    acentoTexto: '#0B6B55',
     faltante: '#B3261E',
-    aviso: '#1B2421',
-    sobreAviso: '#F2F5F4',
-    avisoAccion: '#5FD3B0',
+    aviso: '#12201B',
+    sobreAviso: '#F3F5F1',
+    avisoAccion: '#5EE0B0',
     foco: marca.acento,
     velo: 'rgba(0,0,0,0.45)',
+    dock: '#0F3D32',
+    dockBoton: '#1E5546',
+    sobreDock: '#FFFFFF',
+    /** Menta. */
+    microfono: '#5EE0B0',
+    sobreMicrofono: '#0F3D32',
+    segmento: '#E2E8E3',
+    segmentoActivo: '#FFFFFF',
+    iconoFondo: '#E3F1EA',
+    atencion: '#FFF0C7',
+    sobreAtencion: '#5C4300',
   },
   oscuro: {
-    fondo: '#0C1210',
-    superficie: '#151C1A',
-    superficieAlterna: '#1F2926',
-    borde: '#3A4643',
+    fondo: '#0B1512',
+    superficie: '#13201C',
+    superficieAlterna: '#1C2A25',
+    borde: '#3A4C45',
     bordeControl: '#6F7D79',
-    texto: '#ECF1EF',
-    textoSecundario: '#A9B5B1',
+    texto: '#EAF2EE',
+    textoSecundario: '#9DB0A8',
     textoDeshabilitado: '#5E6A66',
-    acento: marca.claro,
-    sobreAcento: '#04140F',
-    acentoTexto: '#3FC79F',
+    acento: '#5EE0B0',
+    sobreAcento: '#0B1512',
+    acentoTexto: '#5EE0B0',
     faltante: '#FF8A80',
     aviso: '#E3EAE7',
-    sobreAviso: '#111816',
+    sobreAviso: '#12201B',
     avisoAccion: marca.oscuro,
-    foco: '#3FC79F',
+    foco: '#5EE0B0',
     velo: 'rgba(0,0,0,0.6)',
+    dock: '#1C3A31',
+    dockBoton: '#2A5144',
+    sobreDock: '#EAF2EE',
+    microfono: '#5EE0B0',
+    sobreMicrofono: '#0B1512',
+    segmento: '#13201C',
+    segmentoActivo: '#26392F',
+    iconoFondo: '#1C3A31',
+    atencion: '#3A3010',
+    sobreAtencion: '#FFD970',
   },
 };
 
@@ -214,39 +263,32 @@ export type VarianteTexto = keyof typeof tipo;
 export const NUMEROS_TABULARES = ['tabular-nums'] as const;
 
 /**
- * Tokens de la barra de pestañas (Ola 7 §2): Asistente · Movimientos · Cuentas · Tú. La ruta del asistente sigue
- * siendo `hoy` (enlaces, widget y Maestro).
+ * Navegación de arriba (dirección B, `02 §2`): el selector Asistente · Movimientos · Cuentas y el círculo de Tú. La
+ * ruta del asistente sigue siendo `hoy` (enlaces, widget y Maestro); Tú no es segmento: la abre el círculo.
  */
-export const barraPestanas = {
-  pestanas: [
+export const navegacionSuperior = {
+  segmentos: [
     { ruta: 'hoy', etiqueta: 'Asistente' },
     { ruta: 'movimientos', etiqueta: 'Movimientos' },
     { ruta: 'cuentas', etiqueta: 'Cuentas' },
-    { ruta: 'tu', etiqueta: 'Tú' },
   ],
-  alto: 64,
-  tamanoIcono: 24,
-  etiqueta: tipo.pequeno,
+  tu: { ruta: 'tu', etiqueta: 'Tú' },
+  /** Alto del selector y diámetro del círculo de Tú (B1: 48). */
+  alto: 48,
+  /** Separación del selector con la barra de estado (B1: 52 − 44 del área segura ≈ 8). */
+  margenSuperior: espacio.s,
+  etiqueta: { fontSize: 15, lineHeight: 20 },
 } as const;
 
-/**
- * Opciones de estilo para `<Tabs screenOptions>` de Expo Router, sin importar Expo Router aquí.
- * La etiqueta siempre visible: la pestaña activa no se distingue solo por color.
- */
-export function estiloBarraPestanas(c: Colores, esquema: EsquemaColor = 'claro') {
-  const elevacion = sombra.tarjeta[esquema];
-  return {
-    tabBarActiveTintColor: c.acentoTexto,
-    tabBarInactiveTintColor: c.textoSecundario,
-    tabBarShowLabel: true,
-    tabBarStyle: {
-      backgroundColor: c.superficie,
-      borderTopWidth: 0,
-      minHeight: barraPestanas.alto,
-      paddingTop: espacio.xs,
-      ...elevacion,
-    },
-    tabBarLabelStyle: { fontSize: barraPestanas.etiqueta.fontSize, fontWeight: '600' as const },
-    tabBarItemStyle: { minHeight: OBJETIVO_TACTIL_MIN },
-  };
-}
+/** Medidas del dock de voz (B1: 84 de alto, radio 32, botones de 118 × 52 y micrófono de 68). */
+export const dockVoz = {
+  alto: 84,
+  radio: 32,
+  margenLateral: espacio.m,
+  anchoBoton: 118,
+  altoBoton: 52,
+  microfono: 68,
+  /** Anillo de 6 alrededor del micrófono. */
+  anillo: 6,
+  etiqueta: { fontSize: 15, lineHeight: 20, fontWeight: '700' as const },
+} as const;

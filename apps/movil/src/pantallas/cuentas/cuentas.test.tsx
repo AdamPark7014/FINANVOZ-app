@@ -18,6 +18,7 @@ import { auditar } from '../__pruebas__/accesibilidad';
 import { RESPUESTAS_PAGO_INICIALES } from '../onboarding/pagos-fijos';
 import { FormularioPagoFijo } from '../pagos-fijos/FormularioPagoFijo';
 import { PantallaCuentas } from '../principal';
+import { MenuAgregar } from './MenuAgregar';
 import { crearMotorFalso, renderConSesion } from '../principal/__pruebas__/arnes';
 import { abrirPruebaPantalla } from '../principal/__pruebas__/base';
 import { FormularioCuenta } from './FormularioCuenta';
@@ -257,14 +258,17 @@ describe('Agregar pago fijo después del onboarding', () => {
  * botón) y su API nueva (prellenado, sin «O dímelo»).
  */
 describe('Formularios compartidos con el onboarding', () => {
-  it('«Agregar cuenta» y «Agregar pago fijo» solo aparecen con su destino y lo abren', () => {
+  // Dirección B: «Agregar» del dock de Cuentas abre el menú; ya no hay botones sueltos en cada sección.
+  it('«Agregar cuenta» y «Agregar pago fijo» del menú «Agregar» solo aparecen con su destino y lo abren', () => {
     const p = preparar();
     const alAgregarCuenta = jest.fn();
     const alAgregarPagoFijo = jest.fn();
+    const alCerrar = jest.fn();
     renderConSesion(
       p.ctx,
-      <PantallaCuentas
-        alAbrirAjustes={jest.fn()}
+      <MenuAgregar
+        abajo={0}
+        alCerrar={alCerrar}
         alAgregarCuenta={alAgregarCuenta}
         alAgregarPagoFijo={alAgregarPagoFijo}
       />,
@@ -273,12 +277,14 @@ describe('Formularios compartidos con el onboarding', () => {
     expect(screen.getByTestId('boton-agregar-pago-fijo').props.accessibilityLabel).toBe(
       BTN_AGREGAR_PAGO_FIJO,
     );
+    expect(screen.queryByTestId('boton-agregar-tarjeta')).toBeNull();
     fireEvent.press(screen.getByTestId('boton-agregar-cuenta'));
     fireEvent.press(screen.getByTestId('boton-agregar-pago-fijo'));
     expect(alAgregarCuenta).toHaveBeenCalled();
     expect(alAgregarPagoFijo).toHaveBeenCalled();
+    expect(alCerrar).toHaveBeenCalledTimes(2);
     screen.unmount();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    renderConSesion(p.ctx, <PantallaCuentas alAgregarCuenta={jest.fn()} alAgregarPagoFijo={jest.fn()} />);
     expect(screen.queryByTestId('boton-agregar-cuenta')).toBeNull();
     expect(screen.queryByTestId('boton-agregar-pago-fijo')).toBeNull();
     p.cerrar();
@@ -343,7 +349,7 @@ describe('Formularios compartidos con el onboarding', () => {
     );
     expect(screen.queryByTestId('onb-pago-formulario')).toBeNull();
     screen.unmount();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    renderConSesion(p.ctx, <PantallaCuentas />);
     expect(screen.getByTestId('seccion-compromisos-lista')).toHaveTextContent(/renta/i);
     p.cerrar();
   });

@@ -15,13 +15,13 @@ import {
 } from '../cuentas/textos';
 import { abrirPruebaPantalla, conEscenario } from './__pruebas__/base';
 import { renderConSesion } from './__pruebas__/arnes';
+import { MenuAgregar } from '../cuentas/MenuAgregar';
 import { PantallaCuentas } from './PantallaCuentas';
 import { PISTA_CONTAR_EFECTIVO } from './textos';
 
 /** Todas las salidas de Cuentas conectadas, como en la pestaña real (`app/(tabs)/cuentas.tsx`). */
 function navegacion() {
   return {
-    alAbrirAjustes: jest.fn(),
     alContarEfectivo: jest.fn(),
     alAgregarTarjeta: jest.fn(),
     alAbrirPersona: jest.fn(),
@@ -35,7 +35,8 @@ function navegacion() {
 }
 
 describe('Cuentas después del onboarding (auditoría de botones)', () => {
-  it('Tienes: «Agregar cuenta» existe y el vacío dice dónde está', () => {
+  // Dirección B: «Agregar» vive en el dock de Cuentas (`MenuAgregar`); el vacío dice dónde está.
+  it('Tienes: el vacío dice dónde está «Agregar» y el menú abre «Agregar cuenta»', () => {
     const p = abrirPruebaPantalla();
     aceptarConsentimiento(p.ctx, { datosFinancieros: true });
     const nav = navegacion();
@@ -43,6 +44,12 @@ describe('Cuentas después del onboarding (auditoría de botones)', () => {
     expect(screen.getByTestId('cuentas-tienes-vacio')).toHaveProp(
       'accessibilityHint',
       PISTA_CTA_AGREGAR_CUENTA,
+    );
+    expect(screen.queryByTestId('boton-agregar-cuenta')).toBeNull();
+    screen.unmount();
+    renderConSesion(
+      p.ctx,
+      <MenuAgregar abajo={0} alCerrar={jest.fn()} alAgregarCuenta={nav.alAgregarCuenta} />,
     );
     const agregar = screen.getByTestId('boton-agregar-cuenta');
     expect(agregar.props.accessibilityLabel).toBe(BTN_AGREGAR_CUENTA);
@@ -90,7 +97,7 @@ describe('Cuentas después del onboarding (auditoría de botones)', () => {
     p.cerrar();
   });
 
-  it('Compromisos: cada pago abre su detalle; «Agregar pago fijo» y «Ver todos tus pagos fijos»', () => {
+  it('Compromisos: cada pago abre su detalle y «Ver todos tus pagos fijos»; «Agregar pago fijo» va en el menú', () => {
     const p = conEscenario('e4-01');
     const nav = navegacion();
     renderConSesion(p.ctx, <PantallaCuentas {...nav} />);
@@ -101,14 +108,20 @@ describe('Cuentas después del onboarding (auditoría de botones)', () => {
     expect(fila.props.accessibilityLabel).toMatch(/^internet, mié 14\. Pago de internet el mié 14 /);
     fireEvent.press(fila);
     expect(nav.alAbrirPagoFijo).toHaveBeenCalledWith(internet.programadoId);
+    expect(screen.getByTestId('boton-ver-pagos-fijos').props.accessibilityLabel).toBe(BTN_VER_PAGOS_FIJOS);
+    fireEvent.press(screen.getByTestId('boton-ver-pagos-fijos'));
+    expect(nav.alVerPagosFijos).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('boton-agregar-pago-fijo')).toBeNull();
+    screen.unmount();
+    renderConSesion(
+      p.ctx,
+      <MenuAgregar abajo={0} alCerrar={jest.fn()} alAgregarPagoFijo={nav.alAgregarPagoFijo} />,
+    );
     expect(screen.getByTestId('boton-agregar-pago-fijo').props.accessibilityLabel).toBe(
       BTN_AGREGAR_PAGO_FIJO,
     );
     fireEvent.press(screen.getByTestId('boton-agregar-pago-fijo'));
     expect(nav.alAgregarPagoFijo).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('boton-ver-pagos-fijos').props.accessibilityLabel).toBe(BTN_VER_PAGOS_FIJOS);
-    fireEvent.press(screen.getByTestId('boton-ver-pagos-fijos'));
-    expect(nav.alVerPagosFijos).toHaveBeenCalledTimes(1);
     p.cerrar();
   });
 
@@ -138,7 +151,7 @@ describe('Cuentas después del onboarding (auditoría de botones)', () => {
 
   it('sin los callbacks nuevos se ve como antes (sin botones que no lleven a ningún lado)', () => {
     const p = conEscenario('e4-01');
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} />);
+    renderConSesion(p.ctx, <PantallaCuentas />);
     expect(screen.queryByTestId('boton-agregar-cuenta')).toBeNull();
     expect(screen.queryByTestId('boton-agregar-pago-fijo')).toBeNull();
     expect(screen.queryByTestId(`cuenta-${p.e.cuentas.bbva}-abrir`)).toBeNull();

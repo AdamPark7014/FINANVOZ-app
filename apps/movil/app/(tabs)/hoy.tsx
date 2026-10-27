@@ -1,6 +1,4 @@
-import { useContext } from 'react';
 import { useRouter } from 'expo-router';
-import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { dependenciasCompartidoExpo } from '../../src/compartido/expo';
 import { ProveedorCompartido } from '../../src/compartido/ProveedorCompartido';
@@ -10,18 +8,15 @@ import { PantallaAsistente } from '../../src/pantallas/asistente/PantallaAsisten
 import { abrirR2 } from '../../src/pantallas/asistente/r2';
 import { abrirMeAlcanza } from '../../src/pantallas/me-alcanza';
 import { paramsDeDetalle, paramsDeFiltro, useMostrarAviso } from '../../src/pantallas/principal';
-import { useInformarAltoPestanas } from '../../src/pantallas/principal/ProveedorAvisos';
 import { propsContenedorPestana } from '../../src/rutas/pestanas-textos';
 
 /**
- * Pestaña Asistente (Ola 7): la ruta sigue siendo `hoy` para los enlaces, el widget y Maestro. «Cambiar» y la
+ * Asistente (Ola 7, dirección B): la ruta sigue siendo `hoy` para los enlaces, el widget y Maestro. «Cambiar» y la
  * reparación abren R2 (`/registrar`, modal) con lo dicho en memoria (regla 9).
  */
 export default function Hoy() {
   const router = useRouter();
   const mostrarAviso = useMostrarAviso();
-  // El aviso con "Deshacer" se coloca sobre la barra real (en iPhone mide más que el token, `ProveedorAvisos`).
-  useInformarAltoPestanas(useContext(BottomTabBarHeightContext));
   // "Listo: guardé tu ingreso…" al regresar de Ajustes › Ingreso.
   useConfirmacionAlVolver((mensaje) => mostrarAviso({ mensaje }));
   return (

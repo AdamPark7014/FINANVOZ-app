@@ -64,7 +64,7 @@ async function hablar(
 beforeEach(() => reiniciarR2());
 
 describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
-  it('recién instalada: cabecera compacta con la barra del día y el estado vacío con el micrófono enorme', () => {
+  it('recién instalada: cabecera compacta con la barra del día, el estado vacío y el micrófono en el dock', () => {
     const { p } = montar();
     expect(screen.getByTestId('pantalla-hoy')).toBeTruthy();
     expect(screen.getByTestId('hoy-puedes')).toHaveTextContent('$214');
@@ -73,8 +73,8 @@ describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
     expect(screen.getByTestId('leyenda-libre')).toHaveTextContent('Libre $856');
     expect(screen.getByTestId('leyenda-reservado')).toHaveTextContent('Reservado $3,174');
     expect(screen.getByTestId('leyenda-colchon')).toHaveTextContent('Colchón $200');
-    // El micrófono grande está al centro y es el único (Maestro toca `boton-hablar`).
-    expect(within(screen.getByTestId('estado-vacio-mic')).getByTestId('boton-hablar')).toBeTruthy();
+    // El micrófono vive en el dock de voz (dirección B) y es el único (Maestro toca `boton-hablar`).
+    expect(within(screen.getByTestId('dock-voz')).getByTestId('boton-hablar')).toBeTruthy();
     expect(screen.getAllByTestId('boton-hablar')).toHaveLength(1);
     expect(screen.getByTestId('estado-vacio-saludo')).toHaveTextContent('Hola. Hoy puedes gastar $214.');
     p.cerrar();

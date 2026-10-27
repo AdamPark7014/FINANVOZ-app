@@ -117,14 +117,14 @@ describe('Registrar con voz desde Hoy (P0/P1 de la auditoría UX)', () => {
 
   it('el micrófono y el teclado van fijos al pie, fuera de la conversación que se desplaza', () => {
     montarHoy();
-    // Sin turnos: el micrófono enorme al centro (Hoy C) y el teclado al pie.
-    expect(within(screen.getByTestId('estado-vacio-mic')).getByTestId('boton-hablar')).toBeTruthy();
+    // Sin turnos: el micrófono y el teclado ya están en el dock de voz, al pie (dirección B).
     const pie = () => screen.getByTestId('hoy-pie-registrar');
+    expect(within(pie()).getByTestId('boton-hablar')).toBeTruthy();
     expect(within(pie()).getByTestId('boton-escribir')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-escribir'));
     fireEvent.changeText(screen.getByTestId('campo-registrar'), 'coca 25 en efectivo');
     fireEvent.press(screen.getByTestId('boton-enviar-registro'));
-    // Con turnos: el micrófono de 72 pt al pie; la conversación (que se desplaza) no lo contiene.
+    // Con turnos: el micrófono sigue en el dock; la conversación (que se desplaza) no lo contiene.
     expect(within(pie()).getByTestId('boton-hablar')).toBeTruthy();
     const conversacion = screen.getByTestId('conversacion');
     expect(within(conversacion).getByTestId('aviso')).toBeTruthy();

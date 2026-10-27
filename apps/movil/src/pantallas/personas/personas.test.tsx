@@ -102,7 +102,7 @@ describe('CA-M8-01 · cuenta dividida por voz', () => {
       p.ctx,
       <>
         <PantallaHoy navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />
-        <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={jest.fn()} />
+        <PantallaCuentas alAbrirPersona={jest.fn()} />
       </>,
       f.nube,
     );
@@ -271,7 +271,7 @@ describe('CA-M8-02 · Cobrar', () => {
       p.ctx,
       <>
         <PantallaPersona personaId={p.caro} alVolver={jest.fn()} />
-        <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={jest.fn()} />
+        <PantallaCuentas alAbrirPersona={jest.fn()} />
       </>,
     );
     fireEvent.press(screen.getByTestId('boton-ya-me-pago'));
@@ -288,7 +288,7 @@ describe('CA-M8-02 · Cobrar', () => {
     const p = conAmigos();
     cena(p);
     const alAbrirPersona = jest.fn();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={alAbrirPersona} />);
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirPersona={alAbrirPersona} />);
     fireEvent.press(screen.getByTestId(`te-debe-${p.caro}-accion`));
     expect(alAbrirPersona).toHaveBeenCalledWith(p.caro);
   });
@@ -302,7 +302,7 @@ describe('CA-M8-02 · Cobrar', () => {
       monto: 50_000,
     });
     const alAbrirPersona = jest.fn();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirPersona={alAbrirPersona} />);
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirPersona={alAbrirPersona} />);
     fireEvent.press(screen.getByTestId(`cuenta-${p.caro}-accion`));
     expect(alAbrirPersona).toHaveBeenCalledWith(p.caro);
   });

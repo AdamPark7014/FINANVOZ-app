@@ -373,7 +373,7 @@ describe('Tarjetas', () => {
     const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);
     const d = listarCuentas(p.ctx).debes.find((x) => x.id === p.oro);
     if (!t || !d) throw new Error('e5-10 sin Oro en Debes');
-    montar(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTarjeta={jest.fn()} />);
+    montar(p.ctx, <PantallaCuentas alAbrirTarjeta={jest.fn()} />);
     expect(screen.getByTestId(`cuenta-${p.oro}`)).toHaveProp(
       'accessibilityLabel',
       etiquetaAccesibleTarjetaEnLista(d, t),
@@ -484,7 +484,7 @@ describe('Tarjetas', () => {
   it('Cuentas lleva al detalle y muestra uso, fecha límite y próximo corte', () => {
     const p = e510();
     const alAbrirTarjeta = jest.fn();
-    montar(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirTarjeta={alAbrirTarjeta} />);
+    montar(p.ctx, <PantallaCuentas alAbrirTarjeta={alAbrirTarjeta} />);
     const t = listarTarjetas(p.ctx).find((x) => x.id === p.oro);
     expect(textoDe(`cuenta-${p.oro}-limite-pago`)).toBe(
       `Fecha límite: ${t?.etiquetaFechaLimite} · próximo corte: ${t?.etiquetaProximoCorte}`,

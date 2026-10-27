@@ -60,12 +60,15 @@ export function suscribirGuardadosR2(oyente: () => void): () => void {
 }
 
 /**
- * Lo que llega al asistente desde fuera por `/registrar?…` (enlaces de antes): el micrófono del widget
- * (`dictar=1`) o «Revisar» una frase de «Por revisar» (`frase=<id>`, solo el id). La ruta lo deja aquí y abre la
- * pestaña; el asistente lo atiende al recibirlo.
+ * Lo que llega al asistente desde fuera: por `/registrar?…` (enlaces de antes) el micrófono del widget
+ * (`dictar=1`) o «Revisar» una frase de «Por revisar» (`frase=<id>`, solo el id); desde el dock de Movimientos y
+ * Cuentas, el micrófono (`dictar`) y «Escribir» (`escribir`). Quien lo pide abre la pestaña; el asistente lo atiende
+ * al recibirlo.
  */
 export type PedidoAsistente =
-  { readonly tipo: 'dictar' } | { readonly tipo: 'revisar'; readonly frase: string };
+  | { readonly tipo: 'dictar' }
+  | { readonly tipo: 'escribir' }
+  | { readonly tipo: 'revisar'; readonly frase: string };
 
 let pedido: PedidoAsistente | null = null;
 const oyentesPedido = new Set<() => void>();

@@ -9,12 +9,10 @@ import {
   type CuentaDebes,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, Interruptor, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, Cifra, espacio, Interruptor, margenPantalla, Pantalla, Tarjeta, Texto } from '../../ui';
 import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import {
-  BTN_AGREGAR_CUENTA,
-  BTN_AGREGAR_PAGO_FIJO,
   BTN_VER,
   BTN_VER_PAGOS_FIJOS,
   BTN_VER_PERSONAS,
@@ -23,8 +21,6 @@ import {
   PISTA_ABRIR_COMPROMISO,
   PISTA_ABRIR_CUENTA,
   PISTA_ABRIR_EFECTIVO,
-  PISTA_AGREGAR_CUENTA,
-  PISTA_AGREGAR_PAGO_FIJO,
   PISTA_CTA_AGREGAR_CUENTA,
   PISTA_VER_PAGOS_FIJOS,
   PISTA_VER_PERSONAS,
@@ -35,10 +31,6 @@ import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { TarjetaCreditoLista } from '../tarjetas/TarjetaCreditoLista';
 import { EstadoVacio } from './EstadoVacio';
 import {
-  BTN_AGREGAR_TARJETA_CREDITO,
-  BTN_AJUSTES_CUENTAS,
-  BTN_AJUSTES_CUENTAS_ACCESIBLE,
-  PISTA_AGREGAR_TARJETA_CREDITO,
   PISTA_COBRAR_DESDE_CUENTAS,
   PISTA_CONTAR_EFECTIVO,
   contextoSaldoCompromiso,
@@ -62,13 +54,13 @@ const NOMBRE_SUBTIPO: Record<string, string> = {
 };
 
 /**
- * Cuentas (02-UX §11): Tienes · Debes · Te deben · Compromisos (próximos 30 días). Engrane → Ajustes. Cada tarjeta
+ * Cuentas (02-UX §11): Tienes · Debes · Te deben · Compromisos (próximos 30 días). Ajustes se abre con el círculo de
+ * Tú y «Agregar» (cuenta, tarjeta o pago fijo) vive en el dock de voz (dirección B). Cada tarjeta
  * de crédito abre su detalle (02-UX §8); cada cuenta de Tienes, el suyo (corregir saldo, ver movimientos); cada
  * compromiso, el del pago fijo (cambiar monto, quitar). «Agregar cuenta» y «Agregar pago fijo» cumplen lo que el
  * onboarding promete («agrégalas después en Cuentas»).
  */
 export function PantallaCuentas({
-  alAbrirAjustes,
   alAbrirTarjeta,
   alAgregarTarjeta,
   alContarEfectivo,
@@ -79,12 +71,13 @@ export function PantallaCuentas({
   alAbrirDeducciones,
   alAgregarCuenta,
   alAbrirCuenta,
-  alAgregarPagoFijo,
   alAbrirPagoFijo,
   alVerPagosFijos,
   alVerPersonas,
+  espacioInferior = 0,
 }: {
-  alAbrirAjustes: () => void;
+  /** Lo que tapa el dock al pie (dirección B): el contenido deja ese espacio al final. */
+  espacioInferior?: number;
   /** Te deben → detalle de la persona con Cobrar (`02 §17`). */
   alAbrirPersona?: (personaId: string) => void;
   alAbrirTarjeta?: (tarjetaId: string) => void;
@@ -116,29 +109,15 @@ export function PantallaCuentas({
   const tarjetas = useVista(listarTarjetas);
   const hayPersonas = useVista((ctx) => listarPersonas(ctx).length > 0);
   return (
-    <Pantalla testID="pantalla-cuentas" contenidoStyle={{ gap: espacio.xl }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: espacio.m,
-          marginBottom: espacio.xs,
-        }}
-      >
-        <Texto variante="titulo" testID="cuentas-titulo" accessibilityRole="header">
-          Cuentas
-        </Texto>
-        <Boton
-          etiqueta={BTN_AJUSTES_CUENTAS}
-          etiquetaAccesible={BTN_AJUSTES_CUENTAS_ACCESIBLE}
-          pista="Abre la pantalla de Ajustes"
-          variante="texto"
-          ancho="contenido"
-          alPresionar={alAbrirAjustes}
-          testID="boton-ajustes"
-        />
-      </View>
+    <Pantalla
+      testID="pantalla-cuentas"
+      // Arriba manda la navegación de la dirección B (ya cubre la barra de estado); abajo, el dock.
+      bordes={['left', 'right']}
+      contenidoStyle={{ gap: espacio.xl, paddingBottom: margenPantalla + espacioInferior }}
+    >
+      <Texto variante="titulo" testID="cuentas-titulo" accessibilityRole="header">
+        Cuentas
+      </Texto>
 
       <Seccion titulo="Tienes" testID="seccion-tienes">
         {v.tienes.length === 0 ? (
@@ -182,16 +161,6 @@ export function PantallaCuentas({
             ))}
           </View>
         ) : null}
-        {alAgregarCuenta ? (
-          <Boton
-            etiqueta={BTN_AGREGAR_CUENTA}
-            pista={PISTA_AGREGAR_CUENTA}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={alAgregarCuenta}
-            testID="boton-agregar-cuenta"
-          />
-        ) : null}
       </Seccion>
 
       <Seccion titulo="Debes" testID="seccion-debes">
@@ -200,9 +169,7 @@ export function PantallaCuentas({
             texto={TEXTO_CUENTAS_DEBES_VACIO}
             testID="cuentas-debes-vacio"
             etiquetaAccesible={etiquetaVacioCuentasDebes()}
-            {...(alAgregarTarjeta
-              ? { pistaCta: `Más abajo, botón ${BTN_AGREGAR_TARJETA_CREDITO.toLowerCase()}` }
-              : {})}
+            {...(alAgregarTarjeta ? { pistaCta: PISTA_CTA_AGREGAR_CUENTA } : {})}
           />
         ) : null}
         {v.debes.length > 0 ? (
@@ -223,16 +190,6 @@ export function PantallaCuentas({
               ),
             )}
           </View>
-        ) : null}
-        {alAgregarTarjeta ? (
-          <Boton
-            etiqueta={BTN_AGREGAR_TARJETA_CREDITO}
-            pista={PISTA_AGREGAR_TARJETA_CREDITO}
-            variante="texto"
-            ancho="contenido"
-            alPresionar={alAgregarTarjeta}
-            testID="boton-agregar-tarjeta"
-          />
         ) : null}
       </Seccion>
 
@@ -309,29 +266,15 @@ export function PantallaCuentas({
             ))}
           </View>
         ) : null}
-        {alAgregarPagoFijo || alVerPagosFijos ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-            {alAgregarPagoFijo ? (
-              <Boton
-                etiqueta={BTN_AGREGAR_PAGO_FIJO}
-                pista={PISTA_AGREGAR_PAGO_FIJO}
-                variante="texto"
-                ancho="contenido"
-                alPresionar={alAgregarPagoFijo}
-                testID="boton-agregar-pago-fijo"
-              />
-            ) : null}
-            {alVerPagosFijos ? (
-              <Boton
-                etiqueta={BTN_VER_PAGOS_FIJOS}
-                pista={PISTA_VER_PAGOS_FIJOS}
-                variante="texto"
-                ancho="contenido"
-                alPresionar={alVerPagosFijos}
-                testID="boton-ver-pagos-fijos"
-              />
-            ) : null}
-          </View>
+        {alVerPagosFijos ? (
+          <Boton
+            etiqueta={BTN_VER_PAGOS_FIJOS}
+            pista={PISTA_VER_PAGOS_FIJOS}
+            variante="texto"
+            ancho="contenido"
+            alPresionar={alVerPagosFijos}
+            testID="boton-ver-pagos-fijos"
+          />
         ) : null}
       </Seccion>
 

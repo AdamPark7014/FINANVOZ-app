@@ -107,6 +107,24 @@ export const BTN_FORMULARIO = 'Registrar con formulario';
 export const PISTA_FORMULARIO = 'Abre el formulario corto para llenar los datos';
 export const ETIQUETA_CHIPS_INTENCION = 'Atajos para hablar';
 
+// ——— Dock de voz (dirección B, `02 §2`) ———
+
+/** «¿Me alcanza?» del dock: escucha con este arranque (`unirPrefijo`) o lo deja escrito en el campo. */
+export const PREFIJO_ME_ALCANZA = 'me alcanza para ';
+export const PREFIJO_ME_ALCANZA_ESCRITO = '¿Me alcanza para ';
+export const PISTA_DOCK_ME_ALCANZA = 'Te escucho: dime qué quieres comprar y cuánto cuesta';
+export const BTN_DOCK_BUSCAR = 'Buscar';
+export const PISTA_DOCK_BUSCAR = 'Abre un campo para buscar en tus movimientos';
+export const ETIQUETA_CERRAR_BUSQUEDA = 'Cerrar la búsqueda';
+export const BTN_DOCK_AGREGAR = 'Agregar';
+export const PISTA_DOCK_AGREGAR = 'Agrega una cuenta, una tarjeta de crédito o un pago fijo';
+export const ETIQUETA_CERRAR_AGREGAR = 'Cerrar las opciones para agregar';
+/** Escribir y el micrófono fuera del asistente: llevan a él, que es quien contesta. */
+export const PISTA_DOCK_ESCRIBIR_FUERA = 'Abre el asistente con el campo para escribir';
+export const ETIQUETA_DOCK_HABLAR_MOVIMIENTOS = 'Toca para preguntar o registrar';
+export const ETIQUETA_DOCK_HABLAR_CUENTAS = 'Toca para hablar, por ejemplo «traigo 300 en efectivo»';
+export const PISTA_DOCK_HABLAR_FUERA = 'Abre el asistente escuchando';
+
 // ——— R2 (formulario corto, modal) ———
 
 export const TITULO_R2 = 'Registrar';

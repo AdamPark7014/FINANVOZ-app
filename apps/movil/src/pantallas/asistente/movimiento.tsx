@@ -160,7 +160,16 @@ function Punto({ retraso, color }: { retraso: number; color: string }) {
 }
 
 /** Anillo que late alrededor del orbe mientras escucha. Decorativo. */
-export function AnilloEscucha({ activo, tamano }: { activo: boolean; tamano: number }) {
+export function AnilloEscucha({
+  activo,
+  tamano,
+  color,
+}: {
+  activo: boolean;
+  tamano: number;
+  /** Por omisión, el acento de texto (sobre el fondo); en el dock, la menta. */
+  color?: string;
+}) {
   const { c } = useTema();
   const v = useCiclo(activo, 1600);
   if (!activo) return null;
@@ -175,7 +184,7 @@ export function AnilloEscucha({ activo, tamano }: { activo: boolean; tamano: num
         height: tamano,
         borderRadius: tamano / 2,
         borderWidth: 2,
-        borderColor: c.acentoTexto,
+        borderColor: color ?? c.acentoTexto,
         opacity: v.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }),
         transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] }) }],
       }}

@@ -4,14 +4,9 @@ import { textoMovimientoDelDia } from '../../asistente/conversacion';
 import { listarMovimientos } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
 import { espacio, margenPantalla, Texto } from '../../ui';
-import type { BotonHablar } from '../../voz';
 import { TEXTO_PRIMER_USO, TITULO_PRIMER_USO } from '../principal/textos';
-import { MicrofonoAsistente } from './MicrofonoAsistente';
-import { saludoDelDia, SUGERENCIA_DECIR, TEXTO_MANTEN_O_TOCA, TITULO_ULTIMO_ENTENDIDO } from './textos';
+import { saludoDelDia, SUGERENCIA_DECIR, TITULO_ULTIMO_ENTENDIDO } from './textos';
 import { TurnoRegistro } from './turnos/TurnoRegistro';
-
-/** Tamaño del micrófono cuando todavía no hay turnos: el orbe manda; el teclado es secundario. */
-export const TAMANO_MICROFONO_VACIO = 136;
 
 /**
  * Sin turnos todavía (Hoy C dentro de Hoy A, decisión 1): el micrófono enorme al centro, cómo se dice el primer
@@ -20,16 +15,12 @@ export const TAMANO_MICROFONO_VACIO = 136;
 export function EstadoVacio({
   primerUso,
   hoyPuedes,
-  escuchando,
-  boton,
   encabezado,
   alVerMovimiento,
 }: {
   primerUso: boolean;
   /** «$214» tal como lo muestra la cabecera; `null` sin ingreso configurado. */
   hoyPuedes: string | null;
-  escuchando: boolean;
-  boton: BotonHablar;
   encabezado?: ReactNode;
   alVerMovimiento?: (id: string) => void;
 }) {
@@ -61,12 +52,6 @@ export function EstadoVacio({
             {TITULO_PRIMER_USO}
           </Texto>
         ) : null}
-        <View testID="estado-vacio-mic" style={{ paddingVertical: espacio.m }}>
-          <MicrofonoAsistente escuchando={escuchando} boton={boton} tamano={TAMANO_MICROFONO_VACIO} />
-        </View>
-        <Texto variante="etiqueta" tono="acento" alinear="center">
-          {TEXTO_MANTEN_O_TOCA}
-        </Texto>
         <Texto
           variante="cuerpo"
           tono="secundario"

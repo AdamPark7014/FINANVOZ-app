@@ -1,43 +1,36 @@
 import { Tabs, type BottomTabNavigationOptions } from 'expo-router/js-tabs';
-import { IconoPestana } from '../../src/pantallas/asistente/IconoPestana';
+import { NavegacionSuperior } from '../../src/pantallas/navegacion/NavegacionSuperior';
 import { ProveedorAvisos } from '../../src/pantallas/principal';
-import { estiloBarraPestanas, useTema } from '../../src/ui';
+import { useTema } from '../../src/ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
   ETIQUETA_PESTANA,
-  testIdBotonPestana,
   type RutaPestanaVisible,
 } from '../../src/rutas/pestanas-textos';
 
 export { ETIQUETA_ACCESIBILIDAD_PESTANA } from '../../src/rutas/pestanas-textos';
 
 function opcionesPestana(ruta: RutaPestanaVisible): BottomTabNavigationOptions {
-  const etiqueta = ETIQUETA_PESTANA[ruta];
-  return {
-    title: etiqueta,
-    tabBarLabel: etiqueta,
-    tabBarButtonTestID: testIdBotonPestana(ruta),
-    tabBarAccessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta],
-    tabBarIcon: ({ color }) => <IconoPestana ruta={ruta} color={color} />,
-  };
+  return { title: ETIQUETA_PESTANA[ruta], tabBarAccessibilityLabel: ETIQUETA_ACCESIBILIDAD_PESTANA[ruta] };
 }
 
 /**
- * Cuatro pestañas (Ola 7 §2): Asistente (ruta `hoy`) · Movimientos · Cuentas · Tú. Registrar ya no es pestaña:
+ * Dirección B (`02 §2`): la navegación va arriba (`NavegacionSuperior`: el selector Asistente · Movimientos · Cuentas
+ * y el círculo de Tú) y abajo nunca hay pestañas; ahí vive el dock de voz de cada pantalla. Registrar no es pestaña:
  * `/registrar` es la hoja modal R2 (`app/registrar.tsx`). El aviso con "Deshacer" vive aquí para sobrevivir al
- * cambio de pantalla.
+ * cambio de pantalla; los docks le reservan su espacio (`useReservarEspacioAviso`).
  */
 export default function LayoutPestanas() {
-  const { c, esquema } = useTema();
+  const { c } = useTema();
   return (
-    <ProveedorAvisos sobrePestanas>
+    <ProveedorAvisos>
       <Tabs
         backBehavior="history"
+        tabBar={(props) => <NavegacionSuperior {...props} />}
         screenOptions={{
           headerShown: false,
+          tabBarPosition: 'top',
           sceneStyle: { backgroundColor: c.fondo },
-          tabBarAllowFontScaling: true,
-          ...estiloBarraPestanas(c, esquema),
         }}
       >
         <Tabs.Screen name="hoy" options={opcionesPestana('hoy')} />

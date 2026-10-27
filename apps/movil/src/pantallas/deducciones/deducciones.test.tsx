@@ -334,7 +334,7 @@ describe('Deducciones (02 §24, CA-M12-03)', () => {
   it('Cuentas abre Deducciones', () => {
     const ctx = preparar();
     const alAbrir = jest.fn();
-    renderConSesion(ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirDeducciones={alAbrir} />);
+    renderConSesion(ctx, <PantallaCuentas alAbrirDeducciones={alAbrir} />);
     expect(screen.getByTestId('boton-deducciones').props.accessibilityLabel).toBe(BTN_DEDUCCIONES_CUENTAS);
     expect(screen.getByTestId('seccion-deducciones-titulo')).toHaveProp('accessibilityRole', 'header');
     fireEvent.press(screen.getByTestId('boton-deducciones'));

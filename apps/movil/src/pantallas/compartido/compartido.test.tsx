@@ -250,7 +250,7 @@ describe('02 §27 · Gastos con tu pareja', () => {
   it('Cuentas abre Gastos compartidos con etiqueta TalkBack', () => {
     const p = abrirPruebaPantalla('2026-10-11');
     const alAbrir = jest.fn();
-    renderConSesion(p.ctx, <PantallaCuentas alAbrirAjustes={jest.fn()} alAbrirCompartidos={alAbrir} />);
+    renderConSesion(p.ctx, <PantallaCuentas alAbrirCompartidos={alAbrir} />);
     expect(screen.getByTestId('seccion-compartidos-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('boton-compartidos')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('boton-compartidos').props.accessibilityLabel).toBe(BTN_COMPARTIDOS_CUENTAS);
