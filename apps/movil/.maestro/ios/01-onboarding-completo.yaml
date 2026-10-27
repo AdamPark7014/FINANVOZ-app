@@ -210,27 +210,18 @@ tags:
     visible:
       id: pantalla-cuentas
     timeout: 10000
-# Despacio: a la velocidad por omisión la inercia dejaba la tarjeta arriba, fuera de la pantalla (corridas del 26-10)
+# La tarjeta Oro se elige por su etiqueta de VoiceOver («Oro. Tarjeta de crédito. Debes en Oro…»), no con
+# `childOf: seccion-debes-lista`: en iOS el árbol de Maestro es plano y la lista no tiene hijos (la tarjeta es su
+# hermana), así que `childOf` nunca encontraba nada y el desplazamiento seguía hasta el final (corrida 40410251361).
 - scrollUntilVisible:
     element:
       id: 'cuenta-[0-9a-f-]{36}'
-      childOf:
-        id: seccion-debes-lista
+      text: 'Oro\..*'
     speed: 20
     timeout: 30000
-- scrollUntilVisible:
-    element:
-      id: 'cuenta-[0-9a-f-]{36}'
-      childOf:
-        id: seccion-debes-lista
-    direction: UP
-    speed: 20
-    timeout: 8000
-    optional: true
 - tapOn:
     id: 'cuenta-[0-9a-f-]{36}'
-    childOf:
-      id: seccion-debes-lista
+    text: 'Oro\..*'
 - extendedWaitUntil:
     visible:
       id: pantalla-tarjeta
@@ -260,9 +251,18 @@ tags:
       id: corregir-saldo
     timeout: 5000
 - runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: tarjeta-nombre, ID: corregir-cancelar } }
+# «Cancelar» de Corregir está en Configuración, al final: los movimientos y el candado de Plus quedan arriba.
 - scrollUntilVisible:
     element:
       id: tarjeta-movimientos
+    direction: UP
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: candado-compromiso-12-meses
+    direction: UP
+    timeout: 15000
+    optional: true
 - runFlow:
     when:
       visible:

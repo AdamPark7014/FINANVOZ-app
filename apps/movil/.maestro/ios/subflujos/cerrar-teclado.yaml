@@ -3,6 +3,7 @@
 # hideKeyboard de Maestro en iOS solo desliza en el centro y no cierra nada aquí; un toque dentro del ScrollView sí
 # (keyboardShouldPersistTaps="handled"). Con el teclado abierto y un pie fijo («Continuar») el centro de la pantalla
 # cae sobre el pie y deslizar no mueve el contenido: por eso primero «Listo». Variables: ANCLA.
+# Volver al ancla desde el final de Ajustes tomaba 28 de los 30 s de antes (unos 4 s por deslizamiento): 90 s de tope.
 appId: com.finanvoz.app
 name: Subflujo · cerrar el teclado
 ---
@@ -19,6 +20,6 @@ name: Subflujo · cerrar el teclado
     element:
       id: ${ANCLA}
     direction: UP
-    timeout: 30000
+    timeout: 90000
 - tapOn:
     id: ${ANCLA}

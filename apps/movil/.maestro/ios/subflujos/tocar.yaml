@@ -1,8 +1,10 @@
 # Toca un elemento con el teclado cerrado para que nunca caiga sobre una tecla. Variables: ANCLA, ID.
 #
 # Tres pasos, por lo que enseñaron las corridas de Maestro del 25 y 26-10:
-# 1. Buscar despacio (speed 20): a la velocidad por omisión el deslizamiento con inercia de iOS 26 se pasaba de largo
-#    (la tarjeta de «Debes» quedaba arriba, fuera de la pantalla).
+# 1. Buscar despacio (speed 20) con hasta 90 s. Cada deslizamiento con su espera tarda unos 4 s y Ajustes mide unas
+#    6 pantallas: con 30 s el tiempo se acababa justo cuando «Leer los términos de uso» asomaba abajo, y Maestro no
+#    vuelve a mirar después del último deslizamiento, así que fallaba con el elemento entero en pantalla (corrida
+#    40410251361). El tope solo pesa cuando el elemento no existe.
 # 2. Centrar si se puede (opcional): en pantallas con pie fijo («Continuar»), un elemento recién aparecido abajo
 #    queda detrás del pie y el toque cae en el pie. Al final del contenido no se puede centrar: por eso es opcional
 #    (con `centerElement` obligatorio fallaban «Leer los términos de uso» y el último campo de la tarjeta).
@@ -18,7 +20,7 @@ name: Subflujo · tocar sin teclado encima
     element:
       id: ${ID}
     speed: 20
-    timeout: 30000
+    timeout: 90000
 - scrollUntilVisible:
     element:
       id: ${ID}
