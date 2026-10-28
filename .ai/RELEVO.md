@@ -54,6 +54,22 @@
   lado con su barra y «Cómo lo calculé» como barra apilada con «$575 libres ÷ 4 días = $143 al día»; el lector sigue
   oyendo la frase completa de `turno.texto` y los `calculo-*` siguen (ahora como leyenda). **El título dice «Listo, lo
   registré.»** (genérico) aunque D3 diga «la registré» (concordar con cada sustantivo no es confiable).
+- **Fase 5 hecha (Movimientos D5 y Cuentas D6):** «En qué se fue» (`EnQueSeFue.tsx` + `agruparPorCategoria` puro y
+  `enQueSeFue` en `servicios/movimientos.ts`, `en-que-se-fue.test.ts`: la suma da `salieron`; seis partes como máximo,
+  lo demás en «Otros»), «entraron» en verde, por revisar en ámbar. Cuentas: `CarruselCuentas.tsx` (efectivo menta,
+  débito azul, crédito violeta; testIDs de siempre `cuenta-<id>`, `-saldo`, `-accion` = contar el efectivo, `-ver` =
+  «⋯» del efectivo, `-abrir`; las de crédito `carrusel-<id>`), `TarjetaCreditoLista` con `ui/componentes/AnilloUso.tsx`
+  (`tarjeta-credito-<id>`, `cuenta-<id>-anillo-uso`), «Lo que viene» como línea de tiempo (`LoQueViene.tsx`, con los
+  ingresos: `VistaCuentas.loQueViene` y `CuentaTienes.contadaEl` vía `fechaUltimoArqueo`). Debes solo con personas (o
+  vacío). En pruebas, `jest.setup.ts` apaga `Animated.loop` (los bucles del orbe volvían lentísima la suite).
+  Verificado: suite completa de jest 933/934 (la que falló, `estados-cuenta.test.tsx`, pasa sola: tiempo bajo carga,
+  igual que antes `nube`, `respaldo`, `analitica-correccion-voz` y `masvs` en vitest) y vitest de la app 1159/1159.
+- **Lo que se apartó de los tableros (a propósito):** «En qué se fue» usa los nombres reales de las categorías
+  («Vivienda», «Entretenimiento») y no los de familia del tablero («Casa», «Salidas»), que mezclarían categorías (Salud
+  saldría como «Súper»); «⋯» solo en el efectivo (es su único segundo botón; en el débito sería repetir «abrir»); bajo
+  el débito va su tipo/••últimos 4 y no «Al día con tus avisos» (no hay ese dato por cuenta); «Todavía no» sigue en la
+  fila del pago de tarjeta; «Listo, lo registré.» genérico; en «Te escucho» el micrófono de abajo no queda exactamente
+  bajo el dedo del dock (el tablero lo sube para dejar la pista abajo).
 - **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
   luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
   dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.

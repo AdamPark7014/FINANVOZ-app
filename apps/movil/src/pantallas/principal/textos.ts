@@ -6,7 +6,7 @@ import {
   type PlainDate,
   type TipoTransaccion,
 } from '@cartera/core';
-import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
+import { cifraEnPalabras, etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import {
   MENSAJE_LIMITE_DIARIO,
   MENSAJE_LIMITE_MENSUAL_GRATIS,
@@ -14,6 +14,7 @@ import {
 } from '../plan/textos';
 import {
   etiquetaDiaMes,
+  etiquetaFecha,
   MENSAJE_CORRECCION_NO_SOPORTADA,
   MENSAJE_ERROR_GENERAL,
   MENSAJE_LIMITE_NUBE,
@@ -656,6 +657,37 @@ export function partesTotalesCuentas(t: { tienes: number; debes: number }): stri
   if (t.debes === 0) return ['Tienes ', formatearCentavos(t.tienes), ' y no debes nada.'];
   return ['Tienes ', formatearCentavos(t.tienes), ' y debes ', formatearCentavos(t.debes), '.'];
 }
+
+// ——— Dirección B+ «Viva»: Cuentas como tarjetas y «Lo que viene» (`docs/diseno/direccion-b-plus/D6-cuentas.png`) ———
+
+/** Bajo el efectivo: «Lo contaste el vie 23» o, si nunca, «Toca para contarlo». */
+export function textoContasteEl(fecha: PlainDate | null): string {
+  return fecha ? `Lo contaste el ${etiquetaFecha(fecha)}` : 'Toca para contarlo';
+}
+
+/** Bajo una tarjeta de crédito: «Debes · usas 12 %» o «Saldo a favor». */
+export function textoAbajoCredito(aFavor: boolean, usoPorcentaje: number | null): string {
+  if (aFavor) return 'Saldo a favor';
+  return usoPorcentaje === null ? 'Debes' : `Debes · usas ${usoPorcentaje} %`;
+}
+
+/** Lo que oye el lector del indicador de páginas: «Cuenta 1 de 3». */
+export function etiquetaPaginaCarrusel(actual: number, total: number): string {
+  return `Cuenta ${actual} de ${total}`;
+}
+
+/** «Tu quincena» en «Lo que viene». */
+export function tituloIngresoQueViene(concepto: string): string {
+  return `Tu ${concepto}`;
+}
+
+/** Lo que oye el lector de un ingreso que viene: «Tu quincena, vie 30: trece mil pesos». */
+export function etiquetaIngresoQueViene(concepto: string, fecha: string, centavos: number): string {
+  return `${tituloIngresoQueViene(concepto)}, ${fecha}: ${cifraEnPalabras(centavos)}`;
+}
+
+/** «En qué se fue» (B+, D5): lo que salió en el mes por categoría. */
+export const TITULO_EN_QUE_SE_FUE = 'En qué se fue';
 
 /** Lo que viene en los próximos 30 días (antes «Compromisos»). */
 export const TITULO_LO_QUE_VIENE = 'Lo que viene';

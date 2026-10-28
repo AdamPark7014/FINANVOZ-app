@@ -1,7 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import {
-  etiquetaFecha,
   fijarApartarDeuda,
   listarCuentas,
   listarPersonas,
@@ -25,17 +24,12 @@ import {
   useTema,
   type NombreIcono,
 } from '../../ui';
-import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import {
   BTN_VER,
   BTN_VER_PAGOS_FIJOS,
   BTN_VER_PERSONAS,
   etiquetaFila,
-  etiquetaVerCuenta,
-  PISTA_ABRIR_COMPROMISO,
-  PISTA_ABRIR_CUENTA,
-  PISTA_ABRIR_EFECTIVO,
   PISTA_CTA_AGREGAR_CUENTA,
   PISTA_VER_PAGOS_FIJOS,
   PISTA_VER_PERSONAS,
@@ -44,14 +38,14 @@ import { BTN_DEDUCCIONES_CUENTAS } from '../deducciones/textos';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { BTN_SUSCRIPCIONES_CUENTAS } from '../suscripciones/textos';
 import { TarjetaCreditoLista } from '../tarjetas/TarjetaCreditoLista';
+import { etiquetaAccesibleTarjetaEnLista } from '../tarjetas/textos';
+import { CarruselCuentas, type CuentaCarrusel } from './CarruselCuentas';
+import { LoQueViene } from './LoQueViene';
 import { EstadoVacio } from './EstadoVacio';
 import {
   PISTA_COBRAR_DESDE_CUENTAS,
-  PISTA_CONTAR_EFECTIVO,
-  contextoSaldoCompromiso,
   contextoSaldoLeDebes,
   contextoSaldoTeDebe,
-  contextoSaldoTienes,
   SUBTITULO_CUENTAS_COMPROMISOS,
   TEXTO_CUENTAS_COMPROMISOS_VACIO,
   TEXTO_CUENTAS_DEBES_VACIO,
@@ -62,14 +56,6 @@ import {
   partesTotalesCuentas,
   TITULO_LO_QUE_VIENE,
 } from './textos';
-
-/** Ícono de cada tipo de cuenta (B5). */
-const ICONO_SUBTIPO: Record<string, NombreIcono> = {
-  efectivo: 'billete',
-  debito: 'banco',
-  billetera: 'celular',
-  ahorro: 'banco',
-};
 
 /** «••2231» si el nombre no lo trae; si no, el tipo («Débito»), salvo que repita el nombre («Efectivo · Efectivo»). */
 function subtituloCuenta(c: { nombre: string; subtipo: string; ultimos4: string | null }): string | null {
@@ -145,6 +131,21 @@ export function PantallaCuentas({
   const hayPersonas = useVista((ctx) => listarPersonas(ctx).length > 0);
   const { c: tema } = useTema();
   const partes = partesTotalesCuentas(totalesCuentas(v));
+  const tarjetasDebes = v.debes.filter((d) => d.tipo === 'tarjeta');
+  const personasDebes = v.debes.filter((d) => d.tipo === 'persona');
+  // D6: el carrusel lleva tus cuentas y tus tarjetas de crédito (lo que debes en cada una).
+  const carrusel: CuentaCarrusel[] = [
+    ...v.tienes.map((c) => ({ tipo: 'tienes' as const, c, subtitulo: subtituloCuenta(c) })),
+    ...tarjetasDebes.map((d) => {
+      const t = tarjetas.find((x) => x.id === d.id) ?? null;
+      return {
+        tipo: 'credito' as const,
+        d,
+        usoPorcentaje: t ? t.usoPorcentaje : null,
+        etiqueta: etiquetaAccesibleTarjetaEnLista(d, t),
+      };
+    }),
+  ];
   return (
     <Pantalla
       testID="pantalla-cuentas"
@@ -178,84 +179,60 @@ export function PantallaCuentas({
         )}
       </Text>
 
-      <Seccion titulo="Tienes" testID="seccion-tienes">
-        {v.tienes.length === 0 ? (
+      {/* D6: tus cuentas como tarjetas (efectivo menta, débito azul, crédito violeta) en un carrusel. */}
+      {carrusel.length > 0 ? (
+        <View testID="seccion-tienes">
+          <CarruselCuentas
+            cuentas={carrusel}
+            {...(alContarEfectivo ? { alContarEfectivo } : {})}
+            {...(alAbrirCuenta ? { alAbrirCuenta } : {})}
+            {...(alAbrirTarjeta ? { alAbrirTarjeta } : {})}
+          />
+        </View>
+      ) : null}
+      {v.tienes.length === 0 ? (
+        <Seccion titulo="Tienes" testID={carrusel.length > 0 ? 'seccion-tienes-vacia' : 'seccion-tienes'}>
           <EstadoVacio
             texto={TEXTO_CUENTAS_TIENES_VACIO}
             testID="cuentas-tienes-vacio"
             etiquetaAccesible={etiquetaVacioCuentasTienes()}
             {...(alAgregarCuenta ? { pistaCta: PISTA_CTA_AGREGAR_CUENTA } : {})}
           />
-        ) : null}
-        {v.tienes.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-tienes-lista">
-            {v.tienes.map((c, i) => (
-              <Fila
-                key={c.id}
-                primera={i === 0}
-                icono={ICONO_SUBTIPO[c.subtipo] ?? 'banco'}
-                testID={`cuenta-${c.id}`}
-                titulo={c.nombre}
-                subtitulo={subtituloCuenta(c)}
-                centavos={c.saldo}
-                contextoSaldo={contextoSaldoTienes(c.nombre)}
-                {...(c.subtipo === 'efectivo' && alContarEfectivo
-                  ? {
-                      accion: {
-                        etiqueta: TITULO_CONTAR_EFECTIVO,
-                        etiquetaAccesible: etiquetaContarEnCuenta(c.nombre),
-                        pista: PISTA_CONTAR_EFECTIVO,
-                        alPresionar: () => alContarEfectivo(c.id),
-                      },
-                    }
-                  : {})}
-                {...(alAbrirCuenta
-                  ? {
-                      abrir: {
-                        etiquetaVer: etiquetaVerCuenta(c.nombre),
-                        pista: c.subtipo === 'efectivo' ? PISTA_ABRIR_EFECTIVO : PISTA_ABRIR_CUENTA,
-                        alPresionar: () => alAbrirCuenta(c.id),
-                      },
-                    }
-                  : {})}
-              />
-            ))}
-          </View>
-        ) : null}
-      </Seccion>
+        </Seccion>
+      ) : null}
 
-      <Seccion titulo="Debes" testID="seccion-debes">
-        {v.debes.length === 0 ? (
-          <EstadoVacio
-            texto={TEXTO_CUENTAS_DEBES_VACIO}
-            testID="cuentas-debes-vacio"
-            etiquetaAccesible={etiquetaVacioCuentasDebes()}
-            {...(alAgregarTarjeta ? { pistaCta: PISTA_CTA_AGREGAR_CUENTA } : {})}
-          />
-        ) : null}
-        {v.debes.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-debes-lista">
-            {v.debes.map((d, i) =>
-              d.tipo === 'tarjeta' ? (
-                <View key={d.id} role="listitem">
-                  {i > 0 ? <Separador /> : null}
-                  <TarjetaCreditoLista
-                    d={d}
-                    t={tarjetas.find((t) => t.id === d.id) ?? null}
-                    {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
-                    {...(alPagarTarjeta ? { alPagar: () => alPagarTarjeta(d.id) } : {})}
-                  />
-                </View>
-              ) : (
+      {/* D6: cada tarjeta de crédito con su anillo de uso y, si toca, el pago para no generar intereses. */}
+      {tarjetasDebes.map((d) => (
+        <TarjetaCreditoLista
+          key={d.id}
+          d={d}
+          t={tarjetas.find((t) => t.id === d.id) ?? null}
+          {...(alAbrirTarjeta ? { alAbrir: () => alAbrirTarjeta(d.id) } : {})}
+          {...(alPagarTarjeta ? { alPagar: () => alPagarTarjeta(d.id) } : {})}
+        />
+      ))}
+
+      {personasDebes.length > 0 || v.debes.length === 0 ? (
+        <Seccion titulo="Debes" testID="seccion-debes">
+          {v.debes.length === 0 ? (
+            <EstadoVacio
+              texto={TEXTO_CUENTAS_DEBES_VACIO}
+              testID="cuentas-debes-vacio"
+              etiquetaAccesible={etiquetaVacioCuentasDebes()}
+              {...(alAgregarTarjeta ? { pistaCta: PISTA_CTA_AGREGAR_CUENTA } : {})}
+            />
+          ) : (
+            <View accessibilityRole="list" testID="seccion-debes-lista">
+              {personasDebes.map((d, i) => (
                 <View key={d.id} role="listitem">
                   {i > 0 ? <Separador /> : null}
                   <PersonaDebes d={d} {...(alAbrirPersona ? { alAbrirPersona } : {})} />
                 </View>
-              ),
-            )}
-          </View>
-        ) : null}
-      </Seccion>
+              ))}
+            </View>
+          )}
+        </Seccion>
+      ) : null}
 
       {v.teDeben.length > 0 ? (
         <Seccion titulo="Te deben" testID="seccion-te-deben">
@@ -302,37 +279,16 @@ export function PantallaCuentas({
         tituloAccesible={`${TITULO_LO_QUE_VIENE}, ${SUBTITULO_CUENTAS_COMPROMISOS.toLowerCase()}`}
         testID="seccion-compromisos"
       >
-        {v.compromisos.length === 0 ? (
+        {v.loQueViene.length === 0 ? (
           <EstadoVacio
             texto={TEXTO_CUENTAS_COMPROMISOS_VACIO}
             testID="cuentas-compromisos-vacio"
             etiquetaAccesible={etiquetaVacioCuentasCompromisos()}
           />
-        ) : null}
-        {v.compromisos.length > 0 ? (
-          <View accessibilityRole="list" testID="seccion-compromisos-lista">
-            {v.compromisos.map((c, i) => (
-              <Fila
-                key={`${c.programadoId}:${c.fecha}`}
-                primera={i === 0}
-                compacta
-                testID={`compromiso-${c.programadoId}`}
-                titulo={c.concepto}
-                subtitulo={etiquetaFecha(c.fecha)}
-                centavos={c.monto}
-                contextoSaldo={contextoSaldoCompromiso(c.concepto, etiquetaFecha(c.fecha))}
-                {...(alAbrirPagoFijo
-                  ? {
-                      abrir: {
-                        pista: PISTA_ABRIR_COMPROMISO,
-                        alPresionar: () => alAbrirPagoFijo(c.programadoId),
-                      },
-                    }
-                  : {})}
-              />
-            ))}
-          </View>
-        ) : null}
+        ) : (
+          // D6: los pagos fijos y los ingresos que vienen, como línea de tiempo.
+          <LoQueViene items={v.loQueViene} {...(alAbrirPagoFijo ? { alAbrirPagoFijo } : {})} />
+        )}
         {alVerPagosFijos ? (
           <Boton
             etiqueta={BTN_VER_PAGOS_FIJOS}

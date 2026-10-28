@@ -258,14 +258,14 @@ describe('Hoy', () => {
     p.reloj.fijar('2026-10-15');
     todas(p.ctx);
     const antes = obtenerHoy(p.ctx);
-    expect(screen.getAllByText('tanda').length).toBeGreaterThan(0); // en Compromisos
+    expect(screen.getAllByText('Tanda').length).toBeGreaterThan(0); // en «Lo que viene» (D6, con mayúscula)
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-ya-no-aplica'));
     expect(screen.queryByText('¿Ya pagaste la tanda?')).toBeNull();
     const despues = obtenerHoy(p.ctx);
     expect(despues.desglose.compromisos).toBe(antes.desglose.compromisos - 50_000);
     expect(despues.libre).toBe(antes.libre + 50_000);
     expect(textoDe('hoy-puedes')).toBe(formatearCentavos(despues.hoyPuedesCentavos, 'pesos'));
-    expect(screen.queryAllByText('tanda')).toHaveLength(0);
+    expect(screen.queryAllByText('Tanda')).toHaveLength(0);
   });
 
   it('libre negativo: "Hoy: $0" con lo que falta, sin inflar la cifra', () => {
@@ -617,8 +617,12 @@ describe('Cuentas', () => {
     const p = conEscenario('e4-01');
     renderConSesion(p.ctx, <PantallaCuentas />);
     expect(textoDe(`cuenta-${p.e.cuentas.nu}-saldo`)).toBe('$2,000');
-    expect(screen.getByText('internet')).toBeTruthy();
-    expect(screen.getByText('mié 14')).toBeTruthy();
+    expect(screen.getByText('Internet')).toBeTruthy();
+    // B+ (D6): «Lo que viene» es una línea de tiempo con el día en un cuadro («MIÉ» · «14»).
+    expect(within(screen.getByTestId('seccion-compromisos-lista')).getByText('MIÉ')).toBeTruthy();
+    expect(within(screen.getByTestId('seccion-compromisos-lista')).getAllByText('14').length).toBeGreaterThan(
+      0,
+    );
     expect(screen.queryByTestId('boton-ajustes')).toBeNull();
   });
 

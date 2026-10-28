@@ -1,35 +1,35 @@
-import { UMBRAL_USO_BP } from '@cartera/core';
 import { Pressable, Text, View } from 'react-native';
 import type { CuentaDebes, TarjetaVista } from '../../servicios';
 import {
-  FUENTE,
-  Barra,
-  Cifra,
+  AnilloUso,
+  coloresCategoria,
+  coloresCuenta,
   cifraEnPalabras,
   espacio,
   formatearCentavos,
-  Icono,
+  FUENTE,
+  Mosaico,
   OBJETIVO_TACTIL_MIN,
   Texto,
   useTema,
 } from '../../ui';
 import { BotonPildora } from '../../ui/componentes/BotonPildora';
-import { contextoSaldoTarjeta } from '../principal/textos';
 import {
   BTN_PAGAR_LISTA,
-  etiquetaAccesibleBarraUsoTarjeta,
   etiquetaAccesibleTarjetaEnLista,
   PISTA_ABRIR_DETALLE_TARJETA,
   PISTA_PAGAR_LISTA,
   subtituloTarjetaLista,
   textoPngiLista,
-  textoUsoCorteLista,
+  textoPorcentajeUso,
+  textoUsasDeLimite,
 } from './textos';
 
 /**
- * Tarjeta de crédito en Cuentas → Debes (`02 §11`, tablero B5): el renglón con el ícono, lo que debes y «la pagas
- * completa»; la barra de uso con el límite y el corte; y, si hay pago para no generar intereses, la caja con la
- * cifra, la fecha límite y «Pagar» (abre el detalle con el pago listo). Tocar el renglón abre el detalle.
+ * Tarjeta de crédito en Cuentas (`02 §11`, tablero D6 de B+): el renglón con el mosaico violeta, el nombre, «Usas
+ * $1,850 de $15,000 · corte lun 9 nov» y el anillo de uso; y, si hay pago para no generar intereses, la caja con la
+ * cifra, la fecha límite y «Pagar» (abre el detalle con el pago listo). Tocar el renglón abre el detalle. Lo que
+ * debes se ve en su tarjeta violeta del carrusel de arriba.
  */
 export function TarjetaCreditoLista({
   d,
@@ -42,39 +42,53 @@ export function TarjetaCreditoLista({
   alAbrir?: () => void;
   alPagar?: () => void;
 }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
+  const violeta = coloresCuenta[esquema].credito.acento;
   const aFavor = d.saldo < 0;
   const renglon = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m, minHeight: 56 }}>
-      <View
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 14,
-          backgroundColor: c.iconoFondo,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Icono nombre="tarjeta" color={c.acento} />
-      </View>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m, minHeight: 60 }}>
+      <Mosaico familia="salidas" icono="tarjeta" tamano={44} />
       <View style={{ flex: 1, gap: 1 }}>
-        <Texto variante="cuerpoFuerte" style={{ lineHeight: 22, fontWeight: '700' }}>
+        <Texto variante="cuerpoFuerte" style={{ fontSize: 17, lineHeight: 22, fontWeight: '700' }}>
           {d.nombre}
         </Texto>
         <Texto variante="secundario" tono="secundario" style={{ lineHeight: 20 }}>
-          {aFavor ? 'Saldo a favor' : subtituloTarjetaLista(d, t)}
+          {aFavor
+            ? 'Saldo a favor'
+            : t
+              ? textoUsasDeLimite(
+                  formatearCentavos(t.deudaTotal),
+                  formatearCentavos(t.limiteCredito),
+                  t.etiquetaProximoCorte,
+                )
+              : subtituloTarjetaLista(d, t)}
         </Texto>
       </View>
-      <Cifra
-        centavos={aFavor ? -d.saldo : d.saldo}
-        contexto={contextoSaldoTarjeta(d.nombre, aFavor)}
-        testID={`cuenta-${d.id}-saldo`}
-      />
+      {t ? (
+        <AnilloUso
+          testID={`cuenta-${d.id}-anillo-uso`}
+          fraccion={t.usoBp / 10_000}
+          texto={textoPorcentajeUso(t.usoPorcentaje)}
+          color={violeta}
+          riel={coloresCategoria[esquema].salidas.mosaico}
+          tinta={c.texto}
+        />
+      ) : null}
     </View>
   );
   return (
-    <View style={{ gap: 10, paddingVertical: espacio.s }}>
+    <View
+      testID={`tarjeta-credito-${d.id}`}
+      style={{
+        backgroundColor: c.superficie,
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: c.borde,
+        paddingHorizontal: espacio.l,
+        paddingVertical: espacio.m,
+        gap: 10,
+      }}
+    >
       {alAbrir ? (
         <Pressable
           testID={`cuenta-${d.id}`}
@@ -89,7 +103,11 @@ export function TarjetaCreditoLista({
           </View>
         </Pressable>
       ) : (
-        <View testID={`cuenta-${d.id}`}>{renglon}</View>
+        <View testID={`cuenta-${d.id}`} accessible accessibilityLabel={etiquetaAccesibleTarjetaEnLista(d, t)}>
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {renglon}
+          </View>
+        </View>
       )}
       {d.meses > 0 ? (
         <Texto variante="secundario" testID={`cuenta-${d.id}-meses`}>
@@ -99,24 +117,6 @@ export function TarjetaCreditoLista({
       {aFavor ? (
         <Texto variante="secundario" tono="secundario">
           No se suma a tu dinero libre.
-        </Texto>
-      ) : null}
-      {t ? (
-        <View style={{ gap: 6 }}>
-          <Barra
-            alto={8}
-            llenoBp={t.usoBp}
-            marcaBp={UMBRAL_USO_BP}
-            etiquetaAccesible={etiquetaAccesibleBarraUsoTarjeta(t.usoPorcentaje, t.limiteCredito)}
-            testID={`cuenta-${d.id}-barra-uso`}
-          />
-          <Texto variante="pequeno" tono="secundario" importantForAccessibility="no" style={{ fontSize: 13 }}>
-            {textoUsoCorteLista(t.usoPorcentaje, formatearCentavos(t.limiteCredito), t.etiquetaProximoCorte)}
-          </Texto>
-        </View>
-      ) : d.limiteCredito !== null ? (
-        <Texto variante="secundario" tono="secundario">
-          {`Límite: ${formatearCentavos(d.limiteCredito)}`}
         </Texto>
       ) : null}
       {t && t.pngi > 0 ? (
@@ -152,8 +152,8 @@ export function TarjetaCreditoLista({
             <Text
               style={{
                 fontFamily: FUENTE,
-                fontSize: 24,
-                lineHeight: 30,
+                fontSize: 26,
+                lineHeight: 32,
                 fontWeight: '800',
                 color: c.texto,
                 fontVariant: ['tabular-nums'],
@@ -166,7 +166,7 @@ export function TarjetaCreditoLista({
             <BotonPildora
               etiqueta={BTN_PAGAR_LISTA}
               variante="lleno"
-              alto={46}
+              alto={48}
               pista={PISTA_PAGAR_LISTA}
               etiquetaAccesible={`${BTN_PAGAR_LISTA} ${d.nombre}`}
               alPresionar={alPagar}
@@ -177,6 +177,10 @@ export function TarjetaCreditoLista({
       ) : t ? (
         <Texto variante="secundario" tono="secundario" testID={`cuenta-${d.id}-limite-pago`}>
           {`Fecha límite: ${t.etiquetaFechaLimite} · próximo corte: ${t.etiquetaProximoCorte}`}
+        </Texto>
+      ) : d.limiteCredito !== null ? (
+        <Texto variante="secundario" tono="secundario">
+          {`Límite: ${formatearCentavos(d.limiteCredito)}`}
         </Texto>
       ) : null}
     </View>

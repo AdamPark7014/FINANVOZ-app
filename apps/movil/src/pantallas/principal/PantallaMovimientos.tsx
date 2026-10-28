@@ -3,6 +3,7 @@ import { Pressable, ScrollView, SectionList, Text, View } from 'react-native';
 import {
   anularMovimiento,
   descartarPorInterpretar,
+  enQueSeFue,
   etiquetaDiaMes,
   historialMovimiento,
   listarMovimientos,
@@ -21,6 +22,7 @@ import {
   Boton,
   CampoTexto,
   Cifra,
+  coloresCategoria,
   espacio,
   etiquetaHablada,
   cifraEnPalabras,
@@ -37,6 +39,7 @@ import { leerEntero } from '../onboarding/ingreso';
 import { capitalizar } from '../onboarding/pagos-fijos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
+import { EnQueSeFue } from './EnQueSeFue';
 import { EstadoVacio } from './EstadoVacio';
 import { esCorregible, FormularioMovimiento } from './FormularioMovimiento';
 import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
@@ -133,8 +136,9 @@ export function PantallaMovimientos({
   // B4: la frase por revisar es un renglón que se abre; sus botones viven adentro.
   const [revisarAbierto, setRevisarAbierto] = useState(false);
   const totales = useVista(totalesDelMes);
+  const porCategoria = useVista(enQueSeFue);
   const hoy = useVista((c) => c.reloj.hoy());
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const texto = buscando ? busqueda.trim() : '';
   const conTarjetas = useVista((c) => listarTarjetas(c).length > 0);
   const chips = CHIPS_MOVIMIENTOS.filter((c) => c !== 'tarjetas' || conTarjetas);
@@ -210,9 +214,17 @@ export function PantallaMovimientos({
           paddingHorizontal: espacio.s,
         }}
       >
-        {partesTotalesMes(totales).map((parte, i) =>
+        {partesTotalesMes(totales).map((parte, i, todas) =>
           i % 2 === 1 ? (
-            <Text key={i} style={{ fontFamily: FUENTE, fontWeight: '800' }}>
+            <Text
+              key={i}
+              style={{
+                fontFamily: FUENTE,
+                fontWeight: '800',
+                // B+ (D5): lo que entró, en verde.
+                ...(todas[i - 1]?.endsWith('entraron ') ? { color: c.acentoTexto } : {}),
+              }}
+            >
               {parte}
             </Text>
           ) : (
@@ -220,6 +232,9 @@ export function PantallaMovimientos({
           ),
         )}
       </Text>
+
+      {/* B+ (D5): en qué se fue lo que salió este mes, por categoría. */}
+      {porCategoria.total > 0 ? <EnQueSeFue datos={porCategoria} /> : null}
 
       {porRevisar.length > 0 ? (
         <View style={{ gap: espacio.s }} testID="por-revisar">
@@ -233,9 +248,11 @@ export function PantallaMovimientos({
             style={({ pressed }) => ({
               minHeight: 64,
               borderRadius: 22,
-              backgroundColor: pressed ? c.superficieAlterna : c.superficie,
+              // B+ (D5): la frase por revisar en ámbar claro, con su filo.
+              backgroundColor: c.atencion,
               borderWidth: 1,
-              borderColor: c.borde,
+              borderColor: coloresCategoria[esquema].antojos.barra,
+              opacity: pressed ? 0.85 : 1,
               flexDirection: 'row',
               alignItems: 'center',
               gap: espacio.m,
@@ -248,7 +265,7 @@ export function PantallaMovimientos({
                 width: 40,
                 height: 40,
                 borderRadius: 14,
-                backgroundColor: c.atencion,
+                backgroundColor: esquema === 'claro' ? coloresCategoria.claro.antojos.barra : c.superficie,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}

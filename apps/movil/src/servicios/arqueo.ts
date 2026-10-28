@@ -79,6 +79,11 @@ function ultimoArqueo(ctx: Contexto, cuentaId: string) {
   );
 }
 
+/** Cuándo se contó por última vez esa cuenta de efectivo (B+, D6: «Lo contaste el vie 23»); `null` si nunca. */
+export function fechaUltimoArqueo(ctx: Contexto, cuentaId: string): PlainDate | null {
+  return (ultimoArqueo(ctx, cuentaId)?.fecha as PlainDate | undefined) ?? null;
+}
+
 /** Gastos vigentes en `por_asignar` registrados hace más de 24 h, del más viejo al más nuevo. */
 export function gastosPorAsignarParaArqueo(ctx: Contexto): GastoPorAsignar[] {
   const limite = ctx.reloj.ahora() - MS_POR_ASIGNAR_ARQUEO;

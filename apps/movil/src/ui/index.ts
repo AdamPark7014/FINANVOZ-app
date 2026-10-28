@@ -25,6 +25,7 @@ export {
 export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
 export { AnilloTiempo, Icono, iconoDeCategoria, type NombreIcono } from './componentes/Iconos';
 export { Mosaico } from './componentes/Mosaico';
+export { AnilloUso } from './componentes/AnilloUso';
 export { BarraApilada, type ParteBarra } from './componentes/BarraApilada';
 export { BarraDelDia, CifraQueCuenta, DURACION_CUENTA_MS } from './componentes/CifraQueCuenta';
 export { Orbe, type EstadoOrbe } from './componentes/Orbe';

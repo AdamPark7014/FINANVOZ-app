@@ -1,6 +1,7 @@
 import { and, asc, eq } from 'drizzle-orm';
 import { sumarDias, type Centavos, type PlainDate } from '@cartera/core';
 import { esquema } from '@cartera/datos';
+import { fechaUltimoArqueo } from './arqueo';
 import { cuentasPropias, type SubtipoPropio } from './catalogo';
 import type { Contexto } from './contexto';
 import { listarOcurrencias, materializarOcurrencias } from './ocurrencias';
@@ -15,6 +16,8 @@ export interface CuentaTienes {
   readonly subtipo: Exclude<SubtipoPropio, 'tarjeta_credito'>;
   readonly ultimos4: string | null;
   readonly saldo: Centavos;
+  /** Efectivo: cuándo lo contaste por última vez (B+, D6); `null` si nunca o si no es efectivo. */
+  readonly contadaEl: PlainDate | null;
 }
 
 export interface CuentaDebes {
@@ -44,12 +47,19 @@ export interface CompromisoProximo {
   readonly monto: Centavos;
 }
 
+/** «Lo que viene» como línea de tiempo (B+, D6): pagos fijos e ingresos de los próximos 30 días, por fecha. */
+export interface ProximoMovimiento extends CompromisoProximo {
+  readonly tipo: 'egreso' | 'ingreso';
+}
+
 /** Cuentas (`02 §11`): Tienes · Debes · Te deben · Compromisos (próximos 30 días). */
 export interface VistaCuentas {
   readonly tienes: readonly CuentaTienes[];
   readonly debes: readonly CuentaDebes[];
   readonly teDeben: readonly PersonaTeDebe[];
   readonly compromisos: readonly CompromisoProximo[];
+  /** Los compromisos y los ingresos pendientes de los próximos 30 días, juntos y por fecha (los ingresos primero). */
+  readonly loQueViene: readonly ProximoMovimiento[];
 }
 
 function mesesDe(ctx: Contexto, tarjetaId: string): Centavos {
@@ -73,6 +83,7 @@ export function listarCuentas(ctx: Contexto): VistaCuentas {
       subtipo: c.subtipo as CuentaTienes['subtipo'],
       ultimos4: c.ultimos4,
       saldo: ctx.libro.saldo(c.id),
+      contadaEl: c.subtipo === 'efectivo' ? fechaUltimoArqueo(ctx, c.id) : null,
     }));
   const personas = listarPersonas(ctx);
   const debes: CuentaDebes[] = [
@@ -106,7 +117,30 @@ export function listarCuentas(ctx: Contexto): VistaCuentas {
   const compromisos = listarOcurrencias(ctx, { estado: 'pendiente', tipo: 'egreso' })
     .filter((o) => o.fecha < limite)
     .map((o) => ({ programadoId: o.programadoId, concepto: o.concepto, fecha: o.fecha, monto: o.monto }));
-  return { tienes, debes, teDeben, compromisos };
+  const ingresos = listarOcurrencias(ctx, { estado: 'pendiente', tipo: 'ingreso' }).filter(
+    (o) => o.fecha >= hoy && o.fecha < limite && o.monto > 0,
+  );
+  const loQueViene: ProximoMovimiento[] = [
+    ...compromisos.map((c) => ({ ...c, tipo: 'egreso' as const })),
+    ...ingresos.map((o) => ({
+      programadoId: o.programadoId,
+      concepto: o.concepto,
+      fecha: o.fecha,
+      monto: o.monto,
+      tipo: 'ingreso' as const,
+    })),
+  ].sort((a, b) =>
+    a.fecha === b.fecha
+      ? a.tipo === b.tipo
+        ? 0
+        : a.tipo === 'ingreso'
+          ? -1
+          : 1
+      : a.fecha < b.fecha
+        ? -1
+        : 1,
+  );
+  return { tienes, debes, teDeben, compromisos, loQueViene };
 }
 
 /** Categorías del espacio personal para el formulario (sin las de sistema). */

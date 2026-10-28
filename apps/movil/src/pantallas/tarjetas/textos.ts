@@ -420,6 +420,16 @@ export function subtituloTarjetaLista(
   return partes.join(' · ');
 }
 
+/** «Usas $1,850 de $15,000 · corte lun 9 nov» (B+, D6). */
+export function textoUsasDeLimite(deuda: string, limite: string, corte: string): string {
+  return `Usas ${deuda} de ${limite} · corte ${corte}`;
+}
+
+/** «12 %» al centro del anillo de uso (D6). */
+export function textoPorcentajeUso(porcentaje: number): string {
+  return `${porcentaje} %`;
+}
+
 /** «Usas 12 % de $15,000 · corte lun 9 nov». */
 export function textoUsoCorteLista(porcentaje: number, limite: string, corte: string): string {
   return `Usas ${porcentaje} % de ${limite} · corte ${corte}`;

@@ -270,3 +270,73 @@ export function totalesDelMes(ctx: Contexto): TotalesMes {
     hayMovimientos: dias.length > 0,
   };
 }
+
+/** Lo que salió en una categoría del mes («En qué se fue», B+ D5). */
+export interface GastoCategoria {
+  /** Slug del catálogo; `null` para lo que no tiene categoría (préstamos, tandas, ajustes) y para «Otros». */
+  readonly slug: string | null;
+  readonly nombre: string;
+  readonly monto: Centavos;
+}
+
+export interface EnQueSeFue {
+  /** Lo que salió en el mes: el mismo `salieron` de `totalesDelMes`. */
+  readonly total: Centavos;
+  /** De mayor a menor, con «Otros» al final; suman `total`. */
+  readonly categorias: readonly GastoCategoria[];
+}
+
+/** Partes que caben en la barra y su leyenda (D5: seis); lo demás se junta en «Otros». */
+export const MAX_CATEGORIAS_MES = 6;
+export const NOMBRE_OTROS = 'Otros';
+
+/**
+ * Agrupa por categoría lo que salió (sin I/O): cada movimiento cuenta completo en su categoría (la misma suma que
+ * `salieron`, así que el total cuadra con «En octubre salieron…»); lo que no tiene categoría y lo que no cabe en
+ * `max` partes va a «Otros».
+ */
+export function agruparPorCategoria(
+  movimientos: readonly Pick<MovimientoVista, 'sentido' | 'monto' | 'categoria' | 'categoriaSlug'>[],
+  max = MAX_CATEGORIAS_MES,
+): EnQueSeFue {
+  const grupos = new Map<string, { slug: string; nombre: string; monto: number }>();
+  let sinCategoria = 0;
+  let total = 0;
+  for (const m of movimientos) {
+    if (m.sentido !== 'salida') continue;
+    total += m.monto;
+    if (m.categoriaSlug === null) {
+      sinCategoria += m.monto;
+      continue;
+    }
+    const g = grupos.get(m.categoriaSlug);
+    if (g) g.monto += m.monto;
+    else
+      grupos.set(m.categoriaSlug, {
+        slug: m.categoriaSlug,
+        nombre: m.categoria ?? NOMBRE_OTROS,
+        monto: m.monto,
+      });
+  }
+  const ordenadas = [...grupos.values()].sort(
+    (a, b) => b.monto - a.monto || a.nombre.localeCompare(b.nombre, 'es'),
+  );
+  const lugares = sinCategoria > 0 || ordenadas.length > max ? max - 1 : max;
+  const visibles = ordenadas.slice(0, Math.max(0, lugares));
+  const otros = ordenadas.slice(visibles.length).reduce((s, g) => s + g.monto, sinCategoria);
+  return {
+    total: total as Centavos,
+    categorias: [
+      ...visibles.map((g) => ({ slug: g.slug, nombre: g.nombre, monto: g.monto as Centavos })),
+      ...(otros > 0 ? [{ slug: null, nombre: NOMBRE_OTROS, monto: otros as Centavos }] : []),
+    ],
+  };
+}
+
+/** «En qué se fue» del mes en curso (B+, D5): del día 1 a hoy, con el mismo criterio que `totalesDelMes`. */
+export function enQueSeFue(ctx: Contexto): EnQueSeFue {
+  const hoy = ctx.reloj.hoy();
+  const { anio, mes } = partes(hoy);
+  const desde = `${anio}-${String(mes).padStart(2, '0')}-01` as PlainDate;
+  return agruparPorCategoria(listarMovimientos(ctx, { desde, hasta: hoy }).flatMap((d) => d.movimientos));
+}

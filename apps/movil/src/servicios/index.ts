@@ -335,11 +335,18 @@ export {
   type CuentaDebes,
   type CuentaTienes,
   type PersonaTeDebe,
+  type ProximoMovimiento,
   type VistaCuentas,
 } from './cuentas';
 export {
+  agruparPorCategoria,
+  enQueSeFue,
   listarMovimientos,
+  MAX_CATEGORIAS_MES,
+  NOMBRE_OTROS,
   totalesDelMes,
+  type EnQueSeFue,
+  type GastoCategoria,
   type TotalesMes,
   type DiaMovimientos,
   type FiltroMovimientos,

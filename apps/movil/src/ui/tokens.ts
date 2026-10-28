@@ -309,14 +309,15 @@ export const coloresCuenta: Record<EsquemaColor, Record<ClaseCuenta, ColoresCuen
     },
     debito: {
       fondo: '#1D3B6F',
-      texto: '#FFFFFF',
+      // En oscuro, sin blanco puro (`02 §16`: nada blanco en oscuro).
+      texto: '#F2F6FF',
       textoSecundario: '#C9D6F0',
       adorno: '#2D4C82',
       acento: '#8FB0F5',
     },
     credito: {
       fondo: '#5B2A86',
-      texto: '#FFFFFF',
+      texto: '#F8F2FF',
       textoSecundario: '#E3D3F2',
       adorno: '#6C3B98',
       acento: '#B79CE8',
