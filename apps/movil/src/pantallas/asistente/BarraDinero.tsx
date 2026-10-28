@@ -45,7 +45,7 @@ export function BarraDinero({
         borderWidth: 1,
         borderColor: c.borde,
         paddingHorizontal: espacio.l,
-        paddingTop: espacio.xs,
+        paddingTop: espacio.m,
         paddingBottom: espacio.l,
         gap: espacio.m,
       }}
@@ -76,6 +76,8 @@ export function BarraDinero({
         <Pressable
           testID="boton-desglose"
           onPress={alPresionar}
+          // D1: la cabecera es baja; el área de toque llega a 48 con `hitSlop`.
+          hitSlop={{ top: espacio.s, bottom: espacio.s, left: espacio.s, right: espacio.s }}
           accessibilityRole="button"
           accessibilityLabel={BTN_COMO_LO_CALCULE}
           accessibilityHint={
@@ -83,7 +85,7 @@ export function BarraDinero({
           }
           accessibilityState={{ expanded: abierto }}
           style={({ pressed }) => ({
-            minHeight: OBJETIVO_TACTIL_MIN,
+            minHeight: OBJETIVO_TACTIL_MIN - espacio.l,
             flexDirection: 'row',
             alignItems: 'center',
             gap: espacio.xxs,
