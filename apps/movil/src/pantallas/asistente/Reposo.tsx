@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSesion } from '../../sesion/ProveedorSesion';
 import {
+  FUENTE,
   cifraEnPalabras,
   espacio,
   etiquetaHablada,
@@ -91,7 +92,13 @@ export function Reposo({
           {/* El ancla de Maestro para cerrar el teclado: texto fijo arriba, nunca un botón. */}
           <Text
             testID="hoy-fecha"
-            style={{ fontSize: 17, lineHeight: 22, fontWeight: '600', color: c.textoSecundario }}
+            style={{
+              fontFamily: FUENTE,
+              fontSize: 17,
+              lineHeight: 22,
+              fontWeight: '600',
+              color: c.textoSecundario,
+            }}
           >
             {saludo}
           </Text>
@@ -100,7 +107,7 @@ export function Reposo({
             <Text
               testID={negativo ? 'hoy-libre-negativo-etiqueta' : 'hoy-puedes-etiqueta'}
               {...OCULTAR_ETIQUETA_VISIBLE}
-              style={{ fontSize: 30, lineHeight: 38, fontWeight: '600', color: c.texto }}
+              style={{ fontFamily: FUENTE, fontSize: 30, lineHeight: 38, fontWeight: '600', color: c.texto }}
             >
               {negativo ? TITULO_HOY_LIBRE_NEGATIVO : TITULO_HOY_PUEDES_GASTAR}
             </Text>
@@ -109,6 +116,7 @@ export function Reposo({
               accessibilityRole="header"
               accessibilityLabel={`${negativo ? CONTEXTO_CIFRA_LIBRE_NEGATIVO : CONTEXTO_CIFRA_HOY_PUEDES} ${cifraEnPalabras(cifra, 'pesos')}`}
               style={{
+                fontFamily: FUENTE,
                 fontSize: 84,
                 lineHeight: 88,
                 fontWeight: '800',
@@ -126,6 +134,7 @@ export function Reposo({
               testID="hoy-secundario"
               accessibilityLabel={etiquetaHablada(secundario)}
               style={{
+                fontFamily: FUENTE,
                 fontSize: 22,
                 lineHeight: 30,
                 fontWeight: '500',
@@ -154,7 +163,15 @@ export function Reposo({
               opacity: pressed ? 0.7 : 1,
             })}
           >
-            <Text style={{ fontSize: 16, lineHeight: 22, fontWeight: '700', color: c.acentoTexto }}>
+            <Text
+              style={{
+                fontFamily: FUENTE,
+                fontSize: 16,
+                lineHeight: 22,
+                fontWeight: '700',
+                color: c.acentoTexto,
+              }}
+            >
               {BTN_COMO_LO_CALCULE}
             </Text>
             <View style={{ transform: [{ rotate: a.verDesglose ? '90deg' : '0deg' }] }}>
@@ -171,7 +188,13 @@ export function Reposo({
         <View style={{ gap: espacio.s }} accessibilityLabel={ETIQUETA_PUEDES_DECIRME} testID="puedes-decirme">
           <Text
             accessibilityRole="header"
-            style={{ fontSize: 14, lineHeight: 20, fontWeight: '700', color: c.textoSecundario }}
+            style={{
+              fontFamily: FUENTE,
+              fontSize: 14,
+              lineHeight: 20,
+              fontWeight: '700',
+              color: c.textoSecundario,
+            }}
           >
             {TITULO_PUEDES_DECIRME}
           </Text>
@@ -199,7 +222,14 @@ export function Reposo({
               <Icono nombre="microfono" color={c.acentoTexto} tamano={18} grosor={2} />
               <Text
                 importantForAccessibility="no"
-                style={{ flexShrink: 1, fontSize: 16, lineHeight: 22, fontWeight: '500', color: c.texto }}
+                style={{
+                  fontFamily: FUENTE,
+                  flexShrink: 1,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: '500',
+                  color: c.texto,
+                }}
               >
                 {`«${EJEMPLO_INTENCION[chip.clave]}»`}
               </Text>

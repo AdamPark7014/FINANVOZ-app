@@ -2,6 +2,7 @@ import { UMBRAL_USO_BP } from '@cartera/core';
 import { Pressable, Text, View } from 'react-native';
 import type { CuentaDebes, TarjetaVista } from '../../servicios';
 import {
+  FUENTE,
   Barra,
   Cifra,
   cifraEnPalabras,
@@ -137,11 +138,20 @@ export function TarjetaCreditoLista({
             testID={`cuenta-${d.id}-pngi`}
             style={{ flex: 1, gap: 1 }}
           >
-            <Text style={{ fontSize: 14, lineHeight: 19, fontWeight: '600', color: c.textoSecundario }}>
+            <Text
+              style={{
+                fontFamily: FUENTE,
+                fontSize: 14,
+                lineHeight: 19,
+                fontWeight: '600',
+                color: c.textoSecundario,
+              }}
+            >
               {textoPngiLista(t.etiquetaFechaLimite)}
             </Text>
             <Text
               style={{
+                fontFamily: FUENTE,
                 fontSize: 24,
                 lineHeight: 30,
                 fontWeight: '800',

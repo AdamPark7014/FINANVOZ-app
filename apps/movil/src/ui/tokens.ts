@@ -242,21 +242,47 @@ export const hitSlopTactil = {
 export const DURACION_AVISO_MS = 10_000;
 
 /**
+ * Familia de la dirección B (B0: Figtree 400–800). Va enlazada en la build con el plugin `expo-font` de `app.json`
+ * (`assets/fuentes`, licencia OFL): en iOS la familia sale del archivo y en Android es una familia XML con sus
+ * pesos, así que basta `fontFamily` + `fontWeight`. Un `Text` no hereda la familia de otro que no lo contenga:
+ * todo estilo de texto la lleva, por eso vive en `tipo` y en las etiquetas de abajo.
+ */
+export const FUENTE = 'Figtree';
+
+/**
  * Escala tipográfica. Tamaños en sp: escalan con la preferencia del sistema (texto al 200 %);
  * por eso ningún componente fija alto ni corta líneas de cifras.
  */
 export const tipo = {
-  cifraHeroe: { fontSize: 48, lineHeight: 58, fontWeight: '700' as const, letterSpacing: -0.5 },
-  cifraGrande: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const, letterSpacing: -0.3 },
-  titulo: { fontSize: 24, lineHeight: 34, fontWeight: '700' as const, letterSpacing: -0.2 },
-  subtitulo: { fontSize: 18, lineHeight: 28, fontWeight: '600' as const },
+  cifraHeroe: {
+    fontFamily: FUENTE,
+    fontSize: 48,
+    lineHeight: 58,
+    fontWeight: '700' as const,
+    letterSpacing: -0.5,
+  },
+  cifraGrande: {
+    fontFamily: FUENTE,
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: '700' as const,
+    letterSpacing: -0.3,
+  },
+  titulo: {
+    fontFamily: FUENTE,
+    fontSize: 24,
+    lineHeight: 34,
+    fontWeight: '700' as const,
+    letterSpacing: -0.2,
+  },
+  subtitulo: { fontFamily: FUENTE, fontSize: 18, lineHeight: 28, fontWeight: '600' as const },
   /** Lo que dice el asistente (dirección B): texto grande, sin burbuja. */
-  voz: { fontSize: 20, lineHeight: 28, fontWeight: '500' as const },
-  cuerpo: { fontSize: 16, lineHeight: 26, fontWeight: '400' as const },
-  cuerpoFuerte: { fontSize: 16, lineHeight: 26, fontWeight: '600' as const },
-  secundario: { fontSize: 14, lineHeight: 22, fontWeight: '400' as const },
-  etiqueta: { fontSize: 14, lineHeight: 20, fontWeight: '600' as const },
-  pequeno: { fontSize: 12, lineHeight: 18, fontWeight: '400' as const },
+  voz: { fontFamily: FUENTE, fontSize: 20, lineHeight: 28, fontWeight: '500' as const },
+  cuerpo: { fontFamily: FUENTE, fontSize: 16, lineHeight: 26, fontWeight: '400' as const },
+  cuerpoFuerte: { fontFamily: FUENTE, fontSize: 16, lineHeight: 26, fontWeight: '600' as const },
+  secundario: { fontFamily: FUENTE, fontSize: 14, lineHeight: 22, fontWeight: '400' as const },
+  etiqueta: { fontFamily: FUENTE, fontSize: 14, lineHeight: 20, fontWeight: '600' as const },
+  pequeno: { fontFamily: FUENTE, fontSize: 12, lineHeight: 18, fontWeight: '400' as const },
 } as const;
 
 export type VarianteTexto = keyof typeof tipo;
@@ -279,7 +305,7 @@ export const navegacionSuperior = {
   alto: 48,
   /** Separación del selector con la barra de estado (B1: 52 − 44 del área segura ≈ 8). */
   margenSuperior: espacio.s,
-  etiqueta: { fontSize: 15, lineHeight: 20 },
+  etiqueta: { fontFamily: FUENTE, fontSize: 15, lineHeight: 20 },
 } as const;
 
 /** Medidas del dock de voz (B1: 84 de alto, radio 32, botones de 118 × 52 y micrófono de 68). */
@@ -292,5 +318,5 @@ export const dockVoz = {
   microfono: 68,
   /** Anillo de 6 alrededor del micrófono. */
   anillo: 6,
-  etiqueta: { fontSize: 15, lineHeight: 20, fontWeight: '700' as const },
+  etiqueta: { fontFamily: FUENTE, fontSize: 15, lineHeight: 20, fontWeight: '700' as const },
 } as const;

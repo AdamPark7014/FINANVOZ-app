@@ -1,6 +1,6 @@
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
-import { espacio, margenPantalla, navegacionSuperior, useTema } from '../../ui';
+import { FUENTE, espacio, margenPantalla, navegacionSuperior, useTema } from '../../ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
   ETIQUETA_ACCESIBILIDAD_TU,
@@ -136,7 +136,13 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
       >
         <Text
           importantForAccessibility="no"
-          style={{ fontSize: 16, lineHeight: 20, fontWeight: '700', color: enTu ? c.sobreAcento : c.texto }}
+          style={{
+            fontFamily: FUENTE,
+            fontSize: 16,
+            lineHeight: 20,
+            fontWeight: '700',
+            color: enTu ? c.sobreAcento : c.texto,
+          }}
         >
           {TEXTO_CIRCULO_TU}
         </Text>

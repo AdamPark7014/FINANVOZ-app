@@ -124,6 +124,34 @@
           "color": "#0A6B57"
         }
       ],
+      [
+        "expo-font",
+        {
+          "ios": {
+            "fonts": [
+              "./assets/fuentes/Figtree_400Regular.ttf",
+              "./assets/fuentes/Figtree_500Medium.ttf",
+              "./assets/fuentes/Figtree_600SemiBold.ttf",
+              "./assets/fuentes/Figtree_700Bold.ttf",
+              "./assets/fuentes/Figtree_800ExtraBold.ttf"
+            ]
+          },
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Figtree",
+                "fontDefinitions": [
+                  { "path": "./assets/fuentes/Figtree_400Regular.ttf", "weight": 400 },
+                  { "path": "./assets/fuentes/Figtree_500Medium.ttf", "weight": 500 },
+                  { "path": "./assets/fuentes/Figtree_600SemiBold.ttf", "weight": 600 },
+                  { "path": "./assets/fuentes/Figtree_700Bold.ttf", "weight": 700 },
+                  { "path": "./assets/fuentes/Figtree_800ExtraBold.ttf", "weight": 800 }
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "@sentry/react-native",
       "@cartera/captura-android",
       [

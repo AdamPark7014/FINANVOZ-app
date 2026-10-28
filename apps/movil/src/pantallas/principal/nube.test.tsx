@@ -180,7 +180,8 @@ describe('Registrar con la nube', () => {
     await waitFor(() => expect(screen.queryByTestId('indicador-esperando-conexion')).toBeNull());
     expect(listarPorInterpretar(p.ctx)).toEqual([]);
     expect(listarMovimientos(p.ctx).flatMap((d) => d.movimientos)).toHaveLength(2);
-    expect(screen.getByText('tacos')).toBeTruthy();
+    // Movimientos lo muestra con mayúscula inicial, como la tarjeta del asistente.
+    expect(screen.getAllByText('Tacos').length).toBeGreaterThan(0);
   });
 
   it('una frase que la nube entendió pero necesita confirmación lleva "Revisar" y se confirma en Registrar', async () => {

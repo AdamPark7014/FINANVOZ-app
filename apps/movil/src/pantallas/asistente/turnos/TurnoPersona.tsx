@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import type { Turno } from '../../../asistente/tipos';
-import { espacio, Icono, useTema } from '../../../ui';
+import { FUENTE, espacio, Icono, useTema } from '../../../ui';
 import { etiquetaTurnoPersona } from '../textos';
 
 /**
@@ -42,7 +42,14 @@ export function TurnoPersona({
       ) : null}
       <Text
         importantForAccessibility="no"
-        style={{ flexShrink: 1, fontSize: 17, lineHeight: 23, fontWeight: '500', color: c.sobreDock }}
+        style={{
+          fontFamily: FUENTE,
+          flexShrink: 1,
+          fontSize: 17,
+          lineHeight: 23,
+          fontWeight: '500',
+          color: c.sobreDock,
+        }}
       >
         {turno.texto}
       </Text>

@@ -4,7 +4,15 @@ import type { DatosPuedoGastar, Turno } from '../../../asistente/tipos';
 import { mensajeError, obtenerPreferenciasAvisos } from '../../../servicios';
 import { useSesion } from '../../../sesion/ProveedorSesion';
 import { BotonPildora } from '../../../ui/componentes/BotonPildora';
-import { cifraEnPalabras, espacio, etiquetaHablada, formatearCentavos, Texto, useTema } from '../../../ui';
+import {
+  FUENTE,
+  cifraEnPalabras,
+  espacio,
+  etiquetaHablada,
+  formatearCentavos,
+  Texto,
+  useTema,
+} from '../../../ui';
 import { useNotificaciones } from '../../avisos/notificaciones';
 import { avisoRecordatorio } from '../../me-alcanza/recordatorio';
 import {
@@ -98,7 +106,12 @@ export function TurnoPuedoGastar({
     <View testID={testID} style={{ gap: 14 }}>
       <Texto
         testID={`${testID}-texto`}
-        style={{ fontSize: 21, lineHeight: 28, fontWeight: '600', color: falta ? c.faltante : c.texto }}
+        style={{
+          fontSize: 21,
+          lineHeight: 28,
+          fontWeight: '600',
+          color: falta ? c.faltante : c.texto,
+        }}
       >
         {turno.texto}
       </Texto>
@@ -131,16 +144,27 @@ export function TurnoPuedoGastar({
             }}
           >
             <View style={{ flexShrink: 1, gap: 2 }}>
-              <Text style={{ fontSize: 16, lineHeight: 22, fontWeight: '700', color: c.texto }}>
+              <Text
+                style={{
+                  fontFamily: FUENTE,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: '700',
+                  color: c.texto,
+                }}
+              >
                 {o.titulo}
               </Text>
               {o.detalle ? (
-                <Text style={{ fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>{o.detalle}</Text>
+                <Text style={{ fontFamily: FUENTE, fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>
+                  {o.detalle}
+                </Text>
               ) : null}
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               <Text
                 style={{
+                  fontFamily: FUENTE,
                   fontSize: 24,
                   lineHeight: 30,
                   fontWeight: '800',
@@ -150,7 +174,9 @@ export function TurnoPuedoGastar({
               >
                 {formatearCentavos(o.cifra, 'pesos')}
               </Text>
-              <Text style={{ fontSize: 13, lineHeight: 18, color: c.textoSecundario }}>{TEXTO_AL_DIA}</Text>
+              <Text style={{ fontFamily: FUENTE, fontSize: 13, lineHeight: 18, color: c.textoSecundario }}>
+                {TEXTO_AL_DIA}
+              </Text>
             </View>
           </View>
         ))}

@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { cifraEnPalabras, espacio, etiquetaHablada, useTema } from '../../ui';
+import { FUENTE, cifraEnPalabras, espacio, etiquetaHablada, useTema } from '../../ui';
 import { BTN_COMO_LO_CALCULE } from './textos';
 
 export interface FilaCalculo {
@@ -41,7 +41,13 @@ export function TarjetaCalculo({
     >
       <Text
         accessibilityRole="header"
-        style={{ fontSize: 14, lineHeight: 20, fontWeight: '700', color: c.textoSecundario }}
+        style={{
+          fontFamily: FUENTE,
+          fontSize: 14,
+          lineHeight: 20,
+          fontWeight: '700',
+          color: c.textoSecundario,
+        }}
       >
         {titulo}
       </Text>
@@ -60,6 +66,7 @@ export function TarjetaCalculo({
         >
           <Text
             style={{
+              fontFamily: FUENTE,
               flexShrink: 1,
               fontSize: 15,
               lineHeight: 22,
@@ -72,6 +79,7 @@ export function TarjetaCalculo({
           <Text
             {...(f.testID ? { testID: `${f.testID}-valor` } : {})}
             style={{
+              fontFamily: FUENTE,
               fontSize: 15,
               lineHeight: 22,
               fontWeight: f.fuerte ? '700' : '400',

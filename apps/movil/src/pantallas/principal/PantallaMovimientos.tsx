@@ -17,6 +17,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
+  FUENTE,
   Boton,
   CampoTexto,
   Cifra,
@@ -33,6 +34,7 @@ import {
 } from '../../ui';
 import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
+import { capitalizar } from '../onboarding/pagos-fijos';
 import { mensajeCompraMsi } from '../tarjetas/textos';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { EstadoVacio } from './EstadoVacio';
@@ -200,6 +202,7 @@ export function PantallaMovimientos({
         accessibilityRole="header"
         accessibilityLabel={etiquetaHablada(partesTotalesMes(totales).join(''))}
         style={{
+          fontFamily: FUENTE,
           fontSize: 24,
           lineHeight: 32,
           fontWeight: '600',
@@ -209,7 +212,7 @@ export function PantallaMovimientos({
       >
         {partesTotalesMes(totales).map((parte, i) =>
           i % 2 === 1 ? (
-            <Text key={i} style={{ fontWeight: '800' }}>
+            <Text key={i} style={{ fontFamily: FUENTE, fontWeight: '800' }}>
               {parte}
             </Text>
           ) : (
@@ -253,10 +256,18 @@ export function PantallaMovimientos({
               <Icono nombre="alerta" color={c.sobreAtencion} grosor={2} />
             </View>
             <View style={{ flex: 1, gap: 1 }}>
-              <Text style={{ fontSize: 16, lineHeight: 22, fontWeight: '700', color: c.texto }}>
+              <Text
+                style={{
+                  fontFamily: FUENTE,
+                  fontSize: 16,
+                  lineHeight: 22,
+                  fontWeight: '700',
+                  color: c.texto,
+                }}
+              >
                 {textoPorRevisarResumen(porRevisar.length)}
               </Text>
-              <Text style={{ fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>
+              <Text style={{ fontFamily: FUENTE, fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>
                 {`«${porRevisar[0]?.texto ?? ''}»`}
               </Text>
             </View>
@@ -466,7 +477,14 @@ export function PantallaMovimientos({
                 accessibilityRole="header"
                 accessibilityLabel={etiquetaEncabezadoDiaConTotales(section.etiqueta, section.resumen)}
                 testID={`movimientos-dia-${section.fecha}`}
-                style={{ flexShrink: 1, fontSize: 15, lineHeight: 20, fontWeight: '700', color: c.texto }}
+                style={{
+                  fontFamily: FUENTE,
+                  flexShrink: 1,
+                  fontSize: 15,
+                  lineHeight: 20,
+                  fontWeight: '700',
+                  color: c.texto,
+                }}
               >
                 {section.visible}
               </Text>
@@ -476,6 +494,7 @@ export function PantallaMovimientos({
                   accessibilityElementsHidden
                   importantForAccessibility="no"
                   style={{
+                    fontFamily: FUENTE,
                     fontSize: 15,
                     lineHeight: 20,
                     fontWeight: '600',
@@ -572,8 +591,9 @@ export function PantallaMovimientos({
 /** Sin la sombra de `Tarjeta`: la fila vive dentro de la tarjeta del día. */
 const SIN_SOMBRA = { shadowOpacity: 0, elevation: 0 } as const;
 
+/** Con mayúscula inicial, como en la tarjeta del asistente: «coca 25» se registra como «coca» y aquí dice «Coca». */
 function titulo(m: MovimientoVista): string {
-  return m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo);
+  return capitalizar(m.descripcion ?? m.comercio ?? m.categoria ?? nombreTipoLibro(m.tipo));
 }
 
 const MESES_COMUNES = ['3', '6', '9', '12', '18', '24'] as const;

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { etiquetaHablada } from '../formato';
 import { useTema } from '../tema';
-import { espacio, OBJETIVO_TACTIL_MIN } from '../tokens';
+import { FUENTE, espacio, OBJETIVO_TACTIL_MIN } from '../tokens';
 
 export type VariantePildora = 'contorno' | 'lleno' | 'suave';
 
@@ -76,7 +76,14 @@ export function BotonPildora({
       {cargando ? <ActivityIndicator size="small" color={tinta} /> : icono ? <View>{icono}</View> : null}
       <Text
         importantForAccessibility="no"
-        style={{ fontSize: 15, lineHeight: 20, fontWeight: '700', color: tinta, textAlign: 'center' }}
+        style={{
+          fontFamily: FUENTE,
+          fontSize: 15,
+          lineHeight: 20,
+          fontWeight: '700',
+          color: tinta,
+          textAlign: 'center',
+        }}
       >
         {etiqueta}
       </Text>

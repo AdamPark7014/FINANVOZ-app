@@ -11,6 +11,7 @@ import {
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
+  FUENTE,
   Boton,
   Cifra,
   espacio,
@@ -70,10 +71,11 @@ const ICONO_SUBTIPO: Record<string, NombreIcono> = {
   ahorro: 'banco',
 };
 
-/** «••2231» si el nombre no lo trae; si no, el tipo («Débito»). */
+/** «••2231» si el nombre no lo trae; si no, el tipo («Débito»), salvo que repita el nombre («Efectivo · Efectivo»). */
 function subtituloCuenta(c: { nombre: string; subtipo: string; ultimos4: string | null }): string | null {
   if (c.ultimos4 && !c.nombre.includes(c.ultimos4)) return `••${c.ultimos4}`;
-  return NOMBRE_SUBTIPO[c.subtipo] ?? null;
+  const nombreTipo = NOMBRE_SUBTIPO[c.subtipo];
+  return nombreTipo && nombreTipo.toLowerCase() !== c.nombre.trim().toLowerCase() ? nombreTipo : null;
 }
 
 const NOMBRE_SUBTIPO: Record<string, string> = {
@@ -156,6 +158,7 @@ export function PantallaCuentas({
         accessibilityRole="header"
         accessibilityLabel={etiquetaHablada(partes.join(''))}
         style={{
+          fontFamily: FUENTE,
           fontSize: 24,
           lineHeight: 32,
           fontWeight: '600',
@@ -166,7 +169,7 @@ export function PantallaCuentas({
       >
         {partes.map((parte, i) =>
           i % 2 === 1 ? (
-            <Text key={i} style={{ fontWeight: '800' }}>
+            <Text key={i} style={{ fontFamily: FUENTE, fontWeight: '800' }}>
               {parte}
             </Text>
           ) : (

@@ -1,5 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 import {
+  FUENTE,
   dockVoz,
   espacio,
   Icono,
@@ -134,7 +135,7 @@ export function MenuAgregar({
             </View>
             <Text
               importantForAccessibility="no"
-              style={{ fontSize: 16, lineHeight: 22, fontWeight: '600', color: c.texto }}
+              style={{ fontFamily: FUENTE, fontSize: 16, lineHeight: 22, fontWeight: '600', color: c.texto }}
             >
               {o.etiqueta}
             </Text>

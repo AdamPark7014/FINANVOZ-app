@@ -1,6 +1,6 @@
 import { Pressable, Text } from 'react-native';
 import type { VistaHoy } from '../../servicios';
-import { cifraEnPalabras, espacio, formatearCentavos, margenPantalla, useTema } from '../../ui';
+import { FUENTE, cifraEnPalabras, espacio, formatearCentavos, margenPantalla, useTema } from '../../ui';
 import { PISTA_OCULTAR_DESGLOSE, PISTA_VER_DESGLOSE, PISTA_VER_QUE_VIENE } from '../principal/textos';
 import { etiquetaPildoraDia, textoPildoraDia } from './textos';
 
@@ -49,7 +49,14 @@ export function PildoraDia({
     >
       <Text
         importantForAccessibility="no"
-        style={{ flexShrink: 1, fontSize: 15, lineHeight: 20, fontWeight: '600', color: c.textoSecundario }}
+        style={{
+          fontFamily: FUENTE,
+          flexShrink: 1,
+          fontSize: 15,
+          lineHeight: 20,
+          fontWeight: '600',
+          color: c.textoSecundario,
+        }}
       >
         {texto}
       </Text>
@@ -57,6 +64,7 @@ export function PildoraDia({
         testID="hoy-puedes"
         importantForAccessibility="no"
         style={{
+          fontFamily: FUENTE,
           fontSize: 22,
           lineHeight: 28,
           fontWeight: '800',

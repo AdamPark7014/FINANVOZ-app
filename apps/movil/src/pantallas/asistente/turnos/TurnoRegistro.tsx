@@ -3,6 +3,7 @@ import { AccessibilityInfo, Pressable, ScrollView, Text, View } from 'react-nati
 import type { CambioRegistro, Turno } from '../../../asistente/tipos';
 import { mensajeError } from '../../../servicios';
 import {
+  FUENTE,
   AnilloTiempo,
   DURACION_AVISO_MS,
   espacio,
@@ -125,7 +126,14 @@ export function TurnoCompacto({ texto, testID }: { texto: string; testID: string
     <Text
       testID={testID}
       accessibilityLabel={etiquetaHablada(texto)}
-      style={{ fontSize: 17, lineHeight: 24, fontWeight: '500', color: c.textoSecundario, paddingRight: 32 }}
+      style={{
+        fontFamily: FUENTE,
+        fontSize: 17,
+        lineHeight: 24,
+        fontWeight: '500',
+        color: c.textoSecundario,
+        paddingRight: 32,
+      }}
     >
       {texto}
     </Text>
@@ -204,15 +212,20 @@ function TarjetaRegistro({
             <Icono nombre={iconoDeCategoria(m.categoriaSlug)} color={c.acento} tamano={24} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ fontSize: 19, lineHeight: 24, fontWeight: '700', color: c.texto }}>
+            <Text
+              style={{ fontFamily: FUENTE, fontSize: 19, lineHeight: 24, fontWeight: '700', color: c.texto }}
+            >
               {m.descripcion}
             </Text>
             {subtitulo ? (
-              <Text style={{ fontSize: 15, lineHeight: 20, color: c.textoSecundario }}>{subtitulo}</Text>
+              <Text style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: c.textoSecundario }}>
+                {subtitulo}
+              </Text>
             ) : null}
           </View>
           <Text
             style={{
+              fontFamily: FUENTE,
               fontSize: 28,
               lineHeight: 34,
               fontWeight: '800',
@@ -249,7 +262,15 @@ function TarjetaRegistro({
                     opacity: pressed ? 0.8 : 1,
                   })}
                 >
-                  <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: '600', color: c.texto }}>
+                  <Text
+                    style={{
+                      fontFamily: FUENTE,
+                      fontSize: 15,
+                      lineHeight: 20,
+                      fontWeight: '600',
+                      color: c.texto,
+                    }}
+                  >
                     {x.actual}
                   </Text>
                   <View style={{ transform: [{ rotate: abierto === x.clave ? '180deg' : '0deg' }] }}>
@@ -297,6 +318,7 @@ function TarjetaRegistro({
                     >
                       <Text
                         style={{
+                          fontFamily: FUENTE,
                           fontSize: 15,
                           lineHeight: 20,
                           fontWeight: actual ? '700' : '600',
@@ -316,17 +338,19 @@ function TarjetaRegistro({
           <Text
             testID={`${testID}-cambio`}
             accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
-            style={{ fontSize: 17, lineHeight: 24, color: c.texto }}
+            style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
           >
             {partesCambio.antes}
-            <Text style={{ fontWeight: '700', color: c.acentoTexto }}>{partesCambio.despues}</Text>
+            <Text style={{ fontFamily: FUENTE, fontWeight: '700', color: c.acentoTexto }}>
+              {partesCambio.despues}
+            </Text>
             {partesCambio.final}
           </Text>
         ) : turno.cambioDia ? (
           <Text
             testID={`${testID}-cambio`}
             accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
-            style={{ fontSize: 17, lineHeight: 24, color: c.texto }}
+            style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
           >
             {turno.cambioDia}
           </Text>
