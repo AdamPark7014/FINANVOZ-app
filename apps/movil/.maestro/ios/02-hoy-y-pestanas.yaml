@@ -76,7 +76,13 @@ tags:
           visible:
             id: pantalla-hoy
           timeout: 10000
-# El desglose se cierra con la misma barra
+# El desglose se cierra con el mismo «Cómo lo calculé». B+ (D1): el inicio es más largo y la búsqueda de «¿Me alcanza?»
+# lo deja abajo, fuera de pantalla; tocarlo así cae en la barra de estado (que solo sube la página). Primero se sube.
+- scrollUntilVisible:
+    element:
+      id: boton-desglose
+    direction: UP
+    timeout: 10000
 - tapOn:
     id: boton-desglose
 - extendedWaitUntil:

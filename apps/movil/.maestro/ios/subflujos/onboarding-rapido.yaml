@@ -35,7 +35,8 @@ name: Subflujo · onboarding rápido
 - extendedWaitUntil:
     visible:
       id: onb-ingreso
-    timeout: 10000
+    # El primer flujo de la corrida corre con el simulador en frío: el paso de ingreso tardó más de 10 s (03, 28-10).
+    timeout: 30000
 - tapOn:
     id: onb-frecuencia-quincena
 - runFlow:

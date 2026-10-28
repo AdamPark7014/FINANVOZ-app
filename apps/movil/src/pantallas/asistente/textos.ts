@@ -380,31 +380,13 @@ export function filasCalculoCompra(d: DatosPuedoGastar): FilaCalculo[] {
 
 export const TEXTO_AL_DIA_HEROE = 'al día';
 
-/** Una parte de la barra de tu dinero (D1): apartado, colchón o libre, con su cifra. */
-export interface ParteDinero {
-  readonly clave: 'apartado' | 'colchon' | 'libre';
-  readonly etiqueta: string;
-  readonly centavos: number;
-}
-
-/**
- * La barra de tu dinero (D1): de lo que tienes (L), lo apartado, el colchón y lo libre. Es el mismo desglose de
- * «Cómo lo calculé» (E4: libre = L − colchón − reservado), sin cálculos nuevos; si lo libre es negativo se ve en cero
- * (el faltante ya lo dice la frase de arriba).
- */
-export function partesDinero(v: Pick<VistaHoy, 'liquidez' | 'reservado' | 'colchon' | 'libre'>): {
-  total: number;
-  partes: ParteDinero[];
-} {
-  return {
-    total: v.liquidez,
-    partes: [
-      { clave: 'apartado', etiqueta: 'Apartado', centavos: v.reservado },
-      { clave: 'colchon', etiqueta: 'Colchón', centavos: v.colchon },
-      { clave: 'libre', etiqueta: 'Libre', centavos: Math.max(0, v.libre) },
-    ],
-  };
-}
+/** Nombre de cada parte de la barra de tu dinero (D1); el faltante solo sale cuando lo que tienes no alcanza. */
+export const ETIQUETA_PARTE_DINERO = {
+  apartado: 'Apartado',
+  colchon: 'Colchón',
+  libre: 'Libre',
+  faltante: 'Faltan',
+} as const;
 
 /** «De tus $5,249». */
 export function textoDeTus(total: string): string {

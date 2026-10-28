@@ -243,6 +243,7 @@ export {
 } from './hoy';
 export { NADA_ENTENDIDO, prepararEntendiendo, type LoEntendido } from './entendiendo';
 export { diasSeguidos, RACHA_MINIMA, rachaAnotando } from './racha';
+export { barraDinero, type BarraDinero, type LeyendaDinero, type TramoDinero } from './barra-dinero';
 export {
   armarPista,
   COLUMNAS_PISTA,

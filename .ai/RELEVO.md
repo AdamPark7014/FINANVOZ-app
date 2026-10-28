@@ -64,6 +64,14 @@
   vacío). En pruebas, `jest.setup.ts` apaga `Animated.loop` (los bucles del orbe volvían lentísima la suite).
   Verificado: suite completa de jest 933/934 (la que falló, `estados-cuenta.test.tsx`, pasa sola: tiempo bajo carga,
   igual que antes `nube`, `respaldo`, `analitica-correccion-voz` y `masvs` en vitest) y vitest de la app 1159/1159.
+- **Tras el Maestro de `12db214` (corrida 40750001343, 7 flujos: pasaron 01, 04, 05, 06, 09 y los no bloqueantes 07 y
+  08):** el 02 fallaba porque la búsqueda opcional de «¿Me alcanza?» deja «Cómo lo calculé» fuera de pantalla en el
+  inicio largo de D1 y el toque caía en la barra de estado (sube la página sin cerrar el desglose): el flujo ahora
+  sube hasta `boton-desglose` antes de tocarlo. El 03 era el primer flujo con el simulador en frío (la pantalla de
+  ingreso salió después de los 10 s): `onboarding-rapido.yaml` espera `onb-ingreso` hasta 30 s. Y la barra de tu
+  dinero con faltante (efectivo $600, colchón $1,300) parecía llena de colchón: ahora `servicios/barra-dinero.ts`
+  (`barraDinero`, puro, con pruebas) reparte lo que tienes entre lo apartado y el colchón y el resto va en un tramo
+  rojo «Faltan $700» (el faltante de E4); prueba en `direccion-b-plus.test.tsx`.
 - **Lo que se apartó de los tableros (a propósito):** «En qué se fue» usa los nombres reales de las categorías
   («Vivienda», «Entretenimiento») y no los de familia del tablero («Casa», «Salidas»), que mezclarían categorías (Salud
   saldría como «Súper»); «⋯» solo en el efectivo (es su único segundo botón; en el débito sería repetir «abrir»); bajo

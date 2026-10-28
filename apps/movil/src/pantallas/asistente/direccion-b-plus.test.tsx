@@ -1,13 +1,13 @@
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { obtenerHoy, registrarMovimiento } from '../../servicios';
-import { coloresCategoria, coloresDinero, etiquetaHablada, formatearCentavos } from '../../ui';
+import { colores, coloresCategoria, coloresDinero, etiquetaHablada, formatearCentavos } from '../../ui';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { conEscenario } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { PantallaAsistente } from './PantallaAsistente';
 import { reiniciarR2 } from './r2';
-import { etiquetaDiaPista, lineasEventoPista, nombreCorto, partesDinero, textoDiasPista } from './textos';
+import { etiquetaDiaPista, lineasEventoPista, nombreCorto, textoDiasPista } from './textos';
 
 jest.mock('expo-speech', () => ({
   speak: jest.fn((_texto: string, o?: { onDone?: () => void }) => o?.onDone?.()),
@@ -32,20 +32,6 @@ function montar(escenario = 'e4-01') {
 beforeEach(() => reiniciarR2());
 
 describe('B+ · textos del inicio (D1)', () => {
-  it('la barra de tu dinero es el desglose de E4: apartado + colchón + libre = lo que tienes', () => {
-    const v = { liquidez: 524_900, reservado: 284_900, colchon: 130_000, libre: 110_000 };
-    const { total, partes } = partesDinero(v);
-    expect(total).toBe(524_900);
-    expect(partes.map((p) => [p.etiqueta, p.centavos])).toEqual([
-      ['Apartado', 284_900],
-      ['Colchón', 130_000],
-      ['Libre', 110_000],
-    ]);
-    expect(partes.reduce((s, p) => s + p.centavos, 0)).toBe(total);
-    // Libre negativo: se ve en cero (el faltante lo dice la frase de arriba); nada infla lo libre.
-    expect(partesDinero({ ...v, libre: -37_400 }).partes[2]?.centavos).toBe(0);
-  });
-
   it('la pista: insignia, eventos y lo que oye el lector', () => {
     expect(textoDiasPista(4)).toBe('4 días');
     expect(textoDiasPista(1)).toBe('1 día');
@@ -114,6 +100,34 @@ describe('B+ · Inicio «Tablero vivo» (D1)', () => {
     expect(screen.getByTestId('desglose')).toBeTruthy();
     fireEvent.press(screen.getByTestId('boton-desglose'));
     expect(screen.queryByTestId('desglose')).toBeNull();
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    p.cerrar();
+  });
+
+  it('si lo apartado y el colchón no caben en lo que tienes, la barra pinta el faltante en rojo («Faltan $X»)', () => {
+    const p = conEscenario('e4-01');
+    // Un gasto de $1,000 deja lo libre en negativo (E4: «Te faltan…»).
+    registrarMovimiento(p.ctx, {
+      tipo: 'gasto',
+      categoria: 'super',
+      origenId: p.e.cuentas['bbva'] as string,
+      monto: 100_000,
+      fecha: '2026-10-11',
+    });
+    const v = obtenerHoy(p.ctx);
+    expect(v.estado).toBe('libre_negativo');
+    renderConSesion(
+      p.ctx,
+      <PantallaAsistente navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
+    );
+    expect(fondo('barra-dinero-barra-faltante')).toBe(colores.claro.faltante);
+    expect(screen.queryByTestId('barra-dinero-libre')).toBeNull();
+    expect(screen.getByTestId('barra-dinero-faltante')).toHaveTextContent(
+      `Faltan${formatearCentavos(v.faltante)}`,
+    );
+    expect(screen.getByTestId('barra-dinero-colchon')).toHaveTextContent(
+      `Colchón${formatearCentavos(v.colchon, 'pesos')}`,
+    );
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     p.cerrar();
   });

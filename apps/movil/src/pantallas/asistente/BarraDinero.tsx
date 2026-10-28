@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from 'react-native';
-import type { VistaHoy } from '../../servicios';
+import { barraDinero, type VistaHoy } from '../../servicios';
 import {
   BarraApilada,
   cifraEnPalabras,
@@ -12,12 +12,13 @@ import {
   useTema,
 } from '../../ui';
 import { PISTA_OCULTAR_DESGLOSE, PISTA_VER_DESGLOSE, PISTA_VER_QUE_VIENE } from '../principal/textos';
-import { BTN_COMO_LO_CALCULE, partesDinero, textoDeTus } from './textos';
+import { BTN_COMO_LO_CALCULE, ETIQUETA_PARTE_DINERO, textoDeTus } from './textos';
 
 /**
  * Tu dinero en una barra (dirección B+, D1 y D7): «De tus $5,249», la barra apartado · colchón · libre y su leyenda
- * con cada cifra. «Cómo lo calculé ›» (`boton-desglose`) abre y cierra el mismo desglose de siempre. Las cifras son
- * las de E4 en `VistaHoy` (regla 4): aquí solo se reparten a lo ancho.
+ * con cada cifra. Si lo apartado y el colchón no caben en lo que tienes, la barra pinta lo cubierto y el faltante en
+ * rojo («Faltan $700»). «Cómo lo calculé ›» (`boton-desglose`) abre y cierra el mismo desglose de siempre. El reparto
+ * sale de `barraDinero` (el desglose de E4 en `VistaHoy`, regla 4): aquí solo se dibuja a lo ancho.
  */
 export function BarraDinero({
   vista,
@@ -29,8 +30,10 @@ export function BarraDinero({
   alPresionar: () => void;
 }) {
   const { c, esquema } = useTema();
-  const colores = coloresDinero[esquema];
-  const { total, partes } = partesDinero(vista);
+  const dinero = coloresDinero[esquema];
+  const color = (clave: 'apartado' | 'colchon' | 'libre' | 'faltante') =>
+    clave === 'faltante' ? c.faltante : dinero[clave];
+  const { total, tramos, leyenda } = barraDinero(vista);
   const negativo = vista.estado === 'libre_negativo';
   const deTus = textoDeTus(formatearCentavos(total, 'pesos'));
   return (
@@ -106,21 +109,29 @@ export function BarraDinero({
       </View>
       <BarraApilada
         testID="barra-dinero-barra"
-        partes={partes.map((p) => ({ clave: p.clave, valor: p.centavos, color: colores[p.clave] }))}
+        partes={tramos.map((p) => ({ clave: p.clave, valor: p.centavos, color: color(p.clave) }))}
       />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: espacio.s }}>
-        {partes.map((p) => (
+        {leyenda.map((p) => (
           <View
             key={p.clave}
             accessible
-            accessibilityLabel={`${p.etiqueta}: ${cifraEnPalabras(p.centavos, 'pesos')}`}
+            accessibilityLabel={`${ETIQUETA_PARTE_DINERO[p.clave]}: ${cifraEnPalabras(p.centavos, p.clave === 'faltante' ? 'auto' : 'pesos')}`}
             testID={`barra-dinero-${p.clave}`}
             style={{ flexGrow: 1, flexBasis: '30%', gap: 2 }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colores[p.clave] }} />
-              <Text style={{ fontFamily: FUENTE, fontSize: 14, lineHeight: 20, color: c.textoSecundario }}>
-                {p.etiqueta}
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color(p.clave) }} />
+              <Text
+                style={{
+                  fontFamily: FUENTE,
+                  fontSize: 14,
+                  lineHeight: 20,
+                  fontWeight: p.clave === 'faltante' ? '700' : '400',
+                  color: p.clave === 'faltante' ? c.faltante : c.textoSecundario,
+                }}
+              >
+                {ETIQUETA_PARTE_DINERO[p.clave]}
               </Text>
             </View>
             <Text
@@ -129,11 +140,12 @@ export function BarraDinero({
                 fontSize: 18,
                 lineHeight: 24,
                 fontWeight: '800',
-                color: p.clave === 'libre' ? c.acentoTexto : c.texto,
+                color: p.clave === 'libre' ? c.acentoTexto : p.clave === 'faltante' ? c.faltante : c.texto,
                 fontVariant: ['tabular-nums'],
               }}
             >
-              {formatearCentavos(p.centavos, 'pesos')}
+              {/* El faltante con sus centavos, como en «Te faltan…» de arriba: nunca se redondea hacia abajo. */}
+              {formatearCentavos(p.centavos, p.clave === 'faltante' ? 'auto' : 'pesos')}
             </Text>
           </View>
         ))}
