@@ -375,3 +375,118 @@ export function filasCalculoCompra(d: DatosPuedoGastar): FilaCalculo[] {
     'calculo',
   );
 }
+
+// ——— Dirección B+ «Viva»: el inicio «Tablero vivo» (`docs/diseno/direccion-b-plus/D1-reposo.png`) ———
+
+export const TEXTO_AL_DIA_HEROE = 'al día';
+
+/** Una parte de la barra de tu dinero (D1): apartado, colchón o libre, con su cifra. */
+export interface ParteDinero {
+  readonly clave: 'apartado' | 'colchon' | 'libre';
+  readonly etiqueta: string;
+  readonly centavos: number;
+}
+
+/**
+ * La barra de tu dinero (D1): de lo que tienes (L), lo apartado, el colchón y lo libre. Es el mismo desglose de
+ * «Cómo lo calculé» (E4: libre = L − colchón − reservado), sin cálculos nuevos; si lo libre es negativo se ve en cero
+ * (el faltante ya lo dice la frase de arriba).
+ */
+export function partesDinero(v: Pick<VistaHoy, 'liquidez' | 'reservado' | 'colchon' | 'libre'>): {
+  total: number;
+  partes: ParteDinero[];
+} {
+  return {
+    total: v.liquidez,
+    partes: [
+      { clave: 'apartado', etiqueta: 'Apartado', centavos: v.reservado },
+      { clave: 'colchon', etiqueta: 'Colchón', centavos: v.colchon },
+      { clave: 'libre', etiqueta: 'Libre', centavos: Math.max(0, v.libre) },
+    ],
+  };
+}
+
+/** «De tus $5,249». */
+export function textoDeTus(total: string): string {
+  return `De tus ${total}`;
+}
+
+/** «Hasta tu quincena». */
+export function tituloPista(concepto: string): string {
+  return `Hasta tu ${concepto}`;
+}
+
+/** La insignia de la pista: «4 días», «1 día» u «Hoy». */
+export function textoDiasPista(n: number): string {
+  return n <= 0 ? 'Hoy' : textoDias(n);
+}
+
+export const TEXTO_HOY_PISTA = 'Hoy';
+export const TEXTO_NADA_FIJO = 'nada fijo';
+
+const DIA_LARGO: Record<string, string> = {
+  lun: 'lunes',
+  mar: 'martes',
+  mié: 'miércoles',
+  jue: 'jueves',
+  vie: 'viernes',
+  sáb: 'sábado',
+  dom: 'domingo',
+};
+
+/** «Nu ••4410» → «Nu»: en la pista no caben los últimos cuatro. */
+export function nombreCorto(nombre: string): string {
+  return nombre.replace(/\s*••\d{4}$/, '').trim() || nombre;
+}
+
+function mayusculaInicial(t: string): string {
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+/** Lo que se ve de un evento de la pista: el concepto y su cifra («Internet» · «−$499», «Pagar Nu»). */
+export function lineasEventoPista(e: {
+  tipo: 'egreso' | 'tarjeta' | 'ingreso';
+  concepto: string;
+  monto: number;
+}): { concepto: string; cifra: string | null } {
+  if (e.tipo === 'tarjeta') return { concepto: `Pagar ${nombreCorto(e.concepto)}`, cifra: null };
+  const monto = formatearCentavos(e.monto);
+  return {
+    concepto: mayusculaInicial(e.concepto),
+    cifra: e.tipo === 'ingreso' ? `+${monto}` : `−${monto}`,
+  };
+}
+
+/** Lo que oye el lector en cada día de la pista: «Hoy, lunes 26: nada fijo.» · «Jueves 29: tanda, menos …». */
+export function etiquetaDiaPista(d: {
+  hoy: boolean;
+  diaSemana: string;
+  dia: number;
+  eventos: readonly { tipo: 'egreso' | 'tarjeta' | 'ingreso'; concepto: string; monto: number }[];
+}): string {
+  const dia = `${DIA_LARGO[d.diaSemana] ?? d.diaSemana} ${d.dia}`;
+  const cuando = d.hoy ? `Hoy, ${dia}` : mayusculaInicial(dia);
+  const que =
+    d.eventos.length === 0
+      ? TEXTO_NADA_FIJO
+      : d.eventos
+          .map((e) =>
+            e.tipo === 'tarjeta'
+              ? `pagar ${nombreCorto(e.concepto)}, ${etiquetaHablada(formatearCentavos(e.monto))}`
+              : `${e.concepto}, ${etiquetaHablada(`${e.tipo === 'ingreso' ? '' : '−'}${formatearCentavos(e.monto)}`)}`,
+          )
+          .join('; ');
+  return `${cuando}: ${que}.`;
+}
+
+/** La fila de lo pendiente de una tarjeta (D1): «Tu Nu vence el jue 29» · «Paga $1,420 y no generas intereses». */
+export function tituloPagoPendiente(texto: string): string {
+  return texto.replace(/\.$/, '');
+}
+
+/** Ya vencida, pagar ya no evita los intereses: se dice la cifra sin prometerlo. */
+export function detallePagoPendiente(pngi: string, cuando: 'por_vencer' | 'vencido' = 'por_vencer'): string {
+  return cuando === 'vencido'
+    ? `Pago para no generar intereses: ${pngi}`
+    : `Paga ${pngi} y no generas intereses`;
+}

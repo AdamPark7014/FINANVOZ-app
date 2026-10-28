@@ -59,8 +59,12 @@ describe('accesibilidad (CA-M7-05)', () => {
     const libre = i('Libre ochocientos cincuenta y seis pesos entre 4 días: doscientos catorce pesos al día');
     expect(libre).toBeGreaterThan(comoLoCalcule);
     expect(i('Toca para hablar')).toBeGreaterThan(libre);
-    // Cada fila del desglose es un solo elemento: concepto y monto juntos, sin repetir.
-    expect(orden.filter((x) => x.startsWith('Colchón'))).toHaveLength(1);
+    // Cada fila del desglose es un solo elemento: concepto y monto juntos, sin repetir. B+ (D1): la leyenda de la
+    // barra de tu dinero también agrupa cada parte con su cifra, una vez, entre «Cómo lo calculé» y el desglose.
+    expect(orden.filter((x) => x.startsWith('Colchón: menos'))).toHaveLength(1);
+    expect(orden.filter((x) => x === 'Colchón: doscientos pesos')).toHaveLength(1);
+    expect(i('Colchón: doscientos pesos')).toBeGreaterThan(comoLoCalcule);
+    expect(i('Colchón: doscientos pesos')).toBeLessThan(libre);
     p.cerrar();
   });
 

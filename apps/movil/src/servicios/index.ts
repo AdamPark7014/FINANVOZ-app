@@ -241,6 +241,14 @@ export {
   type TarjetaAccion,
   type VistaHoy,
 } from './hoy';
+export {
+  armarPista,
+  COLUMNAS_PISTA,
+  pistaQuincena,
+  type DiaPista,
+  type EventoPista,
+  type PistaQuincena,
+} from './pista';
 export { marcarAvisoVisto, type Aviso } from './avisos';
 export {
   marcarObservacionVista,

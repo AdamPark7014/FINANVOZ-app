@@ -19,6 +19,17 @@
   «Reducir movimiento»; `Orbe.test.tsx`) y `Mosaico.tsx`; los ciclos de animación pasaron a `ui/movimiento.ts`. El
   mosaico ya va en cada fila de Movimientos (`mosaico-<id>`) y en la tarjeta de registro (`aviso-mosaico`). Íconos
   nuevos `cerrar` y `llama`. `02 §16` lo describe.
+- **Fase 2 hecha (Inicio «Tablero vivo», D1 y D7):** `Reposo.tsx` con el orbe junto al saludo, «Hoy puedes gastar»,
+  la cifra con «al día» y la frase de siempre (`hoy-fecha`, `hoy-puedes`, `hoy-secundario` sin cambios). Debajo,
+  `BarraDinero.tsx` («De tus $X», barra apartado · colchón · libre con `ui/componentes/BarraApilada.tsx` y su leyenda;
+  `partesDinero` en `asistente/textos.ts` es el mismo desglose de E4) con «Cómo lo calculé ›» = `boton-desglose`, que
+  sigue abriendo `desglose` debajo. `PistaQuincena.tsx` con el servicio nuevo `servicios/pista.ts`
+  (`pistaQuincena(ctx, proximoIngreso)` + `armarPista` puro, `pista.test.ts`): de hoy al ingreso, pagos fijos,
+  «Pagar Nu» el día límite de una tarjeta con PNGI y el ingreso; con más de cinco días, hoy + días con algo + ingreso.
+  Lo pendiente del pago de tarjeta es ahora una fila (mosaico violeta, «Tu Nu vence el jue 29», «Paga $1,420 y no
+  generas intereses» o, vencida, «Pago para no generar intereses: $X», «Ya la pagué»); **«Todavía no» se quedó debajo
+  en chico** aunque D1 no lo muestra (quitarlo dejaba sin salida). Pruebas: `asistente/direccion-b-plus.test.tsx`
+  (D1) y una de D7 en `oscuro-b6.test.tsx`. `02 §4` y `§16` al día.
 - **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
   luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
   dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.

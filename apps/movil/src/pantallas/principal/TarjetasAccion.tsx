@@ -19,7 +19,17 @@ import { TarjetaArqueo, TarjetaCapturaInactiva, TarjetaReactivarCaptura } from '
 import { FormularioPago, PreguntaLiquidarMeses } from '../tarjetas/componentes';
 import { TarjetaDeTanda } from '../tandas/TarjetasTanda';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, etiquetaHablada, formatearCentavos, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  espacio,
+  etiquetaHablada,
+  formatearCentavos,
+  Mosaico,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
+import { detallePagoPendiente, tituloPagoPendiente } from '../asistente/textos';
 import { BotonPildora } from '../../ui/componentes/BotonPildora';
 import { Chip, GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from './Chip';
 import { useAnuncio, useMostrarAviso } from './ProveedorAvisos';
@@ -263,6 +273,7 @@ function ElegirCuenta({
  */
 function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
   const { ctx, refrescar } = useSesion();
+  const { c } = useTema();
   const mostrar = useMostrarAviso();
   const [pagando, setPagando] = useState(false);
   const [pregunta, setPregunta] = useState<PreguntaLiquidar | null>(null);
@@ -278,42 +289,66 @@ function TarjetaPagoTarjeta({ t, testID }: { t: PagoTarjeta; testID: string }) {
     }
   };
   if (pregunta) return <PreguntaLiquidarMeses pregunta={pregunta} testID={`${testID}-liquidar`} />;
-  // Dirección B (tablero B1): el asistente lo dice en texto grande, sin tarjeta, con sus respuestas de un toque.
+  // B+ (tablero D1): lo pendiente es una fila con el mosaico violeta del crédito, qué vence, cuánto pagar y «Ya la
+  // pagué». «Todavía no» se conserva debajo, en chico (el tablero no lo muestra; quitarlo dejaría sin salida).
   const pngi = formatearCentavos(t.pngi);
-  const frase = `${t.texto} Para no generar intereses, paga ${pngi}.`;
+  const titulo = tituloPagoPendiente(t.texto);
+  const detalle = detallePagoPendiente(pngi, t.cuando);
   return (
-    <View testID={testID} style={{ gap: espacio.m }}>
-      <Texto variante="voz" accessibilityLabel={etiquetaHablada(frase)}>
-        {`${t.texto} Para no generar intereses, paga `}
-        <Texto variante="voz" style={{ fontWeight: '800' }}>
-          {pngi}
-        </Texto>
-        .
-      </Texto>
-      {pagando ? (
-        <Tarjeta>
-          <FormularioPago
-            testID={`${testID}-pago`}
-            tarjetaId={t.tarjetaId}
-            nombre={t.nombre}
-            montoSugerido={t.pngi}
-            alTerminar={(r) => {
-              setPagando(false);
-              setPregunta(r.preguntaLiquidar);
-            }}
-            alCancelar={() => setPagando(false)}
-          />
-        </Tarjeta>
-      ) : (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+    <View
+      testID={testID}
+      style={{
+        backgroundColor: c.superficie,
+        borderRadius: 22,
+        borderWidth: 1,
+        borderColor: c.borde,
+        paddingHorizontal: espacio.l,
+        paddingVertical: espacio.m,
+        gap: espacio.s,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.m }}>
+        <Mosaico familia="salidas" icono="tarjeta" tamano={44} />
+        <View
+          accessible
+          accessibilityLabel={etiquetaHablada(`${titulo}. ${detalle}.`)}
+          testID={`${testID}-texto`}
+          style={{ flex: 1, gap: 1 }}
+        >
+          <Texto variante="cuerpoFuerte" style={{ lineHeight: 22, fontWeight: '700' }}>
+            {titulo}
+          </Texto>
+          <Texto variante="secundario" tono="secundario" style={{ lineHeight: 19 }}>
+            {detalle}
+          </Texto>
+        </View>
+        {pagando ? null : (
           <BotonPildora
             etiqueta="Ya la pagué"
             pista="Te pregunto de qué cuenta salió el pago"
             alPresionar={() => setPagando(true)}
             testID={`${testID}-ya-la-pague`}
           />
-          <BotonPildora
+        )}
+      </View>
+      {pagando ? (
+        <FormularioPago
+          testID={`${testID}-pago`}
+          tarjetaId={t.tarjetaId}
+          nombre={t.nombre}
+          montoSugerido={t.pngi}
+          alTerminar={(r) => {
+            setPagando(false);
+            setPregunta(r.preguntaLiquidar);
+          }}
+          alCancelar={() => setPagando(false)}
+        />
+      ) : (
+        <View style={{ flexDirection: 'row', marginLeft: 44 + espacio.m - espacio.s }}>
+          <Boton
             etiqueta="Todavía no"
+            variante="texto"
+            ancho="contenido"
             pista="Lo sigo apartando y te pregunto mañana"
             testID={`${testID}-todavia-no`}
             alPresionar={posponer}

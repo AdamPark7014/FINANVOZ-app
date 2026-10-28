@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
+import { detallePagoPendiente } from '../asistente/textos';
 import type { ReactNode } from 'react';
 import type { PlainDate } from '@cartera/core';
 import {
@@ -127,13 +128,14 @@ describe('Hoy', () => {
     if (primera?.tipo !== 'pago_tarjeta' || segunda?.tipo !== 'pago_tarjeta') throw new Error('sin pagos');
     montar(p.ctx, hoy());
     const tarjeta0 = screen.getByTestId('tarjeta-accion-0');
-    // Dirección B (B1): el asistente lo dice en una sola frase con lo que hay que pagar.
+    // B+ (D1): una fila con qué vence y, debajo, cuánto pagar para no generar intereses.
+    expect(within(tarjeta0).getByText(primera.texto.replace(/\.$/, ''))).toBeTruthy();
     expect(
-      within(tarjeta0).getByText(
-        `${primera.texto} Para no generar intereses, paga ${formatearCentavos(primera.pngi)}.`,
-      ),
+      within(tarjeta0).getByText(detallePagoPendiente(formatearCentavos(primera.pngi), primera.cuando)),
     ).toBeTruthy();
-    const empieza = (texto: string) => new RegExp(`^${texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+    // La fila (D1) dice «Tu … vence el lun 30» sin el punto final.
+    const empieza = (texto: string) =>
+      new RegExp(`^${texto.replace(/\.$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
 
     fireEvent.press(screen.getByTestId('tarjeta-accion-0-todavia-no'));
     expect(screen.queryByText(empieza(primera.texto))).toBeNull();

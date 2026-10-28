@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
-import { colores } from '../../ui';
+import { colores, coloresDinero } from '../../ui';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { conEscenario } from '../principal/__pruebas__/base';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
@@ -75,18 +75,34 @@ describe('Dirección B en oscuro (tablero B6; el claro sigue siendo el de omisi�
     p.cerrar();
   });
 
-  it('B6 · «Ya la pagué» y «Todavía no» con filo y letra menta sobre la tarjeta', () => {
+  it('D7 · el inicio en oscuro: la barra de tu dinero y la pista con sus colores, sin blancos del claro', () => {
+    const p = conEscenario('e4-01');
+    renderConSesion(
+      p.ctx,
+      <PantallaAsistente navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
+    );
+    const d = coloresDinero.oscuro;
+    expect(estiloDe('barra-dinero-barra-apartado').backgroundColor).toBe(d.apartado);
+    expect(estiloDe('barra-dinero-barra-colchon').backgroundColor).toBe(d.colchon);
+    expect(estiloDe('barra-dinero-barra-libre').backgroundColor).toBe(d.libre);
+    expect(estiloDe('barra-dinero').backgroundColor).toBe(o.superficie);
+    expect(estiloDe('pista-quincena').backgroundColor).toBe(o.superficie);
+    expect(ajenos()).toEqual([]);
+    p.cerrar();
+  });
+
+  it('B6/D7 · «Ya la pagué» con filo y letra menta sobre la tarjeta; «Todavía no», en letra menta', () => {
     const p = conEscenario('e5-10');
     p.reloj.fijar('2026-11-28');
     renderConSesion(
       p.ctx,
       <PantallaAsistente navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
     );
+    const boton = screen.getByTestId('tarjeta-accion-0-ya-la-pague');
+    expect(estilo(boton)).toMatchObject({ backgroundColor: o.superficie, borderColor: o.acento });
     for (const id of ['tarjeta-accion-0-ya-la-pague', 'tarjeta-accion-0-todavia-no']) {
-      const boton = screen.getByTestId(id);
-      expect(estilo(boton)).toMatchObject({ backgroundColor: o.superficie, borderColor: o.acento });
-      const [letra] = within(boton).getAllByText(/./);
-      expect(letra && estilo(letra).color).toBe(o.acento);
+      const [letra] = within(screen.getByTestId(id)).getAllByText(/./);
+      expect(letra && estilo(letra).color).toBe(o.acentoTexto);
     }
     expect(ajenos()).toEqual([]);
     p.cerrar();
