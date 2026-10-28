@@ -1,52 +1,32 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-27
+- **Fecha:** 2026-10-28
 - **Rama:** main
 
 ## Hecho en este turno
 
-- **Dirección B «Plática» (decisión de Adam del 26-10, en curso).** Adam eligió B del canvas «FinanVoz · 3
-  direcciones» con los chips de un toque de C en la tarjeta de registro. Decisión en `docs/ESTADO.md`; tableros B y C2
-  en `docs/diseno/direccion-b/` (mandan sobre las maquetas anteriores); `02 §2`, `§4`, `§10` y `§11` reescritos.
-  Fases: 1) navegación y dock, 2) Asistente B1–B3, 3) Movimientos y Cuentas, 4) oscuro; un commit verificado por fase.
-  Falta comparar las capturas de «iOS · Maestro» (claro y el lote oscuro) contra los PNG de B.
-- **Fase 1 hecha:** navegación arriba (`src/pantallas/navegacion/NavegacionSuperior.tsx`, `tabBarPosition: 'top'`):
-  segmentos `pestana-hoy|movimientos|cuentas` y el círculo «Tú» con testID `boton-ajustes` (la app no pide nombre: no
-  hay inicial). Dock de voz (`DockVoz`, `DockSeccion`): en Asistente «Escribir» (`boton-escribir`), micrófono
-  (`boton-hablar`) y «¿Me alcanza?» (`dock-me-alcanza`, escucha con «me alcanza para…»); en Movimientos «Buscar»
-  (`boton-buscar`, `FiltroMovimientos.texto`) y en Cuentas «Agregar» (`boton-agregar` → `menu-agregar` con los
-  `boton-agregar-*` de antes). Paleta B0 en `ui/tokens.ts` (tokens nuevos `dock`, `microfono`, `segmento`…; AA en
-  `tokens.test.ts`). Íconos de línea con `react-native-svg` 15.15.4 (dependencia nueva, la del SDK 57).
-- **Fase 2 hecha (Asistente B1–B3):** reposo (`Reposo.tsx`: saludo por hora en `hoy-fecha`, cifra `hoy-puedes`,
-  «Cómo lo calculé ›» = `boton-desglose`, lo pendiente y «Puedes decirme» con los `chip-intencion-*`); con turnos de
-  la sesión, la píldora (`PildoraDia`, también `boton-desglose`) y la conversación (lo del día en chico). Tarjeta de
-  registro B2 en `TurnoRegistro` (`aviso`, `aviso-chip-categoria|cuenta|dia` → `aviso-opcion-*`, corrigen con
-  `aplicarCorreccion`; «Deshacer» con anillo de 10 s; pista «Si oí mal…»). «¿Me alcanza?» B3 en `TurnoPuedoGastar`
-  (dos opciones, «Cómo lo calculé», «Lo compré», «Recuérdamelo»). Servicios nuevos: `detalleRegistro`,
-  `nombresLiquidez`. Pruebas: `fraseRegistro`/`oida` en `principal/__pruebas__/arnes.tsx` (la tarjeta dice la frase,
-  no la muestra entera).
-- **Fase 3 hecha (Movimientos B4 y Cuentas B5):** arriba de Movimientos la frase del mes (`movimientos-titulo`,
-  servicio `totalesDelMes`); sin «Registrar» arriba (se registra con el dock; el vacío conserva
-  `boton-registrar-primer-movimiento`); las frases por revisar plegadas en `por-revisar-resumen` (al abrirlo salen
-  `revisar-*`/`descartar-*`); días en tarjetas con «−$25» a la derecha (`movimientos-dia-total-*`) e ícono por
-  categoría. En Cuentas la frase «Tienes … y debes …» (`cuentas-titulo`, servicio `totalesCuentas`: los MSI cuentan y
-  el saldo a favor no resta), secciones en tarjetas, «Lo que viene» (antes Compromisos) y, en cada tarjeta de crédito
-  con pago para no generar intereses, la caja `cuenta-<id>-pngi` con «Pagar» (`cuenta-<id>-pagar`), que abre
-  `/tarjetas/[id]?pagar=1` con el formulario de pago abierto (`pagarAlAbrir`). Chips de filtro con el estilo B.
-  `02 §10` y `§11` al día.
-- **Fase 4 hecha (oscuro, B6):** los tokens oscuros ya eran los de B6; el círculo de Tú pasa a `superficie` (en B1 y
-  B6 es una tarjeta con filo, no un segmento). Pruebas nuevas en oscuro: `asistente/oscuro-b6.test.tsx` (reposo,
-  botones de la tarjeta de pago, Movimientos y Cuentas sin colores del claro) y `rutas/pestanas-oscuro.test.tsx`
-  (riel, segmento sin sombra, círculo). Diferencia a propósito: el filo decorativo es `#3A4C45` y no el `#2A3C35`
-  del tablero (1.5:1 contra la tarjeta, `tokens.test.ts`). `02 §16` lo dice. El claro sigue de omisión.
-- Maestro de iPhone en verde sobre `7f098a3` (fase 1); en las capturas «Movimientos» se partía en el segmento
-  elegido: los segmentos ya no son tercios iguales.
+- **Dirección B+ «Viva» (Adam, 28-10).** Se construye sobre B (commits `7f098a3`, `d1b6cfa`, `c4bff70`, `371fabb`,
+  Figtree en `4fc3cad`) con los tableros de `docs/diseno/direccion-b-plus/` (D0–D7; `D1b` no se construye). Decisión
+  en `docs/ESTADO.md` (Decisiones, 28-10-2026). Cinco fases, un commit verificado y un push por fase:
+  1. Fundamentos · 2. Inicio «Tablero vivo» (D1, D7) · 3. «Te escucho» (D2) · 4. Registro (D3) y «¿Me alcanza?» (D4) ·
+  5. Movimientos (D5) y Cuentas (D6).
+- **Fase 1 hecha (fundamentos):** paletas nuevas en `ui/tokens.ts` — `coloresCategoria` (seis familias del tablero +
+  `otros` gris; mosaico, ícono y barra en claro y oscuro), `familiaDeCategoria(slug)`, `coloresDinero` (apartado,
+  colchón, libre, compra, recorte), `coloresCuenta` (efectivo menta, débito azul, crédito violeta), `coloresEscucha`
+  (pantalla pino) y `orbe`; pruebas de contraste en `tokens.test.ts` (ícono/mosaico ≥ 4.5, textos de tarjetas y de
+  «Te escucho» ≥ 4.5). Componentes `ui/componentes/Orbe.tsx` (respira en reposo, ondas al escuchar, quieto con
+  «Reducir movimiento»; `Orbe.test.tsx`) y `Mosaico.tsx`; los ciclos de animación pasaron a `ui/movimiento.ts`. El
+  mosaico ya va en cada fila de Movimientos (`mosaico-<id>`) y en la tarjeta de registro (`aviso-mosaico`). Íconos
+  nuevos `cerrar` y `llama`. `02 §16` lo describe.
+- **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
+  luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
+  dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.
 - **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de
   `expo-sqlite` con NTSTATUS 0xC0E90002 (política de integridad de código del proceso de Claude, igual que
   cursor-agent). La verificación visual es por las capturas de «iOS · Maestro» en GitHub.
-- Turno anterior (mismo día): intérprete «perfeccionado» — nivel 0 162/164 del golden sin red, nube 163/164 con Haiku
-  5.5, ~0.003 USD por 1,000 frases; números en `docs/ESTADO.md` (Decisiones 26-10, M3) y `services/proxy/README.md`.
+- Turno anterior (27-10): dirección B «Plática» completa en cuatro fases (navegación arriba y dock, Asistente B1–B3,
+  Movimientos y Cuentas B4–B5, oscuro B6); detalle en `git log` y en `02 §2`, `§4`, `§10`, `§11` y `§16`.
 
 ## Estado de tiendas
 

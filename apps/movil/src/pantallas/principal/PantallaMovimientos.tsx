@@ -26,7 +26,7 @@ import {
   cifraEnPalabras,
   formatearCentavos,
   Icono,
-  iconoDeCategoria,
+  Mosaico,
   Pantalla,
   Tarjeta,
   Texto,
@@ -705,18 +705,8 @@ function FilaMovimiento({
         paddingVertical: espacio.s,
       }}
     >
-      <View
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 14,
-          backgroundColor: c.iconoFondo,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Icono nombre={iconoDeCategoria(m.categoriaSlug)} color={c.acento} />
-      </View>
+      {/* B+ (D5): el mosaico de color de la categoría. */}
+      <Mosaico slug={m.categoriaSlug} testID={`mosaico-${m.id}`} />
       <View style={{ flex: 1, gap: 1 }}>
         <Texto variante="cuerpoFuerte" style={{ lineHeight: 22 }}>
           {titulo(m)}

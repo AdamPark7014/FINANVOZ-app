@@ -158,6 +158,224 @@ export const colores: Record<EsquemaColor, Colores> = {
 /** Degradado de marca (bienvenida, ícono, bloqueo). */
 export const degradadoMarca = [marca.claro, marca.oscuro] as const;
 
+// ——— Dirección B+ «Viva» (`docs/diseno/direccion-b-plus/`, D0) ———
+
+/**
+ * Familias de color de las categorías (D0): cada gasto lleva un mosaico claro con su ícono oscuro, y su color de barra
+ * en «En qué se fue». Las seis primeras son las del tablero; `otros` (gris) es nuestra para lo que no cae en ellas.
+ */
+export type FamiliaCategoria =
+  'antojos' | 'comidaFuera' | 'super' | 'transporte' | 'salidas' | 'casa' | 'otros';
+
+export interface PaletaCategoria {
+  /** Fondo del cuadro del ícono. */
+  readonly mosaico: string;
+  /** Ícono sobre `mosaico`; ≥ 4.5:1 (más que el 3:1 que pide WCAG 1.4.11 a un gráfico). */
+  readonly icono: string;
+  /** Segmento de la barra y punto de la leyenda (la leyenda dice nombre y cifra: el color nunca va solo). */
+  readonly barra: string;
+}
+
+/**
+ * Colores exactos de `direccion-b-plus/README.md` en claro. En oscuro (sin tablero): mosaico casi negro teñido del
+ * mismo tono, ícono claro y la misma barra, salvo Casa, cuyo pino desaparecería sobre la tarjeta oscura.
+ */
+export const coloresCategoria: Record<EsquemaColor, Record<FamiliaCategoria, PaletaCategoria>> = {
+  claro: {
+    antojos: { mosaico: '#FFF0D1', icono: '#7A4F00', barra: '#F2B33D' },
+    comidaFuera: { mosaico: '#FFE4DB', icono: '#9C3417', barra: '#EE7650' },
+    super: { mosaico: '#DDF5EA', icono: '#0B5E45', barra: '#2FB386' },
+    transporte: { mosaico: '#E1EBFF', icono: '#224C9E', barra: '#5B8DEF' },
+    salidas: { mosaico: '#EDE5FF', icono: '#5533A8', barra: '#9B7BF0' },
+    casa: { mosaico: '#E6ECE8', icono: '#0F3D32', barra: '#0F3D32' },
+    otros: { mosaico: '#EEEFEC', icono: '#4B5652', barra: '#A9B3AE' },
+  },
+  oscuro: {
+    antojos: { mosaico: '#3A2C0C', icono: '#FFD27A', barra: '#F2B33D' },
+    comidaFuera: { mosaico: '#40211A', icono: '#FFB199', barra: '#EE7650' },
+    super: { mosaico: '#0F3A2B', icono: '#7FE6BC', barra: '#2FB386' },
+    transporte: { mosaico: '#17284A', icono: '#ADC6FF', barra: '#5B8DEF' },
+    salidas: { mosaico: '#2A1F4A', icono: '#CDB9FF', barra: '#9B7BF0' },
+    casa: { mosaico: '#1C2E28', icono: '#B9D3C8', barra: '#5F9C88' },
+    otros: { mosaico: '#252B29', icono: '#C3CCC8', barra: '#7D8984' },
+  },
+};
+
+/** A qué familia de color va cada categoría del catálogo (`04 §2.3`); las que no están, a `otros`. */
+const FAMILIA_DE_CATEGORIA: Readonly<Record<string, FamiliaCategoria>> = {
+  antojos: 'antojos',
+  regalos: 'antojos',
+  regalo_recibido: 'antojos',
+  comida_fuera: 'comidaFuera',
+  mascotas: 'comidaFuera',
+  super: 'super',
+  salud: 'super',
+  cuidado_personal: 'super',
+  sueldo: 'super',
+  honorarios: 'super',
+  ventas: 'super',
+  reembolso: 'super',
+  rendimientos: 'super',
+  otros_ingresos: 'super',
+  transporte: 'transporte',
+  gasolina: 'transporte',
+  viajes: 'transporte',
+  tecnologia: 'transporte',
+  entretenimiento: 'salidas',
+  deporte: 'salidas',
+  ropa: 'salidas',
+  suscripciones: 'salidas',
+  educacion: 'salidas',
+  vivienda: 'casa',
+  hogar: 'casa',
+  servicios: 'casa',
+  apoyo_familiar: 'casa',
+};
+
+export function familiaDeCategoria(slug: string | null | undefined): FamiliaCategoria {
+  return (slug ? FAMILIA_DE_CATEGORIA[slug] : undefined) ?? 'otros';
+}
+
+/**
+ * La barra de tu dinero (D1, D7) y «Cómo lo calculé» de una compra (D4): apartado · colchón · libre, y la compra en
+ * coral. La leyenda nombra cada parte con su cifra.
+ */
+export interface ColoresDinero {
+  readonly apartado: string;
+  readonly colchon: string;
+  readonly libre: string;
+  readonly compra: string;
+  /** Lo que se recorta de la barra del día al registrar (D3). */
+  readonly recorte: string;
+}
+
+export const coloresDinero: Record<EsquemaColor, ColoresDinero> = {
+  claro: { apartado: '#0F3D32', colchon: '#9CC5B5', libre: '#5EE0B0', compra: '#EE7650', recorte: '#FFC9BC' },
+  oscuro: {
+    apartado: '#3E7D6B',
+    colchon: '#8FB3A6',
+    libre: '#5EE0B0',
+    compra: '#EE7650',
+    recorte: '#7A3B2C',
+  },
+};
+
+/** Tus cuentas como tarjetas (D6): efectivo menta, débito azul, crédito violeta; sin logotipos de bancos. */
+export type ClaseCuenta = 'efectivo' | 'debito' | 'credito';
+
+export interface ColoresCuenta {
+  readonly fondo: string;
+  /** Nombre y cifra; ≥ 4.5:1 sobre `fondo`. */
+  readonly texto: string;
+  /** El renglón de abajo («Lo contaste el vie 23»); ≥ 4.5:1 sobre `fondo`. */
+  readonly textoSecundario: string;
+  /** Los círculos decorativos de la esquina. */
+  readonly adorno: string;
+  /** Anillo de uso, mosaico e ícono del crédito fuera de su tarjeta (sobre `superficie`); ≥ 3:1. */
+  readonly acento: string;
+}
+
+export const coloresCuenta: Record<EsquemaColor, Record<ClaseCuenta, ColoresCuenta>> = {
+  claro: {
+    efectivo: {
+      fondo: '#5EE0B0',
+      texto: '#0F3D32',
+      textoSecundario: '#1E5546',
+      adorno: '#4CCFA0',
+      acento: '#0B6B55',
+    },
+    debito: {
+      fondo: '#1D3B6F',
+      texto: '#FFFFFF',
+      textoSecundario: '#C9D6F0',
+      adorno: '#2D4C82',
+      acento: '#224C9E',
+    },
+    credito: {
+      fondo: '#5B2A86',
+      texto: '#FFFFFF',
+      textoSecundario: '#E3D3F2',
+      adorno: '#6C3B98',
+      acento: '#7C4DB8',
+    },
+  },
+  oscuro: {
+    efectivo: {
+      fondo: '#5EE0B0',
+      texto: '#0F3D32',
+      textoSecundario: '#1E5546',
+      adorno: '#4CCFA0',
+      acento: '#5EE0B0',
+    },
+    debito: {
+      fondo: '#1D3B6F',
+      texto: '#FFFFFF',
+      textoSecundario: '#C9D6F0',
+      adorno: '#2D4C82',
+      acento: '#8FB0F5',
+    },
+    credito: {
+      fondo: '#5B2A86',
+      texto: '#FFFFFF',
+      textoSecundario: '#E3D3F2',
+      adorno: '#6C3B98',
+      acento: '#B79CE8',
+    },
+  },
+};
+
+/** «Te escucho» (D2): pantalla completa verde pino mientras escucha. */
+export interface ColoresEscucha {
+  readonly fondo: string;
+  /** La frase en vivo y los botones; ≥ 4.5:1 sobre `fondo`. */
+  readonly texto: string;
+  /** «Voy entendiendo» y la pista de abajo; ≥ 4.5:1 sobre `fondo`. */
+  readonly textoSecundario: string;
+  /** Chips de lo que se va entendiendo y la píldora «Te escucho». */
+  readonly chip: string;
+  /** El chip ya seguro (la cifra) en menta, con su texto en pino. */
+  readonly chipListo: string;
+  readonly sobreChipListo: string;
+  /** Filo del chip que todavía no termina («Efectivo …»); ≥ 3:1 sobre `fondo`. */
+  readonly filoTentativo: string;
+}
+
+export const coloresEscucha: Record<EsquemaColor, ColoresEscucha> = {
+  claro: {
+    fondo: '#0F3D32',
+    texto: '#FFFFFF',
+    textoSecundario: '#A8CFC0',
+    chip: '#1E5546',
+    chipListo: '#5EE0B0',
+    sobreChipListo: '#0F3D32',
+    filoTentativo: '#8FB3A6',
+  },
+  oscuro: {
+    fondo: '#0E2B23',
+    texto: '#EAF2EE',
+    textoSecundario: '#A8CFC0',
+    chip: '#1C4136',
+    chipListo: '#5EE0B0',
+    sobreChipListo: '#0B1512',
+    filoTentativo: '#8FB3A6',
+  },
+};
+
+/**
+ * El orbe (D0): menta con una sombra interior abajo a la derecha y un halo. Respira en reposo (escala del halo 1 →
+ * 1.22 en 3.2 s) y lanza ondas al escuchar; quieto con «Reducir movimiento».
+ */
+export const orbe = {
+  nucleo: '#5EE0B0',
+  sombra: '#3FC895',
+  halo: '#5EE0B0',
+  /** Opacidad del halo en claro y en oscuro. */
+  opacidadHalo: { claro: 0.3, oscuro: 0.22 },
+  escalaRespiro: 1.22,
+  cicloRespiroMs: 3200,
+  cicloOndaMs: 1800,
+} as const;
+
 /**
  * Escala de espaciado en dp (base 4). En `gap` y `padding` de pantallas usa solo estos valores
  * (y `margenPantalla`); guía en `README.md` de esta carpeta.

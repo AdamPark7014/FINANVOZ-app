@@ -1,28 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AccessibilityInfo, Animated, Easing, View } from 'react-native';
+import { Animated, Easing, View } from 'react-native';
 import { espacio, radio, useTema } from '../../ui';
+import { useCiclo, useReducirMovimiento } from '../../ui/movimiento';
 
 /**
  * Movimiento sutil del asistente (entrada de turnos, onda al escuchar, «pensando»): ligero, con `Animated` y el
- * driver nativo, y apagado si la persona pidió «Reducir movimiento» en el teléfono (`02 §15`).
+ * driver nativo, y apagado si la persona pidió «Reducir movimiento» en el teléfono (`02 §15`). Los ciclos viven en
+ * `ui/movimiento` (también los usa el orbe).
  */
-export function useReducirMovimiento(): boolean {
-  const [reducir, setReducir] = useState(false);
-  useEffect(() => {
-    let vigente = true;
-    AccessibilityInfo.isReduceMotionEnabled?.()
-      .then((v) => {
-        if (vigente) setReducir(v === true);
-      })
-      .catch(() => undefined);
-    const sub = AccessibilityInfo.addEventListener?.('reduceMotionChanged', (v: boolean) => setReducir(v));
-    return () => {
-      vigente = false;
-      sub?.remove();
-    };
-  }, []);
-  return reducir;
-}
+export { useReducirMovimiento };
 
 /** Un turno nuevo entra con un desvanecido y un desplazamiento corto (180 ms); los que ya estaban, quietos. */
 export function EntradaTurno({ animar, children }: { animar: boolean; children: ReactNode }) {
@@ -51,38 +37,6 @@ export function EntradaTurno({ animar, children }: { animar: boolean; children: 
       {children}
     </Animated.View>
   );
-}
-
-/** Ciclo infinito 0 → 1 → 0 (se detiene al desmontar o si se reduce el movimiento). */
-function useCiclo(activo: boolean, duracion: number, retraso = 0): Animated.Value {
-  const reducir = useReducirMovimiento();
-  const [valor] = useState(() => new Animated.Value(0));
-  useEffect(() => {
-    if (!activo || reducir) {
-      valor.setValue(0);
-      return;
-    }
-    const ciclo = Animated.loop(
-      Animated.sequence([
-        Animated.delay(retraso),
-        Animated.timing(valor, {
-          toValue: 1,
-          duration: duracion / 2,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        }),
-        Animated.timing(valor, {
-          toValue: 0,
-          duration: duracion / 2,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    ciclo.start();
-    return () => ciclo.stop();
-  }, [activo, reducir, duracion, retraso, valor]);
-  return valor;
 }
 
 /** Onda viva bajo la transcripción mientras escucha: nueve barras que respiran a destiempo. Decorativa. */

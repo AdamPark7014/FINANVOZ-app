@@ -24,6 +24,9 @@ export {
 } from './componentes/CampoTexto';
 export { BotonMicrofono, IconoMicrofono, type BotonMicrofonoProps } from './componentes/BotonMicrofono';
 export { AnilloTiempo, Icono, iconoDeCategoria, type NombreIcono } from './componentes/Iconos';
+export { Mosaico } from './componentes/Mosaico';
+export { Orbe, type EstadoOrbe } from './componentes/Orbe';
+export { useCiclo, useRampa, useReducirMovimiento } from './movimiento';
 export { anunciar, useAnunciar } from './anunciar';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export {

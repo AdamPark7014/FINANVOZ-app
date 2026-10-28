@@ -9,7 +9,7 @@ import {
   espacio,
   etiquetaHablada,
   Icono,
-  iconoDeCategoria,
+  Mosaico,
   OBJETIVO_TACTIL_MIN,
   Texto,
   useTema,
@@ -199,18 +199,8 @@ function TarjetaRegistro({
             minHeight: OBJETIVO_TACTIL_MIN,
           }}
         >
-          <View
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 16,
-              backgroundColor: c.iconoFondo,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icono nombre={iconoDeCategoria(m.categoriaSlug)} color={c.acento} tamano={24} />
-          </View>
+          {/* B+ (D3): el mosaico de color de la categoría. */}
+          <Mosaico slug={m.categoriaSlug} tamano={52} testID={`${testID}-mosaico`} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text
               style={{ fontFamily: FUENTE, fontSize: 19, lineHeight: 24, fontWeight: '700', color: c.texto }}
