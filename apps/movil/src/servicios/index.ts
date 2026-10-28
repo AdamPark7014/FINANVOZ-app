@@ -242,6 +242,7 @@ export {
   type VistaHoy,
 } from './hoy';
 export { NADA_ENTENDIDO, prepararEntendiendo, type LoEntendido } from './entendiendo';
+export { diasSeguidos, RACHA_MINIMA, rachaAnotando } from './racha';
 export {
   armarPista,
   COLUMNAS_PISTA,

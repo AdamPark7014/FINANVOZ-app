@@ -1,26 +1,37 @@
 import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Pressable, ScrollView, Text, View } from 'react-native';
 import type { CambioRegistro, Turno } from '../../../asistente/tipos';
-import { mensajeError } from '../../../servicios';
+import { mensajeError, RACHA_MINIMA, rachaAnotando } from '../../../servicios';
 import {
   FUENTE,
   AnilloTiempo,
+  BarraDelDia,
+  CifraQueCuenta,
+  coloresCategoria,
+  coloresDinero,
   DURACION_AVISO_MS,
   espacio,
   etiquetaHablada,
+  familiaDeCategoria,
+  formatearCentavos,
   Icono,
   Mosaico,
   OBJETIVO_TACTIL_MIN,
+  Orbe,
   Texto,
   useTema,
+  type NombreIcono,
 } from '../../../ui';
 import { BotonPildora } from '../../../ui/componentes/BotonPildora';
+import { useVista } from '../../../sesion/ProveedorSesion';
 import {
   BTN_DESHACER,
   etiquetaChipRegistro,
   NOMBRE_CAMBIO_REGISTRO,
   PISTA_DESHACER,
   separarCambioDia,
+  TEXTO_TU_DIA,
+  textoRacha,
   tituloRegistro,
 } from '../textos';
 import { Burbuja } from './Burbuja';
@@ -29,9 +40,9 @@ import { Burbuja } from './Burbuja';
 const PASO_ANILLO_MS = 250;
 
 /**
- * Lo que se acaba de registrar. Con los datos del movimiento (tablero B2 con los chips de C2): «Listo, lo
- * registré.» y la tarjeta con el ícono de la categoría, qué y cuánto, «Antojos · Efectivo · hoy», «Tu día pasa de
- * $275 a $268.», los chips de un toque (categoría · cuenta · día: elegir otra opción corrige el movimiento, regla 2)
+ * Lo que se acaba de registrar. Con los datos del movimiento (tablero B2 con los chips de C2, vivo en B+ D3): el orbe
+ * con «Listo, lo registré.» y la tarjeta con el mosaico de la categoría, qué y cuánto, «Hoy, 9:41», «Tu día $275 →
+ * $268» con la barra que se recorta (y «Tu día pasa de $275 a $268.» para el lector), los chips de un toque (categoría · cuenta · día: elegir otra opción corrige el movimiento, regla 2)
  * y «Deshacer» con su anillo de tiempo. Sin esos datos (varios movimientos, un ajuste, los del libro), la frase
  * «Registré…» con Deshacer. Tocar la frase abre el movimiento. Si Deshacer o un cambio fallan, el error se queda.
  */
@@ -155,208 +166,348 @@ function TarjetaRegistro({
   alDeshacer: (() => void) | null;
   alCambiar: (cambio: CambioRegistro, valor: string) => void;
 }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const m = turno.movimiento;
   const [abierto, setAbierto] = useState<CambioRegistro['clave'] | null>(null);
+  // B+ (D3): la racha se dice bajo el último registro, desde 3 días seguidos.
+  const racha = useVista(rachaAnotando);
   if (!m) return null;
   const cambios = turno.cambios ?? [];
   const elegido = cambios.find((x) => x.clave === abierto) ?? null;
   const partesCambio = turno.cambioDia ? separarCambioDia(turno.cambioDia) : null;
   const cuenta = m.cuenta ? [m.cuenta] : [];
-  const subtitulo = [m.categoria, ...cuenta, m.cuando].filter(Boolean).join(' · ');
+  const subtitulo = m.cuandoHora ?? [m.categoria, ...cuenta, m.cuando].filter(Boolean).join(' · ');
+  const dia = turno.dia;
+  const dinero = coloresDinero[esquema];
+  const conRacha = ultimo && racha >= RACHA_MINIMA;
   return (
     <View style={{ gap: espacio.m }}>
-      <Texto
-        variante="subtitulo"
-        accessibilityRole="text"
-        style={{ fontSize: 22, lineHeight: 28, fontWeight: '600' }}
-      >
-        {tituloRegistro(turno.corregido === true)}
-      </Texto>
-      <View
-        testID={testID}
-        accessibilityRole="summary"
-        style={{
-          backgroundColor: c.superficie,
-          borderRadius: 26,
-          borderWidth: 1,
-          borderColor: c.borde,
-          padding: 18,
-          gap: 14,
-        }}
-      >
-        <Pressable
-          testID={`${testID}-texto`}
-          disabled={!turno.abrir}
-          {...(turno.abrir ? { onPress: turno.abrir } : {})}
-          accessibilityRole={turno.abrir ? 'button' : 'text'}
-          accessibilityLabel={etiquetaHablada(turno.texto)}
-          {...(turno.abrir ? { accessibilityHint: 'Abre el movimiento' } : {})}
+      {/* D3: el orbe contesta. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+        <Orbe tamano={34} estado={ultimo ? 'reposo' : 'quieto'} testID={`${testID}-orbe`} />
+        <Texto
+          variante="subtitulo"
+          accessibilityRole="text"
+          style={{ flexShrink: 1, fontSize: 22, lineHeight: 28, fontWeight: '600' }}
+        >
+          {tituloRegistro(turno.corregido === true)}
+        </Texto>
+      </View>
+      <View>
+        <View
+          testID={testID}
+          accessibilityRole="summary"
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: espacio.m,
-            minHeight: OBJETIVO_TACTIL_MIN,
+            backgroundColor: c.superficie,
+            borderRadius: 26,
+            borderWidth: 1,
+            borderColor: c.borde,
+            padding: 18,
+            paddingBottom: conRacha ? 30 : 18,
+            gap: 14,
           }}
         >
-          {/* B+ (D3): el mosaico de color de la categoría. */}
-          <Mosaico slug={m.categoriaSlug} tamano={52} testID={`${testID}-mosaico`} />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text
-              style={{ fontFamily: FUENTE, fontSize: 19, lineHeight: 24, fontWeight: '700', color: c.texto }}
-            >
-              {m.descripcion}
-            </Text>
-            {subtitulo ? (
-              <Text style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: c.textoSecundario }}>
-                {subtitulo}
-              </Text>
-            ) : null}
-          </View>
-          <Text
+          <Pressable
+            testID={`${testID}-texto`}
+            disabled={!turno.abrir}
+            {...(turno.abrir ? { onPress: turno.abrir } : {})}
+            accessibilityRole={turno.abrir ? 'button' : 'text'}
+            accessibilityLabel={etiquetaHablada(turno.texto)}
+            {...(turno.abrir ? { accessibilityHint: 'Abre el movimiento' } : {})}
             style={{
-              fontFamily: FUENTE,
-              fontSize: 28,
-              lineHeight: 34,
-              fontWeight: '800',
-              color: c.texto,
-              fontVariant: ['tabular-nums'],
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: espacio.m,
+              minHeight: OBJETIVO_TACTIL_MIN,
             }}
           >
-            {m.montoTexto}
-          </Text>
-        </Pressable>
-        {cambios.length > 0 ? (
-          <View style={{ gap: espacio.s }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
-              {cambios.map((x) => (
-                <Pressable
-                  key={x.clave}
-                  testID={`${testID}-chip-${x.clave}`}
-                  onPress={() => setAbierto(abierto === x.clave ? null : x.clave)}
-                  hitSlop={{ top: 2, bottom: 2, left: 0, right: 0 }}
-                  accessibilityRole="button"
-                  accessibilityLabel={etiquetaChipRegistro(NOMBRE_CAMBIO_REGISTRO[x.clave], x.actual)}
-                  accessibilityState={{ expanded: abierto === x.clave }}
-                  style={({ pressed }) => ({
-                    minHeight: 44,
-                    borderRadius: 22,
-                    paddingLeft: 14,
-                    paddingRight: 12,
+            {/* B+ (D3): el mosaico de color de la categoría. */}
+            <Mosaico slug={m.categoriaSlug} tamano={52} testID={`${testID}-mosaico`} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text
+                style={{
+                  fontFamily: FUENTE,
+                  fontSize: 20,
+                  lineHeight: 26,
+                  fontWeight: '700',
+                  color: c.texto,
+                }}
+              >
+                {m.descripcion}
+              </Text>
+              {subtitulo ? (
+                <Text style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: c.textoSecundario }}>
+                  {subtitulo}
+                </Text>
+              ) : null}
+            </View>
+            <Text
+              style={{
+                fontFamily: FUENTE,
+                fontSize: 30,
+                lineHeight: 36,
+                fontWeight: '800',
+                color: c.texto,
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {m.montoTexto}
+            </Text>
+          </Pressable>
+          {cambios.length > 0 ? (
+            <View style={{ gap: espacio.s }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+                {cambios.map((x) => (
+                  <Pressable
+                    key={x.clave}
+                    testID={`${testID}-chip-${x.clave}`}
+                    onPress={() => setAbierto(abierto === x.clave ? null : x.clave)}
+                    hitSlop={{ top: 2, bottom: 2, left: 0, right: 0 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={etiquetaChipRegistro(NOMBRE_CAMBIO_REGISTRO[x.clave], x.actual)}
+                    accessibilityState={{ expanded: abierto === x.clave }}
+                    style={({ pressed }) => ({
+                      minHeight: 44,
+                      borderRadius: 22,
+                      paddingLeft: 14,
+                      paddingRight: 12,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      backgroundColor: abierto === x.clave ? c.iconoFondo : c.superficieAlterna,
+                      borderWidth: abierto === x.clave ? 1.5 : 0,
+                      borderColor: c.acento,
+                      opacity: pressed ? 0.8 : 1,
+                    })}
+                  >
+                    {x.clave === 'categoria' ? (
+                      // D3: el punto del color de la categoría.
+                      <View
+                        style={{
+                          width: 9,
+                          height: 9,
+                          borderRadius: 5,
+                          backgroundColor: coloresCategoria[esquema][familiaDeCategoria(x.valor)].barra,
+                        }}
+                      />
+                    ) : x.clave === 'cuenta' ? (
+                      <Icono nombre={iconoDeCuenta(m.cuentaClase ?? null)} color={c.texto} tamano={17} />
+                    ) : null}
+                    <Text
+                      style={{
+                        fontFamily: FUENTE,
+                        fontSize: 15,
+                        lineHeight: 20,
+                        fontWeight: '600',
+                        color: c.texto,
+                      }}
+                    >
+                      {x.actual}
+                    </Text>
+                    <View style={{ transform: [{ rotate: abierto === x.clave ? '180deg' : '0deg' }] }}>
+                      <Icono nombre="chevronAbajo" color={c.textoSecundario} tamano={16} grosor={2.4} />
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+              {elegido ? (
+                <ScrollView
+                  horizontal={elegido.opciones.length > 6}
+                  showsHorizontalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                  contentContainerStyle={{
                     flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: espacio.xs,
-                    backgroundColor: abierto === x.clave ? c.iconoFondo : c.superficieAlterna,
-                    borderWidth: abierto === x.clave ? 1.5 : 0,
-                    borderColor: c.acento,
-                    opacity: pressed ? 0.8 : 1,
-                  })}
+                    flexWrap: elegido.opciones.length > 6 ? 'nowrap' : 'wrap',
+                    gap: espacio.s,
+                  }}
+                  testID={`${testID}-opciones-${elegido.clave}`}
                 >
+                  {elegido.opciones.map((o) => {
+                    const actual = o.valor === elegido.valor;
+                    return (
+                      <Pressable
+                        key={o.valor}
+                        testID={`${testID}-opcion-${elegido.clave}-${o.valor}`}
+                        hitSlop={{ top: 2, bottom: 2, left: 0, right: 0 }}
+                        onPress={() => {
+                          setAbierto(null);
+                          if (!actual) alCambiar(elegido, o.valor);
+                        }}
+                        accessibilityRole="button"
+                        accessibilityLabel={o.etiqueta}
+                        accessibilityState={{ selected: actual }}
+                        style={({ pressed }) => ({
+                          minHeight: 44,
+                          borderRadius: 22,
+                          paddingHorizontal: espacio.l,
+                          justifyContent: 'center',
+                          backgroundColor: actual ? c.acento : c.superficie,
+                          borderWidth: 1,
+                          borderColor: actual ? c.acento : c.bordeControl,
+                          opacity: pressed ? 0.8 : 1,
+                        })}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: FUENTE,
+                            fontSize: 15,
+                            lineHeight: 20,
+                            fontWeight: actual ? '700' : '600',
+                            color: actual ? c.sobreAcento : c.texto,
+                          }}
+                        >
+                          {o.etiqueta}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+              ) : null}
+            </View>
+          ) : null}
+          {dia ? (
+            // B+ (D3): «Tu día $275 → $268» y la barra que se recorta; la cifra nueva cuenta hasta su valor.
+            <View
+              testID={`${testID}-cambio`}
+              accessible
+              accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
+              style={{
+                gap: espacio.s,
+                paddingTop: espacio.m,
+                borderTopWidth: 1,
+                borderTopColor: c.superficieAlterna,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  columnGap: espacio.s,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: FUENTE,
+                    fontSize: 15,
+                    lineHeight: 20,
+                    fontWeight: '600',
+                    color: c.textoSecundario,
+                  }}
+                >
+                  {TEXTO_TU_DIA}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text
                     style={{
                       fontFamily: FUENTE,
-                      fontSize: 15,
-                      lineHeight: 20,
-                      fontWeight: '600',
-                      color: c.texto,
+                      fontSize: 17,
+                      lineHeight: 22,
+                      fontWeight: '700',
+                      color: c.textoSecundario,
+                      fontVariant: ['tabular-nums'],
                     }}
                   >
-                    {x.actual}
+                    {formatearCentavos(dia.antes, 'pesos')}
                   </Text>
-                  <View style={{ transform: [{ rotate: abierto === x.clave ? '180deg' : '0deg' }] }}>
-                    <Icono nombre="chevronAbajo" color={c.textoSecundario} tamano={16} grosor={2.4} />
-                  </View>
-                </Pressable>
-              ))}
+                  <Text
+                    style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: c.textoSecundario }}
+                  >
+                    →
+                  </Text>
+                  <CifraQueCuenta
+                    testID={`${testID}-cambio-despues`}
+                    desde={dia.antes}
+                    hasta={dia.despues}
+                    style={{
+                      fontFamily: FUENTE,
+                      fontSize: 17,
+                      lineHeight: 22,
+                      fontWeight: '800',
+                      color: c.acentoTexto,
+                    }}
+                  />
+                </View>
+              </View>
+              <BarraDelDia
+                testID={`${testID}-barra-dia`}
+                antes={dia.antes}
+                despues={dia.despues}
+                lleno={dinero.libre}
+                recorte={dinero.recorte}
+                riel={c.superficieAlterna}
+              />
             </View>
-            {elegido ? (
-              <ScrollView
-                horizontal={elegido.opciones.length > 6}
-                showsHorizontalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{
-                  flexDirection: 'row',
-                  flexWrap: elegido.opciones.length > 6 ? 'nowrap' : 'wrap',
-                  gap: espacio.s,
-                }}
-                testID={`${testID}-opciones-${elegido.clave}`}
-              >
-                {elegido.opciones.map((o) => {
-                  const actual = o.valor === elegido.valor;
-                  return (
-                    <Pressable
-                      key={o.valor}
-                      testID={`${testID}-opcion-${elegido.clave}-${o.valor}`}
-                      hitSlop={{ top: 2, bottom: 2, left: 0, right: 0 }}
-                      onPress={() => {
-                        setAbierto(null);
-                        if (!actual) alCambiar(elegido, o.valor);
-                      }}
-                      accessibilityRole="button"
-                      accessibilityLabel={o.etiqueta}
-                      accessibilityState={{ selected: actual }}
-                      style={({ pressed }) => ({
-                        minHeight: 44,
-                        borderRadius: 22,
-                        paddingHorizontal: espacio.l,
-                        justifyContent: 'center',
-                        backgroundColor: actual ? c.acento : c.superficie,
-                        borderWidth: 1,
-                        borderColor: actual ? c.acento : c.bordeControl,
-                        opacity: pressed ? 0.8 : 1,
-                      })}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: FUENTE,
-                          fontSize: 15,
-                          lineHeight: 20,
-                          fontWeight: actual ? '700' : '600',
-                          color: actual ? c.sobreAcento : c.texto,
-                        }}
-                      >
-                        {o.etiqueta}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-            ) : null}
-          </View>
-        ) : null}
-        {partesCambio ? (
-          <Text
-            testID={`${testID}-cambio`}
-            accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
-            style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
-          >
-            {partesCambio.antes}
-            <Text style={{ fontFamily: FUENTE, fontWeight: '700', color: c.acentoTexto }}>
-              {partesCambio.despues}
+          ) : partesCambio ? (
+            <Text
+              testID={`${testID}-cambio`}
+              accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
+              style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
+            >
+              {partesCambio.antes}
+              <Text style={{ fontFamily: FUENTE, fontWeight: '700', color: c.acentoTexto }}>
+                {partesCambio.despues}
+              </Text>
+              {partesCambio.final}
             </Text>
-            {partesCambio.final}
-          </Text>
-        ) : turno.cambioDia ? (
-          <Text
-            testID={`${testID}-cambio`}
-            accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
-            style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
-          >
-            {turno.cambioDia}
-          </Text>
-        ) : null}
-        {alDeshacer ? <BotonDeshacer testID={`${testID}-deshacer`} alPresionar={alDeshacer} /> : null}
-        {error ? (
-          <Texto variante="secundario" tono="faltante" accessibilityRole="alert">
-            {error}
-          </Texto>
-        ) : null}
+          ) : turno.cambioDia ? (
+            <Text
+              testID={`${testID}-cambio`}
+              accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
+              style={{ fontFamily: FUENTE, fontSize: 17, lineHeight: 24, color: c.texto }}
+            >
+              {turno.cambioDia}
+            </Text>
+          ) : null}
+          {alDeshacer ? <BotonDeshacer testID={`${testID}-deshacer`} alPresionar={alDeshacer} /> : null}
+          {error ? (
+            <Texto variante="secundario" tono="faltante" accessibilityRole="alert">
+              {error}
+            </Texto>
+          ) : null}
+        </View>
+        {conRacha ? <Racha dias={racha} testID={`${testID}-racha`} /> : null}
       </View>
       {ultimo && turno.pista ? (
         <Texto variante="cuerpo" tono="secundario" testID={`${testID}-pista`} style={{ fontWeight: '500' }}>
           {turno.pista}
         </Texto>
       ) : null}
+    </View>
+  );
+}
+
+/** Ícono del chip de la cuenta (D3): billete para el efectivo, banco para débito, tarjeta para el crédito. */
+function iconoDeCuenta(clase: 'efectivo' | 'liquida' | 'tarjeta' | null): NombreIcono {
+  return clase === 'efectivo' ? 'billete' : clase === 'tarjeta' ? 'tarjeta' : 'banco';
+}
+
+/** «6 días seguidos anotando todo» con la llama (D3): una píldora ámbar montada en el borde de abajo de la tarjeta. */
+function Racha({ dias, testID }: { dias: number; testID: string }) {
+  const { esquema } = useTema();
+  const p = coloresCategoria[esquema].antojos;
+  const fuego = coloresCategoria[esquema].comidaFuera.barra;
+  return (
+    <View
+      testID={testID}
+      style={{
+        alignSelf: 'flex-start',
+        marginTop: -18,
+        marginLeft: espacio.s,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: p.mosaico,
+        borderRadius: 999,
+        paddingHorizontal: espacio.m,
+        paddingVertical: 6,
+      }}
+    >
+      <Icono nombre="llama" color={fuego} tamano={16} grosor={2.2} />
+      <Text style={{ fontFamily: FUENTE, fontSize: 14, lineHeight: 20, fontWeight: '700', color: p.icono }}>
+        {textoRacha(dias)}
+      </Text>
     </View>
   );
 }

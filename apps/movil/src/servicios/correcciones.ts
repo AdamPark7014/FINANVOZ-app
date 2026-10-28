@@ -474,6 +474,8 @@ export interface DetalleRegistro {
   readonly tipo: string;
   readonly fecha: PlainDate;
   readonly descripcion: string | null;
+  /** Cuándo se escribió en el libro (ms), para «Hoy, 9:41» en su tarjeta (B+, D3). */
+  readonly registradaEn: number;
   readonly monto: Centavos;
   readonly sentido: 'salida' | 'entrada';
   readonly categoria: {
@@ -506,6 +508,7 @@ export function detalleRegistro(ctx: Contexto, transaccionId: string): DetalleRe
     tipo: fila.tipo,
     fecha: fila.fecha,
     descripcion: fila.descripcion,
+    registradaEn: fila.registradaEn,
     monto: Math.abs(categoria.monto),
     sentido: naturaleza === 'gasto' ? 'salida' : 'entrada',
     categoria: categoria.categoriaSlug

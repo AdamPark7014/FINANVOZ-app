@@ -43,6 +43,17 @@
   existía (`voz/senales.ts`, expo-haptics ya era dependencia: no hay dependencia nueva). testIDs que siguen:
   `hoja-escuchando`, `transcripcion-en-vivo`, `boton-cancelar-escucha` (la X), `onda-voz`; nuevos `voy-entendiendo`,
   `entendido-*`, `pista-escucha`, `boton-terminar-escucha`. **Sin probar en teléfono real** (volumen y deslizar).
+- **Fase 4 hecha (Registro D3 y «¿Me alcanza?» D4):** `TurnoRegistro` con el orbe y «Listo, lo registré.», mosaico,
+  «Hoy, 9:41» (`DetalleRegistro.registradaEn`, la hora solo si es de hoy), chips con el punto de color y el ícono de
+  la cuenta, «Tu día $X → $Y» (`ui/componentes/CifraQueCuenta.tsx`: la cifra cuenta por cuadros y `BarraDelDia` se
+  recorta; quietas con «Reducir movimiento») y la racha (`servicios/racha.ts`: `diasSeguidos` puro +
+  `rachaAnotando`, solo voz/texto/formulario, desde 3 días). Los turnos de registro traen `dia: {antes, despues,
+  delta}` (`leerCambioDia` en `asistente/flujos/textos.ts` relee la frase de `lineaCambioDia`; la diferencia se
+  calcula ahí, no en la UI) y la píldora muestra el «−$7» (`pildora-delta`). `TurnoPuedoGastar` con veredicto
+  («Sí te alcanza.»/«No te alcanza.», `sublineaPuedoGastar` con el pronombre de «unos/una…»), las dos opciones lado a
+  lado con su barra y «Cómo lo calculé» como barra apilada con «$575 libres ÷ 4 días = $143 al día»; el lector sigue
+  oyendo la frase completa de `turno.texto` y los `calculo-*` siguen (ahora como leyenda). **El título dice «Listo, lo
+  registré.»** (genérico) aunque D3 diga «la registré» (concordar con cada sustantivo no es confiable).
 - **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
   luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
   dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.

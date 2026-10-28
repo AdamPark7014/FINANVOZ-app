@@ -1,6 +1,7 @@
 import type { Centavos, PlainDate } from '@cartera/core';
 import { etiquetaDiaMes, etiquetaFecha } from '../../servicios/formato';
-import { formatearCentavos } from '../../ui/formato';
+import { formatearCentavos, leerPesos } from '../../ui/formato';
+import type { CambioDia } from '../tipos';
 
 /**
  * Redacción de los flujos conversacionales (Ola 7 §6, `02 §14`): es-MX, tuteo, sin exclamaciones ni consejos,
@@ -28,6 +29,17 @@ export const ERROR_PASO = 'Ese paso ya no aplica.';
 
 export function lineaCambioDia(antes: string, despues: string): string {
   return `Tu día pasa de ${antes} a ${despues}.`;
+}
+
+/**
+ * Las dos cifras de `lineaCambioDia` de vuelta en centavos, con la diferencia (B+, D3: «Tu día $275 → $268» y el
+ * «−$7»). Son las mismas que calculó `core` para la frase; `null` si el texto no tiene esa forma.
+ */
+export function leerCambioDia(texto: string): CambioDia | null {
+  const m = /^Tu día pasa de (\$[\d,]+(?:\.\d{2})?) a (\$[\d,]+(?:\.\d{2})?)\.$/.exec(texto);
+  const antes = m?.[1] ? leerPesos(m[1]) : null;
+  const despues = m?.[2] ? leerPesos(m[2]) : null;
+  return antes === null || despues === null ? null : { antes, despues, delta: despues - antes };
 }
 
 // ——— Tarjeta ———

@@ -1,8 +1,16 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import type { VistaHoy } from '../../servicios';
-import { FUENTE, cifraEnPalabras, espacio, formatearCentavos, margenPantalla, useTema } from '../../ui';
+import {
+  FUENTE,
+  cifraEnPalabras,
+  coloresCategoria,
+  espacio,
+  formatearCentavos,
+  margenPantalla,
+  useTema,
+} from '../../ui';
 import { PISTA_OCULTAR_DESGLOSE, PISTA_VER_DESGLOSE, PISTA_VER_QUE_VIENE } from '../principal/textos';
-import { etiquetaPildoraDia, textoPildoraDia } from './textos';
+import { etiquetaDeltaDia, etiquetaPildoraDia, textoDeltaDia, textoPildoraDia } from './textos';
 
 /**
  * La cifra del día mientras hay conversación (tablero B2): una píldora arriba con «Hoy puedes gastar · hasta el vie
@@ -12,21 +20,28 @@ export function PildoraDia({
   vista,
   abierto,
   alPresionar,
+  delta = null,
 }: {
   vista: VistaHoy;
   abierto: boolean;
   alPresionar: () => void;
+  /** B+ (D3): cuánto cambió el día con el último registro de la sesión («−$7»); `null` sin cambio. */
+  delta?: number | null;
 }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
   const negativo = vista.estado === 'libre_negativo';
   const cifra = negativo ? 0 : vista.hoyPuedesCentavos;
   const texto = textoPildoraDia(vista);
+  const textoDelta = delta === null ? null : textoDeltaDia(delta);
+  const tonoDelta = coloresCategoria[esquema][delta !== null && delta > 0 ? 'super' : 'comidaFuera'];
   return (
     <Pressable
       testID="boton-desglose"
       onPress={alPresionar}
       accessibilityRole="button"
-      accessibilityLabel={etiquetaPildoraDia(texto, cifraEnPalabras(cifra, 'pesos'))}
+      accessibilityLabel={`${etiquetaPildoraDia(texto, cifraEnPalabras(cifra, 'pesos'))}${
+        textoDelta && delta !== null ? `. ${etiquetaDeltaDia(delta)}` : ''
+      }`}
       accessibilityHint={
         abierto ? PISTA_OCULTAR_DESGLOSE : negativo ? PISTA_VER_QUE_VIENE : PISTA_VER_DESGLOSE
       }
@@ -51,7 +66,7 @@ export function PildoraDia({
         importantForAccessibility="no"
         style={{
           fontFamily: FUENTE,
-          flexShrink: 1,
+          flex: 1,
           fontSize: 15,
           lineHeight: 20,
           fontWeight: '600',
@@ -60,6 +75,31 @@ export function PildoraDia({
       >
         {texto}
       </Text>
+      {textoDelta ? (
+        <View
+          testID="pildora-delta"
+          style={{
+            backgroundColor: tonoDelta.mosaico,
+            borderRadius: 10,
+            paddingHorizontal: espacio.s,
+            paddingVertical: 2,
+          }}
+        >
+          <Text
+            importantForAccessibility="no"
+            style={{
+              fontFamily: FUENTE,
+              fontSize: 14,
+              lineHeight: 20,
+              fontWeight: '700',
+              color: tonoDelta.icono,
+              fontVariant: ['tabular-nums'],
+            }}
+          >
+            {textoDelta}
+          </Text>
+        </View>
+      ) : null}
       <Text
         testID="hoy-puedes"
         importantForAccessibility="no"

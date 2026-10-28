@@ -130,11 +130,16 @@ describe('Asistente · pantalla (Ola 7, criterio 1)', () => {
       'accessibilityLabel',
       etiquetaHablada('Registré Coca $25 · Antojos · Cartera.'),
     );
-    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent('CocaAntojos · Cartera · hoy$25');
+    // B+ (D3): bajo el nombre, «Hoy, 9:41» (la hora en que se registró); categoría, cuenta y día van en los chips.
+    expect(within(aviso).getByTestId('aviso-texto')).toHaveTextContent(/^CocaHoy, \d{1,2}:\d{2}\$25$/);
     expect(within(aviso).getByTestId('aviso-chip-categoria')).toHaveTextContent('Antojos');
     expect(within(aviso).getByTestId('aviso-chip-cuenta')).toHaveTextContent('Cartera');
     expect(within(aviso).getByTestId('aviso-chip-dia')).toHaveTextContent('Hoy');
-    expect(within(aviso).getByTestId('aviso-cambio')).toHaveTextContent('Tu día pasa de $214 a $207.');
+    // B+ (D3): «Tu día $214 → $207» con su barra; el lector oye la frase completa.
+    expect(within(aviso).getByTestId('aviso-cambio')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada('Tu día pasa de $214 a $207.'),
+    );
     // La píldora de arriba ya dice la cifra nueva.
     expect(screen.getByTestId('hoy-puedes')).toHaveTextContent('$207');
     // Lo que dijiste queda como turno de la persona.
@@ -317,8 +322,15 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
     await escribir('puedo gastar 100 en unos tenis');
     const turno = screen.getAllByTestId(/^turno-puedo-gastar-\d+$/)[0];
     expect(turno).toBeDefined();
+    // B+ (D4): el veredicto y qué pasa con tu día a la vista; el lector oye la frase completa.
     expect(within(turno as never).getByTestId(/-texto$/)).toHaveTextContent(
-      'Te alcanza. Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta el jue 15.',
+      'Sí te alcanza.Si los compras hoy, tu día baja a $189.',
+    );
+    expect(within(turno as never).getByTestId(/-texto$/)).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada(
+        'Te alcanza. Si compras unos tenis de $100 hoy, tu día pasa de $214 a $189 hasta el jue 15.',
+      ),
     );
     // B3: las dos opciones (hoy de contado o con tu quincena) y «Cómo lo calculé» con la compra restada.
     expect(within(turno as never).getByTestId(/-opcion-contado$/)).toHaveTextContent(/\$189/);
@@ -326,7 +338,7 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
       /El jue 15, con tu quincena/,
     );
     expect(within(turno as never).getByTestId(/-opcion-esperar$/)).toHaveTextContent(/\$214/);
-    expect(within(turno as never).getByTestId('calculo-compra')).toHaveTextContent('Unos tenis−$100');
+    expect(within(turno as never).getByTestId('calculo-compra')).toHaveTextContent('Unos tenis$100');
     await act(async () => {
       fireEvent.press(within(turno as never).getByTestId(/-registrar$/));
     });
@@ -339,10 +351,9 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
   it('si no alcanza lo dice con el faltante, sin decir qué hacer', async () => {
     const { p } = montar();
     await escribir('¿me alcanza para una tele de 12,000?');
+    expect(screen.getByText('No te alcanza.')).toBeTruthy();
     expect(
-      screen.getByText(
-        /^No te alcanza\. Si compras una tele de \$12,000 hoy, te faltarían \$11,144 para cubrir/,
-      ),
+      screen.getByText(/^Si la compras hoy, te faltarían \$11,144 para cubrir lo que viene/),
     ).toBeTruthy();
     expect(screen.queryByText(/deberías|te recomiendo|mejor/i)).toBeNull();
     p.cerrar();
@@ -353,7 +364,8 @@ describe('Asistente · «¿Puedo gastar en esto?» en la conversación', () => {
     await escribir('¿puedo comprarme unos tenis?');
     expect(screen.getByTestId('pregunta-texto')).toHaveTextContent('¿Cuánto cuesta?');
     await escribir('500');
-    expect(screen.getByText(/^Te alcanza\. Si compras unos tenis de \$500 hoy/)).toBeTruthy();
+    expect(screen.getByText('Sí te alcanza.')).toBeTruthy();
+    expect(screen.getByText(/^Si los compras hoy, tu día baja a/)).toBeTruthy();
     p.cerrar();
   });
 

@@ -523,3 +523,79 @@ export function etiquetaLoEntendido(e: {
   ];
   return `${TEXTO_VOY_ENTENDIENDO}: ${partes.join(', ')}.`;
 }
+
+// ——— Dirección B+ «Viva»: registro y racha (`docs/diseno/direccion-b-plus/D3-registro.png`) ———
+
+export const TEXTO_TU_DIA = 'Tu día';
+
+/** «6 días seguidos anotando todo». */
+export function textoRacha(dias: number): string {
+  return `${dias} días seguidos anotando todo`;
+}
+
+/** El «−$7» de la píldora tras registrar (D3); `null` si el día no cambió. */
+export function textoDeltaDia(delta: number): string | null {
+  if (delta === 0) return null;
+  return `${delta < 0 ? '−' : '+'}${formatearCentavos(Math.abs(delta), 'pesos')}`;
+}
+
+/** Lo que oye el lector del cambio en la píldora: «Bajó siete pesos.» / «Subió…». */
+export function etiquetaDeltaDia(delta: number): string {
+  return `${delta < 0 ? 'Bajó' : 'Subió'} ${cifraEnPalabras(Math.abs(delta), 'pesos')}.`;
+}
+
+// ——— Dirección B+ «Viva»: «¿Me alcanza?» (`docs/diseno/direccion-b-plus/D4-alcanza.png`) ———
+
+/** «Sí te alcanza.» / «No te alcanza.» (el veredicto, junto al orbe). */
+export function tituloPuedoGastar(falta: boolean): string {
+  return falta ? 'No te alcanza.' : 'Sí te alcanza.';
+}
+
+/** «unos tenis» → «los»; «una tele» → «la»; lo demás, «lo». */
+function pronombreDe(que: string | null): string {
+  const q = (que ?? '').trim().toLowerCase();
+  if (/^(unos|los)\b/.test(q)) return 'los';
+  if (/^(unas|las)\b/.test(q)) return 'las';
+  if (/^(una|la)\b/.test(q)) return 'la';
+  return 'lo';
+}
+
+/**
+ * La línea bajo el veredicto (D4) en tres partes para resaltar la cifra: «Si los compras hoy, tu día baja a » ·
+ * «$143» · «.». Describe qué pasa con tu dinero, no qué hacer (`08 §1`); las cifras ya vienen de `core`.
+ */
+export function sublineaPuedoGastar(d: {
+  que: string | null;
+  monto: string;
+  antes: string;
+  despues: string;
+  faltante: string | null;
+  proximo: { etiqueta: string } | null;
+}): { antes: string; cifra: string; final: string } {
+  const si = d.que ? `Si ${pronombreDe(d.que)} compras hoy` : `Si gastas ${d.monto} hoy`;
+  if (d.faltante) {
+    const cuando = d.proximo ? `antes del ${d.proximo.etiqueta}` : 'en los próximos días';
+    return {
+      antes: `${si}, te faltarían `,
+      cifra: d.faltante,
+      final: ` para cubrir lo que viene ${cuando}.`,
+    };
+  }
+  return d.antes === d.despues
+    ? { antes: `${si}, tu día sigue en `, cifra: d.despues, final: '.' }
+    : { antes: `${si}, tu día baja a `, cifra: d.despues, final: '.' };
+}
+
+/** «Tienes $5,224» en la cabecera de «Cómo lo calculé» (D4). */
+export function textoTienes(monto: string): string {
+  return `Tienes ${monto}`;
+}
+
+/** «$575 libres ÷ 4 días = » · «$143 al día» (D4). */
+export function lineaDivision(
+  libre: string,
+  dias: number,
+  alDia: string,
+): { cuenta: string; resultado: string } {
+  return { cuenta: `${libre} libres ÷ ${textoDias(dias)} = `, resultado: `${alDia} ${TEXTO_AL_DIA}` };
+}

@@ -143,6 +143,7 @@ function Cuerpo({
               vista={a.vista}
               abierto={a.verDesglose}
               alPresionar={() => a.setVerDesglose((v) => !v)}
+              delta={deltaDelDia(a)}
             />
           ) : null}
           {desglose ? (
@@ -165,4 +166,14 @@ function Cuerpo({
       </View>
     </>
   );
+}
+
+/** B+ (D3): lo que cambió el día con el último registro de esta sesión (el «−$7» de la píldora); `null` si no hay. */
+function deltaDelDia(a: Asistente): number | null {
+  for (let i = a.turnos.length - 1; i >= 0; i--) {
+    const t = a.turnos[i];
+    if (!t || !a.idsSesion.has(t.id) || t.de !== 'asistente' || t.clase !== 'registro') continue;
+    return t.dia ? t.dia.delta : null;
+  }
+  return null;
 }

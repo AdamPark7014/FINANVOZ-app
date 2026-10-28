@@ -1,7 +1,7 @@
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
-import { obtenerHoy } from '../../servicios';
-import { coloresDinero, formatearCentavos } from '../../ui';
+import { obtenerHoy, registrarMovimiento } from '../../servicios';
+import { coloresCategoria, coloresDinero, etiquetaHablada, formatearCentavos } from '../../ui';
 import { auditar } from '../__pruebas__/accesibilidad';
 import { conEscenario } from '../principal/__pruebas__/base';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
@@ -240,6 +240,88 @@ describe('B+ · «Te escucho» (D2)', () => {
     });
     nivel(0.8);
     expect(screen.getByTestId('onda-voz')).toBeTruthy();
+    p.cerrar();
+  });
+});
+
+describe('B+ · Registro (D3) y «¿Me alcanza?» (D4)', () => {
+  async function escribir(frase: string) {
+    if (!screen.queryByTestId('campo-registrar')) fireEvent.press(screen.getByTestId('boton-escribir'));
+    fireEvent.changeText(screen.getByTestId('campo-registrar'), frase);
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('boton-enviar-registro'));
+    });
+  }
+
+  it('D3: orbe y «Listo», mosaico, «Tu día $X → $Y» con su barra, el «−$Z» de la píldora y la racha', async () => {
+    const p = conEscenario('e4-01');
+    // Dos días seguidos anotando antes de hoy: con el de hoy son tres y la racha se dice.
+    for (const fecha of ['2026-10-09', '2026-10-10'] as const) {
+      registrarMovimiento(p.ctx, {
+        tipo: 'gasto',
+        categoria: 'antojos',
+        origenId: p.e.cuentas['efectivo'] as string,
+        monto: 1_000,
+        fecha,
+      });
+    }
+    const hoyAntes = obtenerHoy(p.ctx);
+    const antes = formatearCentavos(hoyAntes.hoyPuedesCentavos, 'pesos');
+    renderConSesion(
+      p.ctx,
+      <PantallaAsistente
+        navegacion={{ ...navegacionFalsa(), alAbrirR2: jest.fn() }}
+        motor={crearMotorFalso().motor}
+      />,
+    );
+    jest.useFakeTimers();
+    try {
+      await escribir('coca 25 en efectivo');
+      const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
+      expect(screen.getByTestId('aviso-orbe')).toBeTruthy();
+      expect(fondo('aviso-mosaico')).toBe(coloresCategoria.claro.antojos.mosaico);
+      expect(screen.getByTestId('aviso-cambio')).toHaveProp(
+        'accessibilityLabel',
+        etiquetaHablada(`Tu día pasa de ${antes} a ${despues}.`),
+      );
+      expect(screen.getByTestId('aviso-barra-dia')).toBeTruthy();
+      // La cifra nueva cuenta hasta su valor.
+      await act(async () => {
+        jest.advanceTimersByTime(2_000);
+      });
+      expect(screen.getByTestId('aviso-cambio-despues')).toHaveTextContent(despues);
+      // El «−$7» es lo que bajó la cifra del día (no el gasto): de la frase de arriba, en pesos enteros.
+      const pesos = (t: string) => Number(t.replace(/[$,]/g, ''));
+      expect(screen.getByTestId('pildora-delta')).toHaveTextContent(`−$${pesos(antes) - pesos(despues)}`);
+      expect(screen.getByTestId('aviso-racha')).toHaveTextContent('3 días seguidos anotando todo');
+      expect(auditar(screen.toJSON() as never)).toEqual([]);
+    } finally {
+      jest.useRealTimers();
+    }
+    p.cerrar();
+  });
+
+  it('D4: veredicto con orbe, las dos opciones lado a lado y «Cómo lo calculé» como barra apilada', async () => {
+    const p = montar();
+    await escribir('¿me alcanza para unos tenis de 100?');
+    const turno = screen.getAllByTestId(/^turno-puedo-gastar-\d+$/)[0] as never;
+    expect(within(turno).getByTestId(/-texto$/)).toHaveTextContent(
+      'Sí te alcanza.Si los compras hoy, tu día baja a $189.',
+    );
+    expect(within(turno).getByTestId(/-orbe$/)).toBeTruthy();
+    const opciones = within(turno).getByTestId(/-opciones$/);
+    expect(StyleSheet.flatten(opciones.props.style)).toMatchObject({ flexDirection: 'row' });
+    expect(within(turno).getByTestId(/-opcion-contado$/)).toHaveTextContent(/\$189/);
+    expect(within(turno).getByTestId(/-opcion-esperar$/)).toHaveTextContent(/\$214/);
+    // Apartado + colchón + la compra + libre = lo que tienes (E4 con la compra restada).
+    const v = obtenerHoy(p.ctx);
+    expect(within(turno).getByTestId('calculo-liquidez')).toHaveTextContent(
+      `Tienes ${formatearCentavos(v.liquidez, 'pesos')}`,
+    );
+    expect(within(turno).getByTestId('calculo-compra')).toHaveTextContent('Unos tenis$100');
+    expect(within(turno).getByTestId('calculo-libre')).toHaveTextContent('Libre$756');
+    expect(within(turno).getByTestId(/-division$/)).toHaveTextContent('$756 libres ÷ 4 días = $189 al día');
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
     p.cerrar();
   });
 });

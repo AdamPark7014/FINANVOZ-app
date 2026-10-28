@@ -18,7 +18,7 @@ import {
   registrarTexto,
 } from '../../servicios';
 import { listarCuentas } from '../../servicios/cuentas';
-import { formatearCentavos } from '../../ui';
+import { etiquetaHablada, formatearCentavos } from '../../ui';
 import { cifraEnPalabras } from '../../ui/formato';
 import { BTN_TANDAS_CUENTAS } from '../tandas/textos';
 import { abrirPruebaPantalla, conEscenario, vector } from './__pruebas__/base';
@@ -357,7 +357,11 @@ describe('Registrar', () => {
     // Ola 7: el registro es un turno del asistente; la segunda línea dice cómo cambió tu día.
     expect(fraseRegistro()).toMatch(oidaDesde('Registré Coca $25 · '));
     expect(fraseRegistro()).toMatch(/ · Cartera\.$/);
-    expect(within(aviso).getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
+    // B+ (D3): «Tu día $214 → …» con su barra; el lector oye la frase.
+    expect(within(aviso).getByTestId('aviso-cambio')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada(lineaCambioDia('$214', despues)),
+    );
     expect(within(aviso).getByText('Deshacer')).toBeTruthy();
     expect(textoDe(`cuenta-${efectivo}-saldo`)).toBe('$615');
     const [mov] = listarMovimientos(p.ctx)[0]?.movimientos ?? [];
@@ -437,7 +441,10 @@ describe('Registrar', () => {
     // Una compra con la tarjeta que pagas completa se aparta: la cifra de Hoy baja y el aviso lo dice.
     const despues = formatearCentavos(obtenerHoy(p.ctx).hoyPuedesCentavos, 'pesos');
     expect(fraseRegistro()).toBe(oida('Registré Tacos $80 · Comida fuera · Nu ••4410.'));
-    expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', despues));
+    expect(screen.getByTestId('aviso-cambio')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada(lineaCambioDia('$214', despues)),
+    );
     expect(textoDe(`cuenta-${nu}-saldo`)).toBe('$2,080');
   });
 

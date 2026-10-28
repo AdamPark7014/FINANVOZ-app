@@ -96,7 +96,8 @@ import { chipQueNombra, idTurnoRegistro, type TurnoConversacion } from './conver
 import { FLUJOS, responderPaso, siguientePregunta, type FlujoConversacional } from './flujos';
 import { turnosPuedoGastar } from './puedo-gastar';
 import { sugerirReparacion } from './reparacion';
-import type { CambioRegistro, ChipRespuesta, IdFlujo, Respuesta, Turno } from './tipos';
+import { leerCambioDia } from './flujos/textos';
+import type { CambioDia, CambioRegistro, ChipRespuesta, IdFlujo, Respuesta, Turno } from './tipos';
 
 /**
  * De `ResultadoTexto` a turnos del asistente (Ola 7 §3, §4): registrado → «Registré… · Deshacer»; confirmar* →
@@ -197,6 +198,7 @@ export function turnoRegistro(
   },
 ): Extract<Turno, { clase: 'registro' }> {
   const cambio = datos.cambioDia === undefined ? o.cambioDia() : datos.cambioDia;
+  const dia: CambioDia | null = cambio ? leerCambioDia(cambio) : null;
   const ver = o.verMovimiento;
   const token = datos.deshacer;
   const transaccion = datos.transaccionId;
@@ -207,6 +209,7 @@ export function turnoRegistro(
     texto: datos.texto,
     ...(datos.detalle ? { detalle: datos.detalle } : {}),
     ...(cambio ? { cambioDia: cambio } : {}),
+    ...(dia ? { dia } : {}),
     ...(ver && transaccion ? { abrir: () => ver(transaccion) } : {}),
     ...(datos.tarjeta ?? {}),
   };
@@ -222,6 +225,12 @@ export function turnoRegistro(
 
 type TurnoRegistroB = Extract<Turno, { clase: 'registro' }>;
 type DatosTarjetaRegistro = Partial<Pick<TurnoRegistroB, 'movimiento' | 'cambios' | 'pista' | 'corregido'>>;
+
+/** «9:41»: la hora del teléfono en que se registró (solo para mostrarla). */
+function horaDe(ms: number): string {
+  const d = new Date(ms);
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
 
 /** «Hoy», «Ayer», «Antier» o «Vie 23». */
 function etiquetaDia(fecha: PlainDate, hoy: PlainDate): string {
@@ -302,7 +311,13 @@ export function tarjetaRegistro(
       categoria: categoria?.nombre ?? null,
       categoriaSlug: categoria?.slug ?? null,
       cuenta: d.cuenta?.nombre ?? 'por asignar',
+      cuentaClase: cuentas.find((c) => c.id === d.cuenta?.id)?.clase ?? null,
       cuando: etiquetaDia(d.fecha, hoy).toLowerCase(),
+      // B+ (D3): «Hoy, 9:41»; la hora de registro solo cuando el movimiento es de hoy.
+      cuandoHora:
+        d.fecha === hoy
+          ? `${etiquetaDia(d.fecha, hoy)}, ${horaDe(d.registradaEn)}`
+          : etiquetaDia(d.fecha, hoy),
     },
     cambios,
     pista: pistaCorregirRegistro(otra?.nombre ?? null),

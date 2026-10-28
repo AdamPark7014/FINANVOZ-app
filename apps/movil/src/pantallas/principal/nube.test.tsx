@@ -1,4 +1,5 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import { etiquetaHablada } from '../../ui';
 import { useProcesarCola } from '../../nube/useProcesarCola';
 import { listarMovimientos, listarPorInterpretar } from '../../servicios';
 import { nubeFalsa } from '../../servicios/__pruebas__/nube';
@@ -159,7 +160,11 @@ describe('Registrar con la nube', () => {
       fireEvent.press(screen.getByTestId('pregunta-chip-$2.50'));
     });
     expect(fraseRegistro()).toBe(oida('Registré Chicle $2.50 · Otros gastos · Cartera.'));
-    expect(screen.getByTestId('aviso-cambio')).toHaveTextContent(lineaCambioDia('$214', '$213'));
+    // B+ (D3): la tarjeta lo dice como «Tu día $214 → $213»; el lector oye la frase.
+    expect(screen.getByTestId('aviso-cambio')).toHaveProp(
+      'accessibilityLabel',
+      etiquetaHablada(lineaCambioDia('$214', '$213')),
+    );
   });
 
   it('CA-M3-05 · sin internet la frase espera con un indicador discreto y se procesa al reconectar', async () => {

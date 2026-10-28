@@ -40,6 +40,11 @@ export type Turno =
       readonly detalle?: string;
       /** «Tu día pasa de $220 a $214.» */
       readonly cambioDia?: string;
+      /**
+       * La cifra del día antes y después, en pesos enteros como se ven (las de `cambioDia`), y lo que bajó o subió:
+       * «Tu día $275 → $268» con la barra recortada y el «−$7» de la píldora (B+, D3). Solo presenta lo de `core`.
+       */
+      readonly dia?: CambioDia;
       readonly deshacer?: () => Promise<void> | void;
       readonly abrir?: () => void;
       /** Un solo movimiento simple: se pinta como la tarjeta de B2 (con sus chips de un toque). */
@@ -115,6 +120,14 @@ export interface PasoFlujo<E> {
   readonly omitirSi?: (e: E) => boolean;
 }
 
+/** La cifra del día antes y después de registrar (centavos de pesos enteros, como se muestran) y su diferencia. */
+export interface CambioDia {
+  readonly antes: Centavos;
+  readonly despues: Centavos;
+  /** `despues − antes`: negativo si el día bajó. */
+  readonly delta: Centavos;
+}
+
 /** Lo que se ve de un movimiento recién registrado en su tarjeta (tablero B2). Textos ya formateados. */
 export interface MovimientoRegistrado {
   /** «Coca». */
@@ -125,8 +138,12 @@ export interface MovimientoRegistrado {
   /** Para el ícono de la categoría. */
   readonly categoriaSlug: string | null;
   readonly cuenta: string | null;
+  /** Para el ícono del chip de la cuenta (B+, D3). */
+  readonly cuentaClase?: 'efectivo' | 'liquida' | 'tarjeta' | null;
   /** «hoy», «ayer» o «vie 23». */
   readonly cuando: string;
+  /** «Hoy, 9:41» (la hora solo si es de hoy) bajo el nombre (B+, D3). */
+  readonly cuandoHora?: string;
 }
 
 /** Un chip de un toque de la tarjeta de registro (de C2): categoría, cuenta o día. */

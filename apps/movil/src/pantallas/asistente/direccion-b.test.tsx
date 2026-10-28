@@ -107,9 +107,10 @@ describe('Dirección B · Asistente (B1–B3)', () => {
     await escribir('coca 25 en efectivo');
     expect(screen.queryByTestId('reposo')).toBeNull();
     const pildora = screen.getByTestId('boton-desglose');
-    expect(pildora).toHaveTextContent('Hoy puedes gastar · hasta el jue 15$207');
+    // B+ (D3): la píldora dice también cuánto bajó el día con lo que registraste.
+    expect(pildora).toHaveTextContent('Hoy puedes gastar · hasta el jue 15−$7$207');
     expect(pildora.props.accessibilityLabel).toBe(
-      'Hoy puedes gastar, hasta el jue 15: doscientos siete pesos',
+      'Hoy puedes gastar, hasta el jue 15: doscientos siete pesos. Bajó siete pesos.',
     );
     fireEvent.press(pildora);
     expect(screen.getByTestId('desglose')).toBeTruthy();
