@@ -30,6 +30,19 @@
   generas intereses» o, vencida, «Pago para no generar intereses: $X», «Ya la pagué»); **«Todavía no» se quedó debajo
   en chico** aunque D1 no lo muestra (quitarlo dejaba sin salida). Pruebas: `asistente/direccion-b-plus.test.tsx`
   (D1) y una de D7 en `oscuro-b6.test.tsx`. `02 §4` y `§16` al día.
+- **Fase 3 hecha («Te escucho», D2):** `pantallas/asistente/TeEscucho.tsx` a pantalla completa mientras
+  `microfono.escuchando` (solo en el asistente; los paneles y la confirmación por voz siguen con la hoja chica). Tapa
+  también la navegación con un portal: `pantallas/navegacion/CapaPantalla.tsx` (`AnfitrionCapa` en
+  `app/(tabs)/_layout.tsx`; sin anfitrión, p. ej. en pruebas, se pinta encima de la pantalla). El toque que ya empezó
+  en el micrófono del dock sigue siendo suyo: soltar termina y registra. «Voy entendiendo» con el servicio nuevo
+  `servicios/entendiendo.ts` (`prepararEntendiendo(ctx)` → nivel 0 sobre la frase a medias, quitando hasta tres
+  palabras del final; cuenta tentativa por prefijo; `entendiendo.test.ts`); `cuentasResolutor` ahora se exporta de
+  `registrar.ts`. Onda con volumen: `MotorDictado.suscribirVolumen` opcional y `volumeChangeEventOptions` en
+  `motor-expo.ts` (`nivelDeVolumen`, de −2..10 a 0..1); sin volumen se anima sola. «Desliza para cancelar»:
+  `BotonHablar.alDeslizarFuera` + `pressRetentionOffset` de 64 pt en `MicrofonoAsistente`. La vibración al soltar ya
+  existía (`voz/senales.ts`, expo-haptics ya era dependencia: no hay dependencia nueva). testIDs que siguen:
+  `hoja-escuchando`, `transcripcion-en-vivo`, `boton-cancelar-escucha` (la X), `onda-voz`; nuevos `voy-entendiendo`,
+  `entendido-*`, `pista-escucha`, `boton-terminar-escucha`. **Sin probar en teléfono real** (volumen y deslizar).
 - **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
   luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
   dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.

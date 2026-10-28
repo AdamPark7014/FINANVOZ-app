@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { obtenerHoy } from '../../servicios';
 import { coloresDinero, formatearCentavos } from '../../ui';
@@ -131,6 +131,115 @@ describe('B+ · Inicio «Tablero vivo» (D1)', () => {
     );
     expect(within(fila).getByTestId('tarjeta-accion-0-ya-la-pague')).toBeTruthy();
     expect(auditar(screen.toJSON() as never)).toEqual([]);
+    p.cerrar();
+  });
+});
+
+describe('B+ · «Te escucho» (D2)', () => {
+  let ahora = 1_000_000;
+  beforeEach(() => {
+    ahora = 1_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => ahora);
+  });
+  afterEach(() => jest.restoreAllMocks());
+
+  function conVolumen() {
+    const falso = crearMotorFalso();
+    let alNivel: ((n: number) => void) | null = null;
+    const motor = {
+      ...falso.motor,
+      suscribirVolumen: jest.fn((f: (n: number) => void) => {
+        alNivel = f;
+        return () => {
+          alNivel = null;
+        };
+      }),
+    };
+    return { ...falso, motor, nivel: (n: number) => act(() => alNivel?.(n)) };
+  }
+
+  function montarEscucha() {
+    const p = conEscenario('e4-01');
+    const m = conVolumen();
+    renderConSesion(p.ctx, <PantallaAsistente navegacion={navegacionFalsa()} motor={m.motor} />);
+    return { p, ...m };
+  }
+
+  const toque = (x: number, y: number) => ({ nativeEvent: { pageX: x, pageY: y } });
+
+  it('mantener: pantalla pino con la frase en vivo, «Voy entendiendo» del nivel 0 y la onda; soltar registra', async () => {
+    const { p, emitir, motor } = montarEscucha();
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressIn', toque(200, 800));
+    });
+    expect(screen.getByTestId('hoja-escuchando')).toBeTruthy();
+    expect(screen.getByTestId('orbe-escucha')).toBeTruthy();
+    expect(screen.getByTestId('pista-escucha')).toHaveTextContent(
+      'Suelta para registrar · desliza para cancelar',
+    );
+    emitir({ tipo: 'resultado', texto: 'coca de 25 en efec', final: false });
+    expect(screen.getByTestId('transcripcion-en-vivo')).toHaveTextContent('coca de 25 en efec');
+    expect(screen.getByTestId('entendido-monto')).toHaveTextContent('$25');
+    expect(screen.getByTestId('entendido-categoria')).toHaveTextContent('Antojos');
+    expect(screen.getByTestId('entendido-cuenta')).toHaveTextContent('Cartera …');
+    expect(screen.getByTestId('voy-entendiendo').props.accessibilityLabel).toBe(
+      'Voy entendiendo: veinticinco pesos, Antojos, quizá Cartera.',
+    );
+    expect(motor.suscribirVolumen).toHaveBeenCalled();
+    expect(screen.getByTestId('onda-voz')).toBeTruthy();
+    expect(auditar(screen.toJSON() as never)).toEqual([]);
+    // Soltar (después de mantener) termina y registra; la pantalla pino se va.
+    ahora += 1_500;
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressOut', toque(205, 790));
+    });
+    expect(motor.detener).toHaveBeenCalledTimes(1);
+    emitir({ tipo: 'resultado', texto: 'coca 25 en efectivo', final: true });
+    expect(screen.queryByTestId('hoja-escuchando')).toBeNull();
+    expect(screen.getByTestId('aviso')).toBeTruthy();
+    p.cerrar();
+  });
+
+  it('deslizar lejos del micrófono cancela sin registrar; la X también', async () => {
+    const { p, emitir, motor } = montarEscucha();
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressIn', toque(200, 800));
+    });
+    emitir({ tipo: 'resultado', texto: 'coca 25', final: false });
+    ahora += 1_200;
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressOut', toque(200, 600));
+    });
+    expect(motor.abortar).toHaveBeenCalledTimes(1);
+    expect(motor.detener).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('hoja-escuchando')).toBeNull();
+    expect(screen.queryByTestId('aviso')).toBeNull();
+
+    // Toque corto: sigue escuchando y la pista cambia; la X cancela.
+    ahora += 2_000;
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressIn', toque(200, 800));
+    });
+    ahora += 100;
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressOut', toque(200, 800));
+    });
+    expect(screen.getByTestId('pista-escucha')).toHaveTextContent(
+      'Toca el micrófono para terminar · la X cancela',
+    );
+    fireEvent.press(screen.getByTestId('boton-cancelar-escucha'));
+    expect(motor.abortar).toHaveBeenCalledTimes(2);
+    expect(screen.queryByTestId('hoja-escuchando')).toBeNull();
+    p.cerrar();
+  });
+
+  it('el volumen mueve la onda cuando el reconocedor lo da (sin texto ni audio)', async () => {
+    const { p, nivel } = montarEscucha();
+    await act(async () => {
+      fireEvent(screen.getByTestId('boton-hablar'), 'pressIn', toque(200, 800));
+    });
+    nivel(0.8);
+    expect(screen.getByTestId('onda-voz')).toBeTruthy();
     p.cerrar();
   });
 });

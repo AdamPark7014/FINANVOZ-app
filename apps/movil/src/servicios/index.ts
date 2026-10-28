@@ -241,6 +241,7 @@ export {
   type TarjetaAccion,
   type VistaHoy,
 } from './hoy';
+export { NADA_ENTENDIDO, prepararEntendiendo, type LoEntendido } from './entendiendo';
 export {
   armarPista,
   COLUMNAS_PISTA,

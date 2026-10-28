@@ -402,7 +402,8 @@ function tipoResolutor(c: CuentaPropia): CuentaResolutor['tipo'] | null {
   }
 }
 
-function cuentasResolutor(ctx: Contexto): CuentaResolutor[] {
+/** Las cuentas propias como las ve el resolutor (también «Voy entendiendo», `servicios/entendiendo`). */
+export function cuentasResolutor(ctx: Contexto): CuentaResolutor[] {
   const salida: CuentaResolutor[] = [];
   for (const c of cuentasPropias(ctx)) {
     const tipo = tipoResolutor(c);

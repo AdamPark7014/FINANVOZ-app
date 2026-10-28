@@ -97,3 +97,50 @@ describe('useBotonHablar', () => {
     expect(c.detener).not.toHaveBeenCalled();
   });
 });
+
+describe('useBotonHablar · deslizar para cancelar (B+, D2)', () => {
+  function conCancelar() {
+    let t = 10_000;
+    const iniciar = jest.fn();
+    const detener = jest.fn();
+    const cancelar = jest.fn();
+    const { result, rerender } = renderHook(
+      ({ escuchando }: { escuchando: boolean }) =>
+        useBotonHablar({ escuchando, iniciar, detener, cancelar }, () => t),
+      { initialProps: { escuchando: false } },
+    );
+    return {
+      boton: () => result.current,
+      escuchar: (escuchando: boolean) => rerender({ escuchando }),
+      avanzar: (ms: number) => {
+        t += ms;
+      },
+      iniciar,
+      detener,
+      cancelar,
+    };
+  }
+
+  it('mantener y deslizar fuera descarta lo dicho (no lo termina)', () => {
+    const b = conCancelar();
+    b.boton().alPresionarDentro();
+    b.escuchar(true);
+    b.avanzar(UMBRAL_MANTENER_MS + 200);
+    b.boton().alDeslizarFuera();
+    expect(b.cancelar).toHaveBeenCalledTimes(1);
+    expect(b.detener).not.toHaveBeenCalled();
+  });
+
+  it('un toque que vuelve sobre el micrófono mientras escucha no cancela al deslizar (para eso está la X)', () => {
+    const b = conCancelar();
+    b.boton().alPresionarDentro();
+    b.escuchar(true);
+    b.avanzar(100);
+    b.boton().alSoltar();
+    b.avanzar(REBOTE_MS + 500);
+    b.boton().alPresionarDentro();
+    b.boton().alDeslizarFuera();
+    expect(b.cancelar).not.toHaveBeenCalled();
+    expect(b.detener).not.toHaveBeenCalled();
+  });
+});

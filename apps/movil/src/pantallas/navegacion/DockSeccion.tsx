@@ -41,6 +41,7 @@ export function DockSeccion({
     alAccionAccesible: (e) => {
       if (e.nativeEvent.actionName === 'activate') hablar();
     },
+    alDeslizarFuera: () => {},
   };
   return (
     <View

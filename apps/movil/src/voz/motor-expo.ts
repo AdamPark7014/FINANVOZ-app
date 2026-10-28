@@ -1,6 +1,6 @@
 import { requireOptionalNativeModule } from 'expo';
 import type { ExpoSpeechRecognitionModule, SetCategoryOptions } from 'expo-speech-recognition';
-import type { CodigoErrorMotor, MotorDictado } from './motor';
+import { nivelDeVolumen, type CodigoErrorMotor, type MotorDictado } from './motor';
 
 type ModuloNativo = typeof ExpoSpeechRecognitionModule;
 
@@ -100,6 +100,8 @@ export const motorExpo: MotorDictado = {
       addsPunctuation: false,
       maxAlternatives: 1,
       iosCategory: { ...CATEGORIA_AUDIO_IOS, categoryOptions: [...CATEGORIA_AUDIO_IOS.categoryOptions] },
+      // La onda de «Te escucho» (D2) sigue el volumen; solo el nivel, cada 100 ms.
+      volumeChangeEventOptions: { enabled: true, intervalMillis: 100 },
     });
   },
   detener() {
@@ -121,5 +123,11 @@ export const motorExpo: MotorDictado = {
       m.addListener('end', () => alEvento({ tipo: 'fin' })),
     ];
     return () => subs.forEach((s) => s.remove());
+  },
+  suscribirVolumen(alNivel) {
+    const m = modulo();
+    if (!m) return () => {};
+    const sub = m.addListener('volumechange', (e) => alNivel(nivelDeVolumen(e.value)));
+    return () => sub.remove();
   },
 };

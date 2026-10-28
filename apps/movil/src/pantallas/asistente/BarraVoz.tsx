@@ -1,4 +1,7 @@
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { NADA_ENTENDIDO, prepararEntendiendo } from '../../servicios';
+import { useSesion } from '../../sesion/ProveedorSesion';
 import { Boton, CampoTexto, espacio, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
 import {
   IndicadorVoz,
@@ -9,7 +12,9 @@ import {
   TEXTO_TE_ESCUCHO,
 } from '../../voz';
 import { EJEMPLO_CAMPO_REGISTRAR, mensajeEsperandoConexion } from '../principal/textos';
+import { CapaPantallaCompleta } from '../navegacion/CapaPantalla';
 import { DockVoz } from '../navegacion/DockVoz';
+import { TeEscucho } from './TeEscucho';
 import { MicrofonoAsistente } from './MicrofonoAsistente';
 import { OndaVoz, PuntosPensando } from './movimiento';
 import {
@@ -35,9 +40,30 @@ import type { Asistente } from './useAsistente';
  * abajo, el dock de voz verde pino con «Escribir», el micrófono y «¿Me alcanza?». Los atajos de intención viven en
  * «Puedes decirme» del reposo.
  */
-export function BarraVoz({ a }: { a: Asistente }) {
+export function BarraVoz({ a, pantallaCompleta = false }: { a: Asistente; pantallaCompleta?: boolean }) {
   const { c, esquema } = useTema();
+  const { ctx } = useSesion();
   const m = a.microfono;
+  // B+ (D2): mientras se mantiene el micrófono del dock, soltar registra y deslizar cancela.
+  const [manteniendo, setManteniendo] = useState(false);
+  const enCapa = pantallaCompleta && m.escuchando;
+  // «Voy entendiendo»: el nivel 0 sobre la frase a medias, preparado una vez por escucha (sin red, sin registrar).
+  const leer = useMemo(() => {
+    if (!enCapa) return null;
+    try {
+      return prepararEntendiendo(ctx);
+    } catch {
+      return null;
+    }
+  }, [enCapa, ctx]);
+  const entendido = useMemo(() => {
+    if (!leer) return NADA_ENTENDIDO;
+    try {
+      return leer(m.parcial);
+    } catch {
+      return NADA_ENTENDIDO;
+    }
+  }, [leer, m.parcial]);
   // VoiceOver no lee regiones vivas: el error del dictado se anuncia en iPhone.
   useAnunciar(m.aviso);
   // Lo escrito se manda y el campo se cierra: con el teclado arriba, el campo, los chips y el micrófono dejan a la
@@ -50,7 +76,19 @@ export function BarraVoz({ a }: { a: Asistente }) {
   };
   return (
     <View style={{ gap: espacio.m }} testID="barra-voz">
-      {m.escuchando || a.escuchandoConfirmacion ? (
+      {enCapa ? (
+        <CapaPantallaCompleta>
+          <TeEscucho
+            parcial={m.parcial}
+            entendido={entendido}
+            manteniendo={manteniendo}
+            boton={m.boton}
+            alCancelar={m.cancelar}
+            suscribirVolumen={m.suscribirVolumen}
+          />
+        </CapaPantallaCompleta>
+      ) : null}
+      {!enCapa && (m.escuchando || a.escuchandoConfirmacion) ? (
         // Hoja «escuchando»: «Te escucho…», la onda viva y lo que se va oyendo; el orbe es «Terminar».
         <View
           testID="hoja-escuchando"
@@ -198,7 +236,9 @@ export function BarraVoz({ a }: { a: Asistente }) {
           ...(a.escribiendo ? {} : { pista: PISTA_TECLADO }),
           abierto: a.escribiendo,
         }}
-        centro={<MicrofonoAsistente escuchando={m.escuchando} boton={m.boton} />}
+        centro={
+          <MicrofonoAsistente escuchando={m.escuchando} boton={m.boton} alManteniendo={setManteniendo} />
+        }
         derecha={{
           etiqueta: BTN_ME_ALCANZA,
           alPresionar: a.preguntarMeAlcanza,

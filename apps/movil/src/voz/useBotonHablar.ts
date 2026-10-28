@@ -17,6 +17,8 @@ export interface ControlHablar {
   escuchando: boolean;
   iniciar: () => Promise<void> | void;
   detener: () => void;
+  /** Descarta lo dicho (deslizar fuera del micrófono mientras se mantiene, D2). */
+  cancelar?: () => void;
 }
 
 export interface BotonHablar {
@@ -24,6 +26,11 @@ export interface BotonHablar {
   alSoltar: () => void;
   accionesAccesibles: readonly AccessibilityActionInfo[];
   alAccionAccesible: (evento: AccessibilityActionEvent) => void;
+  /**
+   * El dedo se deslizó fuera del micrófono mientras lo mantenía (D2: «desliza para cancelar»): descarta lo dicho en
+   * vez de registrarlo. Un toque corto que dejó escuchando no se cancela así: para eso está la X.
+   */
+  alDeslizarFuera: () => void;
 }
 
 /**
@@ -32,7 +39,7 @@ export interface BotonHablar {
  * llega como la acción "activar" y alterna igual que un toque.
  */
 export function useBotonHablar(
-  { escuchando, iniciar, detener }: ControlHablar,
+  { escuchando, iniciar, detener, cancelar }: ControlHablar,
   reloj: () => number = Date.now,
 ): BotonHablar {
   const ultimoCambio = useRef<number | null>(null);
@@ -73,5 +80,20 @@ export function useBotonHablar(
     [cambiar, escuchando, reloj],
   );
 
-  return { alPresionarDentro, alSoltar, accionesAccesibles: ACCIONES_HABLAR, alAccionAccesible };
+  const alDeslizarFuera = useCallback(() => {
+    const actual = toque.current;
+    toque.current = null;
+    if (!actual?.empezo) return;
+    ultimoCambio.current = reloj();
+    if (cancelar) cancelar();
+    else detener();
+  }, [cancelar, detener, reloj]);
+
+  return {
+    alPresionarDentro,
+    alSoltar,
+    accionesAccesibles: ACCIONES_HABLAR,
+    alAccionAccesible,
+    alDeslizarFuera,
+  };
 }

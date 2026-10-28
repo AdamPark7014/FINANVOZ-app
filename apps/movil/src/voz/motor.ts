@@ -49,4 +49,17 @@ export interface MotorDictado {
   abortar(): void;
   /** Devuelve la función para cancelar la suscripción. */
   suscribir(alEvento: (evento: EventoMotor) => void): () => void;
+  /**
+   * Volumen de lo que entra al micrófono mientras escucha, de 0 (silencio) a 1, para la onda de «Te escucho» (D2).
+   * Opcional: sin él la onda se anima sola. Solo es un nivel; nunca audio ni texto.
+   */
+  suscribirVolumen?(alNivel: (nivel: number) => void): () => void;
+}
+
+/**
+ * Del `volumechange` de expo-speech-recognition (de −2 a 10; menos de 0 no se oye) a un nivel de 0 a 1 para la onda.
+ */
+export function nivelDeVolumen(valor: number): number {
+  if (!Number.isFinite(valor)) return 0;
+  return Math.max(0, Math.min(1, valor / 10));
 }

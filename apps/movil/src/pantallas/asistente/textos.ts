@@ -1,7 +1,7 @@
 import type { ChipIntencion, ClaveIntencion } from '../../asistente/chips';
 import type { DatosPuedoGastar } from '../../asistente/tipos';
 import type { VistaHoy } from '../../servicios';
-import { etiquetaHablada, formatearCentavos } from '../../ui/formato';
+import { cifraEnPalabras, etiquetaHablada, formatearCentavos } from '../../ui/formato';
 import type { FilaCalculo } from './TarjetaCalculo';
 
 /**
@@ -489,4 +489,37 @@ export function detallePagoPendiente(pngi: string, cuando: 'por_vencer' | 'venci
   return cuando === 'vencido'
     ? `Pago para no generar intereses: ${pngi}`
     : `Paga ${pngi} y no generas intereses`;
+}
+
+// ——— Dirección B+ «Viva»: «Te escucho» (`docs/diseno/direccion-b-plus/D2-escuchando.png`) ———
+
+export const ETIQUETA_TE_ESCUCHO = 'Te escucho';
+export const TEXTO_VOY_ENTENDIENDO = 'Voy entendiendo';
+export const PISTA_ESCUCHA_MANTENIENDO = 'Suelta para registrar · desliza para cancelar';
+export const PISTA_ESCUCHA_TOCANDO = 'Toca el micrófono para terminar · la X cancela';
+export const CHIP_ME_ALCANZA_ENTENDIDO = '¿Me alcanza?';
+
+/** Lo que se ve de la frase en vivo: los últimos 90 caracteres, con «…» si había más. */
+export function ultimoTramo(parcial: string, maximo = 90): string {
+  const t = parcial.trim();
+  if (t.length <= maximo) return t;
+  const corte = t.slice(t.length - maximo);
+  const espacio = corte.indexOf(' ');
+  return `…${espacio > 0 ? corte.slice(espacio) : corte}`;
+}
+
+/** Lo que oye el lector de «Voy entendiendo»: «Voy entendiendo: veinticinco pesos, Antojos, Cartera.» */
+export function etiquetaLoEntendido(e: {
+  monto: number | null;
+  categoria: { nombre: string } | null;
+  cuenta: { nombre: string; seguro: boolean } | null;
+  meAlcanza: boolean;
+}): string {
+  const partes = [
+    ...(e.monto !== null ? [cifraEnPalabras(e.monto)] : []),
+    ...(e.meAlcanza ? ['¿me alcanza?'] : []),
+    ...(e.categoria ? [e.categoria.nombre] : []),
+    ...(e.cuenta ? [e.cuenta.seguro ? e.cuenta.nombre : `quizá ${e.cuenta.nombre}`] : []),
+  ];
+  return `${TEXTO_VOY_ENTENDIENDO}: ${partes.join(', ')}.`;
 }

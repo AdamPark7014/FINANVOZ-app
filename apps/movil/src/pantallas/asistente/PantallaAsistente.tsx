@@ -160,7 +160,8 @@ function Cuerpo({
           paddingBottom: enPanel ? 0 : abajo,
         }}
       >
-        <BarraVoz a={a} />
+        {/* B+ (D2): fuera de un panel, «Te escucho» tapa toda la pantalla mientras escucha. */}
+        <BarraVoz a={a} pantallaCompleta={!enPanel} />
       </View>
     </>
   );

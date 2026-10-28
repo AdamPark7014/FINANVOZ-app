@@ -38,6 +38,8 @@ export interface Microfono {
   iniciar: () => Promise<void>;
   /** Descarta lo dictado. */
   cancelar: () => void;
+  /** El volumen mientras escucha (0 a 1) para la onda de «Te escucho»; `null` si el reconocedor no lo da. */
+  suscribirVolumen: ((alNivel: (nivel: number) => void) => () => void) | null;
 }
 
 /**
@@ -99,7 +101,14 @@ export function useMicrofono({
     }
   }, [estado]);
 
-  const boton = useBotonHablar({ escuchando, iniciar, detener });
+  const boton = useBotonHablar({ escuchando, iniciar, detener, cancelar });
+  const suscribirVolumen = useMemo(
+    () =>
+      motor.suscribirVolumen
+        ? (alNivel: (nivel: number) => void) => motor.suscribirVolumen?.(alNivel) ?? (() => {})
+        : null,
+    [motor],
+  );
   const sinPermiso = estado === 'sin_permiso';
   // iOS pide dos permisos (micrófono y reconocimiento de voz); el mensaje los nombra.
   const aviso = sinPermiso
@@ -109,5 +118,5 @@ export function useMicrofono({
     : error
       ? mensajes[error]
       : null;
-  return { disponible, escuchando, parcial, aviso, sinPermiso, boton, iniciar, cancelar };
+  return { disponible, escuchando, parcial, aviso, sinPermiso, boton, iniciar, cancelar, suscribirVolumen };
 }
