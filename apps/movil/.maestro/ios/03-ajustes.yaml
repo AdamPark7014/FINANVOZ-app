@@ -166,10 +166,14 @@ tags:
       id: privacidad-ajustes-telefono
 - tapOn:
     id: privacidad-ajustes-telefono
+# Abre Ajustes de iOS, pero en el simulador de CI Maestro a veces sigue leyendo la jerarquía de Finanvoz detrás y da el
+# botón por visible con Ajustes al frente (corrida 40776940371, dos intentos; la captura muestra Ajustes abierto). La
+# espera es solo para dar tiempo; la prueba es la captura.
 - extendedWaitUntil:
     notVisible:
       id: privacidad-ajustes-telefono
     timeout: 10000
+    optional: true
 - takeScreenshot: ajustes-de-ios
 - openLink:
     link: 'finanvoz://privacidad'
