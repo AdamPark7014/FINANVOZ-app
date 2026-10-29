@@ -6,114 +6,81 @@
 
 ## Hecho en este turno
 
-- **Dirección B+ «Viva» (Adam, 28-10).** Se construye sobre B (commits `7f098a3`, `d1b6cfa`, `c4bff70`, `371fabb`,
-  Figtree en `4fc3cad`) con los tableros de `docs/diseno/direccion-b-plus/` (D0–D7; `D1b` no se construye). Decisión
-  en `docs/ESTADO.md` (Decisiones, 28-10-2026). Cinco fases, un commit verificado y un push por fase:
-  1. Fundamentos · 2. Inicio «Tablero vivo» (D1, D7) · 3. «Te escucho» (D2) · 4. Registro (D3) y «¿Me alcanza?» (D4) ·
-  5. Movimientos (D5) y Cuentas (D6).
-- **Fase 1 hecha (fundamentos):** paletas nuevas en `ui/tokens.ts` — `coloresCategoria` (seis familias del tablero +
-  `otros` gris; mosaico, ícono y barra en claro y oscuro), `familiaDeCategoria(slug)`, `coloresDinero` (apartado,
-  colchón, libre, compra, recorte), `coloresCuenta` (efectivo menta, débito azul, crédito violeta), `coloresEscucha`
-  (pantalla pino) y `orbe`; pruebas de contraste en `tokens.test.ts` (ícono/mosaico ≥ 4.5, textos de tarjetas y de
-  «Te escucho» ≥ 4.5). Componentes `ui/componentes/Orbe.tsx` (respira en reposo, ondas al escuchar, quieto con
-  «Reducir movimiento»; `Orbe.test.tsx`) y `Mosaico.tsx`; los ciclos de animación pasaron a `ui/movimiento.ts`. El
-  mosaico ya va en cada fila de Movimientos (`mosaico-<id>`) y en la tarjeta de registro (`aviso-mosaico`). Íconos
-  nuevos `cerrar` y `llama`. `02 §16` lo describe.
-- **Fase 2 hecha (Inicio «Tablero vivo», D1 y D7):** `Reposo.tsx` con el orbe junto al saludo, «Hoy puedes gastar»,
-  la cifra con «al día» y la frase de siempre (`hoy-fecha`, `hoy-puedes`, `hoy-secundario` sin cambios). Debajo,
-  `BarraDinero.tsx` («De tus $X», barra apartado · colchón · libre con `ui/componentes/BarraApilada.tsx` y su leyenda;
-  `partesDinero` en `asistente/textos.ts` es el mismo desglose de E4) con «Cómo lo calculé ›» = `boton-desglose`, que
-  sigue abriendo `desglose` debajo. `PistaQuincena.tsx` con el servicio nuevo `servicios/pista.ts`
-  (`pistaQuincena(ctx, proximoIngreso)` + `armarPista` puro, `pista.test.ts`): de hoy al ingreso, pagos fijos,
-  «Pagar Nu» el día límite de una tarjeta con PNGI y el ingreso; con más de cinco días, hoy + días con algo + ingreso.
-  Lo pendiente del pago de tarjeta es ahora una fila (mosaico violeta, «Tu Nu vence el jue 29», «Paga $1,420 y no
-  generas intereses» o, vencida, «Pago para no generar intereses: $X», «Ya la pagué»); **«Todavía no» se quedó debajo
-  en chico** aunque D1 no lo muestra (quitarlo dejaba sin salida). Pruebas: `asistente/direccion-b-plus.test.tsx`
-  (D1) y una de D7 en `oscuro-b6.test.tsx`. `02 §4` y `§16` al día.
-- **Fase 3 hecha («Te escucho», D2):** `pantallas/asistente/TeEscucho.tsx` a pantalla completa mientras
-  `microfono.escuchando` (solo en el asistente; los paneles y la confirmación por voz siguen con la hoja chica). Tapa
-  también la navegación con un portal: `pantallas/navegacion/CapaPantalla.tsx` (`AnfitrionCapa` en
-  `app/(tabs)/_layout.tsx`; sin anfitrión, p. ej. en pruebas, se pinta encima de la pantalla). El toque que ya empezó
-  en el micrófono del dock sigue siendo suyo: soltar termina y registra. «Voy entendiendo» con el servicio nuevo
-  `servicios/entendiendo.ts` (`prepararEntendiendo(ctx)` → nivel 0 sobre la frase a medias, quitando hasta tres
-  palabras del final; cuenta tentativa por prefijo; `entendiendo.test.ts`); `cuentasResolutor` ahora se exporta de
-  `registrar.ts`. Onda con volumen: `MotorDictado.suscribirVolumen` opcional y `volumeChangeEventOptions` en
-  `motor-expo.ts` (`nivelDeVolumen`, de −2..10 a 0..1); sin volumen se anima sola. «Desliza para cancelar»:
-  `BotonHablar.alDeslizarFuera` + `pressRetentionOffset` de 64 pt en `MicrofonoAsistente`. La vibración al soltar ya
-  existía (`voz/senales.ts`, expo-haptics ya era dependencia: no hay dependencia nueva). testIDs que siguen:
-  `hoja-escuchando`, `transcripcion-en-vivo`, `boton-cancelar-escucha` (la X), `onda-voz`; nuevos `voy-entendiendo`,
-  `entendido-*`, `pista-escucha`, `boton-terminar-escucha`. **Sin probar en teléfono real** (volumen y deslizar).
-- **Fase 4 hecha (Registro D3 y «¿Me alcanza?» D4):** `TurnoRegistro` con el orbe y «Listo, lo registré.», mosaico,
-  «Hoy, 9:41» (`DetalleRegistro.registradaEn`, la hora solo si es de hoy), chips con el punto de color y el ícono de
-  la cuenta, «Tu día $X → $Y» (`ui/componentes/CifraQueCuenta.tsx`: la cifra cuenta por cuadros y `BarraDelDia` se
-  recorta; quietas con «Reducir movimiento») y la racha (`servicios/racha.ts`: `diasSeguidos` puro +
-  `rachaAnotando`, solo voz/texto/formulario, desde 3 días). Los turnos de registro traen `dia: {antes, despues,
-  delta}` (`leerCambioDia` en `asistente/flujos/textos.ts` relee la frase de `lineaCambioDia`; la diferencia se
-  calcula ahí, no en la UI) y la píldora muestra el «−$7» (`pildora-delta`). `TurnoPuedoGastar` con veredicto
-  («Sí te alcanza.»/«No te alcanza.», `sublineaPuedoGastar` con el pronombre de «unos/una…»), las dos opciones lado a
-  lado con su barra y «Cómo lo calculé» como barra apilada con «$575 libres ÷ 4 días = $143 al día»; el lector sigue
-  oyendo la frase completa de `turno.texto` y los `calculo-*` siguen (ahora como leyenda). **El título dice «Listo, lo
-  registré.»** (genérico) aunque D3 diga «la registré» (concordar con cada sustantivo no es confiable).
-- **Fase 5 hecha (Movimientos D5 y Cuentas D6):** «En qué se fue» (`EnQueSeFue.tsx` + `agruparPorCategoria` puro y
-  `enQueSeFue` en `servicios/movimientos.ts`, `en-que-se-fue.test.ts`: la suma da `salieron`; seis partes como máximo,
-  lo demás en «Otros»), «entraron» en verde, por revisar en ámbar. Cuentas: `CarruselCuentas.tsx` (efectivo menta,
-  débito azul, crédito violeta; testIDs de siempre `cuenta-<id>`, `-saldo`, `-accion` = contar el efectivo, `-ver` =
-  «⋯» del efectivo, `-abrir`; las de crédito `carrusel-<id>`), `TarjetaCreditoLista` con `ui/componentes/AnilloUso.tsx`
-  (`tarjeta-credito-<id>`, `cuenta-<id>-anillo-uso`), «Lo que viene» como línea de tiempo (`LoQueViene.tsx`, con los
-  ingresos: `VistaCuentas.loQueViene` y `CuentaTienes.contadaEl` vía `fechaUltimoArqueo`). Debes solo con personas (o
-  vacío). En pruebas, `jest.setup.ts` apaga `Animated.loop` (los bucles del orbe volvían lentísima la suite).
-  Verificado: suite completa de jest 933/934 (la que falló, `estados-cuenta.test.tsx`, pasa sola: tiempo bajo carga,
-  igual que antes `nube`, `respaldo`, `analitica-correccion-voz` y `masvs` en vitest) y vitest de la app 1159/1159.
-- **Tras el Maestro de `12db214` (corrida 40750001343, 7 flujos: pasaron 01, 04, 05, 06, 09 y los no bloqueantes 07 y
-  08):** el 02 fallaba porque la búsqueda opcional de «¿Me alcanza?» deja «Cómo lo calculé» fuera de pantalla en el
-  inicio largo de D1 y el toque caía en la barra de estado (sube la página sin cerrar el desglose): el flujo ahora
-  sube hasta `boton-desglose` antes de tocarlo. El 03 era el primer flujo con el simulador en frío (la pantalla de
-  ingreso salió después de los 10 s): `onboarding-rapido.yaml` espera `onb-ingreso` hasta 30 s. Y la barra de tu
-  dinero con faltante (efectivo $600, colchón $1,300) parecía llena de colchón: ahora `servicios/barra-dinero.ts`
-  (`barraDinero`, puro, con pruebas) reparte lo que tienes entre lo apartado y el colchón y el resto va en un tramo
-  rojo «Faltan $700» (el faltante de E4); prueba en `direccion-b-plus.test.tsx`.
-- **Lo que se apartó de los tableros (a propósito):** «En qué se fue» usa los nombres reales de las categorías
-  («Vivienda», «Entretenimiento») y no los de familia del tablero («Casa», «Salidas»), que mezclarían categorías (Salud
-  saldría como «Súper»); «⋯» solo en el efectivo (es su único segundo botón; en el débito sería repetir «abrir»); bajo
-  el débito va su tipo/••últimos 4 y no «Al día con tus avisos» (no hay ese dato por cuenta); «Todavía no» sigue en la
-  fila del pago de tarjeta; «Listo, lo registré.» genérico; en «Te escucho» el micrófono de abajo no queda exactamente
-  bajo el dedo del dock (el tablero lo sube para dejar la pista abajo).
-- **Ojo con los colores del README de B+:** las barras de transporte (`#5B8DEF`) y salidas (`#9B7BF0`) tienen la misma
-  luminosidad (0.275 y 0.274) aunque el README diga «luminosidad distinta»; se respetaron tal cual porque la leyenda
-  dice nombre y cifra. Si Adam quiere distinguirlas sin color, hay que mover uno.
-- **No se puede compilar Android aquí desde la app de escritorio:** `expo run:android` muere en el CMake de
-  `expo-sqlite` con NTSTATUS 0xC0E90002 (política de integridad de código del proceso de Claude, igual que
-  cursor-agent). La verificación visual es por las capturas de «iOS · Maestro» en GitHub.
-- Turno anterior (27-10): dirección B «Plática» completa en cuatro fases (navegación arriba y dock, Asistente B1–B3,
-  Movimientos y Cuentas B4–B5, oscuro B6); detalle en `git log` y en `02 §2`, `§4`, `§10`, `§11` y `§16`.
+- **El asistente platica (Adam, 28-10: «ve cómo mejorar los modelos de cada cosa… que tenga igual
+  conversaciones»).** Detalle en `docs/06-NLU.md §15`; decisiones, pendientes 153–155 y mediciones en
+  `docs/ESTADO.md`. Commits: `385ec34` (golden y evaluación), `6c06af2` (nivel 0, esquema, proxy), `04e1047` (app),
+  `fea24e8` (docs).
+  - **Turno anterior**: la app guarda el último turno entendido de la sesión (`TurnoAnterior { frase,
+    interpretacion }`, nunca lo que contestó: ni cifras ni saldos) y lo manda con la siguiente frase al nivel 0 y a la
+    nube (`contexto.anterior`; `OpcionesConversacion` de `servicios/registrar.ts`, `anteriorRef` en
+    `pantallas/asistente/useAsistente.ts`). No se guarda: al relanzar la app la plática empieza de cero.
+  - **Nivel 0** (`packages/nlu/src/reglas/seguimiento.ts`): seguimientos de consultas («¿y la semana pasada?», «¿y en
+    comida?», «¿y en total?», «¿y en la Nu?», «¿y Juan?», «¿por qué?» tras «hoy puedes»), de registros («otra igual»,
+    «otro de 95», «no, en efectivo», «con BBVA», «fue ayer», «eran 850», «ponlo en súper», «quítale 10» con la cuenta
+    hecha en código, «bórrala») y de «¿me alcanza?» («¿y a 6 meses?», «¿y de contado?», «¿y si espero a la
+    quincena?», «¿y de 900?», «ya la compré»), y respuestas a una aclaración (la cifra que faltaba, «$250» de «dos
+    cincuenta», «el jueves» de la semana pasada, el periodo de «¿De cuándo?»), también pegadas a la frase de antes
+    como las manda la app.
+  - **Consultas**: `proximo_ingreso` («¿cuándo me pagan?») y `desglose_hoy` («¿por qué tengo tan poco hoy?», el
+    «Cómo lo calculé» en una frase) nuevas y **de Gratis** (`CONSULTAS_GRATIS`); «¿cuánto debo?» = tarjetas;
+    «¿cuánto tengo?» = todas las cuentas; «la semana pasada» y «antier» como periodos; pagos que vienen siempre hacia
+    adelante («esta semana» = próximos 7 días; sin periodo, hasta el ingreso); «¿cuánto gasté?» sin periodo pregunta
+    «¿De cuándo?» con chips. SIMULAR conserva el artículo («unos tenis»: de ahí sale «Si los compras…»).
+  - **App**: `nivelCero` aplica también correcciones, anulaciones, duplicados y simulaciones del nivel 0 (antes iban
+    a la nube aunque se entendieran; sin red quedaban Por revisar), salvo con frases esperando internet (esperan en la
+    cola). El nivel 0 de la app recibe las fechas del ingreso (`fechasDelIngreso` en `servicios/nube.ts`).
+  - **Charla** (`packages/nlu/src/charla.ts` decide, `apps/movil/src/asistente/charla.ts` contesta): despedida,
+    «ok», «¿cómo estás?», «¿qué le puedo preguntar?», queja, colchón, apartado, libre, pago para no generar intereses
+    y «no entendí»/«¿mande?», que repite lo último que dijo el asistente.
+  - **Nube**: `contexto_min.anterior` en el contrato (≤ 3,000 caracteres, intención conocida; otra clave = 400) y
+    prompt con «# Conversación», 3 ejemplos con turno anterior y la semana pasada calculada en el turno del usuario.
+    **Desplegado** el 28-10 (`desplegar-funciones.sh` desde `fea24e8`): `probar-backend` 31/31, prompt nuevo en
+    producción (17,809 tokens de entrada).
+- **Números** (golden nuevo `fixtures/nlu/golden-conversaciones.jsonl`: 88 conversaciones, 186 turnos):
+  - Nivel 0: cobertura 88/183 → **183/183**; precisión 88/92 → **184/184**; seguimientos 13/87 → 85/87 (los 2 son de
+    la nube); charla 8/19 → 19/19; conversaciones completas 8/88 → 86/88. Golden principal sigue 162/162; pasos,
+    confirmación y reparación al 100 %.
+  - Nube (85 seguimientos, Haiku 5.5 por la puerta): 34/85 sin contexto → **85/85** con turno anterior (dos
+    corridas; la primera, antes de ajustar el prompt, 80/85: el 85/85 puede ser optimista). 0.000255 → 0.000279–0.000317
+    USD por frase. Golden principal con el prompt nuevo: 160/164 en una corrida (163/164 el 26-10); los 4 fallos
+    dieron 11/12 al repetirlos 3 veces.
+  - Gasto: ~0.20 USD del proyecto `pruebas` (de 3.598 a 3.797 USD según `GET /uso`, cota superior porque es
+    compartido). Queda ~0.20 hasta el 1-nov.
+- Verificación: `pnpm lint`, `pnpm typecheck`, `pnpm test` (vitest 3268/3268), jest completo 930/934 y las 4 que
+  fallaban (frases que ahora resuelve el nivel 0) corregidas y vueltas a correr junto con `src/asistente`,
+  `src/pantallas/asistente`, `src/pantallas/me-alcanza` y `src/servicios` (todo en verde). Pruebas viejas que pedían
+  la nube o `null` para «cuánto gasté», «la semana pasada», «qué pagos tengo esta semana», «borra lo del cine», «no,
+  los tacos fueron en efectivo» y la elección de «$2.50» se actualizaron a lo nuevo.
+- Turno anterior (28-10, misma fecha): dirección B+ «Viva» en cinco fases (fundamentos, inicio D1/D7, «Te escucho»
+  D2, registro D3 y «¿Me alcanza?» D4, Movimientos D5 y Cuentas D6) y el arreglo de Maestro 02/03; detalle en
+  `git log` (`7090f46`…`28da864`), `02 §4` y `§16`.
 
 ## Estado de tiendas
 
-- **TestFlight 1.0.0 (14)** desde `dad15f2` (nivel 0 nuevo + tema claro + H1/H8/06): VALID e `IN_BETA_TESTING` en el
-  grupo interno «Equipo Finanvoz (interno)» (acceso a todas las builds, Adam es el único tester), consultado por API el
-  26-10. La 13 (`fce19b9`, tema claro sin el nivel 0 nuevo) queda superada.
-- **Play**: el AAB que se sube es el 1.0.0 (versionCode 5) desde `dad15f2` (corrida 40410380877), firmado con la llave
-  de subida (SHA-256 8F:67:…:05:00 comprobada); copia en `C:\dev\builds\FINANVOZ\1.0.0-5\bundle\release\app-release.aab`.
-  El 4 queda superado.
-- **Maestro de iPhone en `dad15f2`**: pasan 02, 04, 05, 06, 07, 08 y 09. Fallan 01 («Debes»: el desplazamiento deja la
-  tarjeta arriba, fuera de pantalla) y 03 (`ajustes-terminos` está en pantalla y en el árbol, pero Maestro no lo da por
-  visible al final de la lista): fallos del flujo, no de la app (capturas revisadas).
-- **App Store Connect**: app creada el 22-10 (es-MX, SKU `FINANVOZ-IOS`); falta ficha, privacidad y revisión (§5–§7 de
-  `docs/tienda/IOS-APP-STORE.md`). Ficha de Play en `docs/tienda/play/`.
-- **Play**: no hay cuenta de servicio; subir a la prueba interna es a mano en la consola.
-- Secretos de firma de iOS y Android cargados en GitHub el 22-10 (nombres en `docs/tienda/`; los valores viven fuera
-  del repo). Flujos: `ios-testflight.yml`, `android-play.yml`.
+- **TestFlight 1.0.0 (14)** desde `dad15f2` (nivel 0 del 26-10 + tema claro + H1/H8/06): VALID e
+  `IN_BETA_TESTING` en el grupo interno «Equipo Finanvoz (interno)» (Adam es el único tester). La plática y B+ no
+  están en ninguna build.
+- **Play**: el AAB que se sube es el 1.0.0 (versionCode 5) desde `dad15f2`; copia en
+  `C:\dev\builds\FINANVOZ\1.0.0-5\bundle\release\app-release.aab`. No hay cuenta de servicio: subir es a mano.
+- **Maestro de iPhone**: con B+ (`12db214`) pasaban 01, 04, 05, 06, 09 y los no bloqueantes 07 y 08; 02 y 03 se
+  arreglaron en `0049d2a`/`28da864`. No he visto la corrida de CI de este push.
+- **App Store Connect**: app creada el 22-10; falta ficha, privacidad y revisión (`docs/tienda/IOS-APP-STORE.md`).
+- Secretos de firma en GitHub desde el 22-10 (nombres en `docs/tienda/`). Flujos de tiendas solo a mano
+  (`ios-testflight.yml`, `android-play.yml`, `workflow_dispatch`).
 
 ## Backend y puerta de IA
 
-- Backend propio en el Hetzner: `https://finanvoz-api.zynoratek.com` (Supabase mínimo; compose en
-  `/opt/finanvoz-backend`, plantilla en `services/proxy/deploy/`). La IA va por la puerta única
-  (`ANTHROPIC_BASE_URL=http://puerta-ia:8080`, token del proyecto en la carpeta local de secretos, nunca en el repo),
-  Haiku 5.5 en modo herramienta, `NLU_PROVEEDORES=anthropic` (sin alterno: el 2.º intento es con Claude).
-- Funciones al día con este turno (26-10). Para redesplegar: `bash services/proxy/scripts/desplegar-funciones.sh` y
-  después `node services/proxy/scripts/probar-backend.mjs`.
-- Evals de la nube: por la puerta con el token de `pruebas` (Haiku; nunca Opus de juez), `--concurrencia 2
-  --por-minuto 30`. Al 26-10 el proyecto `pruebas` lleva ~3.6 de 4 USD del mes (también lo usan otras apps).
+- Backend propio en el Hetzner: `https://finanvoz-api.zynoratek.com` (Supabase mínimo; `/opt/finanvoz-backend`).
+  La IA va por la puerta única (`http://puerta-ia:8080`, token del proyecto en la carpeta local de secretos), Haiku
+  5.5 en modo herramienta, `NLU_PROVEEDORES=anthropic`.
+- Funciones al día con este turno (28-10, `fea24e8`). Para redesplegar: `bash
+  services/proxy/scripts/desplegar-funciones.sh` y después `node services/proxy/scripts/probar-backend.mjs`.
+- **Compatibilidad**: la app nueva manda `anterior`; el proxy ya lo acepta. Las builds viejas no lo mandan y siguen
+  igual, salvo que si la nube contesta `proximo_ingreso` o `desglose_hoy` el teléfono viejo lo rechaza («No
+  entendí»): solo para «¿cuándo me pagan?» y parecidas, que antes tampoco entendía bien.
+- Evals de la nube: por la puerta con el token de `pruebas` (Haiku), `--concurrencia 2 --por-minuto 30`, y
+  `ANTHROPIC_BASE_URL=https://ia.zynoratek.com` en el comando (el shell trae otro y da 401). Al 28-10 `pruebas` lleva
+  ~3.80 de 4 USD (compartido); se renueva el 1-nov. Medir solo con `--solo` o `--solo-seguimientos`.
 - Respaldo en la nube apagado hasta tener SMTP; sin respaldos de la base (decisión de Adam).
 
 ## Norte de producto (Adam, voz)
@@ -123,18 +90,22 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 ## A medias — CUIDADO
 
-- **El nivel 0 nuevo no está en ninguna build**: hace falta otra de TestFlight y otro AAB para probarlo en teléfono.
-- **Ola 7 y la UI de Cursor sin probar en teléfono**: asistente, voz y onboarding por voz solo se han visto en jest y
-  en el simulador de CI.
-- **Maestro de iPhone nunca ha estado en verde**: pasan 02, 04, 05, 07, 08 y 09; 01 y 03 fallan por tiempos.
+- **La plática no está en ninguna build** ni probada en teléfono (pendiente 153): hace falta TestFlight y AAB nuevos.
+  Solo está probada en vitest, jest y los evals.
+- **B+ y el nivel 0 del 26-10 tampoco están en ninguna build.**
+- **Ola 7 y la UI de Cursor sin probar en teléfono**: asistente, voz y onboarding por voz solo en jest y en el
+  simulador de CI.
+- `fixtures/nlu/grabaciones/` siguen siendo las del prompt del 26-10 (`--offline` reproduce esas); no se regrabaron
+  para no gastar 0.05 USD más del cupo de `pruebas`.
 - M0, dominio `finanvoz.com` y aviso revisado por abogado: Adam (bloquean ficha pública y prueba externa).
 - Respaldar las llaves de Android fuera de la PC.
 
 ## Siguiente
 
-1. Nueva build (TestFlight y AAB) con el nivel 0 nuevo y probar en teléfono frases como «unas chelas, 340 en
-   efectivo», «le pasé 200 a mi jefa», «croquetas para el perro 640 con la oro» sin internet.
-2. Adam prueba la build de `fce19b9` (tema claro, H1, H8, H10).
+1. Nueva build (TestFlight y AAB, a mano) con B+ y la plática, y probar en teléfono: «¿cuánto gasté en comida esta
+   semana?» → «¿y la semana pasada?»; «coca 25» → «no, en efectivo» → «otra igual»; «¿me alcanza para unos tenis de
+   1,200?» → «¿y a 6 meses?» → «ya los compré»; «¿cuándo me pagan?»; «no entendí»; y sin internet.
+2. Pendientes 154 (lo que debes a personas) y 155 (seguimientos que todavía van a la nube).
 3. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): propuestas 2–6 esperan su visto bueno.
 
 ## No tocar
@@ -143,6 +114,7 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 - `LEYENDA_ESTIMACION` (`08 §1`) literal; `packages/core` E*; vectores a mano.
 - `PreviaWidget` / `widget.test` salvo pedido explícito.
 - Emitir facturas, declaraciones u open banking con la clave del banco sin cambio de spec y legal.
+- No subir el tope de `pruebas` en la puerta: lo decide Adam.
 - Credenciales fuera del repo (solo los scripts de Adam las leen); este archivo es público: sin correos, llaves ni
   enlaces privados.
 

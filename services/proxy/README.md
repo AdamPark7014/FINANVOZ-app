@@ -203,6 +203,9 @@ más de caché) y, en el turno del usuario, el turno anterior y la semana pasada
   calculada en el turno del usuario. Por eso el 85/85 puede ser optimista: el golden ya guió esos ajustes.
 - «Quítale 10» lo resuelve el nivel 0 (la cuenta la hace el teléfono, regla 4); si llega a la nube, pregunta el total.
 - Gasto de toda la medición: ~0.20 USD del proyecto `pruebas` (cota superior; `GET /uso` de 3.598 a 3.797 USD).
+- Desplegado el 28-10 con `scripts/desplegar-funciones.sh` (desde `fea24e8`); `probar-backend.mjs`: 31/31,
+  `nlu-interpretar` 200 en 1,228 ms con el prompt nuevo (17,809 tokens de entrada). La prueba de humo no manda
+  `anterior`: el contrato con turno anterior está probado en `contrato-cliente.test.ts`, no con una llamada real.
 
 ## M7 · `webhooks-revenuecat` (`POST /webhooks/revenuecat`)
 
