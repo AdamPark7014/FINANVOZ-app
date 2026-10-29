@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Centavos } from '@cartera/core';
+import type { Interpretacion, TurnoAnterior } from '@cartera/nlu';
 import { respuestaCharla } from '../../asistente/charla';
 import { chipsIntencion, unirPrefijo, type ChipIntencion } from '../../asistente/chips';
 import { useConfirmacionPorVoz } from '../../asistente/confirmacion-voz';
@@ -9,6 +10,7 @@ import {
   idTurnoRegistro,
   preguntaAbierta,
   respuestaDeTexto,
+  ultimaRespuesta,
   useConversacion,
   type TurnoConversacion,
 } from '../../asistente/conversacion';
@@ -242,6 +244,8 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
     turnosRef.current = turnos;
   }, [turnos]);
 
+  /** El último turno entendido de esta sesión (`06 §15`); no se guarda: al relanzar la app la plática empieza de cero. */
+  const anteriorRef = useRef<TurnoAnterior | null>(null);
   /** Solo para la analítica (`03 §8`): cuándo empezó, qué nivel respondió y si hubo que preguntar. */
   const medicion = useRef<{ inicio: number; nivel: 'reglas' | 'nube'; pregunto: boolean } | null>(null);
   const enRevision = useRef<string | null>(o.fraseRevision ?? null);
@@ -472,17 +476,26 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
         }
       }
       setTexto('');
+      const previa = ultimaRespuesta(turnosRef.current);
       agregar({ id: nuevoId('persona'), de: 'persona', texto: limpio, porVoz });
       medicion.current = { inicio: Date.now(), nivel: 'reglas', pregunto: false };
+      // El turno anterior (lo dicho y lo entendido) da sentido a «¿y la semana pasada?» o «no, en efectivo» (06 §15);
+      // lo que se entienda ahora será el anterior de la siguiente frase.
+      const conversacion = {
+        anterior: anteriorRef.current,
+        alInterpretar: (i: Interpretacion) => {
+          anteriorRef.current = { frase: limpio, interpretacion: i };
+        },
+      };
       let local: ResultadoTexto | null;
       try {
-        local = registrarTextoLocal(ctx, limpio, origen);
+        local = registrarTextoLocal(ctx, limpio, origen, conversacion);
       } catch (e) {
         agregar({ id: nuevoId('texto'), de: 'asistente', clase: 'texto', texto: mensajeError(e) });
         return;
       }
-      // «Hola», «gracias», «¿qué puedes hacer?»: charla corta en el teléfono, sin intérprete ni nube.
-      const charla = local === null ? respuestaCharla(limpio) : null;
+      // «Hola», «gracias», «¿qué puedes hacer?», «¿mande?»: charla corta en el teléfono, sin intérprete ni nube.
+      const charla = local === null ? respuestaCharla(limpio, previa) : null;
       if (charla) {
         const turno: Turno = { id: nuevoId('texto'), de: 'asistente', clase: 'texto', texto: charla };
         agregar(turno);
@@ -492,6 +505,19 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
       // «¿Puedo gastar 500 en unos tenis?» se contesta en el teléfono (cero tokens) si el nivel 0 no la tomó.
       const puedo = local === null || local.resultado === 'no_entendi' ? leerPuedoGastar(limpio) : null;
       if (puedo) {
+        // Es una simulación: «¿y a 6 meses?» o «¿y si espero a la quincena?» la siguen.
+        if (puedo.precio !== null) {
+          anteriorRef.current = {
+            frase: limpio,
+            interpretacion: {
+              intencion: 'simular',
+              compra: {
+                precio: puedo.precio,
+                ...(puedo.descripcion ? { descripcion: puedo.descripcion } : {}),
+              },
+            },
+          };
+        }
         const turnos = turnosPuedoGastar(ctx, puedo, acciones(origen, limpio));
         agregar(...turnos);
         const primero = turnos[0];
@@ -504,7 +530,7 @@ export function useAsistente(o: OpcionesAsistente): Asistente {
       }
       medicion.current.nivel = 'nube';
       setInterpretando(true);
-      registrarTexto(ctx, limpio, origen, { nube })
+      registrarTexto(ctx, limpio, origen, { nube, ...conversacion })
         .then((r) => mostrar(r, origen, limpio))
         .catch((e: unknown) =>
           agregar({ id: nuevoId('texto'), de: 'asistente', clase: 'texto', texto: mensajeError(e) }),

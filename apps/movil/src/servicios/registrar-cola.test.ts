@@ -16,7 +16,8 @@ const HOY = '2026-10-11';
 const RECHAZADA = 'una frase que el proxy rechaza';
 // Con cifra: sin ella el nivel 0 ya pregunta el monto sin la nube (reglas/sin-nube.ts).
 const PAN = 'compré el pan de siempre en efectivo por 35';
-const BORRA_CINE = 'borra lo del cine';
+// Una anulación que solo entiende la nube: «borra lo del cine» ya la aplica el nivel 0 en el teléfono (06 §15).
+const BORRA_CINE = 'borra lo que puse del cine';
 
 function conCuenta() {
   const p = abrirPrueba(HOY);

@@ -460,7 +460,8 @@ describe('cola "por interpretar"', () => {
     expect(await revisarPorInterpretar(p.ctx, correccion?.id as string, p.nube)).toMatchObject({
       resultado: 'corregido',
     });
-    expect(p.recibidas[3]?.contexto.fecha_referencia).toBe(HOY);
+    // Ya sin frases esperando, la corrección la entiende el nivel 0 en el teléfono (06 §15): no va a la nube.
+    expect(p.recibidas).toHaveLength(3);
     expect(p.ctx.libro.saldo(p.nu)).toBe(-200_000);
     expect(p.ctx.libro.saldo(p.efectivo)).toBe(64_000 - 2_500 - 8_000);
     expect(listarPorInterpretar(p.ctx)).toEqual([]);

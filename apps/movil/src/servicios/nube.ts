@@ -50,18 +50,32 @@ export function contextoNube(ctx: Contexto, fecha: PlainDate): ContextoInterpret
     const tipo = TIPO_CONTEXTO[c.subtipo];
     if (tipo) cuentas.push({ tipo, nombre: c.nombre, alias: c.alias, espacio: 'personal' });
   }
-  const ingreso = ingresoPrincipal(ctx);
-  const recibidos = ingreso
-    ? listarOcurrencias(ctx, { programadoId: ingreso.id })
-        .map((o) => o.fecha)
-        .filter((f) => f <= fecha)
-    : [];
+  const { ultimoIngreso, proximoIngreso } = fechasDelIngreso(ctx, fecha);
   return contextoMinimo({
     hoy: fecha,
     espacios: ['personal'],
     cuentas,
     contactos: contactosInterprete(ctx),
-    ultimoIngreso: recibidos[recibidos.length - 1] ?? null,
-    proximoIngreso: ingreso ? proximoPago(ingreso.regla, fecha) : null,
+    ultimoIngreso,
+    proximoIngreso,
   });
+}
+
+/**
+ * El último ingreso que ya llegó y el próximo, a la fecha de la frase (`06 §4`): «esta quincena», «la quincena» y
+ * «hasta la quincena» en el nivel 0 y en la nube. Sin ingreso configurado, `null`.
+ */
+export function fechasDelIngreso(
+  ctx: Contexto,
+  fecha: PlainDate,
+): { ultimoIngreso: PlainDate | null; proximoIngreso: PlainDate | null } {
+  const ingreso = ingresoPrincipal(ctx);
+  if (!ingreso) return { ultimoIngreso: null, proximoIngreso: null };
+  const recibidos = listarOcurrencias(ctx, { programadoId: ingreso.id })
+    .map((o) => o.fecha)
+    .filter((f) => f <= fecha);
+  return {
+    ultimoIngreso: recibidos[recibidos.length - 1] ?? null,
+    proximoIngreso: proximoPago(ingreso.regla, fecha),
+  };
 }

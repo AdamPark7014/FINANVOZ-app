@@ -54,9 +54,9 @@ describe('consultas tipadas sobre la semilla e4-01 (CA-M7-03)', () => {
       if (r.resultado !== 'consulta') throw new Error(r.resultado);
       expect(r.respuesta.plantilla).toBe(ESPERADO[id].plantilla);
       expect(r.respuesta.texto).toBe(ESPERADO[id].texto);
-      // Desde el nivel 0 ampliado (06 §9) las consultas tipadas se resuelven sin nube, salvo Q11 («esta
-      // quincena» depende del periodo de ingreso: sigue en la nube, 06 §9.3).
-      expect(f.recibidas).toHaveLength(id === 'Q11' ? 1 : 0);
+      // Desde el nivel 0 ampliado (06 §9) las consultas tipadas se resuelven sin nube; Q11 («esta quincena») también
+      // desde el 28-10-2026: el nivel 0 de la app ya recibe las fechas del ingreso.
+      expect(f.recibidas).toHaveLength(0);
       // Nada se escribió en el libro.
       expect(listarMovimientos(p.ctx)).toEqual([]);
     });
@@ -91,6 +91,33 @@ describe('consultas tipadas sobre la semilla e4-01 (CA-M7-03)', () => {
     if (q04.resultado !== 'consulta') throw new Error(q04.resultado);
     expect(q04.respuesta).toMatchObject({ plantilla: 'saldo', soloPlus: true, lineas: [], filtro: {} });
     expect(q04.respuesta.texto).not.toMatch(/\$/);
+  });
+
+  it('en Gratis, cuándo me pagan y por qué tengo tan poco responden: ya se ven en Hoy (28-10-2026)', async () => {
+    const p = semilla({ plus: false });
+    const cuando = await registrarTexto(p.ctx, '¿cuándo me pagan?', 'voz');
+    if (cuando.resultado !== 'consulta') throw new Error(cuando.resultado);
+    expect(cuando.respuesta).toMatchObject({
+      plantilla: 'proximo_ingreso',
+      texto: 'Tu quincena llega el jue 15 oct, en 4 días.',
+    });
+    expect(cuando.respuesta.soloPlus).toBeUndefined();
+    const porQue = await registrarTexto(p.ctx, '¿por qué tengo tan poco hoy?', 'voz');
+    if (porQue.resultado !== 'consulta') throw new Error(porQue.resultado);
+    expect(porQue.respuesta.plantilla).toBe('desglose_hoy');
+    expect(porQue.respuesta.soloPlus).toBeUndefined();
+    // Las cifras son las de E4 que muestra Hoy: lo que tienes, lo apartado, el colchón y lo libre.
+    const hoy = responderConsulta(p.ctx, { tipo: 'hoy_puedes' }).texto;
+    expect(hoy).toContain('$214');
+    expect(porQue.respuesta.texto).toMatch(
+      /^Tienes \$[\d,]+\. Aparto \$[\d,]+ para lo que viene antes de tu quincena( y \$[\d,]+ de colchón)?: te quedan \$[\d,]+ libres\. Repartido en 4 días, hoy puedes gastar \$214\.$/,
+    );
+    expect(porQue.respuesta.lineas.map((l) => l.etiqueta)).toEqual([
+      'Tienes',
+      'Apartado',
+      'Colchón',
+      'Libre',
+    ]);
   });
 });
 
@@ -194,6 +221,10 @@ describe('consultas con gastos registrados', () => {
     });
     expect(responderConsulta(p.ctx, { tipo: 'hoy_puedes' }).texto).toMatch(
       /^Hoy: \$0\. Te faltan \$[\d,]+ para cubrir lo que viene antes de tu quincena\.$/,
+    );
+    // El desglose dice por qué es $0, con el mismo faltante de E4.
+    expect(responderConsulta(p.ctx, { tipo: 'desglose_hoy' }).texto).toMatch(
+      /^Tienes \$[\d,]+\. Aparto .+: te faltan \$[\d,]+\. Por eso hoy es \$0\.$/,
     );
     expect(() => responderConsulta(p.ctx, { tipo: 'deducciones' })).toThrow(
       expect.objectContaining({ codigo: 'consulta_no_soportada' }),

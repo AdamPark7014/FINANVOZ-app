@@ -159,7 +159,9 @@ describe('Registrar con la nube', () => {
     await act(async () => {
       fireEvent.press(screen.getByTestId('pregunta-chip-$2.50'));
     });
-    expect(fraseRegistro()).toBe(oida('Registré Chicle $2.50 · Otros gastos · Cartera.'));
+    // Desde el 28-10-2026 la opción elegida la lee el nivel 0 con la frase de antes (06 §15): «gasté 2.50 en un
+    // chicle», sin volver a la nube.
+    expect(fraseRegistro()).toBe(oida('Registré Chicle $2.50 · Antojos · por asignar.'));
     // B+ (D3): la tarjeta lo dice como «Tu día $214 → $213»; el lector oye la frase.
     expect(screen.getByTestId('aviso-cambio')).toHaveProp(
       'accessibilityLabel',

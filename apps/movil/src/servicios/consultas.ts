@@ -49,8 +49,20 @@ export const PLANTILLAS_CONSULTA = [
   'comparar_periodos',
   'mayores_gastos',
   'suscripciones',
+  'proximo_ingreso',
+  'desglose_hoy',
 ] as const;
 export type PlantillaConsulta = (typeof PLANTILLAS_CONSULTA)[number];
+
+/**
+ * Consultas de Gratis (`01 §11`): «hoy puedes» y lo que ya se ve en Hoy sin Plus, cuándo llega tu ingreso y «Cómo lo
+ * calculé» (28-10-2026). Las demás son de Plus.
+ */
+export const CONSULTAS_GRATIS: ReadonlySet<Consulta['tipo']> = new Set([
+  'hoy_puedes',
+  'proximo_ingreso',
+  'desglose_hoy',
+]);
 
 export function tienePlantilla(tipo: Consulta['tipo']): tipo is PlantillaConsulta {
   return (PLANTILLAS_CONSULTA as readonly string[]).includes(tipo);
@@ -256,6 +268,63 @@ function hoyPuedes(ctx: Contexto): RespuestaConsulta {
         texto: `Hoy puedes gastar $${miles(v.hoyPuedesPesos)}.${v.mensaje ? ` ${v.mensaje}` : ''}`,
       };
   }
+}
+
+/** «¿Cuándo me pagan?»: la fecha del próximo ingreso que ya usa Hoy (E3.3). */
+function proximoIngreso(ctx: Contexto): RespuestaConsulta {
+  const v = obtenerHoy(ctx);
+  const base = { plantilla: 'proximo_ingreso' as const, lineas: [], filtro: {} };
+  const p = v.proximoIngreso;
+  if (v.estado === 'sin_ingreso' || !p) {
+    return {
+      ...base,
+      texto: 'Todavía no sé cada cuándo te pagan. Dímelo, por ejemplo «me pagan 8 mil cada quincena».',
+    };
+  }
+  const dias = diferenciaDias(v.hoy, p.fecha);
+  const cuando = dias <= 0 ? 'hoy' : dias === 1 ? 'mañana' : `el ${fechaCorta(p.fecha)}, en ${dias} días`;
+  const llega = dias < 0 ? `Tu ${p.concepto} del ${fechaCorta(p.fecha)} todavía no llega.` : null;
+  return { ...base, texto: llega ?? `Tu ${p.concepto} llega ${cuando}.` };
+}
+
+/**
+ * «¿Por qué tengo tan poco hoy?»: el desglose de E4 que ya muestra «Cómo lo calculé» (Gratis), en una frase. Las
+ * cifras salen de `obtenerHoy` (regla 4): lo que tienes, lo apartado, el colchón, lo libre y los días.
+ */
+function desgloseHoy(ctx: Contexto): RespuestaConsulta {
+  const v = obtenerHoy(ctx);
+  const base = { plantilla: 'desglose_hoy' as const, filtro: {} };
+  if (v.estado === 'sin_ingreso') {
+    return { ...base, lineas: [], texto: 'Dime cada cuándo te pagan y te digo cuánto puedes gastar hoy.' };
+  }
+  const lineas = [
+    { etiqueta: 'Tienes', valor: pesos(v.liquidez) },
+    { etiqueta: 'Apartado', valor: pesos(v.reservado) },
+    { etiqueta: 'Colchón', valor: pesos(v.colchon) },
+    { etiqueta: 'Libre', valor: pesos(Math.max(0, v.libre)) },
+  ];
+  const tu = v.proximoIngreso ? ` antes de tu ${v.proximoIngreso.concepto}` : '';
+  const aparto = [
+    ...(v.reservado > 0 ? [`${pesos(v.reservado)} para lo que viene${tu}`] : []),
+    ...(v.colchon > 0 ? [`${pesos(v.colchon)} de colchón`] : []),
+  ];
+  const tienes = `Tienes ${pesos(v.liquidez)}.`;
+  if (v.estado === 'libre_negativo' || v.libre < 0) {
+    const piden = aparto.length > 0 ? ` Aparto ${aparto.join(' y ')}` : '';
+    return {
+      ...base,
+      lineas,
+      texto: `${tienes}${piden}: te faltan ${pesos(v.faltante)}. Por eso hoy es $0.`,
+    };
+  }
+  const reparto =
+    v.dias > 1
+      ? `Repartido en ${v.dias} días, hoy puedes gastar $${miles(v.hoyPuedesPesos)}.`
+      : `Hoy puedes gastar $${miles(v.hoyPuedesPesos)}.`;
+  const libres = `te quedan ${pesos(v.libre)} libres`;
+  const medio =
+    aparto.length > 0 ? ` Aparto ${aparto.join(' y ')}: ${libres}.` : ` Todo está libre: ${libres}.`;
+  return { ...base, lineas, texto: `${tienes}${medio} ${reparto}` };
 }
 
 function gastoTotal(ctx: Contexto, c: Consulta): RespuestaConsulta {
@@ -491,5 +560,9 @@ export function responderConsulta(ctx: Contexto, c: Consulta): RespuestaConsulta
     case 'suscripciones':
       // Q12 (E14): la lista de Cuentas → Suscripciones (`02 §20`).
       return { plantilla: 'suscripciones', ...resumenParaConsulta(ctx), filtro: {} };
+    case 'proximo_ingreso':
+      return proximoIngreso(ctx);
+    case 'desglose_hoy':
+      return desgloseHoy(ctx);
   }
 }

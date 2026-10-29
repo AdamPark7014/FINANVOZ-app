@@ -666,6 +666,8 @@ describe('meAlcanza sobre el libro', () => {
       },
     });
     const r = await registrarTexto(p.ctx, frase, 'voz', { nube: nube.nube });
+    // El nivel 0 la entiende en el teléfono (sin nube) desde el 28-10-2026, con el artículo («unos tenis»).
+    expect(nube.recibidas).toHaveLength(0);
     expect(r).toEqual({
       resultado: 'me_alcanza',
       consulta: { precio: 150_000, descripcion: 'unos tenis', meses: 3 },

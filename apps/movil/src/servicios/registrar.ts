@@ -8,6 +8,7 @@ import {
 } from '@cartera/core';
 import { CUENTAS_SISTEMA } from '@cartera/datos';
 import {
+  anteriorParaNube,
   interpretarReglas,
   normalizarAlias,
   type Ajuste,
@@ -21,6 +22,7 @@ import {
   type RefCuenta,
   type ResultadoNube,
   type ResultadoResolutor,
+  type TurnoAnterior,
 } from '@cartera/nlu';
 /** Escritura bloqueada en solo lectura vía `exigirConsentimiento` (captura, arqueo y demás servicios igual). */
 import { exigirConsentimiento } from '../privacidad/consentimiento';
@@ -30,7 +32,13 @@ import { cuentaPorId, cuentasPropias, idCategoriaDe, type CuentaPropia } from '.
 import { enTransaccion, type Contexto } from './contexto';
 import type { CoberturaAutomatica } from './cobertura';
 import { gruposAbiertosConNombre } from './compartido';
-import { respuestaSoloPlus, responderConsulta, tienePlantilla, type RespuestaConsulta } from './consultas';
+import {
+  CONSULTAS_GRATIS,
+  respuestaSoloPlus,
+  responderConsulta,
+  tienePlantilla,
+  type RespuestaConsulta,
+} from './consultas';
 import { funcionesPlan } from './plan';
 import { configurarCicloPorVoz, type TarjetaEditada, type TarjetaPorAgregar } from './config-tarjetas';
 import {
@@ -62,7 +70,7 @@ import {
 import type { ConsultaMeAlcanza } from './me-alcanza';
 import type { MovimientoVista } from './movimientos';
 import { esSaludEnEfectivo } from './deducciones';
-import { contextoNube, type NivelNube } from './nube';
+import { contextoNube, fechasDelIngreso, type NivelNube } from './nube';
 import { configurarIngreso, proximoPago } from './onboarding';
 import { contactosInterprete } from './personas';
 import { borrarAjuste, escribirAjuste, leerAjuste, listarAjustes } from './preferencias';
@@ -383,6 +391,12 @@ const AUTOMATICOS = new Set<ResultadoTexto['resultado']>([
 
 /** La cola no las aplica sola: cambian lo ya registrado y la persona tiene que verlo, con Deshacer (`06 §7`). */
 const SOLO_CON_LA_PERSONA = new Set<Interpretacion['intencion']>(['anular', 'corregir']);
+/** Intenciones que tocan movimientos ya registrados (el nivel 0 las aplica solo si la cola está vacía). */
+const CAMBIAN_LO_REGISTRADO = new Set<Interpretacion['intencion']>([
+  'anular',
+  'corregir',
+  'revisar_duplicados',
+]);
 
 /** Texto máximo de `POST /nlu/interpretar` (`TEXTO_MAXIMO_NUBE` de `@cartera/nlu`): más largo es un 400. */
 const TEXTO_MAXIMO_NUBE = 500;
@@ -418,11 +432,15 @@ export function contextoInterprete(
   cuentas: readonly CuentaResolutor[] = cuentasResolutor(ctx),
   fecha: PlainDate = ctx.reloj.hoy(),
 ): ContextoInterprete {
+  // Las fechas del ingreso dan «esta quincena», «hasta la quincena» y «¿y si espero a la quincena?» sin nube.
+  const { ultimoIngreso, proximoIngreso } = fechasDelIngreso(ctx, fecha);
   return {
     fecha_referencia: fecha,
     espacios: ['personal'],
     cuentas: cuentas.map((c) => ({ tipo: c.tipo, alias: c.alias, espacio: 'personal' })),
     contactos: contactosInterprete(ctx),
+    ...(ultimoIngreso ? { ultimo_ingreso: ultimoIngreso } : {}),
+    ...(proximoIngreso ? { proximo_ingreso: proximoIngreso } : {}),
   };
 }
 
@@ -589,6 +607,8 @@ interface Frase {
   readonly fecha: PlainDate;
   /** Id en "por interpretar": hace idempotente el registro al procesar la cola. */
   readonly fraseId?: string;
+  /** El turno anterior de la conversación (`06 §15`): solo desde el asistente, nunca en la cola. */
+  readonly anterior?: TurnoAnterior;
 }
 
 function registrarInterpretado(
@@ -1234,8 +1254,8 @@ function aplicarInterpretacion(
         return { resultado: 'explicar', pregunta: i.consulta.pregunta ?? frase.texto };
       }
       if (!tienePlantilla(i.consulta.tipo)) return { resultado: 'no_soportado', motivo: 'consulta' };
-      // "Hoy puedes" es de Gratis; las demás consultas, de Plus (`01 §11`).
-      if (i.consulta.tipo !== 'hoy_puedes' && !funcionesPlan(ctx).consultas)
+      // "Hoy puedes", cuándo llega el ingreso y su desglose son de Gratis; las demás consultas, de Plus (`01 §11`).
+      if (!CONSULTAS_GRATIS.has(i.consulta.tipo) && !funcionesPlan(ctx).consultas)
         return { resultado: 'consulta', respuesta: respuestaSoloPlus(i.consulta.tipo) };
       return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
     case 'aclarar':
@@ -1267,32 +1287,36 @@ function aplicarInterpretacion(
   }
 }
 
-/** Nivel 0: solo lo que el teléfono ya sabe hacer sin la nube; `null` si hay que preguntarle a la nube. */
-function nivelCero(ctx: Contexto, cuentas: readonly CuentaResolutor[], frase: Frase): ResultadoTexto | null {
-  const i = interpretarReglas(frase.texto, contextoInterprete(ctx, cuentas, frase.fecha));
-  // Lo que el nivel 0 contesta sin registrar nada (`reglas/sin-nube.ts`): preguntas obvias, fuera de alcance y
-  // «¿por qué…?» (explicar revisa Plus en la pantalla). Igual que si lo hubiera dicho la nube, sin pagarla.
-  if (
-    i?.intencion === 'aclarar' ||
-    i?.intencion === 'fuera_de_alcance' ||
-    (i?.intencion === 'consultar' && i.consulta.tipo === 'explicar')
-  ) {
-    return aplicarInterpretacion(ctx, i, cuentas, frase);
-  }
-  if (i?.intencion === 'consultar' && tienePlantilla(i.consulta.tipo)) {
-    // La misma puerta que la nube (`aplicarInterpretacion`): "Hoy puedes" es de Gratis; las demás consultas, de
-    // Plus (`01 §11`). Sin esto, el nivel 0 ampliado regalaría las consultas de Plus.
-    if (i.consulta.tipo !== 'hoy_puedes' && !funcionesPlan(ctx).consultas) {
-      return { resultado: 'consulta', respuesta: respuestaSoloPlus(i.consulta.tipo) };
-    }
-    return { resultado: 'consulta', respuesta: responderConsulta(ctx, i.consulta) };
-  }
-  if (i?.intencion === 'arqueo') return { resultado: 'arqueo', efectivoReal: i.efectivo_real };
-  if (i?.intencion === 'gasto_compartido') return proponerGastoCompartido(ctx, i.gasto);
-  // Ingreso y saldo piden "Guardar"; colchón, ciclo de tarjeta y compromisos se aplican con "Deshacer" (K01–K08).
-  if (i?.intencion === 'configurar') return aplicarAjuste(ctx, i.ajuste, cuentas, frase);
-  if (i?.intencion !== 'registrar') return null;
-  return registrarInterpretado(ctx, i.movimientos, cuentas, frase);
+/**
+ * Nivel 0: lo que el teléfono entiende sin la nube, aplicado igual que si lo hubiera dicho la nube
+ * (`aplicarInterpretacion`): registros, correcciones, consultas (con la misma puerta de Plus), simulaciones, ajustes
+ * y lo que se contesta sin registrar (aclarar, fuera de alcance, «¿por qué…?»). `null` si hay que preguntarle a la
+ * nube. Con el turno anterior en el contexto entiende seguimientos («¿y ayer?», «no, en efectivo», `06 §15`).
+ */
+function nivelCero(
+  ctx: Contexto,
+  cuentas: readonly CuentaResolutor[],
+  frase: Frase,
+  alInterpretar?: (i: Interpretacion) => void,
+): ResultadoTexto | null {
+  const contexto = contextoInterprete(ctx, cuentas, frase.fecha);
+  const i = interpretarReglas(
+    frase.texto,
+    frase.anterior ? { ...contexto, anterior: frase.anterior } : contexto,
+  );
+  if (!i) return null;
+  // Cambiar lo ya registrado respeta el orden de lo dicho: con frases esperando internet, la corrección o la
+  // anulación espera su turno en la cola (podría tocar un movimiento que todavía no se registra).
+  if (CAMBIAN_LO_REGISTRADO.has(i.intencion) && contarEsperandoConexion(ctx) > 0) return null;
+  // Las consultas que todavía no tienen plantilla (las del negocio) siguen a la nube, como antes.
+  if (i.intencion === 'consultar' && i.consulta.tipo !== 'explicar' && !tienePlantilla(i.consulta.tipo))
+    return null;
+  const r =
+    i.intencion === 'registrar'
+      ? registrarInterpretado(ctx, i.movimientos, cuentas, frase)
+      : aplicarInterpretacion(ctx, i, cuentas, frase);
+  if (r) alInterpretar?.(i);
+  return r;
 }
 
 /**
@@ -1303,12 +1327,26 @@ export function registrarTextoLocal(
   ctx: Contexto,
   texto: string,
   origen: OrigenDictado = 'texto',
+  opciones: OpcionesConversacion = {},
 ): ResultadoTexto | null {
   exigirConsentimiento(ctx);
-  return nivelCero(ctx, cuentasResolutor(ctx), { texto, origen, fecha: ctx.reloj.hoy() });
+  return nivelCero(
+    ctx,
+    cuentasResolutor(ctx),
+    { texto, origen, fecha: ctx.reloj.hoy(), ...(opciones.anterior ? { anterior: opciones.anterior } : {}) },
+    opciones.alInterpretar,
+  );
 }
 
-export interface OpcionesTexto {
+/** La conversación del asistente (`06 §15`): el turno anterior y quién se entera de lo que se entendió. */
+export interface OpcionesConversacion {
+  /** Lo que se dijo antes y cómo se entendió; viaja al nivel 0 y a la nube (sin cifras de respuestas). */
+  readonly anterior?: TurnoAnterior | null;
+  /** Lo que se entendió de esta frase (nivel 0 o nube), para guardarlo como turno anterior del siguiente. */
+  readonly alInterpretar?: (i: Interpretacion) => void;
+}
+
+export interface OpcionesTexto extends OpcionesConversacion {
   /** Nivel 2; `null` o ausente: sin nube (todo lo que no cubre el nivel 0 queda "por interpretar"). */
   readonly nube?: NivelNube | null;
 }
@@ -1325,11 +1363,17 @@ export async function registrarTexto(
   opciones: OpcionesTexto = {},
 ): Promise<ResultadoTexto> {
   exigirConsentimiento(ctx);
-  const frase: Frase = { texto, origen, fecha: ctx.reloj.hoy() };
+  const frase: Frase = {
+    texto,
+    origen,
+    fecha: ctx.reloj.hoy(),
+    ...(opciones.anterior ? { anterior: opciones.anterior } : {}),
+  };
   const cuentas = cuentasResolutor(ctx);
-  const local = nivelCero(ctx, cuentas, frase);
+  const local = nivelCero(ctx, cuentas, frase, opciones.alInterpretar);
   if (local) return local;
   const r = await interpretarEnNube(ctx, frase, opciones.nube ?? null);
+  if (r.tipo === 'ok') opciones.alInterpretar?.(r.interpretacion);
   if (r.tipo !== 'ok') {
     if (r.tipo === 'invalida') return noEntendi(r);
     return {
@@ -1374,7 +1418,10 @@ async function interpretarEnNube(
   } catch {
     return { tipo: 'sin_red' };
   }
-  const r = await nube.cliente.interpretar(frase.texto, contextoNube(ctx, frase.fecha));
+  const contexto = contextoNube(ctx, frase.fecha);
+  // El turno anterior viaja solo si cabe en el contrato; si no, la frase va sola, como antes.
+  const anterior = anteriorParaNube(frase.anterior);
+  const r = await nube.cliente.interpretar(frase.texto, anterior ? { ...contexto, anterior } : contexto);
   switch (r.tipo) {
     case 'ok':
       return { tipo: 'ok', interpretacion: r.interpretacion };
