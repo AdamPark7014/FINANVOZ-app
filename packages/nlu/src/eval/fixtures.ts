@@ -77,6 +77,30 @@ export function cargarGoldenReparacion(): CasoReparacion[] {
   return leerJsonl<CasoReparacion>('fixtures/nlu/golden-reparacion.jsonl');
 }
 
+/**
+ * Un turno de `fixtures/nlu/golden-conversaciones.jsonl`: lo dicho y lo esperado. `esperado` es una
+ * `Interpretacion` o `{ charla: <tipo> }` (la app contesta sin intérprete). `reglas` = el nivel 0 debe entenderlo;
+ * `solo_reglas` = la cuenta la hace el teléfono (regla 4) y la nube no lo ve.
+ */
+export interface TurnoConversacion {
+  texto: string;
+  esperado: Record<string, unknown>;
+  reglas?: boolean;
+  solo_reglas?: boolean;
+  nota?: string;
+}
+
+/** Caso de `golden-conversaciones.jsonl`: varios turnos seguidos (docs/06-NLU.md §15). */
+export interface CasoConversacion {
+  id: string;
+  nota?: string;
+  turnos: TurnoConversacion[];
+}
+
+export function cargarGoldenConversaciones(): CasoConversacion[] {
+  return leerJsonl<CasoConversacion>('fixtures/nlu/golden-conversaciones.jsonl');
+}
+
 /** `fixtures/nlu/contexto-onboarding.json`: la persona en el onboarding, sin cuentas todavía. */
 export function cargarContextoOnboarding(): ContextoInterprete {
   const f = leerJson('fixtures/nlu/contexto-onboarding.json') as ContextoInterprete;

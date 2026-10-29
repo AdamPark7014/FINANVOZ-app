@@ -44,6 +44,11 @@ function compararValor(
   fallas: string[],
 ): void {
   if (IGNORADOS.has(campo)) return;
+  // `null` en el esperado: el campo no debe venir («¿y de contado?» quita los meses; «¿cuánto tengo?» no lleva alias).
+  if (esperado === null) {
+    if (obtenido !== undefined && obtenido !== null) fallas.push(ruta);
+    return;
+  }
   if (CAMPOS_CUENTA.has(campo)) {
     compararRefCuenta(esperado, obtenido, ruta, fallas);
     return;

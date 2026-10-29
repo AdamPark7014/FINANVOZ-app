@@ -17,6 +17,11 @@
  *                                                    contra golden-confirmacion.jsonl; umbral 100 % como --pasos
  *   --reparacion                                     opciones de «No entendí» con su frase reescrita contra
  *                                                    golden-reparacion.jsonl; umbral 100 % como --pasos
+ *   --conversaciones                                 turnos seguidos con el turno anterior en el contexto contra
+ *                                                    golden-conversaciones.jsonl (06 §15); umbral 100 % como --pasos
+ *   --nivel nube --conversaciones [--solo-seguimientos] [--sin-anterior] …
+ *       Los turnos de conversación por la nube (sin charla ni los que solo resuelve el teléfono). --sin-anterior
+ *       manda cada frase sola, como antes de que el contrato llevara el turno anterior.
  *
  * Salida: 0 si cumple los umbrales (o si --offline no encuentra grabaciones), 1 si no, 2 si el uso es incorrecto.
  */
@@ -39,6 +44,12 @@ import {
 import { Interpretacion } from '../src/esquema';
 import { evaluarReglas, type ResultadoCaso } from '../src/eval/evaluar';
 import { evaluarConfirmacion } from '../src/eval/evaluar-confirmacion';
+import {
+  anteriorDelTurno,
+  esCharla,
+  evaluarConversaciones,
+  type ReporteConversaciones,
+} from '../src/eval/evaluar-conversaciones';
 import { evaluarPasos } from '../src/eval/evaluar-pasos';
 import { evaluarReparacion } from '../src/eval/evaluar-reparacion';
 import {
@@ -46,6 +57,7 @@ import {
   cargarContextoOnboarding,
   cargarGolden,
   cargarGoldenConfirmacion,
+  cargarGoldenConversaciones,
   cargarGoldenPasos,
   cargarGoldenReparacion,
   type CasoGolden,
@@ -61,7 +73,7 @@ function opcion(argumentos: readonly string[], nombre: string): string | undefin
 const porcentaje = (a: number, b: number) => (b === 0 ? '—' : `${((a / b) * 100).toFixed(1)} %`);
 
 const USO =
-  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] [--concurrencia N] [--por-minuto N] [--solo-nube] [--solo G01,G02] [--permitir-caro] | --offline | --pasos | --confirmacion | --reparacion';
+  'Uso: pnpm eval:nlu --nivel reglas | --nivel nube --proveedor anthropic|openai|google [--modelo M] [--grabar] [--limite N] [--concurrencia N] [--por-minuto N] [--solo-nube] [--solo G01,G02] [--permitir-caro] [--conversaciones [--solo-seguimientos] [--sin-anterior]] | --offline | --pasos | --confirmacion | --reparacion | --conversaciones';
 
 interface ReporteCobertura {
   casos: ResultadoCaso[];
@@ -114,6 +126,37 @@ function reparacion(): number {
     reporte,
     'todos los casos',
   );
+}
+
+function conversaciones(): number {
+  const casos = cargarGoldenConversaciones();
+  const r: ReporteConversaciones = evaluarConversaciones(casos, cargarContexto().contexto);
+  const codigo = imprimirCobertura(
+    `Nivel 0 · conversaciones — ${casos.length} casos, ${r.turnos.length} turnos de golden-conversaciones`,
+    {
+      casos: r.turnos.map((t) => ({ ...t })),
+      marcados: r.marcados,
+      marcadosCubiertos: r.marcadosCubiertos,
+      respondidos: r.respondidos,
+      respondidosCorrectos: r.respondidosCorrectos,
+      aprobado: r.aprobado,
+    },
+    'reglas: true',
+  );
+  const parte = (nombre: string, filtro: (t: ReporteConversaciones['turnos'][number]) => boolean) => {
+    const turnos = r.turnos.filter(filtro);
+    const bien = turnos.filter((t) => t.correcto).length;
+    console.log(`  ${nombre.padEnd(22)} ${bien}/${turnos.length} (${porcentaje(bien, turnos.length)})`);
+  };
+  console.log('Turnos correctos en el teléfono:');
+  parte('primer turno', (t) => !t.seguimiento && !t.charla);
+  parte('seguimientos', (t) => t.seguimiento && !t.charla);
+  parte('charla', (t) => t.charla);
+  parte('todos', () => true);
+  console.log(
+    `Conversaciones completas: ${r.conversacionesCompletas}/${r.casos} (${porcentaje(r.conversacionesCompletas, r.casos)})`,
+  );
+  return codigo;
 }
 
 function nivelReglas(): number {
@@ -293,11 +336,43 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
     console.error('eval:nlu: fixtures/nlu/contexto.json no cumple el contrato de /nlu/interpretar');
     return 2;
   }
-  const filtrados = cargarGolden().filter(
+  const conversacion = argumentos.includes('--conversaciones');
+  const sinAnterior = argumentos.includes('--sin-anterior');
+  // Conversaciones: un caso por turno (`<caso>.<n>`) con su turno anterior; sin charla (la contesta la app) ni los
+  // que solo resuelve el teléfono (la cuenta de «quítale 10», regla 4).
+  const contextoDe = new Map<string, ContextoMinimo>();
+  const fuente: CasoGolden[] = conversacion
+    ? cargarGoldenConversaciones().flatMap((caso) =>
+        caso.turnos.flatMap((turno, i): CasoGolden[] => {
+          if (esCharla(turno.esperado) || turno.solo_reglas === true) return [];
+          if (argumentos.includes('--solo-seguimientos') && i === 0) return [];
+          const id = `${caso.id}.${i + 1}`;
+          const anterior = sinAnterior ? undefined : anteriorDelTurno(caso, i);
+          if (anterior) {
+            const conAnterior = validarSolicitud({
+              texto: turno.texto,
+              contexto_min: { ...contexto, anterior },
+              version_esquema: 1,
+            });
+            if (conAnterior === null) throw new Error(`eval:nlu: ${id}: el contrato no acepta el turno anterior`);
+            contextoDe.set(id, conAnterior.contexto_min);
+          }
+          return [
+            {
+              id,
+              texto: turno.texto,
+              esperado: turno.esperado,
+              ...(turno.reglas !== undefined ? { reglas: turno.reglas } : {}),
+            },
+          ];
+        }),
+      )
+    : cargarGolden();
+  const filtrados = fuente.filter(
     (c) => (!soloNube || c.reglas !== true) && (soloIds.size === 0 || soloIds.has(c.id)),
   );
   const casos = limite > 0 ? filtrados.slice(0, limite) : filtrados;
-  if ((soloNube || soloIds.size > 0) && grabar) {
+  if ((soloNube || soloIds.size > 0 || conversacion) && grabar) {
     console.error('eval:nlu: --grabar exige el golden set completo (sin --solo ni --solo-nube); no se escribió nada.');
     return 2;
   }
@@ -308,7 +383,7 @@ async function nivelNube(argumentos: readonly string[]): Promise<number> {
   const grabaciones = await enParalelo(
     casos,
     concurrencia,
-    (c) => llamar(c, solicitud.contexto_min),
+    (c) => llamar(c, contextoDe.get(c.id) ?? solicitud.contexto_min),
     porMinuto,
   );
 
@@ -349,7 +424,9 @@ async function main(argumentos: readonly string[]): Promise<number> {
   if (argumentos.includes('--pasos')) return lectoresPorPaso();
   if (argumentos.includes('--confirmacion')) return confirmacionPorVoz();
   if (argumentos.includes('--reparacion')) return reparacion();
+  if (argumentos.includes('--conversaciones') && !argumentos.includes('--nivel')) return conversaciones();
   const nivel = opcion(argumentos, '--nivel');
+  if (nivel === 'reglas' && argumentos.includes('--conversaciones')) return conversaciones();
   if (nivel === 'reglas') return nivelReglas();
   if (nivel === 'nube') return nivelNube(argumentos);
   console.error(USO);

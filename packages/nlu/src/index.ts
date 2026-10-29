@@ -1,5 +1,5 @@
 export * from './esquema';
-export type { ContextoInterprete, CuentaContexto } from './contexto';
+export type { ContextoInterprete, CuentaContexto, TurnoAnterior } from './contexto';
 export { normalizarAlias } from './normalizar';
 export {
   resolverCuenta,
@@ -48,3 +48,4 @@ export {
 export { compararInterpretacion } from './eval/comparar';
 export * from './cliente';
 export * from './explicar';
+export { leerCharla, TIPOS_CHARLA, type TipoCharla } from './charla';
