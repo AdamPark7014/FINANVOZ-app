@@ -126,7 +126,7 @@ type Motivo = 'monto_faltante' | 'monto_ambiguo' | 'tipo_ambiguo' | 'fecha_ambig
 | la quincena | — | `proximo_ingreso` del contexto |
 | la semana pasada (sin día) | `aclarar/fecha_ambigua` | — |
 
-**Rangos de consulta** (inclusivos): hoy `[hoy, hoy]`; ayer; esta semana `[lunes, hoy]`; este mes `[día 1, hoy]`; el mes pasado `[1, último día]`; esta quincena `[ultimo_ingreso, hoy]`; los próximos N días `[hoy, hoy + N − 1]`; sin periodo en `mayores_gastos` → últimos 30 días, `limite: 5`; sin periodo en "¿cuánto llevo [gastado] en CAT?" → el mes en curso (lo que va). En `comparar_periodos` "este mes contra el pasado" compara el mes en curso con **los mismos días** del mes anterior.
+**Rangos de consulta** (inclusivos): hoy `[hoy, hoy]`; ayer; antier; esta semana `[lunes, hoy]`; la semana pasada `[lunes, domingo]` de la semana anterior (28-10-2026); en `compromisos`, siempre hacia adelante (§9.2, PERIODO_ADELANTE: sin periodo, de hoy al próximo ingreso); este mes `[día 1, hoy]`; el mes pasado `[1, último día]`; esta quincena `[ultimo_ingreso, hoy]`; los próximos N días `[hoy, hoy + N − 1]`; sin periodo en `mayores_gastos` → últimos 30 días, `limite: 5`; sin periodo en "¿cuánto llevo [gastado] en CAT?" → el mes en curso (lo que va). En `comparar_periodos` "este mes contra el pasado" compara el mes en curso con **los mismos días** del mes anterior.
 
 **Cuentas**
 
@@ -194,7 +194,7 @@ Palabras deliberadamente fuera del diccionario por ambiguas: gas (LP o gasolina)
 }
 ```
 
-Sin ids, sin saldos, sin últimos 4 dígitos, sin el nombre del negocio. `clientes` son los alias de los clientes del fiado (solo con negocio activo). El catálogo de categorías es fijo y va en el prompt de sistema (cacheable). `espacios` solo incluye `negocio` si el usuario lo activó.
+Sin ids, sin saldos, sin últimos 4 dígitos, sin el nombre del negocio. `clientes` son los alias de los clientes del fiado (solo con negocio activo). El catálogo de categorías es fijo y va en el prompt de sistema (cacheable). `espacios` solo incluye `negocio` si el usuario lo activó. Desde el 28-10-2026 puede llevar `anterior`: el turno anterior de la conversación, lo dicho y lo entendido, nunca lo que contestó la app (§15).
 
 ## 5. Resolutor de referencias
 
@@ -240,6 +240,12 @@ Cada `consulta.tipo` corresponde a una función de solo lectura en `servicios/co
 | `impuestos` (M11) | `negocio.impuestos({desde, hasta})` (E15) | "En octubre llevas $3,200 apartados para impuestos; vencen el 17 nov." |
 | `deducciones` (M12) | `fiscal.deducciones({ejercicio})` (E13) | "Llevas $25,900 deducibles en 2026 (estimación)." |
 | `explicar` (M10) | Bucle LLM con las funciones anteriores como herramientas | Texto que cita solo cifras devueltas por herramientas |
+| `proximo_ingreso` (28-10-2026, Gratis) | `hoy()` (E3.3, `proximoIngreso`) | "Tu quincena llega el jue 15 oct, en 4 días." |
+| `desglose_hoy` (28-10-2026, Gratis) | `hoy()` (E4: lo que tienes, apartado, colchón, libre y días) | "Tienes $5,249. Aparto $2,849 para lo que viene antes de tu quincena y $1,300 de colchón: te quedan $1,100 libres. Repartido en 4 días, hoy puedes gastar $275." |
+
+Son de Gratis `hoy_puedes`, `proximo_ingreso` y `desglose_hoy` (lo mismo que ya muestra Hoy en Gratis: la cifra, la
+fecha de la quincena y «Cómo lo calculé»); las demás consultas son de Plus (`01 §11`, `CONSULTAS_GRATIS` en
+`servicios/consultas.ts`).
 
 Modo `explicar`: el proxy reenvía mensajes y definiciones de herramientas; el **teléfono** ejecuta las herramientas y devuelve solo resultados agregados; máximo 3 llamadas por pregunta; toda cifra de la respuesta debe aparecer en algún resultado de herramienta (validación en el teléfono; si falla, se muestra la respuesta en plantilla).
 
@@ -449,6 +455,19 @@ CONSULTA  := cuánto puedo gastar [hoy] | cuánto (me queda|tengo) para gastar [
            | cuánto puedo (sacar|retirar) (del negocio|de la tienda|de la caja)                                        → puedo_retirar (solo con negocio)
            | cuánto (llevo|debo) de impuestos PERIODO                                                                 → impuestos (solo con negocio)
            | cuánto llevo (de deducibles|de deducciones|deducible) [PERIODO]                                          → deducciones (sin periodo: el año en curso)
+           | (cuánto|qué tanto) (gasté|he gastado) [en CAT]  (sin PERIODO)          → aclarar/fecha_ambigua «¿De cuándo? ¿Hoy, esta semana o
+                                                                                    este mes?» con esos tres chips (28-10-2026); la respuesta
+                                                                                    llega pegada tras una coma («¿cuánto gasté?, Esta semana»)
+           | cuánto debo | qué tanto debo                                        → deuda_tarjetas (28-10-2026)
+           | cuánto [le] debo (en|a|de) [PREFIJO] ALIAS_CRED                      → saldo de esa tarjeta
+           | cuánto tengo | cuánto dinero tengo | cuánto tengo en total | …        → saldo sin alias (todas las cuentas)
+           | cuándo me pagan | cuándo cae la quincena | cuánto falta para la quincena | …   → proximo_ingreso
+           | por qué tengo tan poco [hoy] | por qué tan poco | cómo lo calculaste | de dónde sale eso | …   → desglose_hoy
+           | (qué pago | qué viene | qué se vence | qué tengo que pagar | …) [PERIODO_ADELANTE]   → compromisos (28-10-2026)
+PERIODO_ADELANTE := (sin nada) [hoy, proximo_ingreso] o los próximos 7 días | hoy | mañana | esta semana [hoy, hoy + 6]
+           | la próxima semana [lunes, domingo] | este mes [hoy, fin de mes] | el mes que viene | esta quincena | hasta o
+             antes de la quincena [hoy, proximo_ingreso] | los próximos N días
+PERIODO (consultas de gasto) suma desde el 28-10-2026: antier y la semana pasada [lunes, domingo de la semana anterior]
 CAT       := comida | movilidad | casa (grupos) | nombre de categoría (antojos, transporte, ropa, salud…) | palabra del diccionario ("uber" → transporte)
 SIMULAR   := [si] ABRE [art] DESC_LIBRE (de|por|en) MONTO [a N (meses|msi)] [FECHA_SIM] [, COLA]
 ABRE      := me alcanza para [comprar] | me alcanzaría para | puedo comprar[me] | me compro | compro | me conviene comprar[me]
@@ -575,7 +594,7 @@ Contactos: {contactos}
 Responde solo con el JSON.
 ```
 
-Más 6 ejemplos de entrada/salida **distintos** de los del golden set (montos con palabras, dos movimientos, corrección, consulta, aclaración, fuera de alcance).
+Más 6 ejemplos de entrada/salida **distintos** de los del golden set (montos con palabras, dos movimientos, corrección, consulta, aclaración, fuera de alcance). Desde el 28-10-2026 el sistema trae además la sección «# Conversación» con 3 ejemplos que llevan turno anterior, y el turno del usuario el turno anterior y la semana pasada ya calculada (§15.2).
 
 `{regla_negocio}` queda vacío si `espacios` no incluye `negocio`. Con negocio activo (M11) es: *"7b. Espacios: usa espacio negocio cuando la frase habla del negocio (la tienda, la caja, un cliente de {clientes}, mercancía, vender, fiar); sin señal, omítelo. Las categorías {categorias_exclusivas_negocio} exigen espacio negocio, también en compromisos ('la renta del local' → compromiso renta_local). ISR o IVA → impuestos; predial del local, nómina, licencias o derechos → otros_impuestos. Sacar dinero del negocio para ti → retiro_dueno; poner dinero tuyo en el negocio → aportacion_dueno; fiar → prestamo_otorgado y cobrar lo fiado → cobro_prestamo, ambos con espacio negocio."* (§3.1, Espacio negocio).
 
@@ -774,3 +793,113 @@ monto; elegirla registra por la vía normal (`registrarTexto`), y sin frase abre
 
 `fixtures/nlu/golden-reparacion.jsonl`: 52 casos (`REP*`) con las opciones en orden y su frase; `pnpm eval:nlu
 --reparacion` exige 100 %, y cada frase esperada se vuelve a interpretar con el nivel 0; medido el 2026-10-23: 52/52 y 52/52.
+
+## 15. Conversación: el turno anterior (28-10-2026)
+
+Pedido de Adam (28-10): «que tenga igual conversaciones». El asistente ya no lee cada frase sola: guarda el **turno
+anterior** de la sesión —lo que la persona dijo y cómo se entendió (`TurnoAnterior { frase, interpretacion }`,
+`packages/nlu/src/contexto.ts`)— y lo pasa al nivel 0 y a la nube en `contexto.anterior`. Nunca lleva lo que
+contestó la app (cifras de consultas, saldos, ids): solo lo dicho y su interpretación, que ya viajaban como frase.
+Toda respuesta es una intención completa del esquema de §3 (no hay intención «seguimiento»), así que el resto de la
+app no cambia. Los turnos no se guardan: al relanzar la app la plática empieza de cero.
+
+En la app (`pantallas/asistente/useAsistente.ts`): cada frase lleva el anterior y, si se entendió (nivel 0 o nube),
+se vuelve el anterior de la siguiente (`OpcionesConversacion.alInterpretar` de `servicios/registrar.ts`). La charla
+no lo cambia. «¿Puedo gastar 500 en unos tenis?» leído en la app (`leerPuedoGastar`) deja una simulación como
+anterior. El nivel 0 de la app recibe ahora también `ultimo_ingreso` y `proximo_ingreso` (`fechasDelIngreso`), así
+que «esta quincena» y «hasta la quincena» ya no van a la nube.
+
+### 15.1 Nivel 0 (`packages/nlu/src/reglas/seguimiento.ts`)
+
+Orden (§9.2): la **respuesta a una aclaración** del turno anterior va antes que todo («unos tenis de 1,200» tras
+«¿me alcanza?» es la compra, no un gasto); los **seguimientos** van después de las producciones completas (una
+frase completa gana: «uber 120» tras una consulta es un registro), seguidos de «y …» o «también …» con una frase
+completa y de las aclaraciones de `sin-nube.ts`.
+
+| Turno anterior | Frase | Resultado |
+|---|---|---|
+| Consulta de gasto (total, categoría, mayores) | «¿y la semana pasada?», «¿y ayer?», «¿y antier?», «¿y este mes?» | La misma consulta con ese periodo |
+| Consulta de gasto | «¿y en comida?», «¿y de uber?», «¿y cuánto en súper el mes pasado?» | `gasto_por_categoria` con esa categoría (y periodo) |
+| Consulta de gasto | «¿y en total?» | `gasto_total` del mismo periodo |
+| `comparar_periodos` | «¿y en transporte?» | La misma comparación con esa categoría |
+| `compromisos` | «¿y este mes?», «¿y la próxima semana?» | Pagos que vienen con ese periodo (siempre hacia adelante) |
+| `saldo` o `deuda_tarjetas` | «¿y en la Nu?», «¿y en efectivo?», «¿y en total?» | `saldo` de esa cuenta (o de todas) |
+| `por_cobrar` | «¿y Juan?» | `por_cobrar` con esa contraparte (nunca un cliente) |
+| `hoy_puedes` | «¿por qué?», «¿por qué tan poco?» | `desglose_hoy` |
+| Registro de un movimiento | «otra igual», «otro igual», «lo mismo», «otra igual pero con la Nu» | Los mismos movimientos (con esa cuenta) |
+| Registro de un movimiento | «otro de 95 [con la Nu]» | El último con esa cifra; la cuenta **no** se hereda |
+| Registro o corrección | «no, en efectivo», «con BBVA», «los pagué con la Nu», «fue ayer», «no, fue antier», «eran 850», «ponlo en súper», «pásala a entretenimiento» | `corregir` con `objetivo: { ultimo: true }` |
+| Registro o corrección del monto | «quítale 10», «súmale 15», «eran 10 más» | `corregir` del monto; **la cuenta la hace el teléfono** (regla 4) y nunca deja la cifra en cero o negativa |
+| Registro o corrección | «bórralo», «bórrala», «quita eso» | `anular` el último |
+| Registro de un movimiento | «ayer también me tomé una igual» | El mismo movimiento con esa fecha |
+| Simulación | «¿y a 6 meses?», «¿y si los saco a 6 meses con la Nu?», «¿y de contado?», «¿y si espero a la quincena?», «¿y el viernes?», «¿y de 900?» | La misma simulación con lo que cambia |
+| Simulación | «ya la compré [con la Nu]» | Registra la compra (con meses, `compra_msi` con crédito) |
+| Aclarar `monto_faltante` | «45», «1,200 con la Nu», «como 400» | La frase de antes con la respuesta tras una coma |
+| Aclarar `monto_faltante` de «¿me alcanza?» | «unos tenis de 1,200», «1,500» | `simular` |
+| Aclarar `monto_ambiguo` | «$250», «2.50», «fueron 250» (solo una de las dos lecturas) | La frase de antes con esa cifra en lugar de «dos cincuenta» |
+| Aclarar `fecha_ambigua` de «la semana pasada» | «el jueves» | Ese día **de la semana pasada** (lunes a domingo anteriores) |
+| Aclarar `fecha_ambigua` de «¿cuánto gasté?» | «esta semana», «hoy», «el mes pasado» | La consulta con ese periodo |
+
+La app manda la respuesta a una aclaración pegada a la frase de antes («¿me alcanza?, unos tenis de 1,200»): el
+nivel 0 quita lo repetido y lee lo nuevo. Antes, «$250» pegado a «me salió en dos cincuenta…» no se entendía (dos
+cifras) y se iba a la nube. Lo que se queda en `null` a propósito: con dos o más movimientos, «otra igual», «quítale
+10» y «otro de 30» (no dicen cuál; «lo mismo» y «otros iguales» sí repiten todos); «con BBVA» tras un ingreso (no
+hay de dónde salió); una categoría para un préstamo; «ponlo en comida» (grupo); «¿y a meses?» sin cuántos; «ya la
+compré en efectivo» de una compra a meses; «¿y mañana?» tras «¿cuánto gasté hoy?»; fragmentos sin turno anterior
+(«otra igual», «bórralo», «fue ayer»).
+
+En la app, el nivel 0 aplica ahora también correcciones, anulaciones, duplicados y simulaciones (antes solo
+registros, consultas y ajustes; lo demás iba a la nube aunque el nivel 0 lo entendiera, y sin red quedaba Por
+revisar). Con frases esperando internet, las correcciones y anulaciones esperan su turno en la cola: podrían tocar
+un movimiento que todavía no se registra.
+
+### 15.2 Nube
+
+`contexto_min.anterior` en `POST /nlu/interpretar` (`services/proxy/.../nlu/contrato.ts`): solo `frase` (hasta 500
+caracteres) e `interpretacion` con una intención conocida, hasta 3,000 caracteres en total; cualquier otra clave es
+un 400. La app no lo manda si no cabe (`anteriorParaNube`). En el prompt (§10) va en el turno del usuario, antes de
+la frase, como `Turno anterior: <anterior>frase → {json}</anterior>`, y el turno del usuario trae además la semana
+pasada ya calculada («semana pasada: del 2026-09-28 al 2026-10-04»), como el mes anterior. El sistema fijo (caché)
+suma la sección «# Conversación» y 3 ejemplos con turno anterior (`EJEMPLOS_CONVERSACION`, distintos de los
+golden). Si la persona pide sumar o quitar a la cifra, la nube **no hace la cuenta**: pregunta el total
+(`aclarar/monto_faltante`).
+
+### 15.3 Charla (`packages/nlu/src/charla.ts`)
+
+`leerCharla(frase)` reconoce frases completas: saludo, gracias, despedida, «ok» (afirmación), «¿cómo estás?»,
+ayuda, «¿qué le puedo preguntar?», «¿quién eres?», pedir que repita («no entendí», «¿mande?», «¿cómo?»), una queja
+(«no sirves») y qué es el colchón, lo apartado, lo libre o el pago para no generar intereses. La app la prueba solo
+si el nivel 0 no entendió y contesta con textos fijos sin cifras (`apps/movil/src/asistente/charla.ts`); «no
+entendí» repite lo último que dijo el asistente («Te lo digo otra vez: …»).
+
+### 15.4 Golden de conversaciones y evaluación
+
+`fixtures/nlu/golden-conversaciones.jsonl`: 88 conversaciones y 186 turnos (80 primeros turnos, 87 seguimientos y
+19 de charla) contra `fixtures/nlu/contexto.json`. Cada turno trae `texto`, `esperado` (una `Interpretacion` o
+`{ "charla": <tipo> }`), `reglas` y, si la cuenta la hace solo el teléfono, `solo_reglas`. El turno anterior de cada
+turno es lo dicho y lo **esperado** del último turno con interpretación (un fallo no arrastra a los siguientes). Lo
+esperado nunca es una cifra de respuesta: es qué consulta del core corre (tipo, periodo, categoría) o qué se
+registra o corrige con lo que la persona dijo. Un `null` en el esperado exige que el campo no venga («¿y de
+contado?» quita los meses; «¿cuánto tengo?» va sin alias).
+
+```
+pnpm eval:nlu --conversaciones                                              # nivel 0, sin red; umbral 100 %
+pnpm eval:nlu --nivel nube --proveedor anthropic --conversaciones --solo-seguimientos [--sin-anterior]
+```
+
+Un turno de charla es correcto si el nivel 0 no lo toma y `leerCharla` da el tipo; uno con interpretación, si el
+nivel 0 acierta (y la charla no lo toma cuando el nivel 0 no responde). Mediciones en `docs/ESTADO.md` (Reportes del
+intérprete).
+
+| Medición (28-10-2026) | Antes | Después |
+|---|---|---|
+| Nivel 0: cobertura de turnos `reglas: true` | 88/183 (48.1 %) | **183/183 (100 %)** |
+| Nivel 0: precisión | 88/92 (95.7 %) | **184/184 (100 %)** |
+| Nivel 0: seguimientos correctos | 13/87 (14.9 %) | **85/87 (97.7 %)**; los 2 que faltan son de la nube |
+| Nivel 0: charla | 8/19 | **19/19** |
+| Nivel 0: conversaciones completas | 8/88 (9.1 %) | **86/88 (97.7 %)** |
+| Nube, 85 seguimientos: caso completo | 34/85 (40.0 %), sin turno anterior | **85/85 (100 %)** con él, en dos corridas |
+| Nube: intención | 48/85 (56.5 %) | 85/85 |
+| Nube: USD por frase (caché caliente) | 0.000255 | 0.000279–0.000317 (sistema ~1,800 tokens más y el turno anterior) |
+| Golden principal, nivel 0 | 162/162 y 162/162 | 162/162 y 162/162 |
+| Golden principal, nube (164 frases) | 163/164 (26-10) | 160/164 en una corrida; los 4 que fallaron dieron 11/12 al repetirlos 3 veces (los resuelve el nivel 0 en producción) |
