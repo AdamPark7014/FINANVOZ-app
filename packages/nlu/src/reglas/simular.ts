@@ -43,8 +43,9 @@ export function simular(tokens: Tokens, env: Entorno): Interpretacion | null {
   if (!forma) return null;
   l.pos += forma.length;
   const esperarQuincena = forma[0] === 'me' && forma[1] === 'conviene' && forma[2] === 'esperar';
-  l.palabra(...ARTICULOS);
+  // La descripción conserva el artículo («unos tenis»): de él sale el pronombre de la respuesta («Si los compras…»).
   const inicioDesc = l.marca();
+  l.palabra(...ARTICULOS);
   let n = 0;
   while (n < 3) {
     const p = l.ver();

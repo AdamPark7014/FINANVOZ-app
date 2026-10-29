@@ -219,6 +219,9 @@ export const TIPOS_CONSULTA = [
   'impuestos',
   'deducciones',
   'puedo_retirar',
+  // Gratis, como «hoy puedes»: «¿cuándo me pagan?» y «¿por qué tengo tan poco hoy?» (06 §6, 28-10-2026).
+  'proximo_ingreso',
+  'desglose_hoy',
 ] as const;
 
 export const Consulta = z.strictObject({

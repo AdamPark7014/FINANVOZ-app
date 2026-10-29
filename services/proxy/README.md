@@ -181,6 +181,29 @@ la puerta limita `pruebas` a 60 peticiones por minuto, compartidas con otros eva
 - Desplegado el 26-10 con `scripts/desplegar-funciones.sh`; `probar-backend.mjs`: 31/31, `nlu-interpretar` 200 en
   1,131 ms con Haiku (ya estaba en producción el reintento de 4 s: lo desplegado era idéntico a `fce19b9`).
 
+### Medición del 28-10-2026 (conversación: el turno anterior, `06 §15`)
+
+Contrato: `contexto_min.anterior = { frase, interpretacion }` (frase ≤ 500, intención conocida, ≤ 3,000 caracteres;
+otra clave → 400). El prompt suma «# Conversación» y 3 ejemplos con turno anterior en el sistema fijo (~1,800 tokens
+más de caché) y, en el turno del usuario, el turno anterior y la semana pasada ya calculada. Mismo modelo y modo
+(Haiku 5.5, `low`, herramienta forzada). Por la puerta con el token de `pruebas`, `--concurrencia 2 --por-minuto 30`.
+
+| Métrica | Sin turno anterior (antes) | Con turno anterior (después) |
+|---|---|---|
+| 85 seguimientos del golden de conversaciones: caso completo | 34/85 (40.0 %) | **85/85 (100 %)**, dos corridas |
+| Intención | 48/85 | 85/85 |
+| p50 / p95 | 1,037 / 2,178 ms | 1,013–1,054 / 1,538–1,921 ms |
+| Entrada / caché leída por frase | 14,188 / 13,575 | ~18,000 / ~17,400 |
+| USD por frase, caché caliente | 0.000255 | 0.000279–0.000317 |
+| Golden principal (164) | 163/164 (26-10) | 160/164; los 4 fallos dieron 11/12 repetidos 3 veces con el prompt final |
+
+- La primera corrida con turno anterior dio 80/85: heredaba la cuenta en «también unas papas de 20», leía «otro de
+  95» como corrección, preguntaba en «ya la compré» y calculaba mal «la semana pasada». Se ajustó el prompt (lo nuevo
+  no hereda la cuenta, «otro» es un movimiento nuevo, «ya la compré» registra sin preguntar) y la semana pasada va
+  calculada en el turno del usuario. Por eso el 85/85 puede ser optimista: el golden ya guió esos ajustes.
+- «Quítale 10» lo resuelve el nivel 0 (la cuenta la hace el teléfono, regla 4); si llega a la nube, pregunta el total.
+- Gasto de toda la medición: ~0.20 USD del proyecto `pruebas` (cota superior; `GET /uso` de 3.598 a 3.797 USD).
+
 ## M7 · `webhooks-revenuecat` (`POST /webhooks/revenuecat`)
 
 RevenueCat avisa cada compra, renovación, cancelación y vencimiento; la función actualiza `derechos` y el cupo del intérprete lo aplica en la siguiente frase (Gratis 30 al mes, Plus 300). La lógica está en `supabase/functions/_shared/revenuecat/` (Vitest + PGlite).

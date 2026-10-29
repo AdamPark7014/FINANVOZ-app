@@ -1,6 +1,7 @@
 /**
  * CONSULTA del nivel 0 (docs/06-NLU.md §6 y §9): preguntas tipadas con rangos de §3.1. Cada forma consume la frase
- * completa (sin signos) o devuelve `null`; las preguntas abiertas (`explicar`) van al nivel 2.
+ * completa (sin signos) o devuelve `null`; las preguntas abiertas (`explicar`) van al nivel 2. «¿Cuánto gasté?»
+ * sin periodo pregunta de cuándo con chips (28-10-2026); la respuesta llega pegada tras una coma o como seguimiento.
  */
 import type { Interpretacion } from '../esquema';
 import { leerCategoriaConsulta } from './categorias';
@@ -9,7 +10,9 @@ import {
   esteAnio,
   esteMes,
   esteMesContraElPasado,
+  hastaElIngreso,
   leerPeriodo,
+  leerPeriodoAdelante,
   ultimosTreintaDias,
   type Rango,
 } from './fechas';
@@ -51,6 +54,12 @@ const HOY_PUEDES: readonly (readonly string[])[] = [
   ['que', 'tanto', 'puedo', 'gastar'],
 ];
 const DEUDA_TARJETAS: readonly (readonly string[])[] = [
+  // «¿Cuánto debo?» a secas: lo de las tarjetas (lo que debes a personas se ve en Cuentas › Debes).
+  ['cuanto', 'debo'],
+  ['cuanto', 'debo', 'en', 'total'],
+  ['que', 'tanto', 'debo'],
+  ['cuanto', 'debo', 'de', 'credito'],
+  ['cuanto', 'debo', 'en', 'mis', 'tarjetas', 'de', 'credito'],
   ['cuanto', 'debo', 'de', 'tarjetas'],
   ['cuanto', 'debo', 'de', 'tarjeta'],
   ['cuanto', 'debo', 'en', 'tarjetas'],
@@ -100,6 +109,79 @@ const COMPROMISOS: readonly (readonly string[])[] = [
   ['que', 'me', 'toca', 'pagar'],
   ['que', 'pagos', 'vienen'],
   ['que', 'pagos', 'se', 'vienen'],
+  ['que', 'pagos', 'me', 'tocan'],
+  ['que', 'debo', 'pagar'],
+  ['que', 'me', 'falta', 'pagar'],
+  ['que', 'pago'],
+  ['que', 'se', 'viene'],
+  ['que', 'viene'],
+  ['que', 'se', 'vence'],
+  ['que', 'vence'],
+  ['que', 'me', 'vence'],
+];
+/** «¿Cuánto tengo?» sin cuenta: lo que tienes en todas (efectivo y débito), como en Cuentas. */
+const SALDO_TOTAL: readonly (readonly string[])[] = [
+  ['cuanto', 'dinero', 'tengo', 'en', 'total'],
+  ['cuanto', 'dinero', 'tengo'],
+  ['cuanto', 'tengo', 'en', 'total'],
+  ['cuanto', 'tengo', 'en', 'mis', 'cuentas'],
+  ['cuanto', 'tengo', 'en', 'las', 'cuentas'],
+  ['cuanto', 'hay', 'en', 'mis', 'cuentas'],
+  ['cuanta', 'lana', 'tengo'],
+  ['cuanto', 'tengo'],
+];
+/** Cuándo llega el próximo ingreso (Gratis: es la fecha que ya dice «Hoy puedes»). */
+const PROXIMO_INGRESO: readonly (readonly string[])[] = [
+  ['cuando', 'me', 'pagan', 'la', 'quincena'],
+  ['cuando', 'me', 'pagan'],
+  ['cuando', 'me', 'depositan', 'la', 'quincena'],
+  ['cuando', 'me', 'depositan'],
+  ['cuando', 'cae', 'la', 'quincena'],
+  ['cuando', 'cae', 'mi', 'quincena'],
+  ['cuando', 'me', 'cae', 'la', 'quincena'],
+  ['cuando', 'llega', 'la', 'quincena'],
+  ['cuando', 'llega', 'mi', 'quincena'],
+  ['cuando', 'me', 'llega', 'la', 'quincena'],
+  ['cuando', 'me', 'llega', 'el', 'sueldo'],
+  ['cuando', 'es', 'la', 'proxima', 'quincena'],
+  ['cuando', 'es', 'mi', 'proxima', 'quincena'],
+  ['cuando', 'es', 'la', 'quincena'],
+  ['cuando', 'es', 'mi', 'quincena'],
+  ['cuando', 'cobro'],
+  ['cuando', 'me', 'toca', 'cobrar'],
+  ['cuanto', 'falta', 'para', 'la', 'quincena'],
+  ['cuanto', 'falta', 'para', 'mi', 'quincena'],
+  ['cuanto', 'falta', 'para', 'que', 'me', 'paguen'],
+  ['cuantos', 'dias', 'faltan', 'para', 'la', 'quincena'],
+  ['cuantos', 'dias', 'faltan', 'para', 'que', 'me', 'paguen'],
+];
+/** Por qué la cifra de hoy es esa: el desglose de E4 que ya muestra «Cómo lo calculé» (Gratis). */
+const DESGLOSE_HOY: readonly (readonly string[])[] = [
+  ['por', 'que', 'tengo', 'tan', 'poco', 'para', 'gastar', 'hoy'],
+  ['por', 'que', 'tengo', 'tan', 'poco', 'para', 'gastar'],
+  ['por', 'que', 'tengo', 'tan', 'poco', 'hoy'],
+  ['por', 'que', 'tengo', 'tan', 'poco'],
+  ['por', 'que', 'tan', 'poco', 'hoy'],
+  ['por', 'que', 'tan', 'poco'],
+  ['por', 'que', 'tan', 'poquito'],
+  ['por', 'que', 'puedo', 'gastar', 'tan', 'poco', 'hoy'],
+  ['por', 'que', 'puedo', 'gastar', 'tan', 'poco'],
+  ['por', 'que', 'me', 'toca', 'tan', 'poco', 'hoy'],
+  ['por', 'que', 'me', 'toca', 'tan', 'poco'],
+  ['por', 'que', 'me', 'alcanza', 'tan', 'poco', 'hoy'],
+  ['por', 'que', 'puedo', 'gastar', 'eso', 'hoy'],
+  ['por', 'que', 'puedo', 'gastar', 'eso'],
+  ['como', 'lo', 'calculaste'],
+  ['como', 'calculaste', 'lo', 'de', 'hoy'],
+  ['como', 'calculas', 'lo', 'de', 'hoy'],
+  ['como', 'calculas', 'lo', 'que', 'puedo', 'gastar'],
+  ['como', 'sacaste', 'eso'],
+  ['como', 'sacaste', 'lo', 'de', 'hoy'],
+  ['de', 'donde', 'sale', 'eso'],
+  ['de', 'donde', 'sale', 'lo', 'de', 'hoy'],
+  ['de', 'donde', 'salio', 'eso'],
+  ['explicame', 'lo', 'de', 'hoy'],
+  ['explicame', 'como', 'lo', 'calculaste'],
 ];
 const COMPARAR: readonly (readonly string[])[] = [
   ['estoy', 'gastando', 'mas'],
@@ -111,16 +193,24 @@ const COMPARAR: readonly (readonly string[])[] = [
 
 const rango = (r: Rango) => ({ desde: r.desde, hasta: r.hasta });
 
+export const PREGUNTA_PERIODO = '¿De cuándo? ¿Hoy, esta semana o este mes?';
+/** Chips de «¿De cuándo?»: cada uno se lee como periodo pegado a la pregunta o como seguimiento. */
+export const OPCIONES_PERIODO = ['Hoy', 'Esta semana', 'Este mes'] as const;
+
 export function consulta(tokens: Tokens, env: Entorno): Interpretacion | null {
   const l = new Lector(tokens);
   const inicio = l.marca();
-  const completa = (...formas: readonly (readonly string[])[]) => {
-    l.volver(inicio);
-    return formas.some((f) => l.secuencia(...f) && l.fin);
-  };
+  const completa = (...formas: readonly (readonly string[])[]) =>
+    formas.some((f) => {
+      l.volver(inicio);
+      return l.secuencia(...f) && l.fin;
+    });
 
   if (completa(...HOY_PUEDES)) return consultar({ tipo: 'hoy_puedes' });
+  if (completa(...DESGLOSE_HOY)) return consultar({ tipo: 'desglose_hoy' });
+  if (completa(...PROXIMO_INGRESO)) return consultar({ tipo: 'proximo_ingreso' });
   if (completa(...DEUDA_TARJETAS)) return consultar({ tipo: 'deuda_tarjetas' });
+  if (completa(...SALDO_TOTAL)) return consultar({ tipo: 'saldo' });
   if (completa(...POR_COBRAR)) return consultar({ tipo: 'por_cobrar' });
   if (completa(...SUSCRIPCIONES)) return consultar({ tipo: 'suscripciones' });
   if (completa(...MAYORES_GASTOS))
@@ -136,12 +226,22 @@ export function consulta(tokens: Tokens, env: Entorno): Interpretacion | null {
     }
   }
 
-  // ¿qué pagos tengo en los próximos 7 días? → compromisos
+  // ¿cuánto debo en la Nu? / ¿cuánto le debo a la oro? → saldo de esa tarjeta («En tu Nu debes $X»)
   l.volver(inicio);
-  if (l.alguna(...COMPROMISOS)) {
-    const periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso);
-    if (periodo && l.fin && periodo.desde >= env.hoy)
-      return consultar({ tipo: 'compromisos', ...rango(periodo) });
+  if (l.alguna(['cuanto', 'le', 'debo'], ['cuanto', 'debo']) && l.palabra('en', 'a', 'de')) {
+    const ref = env.alias(l, ['credito']);
+    if (ref && ref.alias !== undefined && l.fin) return consultar({ tipo: 'saldo', alias: ref.alias });
+  }
+
+  // ¿qué pagos tengo en los próximos 7 días? / ¿qué pago esta semana? / ¿qué tengo que pagar? → compromisos,
+  // siempre hacia adelante; sin periodo, hasta el próximo ingreso.
+  for (const forma of COMPROMISOS) {
+    l.volver(inicio);
+    if (!l.secuencia(...forma)) continue;
+    if (l.fin)
+      return consultar({ tipo: 'compromisos', ...rango(hastaElIngreso(env.hoy, env.proximoIngreso)) });
+    const periodo = leerPeriodoAdelante(l, env.hoy, env.proximoIngreso);
+    if (periodo && l.fin) return consultar({ tipo: 'compromisos', ...rango(periodo) });
   }
 
   // ¿estoy gastando más en comida que el mes pasado? → comparar_periodos
@@ -200,8 +300,23 @@ export function consulta(tokens: Tokens, env: Entorno): Interpretacion | null {
         categoria = leerCategoriaConsulta(l);
         if (!categoria) return null;
       }
-      if (!periodo) periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso);
+      // La respuesta a «¿De cuándo?» puede llegar pegada tras una coma: «¿cuánto gasté?, esta semana».
+      if (!periodo) {
+        l.sep();
+        periodo = leerPeriodo(l, env.hoy, env.ultimoIngreso);
+      }
       if (!periodo && llevo && (conGastado || categoria)) periodo = esteMes(env.hoy);
+      if (!periodo && !llevo && l.fin) {
+        // «¿Cuánto gasté [en comida]?» sin periodo: se pregunta de cuándo, con chips.
+        const parcial = categoria ? { tipo: 'gasto_por_categoria', categoria } : { tipo: 'gasto_total' };
+        return {
+          intencion: 'aclarar',
+          motivo: 'fecha_ambigua',
+          pregunta: PREGUNTA_PERIODO,
+          opciones: [...OPCIONES_PERIODO],
+          parcial: { consulta: parcial },
+        };
+      }
       if (!periodo || !l.fin) return null;
       return categoria
         ? consultar({ tipo: 'gasto_por_categoria', ...rango(periodo), categoria })

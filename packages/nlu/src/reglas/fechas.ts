@@ -170,9 +170,9 @@ export function leerFechaSimulacion(
 }
 
 /**
- * Rango inclusivo de una consulta (§3.1 Rangos): hoy; ayer; esta semana [lunes, hoy]; este mes [1, hoy]; el mes
- * pasado [1, último]; esta quincena [ultimo_ingreso, hoy]; los próximos N días [hoy, hoy + N − 1]; este año
- * [1 de enero, hoy].
+ * Rango inclusivo de una consulta (§3.1 Rangos): hoy; ayer; antier; esta semana [lunes, hoy]; la semana pasada
+ * [lunes, domingo] de la semana anterior; este mes [1, hoy]; el mes pasado [1, último]; esta quincena
+ * [ultimo_ingreso, hoy]; los próximos N días [hoy, hoy + N − 1]; este año [1 de enero, hoy].
  */
 export function leerPeriodo(l: Lector, hoy: string, ultimoIngreso: string | undefined): Rango | null {
   const inicio = l.marca();
@@ -183,7 +183,15 @@ export function leerPeriodo(l: Lector, hoy: string, ultimoIngreso: string | unde
     const ayer = sumarDias(hoy, -1);
     return { desde: ayer, hasta: ayer };
   }
-  if (l.secuencia('esta', 'semana')) return { desde: sumarDias(hoy, -(diaSemana(hoy) - 1)), hasta: hoy };
+  if (l.palabra('antier', 'anteayer')) {
+    const antier = sumarDias(hoy, -2);
+    return { desde: antier, hasta: antier };
+  }
+  if (l.secuencia('esta', 'semana')) return { desde: lunesDe(hoy), hasta: hoy };
+  if (l.secuencia('la', 'semana', 'pasada')) {
+    const lunes = sumarDias(lunesDe(hoy), -7);
+    return { desde: lunes, hasta: sumarDias(lunes, 6) };
+  }
   if (
     l.secuencia('este', 'mes') ||
     l.alguna(['en', 'lo', 'que', 'va', 'del', 'mes'], ['lo', 'que', 'va', 'del', 'mes'])
@@ -207,6 +215,82 @@ export function leerPeriodo(l: Lector, hoy: string, ultimoIngreso: string | unde
   }
   l.volver(inicio);
   return null;
+}
+
+/** Lunes de la semana de `fecha` (la semana va de lunes a domingo). */
+export function lunesDe(fecha: string): string {
+  return sumarDias(fecha, -(diaSemana(fecha) - 1));
+}
+
+/**
+ * Rango hacia adelante de los pagos que vienen (`compromisos`, 06 §3.1): hoy; mañana; esta semana = los próximos 7
+ * días [hoy, hoy + 6] (en domingo «esta semana» ya casi no tiene días); la próxima semana o la semana que viene
+ * [lunes, domingo]; este mes [hoy, último día]; el mes que viene [1, último]; esta quincena, hasta la quincena o
+ * antes de la quincena [hoy, proximo_ingreso]; los próximos N días [hoy, hoy + N − 1]. Consume lo leído.
+ */
+export function leerPeriodoAdelante(
+  l: Lector,
+  hoy: string,
+  proximoIngreso: string | undefined,
+): Rango | null {
+  const inicio = l.marca();
+  const { anio, mes } = partes(hoy);
+  if (l.palabra('hoy')) return { desde: hoy, hasta: hoy };
+  if (l.palabra('mañana')) {
+    const manana = sumarDias(hoy, 1);
+    return { desde: manana, hasta: manana };
+  }
+  l.palabra('en', 'para');
+  if (l.secuencia('esta', 'semana')) return { desde: hoy, hasta: sumarDias(hoy, 6) };
+  if (
+    l.alguna(
+      ['la', 'proxima', 'semana'],
+      ['la', 'semana', 'que', 'viene'],
+      ['la', 'siguiente', 'semana'],
+      ['la', 'otra', 'semana'],
+    )
+  ) {
+    const lunes = sumarDias(lunesDe(hoy), 7);
+    return { desde: lunes, hasta: sumarDias(lunes, 6) };
+  }
+  if (l.secuencia('este', 'mes') || l.secuencia('lo', 'que', 'queda', 'del', 'mes')) {
+    return { desde: hoy, hasta: conDia(anio, mes, diasDelMes(anio, mes)) };
+  }
+  if (l.alguna(['el', 'mes', 'que', 'viene'], ['el', 'proximo', 'mes'], ['el', 'siguiente', 'mes'])) {
+    const primero = conDia(anio, mes + 1, 1);
+    const { anio: a, mes: m } = partes(primero);
+    return { desde: primero, hasta: conDia(a, m, diasDelMes(a, m)) };
+  }
+  l.volver(inicio);
+  if (
+    l.alguna(
+      ['esta', 'quincena'],
+      ['antes', 'de', 'la', 'quincena'],
+      ['antes', 'de', 'mi', 'quincena'],
+      ['hasta', 'la', 'quincena'],
+      ['hasta', 'mi', 'quincena'],
+      ['antes', 'de', 'que', 'me', 'paguen'],
+      ['antes', 'de', 'que', 'me', 'paguen', 'la', 'quincena'],
+    )
+  ) {
+    if (proximoIngreso !== undefined && proximoIngreso >= hoy) return { desde: hoy, hasta: proximoIngreso };
+    l.volver(inicio);
+    return null;
+  }
+  l.volver(inicio);
+  if (l.alguna(['en', 'los', 'proximos'], ['los', 'proximos'], ['los', 'siguientes'], ['estos'])) {
+    const n = leerEntero(l, 90);
+    if (n !== null && l.palabra('dias')) return { desde: hoy, hasta: sumarDias(hoy, n - 1) };
+  }
+  l.volver(inicio);
+  return null;
+}
+
+/** Sin periodo, los pagos que vienen van hasta el próximo ingreso; sin ingreso conocido, los próximos 7 días. */
+export function hastaElIngreso(hoy: string, proximoIngreso: string | undefined): Rango {
+  return proximoIngreso !== undefined && proximoIngreso >= hoy
+    ? { desde: hoy, hasta: proximoIngreso }
+    : { desde: hoy, hasta: sumarDias(hoy, 6) };
 }
 
 /** Mes en curso [1, hoy] y los mismos días del mes anterior (`comparar_periodos`). */

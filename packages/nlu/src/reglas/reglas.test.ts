@@ -995,8 +995,14 @@ describe('nivel 0 · consultas', () => {
       desde: '2026-01-01',
       hasta: '2026-10-11',
     });
-    expect(reglas('cuánto gasté la semana pasada')).toBeNull();
-    expect(reglas('cuánto gasté')).toBeNull();
+    // Desde el 28-10-2026 «la semana pasada» es periodo de consulta (lunes a domingo de la semana anterior) y
+    // «¿cuánto gasté?» sin periodo pregunta de cuándo (06 §15).
+    expect(consulta('cuánto gasté la semana pasada')).toEqual({
+      tipo: 'gasto_total',
+      desde: '2026-09-28',
+      hasta: '2026-10-04',
+    });
+    expect(reglas('cuánto gasté')).toMatchObject({ intencion: 'aclarar', motivo: 'fecha_ambigua' });
     expect(reglas('cuánto gasté en chelas este mes')).toBeNull();
   });
 
@@ -1044,10 +1050,23 @@ describe('nivel 0 · consultas', () => {
     });
   });
 
-  it('«¿cuánto llevo?» a secas no es consulta: también es «cuánto efectivo traigo»; «gasté» sin periodo tampoco', () => {
+  it('«¿cuánto llevo?» a secas no es consulta: también es «cuánto efectivo traigo»; «gasté» sin periodo pregunta de cuándo', () => {
     expect(reglas('¿cuánto llevo?')).toBeNull();
-    expect(reglas('cuánto gasté en antojos')).toBeNull();
-    expect(reglas('cuánto he gastado en antojos')).toBeNull();
+    for (const frase of ['cuánto gasté en antojos', 'cuánto he gastado en antojos']) {
+      expect(reglas(frase)).toEqual({
+        intencion: 'aclarar',
+        motivo: 'fecha_ambigua',
+        pregunta: '¿De cuándo? ¿Hoy, esta semana o este mes?',
+        opciones: ['Hoy', 'Esta semana', 'Este mes'],
+        parcial: { consulta: { tipo: 'gasto_por_categoria', categoria: 'antojos' } },
+      });
+    }
+    expect(consulta('cuánto gasté en antojos, esta semana')).toEqual({
+      tipo: 'gasto_por_categoria',
+      desde: '2026-10-05',
+      hasta: '2026-10-11',
+      categoria: 'antojos',
+    });
     expect(reglas('¿cuánto llevo en chelas?')).toBeNull();
     expect(reglas('cuánto llevo en antojos y comida')).toBeNull();
   });
@@ -1075,7 +1094,12 @@ describe('nivel 0 · consultas', () => {
       limite: 5,
     });
     expect(consulta('¿qué suscripciones tengo?')).toEqual({ tipo: 'suscripciones' });
-    expect(reglas('qué pagos tengo esta semana')).toBeNull();
+    // Los pagos que vienen van hacia adelante: «esta semana» son los próximos 7 días (28-10-2026).
+    expect(consulta('qué pagos tengo esta semana')).toEqual({
+      tipo: 'compromisos',
+      desde: '2026-10-11',
+      hasta: '2026-10-17',
+    });
     expect(reglas('cuánto tengo en la azul')).toBeNull();
     expect(consulta('¿por qué no me alcanzó la quincena pasada?')).toMatchObject({ tipo: 'explicar' });
     expect(reglas('cuanto puedo gastar mañana')).toBeNull();
@@ -1107,7 +1131,7 @@ describe('nivel 0 · simular', () => {
   it('me alcanza, puedo comprar, con meses, con fecha hacia adelante y la quincena', () => {
     expect(reglas('¿me alcanza para unos tenis de 1,500?')).toEqual({
       intencion: 'simular',
-      compra: { precio: 150000, descripcion: 'tenis' },
+      compra: { precio: 150000, descripcion: 'unos tenis' },
     });
     expect(reglas('¿puedo comprar una tele de 12 mil a 12 meses?')).toMatchObject({
       intencion: 'simular',

@@ -24,4 +24,10 @@ export {
   type ResultadoTurno,
   type SalidaTurno,
 } from './turno';
-export { contextoMinimo, type CuentaApp, type DatosContexto } from './contexto-minimo';
+export {
+  ANTERIOR_MAXIMO_NUBE,
+  anteriorParaNube,
+  contextoMinimo,
+  type CuentaApp,
+  type DatosContexto,
+} from './contexto-minimo';

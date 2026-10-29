@@ -107,6 +107,9 @@ export const EJEMPLOS: readonly { titulo: string; cuentas: string; frase: string
   },
 ];
 
+/** El texto del usuario no puede cerrar la etiqueta <frase> ni <anterior> (regla 9). */
+const sinEtiquetas = (texto: string) => texto.replaceAll('<', '‹').replaceAll('>', '›');
+
 const DICCIONARIO = `comida_fuera: tacos, torta, comida, cena, desayuno, restaurante, fonda, pizza, sushi, quesadillas, tamales
 antojos: coca, refresco, café, chicle, botana, papas, dulces, galletas, helado, elote, esquite
 super: súper, despensa, mandado, mercado, abarrotes, verdura, fruta, carne
@@ -123,11 +126,97 @@ apoyo_familiar: dinero que le pasa o le da a un familiar (mamá o jefa, papá o 
 Ambiguas (omite la categoría): gas, chelas, pastel, celular, propina, enganche, mantenimiento, predial de la casa.
 Ingresos: sueldo (quincena, nómina), honorarios (me pagaron por un trabajo), ventas (vendí algo), regalo_recibido, reembolso, rendimientos (intereses, cetes).`;
 
+/**
+ * Ejemplos de conversación (06 §15): la frase sigue al turno anterior. Distintos del golden de conversaciones (una
+ * prueba lo verifica). Misma fecha que los de arriba.
+ */
+export const EJEMPLOS_CONVERSACION: readonly {
+  titulo: string;
+  cuentas: string;
+  anterior: { frase: string; interpretacion: unknown };
+  frase: string;
+  salida: unknown;
+}[] = [
+  {
+    titulo: 'seguimiento de una consulta',
+    cuentas: '(ninguna con alias)',
+    anterior: {
+      frase: 'cuánto gasté en gasolina este mes',
+      interpretacion: {
+        intencion: 'consultar',
+        consulta: {
+          tipo: 'gasto_por_categoria',
+          categoria: 'gasolina',
+          desde: '2026-03-01',
+          hasta: '2026-03-04',
+        },
+      },
+    },
+    frase: '¿y el mes anterior?',
+    salida: {
+      interpretacion: {
+        intencion: 'consultar',
+        consulta: {
+          tipo: 'gasto_por_categoria',
+          categoria: 'gasolina',
+          desde: '2026-02-01',
+          hasta: '2026-02-28',
+        },
+      },
+    },
+  },
+  {
+    titulo: 'corrección del último movimiento',
+    cuentas: 'credito: azul',
+    anterior: {
+      frase: 'pizza 189',
+      interpretacion: {
+        intencion: 'registrar',
+        movimientos: [
+          {
+            tipo: 'gasto',
+            monto: 18900,
+            fecha: '2026-03-04',
+            descripcion: 'pizza',
+            categoria: 'comida_fuera',
+          },
+        ],
+      },
+    },
+    frase: 'no, fue con la azul',
+    salida: {
+      interpretacion: {
+        intencion: 'corregir',
+        objetivo: { ultimo: true },
+        cambios: { origen: { tipo: 'credito', alias: 'azul' } },
+      },
+    },
+  },
+  {
+    titulo: 'respuesta a una aclaración',
+    cuentas: '(ninguna con alias)',
+    anterior: {
+      frase: 'me alcanza para unos lentes',
+      interpretacion: { intencion: 'aclarar', motivo: 'monto_faltante', pregunta: '¿Cuánto cuestan?' },
+    },
+    frase: 'como 2,300',
+    salida: { interpretacion: { intencion: 'simular', compra: { precio: 230000, descripcion: 'lentes' } } },
+  },
+];
+
+const textoAnterior = (a: { frase: string; interpretacion: unknown }) =>
+  `<anterior>${sinEtiquetas(a.frase)} → ${sinEtiquetas(JSON.stringify(a.interpretacion))}</anterior>`;
+
 function textoEjemplos(): string {
-  return EJEMPLOS.map(
+  const sueltos = EJEMPLOS.map(
     (e, i) =>
       `Ejemplo ${i + 1} (${e.titulo}). Cuentas: ${e.cuentas}.\n<frase>${e.frase}</frase>\n${JSON.stringify(e.salida)}`,
-  ).join('\n\n');
+  );
+  const seguidos = EJEMPLOS_CONVERSACION.map(
+    (e, i) =>
+      `Ejemplo ${EJEMPLOS.length + i + 1} (${e.titulo}). Cuentas: ${e.cuentas}.\nTurno anterior: ${textoAnterior(e.anterior)}\n<frase>${e.frase}</frase>\n${JSON.stringify(e.salida)}`,
+  );
+  return [...sueltos, ...seguidos].join('\n\n');
 }
 
 /** Mensaje de sistema fijo: idéntico en cada llamada (caché del proveedor). Reglas de 06 §3.1. */
@@ -162,7 +251,8 @@ Siempre en centavos enteros (pesos × 100): "80" = 8000; "1,250.50" = 125050; "1
 Sin fecha = hoy. ayer = hoy − 1; antier = hoy − 2; hace N días = hoy − N.
 Al registrar: "el viernes" = el viernes pasado más reciente, sin contar hoy; "el N" = el día N más reciente que no pase de hoy: si N es mayor que el día de hoy, es del mes anterior. "La semana pasada" sin día → aclarar/fecha_ambigua.
 Al simular o configurar: la próxima ocurrencia, sin contar hoy; "la quincena" = proximo_ingreso.
-Rangos de consulta, inclusivos: esta semana = del lunes a hoy; este mes = del día 1 a hoy; el mes pasado = completo; esta quincena = de ultimo_ingreso a hoy; los próximos N días = de hoy a hoy + N − 1. mayores_gastos sin periodo = de hoy − 29 a hoy, limite 5. comparar_periodos de este mes contra el pasado: actual = del día 1 a hoy; anterior = los mismos días del mes anterior.
+Rangos de consulta, inclusivos: esta semana = del lunes a hoy; la semana pasada = del lunes al domingo de la semana anterior; este mes = del día 1 a hoy; el mes pasado = completo; esta quincena = de ultimo_ingreso a hoy; los próximos N días = de hoy a hoy + N − 1. mayores_gastos sin periodo = de hoy − 29 a hoy, limite 5. comparar_periodos de este mes contra el pasado: actual = del día 1 a hoy; anterior = los mismos días del mes anterior. "¿Cuánto gasté?" o "¿cuánto gasté en X?" sin periodo → aclarar/fecha_ambigua ("¿De cuándo? ¿Hoy, esta semana o este mes?"); con "llevo" es este mes.
+compromisos va siempre de hoy en adelante: sin periodo, de hoy a proximo_ingreso; esta semana = de hoy a hoy + 6; la próxima semana = de lunes a domingo; este mes = de hoy al último día del mes.
 
 # Cuentas y personas
 origen = de dónde sale el dinero; destino = a dónde llega. Tipos: efectivo (efectivo, cash, billetes); debito (débito, nómina, por transferencia); credito (la de crédito); tarjeta ("con tarjeta" sin tipo). "Me depositó" o "me depositaron" → destino {"tipo":"debito"} aunque no diga la cuenta. Si no dice con qué pagó ni a dónde llegó, omite la cuenta; no la deduzcas del concepto ("me cayó la quincena" no lleva destino). "De contado" no es efectivo.
@@ -176,7 +266,7 @@ En consultas también valen los grupos comida, movilidad y casa ("en comida" →
 Las categorías del negocio (abajo) nunca van sin espacio negocio: si la frase no habla del negocio, omite la categoría.
 
 # Consultas (consulta.tipo)
-hoy_puedes (cuánto puedo gastar hoy); gasto_total; gasto_por_categoria; saldo (alias); deuda_tarjetas; compromisos (pagos que vienen); por_cobrar (quién me debe); comparar_periodos (actual y anterior); mayores_gastos (en qué se me va); suscripciones; impuestos (cuánto lleva de impuestos, ISR o IVA; no es gasto_por_categoria); deducciones; puedo_retirar (cuánto puede sacar del negocio); explicar (por qué pasó algo, con pregunta).
+hoy_puedes (cuánto puedo gastar hoy); proximo_ingreso (cuándo me pagan, cuánto falta para la quincena); desglose_hoy (por qué tengo tan poco hoy, cómo lo calculaste); gasto_total; gasto_por_categoria; saldo (alias; "¿cuánto tengo?" sin cuenta va sin alias; "¿cuánto debo en la Nu?" es saldo de esa tarjeta); deuda_tarjetas ("¿cuánto debo?"); compromisos (pagos que vienen); por_cobrar (quién me debe; contraparte si nombra a alguien); comparar_periodos (actual y anterior); mayores_gastos (en qué se me va); suscripciones; impuestos (cuánto lleva de impuestos, ISR o IVA; no es gasto_por_categoria); deducciones; puedo_retirar (cuánto puede sacar del negocio); explicar (por qué pasó algo, con pregunta).
 
 # Configurar (ajuste.tipo)
 Cada tipo lleva solo sus campos: ingreso_recurrente = monto y regla; compromiso = concepto, monto, categoria, regla y espacio (solo negocio); tanda = aportacion, participantes, turno y regla.
@@ -192,6 +282,15 @@ No es compartido: "pagué yo" sin reparto ni pareja (gasto normal); "entre N", "
 
 # Negocio (solo si Espacios incluye negocio)
 espacio negocio cuando la frase habla del negocio (la tienda, la caja, el local, un cliente de Clientes, mercancía, vender, fiar); sin señal, omite espacio. Las categorías ${CATEGORIAS_NEGOCIO_EXCLUSIVAS.join(', ')} existen solo en el negocio y exigen espacio negocio, también en compromisos ("la renta del local" → compromiso renta_local). ISR o IVA → impuestos; predial del local, nómina, licencias o derechos → otros_impuestos. Sacar dinero del negocio para ti → retiro_dueno; poner dinero tuyo en el negocio → aportacion_dueno. Fiar → prestamo_otorgado y cobrar lo fiado → cobro_prestamo, ambos con espacio negocio.
+
+# Conversación
+Si viene "Turno anterior" (lo que el usuario dijo antes → cómo lo entendiste), la frase puede seguirlo. Responde la intención completa, como si lo hubiera dicho todo junto:
+- Tras una consulta: "¿y la semana pasada?", "¿y en comida?", "¿y en total?", "¿y en la Nu?", "¿y Juan?" repiten la consulta con lo que cambia (otra categoría → gasto_por_categoria; "en total" → gasto_total; una cuenta → saldo). Tras hoy_puedes, "¿por qué?" → desglose_hoy.
+- Tras un registro: "no, en efectivo", "con la Nu", "fue ayer", "eran 850", "ponlo en súper", "los pagué con la Nu" → corregir con objetivo {"ultimo":true} y solo lo que cambia (si nombra lo que corrige, como "no, los tacos fueron…", el objetivo es su texto, como sin turno anterior); "bórralo" → anular el último; "otra igual" → registrar los mismos movimientos otra vez. "Otro"/"otra" con una cifra ("otro de 95") es un movimiento NUEVO (registrar, nunca corregir) igual al último con esa cifra y sin cuenta. Lo nuevo que se registra después ("también unas papas de 20") no hereda la cuenta del anterior si no la dice. Si pide sumar o quitar a la cifra ("quítale 10"), no hagas la cuenta: aclarar/monto_faltante preguntando cuánto fue en total.
+- Tras simular: "¿y a 6 meses?", "¿y de contado?" (sin meses), "¿y si espero a la quincena?", "¿y de 900?" → la misma simulación con lo que cambia; "ya lo compré", "ya la compré" → registrar sin preguntar: un gasto por el precio con su descripción y categoría, sin cuenta si no la dice (si la simulación era a meses, compra_msi).
+- Tras aclarar: la frase es la respuesta; completa la intención de la frase anterior con ella. Si se preguntó qué día de la semana pasada fue, el día que diga es de esa semana (usa "semana pasada" del contexto).
+- Los periodos de un seguimiento salen del contexto: "la semana pasada" es la del contexto, no la de hoy.
+- Si la frase se entiende sola, ignora el turno anterior. Toda cifra sale de lo que dijo el usuario, nunca de respuestas de la app.
 
 # Salida
 Solo el JSON. Omite lo que no dijo: espacio personal, cuenta desconocida, categoría dudosa. descripcion: de 1 a 3 palabras sobre lo que compró o recibió.
@@ -226,9 +325,6 @@ A es uno de: {tipo:"tarjeta_ciclo",alias?,dia_corte?,dia_limite_pago?,dias_para_
 R es uno de: {tipo:"quincenal_15_ultimo"} · {tipo:"quincenal_dias",dias:[d1,d2]} · {tipo:"mensual",dia} · {tipo:"semanal",dia_semana} (1 = lunes … 7 = domingo) · {tipo:"catorcenal",ancla:fecha} · {tipo:"anual",mes,dia}; todas aceptan ajuste?:"anterior"|"siguiente"|"ninguno".
 Valores: tipo de M: ${TIPOS_MOVIMIENTO.join(', ')}. tipo de consulta: ${TIPOS_CONSULTA.join(', ')}. tipo de Cuenta: ${TIPOS_REF_CUENTA.join(', ')}. motivo de aclarar: ${MOTIVOS_ACLARAR.join(', ')}. categoria: los slugs de Categorías (con categoría si la palabra está en el diccionario, también en compromiso: renta → vivienda). monto, precio, efectivo_real y aportacion: centavos enteros. Fechas: "YYYY-MM-DD".`;
 
-/** El texto del usuario no puede cerrar la etiqueta <frase> (regla 9). */
-const sinEtiquetas = (texto: string) => texto.replaceAll('<', '‹').replaceAll('>', '›');
-
 const lista = (grupos: readonly (readonly string[])[] | undefined, vacio: string) =>
   (grupos ?? []).map((a) => a.join('/')).join(', ') || vacio;
 
@@ -236,6 +332,47 @@ const lista = (grupos: readonly (readonly string[])[] | undefined, vacio: string
  * Mes anterior a una fecha civil 'YYYY-MM-DD' y cuántos días tiene, con aritmética entera (sin `Date`, regla 6).
  * Va en el turno del usuario para que "el 20" dicho el día 11 caiga en el mes anterior sin que el modelo lo cuente.
  */
+/** Días civiles desde 1970-01-01 (Hinnant), sin `Date` (regla 6). */
+function aDias(anio: number, mes: number, dia: number): number {
+  const y = mes <= 2 ? anio - 1 : anio;
+  const era = Math.floor(y / 400);
+  const yoe = y - era * 400;
+  const doy = Math.floor((153 * (mes + (mes > 2 ? -3 : 9)) + 2) / 5) + dia - 1;
+  const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
+  return era * 146097 + doe - 719468;
+}
+
+/** Fecha civil 'YYYY-MM-DD' de unos días civiles (inversa de `aDias`). */
+function deDias(z0: number): string {
+  const z = z0 + 719468;
+  const era = Math.floor(z / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365,
+  );
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const dia = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const mes = mp < 10 ? mp + 3 : mp - 9;
+  const anio = yoe + era * 400 + (mes <= 2 ? 1 : 0);
+  return `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+}
+
+/**
+ * La semana pasada (de lunes a domingo) de una fecha civil, con aritmética entera. Va en el turno del usuario para
+ * que «¿y la semana pasada?» y «el jueves» de la semana pasada no dependan de que el modelo cuente días.
+ */
+export function semanaPasada(fecha: string): { desde: string; hasta: string } | null {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha);
+  if (!partes) return null;
+  const dias = aDias(Number(partes[1]), Number(partes[2]), Number(partes[3]));
+  if (deDias(dias) !== fecha) return null;
+  // 1970-01-01 fue jueves: lunes = 0.
+  const diaSemana = (((dias + 3) % 7) + 7) % 7;
+  const lunes = dias - diaSemana - 7;
+  return { desde: deDias(lunes), hasta: deDias(lunes + 6) };
+}
+
 export function mesAnterior(fecha: string): { mes: string; dias: number } | null {
   const partes = /^(\d{4})-(\d{2})-\d{2}$/.exec(fecha);
   if (!partes) return null;
@@ -262,15 +399,18 @@ export function construirPrompt(texto: string, contexto: ContextoMinimo): Prompt
       .join('; ') || '(ninguna con alias)';
   const negocio = contexto.espacios.includes('negocio');
   const anterior = mesAnterior(contexto.fecha_referencia);
+  const semana = semanaPasada(contexto.fecha_referencia);
   const usuario =
     `Hoy es ${contexto.fecha_referencia}${contexto.dia_semana ? ` (${contexto.dia_semana})` : ''}` +
     (anterior ? `; mes anterior: ${anterior.mes} (${anterior.dias} días)` : '') +
+    (semana ? `; semana pasada: del ${semana.desde} al ${semana.hasta}` : '') +
     '. ' +
     `proximo_ingreso: ${contexto.proximo_ingreso ?? 'desconocido'}. ultimo_ingreso: ${contexto.ultimo_ingreso ?? 'desconocido'}.\n` +
     `Espacios: ${contexto.espacios.join(', ') || 'personal'}.\n` +
     `Cuentas: ${cuentas}.\n` +
     `Contactos: ${lista(contexto.contactos, '(ninguno)')}.\n` +
     (negocio ? `Clientes: ${lista(contexto.clientes, '(ninguno)')}.\n` : '') +
+    (contexto.anterior ? `Turno anterior: ${textoAnterior(contexto.anterior)}\n` : '') +
     `<frase>${sinEtiquetas(texto)}</frase>`;
   return { sistema: SISTEMA, usuario };
 }

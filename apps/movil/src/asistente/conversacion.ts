@@ -305,6 +305,21 @@ export function preguntaAbierta(
   return null;
 }
 
+/**
+ * Lo último que dijo el asistente con palabras (registro, pregunta, aviso o respuesta), para «no entendí» o
+ * «¿mande?» (`06 §15`); `null` si todavía no ha dicho nada.
+ */
+export function ultimaRespuesta(turnos: readonly TurnoConversacion[]): string | null {
+  for (let i = turnos.length - 1; i >= 0; i--) {
+    const t = turnos[i];
+    if (!t || t.de !== 'asistente') continue;
+    if (t.clase === 'registro' || t.clase === 'pregunta' || t.clase === 'aviso' || t.clase === 'texto') {
+      return t.texto;
+    }
+  }
+  return null;
+}
+
 function normalizar(t: string): string {
   return t
     .normalize('NFD')

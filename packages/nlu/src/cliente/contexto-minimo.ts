@@ -1,5 +1,5 @@
 import { diaSemana, esFecha, type PlainDate } from '@cartera/core';
-import type { ContextoInterprete, CuentaContexto } from '../contexto';
+import type { ContextoInterprete, CuentaContexto, TurnoAnterior } from '../contexto';
 import type { Espacio } from '../esquema';
 import { normalizarAlias } from '../normalizar';
 
@@ -128,4 +128,19 @@ export function contextoMinimo(datos: DatosContexto): ContextoInterprete {
       )
     : [];
   return { ...base, cuentas, contactos, ...(conNegocio ? { clientes } : {}) };
+}
+
+/** El turno anterior serializado cabe en esto (`ANTERIOR_MAXIMO` del contrato del proxy). */
+export const ANTERIOR_MAXIMO_NUBE = 3000;
+
+/**
+ * El turno anterior tal como viaja al proxy (`06 §15`): lo dicho y lo entendido, nunca cifras de respuestas. Si no
+ * cabe en el contrato, `undefined` y la frase va sola, como antes.
+ */
+export function anteriorParaNube(anterior: TurnoAnterior | null | undefined): TurnoAnterior | undefined {
+  if (!anterior) return undefined;
+  const frase = anterior.frase.trim();
+  if (frase === '' || frase.length > TEXTO_MAXIMO_NUBE) return undefined;
+  const a: TurnoAnterior = { frase, interpretacion: anterior.interpretacion };
+  return JSON.stringify(a).length <= ANTERIOR_MAXIMO_NUBE ? a : undefined;
 }

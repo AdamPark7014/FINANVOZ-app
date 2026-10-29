@@ -2,7 +2,7 @@
  * Lo que el nivel 0 sabe del contexto (docs/06-NLU.md §4): cuentas con sus alias, contactos, clientes, fechas y si
  * el negocio está activo. Resuelve alias, métodos de pago y nombres de persona sobre un `Lector`.
  */
-import type { ContextoInterprete, CuentaContexto } from '../contexto';
+import type { ContextoInterprete, CuentaContexto, TurnoAnterior } from '../contexto';
 import type { Categoria, RefCuenta } from '../esquema';
 import { normalizarAlias } from '../normalizar';
 import { buscarEnDiccionario, FAMILIA } from './diccionario';
@@ -54,6 +54,8 @@ export class Entorno {
   readonly negocio: boolean;
   readonly ultimoIngreso: string | undefined;
   readonly proximoIngreso: string | undefined;
+  /** El turno anterior de la conversación (06 §15), si lo hay. */
+  readonly anterior: TurnoAnterior | undefined;
   /** Alias de cada contacto en forma simple (un arreglo por contacto). */
   private readonly contactos: readonly (readonly string[])[];
 
@@ -69,6 +71,7 @@ export class Entorno {
     this.negocio = contexto.espacios.includes('negocio');
     this.ultimoIngreso = contexto.ultimo_ingreso;
     this.proximoIngreso = contexto.proximo_ingreso;
+    this.anterior = contexto.anterior;
   }
 
   /** Un tramo de palabras es un alias de cuenta dicho tal cual. */

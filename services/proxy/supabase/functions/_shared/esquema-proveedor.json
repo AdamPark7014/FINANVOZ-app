@@ -398,7 +398,9 @@
                       "explicar",
                       "impuestos",
                       "deducciones",
-                      "puedo_retirar"
+                      "puedo_retirar",
+                      "proximo_ingreso",
+                      "desglose_hoy"
                     ]
                   },
                   "desde": {
@@ -1873,7 +1875,9 @@
                       "explicar",
                       "impuestos",
                       "deducciones",
-                      "puedo_retirar"
+                      "puedo_retirar",
+                      "proximo_ingreso",
+                      "desglose_hoy"
                     ]
                   },
                   "desde": {

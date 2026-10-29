@@ -15,6 +15,16 @@ export interface ContextoMinimo {
   clientes?: string[][];
   ultimo_ingreso?: string;
   proximo_ingreso?: string;
+  /**
+   * El turno anterior de la conversación (docs/06-NLU.md §15): lo que el usuario dijo antes y cómo se entendió.
+   * Nunca lleva lo que contestó la app (cifras de consultas, saldos).
+   */
+  anterior?: TurnoAnterior;
+}
+
+export interface TurnoAnterior {
+  frase: string;
+  interpretacion: Record<string, unknown>;
 }
 
 export interface SolicitudInterpretar {
@@ -53,6 +63,22 @@ const ALIAS_MAXIMO = 60;
 const LISTA_MAXIMA = 50;
 
 const CLAVES_SOLICITUD = new Set(['texto', 'contexto_min', 'version_esquema']);
+/** El turno anterior serializado cabe en esto (la app no lo manda si es más largo). */
+export const ANTERIOR_MAXIMO = 3000;
+const CLAVES_ANTERIOR = new Set(['frase', 'interpretacion']);
+const INTENCIONES = new Set([
+  'registrar',
+  'corregir',
+  'anular',
+  'revisar_duplicados',
+  'arqueo',
+  'consultar',
+  'simular',
+  'configurar',
+  'gasto_compartido',
+  'aclarar',
+  'fuera_de_alcance',
+]);
 const CLAVES_CONTEXTO = new Set([
   'fecha_referencia',
   'dia_semana',
@@ -62,6 +88,7 @@ const CLAVES_CONTEXTO = new Set([
   'clientes',
   'ultimo_ingreso',
   'proximo_ingreso',
+  'anterior',
 ]);
 const CLAVES_CUENTA = new Set(['tipo', 'alias', 'espacio']);
 const TIPOS_CUENTA = new Set(['efectivo', 'debito', 'credito', 'billetera']);
@@ -88,6 +115,15 @@ const esListaAlias = (v: unknown): v is string[] =>
   Array.isArray(v) && v.length >= 1 && v.length <= LISTA_MAXIMA && v.every(esTextoCorto);
 const esFechaOpcional = (v: unknown) => v === undefined || (typeof v === 'string' && FECHA.test(v));
 
+/** Solo lo dicho y una interpretación con intención conocida, sin pasar de `ANTERIOR_MAXIMO` caracteres. */
+function anteriorValido(v: unknown): v is TurnoAnterior {
+  if (!esObjeto(v) || !soloClaves(v, CLAVES_ANTERIOR)) return false;
+  if (typeof v.frase !== 'string' || v.frase.trim() === '' || v.frase.length > TEXTO_MAXIMO) return false;
+  const i = v.interpretacion;
+  if (!esObjeto(i) || typeof i.intencion !== 'string' || !INTENCIONES.has(i.intencion)) return false;
+  return JSON.stringify(v).length <= ANTERIOR_MAXIMO;
+}
+
 function contextoValido(v: unknown): v is ContextoMinimo {
   if (!esObjeto(v) || !soloClaves(v, CLAVES_CONTEXTO)) return false;
   if (typeof v.fecha_referencia !== 'string' || !FECHA.test(v.fecha_referencia)) return false;
@@ -110,7 +146,7 @@ function contextoValido(v: unknown): v is ContextoMinimo {
     if (lista === undefined) continue;
     if (!Array.isArray(lista) || lista.length > LISTA_MAXIMA || !lista.every(esListaAlias)) return false;
   }
-  return true;
+  return v.anterior === undefined || anteriorValido(v.anterior);
 }
 
 /**

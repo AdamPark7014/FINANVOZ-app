@@ -89,6 +89,8 @@ const PREVIOS = new Set(['ya', 'hoy', 'ayer', 'anoche', 'tambien']);
 
 function empiezaConGasto(t: readonly string[]): boolean {
   let i = 0;
+  // «la semana pasada me compré unos tenis de 1,200»: la fecha va antes del verbo (se pregunta qué día).
+  if (t[0] === 'la' && t[1] === 'semana' && t[2] === 'pasada') i = 3;
   while (i < t.length && PREVIOS.has(t[i] ?? '')) i++;
   return VERBOS_GASTO.some((v) => v.every((p, k) => t[i + k] === p));
 }
@@ -159,6 +161,26 @@ const MONEDA = new Set(['pesos', 'peso', 'pesitos', 'varos', 'varo', 'baros', 'b
  * igual que la nube (06 §3.1 Montos). Nunca tras "a las" o "las" (es una hora).
  */
 function montoAmbiguo(t: readonly string[]): Interpretacion | null {
+  const u = ubicarMontoAmbiguo(t);
+  if (!u) return null;
+  return {
+    intencion: 'aclarar',
+    motivo: 'monto_ambiguo',
+    pregunta: `¿Fueron ${pesosConCentavos(u.centavos)} o ${pesos(u.cientos / 100)}?`,
+    opciones: [pesosConCentavos(u.centavos), pesos(u.cientos / 100)],
+  };
+}
+
+const pesosConCentavos = (c: number) => `$${Math.floor(c / 100)}.${String(c % 100).padStart(2, '0')}`;
+
+/**
+ * Dónde está un "dos cincuenta" en `t` (sin separadores) y sus dos lecturas en centavos: $2.50 (250) o $250
+ * (25000). Lo usa también la respuesta a esa aclaración (`seguimiento.ts`) para cambiar la pareja por la cifra
+ * elegida. `null` si no hay una pareja así o si la frase trae otra cifra.
+ */
+export function ubicarMontoAmbiguo(
+  t: readonly string[],
+): { inicio: number; fin: number; centavos: number; cientos: number } | null {
   for (let i = 0; i < t.length - 1; i++) {
     const primera = PRIMERA_AMBIGUA[t[i] ?? ''];
     if (primera === undefined || t[i - 1] === 'las') continue;
@@ -172,14 +194,7 @@ function montoAmbiguo(t: readonly string[]): Interpretacion | null {
       fin = i + 4;
     }
     if (tieneCifra([...t.slice(0, i), ...t.slice(fin)].filter((p) => !MONEDA.has(p)))) return null;
-    const centavos = `$${primera}.${String(segunda).padStart(2, '0')}`;
-    const cientos = pesos(primera * 100 + segunda);
-    return {
-      intencion: 'aclarar',
-      motivo: 'monto_ambiguo',
-      pregunta: `¿Fueron ${centavos} o ${cientos}?`,
-      opciones: [centavos, cientos],
-    };
+    return { inicio: i, fin, centavos: primera * 100 + segunda, cientos: (primera * 100 + segunda) * 100 };
   }
   return null;
 }
