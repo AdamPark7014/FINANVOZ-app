@@ -1,10 +1,25 @@
 # RELEVO
 
 - **Último turno:** claude-code
-- **Fecha:** 2026-10-28
+- **Fecha:** 2026-11-08
 - **Rama:** main
 
-## Hecho en este turno
+## Hecho el 08-11
+
+- Adam pidió «mejorarla por muchísimo». La laptop estaba igual a `origin/main` (`b851563`): nada sin subir. Los 29
+  stashes son del 18-10 o antes y no se tocaron.
+- `951243e`/`a7febf9`: O7 solo deja escrito el colchón del 10 % si cabe en lo que hoy queda libre (`colchonInicial`);
+  antes el primer «Hoy» abría en $0 y «Te faltan». Verificado: vitest de `servicios/onboarding`, jest de
+  `pantallas/onboarding` (40/40), `tsc` de `apps/movil`. Suite completa y Maestro: los corre el CI del push.
+- Auditoría con las capturas de Maestro iOS de `b851563` (artefacto `maestro-ios-85`). Cuidado al leerlas: esa build del
+  simulador **no** trae `EXPO_PUBLIC_PLUS_SIN_TIENDA` ni dictado, así que el aviso de Plus en las consultas y la falta de
+  micrófono en «Dímelo» no ocurren en TestFlight. Lo de Plus sí aplicará cuando haya tienda (H7 sigue abierto).
+- Propuesta visual sin construir, esperando a Adam: canvas privado «FinanVoz · El salto» (inicio que dice qué hacer,
+  plática en filas compactas, varias cosas de corrido, cierre del día por voz).
+- Corrección a lo de abajo: `iOS · TestFlight` y `Android · Play` corrieron en verde sobre `b851563` el 28-10, después
+  de escribir «Estado de tiendas». No confirmé en App Store Connect el número de build ni su estado.
+
+## Hecho el 28-10
 
 - **El asistente platica (Adam, 28-10: «ve cómo mejorar los modelos de cada cosa… que tenga igual
   conversaciones»).** Detalle en `docs/06-NLU.md §15`; decisiones, pendientes 153–155 y mediciones en
