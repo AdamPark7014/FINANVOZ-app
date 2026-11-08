@@ -125,9 +125,7 @@ export default function Colchon() {
         {...(sugerido > 0
           ? {
               ayuda:
-                prellenar === null
-                  ? sugerenciaColchonAlCobrar(sugerido)
-                  : sugerenciaMontoColchon10(sugerido),
+                prellenar === null ? sugerenciaColchonAlCobrar(sugerido) : sugerenciaMontoColchon10(sugerido),
             }
           : {})}
         alCambiar={setMonto}
