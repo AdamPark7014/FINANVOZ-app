@@ -176,7 +176,7 @@ name: Onboarding completo
 # O7 · Colchón: acepta la sugerencia del 10 % y termina
 - assertVisible:
     id: onb-colchon
-- assertVisible: 'Te sugerimos $1,300: el 10 % de lo que te pagan.'
+- assertVisible: '.*(Te sugerimos|Cuando cobres).*el 10 % de lo que te pagan\.'
 - tapOn:
     id: onb-ver-mi-dia
 

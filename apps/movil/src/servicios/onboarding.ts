@@ -17,10 +17,11 @@ import {
 import { CUENTAS_SISTEMA, esquema } from '@cartera/datos';
 import { ReglaRecurrente, type ContextoPaso, type CuentaContexto } from '@cartera/nlu';
 import { exigirConsentimiento } from '../privacidad/consentimiento';
-import { marcarIngresoVariable } from './ajustes';
+import { colchonSugerido, marcarIngresoVariable } from './ajustes';
 import { crearAvisoMsiDoble } from './avisos';
 import { cuentasPropias, idCategoriaDe, insertarCuenta, type CuentaPropia } from './catalogo';
 import { enTransaccion, type Contexto } from './contexto';
+import { obtenerHoy } from './hoy';
 import { desactivarProgramado, insertarProgramado, validarRegla } from './programados';
 import { tarjetaPorId } from './tarjetas';
 
@@ -75,6 +76,26 @@ export function contextoPasoOnboarding(ctx: Contexto): ContextoPaso {
     if (tipo) cuentas.push({ tipo, alias: c.alias, espacio: 'personal' });
   }
   return { fecha_referencia: ctx.reloj.hoy(), espacios: ['personal'], cuentas };
+}
+
+// ——— O7 · Colchón ———
+
+export interface ColchonInicial {
+  /** 10 % del ingreso del periodo (`colchonSugerido`). */
+  readonly sugerido: Centavos;
+  /** Lo que se deja escrito en el campo; `null` si el sugerido dejaría a la persona sin dinero libre hoy. */
+  readonly prellenar: Centavos | null;
+}
+
+/**
+ * O7: el 10 % solo se deja escrito si cabe en lo que hoy queda libre. Si no, el primer «Hoy» abriría en $0 con
+ * «te faltan», por un colchón que la persona no pidió: el campo queda vacío y la sugerencia pasa a «cuando cobres».
+ */
+export function colchonInicial(ctx: Contexto): ColchonInicial {
+  const sugerido = colchonSugerido(ctx);
+  const hoy = obtenerHoy(ctx);
+  const cabe = hoy.faltante === 0 && sugerido < hoy.libre + hoy.colchon;
+  return { sugerido, prellenar: sugerido > 0 && cabe ? sugerido : null };
 }
 
 // ——— O3 · Ingreso ———

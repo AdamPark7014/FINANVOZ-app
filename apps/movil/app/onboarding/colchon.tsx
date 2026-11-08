@@ -9,7 +9,10 @@ import {
   pasoVisibleOnb,
 } from '../../src/pantallas/onboarding/componentes';
 import { DecirloPaso, type PropuestaDecirlo } from '../../src/pantallas/onboarding/DecirloPaso';
-import { sugerenciaMontoColchon10 } from '../../src/pantallas/ajustes/colchon-textos';
+import {
+  sugerenciaColchonAlCobrar,
+  sugerenciaMontoColchon10,
+} from '../../src/pantallas/ajustes/colchon-textos';
 import {
   AYUDA_COLCHON_ONB,
   BTN_CAMBIAR_ALGO,
@@ -25,21 +28,22 @@ import {
   TITULO_COLCHON,
   TITULO_ENTENDI_GUARDO,
 } from '../../src/pantallas/onboarding/textos';
-import { colchonSugerido, completarOnboarding, fijarColchon } from '../../src/servicios';
-import { contextoPasoOnboarding } from '../../src/servicios/onboarding';
+import { completarOnboarding, fijarColchon } from '../../src/servicios';
+import { colchonInicial, contextoPasoOnboarding } from '../../src/servicios/onboarding';
 import { useSesion, useVista } from '../../src/sesion/ProveedorSesion';
 import { Boton, CampoMonto } from '../../src/ui';
 
 /**
- * O7 · Colchón (RF-CFG-02): sugerencia del 10 % del ingreso del periodo → "Ver mi día" termina el onboarding.
+ * O7 · Colchón (RF-CFG-02): sugerencia del 10 % del ingreso del periodo, escrita solo si cabe en lo que hoy queda
+ * libre (`colchonInicial`) → "Ver mi día" termina el onboarding.
  * «Dímelo» («quiero 2 mil de colchón», «nada») → «Entendí» → «Sí» guarda y abre tu día sin formulario (Ola 7 §7).
  */
 export default function Colchon() {
   const router = useRouter();
   const { ctx, refrescar } = useSesion();
   const contexto = useVista(contextoPasoOnboarding);
-  const sugerido = useVista(colchonSugerido);
-  const [monto, setMonto] = useState<Centavos | null>(sugerido > 0 ? sugerido : null);
+  const { sugerido, prellenar } = useVista(colchonInicial);
+  const [monto, setMonto] = useState<Centavos | null>(prellenar);
   // Sube con «Cambiar algo»: el campo se vuelve a montar con lo dicho y con el foco.
   const [versionCampo, setVersionCampo] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -117,8 +121,15 @@ export default function Colchon() {
         key={`colchon-${versionCampo}`}
         testID="onb-colchon-monto"
         etiqueta={ETIQUETA_COLCHON}
-        valorInicial={versionCampo > 0 ? monto : sugerido > 0 ? sugerido : null}
-        {...(sugerido > 0 ? { ayuda: sugerenciaMontoColchon10(sugerido) } : {})}
+        valorInicial={versionCampo > 0 ? monto : prellenar}
+        {...(sugerido > 0
+          ? {
+              ayuda:
+                prellenar === null
+                  ? sugerenciaColchonAlCobrar(sugerido)
+                  : sugerenciaMontoColchon10(sugerido),
+            }
+          : {})}
         alCambiar={setMonto}
         autoFocus={versionCampo > 0}
         admiteCero

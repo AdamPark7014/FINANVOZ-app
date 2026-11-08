@@ -170,14 +170,13 @@ tags:
       - takeScreenshot: o6-captura-iphone
       - tapOn:
           id: onb-captura-continuar
-# O7 · colchón sugerido $1,300 (la ayuda está oculta en iOS; se lee el valor del campo)
+# O7 · colchón: el 10 % solo viene escrito si cabe en lo que hoy queda libre (`colchonInicial`, cubierto en vitest)
 - extendedWaitUntil:
     visible:
       id: onb-colchon
     timeout: 10000
 - assertVisible:
     id: onb-colchon-monto
-    text: '1,300(\.00)?'
 - takeScreenshot: o7-colchon
 - tapOn:
     id: onb-ver-mi-dia

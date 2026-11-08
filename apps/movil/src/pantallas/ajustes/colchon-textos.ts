@@ -24,6 +24,11 @@ export function sugerenciaMontoColchon10(sugerido: Centavos): string {
   return `Te sugerimos ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan.`;
 }
 
+/** O7 cuando el 10 % dejaría a la persona sin dinero libre hoy: el campo va vacío y la sugerencia queda para después. */
+export function sugerenciaColchonAlCobrar(sugerido: Centavos): string {
+  return `Cuando cobres, te sugerimos apartar ${formatearCentavos(sugerido)}: el 10 % de lo que te pagan.`;
+}
+
 export function ayudaColchon(sugerido: Centavos): string {
   return `${sugerenciaMontoColchon10(sugerido)} Escribe 0 si no quieres colchón.`;
 }

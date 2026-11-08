@@ -14,6 +14,7 @@ import {
   agregarPagoFijo,
   agregarPagosFijosDichos,
   agregarTarjetaCredito,
+  colchonInicial,
   configurarIngreso,
   configurarIngresoVariable,
   contextoPasoOnboarding,
@@ -271,6 +272,40 @@ describe('onboarding', () => {
     expect(variable.estado).toBe('ingreso_variable');
     expect(variable.dias).toBe(30);
     expect(variable.mensaje).toBe('Reparto tu dinero libre en 30 días.');
+  });
+});
+
+describe('O7 · colchón inicial', () => {
+  const regla = { tipo: 'quincenal_15_ultimo', ajuste: 'anterior' } as const;
+
+  function conEfectivo(efectivo: number) {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    agregarEfectivo(p.ctx, efectivo);
+    configurarIngreso(p.ctx, { monto: 1_300_000, regla });
+    return p;
+  }
+
+  it('deja escrito el 10 % cuando cabe en lo que hoy queda libre', () => {
+    expect(colchonInicial(conEfectivo(480_000).ctx)).toEqual({ sugerido: 130_000, prellenar: 130_000 });
+  });
+
+  it('con menos dinero que el 10 % no lo escribe: Hoy no abre en $0 por un colchón no pedido', () => {
+    const p = conEfectivo(60_000);
+    expect(colchonInicial(p.ctx)).toEqual({ sugerido: 130_000, prellenar: null });
+    expect(obtenerHoy(p.ctx).faltante).toBe(0);
+    expect(obtenerHoy(p.ctx).libre).toBe(60_000);
+  });
+
+  it('si el 10 % se llevaría justo todo lo libre tampoco lo escribe', () => {
+    expect(colchonInicial(conEfectivo(130_000).ctx).prellenar).toBeNull();
+  });
+
+  it('sin ingreso no hay sugerencia', () => {
+    const p = abrirPrueba('2026-10-11');
+    aceptarConsentimiento(p.ctx, { datosFinancieros: true });
+    agregarEfectivo(p.ctx, 60_000);
+    expect(colchonInicial(p.ctx)).toEqual({ sugerido: 0, prellenar: null });
   });
 });
 
