@@ -13,6 +13,7 @@
     "secretos": "tsx scripts/buscar-secretos.ts"
   },
   "dependencies": {
+    "@babel/runtime": "7.29.10",
     "@cartera/captura-android": "workspace:*",
     "@cartera/core": "workspace:*",
     "@cartera/datos": "workspace:*",
@@ -23,6 +24,7 @@
     "@noble/curves": "2.4.0",
     "@noble/hashes": "2.4.0",
     "@sentry/react-native": "~7.11.0",
+    "@shopify/react-native-skia": "2.6.2",
     "drizzle-orm": "^0.45.4",
     "expo": "~57.0.27",
     "expo-background-task": "~57.0.21",
@@ -33,6 +35,7 @@
     "expo-document-picker": "~57.0.3",
     "expo-file-system": "~57.0.7",
     "expo-font": "~57.0.4",
+    "expo-glass-effect": "~57.0.4",
     "expo-haptics": "~57.0.3",
     "expo-linking": "~57.0.12",
     "expo-local-authentication": "~57.0.3",
@@ -46,6 +49,7 @@
     "expo-speech-recognition": "~57.1.1",
     "expo-sqlite": "~57.0.4",
     "expo-status-bar": "~57.0.1",
+    "expo-symbols": "~57.0.3",
     "expo-system-ui": "~57.0.4",
     "expo-task-manager": "~57.0.21",
     "fflate": "0.8.3",
@@ -58,9 +62,11 @@
     "react-native-purchases": "10.10.2",
     "react-native-quick-base64": "3.0.1",
     "react-native-quick-crypto": "1.1.7",
+    "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
+    "react-native-worklets": "0.10.1",
     "zod": "^4.6.6"
   },
   "devDependencies": {

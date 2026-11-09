@@ -1,5 +1,9 @@
+import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import type { ReactNode } from 'react';
+import { Platform } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
+
+type SFSymbol = Extract<SymbolViewProps['name'], string>;
 
 /**
  * Íconos de línea de la dirección B (`docs/diseno/direccion-b/`), con los mismos trazos que los tableros (estilo
@@ -36,6 +40,39 @@ export type NombreIcono =
   | 'porcentaje'
   | 'cerrar'
   | 'llama';
+
+/** SF Symbols de cada ícono (iPhone). */
+const SIMBOLO_IOS: Record<NombreIcono, SFSymbol> = {
+  microfono: 'mic',
+  teclado: 'keyboard',
+  buscar: 'magnifyingglass',
+  mas: 'plus',
+  chevronDerecha: 'chevron.right',
+  chevronAbajo: 'chevron.down',
+  palomita: 'checkmark',
+  alerta: 'exclamationmark.triangle',
+  vaso: 'cup.and.saucer',
+  cubiertos: 'fork.knife',
+  carrito: 'cart',
+  boleto: 'ticket',
+  coche: 'car',
+  tarjeta: 'creditcard',
+  billete: 'banknote',
+  banco: 'building.columns',
+  moneda: 'dollarsign.circle',
+  casa: 'house',
+  rayo: 'bolt',
+  corazon: 'heart',
+  regalo: 'gift',
+  camisa: 'tshirt',
+  celular: 'iphone',
+  repetir: 'arrow.triangle.2.circlepath',
+  libro: 'book',
+  personas: 'person.2',
+  porcentaje: 'percent',
+  cerrar: 'xmark',
+  llama: 'flame',
+};
 
 function trazos(nombre: NombreIcono): ReactNode {
   switch (nombre) {
@@ -225,7 +262,7 @@ export function Icono({
   grosor?: number;
   testID?: string;
 }) {
-  return (
+  const dibujo = (
     <Svg
       width={tamano}
       height={tamano}
@@ -241,6 +278,20 @@ export function Icono({
     >
       {trazos(nombre)}
     </Svg>
+  );
+  if (Platform.OS !== 'ios') return dibujo;
+  // En iPhone, el símbolo del sistema; el trazo propio queda de respaldo.
+  return (
+    <SymbolView
+      name={SIMBOLO_IOS[nombre]}
+      size={tamano}
+      tintColor={color}
+      weight={grosor >= 2.4 ? 'semibold' : grosor >= 2 ? 'medium' : 'regular'}
+      fallback={dibujo}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      {...(testID ? { testID } : {})}
+    />
   );
 }
 

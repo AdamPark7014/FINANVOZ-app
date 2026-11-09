@@ -29,7 +29,11 @@
     "vitest": "^4.0.8"
   },
   "pnpm": {
+    "overrides": {
+      "react-native-reanimated": "4.5.1"
+    },
     "onlyBuiltDependencies": [
+      "@shopify/react-native-skia",
       "better-sqlite3",
       "esbuild"
     ]

@@ -129,6 +129,7 @@
         {
           "ios": {
             "fonts": [
+              "./assets/fuentes/Figtree_300Light.ttf",
               "./assets/fuentes/Figtree_400Regular.ttf",
               "./assets/fuentes/Figtree_500Medium.ttf",
               "./assets/fuentes/Figtree_600SemiBold.ttf",
@@ -141,6 +142,7 @@
               {
                 "fontFamily": "Figtree",
                 "fontDefinitions": [
+                  { "path": "./assets/fuentes/Figtree_300Light.ttf", "weight": 300 },
                   { "path": "./assets/fuentes/Figtree_400Regular.ttf", "weight": 400 },
                   { "path": "./assets/fuentes/Figtree_500Medium.ttf", "weight": 500 },
                   { "path": "./assets/fuentes/Figtree_600SemiBold.ttf", "weight": 600 },
