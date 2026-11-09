@@ -36,7 +36,8 @@ tags:
     visible:
       id: seccion-tienes
     timeout: 10000
+# La cifra va oculta a VoiceOver dentro del botón (`accessibilityElementsHidden`): el saldo se lee de la etiqueta de este
 - assertVisible:
-    id: 'cuenta-.*-saldo'
+    id: 'cuenta-.*-accion'
     text: '.*(\$575|quinientos setenta y cinco pesos).*'
 - takeScreenshot: cuentas-575

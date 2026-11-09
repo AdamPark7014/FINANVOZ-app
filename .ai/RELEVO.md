@@ -18,6 +18,12 @@
   plática en filas compactas, varias cosas de corrido, cierre del día por voz).
 - Corrección a lo de abajo: `iOS · TestFlight` y `Android · Play` corrieron en verde sobre `b851563` el 28-10, después
   de escribir «Estado de tiendas». No confirmé en App Store Connect el número de build ni su estado.
+- 09-11: Maestro 05 fallaba dos veces seguidas porque `cuenta-*-saldo` ya no sale en el árbol de accesibilidad de iOS
+  (va dentro de `accessibilityElementsHidden`; el código no cambió desde el 28-10, en pantalla salía $575). Ahora lee
+  la etiqueta de `cuenta-*-accion`. 03 falló una vez y pasó al repetirlo.
+- 09-11: Adam pide herramientas «más duras» para diseño y natividad. Propuesta sin construir: mantener los motores en
+  TypeScript y pasar lo visible a SwiftUI/Compose (`@expo/ui`, `expo-symbols`, `expo-glass-effect`, Reanimated 4, Skia,
+  `expo-widgets`; todas con versión en el SDK 57). Hoy la app no usa ninguna.
 
 ## Hecho el 28-10
 
