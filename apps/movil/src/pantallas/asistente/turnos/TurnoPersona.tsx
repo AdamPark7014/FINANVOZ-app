@@ -4,8 +4,8 @@ import { FUENTE, espacio, Icono, useTema } from '../../../ui';
 import { etiquetaTurnoPersona } from '../textos';
 
 /**
- * Lo que dijiste o escribiste (dirección B, tablero B2): una burbuja verde pino a la derecha, con el micrófono menta
- * si fue por voz. Lo que dice el asistente va sin burbuja; esto es lo único que la lleva.
+ * Lo que dijiste o escribiste (premium, 08-11): tu frase en chico a la derecha, como una transcripción, con un
+ * micrófono si fue por voz. Lo importante es lo que contesta el asistente.
  */
 export function TurnoPersona({
   turno,
@@ -25,19 +25,13 @@ export function TurnoPersona({
         maxWidth: '82%',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: espacio.s,
-        backgroundColor: c.dock,
-        borderTopLeftRadius: 22,
-        borderTopRightRadius: 22,
-        borderBottomLeftRadius: 22,
-        borderBottomRightRadius: 6,
-        paddingVertical: espacio.m,
-        paddingHorizontal: espacio.l,
+        gap: espacio.xs + 2,
+        paddingVertical: espacio.xs,
       }}
     >
       {turno.porVoz ? (
         <View testID={`${testID}-voz`}>
-          <Icono nombre="microfono" color={c.microfono} tamano={16} grosor={2.2} />
+          <Icono nombre="microfono" color={c.textoSecundario} tamano={14} grosor={1.8} />
         </View>
       ) : null}
       <Text
@@ -45,10 +39,9 @@ export function TurnoPersona({
         style={{
           fontFamily: FUENTE,
           flexShrink: 1,
-          fontSize: 17,
-          lineHeight: 23,
-          fontWeight: '500',
-          color: c.sobreDock,
+          fontSize: 15,
+          lineHeight: 21,
+          color: c.textoSecundario,
         }}
       >
         {turno.texto}

@@ -1,14 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { VistaHoy } from '../../servicios';
-import {
-  FUENTE,
-  cifraEnPalabras,
-  coloresCategoria,
-  espacio,
-  formatearCentavos,
-  margenPantalla,
-  useTema,
-} from '../../ui';
+import { FUENTE, cifraEnPalabras, coloresCategoria, espacio, formatearCentavos, useTema } from '../../ui';
 import { PISTA_OCULTAR_DESGLOSE, PISTA_VER_DESGLOSE, PISTA_VER_QUE_VIENE } from '../principal/textos';
 import { etiquetaDeltaDia, etiquetaPildoraDia, textoDeltaDia, textoPildoraDia } from './textos';
 
@@ -47,19 +39,16 @@ export function PildoraDia({
       }
       accessibilityState={{ expanded: abierto }}
       style={({ pressed }) => ({
-        marginHorizontal: margenPantalla,
-        minHeight: 52,
-        borderRadius: 26,
-        backgroundColor: c.superficie,
-        borderWidth: 1,
-        borderColor: abierto ? c.acento : c.borde,
+        marginHorizontal: espacio.xl,
+        minHeight: 56,
+        borderBottomWidth: abierto ? 1 : StyleSheet.hairlineWidth,
+        borderBottomColor: abierto ? c.acento : c.borde,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: espacio.m,
-        paddingHorizontal: 18,
-        paddingVertical: espacio.xs,
-        opacity: pressed ? 0.85 : 1,
+        paddingBottom: espacio.s,
+        opacity: pressed ? 0.6 : 1,
       })}
     >
       <Text
@@ -67,9 +56,8 @@ export function PildoraDia({
         style={{
           fontFamily: FUENTE,
           flex: 1,
-          fontSize: 15,
+          fontSize: 14,
           lineHeight: 20,
-          fontWeight: '600',
           color: c.textoSecundario,
         }}
       >
@@ -105,10 +93,10 @@ export function PildoraDia({
         importantForAccessibility="no"
         style={{
           fontFamily: FUENTE,
-          fontSize: 22,
-          lineHeight: 28,
-          fontWeight: '800',
-          color: negativo ? c.faltante : c.acentoTexto,
+          fontSize: 28,
+          lineHeight: 34,
+          fontWeight: '300',
+          color: negativo ? c.faltante : c.texto,
           fontVariant: ['tabular-nums'],
         }}
       >

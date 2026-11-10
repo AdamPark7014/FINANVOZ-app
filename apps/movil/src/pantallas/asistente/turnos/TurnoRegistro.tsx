@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AccessibilityInfo, Pressable, ScrollView, Text, View } from 'react-native';
+import { AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { CambioRegistro, Turno } from '../../../asistente/tipos';
 import { mensajeError, RACHA_MINIMA, rachaAnotando } from '../../../servicios';
 import {
@@ -181,14 +181,15 @@ function TarjetaRegistro({
   const dinero = coloresDinero[esquema];
   const conRacha = ultimo && racha >= RACHA_MINIMA;
   return (
-    <View style={{ gap: espacio.m }}>
+    <View style={{ gap: espacio.s }}>
       {/* D3: el orbe contesta. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
-        <Orbe tamano={34} estado={ultimo ? 'reposo' : 'quieto'} testID={`${testID}-orbe`} />
+        <Orbe tamano={20} estado={ultimo ? 'reposo' : 'quieto'} testID={`${testID}-orbe`} />
         <Texto
-          variante="subtitulo"
+          variante="secundario"
+          tono="secundario"
           accessibilityRole="text"
-          style={{ flexShrink: 1, fontSize: 22, lineHeight: 28, fontWeight: '600' }}
+          style={{ flexShrink: 1, fontSize: 15, lineHeight: 20 }}
         >
           {tituloRegistro(turno.corregido === true)}
         </Texto>
@@ -198,13 +199,10 @@ function TarjetaRegistro({
           testID={testID}
           accessibilityRole="summary"
           style={{
-            backgroundColor: c.superficie,
-            borderRadius: 26,
-            borderWidth: 1,
-            borderColor: c.borde,
-            padding: 18,
-            paddingBottom: conRacha ? 30 : 18,
-            gap: 14,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: c.borde,
+            paddingBottom: conRacha ? espacio.xl : espacio.m,
+            gap: espacio.s,
           }}
         >
           <Pressable
@@ -222,21 +220,21 @@ function TarjetaRegistro({
             }}
           >
             {/* B+ (D3): el mosaico de color de la categoría. */}
-            <Mosaico slug={m.categoriaSlug} tamano={52} testID={`${testID}-mosaico`} />
+            <Mosaico slug={m.categoriaSlug} tamano={36} testID={`${testID}-mosaico`} />
             <View style={{ flex: 1, gap: 2 }}>
               <Text
                 style={{
                   fontFamily: FUENTE,
-                  fontSize: 20,
-                  lineHeight: 26,
-                  fontWeight: '700',
+                  fontSize: 17,
+                  lineHeight: 22,
+                  fontWeight: '500',
                   color: c.texto,
                 }}
               >
                 {m.descripcion}
               </Text>
               {subtitulo ? (
-                <Text style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: c.textoSecundario }}>
+                <Text style={{ fontFamily: FUENTE, fontSize: 13, lineHeight: 18, color: c.textoSecundario }}>
                   {subtitulo}
                 </Text>
               ) : null}
@@ -244,9 +242,9 @@ function TarjetaRegistro({
             <Text
               style={{
                 fontFamily: FUENTE,
-                fontSize: 30,
-                lineHeight: 36,
-                fontWeight: '800',
+                fontSize: 26,
+                lineHeight: 32,
+                fontWeight: '300',
                 color: c.texto,
                 fontVariant: ['tabular-nums'],
               }}
@@ -256,7 +254,7 @@ function TarjetaRegistro({
           </Pressable>
           {cambios.length > 0 ? (
             <View style={{ gap: espacio.s }}>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: espacio.l }}>
                 {cambios.map((x) => (
                   <Pressable
                     key={x.clave}
@@ -269,15 +267,13 @@ function TarjetaRegistro({
                     style={({ pressed }) => ({
                       minHeight: 44,
                       borderRadius: 22,
-                      paddingLeft: 14,
-                      paddingRight: 12,
+                      paddingHorizontal: abierto === x.clave ? espacio.m : 0,
                       flexDirection: 'row',
                       alignItems: 'center',
-                      gap: 6,
-                      backgroundColor: abierto === x.clave ? c.iconoFondo : c.superficieAlterna,
-                      borderWidth: abierto === x.clave ? 1.5 : 0,
+                      gap: espacio.xs,
+                      borderWidth: abierto === x.clave ? 1 : 0,
                       borderColor: c.acento,
-                      opacity: pressed ? 0.8 : 1,
+                      opacity: pressed ? 0.6 : 1,
                     })}
                   >
                     {x.clave === 'categoria' ? (
@@ -296,16 +292,16 @@ function TarjetaRegistro({
                     <Text
                       style={{
                         fontFamily: FUENTE,
-                        fontSize: 15,
+                        fontSize: 14,
                         lineHeight: 20,
-                        fontWeight: '600',
+                        fontWeight: '500',
                         color: c.texto,
                       }}
                     >
                       {x.actual}
                     </Text>
                     <View style={{ transform: [{ rotate: abierto === x.clave ? '180deg' : '0deg' }] }}>
-                      <Icono nombre="chevronAbajo" color={c.textoSecundario} tamano={16} grosor={2.4} />
+                      <Icono nombre="chevronAbajo" color={c.textoSecundario} tamano={13} grosor={2} />
                     </View>
                   </Pressable>
                 ))}
@@ -373,9 +369,6 @@ function TarjetaRegistro({
               accessibilityLabel={etiquetaHablada(turno.cambioDia ?? '')}
               style={{
                 gap: espacio.s,
-                paddingTop: espacio.m,
-                borderTopWidth: 1,
-                borderTopColor: c.superficieAlterna,
               }}
             >
               <View
@@ -390,9 +383,8 @@ function TarjetaRegistro({
                 <Text
                   style={{
                     fontFamily: FUENTE,
-                    fontSize: 15,
-                    lineHeight: 20,
-                    fontWeight: '600',
+                    fontSize: 13,
+                    lineHeight: 18,
                     color: c.textoSecundario,
                   }}
                 >
@@ -402,9 +394,8 @@ function TarjetaRegistro({
                   <Text
                     style={{
                       fontFamily: FUENTE,
-                      fontSize: 17,
-                      lineHeight: 22,
-                      fontWeight: '700',
+                      fontSize: 15,
+                      lineHeight: 20,
                       color: c.textoSecundario,
                       fontVariant: ['tabular-nums'],
                     }}
@@ -422,9 +413,9 @@ function TarjetaRegistro({
                     hasta={dia.despues}
                     style={{
                       fontFamily: FUENTE,
-                      fontSize: 17,
-                      lineHeight: 22,
-                      fontWeight: '800',
+                      fontSize: 15,
+                      lineHeight: 20,
+                      fontWeight: '600',
                       color: c.acentoTexto,
                     }}
                   />
