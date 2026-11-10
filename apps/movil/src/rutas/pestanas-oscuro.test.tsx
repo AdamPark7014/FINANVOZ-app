@@ -1,4 +1,4 @@
-import { renderRouter, screen } from 'expo-router/testing-library';
+import { renderRouter, screen, within } from 'expo-router/testing-library';
 import { StyleSheet, Text } from 'react-native';
 import LayoutPestanas from '../../app/(tabs)/_layout';
 import { colores } from '../ui';
@@ -20,19 +20,21 @@ const RUTAS = {
 const estilo = (elemento: { props: { style?: unknown } }) =>
   (StyleSheet.flatten(elemento.props.style as never) ?? {}) as Record<string, unknown>;
 
-describe('Navegación de arriba en oscuro (tablero B6)', () => {
-  it('riel y segmento elegido en los verdes casi negros, sin halo; el círculo de Tú sobre la tarjeta con su filo', () => {
+describe('Navegación de arriba en oscuro (premium)', () => {
+  it('la elegida en letra clara y la demás en secundaria, sin halo; el círculo de Tú con su filo', () => {
     renderRouter(RUTAS, { initialUrl: '/hoy' });
     const o = colores.oscuro;
     expect(estilo(screen.getByTestId('navegacion-superior')).backgroundColor).toBe(o.fondo);
-    expect(estilo(screen.getByLabelText(ETIQUETA_SELECTOR_SECCIONES)).backgroundColor).toBe(o.segmento);
+    expect(screen.getByLabelText(ETIQUETA_SELECTOR_SECCIONES)).toBeTruthy();
     const elegido = estilo(screen.getByTestId('pestana-hoy'));
-    expect(elegido.backgroundColor).toBe(o.segmentoActivo);
-    // En oscuro una sombra con la letra clara sería un halo: el segmento elegido no la lleva.
+    // En oscuro una sombra con la letra clara sería un halo: la elegida no la lleva.
     expect(elegido.shadowOpacity).toBeUndefined();
-    expect(estilo(screen.getByTestId('pestana-movimientos')).backgroundColor).toBe('transparent');
+    expect(estilo(within(screen.getByTestId('pestana-hoy')).getByText('Asistente')).color).toBe(o.texto);
+    expect(estilo(within(screen.getByTestId('pestana-movimientos')).getByText('Movimientos')).color).toBe(
+      o.textoSecundario,
+    );
     expect(estilo(screen.getByTestId(TEST_ID_CIRCULO_TU))).toMatchObject({
-      backgroundColor: o.superficie,
+      backgroundColor: 'transparent',
       borderColor: o.borde,
     });
   });
