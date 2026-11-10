@@ -1,27 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
-import { useContext, useEffect, useState, type ReactNode } from 'react';
-import { Animated, Pressable, Text, View } from 'react-native';
+import { useContext, useEffect, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import type { LoEntendido } from '../../servicios';
 import {
-  coloresCategoria,
   coloresEscucha,
   espacio,
-  familiaDeCategoria,
   formatearCentavos,
   FUENTE,
   Icono,
-  iconoDeCategoria,
   OBJETIVO_TACTIL_MIN,
-  Orbe,
   useCiclo,
   useReducirMovimiento,
   useTema,
 } from '../../ui';
+import { OrbeVivo } from '../../ui/componentes/OrbeVivo';
 import { ETIQUETA_ESCUCHANDO, PISTA_ESCUCHANDO, type BotonHablar } from '../../voz';
 import { useMedidasDock } from '../navegacion/DockVoz';
 import {
   BTN_CANCELAR_ESCUCHA,
+  BTN_LISTO_ESCUCHA,
   ETIQUETA_TE_ESCUCHO,
   etiquetaLoEntendido,
   PISTA_CANCELAR_ESCUCHA,
@@ -36,15 +34,15 @@ import {
 const ONDA = [
   0.25, 0.45, 0.7, 0.4, 0.85, 0.55, 1, 0.65, 0.9, 0.5, 1, 0.7, 0.95, 0.45, 0.8, 0.6, 0.35, 0.75, 0.5, 0.3,
 ];
-const ALTO_ONDA = 52;
-const MICROFONO = 80;
+const ALTO_ONDA = 28;
+const ORBE = 104;
 
 /**
- * «Te escucho» (dirección B+, D2): la pantalla completa en verde pino mientras escucha. Arriba «Te escucho» y la X
- * (cancela); al centro el orbe grande con ondas y la frase en vivo; debajo «Voy entendiendo» con lo que el nivel 0 ya
- * sacó de la frase a medias (la cifra segura en menta, la categoría con su color, la cuenta que todavía no termina
- * con «…»); la onda de voz sigue el volumen si el reconocedor lo da y, si no, se anima sola; abajo el micrófono, que
- * termina al soltarlo (mantener) o al tocarlo (toque). Nada de esto va a logs (regla 9).
+ * «Te escucho» (premium, 08-11): la pantalla completa en pino profundo mientras escucha. Arriba «Te escucho» y la X
+ * (cancela); la frase en vivo, grande y ligera; debajo «Voy entendiendo» en una fila con lo que el nivel 0 ya sacó de
+ * la frase a medias (la cuenta que todavía no termina con «…»); la onda y el orbe (GPU) siguen el volumen si el
+ * reconocedor lo da y, si no, se animan solos; abajo «Listo», que termina al soltarlo (mantener) o al tocarlo.
+ * Nada de esto va a logs (regla 9).
  */
 export function TeEscucho({
   parcial,
@@ -82,31 +80,12 @@ export function TeEscucho({
     >
       <StatusBar style="light" />
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View
+        <Text
           accessibilityRole="header"
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: espacio.s,
-            backgroundColor: e.chip,
-            borderRadius: 999,
-            paddingHorizontal: 14,
-            paddingVertical: 7,
-          }}
+          style={{ fontFamily: FUENTE, fontSize: 15, lineHeight: 20, color: e.textoSecundario }}
         >
-          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: e.chipListo }} />
-          <Text
-            style={{
-              fontFamily: FUENTE,
-              fontSize: 15,
-              lineHeight: 20,
-              fontWeight: '700',
-              color: e.chipListo,
-            }}
-          >
-            {ETIQUETA_TE_ESCUCHO}
-          </Text>
-        </View>
+          {ETIQUETA_TE_ESCUCHO}
+        </Text>
         <Pressable
           testID="boton-cancelar-escucha"
           onPress={alCancelar}
@@ -117,102 +96,87 @@ export function TeEscucho({
             width: OBJETIVO_TACTIL_MIN,
             height: OBJETIVO_TACTIL_MIN,
             borderRadius: OBJETIVO_TACTIL_MIN / 2,
-            backgroundColor: e.chip,
+            borderWidth: 1,
+            borderColor: e.linea,
             alignItems: 'center',
             justifyContent: 'center',
             opacity: pressed ? 0.8 : 1,
           })}
         >
-          <Icono nombre="cerrar" color={e.texto} tamano={22} grosor={2.2} />
+          <Icono nombre="cerrar" color={e.texto} tamano={18} grosor={1.8} />
         </Pressable>
       </View>
 
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: espacio.xl }}>
-        <Orbe tamano={200} estado="escuchando" testID="orbe-escucha" />
+      <View style={{ flex: 1, paddingTop: espacio.l, gap: espacio.xl }}>
         <Text
           accessibilityLiveRegion="polite"
           accessibilityLabel={parcial === '' ? ETIQUETA_ESCUCHANDO : parcial}
           style={{
             fontFamily: FUENTE,
-            fontSize: 32,
-            lineHeight: 40,
-            fontWeight: '800',
-            letterSpacing: -0.4,
-            textAlign: 'center',
+            fontSize: 34,
+            lineHeight: 42,
+            fontWeight: '300',
+            letterSpacing: -0.5,
             color: e.texto,
           }}
         >
           <Text testID="transcripcion-en-vivo">{frase}</Text>
-          {/* El cursor de D2: la frase sigue creciendo. */}
+          {/* La frase sigue creciendo. */}
           <Text style={{ fontFamily: FUENTE, fontWeight: '300', color: e.chipListo }}>|</Text>
         </Text>
+        <LoQueVoyEntendiendo entendido={entendido} />
       </View>
 
-      <LoQueVoyEntendiendo entendido={entendido} />
       <OndaDeVoz suscribirVolumen={suscribirVolumen} />
 
-      <View style={{ alignItems: 'center', gap: espacio.m, paddingTop: espacio.l }}>
-        <View
-          style={{
-            width: MICROFONO + 48,
-            height: MICROFONO + 48,
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingTop: espacio.m,
+        }}
+      >
+        <OrbeVivo tamano={ORBE} suscribirVolumen={suscribirVolumen} testID="orbe-escucha" />
+        {/* Con un toque se termina de escuchar aquí; mientras se mantiene, manda el micrófono del dock (debajo). */}
+        <Pressable
+          testID="boton-terminar-escucha"
+          onPressIn={boton.alPresionarDentro}
+          onPressOut={boton.alSoltar}
+          accessibilityRole="button"
+          accessibilityLabel={ETIQUETA_ESCUCHANDO}
+          accessibilityHint={PISTA_ESCUCHANDO}
+          style={({ pressed }) => ({
+            minHeight: 56,
+            borderRadius: 28,
+            paddingHorizontal: espacio.xxl,
+            backgroundColor: e.texto,
             alignItems: 'center',
             justifyContent: 'center',
-          }}
+            transform: [{ scale: pressed ? 0.97 : 1 }],
+          })}
         >
-          <View
-            style={{
-              position: 'absolute',
-              width: MICROFONO + 48,
-              height: MICROFONO + 48,
-              borderRadius: (MICROFONO + 48) / 2,
-              backgroundColor: e.chip,
-              opacity: 0.6,
-            }}
-          />
-          <View
-            style={{
-              position: 'absolute',
-              width: MICROFONO + 22,
-              height: MICROFONO + 22,
-              borderRadius: (MICROFONO + 22) / 2,
-              backgroundColor: e.chip,
-            }}
-          />
-          {/* Con un toque se terminó de escuchar aquí; mientras se mantiene, manda el micrófono del dock (debajo). */}
-          <Pressable
-            testID="boton-terminar-escucha"
-            onPressIn={boton.alPresionarDentro}
-            onPressOut={boton.alSoltar}
-            accessibilityRole="button"
-            accessibilityLabel={ETIQUETA_ESCUCHANDO}
-            accessibilityHint={PISTA_ESCUCHANDO}
-            style={({ pressed }) => ({
-              width: MICROFONO,
-              height: MICROFONO,
-              borderRadius: MICROFONO / 2,
-              backgroundColor: e.chipListo,
-              alignItems: 'center',
-              justifyContent: 'center',
-              transform: [{ scale: pressed ? 0.95 : 1 }],
-            })}
+          <Text
+            importantForAccessibility="no"
+            style={{ fontFamily: FUENTE, fontSize: 16, lineHeight: 22, fontWeight: '600', color: e.fondo }}
           >
-            <Icono nombre="microfono" color={e.sobreChipListo} tamano={34} grosor={2.1} />
-          </Pressable>
-        </View>
-        <Text
-          testID="pista-escucha"
-          style={{
-            fontFamily: FUENTE,
-            fontSize: 14,
-            lineHeight: 20,
-            fontWeight: '600',
-            color: e.textoSecundario,
-          }}
-        >
-          {manteniendo ? PISTA_ESCUCHA_MANTENIENDO : PISTA_ESCUCHA_TOCANDO}
-        </Text>
+            {BTN_LISTO_ESCUCHA}
+          </Text>
+        </Pressable>
       </View>
+      <Text
+        testID="pista-escucha"
+        style={{
+          fontFamily: FUENTE,
+          fontSize: 14,
+          lineHeight: 20,
+          textAlign: 'center',
+          paddingTop: espacio.s,
+          color: e.textoSecundario,
+        }}
+      >
+        {manteniendo ? PISTA_ESCUCHA_MANTENIENDO : PISTA_ESCUCHA_TOCANDO}
+      </Text>
     </View>
   );
 }
@@ -222,113 +186,82 @@ function LoQueVoyEntendiendo({ entendido }: { entendido: LoEntendido }) {
   const { esquema } = useTema();
   const e = coloresEscucha[esquema];
   const hay = entendido.monto !== null || entendido.categoria !== null || entendido.cuenta !== null;
+  const nombre: { testID: string; texto: string } | null = entendido.meAlcanza
+    ? { testID: 'entendido-me-alcanza', texto: CHIP_ME_ALCANZA_ENTENDIDO }
+    : entendido.categoria
+      ? { testID: 'entendido-categoria', texto: entendido.categoria.nombre }
+      : null;
   return (
     <View
       testID="voy-entendiendo"
       accessible={hay}
       {...(hay ? { accessibilityLabel: etiquetaLoEntendido(entendido) } : {})}
-      style={{ alignItems: 'center', gap: espacio.s, minHeight: 72 }}
+      style={{ gap: espacio.xs, minHeight: 72 }}
     >
       {hay ? (
         <>
-          <Text
-            style={{
-              fontFamily: FUENTE,
-              fontSize: 14,
-              lineHeight: 20,
-              fontWeight: '600',
-              color: e.textoSecundario,
-            }}
-          >
+          <Text style={{ fontFamily: FUENTE, fontSize: 14, lineHeight: 20, color: e.textoSecundario }}>
             {TEXTO_VOY_ENTENDIENDO}
           </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: espacio.s }}>
-            {entendido.monto !== null ? (
-              <Chip testID="entendido-monto" lleno>
-                <Icono nombre="palomita" color={e.sobreChipListo} tamano={16} grosor={2.6} />
-                <TextoChip color={e.sobreChipListo}>{formatearCentavos(entendido.monto)}</TextoChip>
-              </Chip>
-            ) : null}
-            {entendido.meAlcanza ? (
-              <Chip testID="entendido-me-alcanza">
-                <TextoChip color={e.texto}>{CHIP_ME_ALCANZA_ENTENDIDO}</TextoChip>
-              </Chip>
-            ) : null}
-            {entendido.categoria ? (
-              <Chip testID="entendido-categoria">
-                <MosaicoChico slug={entendido.categoria.slug} />
-                <TextoChip color={e.texto}>{entendido.categoria.nombre}</TextoChip>
-              </Chip>
-            ) : null}
-            {entendido.cuenta ? (
-              <Chip testID="entendido-cuenta" tentativo={!entendido.cuenta.seguro}>
-                <TextoChip color={e.texto}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: espacio.m,
+              minHeight: 62,
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderBottomWidth: StyleSheet.hairlineWidth,
+              borderColor: e.linea,
+            }}
+          >
+            <View style={{ flexShrink: 1, gap: 2 }}>
+              {nombre ? (
+                <Text
+                  testID={nombre.testID}
+                  style={{
+                    fontFamily: FUENTE,
+                    fontSize: 17,
+                    lineHeight: 22,
+                    fontWeight: '500',
+                    color: e.texto,
+                  }}
+                >
+                  {nombre.texto}
+                </Text>
+              ) : null}
+              {entendido.cuenta ? (
+                <Text
+                  testID="entendido-cuenta"
+                  style={{
+                    fontFamily: FUENTE,
+                    fontSize: 14,
+                    lineHeight: 20,
+                    color: entendido.cuenta.seguro ? e.textoSecundario : e.filoTentativo,
+                  }}
+                >
                   {entendido.cuenta.seguro ? entendido.cuenta.nombre : `${entendido.cuenta.nombre} …`}
-                </TextoChip>
-              </Chip>
+                </Text>
+              ) : null}
+            </View>
+            {entendido.monto !== null ? (
+              <Text
+                testID="entendido-monto"
+                style={{
+                  fontFamily: FUENTE,
+                  fontSize: 26,
+                  lineHeight: 32,
+                  fontWeight: '300',
+                  color: e.texto,
+                  fontVariant: ['tabular-nums'],
+                }}
+              >
+                {formatearCentavos(entendido.monto)}
+              </Text>
             ) : null}
           </View>
         </>
       ) : null}
-    </View>
-  );
-}
-
-function Chip({
-  children,
-  lleno = false,
-  tentativo = false,
-  testID,
-}: {
-  children: ReactNode;
-  lleno?: boolean;
-  tentativo?: boolean;
-  testID: string;
-}) {
-  const { esquema } = useTema();
-  const e = coloresEscucha[esquema];
-  return (
-    <View
-      testID={testID}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        minHeight: 40,
-        borderRadius: 20,
-        paddingHorizontal: 14,
-        backgroundColor: lleno ? e.chipListo : tentativo ? 'transparent' : e.chip,
-        borderWidth: tentativo ? 1.5 : 0,
-        borderColor: e.filoTentativo,
-      }}
-    >
-      {children}
-    </View>
-  );
-}
-
-function TextoChip({ children, color }: { children: ReactNode; color: string }) {
-  return (
-    <Text style={{ fontFamily: FUENTE, fontSize: 16, lineHeight: 22, fontWeight: '700', color }}>
-      {children}
-    </Text>
-  );
-}
-
-function MosaicoChico({ slug }: { slug: string }) {
-  const p = coloresCategoria.claro[familiaDeCategoria(slug)];
-  return (
-    <View
-      style={{
-        width: 26,
-        height: 26,
-        borderRadius: 13,
-        backgroundColor: p.mosaico,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Icono nombre={iconoDeCategoria(slug)} color={p.icono} tamano={15} grosor={2} />
     </View>
   );
 }

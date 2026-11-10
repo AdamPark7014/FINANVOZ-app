@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
-import { colores, coloresDinero } from '../../ui';
+import { colores, coloresDinero, heroeDia } from '../../ui';
 import { crearMotorFalso, navegacionFalsa, renderConSesion } from '../principal/__pruebas__/arnes';
 import { conEscenario } from '../principal/__pruebas__/base';
 import { PantallaCuentas } from '../principal/PantallaCuentas';
@@ -52,25 +52,25 @@ const DEL_CLARO = new Set(
 const ajenos = () => coloresPintados().filter((c) => BLANCOS.test(c) || DEL_CLARO.has(c.toLowerCase()));
 
 describe('Dirección B en oscuro (tablero B6; el claro sigue siendo el de omisión)', () => {
-  it('B6 · en reposo: la cifra y «Cómo lo calculé» en menta, «Puedes decirme» sobre la tarjeta y el dock pino con el micrófono menta', () => {
+  it('Premium · en reposo: la cifra sobre la placa, «Cómo lo calculé» en menta, «Puedes decirme» en filas y el micrófono menta', () => {
     const p = conEscenario('e4-01');
     renderConSesion(
       p.ctx,
       <PantallaAsistente navegacion={navegacionFalsa()} motor={crearMotorFalso().motor} />,
     );
     expect(estiloDe('pantalla-hoy').backgroundColor).toBe(o.fondo);
-    expect(estiloDe('hoy-puedes').color).toBe(o.acentoTexto);
+    expect(estiloDe('cabecera-dia').backgroundColor).toBe(heroeDia.oscuro.fondo);
+    expect(estiloDe('hoy-puedes').color).toBe(heroeDia.oscuro.texto);
     expect(estilo(within(screen.getByTestId('boton-desglose')).getByText('Cómo lo calculé')).color).toBe(
       o.acentoTexto,
     );
     const chips = screen.getAllByTestId(/^chip-intencion-/);
     expect(chips.length).toBeGreaterThan(0);
     for (const chip of chips) {
-      expect(estilo(chip).backgroundColor).toBe(o.superficie);
-      expect(estilo(chip).borderColor).toBe(o.borde);
+      expect(estilo(chip).borderBottomColor).toBe(o.borde);
     }
     expect(estiloDe('boton-hablar').backgroundColor).toBe(o.microfono);
-    expect(estiloDe('boton-escribir').backgroundColor).toBe(o.dockBoton);
+    expect(estilo(within(screen.getByTestId('boton-escribir')).getByText('Escribir')).color).toBe(o.texto);
     expect(ajenos()).toEqual([]);
     p.cerrar();
   });
@@ -85,8 +85,7 @@ describe('Dirección B en oscuro (tablero B6; el claro sigue siendo el de omisi�
     expect(estiloDe('barra-dinero-barra-apartado').backgroundColor).toBe(d.apartado);
     expect(estiloDe('barra-dinero-barra-colchon').backgroundColor).toBe(d.colchon);
     expect(estiloDe('barra-dinero-barra-libre').backgroundColor).toBe(d.libre);
-    expect(estiloDe('barra-dinero').backgroundColor).toBe(o.superficie);
-    expect(estiloDe('pista-quincena').backgroundColor).toBe(o.superficie);
+    expect(estiloDe('pista-quincena').borderTopColor).toBe(o.borde);
     expect(ajenos()).toEqual([]);
     p.cerrar();
   });

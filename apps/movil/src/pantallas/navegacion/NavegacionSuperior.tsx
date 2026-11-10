@@ -1,6 +1,7 @@
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
-import { Pressable, Text, useWindowDimensions, View } from 'react-native';
-import { FUENTE, espacio, margenPantalla, navegacionSuperior, useTema } from '../../ui';
+import { StatusBar } from 'expo-status-bar';
+import { Pressable, Text, View } from 'react-native';
+import { FUENTE, espacio, heroeDia, margenPantalla, navegacionSuperior, useTema } from '../../ui';
 import {
   ETIQUETA_ACCESIBILIDAD_PESTANA,
   ETIQUETA_ACCESIBILIDAD_TU,
@@ -13,22 +14,23 @@ import {
   testIdBotonPestana,
   type RutaPestanaVisible,
 } from '../../rutas/pestanas-textos';
-
-/** Ancho relativo de cada segmento (Asistente · Movimientos · Cuentas). */
-const PESO_SEGMENTO = { hoy: 1, movimientos: 1.2, cuentas: 0.9 } as const;
+import { useTonoNavegacion } from './TonoNavegacion';
 
 /**
- * Navegación de arriba (dirección B, tablero B1; `02 §2`): el selector Asistente · Movimientos · Cuentas y el
- * círculo de Tú. Es la «barra de pestañas» del grupo `(tabs)` puesta arriba (`tabBarPosition: 'top'`): cambia de
- * pantalla sin perder lo que cada una tenía, y abajo queda solo la voz. El segmento elegido va en blanco con su
- * etiqueta en negritas (no solo cambia el color, `02 §15`); en Tú, el círculo se llena de pino.
+ * Navegación de arriba (`02 §2`, premium 08-11): Asistente · Movimientos · Cuentas como texto y el círculo de Tú. Es
+ * la «barra de pestañas» del grupo `(tabs)` puesta arriba (`tabBarPosition: 'top'`). La elegida va en negritas con una
+ * rayita abajo (no solo cambia el color, `02 §15`); en Tú, el círculo se llena de pino. En Inicio en reposo se funde
+ * con la placa verde (`useHeroeEnNavegacion`). Con texto grande, las etiquetas pasan al siguiente renglón.
  */
 export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarProps) {
   const { c, esquema } = useTema();
-  // Con texto grande (más de 1.3×) las etiquetas no caben en tercios iguales: cada segmento mide lo que su texto y el
-  // riel pasa al siguiente renglón en vez de cortarlas (`02 §15`, texto al 200 %).
-  const grande = useWindowDimensions().fontScale > 1.3;
   const activa = state.routes[state.index]?.name as RutaPestanaVisible | undefined;
+  const tono = useTonoNavegacion();
+  const heroe = tono === 'heroe' && activa === 'hoy';
+  const h = heroeDia[esquema];
+  const fondo = heroe ? h.fondo : c.fondo;
+  const elegidoColor = heroe ? h.texto : c.texto;
+  const restoColor = heroe ? h.textoSecundario : c.textoSecundario;
 
   const ir = (ruta: RutaPestanaVisible) => {
     const destino = state.routes.find((r) => r.name === ruta);
@@ -38,32 +40,28 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
   };
 
   const enTu = activa === 'tu';
-  const radioSegmento = navegacionSuperior.alto / 2 - 3;
   return (
     <View
       testID="navegacion-superior"
       style={{
         paddingTop: insets.top + navegacionSuperior.margenSuperior,
-        paddingHorizontal: margenPantalla,
-        paddingBottom: espacio.s,
-        backgroundColor: c.fondo,
+        paddingHorizontal: espacio.xl,
+        paddingBottom: espacio.xs,
+        backgroundColor: fondo,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: espacio.s,
+        gap: margenPantalla,
       }}
     >
+      {heroe ? <StatusBar style="light" /> : null}
       <View
         accessibilityRole="tablist"
         accessibilityLabel={ETIQUETA_SELECTOR_SECCIONES}
         style={{
           flex: 1,
-          minHeight: navegacionSuperior.alto,
-          borderRadius: navegacionSuperior.alto / 2,
-          backgroundColor: c.segmento,
           flexDirection: 'row',
-          flexWrap: grande ? 'wrap' : 'nowrap',
-          padding: 3,
-          gap: 2,
+          flexWrap: 'wrap',
+          columnGap: espacio.xl - espacio.xs,
         }}
       >
         {RUTAS_SEGMENTOS.map((ruta) => {
@@ -76,40 +74,33 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
               accessibilityRole="tab"
               accessibilityLabel={ETIQUETA_ACCESIBILIDAD_PESTANA[ruta]}
               accessibilityState={{ selected: elegido }}
-              // El segmento mide 42 dentro del riel de 48: el toque se amplía a 48.
-              hitSlop={{ top: 3, bottom: 3, left: 0, right: 0 }}
               style={({ pressed }) => ({
-                // «Movimientos» en negritas no cabía en un tercio con la letra del sistema (capturas de Maestro del
-                // 26-10): cada segmento crece según lo largo de su etiqueta.
-                ...(grande ? { flexGrow: 1 } : { flexGrow: PESO_SEGMENTO[ruta], flexBasis: 0 }),
-                minHeight: navegacionSuperior.alto - 6,
-                borderRadius: radioSegmento,
+                minHeight: navegacionSuperior.alto,
                 alignItems: 'center',
                 justifyContent: 'center',
-                paddingHorizontal: espacio.xs,
-                backgroundColor: elegido ? c.segmentoActivo : 'transparent',
                 opacity: pressed && !elegido ? 0.7 : 1,
-                ...(elegido && esquema === 'claro'
-                  ? {
-                      shadowColor: c.texto,
-                      shadowOffset: { width: 0, height: 1 },
-                      shadowOpacity: 0.14,
-                      shadowRadius: 3,
-                      elevation: 2,
-                    }
-                  : null),
               })}
             >
               <Text
                 importantForAccessibility="no"
                 style={{
                   ...navegacionSuperior.etiqueta,
-                  fontWeight: elegido ? '700' : '600',
-                  color: elegido ? c.texto : c.textoSecundario,
+                  fontWeight: elegido ? '600' : '500',
+                  color: elegido ? elegidoColor : restoColor,
                 }}
               >
                 {ETIQUETA_PESTANA[ruta]}
               </Text>
+              <View
+                style={{
+                  position: 'absolute',
+                  bottom: espacio.xs,
+                  width: 16,
+                  height: 2,
+                  borderRadius: 1,
+                  backgroundColor: elegido ? elegidoColor : 'transparent',
+                }}
+              />
             </Pressable>
           );
         })}
@@ -125,10 +116,9 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
           width: navegacionSuperior.alto,
           height: navegacionSuperior.alto,
           borderRadius: navegacionSuperior.alto / 2,
-          // B1/B6: el círculo es una tarjeta con filo (blanco en claro, `#13201C` en oscuro), no un segmento.
-          backgroundColor: enTu ? c.acento : c.superficie,
+          backgroundColor: enTu ? c.acento : 'transparent',
           borderWidth: 1,
-          borderColor: enTu ? c.acento : c.borde,
+          borderColor: enTu ? c.acento : heroe ? h.linea : c.borde,
           alignItems: 'center',
           justifyContent: 'center',
           opacity: pressed ? 0.8 : 1,
@@ -138,10 +128,10 @@ export function NavegacionSuperior({ state, navigation, insets }: BottomTabBarPr
           importantForAccessibility="no"
           style={{
             fontFamily: FUENTE,
-            fontSize: 16,
+            fontSize: 15,
             lineHeight: 20,
-            fontWeight: '700',
-            color: enTu ? c.sobreAcento : c.texto,
+            fontWeight: '500',
+            color: enTu ? c.sobreAcento : elegidoColor,
           }}
         >
           {TEXTO_CIRCULO_TU}

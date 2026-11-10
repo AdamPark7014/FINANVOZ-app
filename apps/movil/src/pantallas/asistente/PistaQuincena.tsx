@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { DiaPista, PistaQuincena as DatosPista } from '../../servicios';
 import { coloresCategoria, espacio, FUENTE, useTema } from '../../ui';
 import {
@@ -26,12 +26,9 @@ export function PistaQuincena({ pista }: { pista: DatosPista }) {
     <View
       testID="pista-quincena"
       style={{
-        backgroundColor: c.superficie,
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: c.borde,
-        paddingHorizontal: espacio.l,
-        paddingVertical: espacio.m,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: c.borde,
+        paddingTop: espacio.l,
         gap: espacio.m,
       }}
     >

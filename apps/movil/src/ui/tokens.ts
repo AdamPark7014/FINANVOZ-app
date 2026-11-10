@@ -339,11 +339,41 @@ export interface ColoresEscucha {
   readonly sobreChipListo: string;
   /** Filo del chip que todavía no termina («Efectivo …»); ≥ 3:1 sobre `fondo`. */
   readonly filoTentativo: string;
+  /** Líneas finas entre lo que se va entendiendo. */
+  readonly linea: string;
 }
+
+/** La placa de arriba de Inicio (premium, 08-11): pino profundo con la cifra del día. */
+export const heroeDia: Record<
+  EsquemaColor,
+  {
+    readonly fondo: string;
+    readonly texto: string;
+    readonly textoSecundario: string;
+    readonly faltante: string;
+    readonly linea: string;
+  }
+> = {
+  claro: {
+    fondo: '#0B2A23',
+    texto: '#FFFFFF',
+    textoSecundario: '#B5CCC3',
+    faltante: '#FFB4A2',
+    linea: '#3A5A50',
+  },
+  oscuro: {
+    fondo: '#12322A',
+    texto: '#EAF2EE',
+    textoSecundario: '#B5CCC3',
+    faltante: '#FFB4A2',
+    linea: '#3A5A50',
+  },
+};
 
 export const coloresEscucha: Record<EsquemaColor, ColoresEscucha> = {
   claro: {
-    fondo: '#0F3D32',
+    linea: '#2A4A40',
+    fondo: '#0B2A23',
     texto: '#FFFFFF',
     textoSecundario: '#A8CFC0',
     chip: '#1E5546',
@@ -352,6 +382,7 @@ export const coloresEscucha: Record<EsquemaColor, ColoresEscucha> = {
     filoTentativo: '#8FB3A6',
   },
   oscuro: {
+    linea: '#2A4A40',
     fondo: '#0E2B23',
     texto: '#EAF2EE',
     textoSecundario: '#A8CFC0',
@@ -367,6 +398,9 @@ export const coloresEscucha: Record<EsquemaColor, ColoresEscucha> = {
  * 1.22 en 3.2 s) y lanza ondas al escuchar; quieto con «Reducir movimiento».
  */
 export const orbe = {
+  luz: '#B6F5DC',
+  profundo: '#38BE91',
+  sombraMicrofono: '#0B2A23',
   nucleo: '#5EE0B0',
   sombra: '#3FC895',
   halo: '#5EE0B0',

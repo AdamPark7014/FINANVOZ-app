@@ -476,6 +476,7 @@ export function detallePagoPendiente(pngi: string, cuando: 'por_vencer' | 'venci
 // ——— Dirección B+ «Viva»: «Te escucho» (`docs/diseno/direccion-b-plus/D2-escuchando.png`) ———
 
 export const ETIQUETA_TE_ESCUCHO = 'Te escucho';
+export const BTN_LISTO_ESCUCHA = 'Listo';
 export const TEXTO_VOY_ENTENDIENDO = 'Voy entendiendo';
 export const PISTA_ESCUCHA_MANTENIENDO = 'Suelta para registrar · desliza para cancelar';
 export const PISTA_ESCUCHA_TOCANDO = 'Toca el micrófono para terminar · la X cancela';

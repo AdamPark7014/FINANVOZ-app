@@ -1,6 +1,7 @@
 import { Tabs, type BottomTabNavigationOptions } from 'expo-router/js-tabs';
 import { AnfitrionCapa } from '../../src/pantallas/navegacion/CapaPantalla';
 import { NavegacionSuperior } from '../../src/pantallas/navegacion/NavegacionSuperior';
+import { ProveedorTonoNavegacion } from '../../src/pantallas/navegacion/TonoNavegacion';
 import { ProveedorAvisos } from '../../src/pantallas/principal';
 import { useTema } from '../../src/ui';
 import {
@@ -27,20 +28,22 @@ export default function LayoutPestanas() {
     <ProveedorAvisos>
       {/* B+ (D2): «Te escucho» tapa también la navegación de arriba. */}
       <AnfitrionCapa>
-        <Tabs
-          backBehavior="history"
-          tabBar={(props) => <NavegacionSuperior {...props} />}
-          screenOptions={{
-            headerShown: false,
-            tabBarPosition: 'top',
-            sceneStyle: { backgroundColor: c.fondo },
-          }}
-        >
-          <Tabs.Screen name="hoy" options={opcionesPestana('hoy')} />
-          <Tabs.Screen name="movimientos" options={opcionesPestana('movimientos')} />
-          <Tabs.Screen name="cuentas" options={opcionesPestana('cuentas')} />
-          <Tabs.Screen name="tu" options={opcionesPestana('tu')} />
-        </Tabs>
+        <ProveedorTonoNavegacion>
+          <Tabs
+            backBehavior="history"
+            tabBar={(props) => <NavegacionSuperior {...props} />}
+            screenOptions={{
+              headerShown: false,
+              tabBarPosition: 'top',
+              sceneStyle: { backgroundColor: c.fondo },
+            }}
+          >
+            <Tabs.Screen name="hoy" options={opcionesPestana('hoy')} />
+            <Tabs.Screen name="movimientos" options={opcionesPestana('movimientos')} />
+            <Tabs.Screen name="cuentas" options={opcionesPestana('cuentas')} />
+            <Tabs.Screen name="tu" options={opcionesPestana('tu')} />
+          </Tabs>
+        </ProveedorTonoNavegacion>
       </AnfitrionCapa>
     </ProveedorAvisos>
   );

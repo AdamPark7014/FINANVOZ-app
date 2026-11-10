@@ -37,19 +37,7 @@ export function BarraDinero({
   const negativo = vista.estado === 'libre_negativo';
   const deTus = textoDeTus(formatearCentavos(total, 'pesos'));
   return (
-    <View
-      testID="barra-dinero"
-      style={{
-        backgroundColor: c.superficie,
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: c.borde,
-        paddingHorizontal: espacio.l,
-        paddingTop: espacio.m,
-        paddingBottom: espacio.l,
-        gap: espacio.m,
-      }}
-    >
+    <View testID="barra-dinero" style={{ gap: espacio.m }}>
       <View
         style={{
           flexDirection: 'row',
@@ -111,6 +99,7 @@ export function BarraDinero({
       </View>
       <BarraApilada
         testID="barra-dinero-barra"
+        alto={6}
         partes={tramos.map((p) => ({ clave: p.clave, valor: p.centavos, color: color(p.clave) }))}
       />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: espacio.s }}>
@@ -139,9 +128,9 @@ export function BarraDinero({
             <Text
               style={{
                 fontFamily: FUENTE,
-                fontSize: 18,
-                lineHeight: 24,
-                fontWeight: '800',
+                fontSize: 22,
+                lineHeight: 28,
+                fontWeight: '300',
                 color: p.clave === 'libre' ? c.acentoTexto : p.clave === 'faltante' ? c.faltante : c.texto,
                 fontVariant: ['tabular-nums'],
               }}

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
-import { Pressable, View, type GestureResponderEvent } from 'react-native';
-import { dockVoz, Icono, useTema } from '../../ui';
+import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+import { dockVoz, Icono, orbe, useTema } from '../../ui';
 import {
   ETIQUETA_ESCUCHANDO,
   PISTA_ESCUCHANDO,
@@ -51,18 +52,6 @@ export function MicrofonoAsistente({
   const total = tamano + anillo * 2;
   return (
     <View style={{ width: total, height: total, alignItems: 'center', justifyContent: 'center' }}>
-      {/* Anillo de 6 pt de la menta al 22 % (18 % en oscuro), como en el tablero B1. */}
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          width: total,
-          height: total,
-          borderRadius: total / 2,
-          backgroundColor: c.microfono,
-          opacity: esquema === 'oscuro' ? 0.18 : 0.22,
-        }}
-      />
       <AnilloEscucha activo={escuchando} tamano={total} color={c.microfono} />
       <Pressable
         testID={testID}
@@ -104,8 +93,31 @@ export function MicrofonoAsistente({
           justifyContent: 'center',
           opacity: pressed ? 0.9 : 1,
           transform: [{ scale: pressed ? 0.95 : 1 }],
+          shadowColor: orbe.sombraMicrofono,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: esquema === 'oscuro' ? 0 : 0.28,
+          shadowRadius: 14,
+          elevation: esquema === 'oscuro' ? 0 : 6,
         })}
       >
+        <Svg
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={StyleSheet.absoluteFill}
+          width={tamano}
+          height={tamano}
+          viewBox="0 0 100 100"
+        >
+          <Defs>
+            <RadialGradient id="luz" cx="35%" cy="28%" r="80%">
+              <Stop offset="0" stopColor={orbe.luz} />
+              <Stop offset="0.58" stopColor={orbe.nucleo} />
+              <Stop offset="1" stopColor={orbe.profundo} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={50} cy={50} r={50} fill="url(#luz)" />
+        </Svg>
         {escuchando ? (
           <View
             accessibilityElementsHidden

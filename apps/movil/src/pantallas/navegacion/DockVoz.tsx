@@ -1,5 +1,6 @@
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { useContext, type ReactNode } from 'react';
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { dockVoz, espacio, Icono, useTema, type NombreIcono } from '../../ui';
 
@@ -29,9 +30,9 @@ export function useMedidasDock(): { abajo: number; ocupado: number } {
 }
 
 /**
- * Dock de voz (dirección B, `02 §2`): la barra verde pino del pie con «Escribir» a la izquierda, el micrófono al
- * centro y la acción de la pantalla a la derecha. Objetivos de 52 pt y de 68 pt; con texto grande la etiqueta pasa a dos renglones y el
- * dock crece, nunca se corta (`02 §15`).
+ * Dock de voz (`02 §2`, premium 08-11): «Escribir» a la izquierda, el micrófono al centro y la acción de la pantalla a
+ * la derecha, sobre cristal de iOS 26 (en otros teléfonos, una superficie con filo). Objetivos de 52 y 68 pt; con texto
+ * grande la etiqueta pasa a dos renglones y el dock crece, nunca se corta (`02 §15`).
  */
 export function DockVoz({
   izquierda,
@@ -46,7 +47,8 @@ export function DockVoz({
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
-  const { c } = useTema();
+  const { c, esquema } = useTema();
+  const cristal = Platform.OS === 'ios' && isLiquidGlassAvailable();
   return (
     <View
       testID={testID}
@@ -54,7 +56,6 @@ export function DockVoz({
         {
           minHeight: dockVoz.alto,
           borderRadius: dockVoz.radio,
-          backgroundColor: c.dock,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -62,9 +63,17 @@ export function DockVoz({
           paddingHorizontal: 10,
           paddingVertical: espacio.xs,
         },
+        cristal ? null : { backgroundColor: c.superficie, borderWidth: 1, borderColor: c.borde },
         style,
       ]}
     >
+      {cristal ? (
+        <GlassView
+          glassEffectStyle="regular"
+          colorScheme={esquema === 'oscuro' ? 'dark' : 'light'}
+          style={[StyleSheet.absoluteFill, { borderRadius: dockVoz.radio }]}
+        />
+      ) : null}
       <BotonLateral boton={izquierda} />
       {centro}
       <BotonLateral boton={derecha} />
@@ -88,20 +97,22 @@ function BotonLateral({ boton }: { boton: BotonDock }) {
         flexShrink: 1,
         minHeight: dockVoz.altoBoton,
         borderRadius: dockVoz.altoBoton / 2,
-        backgroundColor: c.dockBoton,
-        // Abierto: un filo menta (la forma cambia, no solo el color, `02 §15`).
-        borderWidth: abierto ? 2 : 0,
-        borderColor: c.microfono,
+        // Abierto: un filo (la forma cambia, no solo el color, `02 §15`).
+        borderWidth: abierto ? 1.5 : 0,
+        borderColor: c.acentoTexto,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: espacio.s,
+        gap: espacio.xs + 2,
         paddingHorizontal: espacio.s,
-        opacity: pressed ? 0.85 : 1,
+        opacity: pressed ? 0.6 : 1,
       })}
     >
-      {boton.icono ? <Icono nombre={boton.icono} color={c.sobreDock} tamano={20} grosor={2} /> : null}
-      <Text importantForAccessibility="no" style={{ ...dockVoz.etiqueta, color: c.sobreDock, flexShrink: 1 }}>
+      {boton.icono ? <Icono nombre={boton.icono} color={c.texto} tamano={18} grosor={1.8} /> : null}
+      <Text
+        importantForAccessibility="no"
+        style={{ ...dockVoz.etiqueta, fontWeight: '500', color: c.texto, flexShrink: 1 }}
+      >
         {boton.etiqueta}
       </Text>
     </Pressable>
