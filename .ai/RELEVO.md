@@ -1,5 +1,21 @@
 # RELEVO
 
+- **2026-11-15 (claude-code) — Dependencias al día con Node 26.13.1 / pnpm 10.34.9 (solo parches y menores). NO publicado.**
+  - Fuera de la app: eslint 9.39.5, typescript-eslint 8.72, prettier 3.10, vite 7.3.8, vitest 4.1.12, jsdom 27.4,
+    fast-check 4.10, fast-xml-parser 5.12, zod 4.6.7, fflate 0.8.3.
+  - App (`apps/movil`): expo 57.0.33 y los módulos `expo-*` / `jest-expo` en los parches que pide el SDK 57
+    (`pnpm exec expo install …`). Son módulos nativos: la próxima build de desarrollo/tienda debe recompilarse.
+    React, React Native, Skia, Reanimated y demás nativos no se tocaron. Expo sugiere TypeScript ~6.0.3: es mayor, no se subió.
+  - `better-sqlite3` se queda en 13.0.3: la 13.2.0 siempre compila con node-gyp y aquí no hay Visual Studio. La 13.0.3
+    instalada carga bien en Node 26.
+  - `apps/movil/jest.setup.ts`: Node 26 trae `ErrorEvent` global y React 19 trataba de usar `window.dispatchEvent` en el
+    entorno de jest-expo (3 pruebas de `compartido.test.tsx` caían con «window.dispatchEvent is not a function»; con
+    Node 22 pasan). Se borra `ErrorEvent` cuando no hay `dispatchEvent`, como en Node 22. Decisión en `docs/ESTADO.md`.
+  - Verificado con Node 26: `pnpm lint`, `pnpm typecheck`, `pnpm test` (3,272), `pnpm --filter movil test:app` (934) y build
+    de la calculadora. Aviso de pnpm sin efecto en pruebas: `expo-router` 57.0.31 pide `@expo/metro-runtime` ^57.0.18 y
+    `@expo/router-server` lo deja en 57.0.16.
+  - Mayores pendientes y su costo: `C:\dev\.ai\dependencias-2026-11.md`.
+
 - **2026-11-14 (claude-code) — Limpieza de documentación (Adam: «quita documentación y unifica»).** Borrados 1 documentos obsoletos sin referencias (auditorías, planes y prompts viejos; están en el historial de git). Índice único del repo: `docs/INDICE.md`; índice de todos los proyectos: `C:\dev\DOCS.md`; memoria compartida de Codex/Claude/Cursor/Grok: `C:\dev\.ai\memoria`.
 
 - **Último turno:** claude-code

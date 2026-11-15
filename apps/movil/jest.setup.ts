@@ -5,6 +5,13 @@ import { Animated } from 'react-native';
 // las pruebas siguen buscando ese texto visible, así que las consultas incluyen elementos ocultos.
 configure({ defaultIncludeHiddenElements: true });
 
+// Node 26 trae `ErrorEvent` global. Aquí `window` es el propio global (sin `dispatchEvent`) y React 19, al ver
+// `window.ErrorEvent`, quiere despachar los errores no atrapados y truena con «window.dispatchEvent is not a function».
+// Sin `ErrorEvent`, React los reporta por consola, igual que con Node 22.
+if (typeof (globalThis as { dispatchEvent?: unknown }).dispatchEvent !== 'function') {
+  delete (globalThis as { ErrorEvent?: unknown }).ErrorEvent;
+}
+
 // El orbe de «Te escucho» dibuja con Skia y Reanimated, que no existen en las pruebas: aquí es una vista con su testID.
 jest.mock('./src/ui/componentes/OrbeVivo', () => {
   const { createElement } = jest.requireActual<typeof import('react')>('react');
