@@ -1,0 +1,285 @@
+@import './tokens.css';
+@import './venta.css';
+@import './admin.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-cuerpo);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-titulo);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-acento-oscuro);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}
+
+.saltar {
+  position: absolute;
+  left: -9999px;
+}
+.saltar:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  background: var(--color-acento);
+  color: var(--color-sobre-acento);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radio-control);
+}
+
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tocable);
+  padding: 0 18px;
+  border-radius: var(--radio-pildora);
+  border: 1px solid transparent;
+  font: 600 15px/1 var(--fuente-cuerpo);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--color-texto);
+  background: transparent;
+  transition:
+    background var(--movimiento),
+    border-color var(--movimiento);
+}
+.btn-primario {
+  background: var(--color-acento);
+  color: var(--color-sobre-acento);
+}
+.btn-primario:hover {
+  background: var(--color-acento-oscuro);
+}
+.btn-secundario {
+  border-color: var(--color-borde-control);
+  background: var(--color-superficie);
+}
+.btn-secundario:hover {
+  background: var(--color-superficie-alterna);
+}
+.btn-peligro {
+  border-color: var(--color-peligro);
+  color: var(--color-peligro);
+  background: var(--color-superficie);
+}
+.btn-texto {
+  padding: 0 8px;
+  color: var(--color-acento-oscuro);
+}
+.btn-texto-gris {
+  color: var(--color-secundario);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-control {
+  min-height: var(--control);
+  border-radius: var(--radio-control);
+  font-size: 14px;
+  padding: 0 14px;
+}
+
+/* Formularios */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.campo label {
+  font-size: 14px;
+  color: var(--color-secundario);
+  font-weight: 500;
+}
+.campo input,
+.campo select,
+.campo textarea {
+  min-height: var(--tocable);
+  font-size: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-borde-control);
+  border-radius: var(--radio-control);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  font-family: inherit;
+}
+.campo .pista {
+  font-size: 13px;
+  color: var(--color-terciario);
+}
+.campo .error-campo {
+  font-size: 13px;
+  color: var(--color-peligro);
+}
+.hp {
+  position: absolute;
+  left: -9999px;
+  height: 0;
+  overflow: hidden;
+}
+
+.tarjeta {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  padding: 18px 20px;
+}
+
+/* Estados */
+.esqueleto {
+  height: 48px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--color-linea), var(--color-borde), var(--color-linea));
+  background-size: 200% 100%;
+  animation: brillo 1.2s infinite;
+  border-radius: var(--radio-control);
+}
+@keyframes brillo {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+.estado-vacio,
+.estado-error,
+.estado-permiso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--color-secundario);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+}
+.estado-error {
+  background: var(--color-peligro-fondo);
+  border-color: transparent;
+  color: var(--color-texto);
+}
+
+/* Hoja (modal que sube desde abajo en el celular) */
+.hoja-fondo {
+  position: fixed;
+  inset: 0;
+  background: var(--velo);
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .hoja-fondo {
+    align-items: center;
+  }
+}
+.hoja {
+  background: var(--color-superficie);
+  width: min(480px, 100%);
+  border-radius: var(--radio-grande) var(--radio-grande) 0 0;
+  padding: 20px 20px 24px;
+  max-height: 90vh;
+  overflow: auto;
+}
+@media (min-width: 640px) {
+  .hoja {
+    border-radius: var(--radio-grande);
+  }
+}
+.hoja-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.hoja-cabecera h2 {
+  font-size: 21px;
+}
+.hoja-entrada {
+  margin: -6px 0 18px;
+  font-size: 15px;
+  color: var(--color-secundario);
+}
+.boton-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tocable);
+  height: var(--tocable);
+  border-radius: var(--radio-pildora);
+  border: 0;
+  background: var(--color-superficie-alterna);
+  color: var(--color-texto);
+  cursor: pointer;
+}
+.hoja-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}

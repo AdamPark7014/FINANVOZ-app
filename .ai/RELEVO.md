@@ -1,5 +1,27 @@
 # RELEVO
 
+- **2026-11-16 (claude-code) — Panel admin/ERP y página de venta (pedido de Adam desde el hilo de proyecto). NO desplegado.**
+  - Tres pasadas: Cursor hizo la primera (`.ai/encargos/2026-11-16-admin-erp-y-venta.md`, copia en
+    `docs/diseno/admin-venta/ENCARGO.md`); Codex no arrancó (`codex exec` no pudo leer archivos en su sandbox de
+    Windows); Claude hizo el pulido y la revisión final.
+  - Base: `services/proxy/supabase/migrations/20261401000000_admin_erp.sql` (miembros, parámetros, clientes,
+    prospectos, ventas con folio FV-0001, bitácora por triggers, comisiones por mes, `admin_resumen`,
+    `admin_convertir_prospecto` atómica, `admin_registrar_prospecto` con límite por IP y reparto por turno).
+    Huecos cerrados en la pasada final: vendedor que insertaba venta pagada, venta con cliente de otro vendedor,
+    venta cobrada editable, folio/autor reescribibles, cancelar sin motivo, trigger de parámetros que bloqueaba al
+    service_role, cifras globales visibles al vendedor, cobrado contado en el mes de registro.
+  - Edge Function `prospecto` (formulario «Hablar con un asesor»). Variables: `WEB_ORIGEN`, `PROSPECTO_SAL`.
+  - Web `apps/web` (`@cartera/web`): venta `/` igual a la muestra aprobada (`docs/diseno/admin-venta/venta.html`),
+    panel `/admin` (Resumen, Prospectos, Clientes, Ventas, Vendedores y comisiones, Ajustes), aviso y soporte
+    reutilizan los de la calculadora. `/admin?demo` = datos de ejemplo en memoria. Variables `VITE_*` en
+    `apps/web/.env.example`.
+  - Verificado: `pnpm lint`, `pnpm typecheck`, vitest `proxy` 265 (admin 27), `web` 10, `calculadora` 40, build web;
+    capturas 390/1536 de las 7 pantallas sin desborde ni errores de consola; recorrido real en modo de ejemplo
+    (prospecto → ganado → venta $6,000 → cobro → cancelación con motivo → ajustes → cliente con RFC → menú móvil).
+  - Pendiente de Adam: qué venden de verdad los vendedores, precios y comisión reales (se cambian en Ajustes), el
+    dominio «admin» que conservó, y su OK para aplicar la migración, desplegar la función y publicar la web. Las
+    cuentas de los vendedores se crean en Supabase Auth y se dan de alta en Vendedores.
+
 - **2026-11-15 (claude-code) — Dependencias al día con Node 26.13.1 / pnpm 10.34.9 (solo parches y menores). NO publicado.**
   - Fuera de la app: eslint 9.39.5, typescript-eslint 8.72, prettier 3.10, vite 7.3.8, vitest 4.1.12, jsdom 27.4,
     fast-check 4.10, fast-xml-parser 5.12, zod 4.6.7, fflate 0.8.3.

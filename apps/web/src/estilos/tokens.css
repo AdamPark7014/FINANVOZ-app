@@ -1,0 +1,48 @@
+/* Tokens de Finanvoz web (mismos valores que apps/movil/src/ui/tokens.ts, tema claro). Único lugar con colores. */
+:root {
+  --color-acento: #0e8a6e;
+  --color-acento-oscuro: #0a6b57;
+  --color-acento-suave: #e3f2ec;
+  --color-acento-brillo: #34c39c;
+  --color-fondo: #f6f7f5;
+  --color-superficie: #ffffff;
+  --color-superficie-alterna: #f1f4f2;
+  --color-texto: #0f1a16;
+  --color-texto-fuerte: #33413b;
+  --color-secundario: #4a5852;
+  --color-terciario: #5b6963;
+  --color-borde: #e3e8e5;
+  --color-borde-control: #9aa8a1;
+  --color-borde-suave: #c9d1cd;
+  --color-linea: #edf0ee;
+  --color-riel: #e8ecea;
+  --color-sobre-acento: #ffffff;
+  --color-tinta: #0f1a16;
+  --color-sobre-tinta: #ffffff;
+  --color-sobre-tinta-tenue: #c9d1cd;
+  --color-aviso: #7a4b00;
+  --color-aviso-fondo: #fff4de;
+  --color-pendiente: #b26a00;
+  --color-peligro: #b42318;
+  --color-peligro-fondo: #fef3f2;
+  --velo: rgb(15 26 22 / 40%);
+  --vidrio-fondo: rgb(246 247 245 / 92%);
+
+  --fuente-cuerpo: 'Inter', system-ui, sans-serif;
+  --fuente-titulo: 'Inter Tight', 'Inter', system-ui, sans-serif;
+
+  --radio-control: 8px;
+  --radio-menu: 10px;
+  --radio-tarjeta: 14px;
+  --radio-grande: 20px;
+  --radio-pildora: 999px;
+
+  --sombra-suave: 0 1px 2px rgb(15 26 22 / 4%);
+  --sombra-telefono: 0 30px 60px -20px rgb(11 61 51 / 35%), 0 0 0 1px rgb(15 26 22 / 8%);
+
+  --tocable: 44px;
+  --control: 36px;
+  --ancho-max: 1200px;
+  --gutter: 24px;
+  --movimiento: 160ms ease-out;
+}

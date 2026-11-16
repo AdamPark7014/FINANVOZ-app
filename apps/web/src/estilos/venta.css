@@ -1,0 +1,488 @@
+/* Página de venta: sigue la muestra aprobada (docs/diseno/admin-venta/venta.html). */
+
+.venta-encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 14px var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  justify-content: space-between;
+  background: var(--vidrio-fondo);
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-texto);
+  text-decoration: none;
+  min-height: var(--tocable);
+}
+.marca-cuadro {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radio-menu);
+  background: var(--color-acento);
+  color: var(--color-sobre-acento);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.marca-nombre {
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+.venta-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  font-size: 15px;
+}
+.venta-nav a {
+  color: var(--color-secundario);
+  text-decoration: none;
+  min-height: var(--tocable);
+  display: inline-flex;
+  align-items: center;
+}
+.venta-nav a:hover {
+  color: var(--color-texto);
+}
+@media (max-width: 719px) {
+  .venta-nav {
+    display: none;
+  }
+}
+
+.ceja {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-acento-oscuro);
+  margin-bottom: 14px;
+}
+.entrada {
+  margin-top: 12px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--color-secundario);
+  max-width: 620px;
+}
+.nota {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-terciario);
+}
+
+.venta-heroe {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 48px var(--gutter) 72px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+  align-items: center;
+}
+.heroe-texto {
+  flex: 1 1 460px;
+  min-width: 0;
+}
+.heroe-texto h1 {
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+.heroe-entrada {
+  margin-top: 24px;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--color-secundario);
+  max-width: 520px;
+}
+.tiendas {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tienda {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-tinta);
+  color: var(--color-sobre-tinta);
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: var(--radio-tarjeta);
+  min-height: 52px;
+}
+.tienda[aria-disabled='true'] {
+  cursor: default;
+}
+.tienda-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.tienda-arriba {
+  font-size: 11px;
+  color: var(--color-sobre-tinta-tenue);
+}
+.tienda-abajo {
+  font-size: 17px;
+  font-weight: 600;
+}
+.heroe-telefono {
+  flex: 1 1 360px;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Maqueta del teléfono */
+.telefono {
+  width: 320px;
+  max-width: 100%;
+  height: 640px;
+  border-radius: 48px;
+  background: var(--color-tinta);
+  padding: 12px;
+  box-shadow: var(--sombra-telefono);
+}
+.telefono-pantalla {
+  height: 100%;
+  border-radius: 38px;
+  background: var(--color-superficie);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tel-encabezado {
+  padding: 44px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--color-terciario);
+}
+.tel-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-acento-suave);
+  color: var(--color-acento-oscuro);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tel-cifra-bloque {
+  padding: 20px 24px 0;
+}
+.tel-etiqueta {
+  font-size: 14px;
+  color: var(--color-secundario);
+}
+.tel-cifra {
+  margin-top: 4px;
+  font-family: var(--fuente-titulo);
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.tel-barra {
+  margin-top: 14px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-riel);
+  overflow: hidden;
+}
+.tel-barra > span {
+  display: block;
+  width: 62%;
+  height: 100%;
+  background: var(--color-acento);
+  border-radius: 4px;
+}
+.tel-pista {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--color-terciario);
+}
+.tel-platica {
+  padding: 22px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tel-burbuja {
+  background: var(--color-superficie-alterna);
+  padding: 12px 14px;
+  border-radius: 18px 18px 18px 4px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.tel-burbuja-tu {
+  align-self: flex-end;
+  background: var(--color-acento);
+  color: var(--color-sobre-acento);
+  padding: 10px 14px;
+  border-radius: 18px 18px 4px 18px;
+}
+.tel-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tel-chips span {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radio-pildora);
+  border: 1px solid var(--color-borde-suave);
+  color: var(--color-texto-fuerte);
+}
+.tel-voz {
+  margin-top: auto;
+  padding-bottom: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tel-orbe {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--color-acento-brillo),
+    var(--color-acento) 60%,
+    var(--color-acento-oscuro)
+  );
+  box-shadow: 0 0 0 10px var(--color-acento-suave);
+  color: var(--color-sobre-acento);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: respirar 3.2s ease-in-out infinite;
+}
+@keyframes respirar {
+  0%,
+  100% {
+    box-shadow: 0 0 0 10px var(--color-acento-suave);
+  }
+  50% {
+    box-shadow: 0 0 0 16px var(--color-acento-suave);
+  }
+}
+
+/* Bandas blancas de ancho completo */
+.banda {
+  background: var(--color-superficie);
+  border-top: 1px solid var(--color-borde);
+  border-bottom: 1px solid var(--color-borde);
+}
+.banda-interior {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 80px var(--gutter);
+}
+.banda h2,
+.venta-negocio h2 {
+  font-size: clamp(30px, 4vw, 44px);
+}
+
+.pasos {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+}
+.pasos article {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.paso-numero {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-acento-oscuro);
+}
+.pasos h3 {
+  font-size: 21px;
+}
+.pasos p {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-secundario);
+}
+
+.venta-negocio {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 80px var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  align-items: center;
+}
+.negocio-texto {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+.negocio-tarjeta {
+  flex: 1 1 380px;
+  min-width: 0;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  padding: 8px 24px 16px;
+}
+.negocio-tarjeta dl {
+  margin: 0;
+}
+.negocio-tarjeta dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-linea);
+}
+.negocio-tarjeta dt {
+  color: var(--color-secundario);
+}
+.negocio-tarjeta dd {
+  margin: 0;
+  font-weight: 600;
+}
+.negocio-tarjeta .total {
+  border-bottom: 0;
+}
+.negocio-tarjeta .total dt {
+  color: var(--color-texto);
+  font-weight: 600;
+}
+.negocio-tarjeta .total dd {
+  font-weight: 700;
+  color: var(--color-acento-oscuro);
+}
+.negocio-tarjeta .nota {
+  margin-top: 0;
+  font-size: 12px;
+}
+
+.precios {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.precio {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.precio-destacado {
+  border: 2px solid var(--color-acento);
+  padding: 31px;
+}
+.precio h3 {
+  font-size: 20px;
+}
+.precio-monto {
+  font-family: var(--fuente-titulo);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.precio-monto span {
+  font-family: var(--fuente-cuerpo);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-secundario);
+}
+.precio-alterno {
+  margin-top: -10px;
+  font-size: 14px;
+  color: var(--color-terciario);
+}
+.precio-texto {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-secundario);
+}
+.precio ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--color-texto-fuerte);
+}
+.precio .btn {
+  margin-top: auto;
+}
+
+.venta-privacidad {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 80px var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+}
+.venta-privacidad h3 {
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+.venta-privacidad p {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-secundario);
+}
+
+.venta-pie {
+  border-top: 1px solid var(--color-borde);
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 32px var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--color-terciario);
+}
+.venta-pie nav {
+  display: flex;
+  gap: 8px 24px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 719px) {
+  :root {
+    --gutter: 16px;
+  }
+  .venta-heroe {
+    padding-top: 24px;
+    gap: 40px;
+  }
+  .banda-interior,
+  .venta-negocio,
+  .venta-privacidad {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+  .precio,
+  .precio-destacado {
+    padding: 24px;
+  }
+}

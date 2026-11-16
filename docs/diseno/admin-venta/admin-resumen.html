@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<title>Finanvoz admin · Resumen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Inter+Tight:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F7F5}
+a{color:#0A6B57}a:hover{color:#0B3D33}
+.num{font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #0F1A16; background: #F6F7F5; min-height: 100vh; display: flex; flex-wrap: wrap">
+
+<aside style="flex: 1 1 220px; max-width: 260px; background: #FFFFFF; border-right: 1px solid #E3E8E5; padding: 20px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+  <div style="display: flex; align-items: center; gap: 10px; padding: 4px 12px 20px">
+    <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: #0E8A6E; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v12"/><path d="M8 7v6"/><path d="M16 7v6"/><path d="M8 20h8"/></svg></span>
+    <span style="font-family: 'Inter Tight', Inter, sans-serif; font-weight: 700; font-size: 17px">Finanvoz <span style="font-weight: 500; color: #5B6963">admin</span></span>
+  </div>
+  <nav aria-label="Módulos" style="display: flex; flex-direction: column; gap: 2px; font-size: 15px">
+    <a href="#" aria-current="page" style="padding: 10px 12px; border-radius: 10px; background: #E3F2EC; color: #0A6B57; font-weight: 600; text-decoration: none">Resumen</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Ventas y clientes</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Vendedores y comisiones</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Suscripciones Plus</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Usuarios de la app</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Uso de IA</a>
+    <a href="#" style="padding: 10px 12px; border-radius: 10px; color: #33413B; text-decoration: none">Soporte</a>
+  </nav>
+  <div style="margin-top: auto; padding: 16px 12px 0; border-top: 1px solid #EDF0EE; font-size: 13px; color: #5B6963">Adam · Dueño</div>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 48px; box-sizing: border-box">
+  <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between">
+    <div>
+      <h1 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-size: 28px; letter-spacing: -0.02em">Resumen</h1>
+      <p style="margin: 4px 0 0; font-size: 14px; color: #5B6963">Noviembre 2026 · al domingo 15</p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+      <button type="button" style="font: inherit; font-size: 14px; padding: 8px 14px; min-height: 36px; border-radius: 8px; border: 1px solid #C9D1CD; background: #FFFFFF; color: #0F1A16">Este mes</button>
+      <button type="button" style="font: inherit; font-size: 14px; font-weight: 600; padding: 8px 14px; min-height: 36px; border-radius: 8px; border: 0; background: #0E8A6E; color: #FFFFFF">Registrar venta</button>
+    </div>
+  </div>
+
+  <p style="margin: 16px 0 0; font-size: 13px; color: #7A4B00; background: #FFF4DE; border-radius: 8px; padding: 8px 12px">Datos de ejemplo para la muestra. En producción salen de la base, de RevenueCat y de la puerta de IA.</p>
+
+  <section aria-label="Cifras del mes" style="margin-top: 20px; background: #FFFFFF; border: 1px solid #E3E8E5; border-radius: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
+    <div style="padding: 18px 20px; border-right: 1px solid #EDF0EE"><p style="margin: 0; font-size: 13px; color: #5B6963">Ingreso del mes</p><p class="num" style="margin: 6px 0 0; font-size: 26px; font-weight: 700; font-family: 'Inter Tight', Inter, sans-serif">$18,450</p><p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">Plus $6,930 · licencias $11,520</p></div>
+    <div style="padding: 18px 20px; border-right: 1px solid #EDF0EE"><p style="margin: 0; font-size: 13px; color: #5B6963">Plus activos</p><p class="num" style="margin: 6px 0 0; font-size: 26px; font-weight: 700; font-family: 'Inter Tight', Inter, sans-serif">77</p><p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">9 nuevos · 2 cancelaron</p></div>
+    <div style="padding: 18px 20px; border-right: 1px solid #EDF0EE"><p style="margin: 0; font-size: 13px; color: #5B6963">Usuarios activos 7 días</p><p class="num" style="margin: 6px 0 0; font-size: 26px; font-weight: 700; font-family: 'Inter Tight', Inter, sans-serif">612</p><p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">4.1 registros por voz al día</p></div>
+    <div style="padding: 18px 20px"><p style="margin: 0; font-size: 13px; color: #5B6963">Gasto de IA</p><p class="num" style="margin: 6px 0 0; font-size: 26px; font-weight: 700; font-family: 'Inter Tight', Inter, sans-serif">US$3.12</p><p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">de US$5 de tope · 0.03 ¢ por frase</p></div>
+  </section>
+
+  <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <section aria-labelledby="t-ventas" style="flex: 2 1 480px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E8E5; border-radius: 14px">
+      <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px">
+        <h2 id="t-ventas" style="margin: 0; font-size: 17px">Últimas ventas</h2>
+        <a href="#" style="font-size: 14px">Ver todas</a>
+      </div>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px">
+          <thead><tr style="color: #5B6963; text-align: left"><th style="font-weight: 500; padding: 8px 20px; border-bottom: 1px solid #EDF0EE">Cliente</th><th style="font-weight: 500; padding: 8px 12px; border-bottom: 1px solid #EDF0EE">Qué compró</th><th style="font-weight: 500; padding: 8px 12px; border-bottom: 1px solid #EDF0EE">Vendedor</th><th style="font-weight: 500; padding: 8px 12px; border-bottom: 1px solid #EDF0EE">Estado</th><th style="font-weight: 500; padding: 8px 20px; border-bottom: 1px solid #EDF0EE; text-align: right">Monto</th></tr></thead>
+          <tbody>
+            <tr><td style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE">Caja Popular San Andrés Cholula<div style="font-size: 12px; color: #5B6963">Folio FV-0012 · 14 nov</div></td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">40 licencias · 12 meses</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">Vendedor 1</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE"><span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #0E8A6E"></span>Pagada</span></td><td class="num" style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE; text-align: right; font-weight: 600">$9,600</td></tr>
+            <tr><td style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE">Estética Lupita<div style="font-size: 12px; color: #5B6963">Folio FV-0011 · 12 nov</div></td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">Plus anual</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">Vendedor 2</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE"><span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #0E8A6E"></span>Pagada</span></td><td class="num" style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE; text-align: right; font-weight: 600">$990</td></tr>
+            <tr><td style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE">Transportes Hermanos Rojas Huerta, S.A. de C.V.<div style="font-size: 12px; color: #5B6963">Folio FV-0010 · 10 nov</div></td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">8 licencias · 6 meses</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE">Vendedor 1</td><td style="padding: 12px; border-bottom: 1px solid #EDF0EE"><span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; border: 2px solid #B26A00; box-sizing: border-box"></span>Por cobrar</span></td><td class="num" style="padding: 12px 20px; border-bottom: 1px solid #EDF0EE; text-align: right; font-weight: 600">$1,920</td></tr>
+            <tr><td style="padding: 12px 20px">Taller Mecánico El Güero<div style="font-size: 12px; color: #5B6963">Folio FV-0009 · 7 nov</div></td><td style="padding: 12px">Plus mensual</td><td style="padding: 12px">Vendedor 2</td><td style="padding: 12px"><span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #0E8A6E"></span>Pagada</span></td><td class="num" style="padding: 12px 20px; text-align: right; font-weight: 600">$99</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="t-vend" style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E8E5; border-radius: 14px; padding: 16px 20px">
+      <h2 id="t-vend" style="margin: 0 0 4px; font-size: 17px">Vendedores este mes</h2>
+      <p style="margin: 0 0 8px; font-size: 13px; color: #5B6963">Comisión de [X] % sobre lo cobrado</p>
+      <div style="padding: 12px 0; border-bottom: 1px solid #EDF0EE">
+        <div style="display: flex; justify-content: space-between"><span style="font-weight: 600">Vendedor 1</span><span class="num" style="font-weight: 600">$9,600</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5B6963; margin-top: 4px"><span>2 ventas · 1 por cobrar</span><span class="num">Comisión $[ ]</span></div>
+        <div aria-hidden="true" style="margin-top: 8px; height: 6px; border-radius: 3px; background: #E8ECEA"><div style="width: 64%; height: 100%; border-radius: 3px; background: #0E8A6E"></div></div>
+        <p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">64 % de su meta de $15,000</p>
+      </div>
+      <div style="padding: 12px 0">
+        <div style="display: flex; justify-content: space-between"><span style="font-weight: 600">Vendedor 2</span><span class="num" style="font-weight: 600">$1,089</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5B6963; margin-top: 4px"><span>2 ventas</span><span class="num">Comisión $[ ]</span></div>
+        <div aria-hidden="true" style="margin-top: 8px; height: 6px; border-radius: 3px; background: #E8ECEA"><div style="width: 11%; height: 100%; border-radius: 3px; background: #0E8A6E"></div></div>
+        <p style="margin: 4px 0 0; font-size: 12px; color: #5B6963">11 % de su meta de $10,000</p>
+      </div>
+      <h2 style="margin: 12px 0 8px; font-size: 15px">Pendiente hoy</h2>
+      <ul style="margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.8; color: #33413B">
+        <li>Cobrar FV-0010 · vence el 20 nov</li>
+        <li>3 prospectos sin llamar desde la página de venta</li>
+        <li>1 ticket de soporte sin respuesta</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
