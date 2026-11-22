@@ -3,7 +3,20 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { cambiarMontoPagoFijo, detallePagoFijo, quitarPagoFijoActivo } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Cifra, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  CampoMonto,
+  Cifra,
+  espacio,
+  EstadoVacio,
+  Icono,
+  Pantalla,
+  radio,
+  Tarjeta,
+  Texto,
+  useTema,
+  type NombreIcono,
+} from '../../ui';
 import { capitalizar, describirRegla } from '../onboarding/pagos-fijos';
 import { conAnuncio, Encabezado, MensajeEnLinea } from './Encabezado';
 import {
@@ -57,6 +70,7 @@ export function PantallaDetallePagoFijo({
 }) {
   const { ctx, refrescar } = useSesion();
   const p = useVista((x) => detallePagoFijo(x, programadoId));
+  const { c } = useTema();
   const [paso, setPaso] = useState<'ver' | 'monto' | 'quitar'>('ver');
   const [monto, setMonto] = useState<Centavos | null>(null);
   const [mensaje, setMensajeBase] = useState<{ texto: string; error: boolean } | null>(null);
@@ -78,12 +92,12 @@ export function PantallaDetallePagoFijo({
 
   const titulo = capitalizar(p.concepto);
   const regla = describirRegla(p.regla);
-  const detalles = [
-    regla,
-    textoProximoPago(p.proxima),
-    p.cuenta ? textoSaleDe(p.cuenta) : null,
-    p.hasta ? textoHasta(p.hasta) : null,
-  ].filter((x): x is string => x !== null);
+  const detalles: (readonly [NombreIcono, string])[] = [
+    ['repetir', capitalizar(regla)],
+    ['calendario', textoProximoPago(p.proxima)],
+  ];
+  if (p.cuenta) detalles.push(['banco', textoSaleDe(p.cuenta)]);
+  if (p.hasta) detalles.push(['reloj', textoHasta(p.hasta)]);
 
   const guardarMonto = () => {
     if (monto === null || monto <= 0) {
@@ -140,20 +154,34 @@ export function PantallaDetallePagoFijo({
         </Texto>
         <Cifra
           centavos={p.monto}
-          tamano="grande"
+          tamano="heroe"
           contexto={`${titulo}, apartas`}
           testID="pago-detalle-monto"
+          style={{ fontWeight: '300', letterSpacing: -1 }}
         />
         {p.variable ? (
           <Texto variante="secundario" tono="secundario">
             {TEXTO_MONTO_VARIABLE}
           </Texto>
         ) : null}
-        {detalles.map((d) => (
-          <Texto key={d} variante="cuerpo">
-            {d}
-          </Texto>
-        ))}
+        <View
+          style={{
+            gap: espacio.s,
+            padding: espacio.m,
+            borderRadius: radio.m,
+            backgroundColor: c.fondo,
+            marginTop: espacio.xs,
+          }}
+        >
+          {detalles.map(([icono, d]) => (
+            <View key={d} style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+              <Icono nombre={icono} color={c.textoSecundario} tamano={16} />
+              <Texto variante="cuerpo" style={{ flex: 1 }}>
+                {d}
+              </Texto>
+            </View>
+          ))}
+        </View>
         <MensajeEnLinea
           texto={mensaje?.texto ?? null}
           error={mensaje?.error ?? false}

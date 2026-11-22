@@ -408,7 +408,7 @@ describe('Detalle de un pago fijo', () => {
       <PantallaDetallePagoFijo programadoId={renta} alVolver={jest.fn()} alQuitado={alQuitado} />,
     );
     expect(screen.getByTestId('pago-detalle-titulo')).toHaveTextContent('Renta');
-    expect(screen.getByText('día 1 de cada mes')).toBeTruthy();
+    expect(screen.getByText('Día 1 de cada mes')).toBeTruthy();
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('pago-detalle-cambiar-monto'));
     fireEvent.changeText(screen.getByTestId('pago-detalle-monto-nuevo'), '8,500');
