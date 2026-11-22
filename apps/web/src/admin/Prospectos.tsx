@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { diasEntre, fechaCorta, hoyMexico, sumarDias } from '../util/fecha';
+import { hoyMexico, sumarDias } from '../util/fecha';
 import { Icono } from '../util/Icono';
 import type { CapaDatos, Miembro, Prospecto, SesionAdmin } from './datos';
 import { Cabecera, Cargando, ErrorCarga, Vacio } from './componentes/Estados';
+import { etiquetaSiguientePaso } from './prospectosFecha';
 import { ETAPAS, INTERESES, ORIGENES } from './textos';
+
+export { etiquetaSiguientePaso } from './prospectosFecha';
 
 /** La siguiente etapa natural: un toque para avanzar. */
 const SIGUIENTE: Record<string, { etapa: string; etiqueta: string }> = {
@@ -12,15 +15,6 @@ const SIGUIENTE: Record<string, { etapa: string; etiqueta: string }> = {
   demo: { etapa: 'propuesta', etiqueta: 'Mandé propuesta' },
   propuesta: { etapa: 'ganado', etiqueta: 'Ganado' },
 };
-
-function cuando(fecha: string | null, hoy: string): string {
-  if (!fecha) return '';
-  const d = diasEntre(hoy, fecha);
-  if (d < 0) return `Atrasado desde el ${fechaCorta(fecha)}`;
-  if (d === 0) return 'Hoy';
-  if (d === 1) return 'Mañana';
-  return fechaCorta(fecha);
-}
 
 export function Prospectos({
   datos,
@@ -38,6 +32,7 @@ export function Prospectos({
   const [lista, setLista] = useState<Prospecto[]>([]);
   const [filtro, setFiltro] = useState<string>('nuevo');
   const [alta, setAlta] = useState(false);
+  const [perdido, setPerdido] = useState<Prospecto | null>(null);
 
   const cargar = useCallback(async () => {
     setEstado('cargando');
@@ -66,7 +61,7 @@ export function Prospectos({
     .filter((p) => p.etapa === filtro)
     .sort((a, b) => (a.siguiente_paso_en ?? '9999').localeCompare(b.siguiente_paso_en ?? '9999'));
 
-  async function mover(p: Prospecto, etapa: string) {
+  async function mover(p: Prospecto, etapa: string, motivo?: string) {
     setAviso('');
     if (etapa === 'ganado') {
       const r = await datos.convertirProspectoEnCliente(p.id);
@@ -77,11 +72,11 @@ export function Prospectos({
       onRegistrarVenta(r.datos.cliente.id);
       return;
     }
-    const motivo = etapa === 'perdido' ? (window.prompt('¿Por qué se perdió? (opcional)') ?? '') : undefined;
     const r = await datos.actualizarEtapaProspecto(p.id, etapa, motivo);
     setAviso(
       r.ok ? `${p.nombre} pasó a ${ETAPAS.find((e) => e.id === etapa)?.etiqueta.toLowerCase()}.` : r.error,
     );
+    setPerdido(null);
     await cargar();
   }
 
@@ -102,6 +97,15 @@ export function Prospectos({
             setFiltro('nuevo');
             setAviso(`Anoté a ${p.nombre}.`);
             void cargar();
+          }}
+        />
+      ) : null}
+      {perdido ? (
+        <HojaPerdido
+          prospecto={perdido}
+          onCerrar={() => setPerdido(null)}
+          onConfirmar={async (motivo) => {
+            await mover(perdido, 'perdido', motivo);
           }}
         />
       ) : null}
@@ -153,7 +157,7 @@ export function Prospectos({
             <tbody>
               {visibles.map((p) => {
                 const sig = SIGUIENTE[p.etapa];
-                const fecha = cuando(p.siguiente_paso_en, hoy);
+                const fecha = etiquetaSiguientePaso(p.siguiente_paso_en, hoy);
                 return (
                   <tr key={p.id}>
                     <td>
@@ -179,7 +183,7 @@ export function Prospectos({
                           <button
                             type="button"
                             className="btn btn-texto btn-texto-gris btn-control"
-                            onClick={() => void mover(p, 'perdido')}
+                            onClick={() => setPerdido(p)}
                           >
                             Marcar perdido
                           </button>
@@ -219,6 +223,60 @@ export function Prospectos({
         </div>
       )}
     </>
+  );
+}
+
+function HojaPerdido({
+  prospecto,
+  onCerrar,
+  onConfirmar,
+}: {
+  prospecto: Prospecto;
+  onCerrar: () => void;
+  onConfirmar: (motivo: string | undefined) => Promise<void>;
+}) {
+  const [motivo, setMotivo] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  return (
+    <div className="hoja-fondo" role="dialog" aria-modal="true" aria-labelledby="perdido-titulo">
+      <div className="hoja">
+        <div className="hoja-cabecera">
+          <h2 id="perdido-titulo">Marcar perdido a {prospecto.nombre}</h2>
+          <button type="button" className="boton-icono" onClick={onCerrar} aria-label="Cerrar">
+            <Icono nombre="cerrar" />
+          </button>
+        </div>
+        <p className="hoja-entrada">
+          Queda en Perdidos y en la bitácora. El motivo es opcional.
+        </p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setEnviando(true);
+            void onConfirmar(motivo.trim() || undefined).finally(() => setEnviando(false));
+          }}
+        >
+          <div className="campo">
+            <label htmlFor="motivo-perdido">Motivo (opcional)</label>
+            <input
+              id="motivo-perdido"
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              maxLength={200}
+            />
+          </div>
+          <div className="hoja-acciones">
+            <button type="button" className="btn btn-secundario" onClick={onCerrar}>
+              Volver
+            </button>
+            <button type="submit" className="btn btn-peligro" disabled={enviando}>
+              {enviando ? 'Guardando…' : 'Marcar perdido'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 

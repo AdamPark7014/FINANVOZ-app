@@ -1,5 +1,17 @@
 # RELEVO
 
+- **2026-11-22 (cursor) — Pulido noche admin: Prospectos hoja perdido + tests Prospectos/Ventas/Clientes. NO push / NO deploy.**
+  - Arranque: árbol limpio en `main` (ahead 4 de origin tras turnos previos). EXEC-PACKET: NONE.
+  - Prospectos: quitó `window.prompt`; «Marcar perdido» abre hoja (motivo opcional) alineada a cancelar venta.
+    Helper puro `prospectosFecha.etiquetaSiguientePaso` (hoy/mañana/atrasado/fecha corta).
+  - Tests nuevos: `Prospectos.test.tsx` (7), `Ventas.test.tsx` (6), `Clientes.test.tsx` (3). Suite web 37/37.
+  - Verificado: `pnpm --filter @cartera/web typecheck` OK; vitest web 37/37.
+  - Nota infra: Ollama chat se colgó a mitad del turno (llama-server); `prospectosFecha` sí salió por
+    `ollama_implement -Apply`; el resto se integró desde drafts revisados cuando el worker dejó de responder.
+  - Pendiente Adam (sin cambio): precios/comisión, dominio venta, OK migración `20261401000000_admin_erp.sql`,
+    Edge `prospecto`, publicar web, cuentas vendedores Auth.
+  - Coordinador: push+deploy al cerrar la noche. Este agente no hizo push ni deploy.
+
 - **2026-11-22 (cursor) — Cierre del WIP admin Actividad/Layout/Prospectos. NO push / NO deploy.**
   - Arranque: `relevo salvar` dejó `15a3966` (rescate) con pulido ya en disco: Actividad (inicial del autor +
     «qué» / «cuándo» en columnas), nav «Vendedores», botón «Marcar perdido», CSS «Pulido 22-11» en
@@ -175,13 +187,9 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 ## Siguiente
 
-1. Adam: precios/comisión reales, dominio de venta, OK para migración admin + Edge `prospecto` + publicar web
-   (sin eso no hay deploy del panel).
-2. Nueva build (TestFlight y AAB, a mano) con B+ y la plática, y probar en teléfono: «¿cuánto gasté en comida esta
-   semana?» → «¿y la semana pasada?»; «coca 25» → «no, en efectivo» → «otra igual»; «¿me alcanza para unos tenis de
-   1,200?» → «¿y a 6 meses?» → «ya los compré»; «¿cuándo me pagan?»; «no entendí»; y sin internet.
-3. Pendientes 154 (lo que debes a personas) y 155 (seguimientos que todavía van a la nube).
-4. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): propuestas 2–6 esperan su visto bueno.
+1. Coordinador noche: push + deploy de lo acumulado en `main` local (este turno no empujó).
+2. Adam: precios/comisión, dominio, OK migración admin + Edge `prospecto` + publicar web.
+3. Nueva build (TestFlight y AAB) con B+ y la plática; pendientes 154/155.
 
 ## No tocar
 
@@ -196,4 +204,4 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 ## Estimación rápida
 
 FinanVoz código ~95 %; camino a tiendas ~70 % (prueba interna en Play y TestFlight; faltan fichas públicas, dominio y
-legal).
+legal). Admin/venta web listo en código; publicación bloqueada por decisiones de Adam.
