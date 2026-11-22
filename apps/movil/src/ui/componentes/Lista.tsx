@@ -52,8 +52,11 @@ export function Grupo({
   /** Etiqueta corta arriba de la tarjeta («Tu dinero»). */
   titulo?: string;
   testIDTitulo?: string;
-  /** Fuerza la línea entre filas a empezar después del ícono (filas que son componentes propios). */
-  sangria?: boolean;
+  /**
+   * Fuerza la línea entre filas a empezar después del ícono (filas que son componentes propios); un número es el
+   * ancho de lo que va a la izquierda (p. ej. el cuadro de fecha de 44).
+   */
+  sangria?: boolean | number;
   /** Nota al pie, en letra chica («Todo se guarda cifrado…»). */
   nota?: string | null;
   children: ReactNode;
@@ -88,7 +91,11 @@ export function Grupo({
       >
         {filas.map((fila, i) => (
           <Fragment key={(isValidElement(fila) && fila.key) || i}>
-            {i > 0 ? <Separador conIcono={sangria ?? tieneIcono(fila)} /> : null}
+            {i > 0 ? (
+              <Separador
+                sangria={typeof sangria === 'number' ? sangria : (sangria ?? tieneIcono(fila)) ? ICONO : 0}
+              />
+            ) : null}
             {fila}
           </Fragment>
         ))}
@@ -117,14 +124,14 @@ function tieneIcono(fila: ReactNode): boolean {
   return isValidElement(fila) && Boolean((fila.props as { icono?: unknown }).icono);
 }
 
-function Separador({ conIcono }: { conIcono: boolean }) {
+function Separador({ sangria }: { sangria: number }) {
   const { c } = useTema();
   return (
     <View
       style={{
         height: StyleSheet.hairlineWidth,
         backgroundColor: c.borde,
-        marginLeft: conIcono ? espacio.l + ICONO + espacio.m : espacio.l,
+        marginLeft: sangria > 0 ? espacio.l + sangria + espacio.m : espacio.l,
       }}
     />
   );
@@ -162,6 +169,8 @@ export interface FilaProps {
   tonoValor?: TonoTexto;
   icono?: NombreIcono;
   familia?: FamiliaCategoria;
+  /** Algo propio a la izquierda en vez del mosaico (p. ej. el cuadro de la fecha). */
+  inicio?: ReactNode;
   /** Abre algo: muestra el chevron y responde al toque. */
   alPresionar?: () => void;
   pista?: string;
@@ -170,6 +179,8 @@ export interface FilaProps {
   destructiva?: boolean;
   /** Algo propio a la derecha en vez del valor (p. ej. un anillo). */
   derecha?: ReactNode;
+  /** Renglones extra bajo el apoyo (decorativos si la fila se toca: la etiqueta ya los dice). */
+  pie?: ReactNode;
   testID?: string;
   testIDTitulo?: string;
   testIDApoyo?: string;
@@ -185,11 +196,13 @@ export function Fila({
   tonoValor = 'secundario',
   icono,
   familia,
+  inicio,
   alPresionar,
   pista,
   etiquetaAccesible,
   destructiva = false,
   derecha,
+  pie,
   testID,
   testIDTitulo,
   testIDApoyo,
@@ -212,7 +225,7 @@ export function Fila({
         paddingVertical: espacio.m,
       }}
     >
-      {icono ? <IconoFila icono={icono} {...(familia ? { familia } : {})} /> : null}
+      {inicio ?? (icono ? <IconoFila icono={icono} {...(familia ? { familia } : {})} /> : null)}
       <View style={{ flex: 1, gap: espacio.xxs }}>
         <Texto
           variante="cuerpo"
@@ -228,6 +241,7 @@ export function Fila({
             {apoyoLimpio}
           </Texto>
         ) : null}
+        {pie}
       </View>
       {derecha ??
         (valor ? (

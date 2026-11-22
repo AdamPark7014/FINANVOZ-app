@@ -174,6 +174,7 @@ export function PantallaCompartidos({
             </Texto>
           ) : grupos.length === 0 ? (
             <EstadoVacio
+              icono="corazon"
               texto={TEXTO_COMPARTIDOS_VACIO}
               testID="compartidos-vacio"
               etiquetaAccesible={etiquetaVacioCompartidos()}

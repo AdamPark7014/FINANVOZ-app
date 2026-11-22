@@ -136,6 +136,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver?: () => void }) {
         </Texto>
       ) : (
         <EstadoVacio
+          icono="repetir"
           texto={TEXTO_SUSCRIPCIONES_VACIO}
           testID="suscripciones-vacio"
           etiquetaAccesible={etiquetaVacioSuscripciones()}

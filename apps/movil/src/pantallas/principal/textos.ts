@@ -691,3 +691,10 @@ export const TITULO_EN_QUE_SE_FUE = 'En qué se fue';
 
 /** Lo que viene en los próximos 30 días (antes «Compromisos»). */
 export const TITULO_LO_QUE_VIENE = 'Lo que viene';
+
+/** Cuentas › «Más»: tandas, gastos con tu pareja, suscripciones y deducciones en una lista (pase de pulido, 22-11). */
+export const TITULO_MAS_CUENTAS = 'Más de tu dinero';
+export const APOYO_TANDAS_CUENTAS = 'Aparto cada aportación el día que toca.';
+export const APOYO_COMPARTIDOS_CUENTAS = 'Lo que comparten y quién le debe a quién.';
+export const APOYO_SUSCRIPCIONES_CUENTAS = 'Lo que se cobra solo cada mes, semana o año.';
+export const APOYO_DEDUCCIONES_CUENTAS = 'Tus facturas y lo que puedes deducir este año.';

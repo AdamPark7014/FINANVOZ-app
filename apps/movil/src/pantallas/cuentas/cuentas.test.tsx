@@ -481,7 +481,7 @@ describe('Lista de pagos fijos y de personas', () => {
       <PantallaPagosFijos alVolver={jest.fn()} alAgregar={alAgregar} alAbrir={alAbrir} />,
     );
     expect(screen.getByText('Predial')).toBeTruthy();
-    expect(screen.getByText('cada 15 de febrero')).toBeTruthy();
+    expect(screen.getByText(/^Cada 15 de febrero/)).toBeTruthy();
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId(`pago-fijo-${predial}-abrir`));
     expect(alAbrir).toHaveBeenCalledWith(predial);

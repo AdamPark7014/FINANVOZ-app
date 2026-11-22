@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { listarTandas, type TandaCreada } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Pantalla, Texto } from '../../ui';
+import { Fila, Grupo } from '../../ui/componentes/Lista';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { FormularioTanda } from './FormularioTanda';
 import {
@@ -39,6 +40,14 @@ export function PantallaTandas({
 }) {
   const tandas = useVista(listarTandas);
   const [nueva, setNueva] = useState(nuevaAlInicio);
+  const botonNueva = (
+    <Boton
+      testID="tandas-nueva"
+      etiqueta={ETIQUETA_NUEVA_TANDA}
+      alPresionar={() => setNueva(true)}
+      pista={PISTA_NUEVA_TANDA}
+    />
+  );
   return (
     <Pantalla
       testID="pantalla-tandas"
@@ -75,43 +84,48 @@ export function PantallaTandas({
         <>
           {tandas.length === 0 ? (
             <EstadoVacio
+              icono="personas"
               texto={TEXTO_TANDAS_VACIO}
               testID="tandas-vacio"
               etiquetaAccesible={etiquetaVacioTandas()}
               pistaCta={PISTA_VACIO_TANDAS}
-            />
+            >
+              {botonNueva}
+            </EstadoVacio>
           ) : null}
-          <View accessibilityRole="list" testID="tandas-lista" style={{ gap: espacio.m }}>
-            {/* Toda la tarjeta abre el detalle (antes solo "Ver calendario", abajo y pequeño). */}
-            {tandas.map((t) => (
-              <Tarjeta
-                key={t.id}
-                testID={`tanda-${t.id}`}
-                alPresionar={() => alAbrirTanda(t.id)}
-                etiquetaAccesible={etiquetaAccesibleTandaEnLista(t)}
-                pista={PISTA_VER_CALENDARIO}
-              >
-                <View style={{ gap: espacio.s }}>
-                  <Texto variante="cuerpoFuerte">{t.nombre}</Texto>
-                  <Texto variante="secundario" tono="secundario">
-                    {t.proxima
-                      ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
-                      : textoSubtituloListaSinProxima(t.etiquetaCobro)}
-                  </Texto>
-                  <Texto variante="secundario">{textoEnRiesgo(t.enRiesgo)}</Texto>
-                </View>
-                <Texto variante="etiqueta" tono="acento" testID={`tanda-${t.id}-abrir`}>
-                  {`${ETIQUETA_VER_CALENDARIO} ›`}
-                </Texto>
-              </Tarjeta>
-            ))}
+          <View accessibilityRole="list" testID="tandas-lista">
+            {tandas.length > 0 ? (
+              <Grupo sangria>
+                {/* Toda la fila abre el detalle (antes solo "Ver calendario", abajo y pequeño). */}
+                {tandas.map((t) => (
+                  <Fila
+                    key={t.id}
+                    testID={`tanda-${t.id}`}
+                    icono="personas"
+                    familia="antojos"
+                    titulo={t.nombre}
+                    apoyo={
+                      t.proxima
+                        ? textoSubtituloListaConProxima(t.aportacion, t.proxima.etiqueta, t.etiquetaCobro)
+                        : textoSubtituloListaSinProxima(t.etiquetaCobro)
+                    }
+                    alPresionar={() => alAbrirTanda(t.id)}
+                    etiquetaAccesible={etiquetaAccesibleTandaEnLista(t)}
+                    pista={PISTA_VER_CALENDARIO}
+                    pie={
+                      <>
+                        <Texto variante="secundario">{textoEnRiesgo(t.enRiesgo)}</Texto>
+                        <Texto variante="etiqueta" tono="acento" testID={`tanda-${t.id}-abrir`}>
+                          {ETIQUETA_VER_CALENDARIO}
+                        </Texto>
+                      </>
+                    }
+                  />
+                ))}
+              </Grupo>
+            ) : null}
           </View>
-          <Boton
-            testID="tandas-nueva"
-            etiqueta={ETIQUETA_NUEVA_TANDA}
-            alPresionar={() => setNueva(true)}
-            pista={PISTA_NUEVA_TANDA}
-          />
+          {tandas.length > 0 ? botonNueva : null}
         </>
       )}
     </Pantalla>

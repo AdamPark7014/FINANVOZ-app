@@ -221,6 +221,7 @@ export function PantallaDeducciones({
       </Texto>
       {v.facturas.length === 0 ? (
         <EstadoVacio
+          icono="documento"
           texto={TEXTO_FACTURAS_VACIO}
           testID="deducciones-sin-facturas"
           etiquetaAccesible={etiquetaVacioFacturas()}
@@ -677,6 +678,8 @@ export function ImportarCompartidas({
       {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
       {estado.tipo === 'vacio' ? (
         <EstadoVacio
+          icono="documento"
+          compacto
           texto={TEXTO_IMPORTAR_VACIO}
           testID="importar-vacio"
           etiquetaAccesible={etiquetaVacioImportar()}

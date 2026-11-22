@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { etiquetaEstadoVacio } from '../formato';
 import { useTema } from '../tema';
@@ -18,6 +19,8 @@ export function EstadoVacio({
   pistaCta,
   icono,
   titulo,
+  compacto = false,
+  children,
 }: {
   texto: string;
   /**
@@ -27,6 +30,10 @@ export function EstadoVacio({
   icono?: NombreIcono;
   /** Título corto arriba del texto (solo con `icono`). */
   titulo?: string;
+  /** Con `icono`: renglón chico (ícono a la izquierda) para los vacíos dentro de una pantalla con más secciones. */
+  compacto?: boolean;
+  /** Con `icono` (no compacto): la acción principal dentro de la misma tarjeta, abajo del texto. */
+  children?: ReactNode;
   testID: string;
   /** Incluye el título de sección para TalkBack (p. ej. «Tienes. …»). */
   etiquetaAccesible?: string;
@@ -34,6 +41,49 @@ export function EstadoVacio({
   pistaCta?: string;
 }) {
   const { c } = useTema();
+  if (icono && compacto) {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: espacio.m,
+          padding: espacio.l,
+          borderRadius: radio.l,
+          backgroundColor: c.superficie,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: c.borde,
+        }}
+      >
+        <View
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: c.iconoFondo,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icono nombre={icono} color={c.acentoTexto} tamano={20} grosor={1.9} />
+        </View>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID={testID}
+          accessibilityRole="text"
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={etiquetaAccesible ?? etiquetaEstadoVacio(texto)}
+          {...(pistaCta === undefined ? {} : { accessibilityHint: pistaCta })}
+          style={{ flex: 1 }}
+        >
+          {texto}
+        </Texto>
+      </View>
+    );
+  }
   if (icono) {
     return (
       <View
@@ -89,6 +139,7 @@ export function EstadoVacio({
         >
           {texto}
         </Texto>
+        {children ? <View style={{ alignSelf: 'stretch', marginTop: espacio.m }}>{children}</View> : null}
       </View>
     );
   }

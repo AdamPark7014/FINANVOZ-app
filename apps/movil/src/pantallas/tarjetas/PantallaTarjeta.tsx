@@ -1,6 +1,6 @@
 import { UMBRAL_USO_BP } from '@cartera/core';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   detalleTarjeta,
   etiquetaDiaMes,
@@ -11,7 +11,23 @@ import {
   type PreguntaLiquidar,
 } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Barra, Boton, Cifra, espacio, formatearCentavos, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Barra,
+  Boton,
+  Cifra,
+  coloresCuenta,
+  espacio,
+  formatearCentavos,
+  Icono,
+  orbe,
+  Pantalla,
+  radio,
+  sombra,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
+import { Fila as FilaLista, Grupo } from '../../ui/componentes/Lista';
 import { CandadoPlus } from '../plan/CandadoPlus';
 import { EstadoVacio } from '../principal/EstadoVacio';
 import { nombreTipoLibro } from '../principal/textos';
@@ -219,6 +235,8 @@ function Detalle({
       >
         {d.desdeElCorte.length === 0 ? (
           <EstadoVacio
+            icono="tarjeta"
+            compacto
             texto={VACIO_MOVIMIENTOS_TARJETA}
             testID="tarjeta-movimientos-vacio"
             etiquetaAccesible={etiquetaVacioMovimientosTarjeta(
@@ -254,6 +272,8 @@ function Detalle({
       <Seccion titulo={TITULO_ESTADOS_CUENTA} testID="tarjeta-estados">
         {d.estadosCuenta.length === 0 ? (
           <EstadoVacio
+            icono="documento"
+            compacto
             texto={textoPrimerCorteEnApp(d.etiquetaProximoCorte)}
             testID="tarjeta-estados-vacio"
             etiquetaAccesible={etiquetaVacioEstadosTarjeta(textoPrimerCorteEnApp(d.etiquetaProximoCorte))}
@@ -278,23 +298,26 @@ function Detalle({
         ) : panel === 'corregir' ? (
           <CorregirSaldo d={d} alTerminar={() => setPanel(null)} />
         ) : (
-          <>
-            <Texto variante="secundario" tono="secundario" testID="tarjeta-ciclo-resumen">
-              {textoCicloTarjeta(d.ciclo)}
-            </Texto>
-            <Boton
-              etiqueta={BTN_EDITAR_TARJETA}
-              variante="secundario"
-              alPresionar={() => setPanel('editar')}
+          <Grupo sangria>
+            <FilaLista
               testID="tarjeta-editar"
+              icono="lapiz"
+              familia="salidas"
+              titulo={BTN_EDITAR_TARJETA}
+              apoyo={textoCicloTarjeta(d.ciclo)}
+              testIDApoyo="tarjeta-ciclo-resumen"
+              etiquetaAccesible={BTN_EDITAR_TARJETA}
+              alPresionar={() => setPanel('editar')}
             />
-            <Boton
-              etiqueta={BTN_CORREGIR_SALDO}
-              variante="texto"
-              alPresionar={() => setPanel('corregir')}
+            <FilaLista
               testID="tarjeta-corregir"
+              icono="repetir"
+              familia="otros"
+              titulo={BTN_CORREGIR_SALDO}
+              etiquetaAccesible={BTN_CORREGIR_SALDO}
+              alPresionar={() => setPanel('corregir')}
             />
-          </>
+          </Grupo>
         )}
       </Seccion>
       <View style={{ height: espacio.xxxl }} />
@@ -302,22 +325,55 @@ function Detalle({
   );
 }
 
+/**
+ * Lo que debes en la tarjeta como una placa violeta (D6: el crédito es violeta), con la cifra grande, las fechas y el
+ * anillo de uso como barra menta. Cada dato se sigue oyendo con su etiqueta.
+ */
 function Resumen({ d }: { d: DetalleTarjeta }) {
+  const { esquema } = useTema();
+  const p = coloresCuenta[esquema].credito;
+  const sec = { color: p.textoSecundario };
   return (
-    <Tarjeta testID="tarjeta-resumen">
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-        <Texto variante="subtitulo" style={{ flex: 1 }}>
+    <View
+      testID="tarjeta-resumen"
+      style={{
+        backgroundColor: p.fondo,
+        borderRadius: radio.xl,
+        padding: espacio.xl,
+        gap: espacio.m,
+        overflow: 'hidden',
+        ...sombra.tarjeta[esquema],
+      }}
+    >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          position: 'absolute',
+          right: -60,
+          top: -60,
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          borderWidth: 28,
+          borderColor: p.adorno,
+        }}
+      />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+        <Icono nombre="tarjeta" color={p.textoSecundario} tamano={18} grosor={2} />
+        <Texto variante="etiqueta" style={sec}>
           {ETIQUETA_DEBES}
         </Texto>
-        <Cifra
-          centavos={d.deudaTotal}
-          tamano="grande"
-          contexto={`Debes en tu ${d.nombre}`}
-          testID="tarjeta-deuda"
-        />
       </View>
+      <Cifra
+        centavos={d.deudaTotal}
+        tamano="heroe"
+        contexto={`Debes en tu ${d.nombre}`}
+        testID="tarjeta-deuda"
+        style={{ color: p.texto, fontWeight: '300', letterSpacing: -1 }}
+      />
       {d.msiPorPagar > 0 ? (
-        <Texto variante="secundario" tono="secundario" testID="tarjeta-deuda-meses">
+        <Texto variante="secundario" testID="tarjeta-deuda-meses" style={sec}>
           {textoDeudaMeses(formatearCentavos(d.msiPorPagar))}
         </Texto>
       ) : null}
@@ -329,42 +385,70 @@ function Resumen({ d }: { d: DetalleTarjeta }) {
           style={{ gap: espacio.s }}
         >
           <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <Dato etiqueta={ETIQUETA_SALDO_A_FAVOR} valor={formatearCentavos(d.saldoAFavor)} />
-            <Texto variante="secundario" tono="secundario">
+            <Dato
+              etiqueta={ETIQUETA_SALDO_A_FAVOR}
+              valor={formatearCentavos(d.saldoAFavor)}
+              color={p.texto}
+              colorEtiqueta={p.textoSecundario}
+            />
+            <Texto variante="secundario" style={sec}>
               {AYUDA_SALDO_A_FAVOR}
             </Texto>
           </View>
         </View>
       ) : null}
       {d.ultimoCorte ? (
-        <View style={{ gap: espacio.s }}>
-          <Dato etiqueta={ETIQUETA_PNGI} valor={formatearCentavos(d.pngi)} testID="tarjeta-pngi" />
-          <Texto variante="secundario" tono="secundario">
+        <View style={{ gap: espacio.xs }}>
+          <Dato
+            etiqueta={ETIQUETA_PNGI}
+            valor={formatearCentavos(d.pngi)}
+            testID="tarjeta-pngi"
+            color={p.texto}
+            colorEtiqueta={p.textoSecundario}
+          />
+          <Texto variante="secundario" style={sec}>
             {d.pngi > 0 ? textoPagarPngiAntesDe(d.etiquetaFechaLimite) : TEXTO_PNGI_CUBIERTO}
           </Texto>
         </View>
       ) : (
-        <Texto variante="secundario" tono="secundario" testID="tarjeta-sin-corte">
+        <Texto variante="secundario" testID="tarjeta-sin-corte" style={sec}>
           {textoSinCorteDesdeAlta(d.etiquetaProximoCorte)}
         </Texto>
       )}
-      <Dato etiqueta={ETIQUETA_FECHA_LIMITE} valor={d.etiquetaFechaLimite} testID="tarjeta-fecha-limite" />
-      <Dato etiqueta={ETIQUETA_PROXIMO_CORTE} valor={d.etiquetaProximoCorte} testID="tarjeta-proximo-corte" />
+      <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: p.textoSecundario, opacity: 0.4 }} />
+      <Dato
+        etiqueta={ETIQUETA_FECHA_LIMITE}
+        valor={d.etiquetaFechaLimite}
+        testID="tarjeta-fecha-limite"
+        color={p.texto}
+        colorEtiqueta={p.textoSecundario}
+      />
+      <Dato
+        etiqueta={ETIQUETA_PROXIMO_CORTE}
+        valor={d.etiquetaProximoCorte}
+        testID="tarjeta-proximo-corte"
+        color={p.texto}
+        colorEtiqueta={p.textoSecundario}
+      />
       <Dato
         etiqueta={ETIQUETA_DISPONIBLE}
         valor={formatearCentavos(d.disponible)}
         testID="tarjeta-disponible"
+        color={p.texto}
+        colorEtiqueta={p.textoSecundario}
       />
       <Barra
         llenoBp={d.usoBp}
         marcaBp={UMBRAL_USO_BP}
         etiquetaAccesible={etiquetaAccesibleBarraUsoTarjeta(d.usoPorcentaje, d.limiteCredito)}
         testID="tarjeta-barra-uso"
+        alto={10}
+        colores={{ riel: p.adorno, lleno: orbe.nucleo, marca: p.texto }}
       />
-      <Texto variante="secundario" tono="secundario" testID="tarjeta-uso" importantForAccessibility="no">
+      <Texto variante="secundario" testID="tarjeta-uso" importantForAccessibility="no" style={sec}>
         {textoUsoLimiteTarjeta(d.usoPorcentaje, formatearCentavos(d.limiteCredito))}
       </Texto>
-    </Tarjeta>
+    </View>
   );
 }
 

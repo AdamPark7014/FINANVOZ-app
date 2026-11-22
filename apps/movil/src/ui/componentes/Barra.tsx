@@ -10,13 +10,15 @@ export interface BarraProps {
   /** Lo que dice TalkBack: la barra nunca es la única forma de leer el dato (`02 §15`). */
   etiquetaAccesible: string;
   alto?: number;
+  /** Colores propios sobre una superficie de color (p. ej. la placa violeta de la tarjeta de crédito). */
+  colores?: { readonly riel: string; readonly lleno: string; readonly marca: string };
   testID?: string;
 }
 
 const acotar = (bp: number) => Math.max(0, Math.min(10000, bp)) / 100;
 
 /** Barra horizontal sobria (`02 §16`: las barras viven en Tarjetas y Cuentas). Solo dibuja lo que recibe. */
-export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, testID }: BarraProps) {
+export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, colores, testID }: BarraProps) {
   const { c } = useTema();
   const porcentaje = Math.round(acotar(llenoBp));
   return (
@@ -29,7 +31,7 @@ export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, testID }
       style={{
         height: alto,
         borderRadius: radio.pastilla,
-        backgroundColor: c.superficieAlterna,
+        backgroundColor: colores?.riel ?? c.superficieAlterna,
         borderWidth: 0,
         overflow: 'hidden',
       }}
@@ -38,7 +40,7 @@ export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, testID }
         style={{
           width: `${acotar(llenoBp)}%`,
           height: '100%',
-          backgroundColor: c.acento,
+          backgroundColor: colores?.lleno ?? c.acento,
           borderRadius: radio.pastilla,
         }}
       />
@@ -50,7 +52,7 @@ export function Barra({ llenoBp, marcaBp, etiquetaAccesible, alto = 12, testID }
             top: 0,
             bottom: 0,
             width: 2,
-            backgroundColor: c.texto,
+            backgroundColor: colores?.marca ?? c.texto,
           }}
         />
       ) : null}

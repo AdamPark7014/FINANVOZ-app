@@ -435,6 +435,8 @@ function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver?: ()
       </Texto>
       {g.movimientos.length === 0 ? (
         <EstadoVacio
+          icono="libro"
+          compacto
           texto={TEXTO_GRUPO_MOVIMIENTOS_VACIO}
           testID="grupo-movimientos-vacio"
           etiquetaAccesible={etiquetaVacioGrupoMovimientos()}

@@ -271,6 +271,8 @@ function Detalle({
         </Texto>
         {d.movimientos.length === 0 ? (
           <EstadoVacio
+            icono="libro"
+            compacto
             texto={TEXTO_MOVIMIENTOS_PERSONA_VACIO}
             testID="persona-movimientos-vacio"
             etiquetaAccesible={etiquetaVacioMovimientosPersona()}
