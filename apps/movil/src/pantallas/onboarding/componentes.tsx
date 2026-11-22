@@ -1,15 +1,28 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { AccessibilityInfo, findNodeHandle, Platform, Pressable, View } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  findNodeHandle,
+  Platform,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import {
   Barra,
+  FUENTE,
+  Icono,
   Pantalla,
   Texto,
   espacio,
   etiquetaHablada,
   OBJETIVO_TACTIL_MIN,
   radio,
+  useReducirMovimiento,
   useTema,
+  vibrar,
 } from '../../ui';
 import {
   anuncioCambioPasoOnboarding,
@@ -85,7 +98,10 @@ export function Chips<T extends string | number>({
             <Pressable
               key={String(o.valor)}
               testID={`${testID}-${o.valor}`}
-              onPress={() => alCambiar(o.valor)}
+              onPress={() => {
+                if (!activo) vibrar('seleccion');
+                alCambiar(o.valor);
+              }}
               accessibilityRole="radio"
               accessibilityLabel={etiquetaHablada(o.etiqueta)}
               accessibilityHint={activo ? PISTA_CHIP_ONB_SELECCIONADA : PISTA_CHIP_ONB_ELEGIR}
@@ -98,12 +114,15 @@ export function Chips<T extends string | number>({
                 borderRadius: radio.pastilla,
                 borderWidth: activo ? 2 : 1,
                 borderColor: activo ? c.acentoTexto : c.borde,
-                backgroundColor: activo ? c.superficieAlterna : c.superficie,
+                backgroundColor: activo ? c.iconoFondo : c.superficie,
               }}
             >
-              <Texto variante="etiqueta" tono={activo ? 'acento' : 'normal'}>
-                {activo ? `✓ ${o.etiqueta}` : o.etiqueta}
-              </Texto>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.xs + 2 }}>
+                {activo ? <Icono nombre="palomita" color={c.acentoTexto} tamano={16} grosor={2.4} /> : null}
+                <Texto variante="etiqueta" tono={activo ? 'acento' : 'normal'}>
+                  {o.etiqueta}
+                </Texto>
+              </View>
             </Pressable>
           );
         })}
@@ -128,7 +147,10 @@ export function Casilla({
   return (
     <Pressable
       testID={testID}
-      onPress={() => alCambiar(!valor)}
+      onPress={() => {
+        vibrar('seleccion');
+        alCambiar(!valor);
+      }}
       accessibilityRole="checkbox"
       accessibilityLabel={etiquetaHablada(etiqueta)}
       accessibilityHint={PISTA_CASILLA_ONB}
@@ -155,11 +177,7 @@ export function Casilla({
           justifyContent: 'center',
         }}
       >
-        {valor ? (
-          <Texto variante="etiqueta" style={{ color: c.sobreAcento }}>
-            ✓
-          </Texto>
-        ) : null}
+        {valor ? <Icono nombre="palomita" color={c.sobreAcento} tamano={18} grosor={2.6} /> : null}
       </View>
       <Texto variante="cuerpo" style={{ flex: 1 }}>
         {etiqueta}
@@ -168,13 +186,22 @@ export function Casilla({
   );
 }
 
-/** Marco de cada paso: «Paso n de 7» (de 6 en iPhone) con su barra, título, ayuda y botones fijos al pie. */
+/** Lo que tarda en entrar el contenido de un paso y lo que se desplaza (pt). */
+const ENTRADA_MS = 260;
+const ENTRADA_PT = 12;
+
+/**
+ * Marco de cada paso: «Paso n de 7» (de 6 en iPhone) con su barra, que avanza desde el paso anterior; el título con
+ * presencia, la ayuda y los botones fijos al pie. El contenido entra con un desvanecido corto (quieto con «Reducir
+ * movimiento»). El consejo va al final y sin caja: acompaña, no estorba lo que hay que contestar.
+ */
 export function PasoOnboarding({
   paso,
   titulo,
   ayuda,
   tip,
   pie,
+  encabezado,
   children,
   testID,
 }: {
@@ -184,6 +211,8 @@ export function PasoOnboarding({
   /** Consejo corto opcional (`02 §14`, tuteo). */
   tip?: string;
   pie?: ReactNode;
+  /** Algo arriba del título (el orbe de la bienvenida). Decorativo. */
+  encabezado?: ReactNode;
   children?: ReactNode;
   testID: string;
 }) {
@@ -213,12 +242,28 @@ export function PasoOnboarding({
     };
   }, [paso, titulo]);
   const { c } = useTema();
+  const reducir = useReducirMovimiento();
+  const [entrada] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    if (reducir) {
+      entrada.setValue(1);
+      return;
+    }
+    const animacion = Animated.timing(entrada, {
+      toValue: 1,
+      duration: ENTRADA_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    animacion.start();
+    return () => animacion.stop();
+  }, [entrada, reducir]);
   return (
     <Pantalla
       testID={testID}
       bordes={['top', 'left', 'right', 'bottom']}
       pie={pie}
-      contenidoStyle={{ gap: espacio.xl }}
+      contenidoStyle={{ gap: espacio.xl, paddingBottom: espacio.xxl }}
     >
       <View style={{ gap: espacio.s }}>
         <Texto
@@ -228,6 +273,7 @@ export function PasoOnboarding({
           accessibilityRole="text"
           accessibilityLabel={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
           accessibilityHint={PISTA_PROGRESO_ONB}
+          style={{ fontWeight: '600', letterSpacing: 0.2 }}
         >
           {textoProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
         </Texto>
@@ -236,55 +282,76 @@ export function PasoOnboarding({
           <Barra
             testID="onb-progreso-barra"
             llenoBp={progresoOnboardingBp(paso, PASOS_VISIBLES_ONB)}
+            desdeBp={progresoOnboardingBp(paso - 1, PASOS_VISIBLES_ONB)}
             etiquetaAccesible={etiquetaProgresoOnboarding(paso, PASOS_VISIBLES_ONB)}
-            alto={8}
+            alto={6}
           />
         </View>
       </View>
-      <View
-        ref={refTitulo}
-        testID="onb-titulo-paso"
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel={etiquetaTituloPasoOnboarding(titulo)}
-        style={{ marginTop: espacio.s }}
+      <Animated.View
+        style={{
+          gap: espacio.xl,
+          opacity: entrada,
+          transform: [
+            { translateY: entrada.interpolate({ inputRange: [0, 1], outputRange: [ENTRADA_PT, 0] }) },
+          ],
+        }}
       >
-        <Texto variante="titulo" accessible={false}>
-          {titulo}
-        </Texto>
-      </View>
-      {ayuda ? (
-        <Texto
-          variante="cuerpo"
-          tono="secundario"
-          accessibilityRole="text"
-          accessibilityLabel={etiquetaAyudaPasoOnboarding(ayuda)}
-        >
-          {ayuda}
-        </Texto>
-      ) : null}
-      {tip ? (
-        <View
-          testID="onb-tip"
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={etiquetaTipOnboarding(tip)}
-          style={{
-            padding: espacio.l,
-            borderRadius: radio.l,
-            backgroundColor: c.superficieAlterna,
-          }}
-        >
-          <Texto variante="secundario" tono="secundario" accessible={false}>
-            {tip}
-          </Texto>
+        {encabezado}
+        <View style={{ gap: espacio.m }}>
+          <View
+            ref={refTitulo}
+            testID="onb-titulo-paso"
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel={etiquetaTituloPasoOnboarding(titulo)}
+            style={{ marginTop: encabezado ? 0 : espacio.s }}
+          >
+            <Text
+              accessible={false}
+              style={{
+                fontFamily: FUENTE,
+                fontSize: 30,
+                lineHeight: 36,
+                fontWeight: '700',
+                letterSpacing: -0.6,
+                color: c.texto,
+              }}
+            >
+              {titulo}
+            </Text>
+          </View>
+          {ayuda ? (
+            <Texto
+              variante="cuerpo"
+              tono="secundario"
+              accessibilityRole="text"
+              accessibilityLabel={etiquetaAyudaPasoOnboarding(ayuda)}
+              style={{ fontSize: 17 }}
+            >
+              {ayuda}
+            </Texto>
+          ) : null}
         </View>
-      ) : null}
-      {children}
+        {children}
+        {tip ? (
+          <View
+            testID="onb-tip"
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={etiquetaTipOnboarding(tip)}
+            style={{ flexDirection: 'row', gap: espacio.m, alignItems: 'flex-start' }}
+          >
+            <View style={{ width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: c.borde }} />
+            <Texto variante="secundario" tono="secundario" accessible={false} style={{ flex: 1 }}>
+              {tip}
+            </Texto>
+          </View>
+        ) : null}
+      </Animated.View>
     </Pantalla>
   );
 }
-
 /** Mensaje de error de formulario (`02 §14`: qué pasó + qué hacer). Nunca muestra el detalle técnico. */
 export function MensajeError({ texto }: { texto: string | null }) {
   if (!texto) return null;

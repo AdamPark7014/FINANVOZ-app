@@ -2,8 +2,10 @@ import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 // Archivos sueltos de voz/ (no su índice): ui/ no arrastra el reconocedor ni la voz del teléfono.
 import { ETIQUETA_ESCUCHANDO, PISTA_ESCUCHANDO, TEXTO_DIMELO, TEXTO_TERMINAR } from '../../voz/textos';
 import type { BotonHablar } from '../../voz/useBotonHablar';
+import { vibrar } from '../haptica';
 import { useTema } from '../tema';
 import { espacio, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
+import { Icono } from './Iconos';
 import { Texto } from './Texto';
 
 export interface BotonMicrofonoProps {
@@ -16,6 +18,8 @@ export interface BotonMicrofonoProps {
   etiqueta: string;
   /** Qué pasa al tocarlo, mientras no escucha. */
   pista: string;
+  /** Forma `icono` protagonista (el micrófono de «Dímelo»): más grande y relleno del color de acción. */
+  destacado?: boolean;
   /** Texto visible de la forma `boton`; por omisión "Dímelo". */
   texto?: string;
   style?: StyleProp<ViewStyle>;
@@ -34,17 +38,23 @@ export function BotonMicrofono({
   etiqueta,
   pista,
   texto = TEXTO_DIMELO,
+  destacado = false,
   style,
   testID,
 }: BotonMicrofonoProps) {
   const { c } = useTema();
   const enIcono = forma === 'icono';
-  const fondo = enIcono && !escuchando ? c.superficie : c.acento;
-  const tinta = enIcono && !escuchando ? c.acentoTexto : c.sobreAcento;
+  const claro = enIcono && !escuchando && !destacado;
+  const fondo = claro ? c.superficie : c.acento;
+  const tinta = claro ? c.acentoTexto : c.sobreAcento;
+  const lado = destacado ? OBJETIVO_TACTIL_MIN + espacio.s : OBJETIVO_TACTIL_MIN;
   return (
     <Pressable
       {...(testID === undefined ? {} : { testID })}
-      onPressIn={boton.alPresionarDentro}
+      onPressIn={() => {
+        vibrar(escuchando ? 'ligero' : 'medio');
+        boton.alPresionarDentro();
+      }}
       onPressOut={boton.alSoltar}
       accessibilityActions={boton.accionesAccesibles}
       onAccessibilityAction={boton.alAccionAccesible}
@@ -54,10 +64,10 @@ export function BotonMicrofono({
       style={({ pressed }) => [
         enIcono
           ? {
-              width: OBJETIVO_TACTIL_MIN,
-              height: OBJETIVO_TACTIL_MIN,
+              width: lado,
+              height: lado,
               borderRadius: radio.pastilla,
-              borderWidth: escuchando ? 0 : 1,
+              borderWidth: claro ? 1 : 0,
               borderColor: c.bordeControl,
             }
           : {
@@ -70,13 +80,18 @@ export function BotonMicrofono({
         {
           backgroundColor: fondo,
           opacity: pressed ? 0.85 : 1,
+          transform: [{ scale: pressed ? 0.94 : 1 }],
           alignItems: 'center' as const,
           justifyContent: 'center' as const,
         },
         style,
       ]}
     >
-      {enIcono && escuchando ? <IconoDetener color={tinta} /> : <IconoMicrofono color={tinta} />}
+      {enIcono && escuchando ? (
+        <IconoDetener color={tinta} />
+      ) : (
+        <Icono nombre="microfono" color={tinta} tamano={destacado ? 24 : 22} grosor={2} />
+      )}
       {enIcono ? null : (
         <Texto
           style={[tipo.etiqueta, { fontSize: 16, color: tinta }]}

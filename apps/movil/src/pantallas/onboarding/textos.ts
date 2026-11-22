@@ -33,6 +33,11 @@ export function cuerpoBienvenida(os?: string): string {
     os,
   );
 }
+/** La muestra de O1: una frase dicha y lo que contesta el asistente (sin cifras de nadie). */
+export const EJEMPLO_FRASE_BIENVENIDA = 'tacos 80 en efectivo';
+export const EJEMPLO_RESPUESTA_BIENVENIDA = 'Listo, lo anoté.';
+export const etiquetaEjemploBienvenida = () =>
+  `Por ejemplo, dices: ${EJEMPLO_FRASE_BIENVENIDA}. Y te contesto: ${EJEMPLO_RESPUESTA_BIENVENIDA}`;
 export const BTN_ONB_EMPEZAR = 'Empezar';
 export const BTN_ONB_CONTINUAR = 'Continuar';
 export const PISTA_ONB_EMPEZAR = 'Inicia el recorrido de configuración';

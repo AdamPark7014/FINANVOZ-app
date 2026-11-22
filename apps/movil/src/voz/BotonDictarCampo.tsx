@@ -60,6 +60,7 @@ function MicrofonoDeCampo({
   return (
     <BotonMicrofono
       forma="icono"
+      destacado={dicta === 'frase'}
       escuchando={escuchando}
       boton={mic.boton}
       etiqueta={etiquetaMicrofonoCampo(etiquetaCampo)}

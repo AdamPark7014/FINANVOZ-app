@@ -4,7 +4,7 @@ import { FUENTE, espacio, Icono, useTema } from '../../../ui';
 import { etiquetaTurnoPersona } from '../textos';
 
 /**
- * Lo que dijiste o escribiste (premium, 08-11): tu frase en chico a la derecha, como una transcripción, con un
+ * Lo que dijiste o escribiste: tu frase a la derecha en una burbuja suave (solo tú llevas burbuja), con un
  * micrófono si fue por voz. Lo importante es lo que contesta el asistente.
  */
 export function TurnoPersona({
@@ -26,7 +26,11 @@ export function TurnoPersona({
         flexDirection: 'row',
         alignItems: 'center',
         gap: espacio.xs + 2,
-        paddingVertical: espacio.xs,
+        paddingVertical: espacio.s,
+        paddingHorizontal: espacio.m + 2,
+        borderRadius: 20,
+        borderBottomRightRadius: 6,
+        backgroundColor: c.superficieAlterna,
       }}
     >
       {turno.porVoz ? (
@@ -39,9 +43,9 @@ export function TurnoPersona({
         style={{
           fontFamily: FUENTE,
           flexShrink: 1,
-          fontSize: 15,
-          lineHeight: 21,
-          color: c.textoSecundario,
+          fontSize: 16,
+          lineHeight: 22,
+          color: c.texto,
         }}
       >
         {turno.texto}

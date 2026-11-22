@@ -479,7 +479,9 @@ export const ETIQUETA_TE_ESCUCHO = 'Te escucho';
 export const BTN_LISTO_ESCUCHA = 'Listo';
 export const TEXTO_VOY_ENTENDIENDO = 'Voy entendiendo';
 export const PISTA_ESCUCHA_MANTENIENDO = 'Suelta para registrar · desliza para cancelar';
-export const PISTA_ESCUCHA_TOCANDO = 'Toca el micrófono para terminar · la X cancela';
+export const PISTA_ESCUCHA_TOCANDO = 'Toca «Listo» para terminar · la X cancela';
+/** Antes de la primera palabra: «Te escucho» no se queda en blanco. */
+export const INVITACION_ESCUCHA = 'Dime un gasto, un pago o una duda.';
 export const CHIP_ME_ALCANZA_ENTENDIDO = '¿Me alcanza?';
 
 /** Lo que se ve de la frase en vivo: los últimos 90 caracteres, con «…» si había más. */

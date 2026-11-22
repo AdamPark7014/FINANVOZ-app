@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { NADA_ENTENDIDO, prepararEntendiendo } from '../../servicios';
 import { useSesion } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
+import { Boton, CampoTexto, espacio, Icono, radio, sombra, Texto, useAnunciar, useTema } from '../../ui';
 import {
   IndicadorVoz,
   abrirAjustesDictado,
@@ -145,16 +145,43 @@ export function BarraVoz({ a, pantallaCompleta = false }: { a: Asistente; pantal
         </View>
       ) : null}
       {m.aviso ? (
-        <Texto
-          variante="secundario"
-          tono="faltante"
-          accessibilityRole="alert"
-          accessibilityLiveRegion="polite"
+        // No es un faltante (el rojo se queda para eso): un recado tranquilo sobre el dock, con su salida al lado.
+        <View
+          testID="aviso-microfono"
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: espacio.m,
+            paddingVertical: espacio.m,
+            paddingHorizontal: espacio.l,
+            borderRadius: radio.l,
+            backgroundColor: c.atencion,
+          }}
         >
-          {m.aviso}
-        </Texto>
-      ) : null}
-      {m.sinPermiso ? (
+          <Icono nombre="alerta" color={c.sobreAtencion} tamano={20} grosor={1.8} />
+          <View style={{ flex: 1, gap: espacio.xs }}>
+            <Texto
+              variante="secundario"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              style={{ color: c.sobreAtencion }}
+            >
+              {m.aviso}
+            </Texto>
+            {m.sinPermiso ? (
+              <Boton
+                etiqueta={BTN_ABRIR_AJUSTES_DICTADO}
+                variante="texto"
+                ancho="contenido"
+                pista={PISTA_ABRIR_AJUSTES_DICTADO}
+                alPresionar={abrirAjustesDictado}
+                testID="boton-abrir-ajustes-dictado"
+                style={{ paddingHorizontal: 0 }}
+              />
+            ) : null}
+          </View>
+        </View>
+      ) : m.sinPermiso ? (
         <Boton
           etiqueta={BTN_ABRIR_AJUSTES_DICTADO}
           variante="texto"

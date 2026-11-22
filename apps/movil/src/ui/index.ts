@@ -31,6 +31,7 @@ export { BarraDelDia, CifraQueCuenta, DURACION_CUENTA_MS } from './componentes/C
 export { Orbe, type EstadoOrbe } from './componentes/Orbe';
 export { useCiclo, useRampa, useReducirMovimiento } from './movimiento';
 export { anunciar, useAnunciar } from './anunciar';
+export { golpe, vibrar, type GolpeInterfaz, type Toque } from './haptica';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export {
   ContextoDictadoCampos,

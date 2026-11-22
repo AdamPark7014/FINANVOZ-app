@@ -239,7 +239,7 @@ describe('B+ · «Te escucho» (D2)', () => {
       fireEvent(screen.getByTestId('boton-hablar'), 'pressOut', toque(200, 800));
     });
     expect(screen.getByTestId('pista-escucha')).toHaveTextContent(
-      'Toca el micrófono para terminar · la X cancela',
+      'Toca «Listo» para terminar · la X cancela',
     );
     fireEvent.press(screen.getByTestId('boton-cancelar-escucha'));
     expect(motor.abortar).toHaveBeenCalledTimes(2);

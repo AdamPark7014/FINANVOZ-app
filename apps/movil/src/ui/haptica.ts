@@ -1,12 +1,14 @@
 import { requireOptionalNativeModule } from 'expo';
 
 /**
- * Háptica de la interfaz (pase de pulido, 22-11): un toque muy ligero al elegir algo (interruptor, chip, opción) y uno
- * de aviso antes de una acción que no se deshace. Usa el módulo nativo de `expo-haptics` si la build lo trae; si no,
- * no vibra (nunca la vibración larga de `Vibration`, que en iPhone es una alerta). Es solo adorno: el estado siempre
- * se ve y se anuncia.
+ * Háptica de la interfaz: toques cortos al elegir, pulsar o avisar. Usa ExpoHaptics si la build lo trae;
+ * si no, no vibra. Solo adorno: el estado siempre se ve y se anuncia.
  */
+
 export type GolpeInterfaz = 'eleccion' | 'ligero' | 'exito' | 'aviso';
+
+/** API del onboarding/voz: mismos motores, nombres distintos (incluye «medio» para el micrófono). */
+export type Toque = 'seleccion' | 'ligero' | 'medio' | 'exito' | 'aviso';
 
 interface ModuloHaptics {
   selectionAsync?: () => Promise<void>;
@@ -40,5 +42,23 @@ export function golpe(tipo: GolpeInterfaz = 'eleccion'): void {
     if (promesa) promesa.catch(() => {});
   } catch {
     // Sin motor de vibración: no pasa nada.
+  }
+}
+
+export function vibrar(toque: Toque): void {
+  try {
+    const h = haptics();
+    if (!h) return;
+    const promesa =
+      toque === 'seleccion'
+        ? h.selectionAsync?.()
+        : toque === 'ligero'
+          ? h.impactAsync?.('light')
+          : toque === 'medio'
+            ? h.impactAsync?.('medium')
+            : h.notificationAsync?.(toque === 'exito' ? 'success' : 'warning');
+    if (promesa) void Promise.resolve(promesa).catch(() => undefined);
+  } catch {
+    // Sin motor de vibración: se queda sin vibrar.
   }
 }

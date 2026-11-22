@@ -22,6 +22,7 @@ import {
   BTN_LISTO_ESCUCHA,
   ETIQUETA_TE_ESCUCHO,
   etiquetaLoEntendido,
+  INVITACION_ESCUCHA,
   PISTA_CANCELAR_ESCUCHA,
   PISTA_ESCUCHA_MANTENIENDO,
   PISTA_ESCUCHA_TOCANDO,
@@ -123,6 +124,15 @@ export function TeEscucho({
           <Text testID="transcripcion-en-vivo">{frase}</Text>
           {/* La frase sigue creciendo. */}
           <Text style={{ fontFamily: FUENTE, fontWeight: '300', color: e.chipListo }}>|</Text>
+          {/* Sin palabras todavía, una invitación tenue en lugar de la pantalla vacía. */}
+          {parcial === '' ? (
+            <Text
+              testID="invitacion-escucha"
+              style={{ fontFamily: FUENTE, fontWeight: '300', color: e.filoTentativo }}
+            >
+              {` ${INVITACION_ESCUCHA}`}
+            </Text>
+          ) : null}
         </Text>
         <LoQueVoyEntendiendo entendido={entendido} />
       </View>

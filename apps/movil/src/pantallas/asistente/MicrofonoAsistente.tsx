@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
-import { dockVoz, Icono, orbe, useTema } from '../../ui';
+import { dockVoz, Icono, orbe, useTema, vibrar } from '../../ui';
 import {
   ETIQUETA_ESCUCHANDO,
   PISTA_ESCUCHANDO,
@@ -57,6 +57,7 @@ export function MicrofonoAsistente({
         testID={testID}
         onPressIn={(e?: GestureResponderEvent) => {
           inicio.current = posicion(e);
+          vibrar(escuchando ? 'ligero' : 'medio');
           alManteniendo?.(true);
           boton.alPresionarDentro();
         }}

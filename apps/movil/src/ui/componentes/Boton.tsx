@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { etiquetaHablada } from '../formato';
+import { vibrar } from '../haptica';
 import { useTema } from '../tema';
 import { espacio, hitSlopTactil, OBJETIVO_TACTIL_MIN, radio, tipo } from '../tokens';
 
@@ -45,7 +46,10 @@ export function Boton({
   return (
     <Pressable
       testID={testID}
-      onPress={alPresionar}
+      onPress={() => {
+        if (variante === 'primario') vibrar('ligero');
+        alPresionar();
+      }}
       disabled={inactivo}
       accessibilityRole="button"
       accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}

@@ -1,6 +1,6 @@
 import { interpretarPaso, type ContextoPaso, type LecturaPaso, type Paso } from '@cartera/nlu';
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
-import { Linking, View } from 'react-native';
+import { Linking, View, type ViewStyle } from 'react-native';
 import { leerConfirmacion, useConfirmacionPorVoz } from '../../asistente/confirmacion-voz';
 import {
   anunciar,
@@ -11,10 +11,12 @@ import {
   TarjetaEntendi,
   Texto,
   useDictadoCampos,
+  useTema,
   type AvisoDictadoCampo,
   type PropuestaEntendi,
 } from '../../ui';
 import { useVozAsistente } from '../../voz';
+import { OndaVoz } from '../asistente/movimiento';
 import { combinarLecturas, resumenEntendi } from './decirlo';
 import {
   ejemploDecirlo,
@@ -83,6 +85,20 @@ export function DecirloPaso<T>(props: PropsDecirlo | PropsDecirloCampos<T>): Rea
   return 'interpretar' in props ? <DecirloCampos {...props} /> : <DecirloConEntendi {...props} />;
 }
 
+/**
+ * «Dímelo» es la forma principal de contestar cada paso: va sobre el verde claro de la marca, sin filo ni sombra,
+ * para que se distinga del formulario (tarjetas blancas) sin competir con el botón del pie.
+ */
+function estiloTarjetaDimelo(fondo: string): ViewStyle {
+  return {
+    gap: espacio.m,
+    backgroundColor: fondo,
+    borderWidth: 0,
+    shadowOpacity: 0,
+    elevation: 0,
+  };
+}
+
 type Estado =
   | { tipo: 'nada' }
   | { tipo: 'no_entendi'; texto: string }
@@ -93,6 +109,7 @@ const NADA: Estado = { tipo: 'nada' };
 
 function DecirloConEntendi({ pasos, ejemplo, contexto, proponer, correccion, testID }: PropsDecirlo) {
   const dictado = useDictadoCampos();
+  const { c } = useTema();
   const [aviso, setAviso] = useState<AvisoDictadoCampo | null>(null);
   const [estado, setEstado] = useState<Estado>(NADA);
   const [errorVoz, setErrorVoz] = useState<string | null>(null);
@@ -241,6 +258,7 @@ function DecirloConEntendi({ pasos, ejemplo, contexto, proponer, correccion, tes
 
   if (!dictado) return null;
   const { BotonDictar } = dictado;
+  const estiloDimelo = estiloTarjetaDimelo(c.iconoFondo);
   const linea =
     estado.tipo === 'entendi'
       ? (estado.nota ?? textoDijiste(estado.oido))
@@ -249,9 +267,9 @@ function DecirloConEntendi({ pasos, ejemplo, contexto, proponer, correccion, tes
         : null;
   return (
     <View style={{ gap: espacio.l }} testID={testID} onTouchStart={alTocar}>
-      <Tarjeta style={{ gap: espacio.m }}>
+      <Tarjeta style={estiloDimelo}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.l }}>
-          <View style={{ flex: 1, gap: espacio.s }}>
+          <View style={{ flex: 1, gap: espacio.xs }}>
             <Texto variante="subtitulo">{TITULO_DECIRLO}</Texto>
             <Texto variante="secundario" tono="secundario">
               {ejemploDecirlo(ejemplo)}
@@ -265,6 +283,7 @@ function DecirloConEntendi({ pasos, ejemplo, contexto, proponer, correccion, tes
             alOir={alOirEstable}
           />
         </View>
+        {aviso?.escuchando ? <OndaVoz activa /> : null}
         {aviso ? (
           <Texto variante="secundario" tono="secundario" accessibilityLiveRegion="polite">
             {aviso.texto}
@@ -327,12 +346,14 @@ function DecirloCampos<T>({ ejemplo, interpretar, alEntender, testID }: PropsDec
   const dictado = useDictadoCampos();
   const [aviso, setAviso] = useState<AvisoDictadoCampo | null>(null);
   const [resultado, setResultado] = useState<string | null>(null);
+  const { c } = useTema();
   if (!dictado) return null;
   const { BotonDictar } = dictado;
+  const estiloDimelo = estiloTarjetaDimelo(c.iconoFondo);
   return (
-    <Tarjeta testID={testID} style={{ gap: espacio.m }}>
+    <Tarjeta testID={testID} style={estiloDimelo}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.l }}>
-        <View style={{ flex: 1, gap: espacio.s }}>
+        <View style={{ flex: 1, gap: espacio.xs }}>
           <Texto variante="subtitulo">{TITULO_DECIRLO}</Texto>
           <Texto variante="secundario" tono="secundario">
             {ejemploDecirlo(ejemplo)}
@@ -354,6 +375,7 @@ function DecirloCampos<T>({ ejemplo, interpretar, alEntender, testID }: PropsDec
           }}
         />
       </View>
+      {aviso?.escuchando ? <OndaVoz activa /> : null}
       {aviso ? (
         <Texto variante="secundario" tono="secundario" accessibilityLiveRegion="polite">
           {aviso.texto}
