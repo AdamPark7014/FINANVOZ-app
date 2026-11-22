@@ -1,5 +1,17 @@
 # RELEVO
 
+- **2026-11-22 (cursor) — Cierre del WIP admin Actividad/Layout/Prospectos. NO push / NO deploy.**
+  - Arranque: `relevo salvar` dejó `15a3966` (rescate) con pulido ya en disco: Actividad (inicial del autor +
+    «qué» / «cuándo» en columnas), nav «Vendedores», botón «Marcar perdido», CSS «Pulido 22-11» en
+    `apps/web/src/estilos/admin.css`. Árbol limpio al entrar este turno.
+  - Este turno: revisión del rescate, sin redeploy ni push. Verificado en `apps/web`: `pnpm typecheck` OK;
+    vitest `src/admin/actividad.test.tsx` 11/11; suite web completa 21/21 (4 archivos).
+  - Panel admin/ERP + venta siguen hechos (commits previos `e7de9e1`…`912845d`); no hay hueco de código seguro
+    pendiente en el panel sin decisión de Adam.
+  - Pendiente de Adam (bloquea publicación): precios y comisión reales (Ajustes), dominio de la página de venta,
+    OK para aplicar migración `20261401000000_admin_erp.sql`, desplegar Edge `prospecto` y publicar la web.
+    Cuentas de vendedores: Supabase Auth + alta en Vendedores.
+
 - **2026-11-16 (claude-code) — Panel admin/ERP y página de venta (pedido de Adam desde el hilo de proyecto). NO desplegado.**
   - Tres pasadas: Cursor hizo la primera (`.ai/encargos/2026-11-16-admin-erp-y-venta.md`, copia en
     `docs/diseno/admin-venta/ENCARGO.md`); Codex no arrancó (`codex exec` no pudo leer archivos en su sandbox de
@@ -12,7 +24,7 @@
     service_role, cifras globales visibles al vendedor, cobrado contado en el mes de registro.
   - Edge Function `prospecto` (formulario «Hablar con un asesor»). Variables: `WEB_ORIGEN`, `PROSPECTO_SAL`.
   - Web `apps/web` (`@cartera/web`): venta `/` igual a la muestra aprobada (`docs/diseno/admin-venta/venta.html`),
-    panel `/admin` (Resumen, Prospectos, Clientes, Ventas, Vendedores y comisiones, Ajustes), aviso y soporte
+    panel `/admin` (Resumen, Prospectos, Clientes, Ventas, Vendedores, Ajustes, Actividad), aviso y soporte
     reutilizan los de la calculadora. `/admin?demo` = datos de ejemplo en memoria. Variables `VITE_*` en
     `apps/web/.env.example`.
   - Verificado: `pnpm lint`, `pnpm typecheck`, vitest `proxy` 265 (admin 27), `web` 10, `calculadora` 40, build web;
@@ -40,8 +52,8 @@
 
 - **2026-11-14 (claude-code) — Limpieza de documentación (Adam: «quita documentación y unifica»).** Borrados 1 documentos obsoletos sin referencias (auditorías, planes y prompts viejos; están en el historial de git). Índice único del repo: `docs/INDICE.md`; índice de todos los proyectos: `C:\dev\DOCS.md`; memoria compartida de Codex/Claude/Cursor/Grok: `C:\dev\.ai\memoria`.
 
-- **Último turno:** claude-code
-- **Fecha:** 2026-11-08
+- **Último turno:** cursor
+- **Fecha:** 2026-11-22
 - **Rama:** main
 
 ## Hecho el 08-11
@@ -163,11 +175,13 @@ spec: web con el libro, facturar por voz, «todo el planeta» o SAT automático 
 
 ## Siguiente
 
-1. Nueva build (TestFlight y AAB, a mano) con B+ y la plática, y probar en teléfono: «¿cuánto gasté en comida esta
+1. Adam: precios/comisión reales, dominio de venta, OK para migración admin + Edge `prospecto` + publicar web
+   (sin eso no hay deploy del panel).
+2. Nueva build (TestFlight y AAB, a mano) con B+ y la plática, y probar en teléfono: «¿cuánto gasté en comida esta
    semana?» → «¿y la semana pasada?»; «coca 25» → «no, en efectivo» → «otra igual»; «¿me alcanza para unos tenis de
    1,200?» → «¿y a 6 meses?» → «ya los compré»; «¿cuándo me pagan?»; «no entendí»; y sin internet.
-2. Pendientes 154 (lo que debes a personas) y 155 (seguimientos que todavía van a la nube).
-3. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): propuestas 2–6 esperan su visto bueno.
+3. Pendientes 154 (lo que debes a personas) y 155 (seguimientos que todavía van a la nube).
+4. Adam decide la auditoría (`docs/diseno/AUDITORIA-PRO-2026-10.md`): propuestas 2–6 esperan su visto bueno.
 
 ## No tocar
 
