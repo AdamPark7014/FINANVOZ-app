@@ -1,7 +1,8 @@
 import { View } from 'react-native';
 import { listarPersonas } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Cifra, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Cifra, espacio, EstadoVacio, Pantalla, Texto } from '../../ui';
+import { Fila, Grupo, Inicial } from '../../ui/componentes/Lista';
 import { Encabezado } from './Encabezado';
 import {
   estadoPersona,
@@ -32,35 +33,35 @@ export function PantallaPersonas({
       contenidoStyle={{ gap: espacio.xl }}
     >
       <Encabezado titulo={TITULO_PERSONAS} {...(alVolver ? { alVolver } : {})} testID="personas" />
-      <Texto variante="secundario" tono="secundario">
+      <Texto variante="cuerpo" tono="secundario" style={{ marginTop: -espacio.m }}>
         {INTRO_PERSONAS}
       </Texto>
       {personas.length === 0 ? (
-        <EstadoVacio texto={TEXTO_PERSONAS_VACIO} testID="personas-vacio" />
+        <EstadoVacio icono="personas" texto={TEXTO_PERSONAS_VACIO} testID="personas-vacio" />
       ) : (
-        <View accessibilityRole="list" testID="personas-lista" style={{ gap: espacio.m }}>
-          {personas.map((p) => (
-            <View key={p.cuentaId} role="listitem" testID={`persona-${p.cuentaId}`}>
-              <Tarjeta
-                alPresionar={() => alAbrirPersona(p.cuentaId)}
-                etiquetaAccesible={etiquetaPersona(p.nombre, p.saldo)}
-                pista={PISTA_ABRIR_PERSONA}
-                testID={`persona-${p.cuentaId}-abrir`}
-              >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-                  <View style={{ flex: 1, gap: espacio.xs }}>
-                    <Texto variante="cuerpoFuerte">{p.nombre}</Texto>
-                    <Texto variante="secundario" tono="secundario">
-                      {estadoPersona(p.saldo)}
-                    </Texto>
-                  </View>
-                  {p.saldo !== 0 ? (
-                    <Cifra centavos={Math.abs(p.saldo)} testID={`persona-${p.cuentaId}-saldo`} />
-                  ) : null}
-                </View>
-              </Tarjeta>
-            </View>
-          ))}
+        <View accessibilityRole="list" testID="personas-lista">
+          <Grupo sangria={40}>
+            {personas.map((p) => (
+              <View key={p.cuentaId} role="listitem" testID={`persona-${p.cuentaId}`}>
+                <Fila
+                  testID={`persona-${p.cuentaId}-abrir`}
+                  inicio={<Inicial nombre={p.nombre} />}
+                  titulo={p.nombre}
+                  apoyo={estadoPersona(p.saldo)}
+                  etiquetaAccesible={etiquetaPersona(p.nombre, p.saldo)}
+                  pista={PISTA_ABRIR_PERSONA}
+                  alPresionar={() => alAbrirPersona(p.cuentaId)}
+                  {...(p.saldo !== 0
+                    ? {
+                        derecha: (
+                          <Cifra centavos={Math.abs(p.saldo)} testID={`persona-${p.cuentaId}-saldo`} />
+                        ),
+                      }
+                    : {})}
+                />
+              </View>
+            ))}
+          </Grupo>
         </View>
       )}
     </Pantalla>

@@ -159,6 +159,47 @@ export function IconoFila({ icono, familia = 'casa' }: { icono: NombreIcono; fam
   );
 }
 
+const FAMILIAS_INICIAL: readonly FamiliaCategoria[] = [
+  'transporte',
+  'salidas',
+  'comidaFuera',
+  'super',
+  'antojos',
+];
+
+/**
+ * La inicial de una persona en un círculo de color (siempre el mismo color para el mismo nombre). Decorativo: el
+ * nombre va en el texto de la fila.
+ */
+export function Inicial({ nombre, tamano = 40 }: { nombre: string; tamano?: number }) {
+  const { esquema } = useTema();
+  let h = 0;
+  for (const ch of nombre) h = (h * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
+  const p = coloresCategoria[esquema][FAMILIAS_INICIAL[h % FAMILIAS_INICIAL.length] ?? 'casa'];
+  const letra = (nombre.trim()[0] ?? '·').toLocaleUpperCase('es-MX');
+  return (
+    <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={{
+        width: tamano,
+        height: tamano,
+        borderRadius: tamano / 2,
+        backgroundColor: p.mosaico,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Texto
+        variante="cuerpoFuerte"
+        style={{ color: p.icono, fontSize: tamano * 0.42, lineHeight: tamano * 0.6 }}
+      >
+        {letra}
+      </Texto>
+    </View>
+  );
+}
+
 export interface FilaProps {
   titulo: string;
   /** Línea de apoyo bajo el título; nunca se corta. */
@@ -401,6 +442,91 @@ export function TituloPantalla({
           {bajada}
         </Texto>
       ) : null}
+    </View>
+  );
+}
+
+/**
+ * Acción en píldora tonal con ícono (detalle de un movimiento, tarjetas): más ligera que un botón de contorno y
+ * varias caben en una fila. `destructiva` pinta el texto en rojo; el estado presionado oscurece el fondo.
+ */
+export function AccionPildora({
+  etiqueta,
+  icono,
+  alPresionar,
+  pista,
+  etiquetaAccesible,
+  destructiva = false,
+  testID,
+}: {
+  etiqueta: string;
+  icono: NombreIcono;
+  alPresionar: () => void;
+  pista?: string;
+  etiquetaAccesible?: string;
+  destructiva?: boolean;
+  testID?: string;
+}) {
+  const { c } = useTema();
+  const color = destructiva ? c.faltante : c.acentoTexto;
+  return (
+    <Pressable
+      testID={testID}
+      onPress={() => {
+        golpe(destructiva ? 'aviso' : 'ligero');
+        alPresionar();
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={etiquetaAccesible ?? etiquetaHablada(etiqueta)}
+      accessibilityHint={pista}
+      hitSlop={{ top: 4, bottom: 4, left: 2, right: 2 }}
+      style={({ pressed }) => ({
+        minHeight: 40,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: espacio.xs + 2,
+        paddingLeft: espacio.m - 2,
+        paddingRight: espacio.m,
+        borderRadius: radio.pastilla,
+        backgroundColor: destructiva
+          ? pressed
+            ? c.borde
+            : c.superficieAlterna
+          : pressed
+            ? c.borde
+            : c.iconoFondo,
+        transform: [{ scale: pressed ? 0.97 : 1 }],
+      })}
+    >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.xs + 2 }}
+      >
+        <Icono nombre={icono} color={color} tamano={17} grosor={2} />
+        <Texto variante="cuerpoFuerte" style={{ color, fontSize: 15, lineHeight: 20 }}>
+          {etiqueta}
+        </Texto>
+      </View>
+    </Pressable>
+  );
+}
+
+/** Un dato en dos columnas («Salió de · Cartera»): una sola etiqueta para el lector de pantalla. */
+export function DatoFila({ etiqueta, valor, testID }: { etiqueta: string; valor: string; testID?: string }) {
+  return (
+    <View
+      testID={testID}
+      accessible
+      accessibilityLabel={`${etiqueta}: ${valor}`}
+      style={{ flexDirection: 'row', alignItems: 'flex-start', gap: espacio.m, paddingVertical: 2 }}
+    >
+      <Texto variante="secundario" tono="secundario" style={{ width: 92 }}>
+        {etiqueta}
+      </Texto>
+      <Texto variante="secundario" style={{ flex: 1, fontWeight: '600' }}>
+        {valor}
+      </Texto>
     </View>
   );
 }
