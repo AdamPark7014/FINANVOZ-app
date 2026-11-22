@@ -10,7 +10,7 @@ import {
   unirseConQr,
 } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, EstadoVacio, etiquetaHablada, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, EstadoVacio, etiquetaHablada, Pantalla, Texto } from '../../ui';
 import { useAnunciarEnIos } from '../avisos/anunciar';
 import { MensajeError } from '../onboarding/componentes';
 import { CodigoQr } from './CodigoQr';
@@ -42,7 +42,7 @@ import {
   TEXTO_COMPARTIDOS_VACIO,
   TITULO_GASTOS_COMPARTIDOS,
 } from './textos';
-import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
+import { ESTILO_TITULO_PANTALLA, Fila, Grupo, Inicial } from '../../ui/componentes/Lista';
 
 type Modo =
   | { tipo: 'lista' }
@@ -164,14 +164,12 @@ export function PantallaCompartidos({
       {modo.tipo === 'lista' ? (
         <>
           {sinServicio ? (
-            <Texto
-              variante="cuerpo"
+            <EstadoVacio
+              icono="nube"
+              titulo="Por ahora, sin compartir"
+              texto={mensajeErrorCompartido('sin_servicio')}
               testID="compartidos-sin-servicio"
-              accessibilityRole="alert"
-              accessibilityLiveRegion="polite"
-            >
-              {mensajeErrorCompartido('sin_servicio')}
-            </Texto>
+            />
           ) : grupos.length === 0 ? (
             <EstadoVacio
               icono="corazon"
@@ -180,30 +178,38 @@ export function PantallaCompartidos({
               etiquetaAccesible={etiquetaVacioCompartidos()}
             />
           ) : null}
-          {grupos.map((g) => (
-            <Tarjeta
-              key={g.id}
-              testID={`compartido-${g.id}`}
-              alPresionar={() => abrirGrupo(g.id)}
-              etiquetaAccesible={etiquetaHablada(`${g.nombre}. ${g.avisoCierre ?? g.saldo.texto}`)}
-              pista={PISTA_ABRIR_GRUPO}
-            >
-              <Texto variante="cuerpoFuerte">{g.nombre}</Texto>
-              <Texto variante="secundario" accessibilityLabel={etiquetaHablada(g.saldo.texto)}>
-                {g.saldo.texto}
-              </Texto>
-              {g.avisoCierre ? (
-                <Texto variante="secundario" tono="secundario">
-                  {g.avisoCierre}
-                </Texto>
-              ) : null}
-              {g.revincular ? (
-                <Texto variante="secundario" tono="faltante">
-                  {AVISO_REVINCULAR_LISTA}
-                </Texto>
-              ) : null}
-            </Tarjeta>
-          ))}
+          {grupos.length > 0 ? (
+            <Grupo sangria={40}>
+              {grupos.map((g) => (
+                <Fila
+                  key={g.id}
+                  testID={`compartido-${g.id}`}
+                  alPresionar={() => abrirGrupo(g.id)}
+                  etiquetaAccesible={etiquetaHablada(`${g.nombre}. ${g.avisoCierre ?? g.saldo.texto}`)}
+                  pista={PISTA_ABRIR_GRUPO}
+                  inicio={<Inicial nombre={g.nombre} />}
+                  titulo={g.nombre}
+                  apoyo={g.saldo.texto}
+                  pie={
+                    g.avisoCierre || g.revincular ? (
+                      <>
+                        {g.avisoCierre ? (
+                          <Texto variante="secundario" tono="secundario">
+                            {g.avisoCierre}
+                          </Texto>
+                        ) : null}
+                        {g.revincular ? (
+                          <Texto variante="secundario" tono="faltante">
+                            {AVISO_REVINCULAR_LISTA}
+                          </Texto>
+                        ) : null}
+                      </>
+                    ) : undefined
+                  }
+                />
+              ))}
+            </Grupo>
+          ) : null}
           {sinServicio ? null : (
             <>
               <Boton

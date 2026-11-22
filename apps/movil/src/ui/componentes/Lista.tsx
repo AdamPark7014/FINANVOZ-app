@@ -530,3 +530,40 @@ export function DatoFila({ etiqueta, valor, testID }: { etiqueta: string; valor:
     </View>
   );
 }
+
+/** Botón solo de ícono (lápiz junto a un nombre): 40 px visibles, 48 de toque, y su etiqueta para el lector. */
+export function BotonIcono({
+  icono,
+  etiqueta,
+  alPresionar,
+  pista,
+  testID,
+}: {
+  icono: NombreIcono;
+  etiqueta: string;
+  alPresionar: () => void;
+  pista?: string;
+  testID?: string;
+}) {
+  const { c } = useTema();
+  return (
+    <Pressable
+      testID={testID}
+      onPress={alPresionar}
+      accessibilityRole="button"
+      accessibilityLabel={etiqueta}
+      accessibilityHint={pista}
+      hitSlop={4}
+      style={({ pressed }) => ({
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: pressed ? c.iconoFondo : 'transparent',
+      })}
+    >
+      <Icono nombre={icono} color={c.acentoTexto} tamano={18} grosor={2} />
+    </Pressable>
+  );
+}
