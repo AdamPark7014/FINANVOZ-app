@@ -203,6 +203,7 @@ export function PantallaArqueo({
         />
       ) : (
         <EstadoVacio
+          icono="billete"
           texto={TEXTO_SIN_CUENTA_EFECTIVO}
           testID="arqueo-sin-efectivo"
           etiquetaAccesible={etiquetaVacioSinEfectivo()}

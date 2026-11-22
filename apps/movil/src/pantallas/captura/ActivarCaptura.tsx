@@ -249,6 +249,8 @@ export function ActivarCaptura({
               {TITULO_ELEGIR_APPS}
             </Texto>
             <EstadoVacio
+              icono="celular"
+              compacto
               texto={TEXTO_SIN_APPS_BANCO}
               testID={`${testID}-sin-apps`}
               etiquetaAccesible={etiquetaSinAppsBanco()}

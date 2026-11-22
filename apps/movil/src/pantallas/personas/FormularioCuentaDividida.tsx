@@ -268,6 +268,8 @@ export function FormularioCuentaDividida({
         </Texto>
         {personas.length === 0 ? (
           <EstadoVacio
+            icono="personas"
+            compacto
             texto={TEXTO_CONTACTOS_VACIO}
             testID="division-contactos-vacio"
             etiquetaAccesible={etiquetaVacioContactosDivision()}

@@ -68,6 +68,8 @@ export function PorRevisarCapturas({ alRegistrar }: { alRegistrar: () => void })
           {TITULO_CAPTURAS_POR_REVISAR}
         </Texto>
         <EstadoVacio
+          icono="palomita"
+          compacto
           texto={TEXTO_CAPTURAS_POR_REVISAR_VACIO}
           testID="capturas-por-revisar-vacio"
           etiquetaAccesible={etiquetaVacioCapturasPorRevisar()}

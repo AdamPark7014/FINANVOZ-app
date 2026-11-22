@@ -16,7 +16,6 @@ import {
 import { crearSesionPrueba } from '../onboarding/__pruebas__/sesion';
 import { ProveedorAvisos } from '../principal/ProveedorAvisos';
 import { auditar } from '../__pruebas__/accesibilidad';
-import { ETIQUETA_CAPTURA_NO_DISPONIBLE } from './captura-textos';
 import { etiquetaCampoMonto, pistaCampoMonto } from '../../ui/formato';
 import { ayudaColchon, ETIQUETA_MONTO_COLCHON, PISTA_GUARDAR_COLCHON } from './colchon-textos';
 import {
@@ -154,11 +153,8 @@ describe('Ajustes › Ingreso y Colchón (02 §12)', () => {
     );
     expect(screen.getByTestId('ajustes-ingreso-titulo')).toHaveProp('accessibilityRole', 'header');
     expect(screen.getByTestId('ajustes-colchon-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('ajustes-captura-titulo')).toHaveProp('accessibilityRole', 'header');
-    expect(screen.getByTestId('ajustes-captura-estado')).toHaveProp(
-      'accessibilityLabel',
-      ETIQUETA_CAPTURA_NO_DISPONIBLE,
-    );
+    // Captura vive en Tú › Avisos y captura (subpantalla): aquí solo la fila que la abre.
+    expect(screen.getByTestId('ajustes-abrir-avisos')).toHaveProp('accessibilityRole', 'button');
     expect(screen.getByTestId('ajustes-cambiar-ingreso')).toHaveProp(
       'accessibilityHint',
       'Abre el formulario para cambiar cuánto y cada cuándo te pagan',

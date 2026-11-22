@@ -119,3 +119,18 @@ export function lineaVersion(version: string): string {
 export function etiquetaAccesibilidadVersion(version: string): string {
   return `Finanvoz versión ${version}`;
 }
+
+/** Subpantallas de Tú (pase de pulido, 22-11): la página principal queda corta y cada tema abre la suya. */
+export const TITULO_VOZ = 'Voz';
+export const TITULO_AVISOS = 'Avisos y captura';
+export const TITULO_SEGURIDAD = 'Bloqueo';
+export const BAJADA_VOZ = 'Cómo te contesto y cuándo te pregunto antes de registrar.';
+export const BAJADA_AVISOS = 'Lo que te aviso antes de que pase y lo que leo de tus notificaciones.';
+export const BAJADA_SEGURIDAD = 'Quién puede abrir Finanvoz y qué se ve en las apps recientes.';
+export const VALOR_VOZ_CONTESTA = 'Te contesto en voz alta';
+export const VALOR_VOZ_PANTALLA = 'Solo en pantalla';
+export const VALOR_AVISOS = 'Cortes, pagos y captura';
+export const VALOR_AVISOS_IOS = 'Cortes, pagos y riesgo';
+export const VALOR_BLOQUEO_ACTIVO = 'Activado';
+export const VALOR_BLOQUEO_APAGADO = 'Apagado';
+export const PISTA_ABRIR_SUBPANTALLA = 'Abre sus opciones';

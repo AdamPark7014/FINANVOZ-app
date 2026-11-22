@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { etiquetaHablada } from '../formato';
+import { golpe } from '../haptica';
 import { useTema } from '../tema';
 import { espacio, hitSlopTactil, OBJETIVO_TACTIL_MIN, radio } from '../tokens';
 import { Texto } from './Texto';
@@ -62,7 +63,10 @@ export function Chip({
   return (
     <Pressable
       testID={testID}
-      onPress={alPresionar}
+      onPress={() => {
+        golpe('eleccion');
+        alPresionar();
+      }}
       disabled={deshabilitado}
       accessibilityRole={multiple ? 'checkbox' : 'radio'}
       accessibilityLabel={etiquetaChipHablada(etiqueta, etiquetaAccesible)}

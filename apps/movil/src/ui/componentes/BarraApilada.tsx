@@ -1,4 +1,5 @@
-import { View } from 'react-native';
+import { Animated, View } from 'react-native';
+import { useEntrada } from '../movimiento';
 import { espacio } from '../tokens';
 
 export interface ParteBarra {
@@ -20,18 +21,31 @@ export function BarraApilada({
   partes,
   alto = 14,
   testID,
+  animar = false,
 }: {
   partes: readonly ParteBarra[];
   alto?: number;
   testID?: string;
+  /** Crece de izquierda a derecha al aparecer (respeta «Reducir movimiento»). */
+  animar?: boolean;
 }) {
   const visibles = partes.filter((p) => p.valor > 0);
+  const entrada = useEntrada(640, 80);
   return (
-    <View
+    <Animated.View
       {...(testID ? { testID } : {})}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={{ flexDirection: 'row', height: alto, gap: espacio.xs - 1 }}
+      style={[
+        { flexDirection: 'row', height: alto, gap: espacio.xs - 1 },
+        animar
+          ? {
+              opacity: entrada.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0, 1, 1] }),
+              transform: [{ scaleX: entrada.interpolate({ inputRange: [0, 1], outputRange: [0.04, 1] }) }],
+              transformOrigin: 'left',
+            }
+          : null,
+      ]}
     >
       {visibles.map((p) => (
         <View
@@ -48,6 +62,6 @@ export function BarraApilada({
           }}
         />
       ))}
-    </View>
+    </Animated.View>
   );
 }

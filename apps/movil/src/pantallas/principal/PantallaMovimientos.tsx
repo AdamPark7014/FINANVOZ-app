@@ -417,6 +417,7 @@ export function PantallaMovimientos({
 
       {dias.length === 0 ? (
         <EstadoVacio
+          icono={texto !== '' ? 'buscar' : 'libro'}
           testID="movimientos-vacio"
           texto={
             texto !== ''
@@ -427,26 +428,24 @@ export function PantallaMovimientos({
           }
           etiquetaAccesible={etiquetaVacioMovimientos(filtro != null || chip !== 'todos' || texto !== '')}
           {...(filtro || chip !== 'todos' || texto !== '' ? {} : { pistaCta: PISTA_VACIO_MOVIMIENTOS })}
-        />
-      ) : null}
-      {dias.length === 0 && chip !== 'todos' ? (
-        <Boton
-          etiqueta="Ver todos"
-          variante="texto"
-          ancho="contenido"
-          alPresionar={() => setChip('todos')}
-          pista={PISTA_VER_TODOS_MOVIMIENTOS}
-          testID="movimientos-chip-ver-todos"
-        />
-      ) : null}
-      {dias.length === 0 && !filtro && chip === 'todos' && texto === '' ? (
-        <Boton
-          etiqueta={BTN_REGISTRAR_PRIMER_MOVIMIENTO}
-          variante="secundario"
-          alPresionar={alRegistrar}
-          pista={PISTA_REGISTRAR_MOVIMIENTO}
-          testID="boton-registrar-primer-movimiento"
-        />
+        >
+          {chip !== 'todos' ? (
+            <Boton
+              etiqueta="Ver todos"
+              variante="secundario"
+              alPresionar={() => setChip('todos')}
+              pista={PISTA_VER_TODOS_MOVIMIENTOS}
+              testID="movimientos-chip-ver-todos"
+            />
+          ) : !filtro && texto === '' ? (
+            <Boton
+              etiqueta={BTN_REGISTRAR_PRIMER_MOVIMIENTO}
+              alPresionar={alRegistrar}
+              pista={PISTA_REGISTRAR_MOVIMIENTO}
+              testID="boton-registrar-primer-movimiento"
+            />
+          ) : null}
+        </EstadoVacio>
       ) : null}
     </View>
   );

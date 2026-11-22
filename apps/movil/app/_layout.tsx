@@ -51,6 +51,7 @@ import {
   Pantalla,
   Texto,
   useAnunciar,
+  useReducirMovimiento,
   useTema,
 } from '../src/ui';
 import { motorExpo, ProveedorDictado } from '../src/voz';
@@ -230,6 +231,7 @@ function AppProtegida({
   avisoInicial: string | null;
 }) {
   const { esquema } = useTema();
+  const reducirMovimiento = useReducirMovimiento();
   const [aviso, setAviso] = useState(avisoInicial);
   // "Listo: recuperé …": TalkBack lo lee por la región viva del aviso; VoiceOver necesita el anuncio.
   useAnunciar(aviso ? etiquetaHablada(aviso) : null);
@@ -283,7 +285,16 @@ function AppProtegida({
         />
         {/* Cola de captura en segundo plano mientras la lectura de avisos bancarios está activa. */}
         <SincronizarCaptura />
-        <Stack screenOptions={{ headerShown: false }}>
+        {/*
+          Pase de pulido (22-11): en Android, la entrada lateral con paralaje de iOS en vez del desvanecido de Material
+          (en iPhone ya es la nativa). Con «Reducir movimiento», un fundido corto.
+        */}
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: reducirMovimiento ? 'fade' : 'ios_from_right',
+          }}
+        >
           <Stack.Screen name="index" />
           <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
           <Stack.Screen name="ajustes" />

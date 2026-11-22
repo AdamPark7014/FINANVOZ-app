@@ -85,3 +85,39 @@ export function useRampa(activo: boolean, duracion: number, retraso = 0): Animat
   }, [activo, reducir, duracion, retraso, valor]);
   return valor;
 }
+
+/**
+ * Entrada 0 → 1 una sola vez al montar (pase de pulido, 22-11): barras que crecen, tarjetas que aparecen. Con
+ * «Reducir movimiento» se queda en 1 desde el principio.
+ */
+export function useEntrada(duracion = 520, retraso = 0): Animated.Value {
+  const [valor] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    let vigente = true;
+    let anim: Animated.CompositeAnimation | null = null;
+    const arrancar = (reducir: boolean) => {
+      if (!vigente) return;
+      if (reducir) {
+        valor.setValue(1);
+        return;
+      }
+      anim = Animated.timing(valor, {
+        toValue: 1,
+        duration: duracion,
+        delay: retraso,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      });
+      anim.start();
+    };
+    const consulta = AccessibilityInfo.isReduceMotionEnabled?.();
+    if (consulta) consulta.then((v) => arrancar(v === true)).catch(() => arrancar(false));
+    else arrancar(false);
+    return () => {
+      vigente = false;
+      anim?.stop();
+      valor.setValue(1);
+    };
+  }, [duracion, retraso, valor]);
+  return valor;
+}

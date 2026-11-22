@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { ESCENARIOS_DEV } from '../src/pantallas/ajustes/escenarios';
 import {
   BTN_TERMINOS,
@@ -28,17 +28,24 @@ import {
   mensajeErrorCargarEscenario,
 } from '../src/pantallas/ajustes';
 import { SeccionApariencia } from '../src/pantallas/ajustes/SeccionApariencia';
-import { SeccionAvisos } from '../src/pantallas/ajustes/SeccionAvisos';
-import { SeccionBloqueo } from '../src/pantallas/ajustes/SeccionBloqueo';
-import { SeccionCaptura } from '../src/pantallas/ajustes/SeccionCaptura';
 import { SeccionColchon } from '../src/pantallas/ajustes/SeccionColchon';
 import { SeccionDatosCobro } from '../src/pantallas/ajustes/SeccionDatosCobro';
 import { SeccionIngreso } from '../src/pantallas/ajustes/SeccionIngreso';
-import { SeccionVoz } from '../src/pantallas/ajustes/SeccionVoz';
-import { SeccionWidget } from '../src/pantallas/ajustes/SeccionWidget';
 import { SeccionPlan } from '../src/pantallas/plan';
 import { TEXTO_NO_ASESORIA } from '../src/pantallas/privacidad/legales';
-import { obtenerRespaldoNube } from '../src/servicios';
+import {
+  PISTA_ABRIR_SUBPANTALLA,
+  TITULO_AVISOS,
+  TITULO_SEGURIDAD,
+  TITULO_VOZ,
+  VALOR_AVISOS,
+  VALOR_AVISOS_IOS,
+  VALOR_BLOQUEO_ACTIVO,
+  VALOR_BLOQUEO_APAGADO,
+  VALOR_VOZ_CONTESTA,
+  VALOR_VOZ_PANTALLA,
+} from '../src/pantallas/ajustes/textos';
+import { obtenerBloqueo, obtenerRespaldoNube, obtenerVozRespuesta } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, espacio, FilaAjuste, Pantalla, Tarjeta, Texto } from '../src/ui';
@@ -67,6 +74,8 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
   // Sin nube (build sin Supabase), la tarjeta no habla de la nube: invita a exportar el archivo.
   const conNube = Boolean(control.respaldo?.nube);
   const respaldo = useVista((ctx) => obtenerRespaldoNube(ctx, { conNube }));
+  const vozActiva = useVista((ctx) => obtenerVozRespuesta(ctx).activa);
+  const bloqueoActivo = useVista((ctx) => obtenerBloqueo(ctx).activo);
   const version = Constants.expoConfig?.version ?? '—';
 
   const [menuDev, setMenuDev] = useState(false);
@@ -102,17 +111,39 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         </Grupo>
 
         <TituloGrupo titulo={GRUPO_APP} />
-        <SeccionVoz />
-        <SeccionAvisos />
-        <SeccionCaptura />
-        <SeccionWidget />
         <Grupo sangria>
+          <FilaAjuste
+            testID="ajustes-abrir-voz"
+            icono="microfono"
+            familia="super"
+            titulo={TITULO_VOZ}
+            valor={vozActiva ? VALOR_VOZ_CONTESTA : VALOR_VOZ_PANTALLA}
+            pista={PISTA_ABRIR_SUBPANTALLA}
+            alPresionar={() => router.push('/ajustes/voz')}
+          />
+          <FilaAjuste
+            testID="ajustes-abrir-avisos"
+            icono="campana"
+            familia="antojos"
+            titulo={TITULO_AVISOS}
+            valor={Platform.OS === 'ios' ? VALOR_AVISOS_IOS : VALOR_AVISOS}
+            pista={PISTA_ABRIR_SUBPANTALLA}
+            alPresionar={() => router.push('/ajustes/avisos')}
+          />
           <SeccionApariencia />
         </Grupo>
 
         <TituloGrupo titulo={GRUPO_SEGURIDAD} />
-        <SeccionBloqueo />
         <Grupo sangria>
+          <FilaAjuste
+            testID="ajustes-abrir-seguridad"
+            icono="escudo"
+            familia="salidas"
+            titulo={TITULO_SEGURIDAD}
+            valor={bloqueoActivo ? VALOR_BLOQUEO_ACTIVO : VALOR_BLOQUEO_APAGADO}
+            pista={PISTA_ABRIR_SUBPANTALLA}
+            alPresionar={() => router.push('/ajustes/seguridad')}
+          />
           <View testID="ajustes-respaldo">
             <FilaAjuste
               testID="ajustes-abrir-respaldo"
