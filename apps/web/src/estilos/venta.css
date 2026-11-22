@@ -4,15 +4,22 @@
   position: sticky;
   top: 0;
   z-index: 20;
+  background: var(--vidrio-fondo);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--movimiento);
+}
+.venta-encabezado.desplazada {
+  border-bottom-color: var(--color-borde);
+}
+.venta-encabezado-interior {
   max-width: var(--ancho-max);
   margin: 0 auto;
-  padding: 14px var(--gutter);
+  padding: 10px var(--gutter);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 24px;
   justify-content: space-between;
-  background: var(--vidrio-fondo);
 }
 .marca {
   display: flex;
@@ -145,143 +152,267 @@
   justify-content: center;
 }
 
-/* Maqueta del teléfono */
+/* Maqueta del teléfono: la pantalla de inicio real de la app (placa pino, plática y dock de voz). */
 .telefono {
+  --tel-pino: #0b2a23;
+  --tel-menta: #5ee0b0;
+  --tel-niebla: #f3f5f1;
+  --tel-tenue: #b5ccc3;
   width: 320px;
   max-width: 100%;
   height: 640px;
   border-radius: 48px;
   background: var(--color-tinta);
-  padding: 12px;
+  padding: 10px;
   box-shadow: var(--sombra-telefono);
+  font-family: 'Figtree', var(--fuente-cuerpo);
 }
 .telefono-pantalla {
   height: 100%;
-  border-radius: 38px;
-  background: var(--color-superficie);
+  border-radius: 39px;
+  background: var(--tel-niebla);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-.tel-encabezado {
-  padding: 44px 24px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: var(--color-terciario);
+.tel-placa {
+  background: var(--tel-pino);
+  color: #fff;
+  padding: 38px 22px 22px;
+  border-radius: 0 0 30px 30px;
 }
-.tel-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--color-acento-suave);
-  color: var(--color-acento-oscuro);
+.tel-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--tel-tenue);
+}
+.tel-nav-activa {
+  color: #fff;
   font-weight: 600;
+}
+.tel-tu {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #3a5a50;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.tel-cifra-bloque {
-  padding: 20px 24px 0;
+.tel-saludo,
+.tel-respuesta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tel-saludo {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--tel-tenue);
+}
+.tel-orbe-chico {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, var(--tel-menta) 0 58%, #3fc895 60%);
+  box-shadow: 0 0 0 4px rgb(94 224 176 / 26%);
 }
 .tel-etiqueta {
+  margin-top: 16px;
   font-size: 14px;
-  color: var(--color-secundario);
+  color: var(--tel-tenue);
 }
 .tel-cifra {
-  margin-top: 4px;
-  font-family: var(--fuente-titulo);
-  font-size: 56px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-.tel-barra {
-  margin-top: 14px;
-  height: 8px;
-  border-radius: 4px;
-  background: var(--color-riel);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 76px;
+  font-weight: 300;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  height: 82px;
   overflow: hidden;
 }
-.tel-barra > span {
-  display: block;
-  width: 62%;
-  height: 100%;
-  background: var(--color-acento);
-  border-radius: 4px;
+.tel-cifra small {
+  font-size: 16px;
+  letter-spacing: 0;
+  color: var(--tel-tenue);
 }
-.tel-pista {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--color-terciario);
-}
-.tel-platica {
-  padding: 22px 16px 0;
+.tel-cifra-rollo {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  transform: translateY(-50%);
+  animation: tel-cifra 9s cubic-bezier(0.3, 0, 0.2, 1) infinite;
 }
-.tel-burbuja {
-  background: var(--color-superficie-alterna);
-  padding: 12px 14px;
-  border-radius: 18px 18px 18px 4px;
-  font-size: 14px;
-  line-height: 1.4;
+.tel-cifra-rollo > span {
+  height: 82px;
+}
+.tel-hasta {
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+.tel-platica {
+  padding: 18px 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #12201b;
 }
 .tel-burbuja-tu {
   align-self: flex-end;
-  background: var(--color-acento);
-  color: var(--color-sobre-acento);
-  padding: 10px 14px;
-  border-radius: 18px 18px 4px 18px;
-}
-.tel-chips {
-  display: flex;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  background: #e5ebe6;
+  padding: 8px 13px;
+  border-radius: 18px 18px 5px 18px;
+  font-size: 14px;
+  animation: tel-entra-1 9s ease-out infinite;
 }
-.tel-chips span {
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: var(--radio-pildora);
-  border: 1px solid var(--color-borde-suave);
-  color: var(--color-texto-fuerte);
+.tel-respuesta {
+  font-size: 16px;
+  font-weight: 500;
+  animation: tel-entra-2 9s ease-out infinite;
 }
-.tel-voz {
-  margin-top: auto;
-  padding-bottom: 26px;
+.tel-registro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #c9d1cc;
+  border-bottom: 1px solid #c9d1cc;
+  animation: tel-entra-3 9s ease-out infinite;
+}
+.tel-mosaico {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #ffe4db;
+  flex: none;
+}
+.tel-registro-nombre {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
 }
-.tel-orbe {
-  width: 72px;
-  height: 72px;
+.tel-registro-nombre small {
+  font-size: 12px;
+  font-weight: 400;
+  color: #52605a;
+}
+.tel-registro-monto {
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 300;
+}
+.tel-dock {
+  margin: auto 12px 14px;
+  min-height: 66px;
+  border-radius: 28px;
+  background: #fff;
+  border: 1px solid #c9d1cc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #12201b;
+}
+.tel-mic {
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    var(--color-acento-brillo),
-    var(--color-acento) 60%,
-    var(--color-acento-oscuro)
-  );
-  box-shadow: 0 0 0 10px var(--color-acento-suave);
-  color: var(--color-sobre-acento);
+  background: radial-gradient(circle at 35% 28%, #b6f5dc, var(--tel-menta) 58%, #38be91);
+  color: #0f3d32;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: respirar 3.2s ease-in-out infinite;
+  box-shadow: 0 8px 14px rgb(11 42 35 / 26%);
+  animation: tel-mic 9s ease-in-out infinite;
 }
-@keyframes respirar {
+/* La escena dura 9 s: reposo, dices la frase, contesta, baja la cifra y se queda. */
+@keyframes tel-cifra {
   0%,
-  100% {
-    box-shadow: 0 0 0 10px var(--color-acento-suave);
+  46% {
+    transform: translateY(0);
   }
-  50% {
-    box-shadow: 0 0 0 16px var(--color-acento-suave);
+  54%,
+  94% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
-
+@keyframes tel-entra-1 {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  22%,
+  94% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes tel-entra-2 {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  36%,
+  94% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes tel-entra-3 {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  44%,
+  94% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes tel-mic {
+  0%,
+  4%,
+  20%,
+  100% {
+    box-shadow:
+      0 8px 14px rgb(11 42 35 / 26%),
+      0 0 0 0 rgb(94 224 176 / 0%);
+  }
+  12% {
+    box-shadow:
+      0 8px 14px rgb(11 42 35 / 26%),
+      0 0 0 12px rgb(94 224 176 / 38%);
+  }
+}
 /* Bandas blancas de ancho completo */
 .banda {
   background: var(--color-superficie);
@@ -484,5 +615,246 @@
   .precio,
   .precio-destacado {
     padding: 24px;
+  }
+}
+
+/* ——— Pulido 22-11: movimiento, precios, preguntas y cierre ——— */
+
+/* Las secciones entran al llegar a la vista (solo si hay JS y la persona no pidió menos movimiento). */
+.con-movimiento [data-revelar] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 480ms ease-out,
+    transform 480ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.con-movimiento [data-revelar].visto {
+  opacity: 1;
+  transform: none;
+}
+.con-movimiento .pasos [data-revelar]:nth-child(2),
+.con-movimiento .precios [data-revelar]:nth-child(2),
+.con-movimiento .privacidad-puntos [data-revelar]:nth-child(2) {
+  transition-delay: 80ms;
+}
+.con-movimiento .pasos [data-revelar]:nth-child(3),
+.con-movimiento .precios [data-revelar]:nth-child(3),
+.con-movimiento .privacidad-puntos [data-revelar]:nth-child(3) {
+  transition-delay: 160ms;
+}
+
+.venta-nav a {
+  transition: color var(--movimiento);
+}
+.tienda {
+  transition:
+    transform var(--movimiento),
+    box-shadow var(--movimiento);
+}
+.tienda:not([aria-disabled='true']):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -8px rgb(15 26 22 / 45%);
+}
+.venta .btn {
+  transition:
+    background var(--movimiento),
+    border-color var(--movimiento),
+    transform var(--movimiento);
+}
+.venta .btn:active {
+  transform: scale(0.98);
+}
+
+/* Pasos: cada uno con su filo arriba, para que se lean como tres momentos y no como un párrafo. */
+.pasos article {
+  padding-top: 20px;
+  border-top: 2px solid var(--color-texto);
+}
+.pasos h3 {
+  line-height: 1.25;
+}
+
+/* Precios */
+.precio {
+  background: var(--color-superficie);
+  transition:
+    transform var(--movimiento),
+    box-shadow var(--movimiento);
+}
+.precio:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -20px rgb(15 26 22 / 30%);
+}
+.precio-destacado {
+  background: linear-gradient(var(--color-acento-suave), var(--color-superficie) 42%);
+}
+.precio ul {
+  list-style: none;
+  padding-left: 0;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.precio li {
+  position: relative;
+  padding-left: 28px;
+}
+.precio li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.32em;
+  width: 13px;
+  height: 7px;
+  border-left: 2px solid var(--color-acento);
+  border-bottom: 2px solid var(--color-acento);
+  transform: rotate(-45deg);
+}
+.precio-ahorro {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: var(--radio-pildora);
+  background: var(--color-acento-suave);
+  color: var(--color-acento-oscuro);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Privacidad: una frase grande y tres hechos. */
+.venta-privacidad {
+  display: block;
+}
+.privacidad-cabeza .ceja {
+  margin-bottom: 10px;
+}
+.venta-privacidad .privacidad-frase {
+  color: var(--color-texto);
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.privacidad-puntos {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+}
+
+/* Preguntas frecuentes */
+.preguntas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 24px 56px;
+  align-items: start;
+}
+.preguntas-lista {
+  border-top: 1px solid var(--color-borde);
+}
+.preguntas details {
+  border-bottom: 1px solid var(--color-borde);
+}
+.preguntas summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 12px 0;
+  font-family: var(--fuente-titulo);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.preguntas summary::-webkit-details-marker {
+  display: none;
+}
+.preguntas summary:hover {
+  color: var(--color-acento-oscuro);
+}
+.pregunta-signo {
+  position: relative;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-superficie-alterna);
+}
+.pregunta-signo::before,
+.pregunta-signo::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 13px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-texto);
+  transition: transform var(--movimiento);
+}
+.pregunta-signo::after {
+  transform: rotate(90deg);
+}
+.preguntas details[open] .pregunta-signo::after {
+  transform: rotate(0deg);
+}
+.preguntas details p {
+  padding: 0 44px 20px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-secundario);
+  max-width: 640px;
+}
+
+/* Cierre: la placa pino de la app, con la invitación a descargar. */
+.venta-cierre {
+  padding: 80px var(--gutter);
+}
+.cierre-interior {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 72px);
+  border-radius: 32px;
+  background: #0b2a23;
+  color: #fff;
+}
+.cierre-interior h2 {
+  font-size: clamp(30px, 4vw, 48px);
+  max-width: 720px;
+}
+.cierre-interior p {
+  margin-top: 14px;
+  font-size: 18px;
+  color: #b5ccc3;
+}
+.cierre-interior .tienda {
+  background: #fff;
+  color: #0b2a23;
+}
+.cierre-interior .tienda-arriba {
+  color: #52605a;
+}
+
+@media (max-width: 719px) {
+  .preguntas {
+    grid-template-columns: 1fr;
+  }
+  .venta-cierre {
+    padding: 56px var(--gutter);
+  }
+  .cierre-interior {
+    border-radius: 24px;
+  }
+  .telefono {
+    width: 312px;
+    height: 624px;
+  }
+  .heroe-telefono {
+    flex-basis: 312px;
   }
 }
