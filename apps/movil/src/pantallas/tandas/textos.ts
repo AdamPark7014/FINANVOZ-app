@@ -271,6 +271,11 @@ export function textoLineaRonda(t: number, etiqueta: string, esCobro: boolean): 
   return `${t}. ${etiqueta}${esCobro ? SUFIJO_TU_TURNO : ''}`;
 }
 
+/** La fila del calendario ya muestra el día en su cuadro (pase de pulido, 22-11): aquí solo «Ronda 4 · tu turno». */
+export function textoRonda(t: number, esCobro: boolean): string {
+  return `Ronda ${t}${esCobro ? SUFIJO_TU_TURNO : ''}`;
+}
+
 export function etiquetaEstadoRonda(r: RondaTandaVista, archivada: boolean): string {
   if (!r.estado) return 'Más adelante';
   if (archivada && r.estado === 'omitida') return 'Cancelada';

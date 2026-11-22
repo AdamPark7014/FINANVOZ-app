@@ -60,7 +60,7 @@ import {
   textoAportado,
   textoDespuesRondaRiesgo,
   textoEnRiesgo,
-  textoLineaRonda,
+  textoRonda,
   textoPorAportar,
   textoYaEmpezoCompleto,
 } from './textos';
@@ -311,7 +311,7 @@ describe('Tandas (02 §18)', () => {
     let vista = renderConSesion(p.ctx, <PantallaTanda tandaId={tandaId} alVolver={jest.fn()} />);
 
     // Calendario: tu ronda marcada y lo que arriesgas después de cada una (E11-01 `en_riesgo`).
-    expect(screen.getByText(textoLineaRonda(4, 'vie 6', true))).toBeTruthy();
+    expect(screen.getByText(textoRonda(4, true))).toBeTruthy();
     for (const r of esperado) {
       expect(textoDe(`tanda-ronda-${r.t}-riesgo`)).toBe(textoDespuesRondaRiesgo(r.en_riesgo));
     }

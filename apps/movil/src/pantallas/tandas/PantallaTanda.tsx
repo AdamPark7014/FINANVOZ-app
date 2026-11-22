@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { archivarTanda, detalleTanda, editarTanda, listarCuentas, type DetalleTanda } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Icono, Pantalla, radio, Tarjeta, Texto, useTema } from '../../ui';
+import { CuadroFecha, LADO_CUADRO_FECHA } from '../cuentas/CuadroFecha';
 import { Chips, MensajeError } from '../onboarding/componentes';
 import { Seccion } from '../tarjetas/componentes';
 import { codigoError, mensajeError } from '../principal/textos';
@@ -45,13 +46,13 @@ import {
   textoCobras,
   textoDespuesRondaRiesgo,
   textoEnRiesgo,
-  textoLineaRonda,
+  textoRonda,
   textoPorAportar,
   textoProximaAportacion,
   textoSubtituloTanda,
   TITULO_CALENDARIO,
 } from './textos';
-import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
+import { ESTILO_TITULO_PANTALLA, Grupo } from '../../ui/componentes/Lista';
 
 /**
  * Detalle de una tanda (`02 §18`): calendario de rondas con la tuya marcada (E11), "Llevas $1,500 aportados",
@@ -218,37 +219,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver?: () => void
       {d.activa ? <Ajustes tandaId={tandaId} d={d} alArchivar={alVolver ?? (() => undefined)} /> : null}
 
       <Seccion titulo={TITULO_CALENDARIO} testID="tanda-calendario">
-        <View accessibilityRole="list" style={{ gap: espacio.s }}>
-          {d.rondas.map((r) => (
-            <Tarjeta key={r.t} testID={`tanda-ronda-${r.t}`}>
-              <View
-                accessible
-                accessibilityLabel={etiquetaAccesibleRondaTanda(r, !d.activa)}
-                style={{ gap: espacio.s }}
-              >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-                  <Texto
-                    variante={r.esCobro ? 'cuerpoFuerte' : 'cuerpo'}
-                    style={{ flex: 1 }}
-                    importantForAccessibility="no"
-                  >
-                    {textoLineaRonda(r.t, r.etiqueta, r.esCobro)}
-                  </Texto>
-                  <Texto variante="secundario" tono="secundario" importantForAccessibility="no">
-                    {etiquetaEstadoRonda(r, !d.activa)}
-                  </Texto>
-                </View>
-                <Texto
-                  variante="secundario"
-                  tono="secundario"
-                  testID={`tanda-ronda-${r.t}-riesgo`}
-                  importantForAccessibility="no"
-                >
-                  {textoDespuesRondaRiesgo(r.enRiesgo)}
-                </Texto>
-              </View>
-            </Tarjeta>
-          ))}
+        <View accessibilityRole="list">
+          <Grupo sangria={LADO_CUADRO_FECHA}>
+            {d.rondas.map((r) => (
+              <FilaRonda key={r.t} r={r} archivada={!d.activa} />
+            ))}
+          </Grupo>
         </View>
       </Seccion>
     </Pantalla>
@@ -413,5 +389,65 @@ function Resumen({ d }: { d: DetalleTanda }) {
         ) : null}
       </View>
     </Tarjeta>
+  );
+}
+
+/** Una ronda del calendario: cuadro con el día, «Ronda 4 · tu turno», lo que arriesgas y el estado en una pastilla. */
+function FilaRonda({ r, archivada }: { r: DetalleTanda['rondas'][number]; archivada: boolean }) {
+  const { c } = useTema();
+  const hecha = r.estado === 'cubierta' || r.estado === 'omitida';
+  return (
+    <View
+      testID={`tanda-ronda-${r.t}`}
+      accessible
+      accessibilityLabel={etiquetaAccesibleRondaTanda(r, archivada)}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: espacio.m,
+        paddingHorizontal: espacio.l,
+        paddingVertical: espacio.m,
+        backgroundColor: r.esCobro ? c.iconoFondo : 'transparent',
+      }}
+    >
+      <CuadroFecha fecha={r.fecha} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Texto
+          variante="cuerpoFuerte"
+          importantForAccessibility="no"
+          style={r.esCobro ? { color: c.acentoTexto } : null}
+        >
+          {textoRonda(r.t, r.esCobro)}
+        </Texto>
+        <Texto
+          variante="secundario"
+          tono="secundario"
+          testID={`tanda-ronda-${r.t}-riesgo`}
+          importantForAccessibility="no"
+        >
+          {textoDespuesRondaRiesgo(r.enRiesgo)}
+        </Texto>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
+          paddingHorizontal: espacio.s,
+          paddingVertical: 4,
+          borderRadius: radio.pastilla,
+          backgroundColor: hecha ? c.iconoFondo : c.superficieAlterna,
+        }}
+      >
+        {hecha ? <Icono nombre="palomita" color={c.acentoTexto} tamano={13} grosor={2.4} /> : null}
+        <Texto
+          variante="pequeno"
+          importantForAccessibility="no"
+          style={{ color: hecha ? c.acentoTexto : c.textoSecundario, fontWeight: '600' }}
+        >
+          {etiquetaEstadoRonda(r, archivada)}
+        </Texto>
+      </View>
+    </View>
   );
 }
