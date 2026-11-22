@@ -8,6 +8,7 @@ import { Clientes } from './Clientes';
 import { Ventas } from './Ventas';
 import { Vendedores } from './Vendedores';
 import { Ajustes } from './Ajustes';
+import { Actividad } from './Actividad';
 import { Cargando } from './componentes/Estados';
 import { irA } from '../util/router';
 
@@ -62,6 +63,7 @@ export function AdminApp({ seccion, capa = capaDefault }: { seccion: string; cap
       {sec === 'ventas' ? <Ventas datos={capa} sesion={sesion} clienteInicial={clienteVenta} /> : null}
       {sec === 'vendedores' ? <Vendedores datos={capa} sesion={sesion} /> : null}
       {sec === 'ajustes' ? <Ajustes datos={capa} sesion={sesion} /> : null}
+      {sec === 'actividad' ? <Actividad datos={capa} sesion={sesion} /> : null}
     </Layout>
   );
 }

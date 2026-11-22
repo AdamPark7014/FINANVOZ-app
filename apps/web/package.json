@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "verificar-publicacion": "node ./scripts/verificar-publicacion.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",

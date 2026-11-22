@@ -8,3 +8,4 @@ dist/
 coverage/
 scripts/
 .ai/
+apps/web/deploy/*.inc

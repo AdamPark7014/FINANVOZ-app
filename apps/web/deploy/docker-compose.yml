@@ -1,0 +1,35 @@
+# Web pública + panel admin. Vive en la red externa `proxy` (Traefik).
+# Uso (en el servidor, p. ej. /opt/finanvoz-web):
+#   docker compose up -d
+# No publica puertos: Traefik enruta por el archivo traefik-finanvoz-web.yml.
+
+name: finanvoz-web
+
+services:
+  finanvoz-web:
+    container_name: finanvoz-web
+    build:
+      context: ../../..
+      dockerfile: apps/web/deploy/Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_PROSPECTO_URL: ${VITE_PROSPECTO_URL:-}
+        VITE_APP_STORE_URL: ${VITE_APP_STORE_URL:-}
+        VITE_PLAY_STORE_URL: ${VITE_PLAY_STORE_URL:-}
+    image: finanvoz-web:local
+    restart: unless-stopped
+    mem_limit: 128m
+    networks: [proxy]
+    environment:
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '3'
+
+networks:
+  proxy:
+    external: true
+    name: proxy

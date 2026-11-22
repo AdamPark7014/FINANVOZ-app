@@ -753,3 +753,7 @@ grant all on public.admin_prospectos to service_role;
 grant all on public.admin_ventas to service_role;
 grant all on public.admin_bitacora to service_role;
 grant all on public.admin_prospecto_intentos to service_role;
+
+-- Índices de la bitácora (paginación por id desc y filtro por tabla).
+create index admin_bitacora_id_desc on public.admin_bitacora (id desc);
+create index admin_bitacora_tabla_id on public.admin_bitacora (tabla, id desc);

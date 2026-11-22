@@ -11,6 +11,7 @@ const LINKS: { id: string; etiqueta: string; soloDueno?: boolean }[] = [
   { id: 'ventas', etiqueta: 'Ventas' },
   { id: 'vendedores', etiqueta: 'Vendedores y comisiones' },
   { id: 'ajustes', etiqueta: 'Ajustes', soloDueno: true },
+  { id: 'actividad', etiqueta: 'Actividad', soloDueno: true },
 ];
 
 export function Layout({
