@@ -39,17 +39,40 @@ tags:
     timeout: 5000
 - takeScreenshot: ajustes-colchon
 - runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-colchon-cancelar } }
-# Interruptores (el bloqueo no se toca: pediría Face ID)
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-multitarea } }
+# Bloqueo (subpantalla; el bloqueo no se toca: pediría Face ID)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-seguridad } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-seguridad-pantalla
+    timeout: 10000
 - tapOn:
     id: ajustes-multitarea
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-voz-contestar } }
+- takeScreenshot: ajustes-bloqueo
+- runFlow: subflujos/atras.yaml
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Voz (subpantalla)
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-voz } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-voz-pantalla
+    timeout: 10000
 - tapOn:
     id: ajustes-voz-contestar
-# Avisos: «Permitir avisos» saca el aviso de iOS
-- scrollUntilVisible:
-    element:
-      id: ajustes-aviso-corte
+- takeScreenshot: ajustes-voz
+- runFlow: subflujos/atras.yaml
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
+# Avisos y captura (subpantalla): «Permitir avisos» saca el aviso de iOS
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-avisos } }
+- extendedWaitUntil:
+    visible:
+      id: ajustes-avisos-pantalla
+    timeout: 10000
 - takeScreenshot: ajustes-avisos
 - runFlow:
     when:
@@ -64,17 +87,12 @@ tags:
             id: ajustes-avisos-permitir
           timeout: 10000
 # El horario de silencio se guarda al tocar el chip (B-2b): ya no hay botón «Guardar horario»
-- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: 'ajustes-silencio-inicio-23:00' } }
+- runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-avisos-pantalla-titulo, ID: 'ajustes-silencio-inicio-23:00' } }
 - extendedWaitUntil:
     visible:
       id: ajustes-avisos-mensaje
     timeout: 5000
-# Captura y widget: en iPhone no se muestran (#31, 02 §25); se revisa junto a Bloqueo, que sí está
-- scrollUntilVisible:
-    element:
-      id: ajustes-seccion-bloqueo
-    centerElement: true
-    timeout: 30000
+# Captura y widget: en iPhone no se muestran (#31, 02 §25)
 - assertNotVisible:
     id: ajustes-captura-estado
 - assertNotVisible:
@@ -82,6 +100,11 @@ tags:
 - assertNotVisible:
     id: ajustes-widget
 - takeScreenshot: ajustes-captura-iphone
+- runFlow: subflujos/atras.yaml
+- extendedWaitUntil:
+    visible:
+      id: ajustes
+    timeout: 10000
 # Respaldo → Restaurar → Volver
 - runFlow: { file: subflujos/tocar.yaml, env: { ANCLA: ajustes-titulo, ID: ajustes-abrir-respaldo } }
 - extendedWaitUntil:

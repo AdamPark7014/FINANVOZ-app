@@ -3,6 +3,9 @@ import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testi
 import { Appearance, Linking, Text } from 'react-native';
 import Raiz from '../../../app/_layout';
 import Ajustes from '../../../app/ajustes';
+import AjustesAvisos from '../../../app/ajustes/avisos';
+import AjustesSeguridad from '../../../app/ajustes/seguridad';
+import AjustesVoz from '../../../app/ajustes/voz';
 import Tu from '../../../app/(tabs)/tu';
 import Ayuda from '../../../app/ayuda';
 import AvisoPrivacidad from '../../../app/aviso-privacidad';
@@ -88,6 +91,9 @@ const RUTAS = {
   _layout: Raiz,
   index: Inicio,
   ajustes: Ajustes,
+  'ajustes/voz': AjustesVoz,
+  'ajustes/avisos': AjustesAvisos,
+  'ajustes/seguridad': AjustesSeguridad,
   ayuda: Ayuda,
   'aviso-privacidad': AvisoPrivacidad,
   'onboarding/_layout': OnboardingLayout,
@@ -144,7 +150,7 @@ describe('ajustes', () => {
   });
 
   it('bloqueo y ocultar en multitarea se guardan; el bloqueo solo tras un desbloqueo con éxito', async () => {
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    renderRouter(RUTAS, { initialUrl: '/ajustes/seguridad' });
     const ctx = ctxInicial();
     fireEvent.press(screen.getByTestId('ajustes-multitarea'));
     expect(obtenerBloqueo(ctx)).toMatchObject({ activo: false, ocultarEnMultitarea: true });
@@ -163,7 +169,7 @@ describe('ajustes', () => {
 
   it('en un teléfono sin código el bloqueo no se enciende y se explica cómo ponerlo (con «Abrir Ajustes»)', async () => {
     mockAutenticacion.nivel = 0;
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    renderRouter(RUTAS, { initialUrl: '/ajustes/seguridad' });
     const ctx = ctxInicial();
     await act(async () => {
       fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
@@ -179,7 +185,7 @@ describe('ajustes', () => {
 
   it('si el desbloqueo se cancela, el bloqueo sigue apagado', async () => {
     mockAutenticacion.resultado = { success: false, error: 'user_cancel' };
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    renderRouter(RUTAS, { initialUrl: '/ajustes/seguridad' });
     const ctx = ctxInicial();
     await act(async () => {
       fireEvent.press(screen.getByTestId('ajustes-bloqueo'));
@@ -194,7 +200,7 @@ describe('ajustes', () => {
       fijarBloqueo(ctx, { activo: true });
     };
     mockAutenticacion.nivel = 0;
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    renderRouter(RUTAS, { initialUrl: '/ajustes/seguridad' });
     const ctx = ctxInicial();
     await waitFor(() => expect(obtenerBloqueo(ctx).activo).toBe(false));
     expect(screen.getByTestId('ajustes-bloqueo-mensaje')).toHaveTextContent(
@@ -230,6 +236,21 @@ describe('ajustes', () => {
     expect(screen.queryByTestId('ajustes-volver')).toBeNull();
   });
 
+  it('Voz, Avisos y Bloqueo abren su propia subpantalla con título grande', () => {
+    for (const [fila, pantalla] of [
+      ['ajustes-abrir-voz', 'ajustes-voz-pantalla'],
+      ['ajustes-abrir-avisos', 'ajustes-avisos-pantalla'],
+      ['ajustes-abrir-seguridad', 'ajustes-seguridad-pantalla'],
+    ] as const) {
+      const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
+      expect(screen.getByTestId(fila)).toHaveProp('accessibilityRole', 'button');
+      fireEvent.press(screen.getByTestId(fila));
+      expect(screen.getByTestId(pantalla)).toBeTruthy();
+      expect(screen.getByTestId(`${pantalla}-titulo`)).toHaveProp('accessibilityRole', 'header');
+      r.unmount();
+    }
+  });
+
   it('Ajustes pasa la auditoría de accesibilidad y abre la Ayuda (CA-M13-04)', () => {
     const r = renderRouter(RUTAS, { initialUrl: '/ajustes' });
     expect(screen.getByTestId('ajustes-titulo')).toHaveProp('accessibilityRole', 'header');
@@ -256,7 +277,7 @@ describe('ajustes', () => {
   });
 
   it('los avisos de tanda, compromiso sin cubrir e ingreso que no llegó se apagan desde Ajustes › Avisos', () => {
-    renderRouter(RUTAS, { initialUrl: '/ajustes' });
+    renderRouter(RUTAS, { initialUrl: '/ajustes/avisos' });
     const ctx = ctxInicial();
     expect(obtenerPreferenciasAvisos(ctx)).toMatchObject({ tanda: true, compromiso: true, ingreso: true });
     fireEvent.press(screen.getByTestId('ajustes-aviso-tanda'));
