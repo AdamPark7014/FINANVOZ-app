@@ -74,7 +74,7 @@ export function PantallaDetalleCuenta({
         contenidoStyle={{ gap: espacio.xl }}
       >
         <Encabezado titulo={ETIQUETA_TIENES} {...(alVolver ? { alVolver } : {})} testID="cuenta-detalle" />
-        <EstadoVacio texto={TEXTO_CUENTA_NO_ENCONTRADA} testID="cuenta-detalle-no-encontrada" />
+        <EstadoVacio icono="banco" texto={TEXTO_CUENTA_NO_ENCONTRADA} testID="cuenta-detalle-no-encontrada" />
       </Pantalla>
     );
   }

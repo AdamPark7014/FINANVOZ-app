@@ -20,6 +20,7 @@ export function EstadoVacio({
   icono,
   titulo,
   compacto = false,
+  plano = false,
   children,
 }: {
   texto: string;
@@ -32,6 +33,8 @@ export function EstadoVacio({
   titulo?: string;
   /** Con `icono`: renglón chico (ícono a la izquierda) para los vacíos dentro de una pantalla con más secciones. */
   compacto?: boolean;
+  /** Con `compacto`: sin caja propia, para cuando ya va dentro de una tarjeta (Cuentas › Tienes). */
+  plano?: boolean;
   /** Con `icono` (no compacto): la acción principal dentro de la misma tarjeta, abajo del texto. */
   children?: ReactNode;
   testID: string;
@@ -48,11 +51,15 @@ export function EstadoVacio({
           flexDirection: 'row',
           alignItems: 'center',
           gap: espacio.m,
-          padding: espacio.l,
-          borderRadius: radio.l,
-          backgroundColor: c.superficie,
-          borderWidth: StyleSheet.hairlineWidth,
-          borderColor: c.borde,
+          ...(plano
+            ? { paddingVertical: espacio.xs }
+            : {
+                padding: espacio.l,
+                borderRadius: radio.l,
+                backgroundColor: c.superficie,
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: c.borde,
+              }),
         }}
       >
         <View

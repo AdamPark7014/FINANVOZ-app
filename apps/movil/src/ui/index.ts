@@ -29,7 +29,7 @@ export { AnilloUso } from './componentes/AnilloUso';
 export { BarraApilada, type ParteBarra } from './componentes/BarraApilada';
 export { BarraDelDia, CifraQueCuenta, DURACION_CUENTA_MS } from './componentes/CifraQueCuenta';
 export { Orbe, type EstadoOrbe } from './componentes/Orbe';
-export { useCiclo, useRampa, useReducirMovimiento } from './movimiento';
+export { useCiclo, useEntrada, useRampa, useReducirMovimiento } from './movimiento';
 export { anunciar, useAnunciar } from './anunciar';
 export { CampoMonto, ERROR_FORMATO_MONTO, type CampoMontoProps } from './componentes/CampoMonto';
 export {

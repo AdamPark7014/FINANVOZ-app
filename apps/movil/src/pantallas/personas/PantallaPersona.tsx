@@ -118,6 +118,7 @@ export function PantallaPersona({
           />
         ) : null}
         <EstadoVacio
+          icono="persona"
           texto={TEXTO_PERSONA_NO_ENCONTRADA}
           testID="persona-no-encontrada"
           etiquetaAccesible={etiquetaPersonaNoEncontrada()}

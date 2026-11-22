@@ -21,7 +21,11 @@ export function Subpantalla({
   return (
     <>
       <BarraNativa salida="/tu" />
-      <Pantalla testID={testID} bordes={['top', 'left', 'right', 'bottom']} contenidoStyle={{ gap: espacio.xl }}>
+      <Pantalla
+        testID={testID}
+        bordes={['top', 'left', 'right', 'bottom']}
+        contenidoStyle={{ gap: espacio.xl }}
+      >
         <TituloPantalla testID={`${testID}-titulo`} titulo={titulo} bajada={bajada} />
         {children}
       </Pantalla>

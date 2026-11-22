@@ -488,6 +488,8 @@ function Revisar({
         </View>
       ) : (
         <EstadoVacio
+          icono="documento"
+          compacto
           texto={TEXTO_SIN_NUEVOS}
           testID="estado-sin-nuevos"
           etiquetaAccesible={etiquetaVacioSinNuevosEstado()}

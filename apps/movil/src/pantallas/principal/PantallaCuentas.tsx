@@ -199,6 +199,9 @@ export function PantallaCuentas({
       {v.tienes.length === 0 ? (
         <Seccion titulo="Tienes" testID={carrusel.length > 0 ? 'seccion-tienes-vacia' : 'seccion-tienes'}>
           <EstadoVacio
+            icono="banco"
+            compacto
+            plano
             texto={TEXTO_CUENTAS_TIENES_VACIO}
             testID="cuentas-tienes-vacio"
             etiquetaAccesible={etiquetaVacioCuentasTienes()}
@@ -222,6 +225,9 @@ export function PantallaCuentas({
         <Seccion titulo="Debes" testID="seccion-debes">
           {v.debes.length === 0 ? (
             <EstadoVacio
+              icono="tarjeta"
+              compacto
+              plano
               texto={TEXTO_CUENTAS_DEBES_VACIO}
               testID="cuentas-debes-vacio"
               etiquetaAccesible={etiquetaVacioCuentasDebes()}
@@ -287,6 +293,9 @@ export function PantallaCuentas({
       >
         {v.loQueViene.length === 0 ? (
           <EstadoVacio
+            icono="calendario"
+            compacto
+            plano
             texto={TEXTO_CUENTAS_COMPROMISOS_VACIO}
             testID="cuentas-compromisos-vacio"
             etiquetaAccesible={etiquetaVacioCuentasCompromisos()}

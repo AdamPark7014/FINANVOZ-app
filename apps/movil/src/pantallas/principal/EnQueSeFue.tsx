@@ -51,6 +51,7 @@ export function EnQueSeFue({ datos }: { datos: DatosEnQueSeFue }) {
       </Text>
       <BarraApilada
         testID="en-que-se-fue-barra"
+        animar
         partes={datos.categorias.map((g) => ({
           clave: g.slug ?? 'otros',
           valor: g.monto,
