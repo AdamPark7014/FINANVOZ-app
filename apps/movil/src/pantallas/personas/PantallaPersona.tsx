@@ -72,7 +72,8 @@ import {
   TITULO_RECORDATORIO_COBRO,
   TITULO_YA_ME_PAGO,
 } from './textos';
-import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
+import { ESTILO_TITULO_PANTALLA, Grupo, Inicial } from '../../ui/componentes/Lista';
+import { capitalizar } from '../onboarding/pagos-fijos';
 
 /** Abre la hoja de compartir del sistema con el mensaje (WhatsApp, SMS, lo que elijas). */
 export type Compartir = (mensaje: string) => Promise<void>;
@@ -180,21 +181,25 @@ function Detalle({
         {d.nombre}
       </Texto>
       <Tarjeta>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-          <Texto
-            variante="cuerpoFuerte"
-            {...(d.saldo !== 0 ? OCULTAR_ETIQUETA_VISIBLE : {})}
-            testID="persona-saldo-etiqueta"
-          >
-            {etiquetaSaldoPersona(d.saldo)}
-          </Texto>
-          {d.saldo !== 0 ? (
-            <Cifra
-              centavos={Math.abs(d.saldo)}
-              contexto={etiquetaSaldoPersona(d.saldo)}
-              testID="persona-saldo"
-            />
-          ) : null}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.l }}>
+          <Inicial nombre={d.nombre} tamano={56} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Texto
+              variante={d.saldo !== 0 ? 'etiqueta' : 'cuerpoFuerte'}
+              {...(d.saldo !== 0 ? OCULTAR_ETIQUETA_VISIBLE : {})}
+              testID="persona-saldo-etiqueta"
+            >
+              {etiquetaSaldoPersona(d.saldo)}
+            </Texto>
+            {d.saldo !== 0 ? (
+              <Cifra
+                centavos={Math.abs(d.saldo)}
+                tamano="grande"
+                contexto={etiquetaSaldoPersona(d.saldo)}
+                testID="persona-saldo"
+              />
+            ) : null}
+          </View>
         </View>
         {d.saldo > 0 ? (
           <Texto
@@ -279,27 +284,40 @@ function Detalle({
           />
         ) : null}
         {d.movimientos.length > 0 ? (
-          <View accessibilityRole="list" testID="persona-movimientos-lista" style={{ gap: espacio.m }}>
-            {d.movimientos.map((m) => (
-              <Tarjeta key={m.id} testID={`persona-mov-${m.id}`} style={{ gap: espacio.s }}>
+          <View accessibilityRole="list" testID="persona-movimientos-lista">
+            <Grupo>
+              {d.movimientos.map((m) => (
                 <View
-                  role="listitem"
-                  style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
+                  key={m.id}
+                  testID={`persona-mov-${m.id}`}
+                  style={{ paddingHorizontal: espacio.l, paddingVertical: espacio.m }}
                 >
-                  <View style={{ flex: 1, gap: espacio.xs }}>
-                    <Texto variante="cuerpoFuerte">{m.descripcion ?? nombreTipoLibro(m.tipo)}</Texto>
-                    <Texto variante="secundario" tono="secundario">
-                      {`${nombreTipoLibro(m.tipo)} · ${etiquetaDiaMes(m.fecha)}`}
-                    </Texto>
+                  <View
+                    role="listitem"
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: espacio.s,
+                    }}
+                  >
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <Texto variante="cuerpoFuerte">
+                        {capitalizar(m.descripcion ?? nombreTipoLibro(m.tipo))}
+                      </Texto>
+                      <Texto variante="secundario" tono="secundario">
+                        {`${nombreTipoLibro(m.tipo)} · ${etiquetaDiaMes(m.fecha)}`}
+                      </Texto>
+                    </View>
+                    <Cifra
+                      centavos={m.monto}
+                      contexto={m.descripcion ?? nombreTipoLibro(m.tipo)}
+                      testID={`persona-mov-${m.id}-saldo`}
+                    />
                   </View>
-                  <Cifra
-                    centavos={m.monto}
-                    contexto={m.descripcion ?? nombreTipoLibro(m.tipo)}
-                    testID={`persona-mov-${m.id}-saldo`}
-                  />
                 </View>
-              </Tarjeta>
-            ))}
+              ))}
+            </Grupo>
           </View>
         ) : null}
       </View>
@@ -324,7 +342,7 @@ function BotonYaMePago({ expandido, alPresionar }: { expandido: boolean; alPresi
         minWidth: OBJETIVO_TACTIL_MIN,
         paddingHorizontal: espacio.xl,
         paddingVertical: espacio.m,
-        borderRadius: radio.m,
+        borderRadius: radio.l,
         borderWidth: 1.5,
         borderColor: c.acentoTexto,
         alignItems: 'center',

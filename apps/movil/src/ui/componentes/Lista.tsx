@@ -192,7 +192,7 @@ export function Inicial({ nombre, tamano = 40 }: { nombre: string; tamano?: numb
     >
       <Texto
         variante="cuerpoFuerte"
-        style={{ color: p.icono, fontSize: tamano * 0.42, lineHeight: tamano * 0.6 }}
+        style={{ color: p.icono, fontSize: tamano * 0.42, lineHeight: tamano * 0.6, fontWeight: '700' }}
       >
         {letra}
       </Texto>
