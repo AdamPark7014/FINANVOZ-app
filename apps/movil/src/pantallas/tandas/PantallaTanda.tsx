@@ -51,6 +51,7 @@ import {
   textoSubtituloTanda,
   TITULO_CALENDARIO,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Detalle de una tanda (`02 §18`): calendario de rondas con la tuya marcada (E11), "Llevas $1,500 aportados",
@@ -129,7 +130,12 @@ function Detalle({ tandaId, alVolver }: { tandaId: string; alVolver?: () => void
         />
       ) : null}
       <View style={{ gap: espacio.s }}>
-        <Texto variante="titulo" testID="tanda-titulo" accessibilityRole="header">
+        <Texto
+          variante="titulo"
+          testID="tanda-titulo"
+          accessibilityRole="header"
+          style={ESTILO_TITULO_PANTALLA}
+        >
           {d.nombre}
         </Texto>
         {!d.activa ? (

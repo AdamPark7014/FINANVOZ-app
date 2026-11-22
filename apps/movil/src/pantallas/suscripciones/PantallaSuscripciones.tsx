@@ -64,6 +64,7 @@ import {
   textoConfirmarNoEs,
   type AccionSuscripcion,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 const HACER: Record<AccionSuscripcion, (ctx: Contexto, comercio: string) => unknown> = {
   compromiso: convertirEnCompromiso,
@@ -111,6 +112,7 @@ export function PantallaSuscripciones({ alVolver }: { alVolver?: () => void }) {
         variante="titulo"
         accessibilityRole="header"
         accessibilityLabel={TITULO_PANTALLA}
+        style={ESTILO_TITULO_PANTALLA}
       >
         {TITULO_PANTALLA}
       </Texto>

@@ -1,10 +1,23 @@
-import { useEffect, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Platform, Pressable, View } from 'react-native';
 import { obtenerPlan, sincronizarPlan, type EstadoTienda } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
 import type { OfertaPlus } from '../../suscripciones/tipos';
-import { Boton, espacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  espacio,
+  heroeDia,
+  Icono,
+  OBJETIVO_TACTIL_MIN,
+  orbe,
+  Pantalla,
+  radio,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
+import { TituloPantalla } from '../../ui/componentes/Lista';
 import {
   CARGANDO_OFERTAS,
   CUERPO_PLAN_IOS,
@@ -141,35 +154,11 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
             testID={ID.volver}
           />
         ) : null}
-        <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
-          {TITULO_PANTALLA}
-        </Texto>
-        <Tarjeta testID={ID.plusDePrueba}>
-          <Texto
-            variante="subtitulo"
-            testID={ID.titulo}
-            accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
-          >
-            {resumen.titulo}
-          </Texto>
-          {resumen.detalle ? (
-            <Texto variante="cuerpo" tono="secundario" testID={ID.detalle} importantForAccessibility="no">
-              {resumen.detalle}
-            </Texto>
-          ) : null}
-        </Tarjeta>
+        <TituloPantalla testID={ID.tituloPantalla} titulo={TITULO_PANTALLA} />
+        <PlacaPlan testID={ID.plusDePrueba} titulo={resumen.titulo} detalle={resumen.detalle} />
         <Tarjeta testID={ID.incluye}>
           <Texto variante="subtitulo">{SECCION_INCLUYE_PRUEBA}</Texto>
-          <View accessibilityRole="list" style={{ gap: espacio.xs }}>
-            {FUNCIONES_PLUS.map((t) => (
-              <Texto
-                key={t}
-                variante="cuerpo"
-                role="listitem"
-                accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
-              >{`• ${t}`}</Texto>
-            ))}
-          </View>
+          <ListaBeneficios items={FUNCIONES_PLUS} />
         </Tarjeta>
         <Texto variante="secundario" tono="secundario" testID={ID.notaPlusDePrueba}>
           {NOTA_PLUS_DE_PRUEBA}
@@ -197,9 +186,7 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
             testID={ID.volver}
           />
         ) : null}
-        <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
-          {TITULO_PANTALLA}
-        </Texto>
+        <TituloPantalla testID={ID.tituloPantalla} titulo={TITULO_PANTALLA} />
         <Tarjeta testID={ID.soloIos}>
           <Texto variante="subtitulo">{TITULO_PLAN_IOS}</Texto>
           <Texto variante="cuerpo" tono="secundario">
@@ -208,16 +195,7 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
         </Tarjeta>
         <Tarjeta testID={ID.incluye}>
           <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
-          <View accessibilityRole="list" style={{ gap: espacio.xs }}>
-            {INCLUYE_PLUS.map((t) => (
-              <Texto
-                key={t}
-                variante="cuerpo"
-                role="listitem"
-                accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
-              >{`• ${t}`}</Texto>
-            ))}
-          </View>
+          <ListaBeneficios items={INCLUYE_PLUS} />
         </Tarjeta>
       </Pantalla>
     );
@@ -239,23 +217,9 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
           testID={ID.volver}
         />
       ) : null}
-      <Texto testID={ID.tituloPantalla} variante="titulo" accessibilityRole="header">
-        {TITULO_PANTALLA}
-      </Texto>
+      <TituloPantalla testID={ID.tituloPantalla} titulo={TITULO_PANTALLA} />
 
-      <Tarjeta testID={ID.actual}>
-        <Texto
-          variante="subtitulo"
-          testID={ID.titulo}
-          accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
-        >
-          {resumen.titulo}
-        </Texto>
-        {resumen.detalle ? (
-          <Texto variante="cuerpo" tono="secundario" testID={ID.detalle} importantForAccessibility="no">
-            {resumen.detalle}
-          </Texto>
-        ) : null}
+      <PlacaPlan testID={ID.actual} titulo={resumen.titulo} detalle={resumen.detalle}>
         {vista.plan === 'plus' && compras ? (
           <Boton
             etiqueta={ETIQUETA_ADMINISTRAR}
@@ -265,20 +229,11 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
             testID={ID.administrar}
           />
         ) : null}
-      </Tarjeta>
+      </PlacaPlan>
 
       <Tarjeta testID={ID.incluye}>
         <Texto variante="subtitulo">{SECCION_INCLUYE}</Texto>
-        <View accessibilityRole="list" style={{ gap: espacio.xs }}>
-          {INCLUYE_PLUS.map((t) => (
-            <Texto
-              key={t}
-              variante="cuerpo"
-              role="listitem"
-              accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
-            >{`• ${t}`}</Texto>
-          ))}
-        </View>
+        <ListaBeneficios items={INCLUYE_PLUS} />
         <Texto variante="secundario" tono="secundario" accessibilityLabel={etiquetaAccesibleIncluyeGratis()}>
           {INCLUYE_GRATIS}
         </Texto>
@@ -407,36 +362,184 @@ export function PantallaPlan({ alVolver }: { alVolver?: () => void }) {
   );
 }
 
-/** Ajustes → Plan (`02 §12`): el plan actual y la entrada a la pantalla del plan. */
-export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
-  const resumen = resumenPlan(useVista(obtenerPlan));
+/** La placa del plan actual: pino profundo con el destello de Plus, como la placa de Inicio. */
+function PlacaPlan({
+  testID,
+  titulo,
+  detalle,
+  children,
+}: {
+  testID: string;
+  titulo: string;
+  detalle: string | null | undefined;
+  children?: ReactNode;
+}) {
+  const { esquema } = useTema();
+  const placa = heroeDia[esquema];
   return (
-    <Tarjeta testID={ID.ajustesPlan}>
-      <Texto variante="subtitulo">{SECCION_AJUSTES}</Texto>
+    <View
+      testID={testID}
+      style={{
+        backgroundColor: placa.fondo,
+        borderRadius: radio.xl,
+        padding: espacio.xl,
+        gap: espacio.m,
+        overflow: 'hidden',
+      }}
+    >
+      <Halo />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+        <Icono nombre="destello" color={orbe.nucleo} tamano={18} grosor={2} />
+        <Texto variante="etiqueta" style={{ color: placa.textoSecundario }}>
+          {SECCION_AJUSTES}
+        </Texto>
+      </View>
       <Texto
-        variante="cuerpo"
-        testID={ID.ajustesPlanTitulo}
-        accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
+        variante="subtitulo"
+        testID={ID.titulo}
+        accessibilityLabel={etiquetaAccesibleResumenPlan(titulo, detalle ?? null)}
+        style={{ color: placa.texto, fontSize: 24, lineHeight: 30, fontWeight: '700', letterSpacing: -0.3 }}
       >
-        {resumen.titulo}
+        {titulo}
       </Texto>
-      {resumen.detalle ? (
+      {detalle ? (
         <Texto
-          variante="secundario"
-          tono="secundario"
-          testID={ID.ajustesPlanDetalle}
+          variante="cuerpo"
+          testID={ID.detalle}
           importantForAccessibility="no"
+          style={{ color: placa.textoSecundario }}
         >
-          {resumen.detalle}
+          {detalle}
         </Texto>
       ) : null}
-      <Boton
-        etiqueta={ETIQUETA_VER_PLANES}
-        variante="secundario"
-        alPresionar={alAbrirPlan}
-        pista={PISTA_VER_PLANES}
+      {children}
+    </View>
+  );
+}
+
+/** Círculo menta muy tenue en la esquina de las placas pino (decorativo). */
+function Halo() {
+  return (
+    <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={{
+        position: 'absolute',
+        right: -40,
+        top: -40,
+        width: 160,
+        height: 160,
+        borderRadius: 80,
+        backgroundColor: orbe.nucleo,
+        opacity: 0.12,
+      }}
+    />
+  );
+}
+
+/** Lo que incluye Plus: cada beneficio con su palomita menta (la lista se oye como lista). */
+function ListaBeneficios({ items }: { items: readonly string[] }) {
+  const { c } = useTema();
+  return (
+    <View accessibilityRole="list" style={{ gap: espacio.m }}>
+      {items.map((t) => (
+        <View
+          key={t}
+          role="listitem"
+          accessible
+          accessibilityLabel={etiquetaAccesibleBeneficioPlus(t)}
+          style={{ flexDirection: 'row', gap: espacio.m, alignItems: 'flex-start' }}
+        >
+          <View
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              marginTop: 1,
+              backgroundColor: c.iconoFondo,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icono nombre="palomita" color={c.acentoTexto} tamano={14} grosor={2.6} />
+          </View>
+          <Texto variante="cuerpo" style={{ flex: 1 }}>
+            {t}
+          </Texto>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/**
+ * Ajustes → Plan (`02 §12`): el plan actual y la entrada a la pantalla del plan. En Tú es la placa de arriba (pase de
+ * pulido, 22-11): pino profundo como la placa de Inicio, con el destello de Plus y el botón menta.
+ */
+export function SeccionPlan({ alAbrirPlan }: { alAbrirPlan: () => void }) {
+  const resumen = resumenPlan(useVista(obtenerPlan));
+  const { esquema } = useTema();
+  const placa = heroeDia[esquema];
+  return (
+    <View
+      testID={ID.ajustesPlan}
+      style={{
+        backgroundColor: placa.fondo,
+        borderRadius: radio.xl,
+        padding: espacio.xl,
+        gap: espacio.m,
+        overflow: 'hidden',
+      }}
+    >
+      <Halo />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}>
+        <Icono nombre="destello" color={orbe.nucleo} tamano={18} grosor={2} />
+        <Texto variante="etiqueta" style={{ color: placa.textoSecundario }}>
+          {SECCION_AJUSTES}
+        </Texto>
+      </View>
+      <View style={{ gap: espacio.xs }}>
+        <Texto
+          variante="subtitulo"
+          testID={ID.ajustesPlanTitulo}
+          accessibilityLabel={etiquetaAccesibleResumenPlan(resumen.titulo, resumen.detalle)}
+          style={{ color: placa.texto, fontSize: 22, lineHeight: 28, fontWeight: '700' }}
+        >
+          {resumen.titulo}
+        </Texto>
+        {resumen.detalle ? (
+          <Texto
+            variante="secundario"
+            testID={ID.ajustesPlanDetalle}
+            importantForAccessibility="no"
+            style={{ color: placa.textoSecundario }}
+          >
+            {resumen.detalle}
+          </Texto>
+        ) : null}
+      </View>
+      <Pressable
         testID={ID.ajustesPlanVer}
-      />
-    </Tarjeta>
+        onPress={alAbrirPlan}
+        accessibilityRole="button"
+        accessibilityLabel={ETIQUETA_VER_PLANES}
+        accessibilityHint={PISTA_VER_PLANES}
+        style={({ pressed }) => ({
+          alignSelf: 'flex-start',
+          minHeight: OBJETIVO_TACTIL_MIN,
+          paddingHorizontal: espacio.xl,
+          borderRadius: radio.pastilla,
+          backgroundColor: orbe.nucleo,
+          alignItems: 'center',
+          justifyContent: 'center',
+          transform: [{ scale: pressed ? 0.97 : 1 }],
+          opacity: pressed ? 0.9 : 1,
+        })}
+      >
+        <Texto variante="etiqueta" style={{ color: '#0B2A23', fontSize: 15 }}>
+          {ETIQUETA_VER_PLANES}
+        </Texto>
+      </Pressable>
+    </View>
   );
 }

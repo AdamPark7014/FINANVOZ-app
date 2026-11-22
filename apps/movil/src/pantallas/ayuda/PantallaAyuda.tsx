@@ -25,6 +25,7 @@ import {
   TITULO,
   type PreguntaFrecuente,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Ayuda (CA-M13-04): las preguntas frecuentes de `textos.ts` (se abren una a una) y el correo de contacto.
@@ -66,7 +67,12 @@ export function PantallaAyuda({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="ayuda-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="ayuda-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO}
       </Texto>
       <Texto

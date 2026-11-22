@@ -21,6 +21,7 @@ import {
   textoSubtituloListaConProxima,
   textoSubtituloListaSinProxima,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Cuentas → Tandas (`02 §18`, gratis): tus tandas con su próxima aportación y lo que arriesgas, y "Nueva tanda"
@@ -54,7 +55,12 @@ export function PantallaTandas({
           pista={PISTA_VOLVER}
         />
       ) : null}
-      <Texto variante="titulo" testID="tandas-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="tandas-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_TANDAS}
       </Texto>
       {nueva ? (

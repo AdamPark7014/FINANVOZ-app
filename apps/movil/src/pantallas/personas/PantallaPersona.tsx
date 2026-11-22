@@ -72,6 +72,7 @@ import {
   TITULO_RECORDATORIO_COBRO,
   TITULO_YA_ME_PAGO,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /** Abre la hoja de compartir del sistema con el mensaje (WhatsApp, SMS, lo que elijas). */
 export type Compartir = (mensaje: string) => Promise<void>;
@@ -170,7 +171,12 @@ function Detalle({
           pista={PISTA_VOLVER}
         />
       ) : null}
-      <Texto variante="titulo" testID="persona-nombre" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="persona-nombre"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {d.nombre}
       </Texto>
       <Tarjeta>

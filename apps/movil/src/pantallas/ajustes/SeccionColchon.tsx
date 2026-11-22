@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { colchonSugerido, fijarColchon, obtenerAjustes } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { View } from 'react-native';
-import { Boton, CampoMonto, espacio, etiquetaFilaAjuste, FilaAjuste, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoMonto, espacio, etiquetaFilaAjuste, FilaAjuste, Texto } from '../../ui';
 import {
   ayudaColchon,
   AYUDA_SIN_SUGERENCIA,
@@ -75,8 +75,10 @@ export function SeccionColchon() {
   // Cerrado es una fila de Ajustes (`PLAN-UX-VOZ` §3.6): tocarla abre el campo aquí mismo.
   if (!editando) {
     return (
-      <View testID="ajustes-colchon" style={{ gap: espacio.s }}>
+      <View testID="ajustes-colchon">
         <FilaAjuste
+          icono="escudo"
+          familia="super"
           testID="ajustes-cambiar-colchon"
           testIDTitulo="ajustes-colchon-titulo"
           testIDValor="ajustes-colchon-resumen"
@@ -87,13 +89,15 @@ export function SeccionColchon() {
           etiquetaAccesible={etiquetaFilaAjuste(SECCION_COLCHON, resumen, accion)}
           alPresionar={abrir}
         />
-        {textoMensaje}
+        {textoMensaje ? (
+          <View style={{ paddingHorizontal: espacio.l, paddingBottom: espacio.m }}>{textoMensaje}</View>
+        ) : null}
       </View>
     );
   }
 
   return (
-    <Tarjeta testID="ajustes-colchon">
+    <View testID="ajustes-colchon" style={{ padding: espacio.l, gap: espacio.m }}>
       <Texto variante="subtitulo" testID="ajustes-colchon-titulo" accessibilityRole="header">
         {SECCION_COLCHON}
       </Texto>
@@ -119,6 +123,6 @@ export function SeccionColchon() {
         alPresionar={() => setEditando(false)}
       />
       {textoMensaje}
-    </Tarjeta>
+    </View>
   );
 }

@@ -62,6 +62,7 @@ import {
   textoConsentimiento,
   textoDerechosArco,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Centro de privacidad (RF-PRI-03, `02 §12`, `08 §2`): qué se guarda, qué sale del teléfono y a quién,
@@ -146,7 +147,12 @@ export function CentroPrivacidad({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto testID="privacidad-titulo" variante="titulo" accessibilityRole="header">
+      <Texto
+        testID="privacidad-titulo"
+        variante="titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_PRIVACIDAD}
       </Texto>
       <Texto

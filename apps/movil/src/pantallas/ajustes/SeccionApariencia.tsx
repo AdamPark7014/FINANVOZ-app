@@ -10,7 +10,6 @@ import {
   FilaAjuste,
   GrupoChips,
   OCULTAR_ETIQUETA_VISIBLE,
-  Tarjeta,
   Texto,
 } from '../../ui';
 import {
@@ -65,8 +64,10 @@ export function SeccionApariencia() {
 
   if (!abierta) {
     return (
-      <View testID="ajustes-apariencia" style={{ gap: espacio.s }}>
+      <View testID="ajustes-apariencia">
         <FilaAjuste
+          icono="sol"
+          familia="antojos"
           testID="ajustes-cambiar-apariencia"
           testIDTitulo="ajustes-apariencia-titulo"
           testIDValor="ajustes-apariencia-valor"
@@ -80,13 +81,15 @@ export function SeccionApariencia() {
             setAbierta(true);
           }}
         />
-        {textoError}
+        {textoError ? (
+          <View style={{ paddingHorizontal: espacio.l, paddingBottom: espacio.m }}>{textoError}</View>
+        ) : null}
       </View>
     );
   }
 
   return (
-    <Tarjeta testID="ajustes-apariencia">
+    <View testID="ajustes-apariencia" style={{ padding: espacio.l, gap: espacio.m }}>
       <Texto variante="subtitulo" testID="ajustes-apariencia-titulo" accessibilityRole="header">
         {SECCION_APARIENCIA}
       </Texto>
@@ -112,6 +115,6 @@ export function SeccionApariencia() {
         pista={PISTA_LISTO_APARIENCIA}
         alPresionar={() => setAbierta(false)}
       />
-    </Tarjeta>
+    </View>
   );
 }

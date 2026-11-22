@@ -39,7 +39,25 @@ export type NombreIcono =
   | 'personas'
   | 'porcentaje'
   | 'cerrar'
-  | 'llama';
+  | 'llama'
+  | 'campana'
+  | 'candado'
+  | 'nube'
+  | 'escudo'
+  | 'destello'
+  | 'pregunta'
+  | 'sol'
+  | 'documento'
+  | 'calendario'
+  | 'cuadricula'
+  | 'persona'
+  | 'descargar'
+  | 'basura'
+  | 'reloj'
+  | 'flechaArriba'
+  | 'flechaAbajo'
+  | 'lapiz'
+  | 'grafica';
 
 /** SF Symbols de cada ícono (iPhone). */
 const SIMBOLO_IOS: Record<NombreIcono, SFSymbol> = {
@@ -72,6 +90,24 @@ const SIMBOLO_IOS: Record<NombreIcono, SFSymbol> = {
   porcentaje: 'percent',
   cerrar: 'xmark',
   llama: 'flame',
+  campana: 'bell',
+  candado: 'lock',
+  nube: 'icloud',
+  escudo: 'checkmark.shield',
+  destello: 'sparkles',
+  pregunta: 'questionmark.circle',
+  sol: 'circle.lefthalf.filled',
+  documento: 'doc.text',
+  calendario: 'calendar',
+  cuadricula: 'square.grid.2x2',
+  persona: 'person',
+  descargar: 'arrow.down.circle',
+  basura: 'trash',
+  reloj: 'clock',
+  flechaArriba: 'arrow.up.right',
+  flechaAbajo: 'arrow.down.left',
+  lapiz: 'pencil',
+  grafica: 'chart.bar',
 };
 
 function trazos(nombre: NombreIcono): ReactNode {
@@ -235,6 +271,117 @@ function trazos(nombre: NombreIcono): ReactNode {
           <Circle cx={9} cy={7} r={4} />
           <Path d="M22 21v-2a4 4 0 0 0-3-3.87" />
           <Path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </>
+      );
+    case 'campana':
+      return (
+        <>
+          <Path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+          <Path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        </>
+      );
+    case 'candado':
+      return (
+        <>
+          <Rect x={4} y={11} width={16} height={10} rx={2} />
+          <Path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </>
+      );
+    case 'nube':
+      return <Path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />;
+    case 'escudo':
+      return (
+        <>
+          <Path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <Path d="m9 12 2 2 4-4" />
+        </>
+      );
+    case 'destello':
+      return (
+        <>
+          <Path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z" />
+          <Path d="M20 3v4M22 5h-4" />
+        </>
+      );
+    case 'pregunta':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={9} />
+          <Path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3M12 17h.01" />
+        </>
+      );
+    case 'sol':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={4} />
+          <Path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </>
+      );
+    case 'documento':
+      return (
+        <>
+          <Path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+          <Path d="M14 2v4a2 2 0 0 0 2 2h4M10 13H8M16 17H8M16 13h-2" />
+        </>
+      );
+    case 'calendario':
+      return (
+        <>
+          <Rect x={3} y={4} width={18} height={18} rx={2} />
+          <Path d="M16 2v4M8 2v4M3 10h18" />
+        </>
+      );
+    case 'cuadricula':
+      return (
+        <>
+          <Rect x={3} y={3} width={7} height={7} rx={1.5} />
+          <Rect x={14} y={3} width={7} height={7} rx={1.5} />
+          <Rect x={3} y={14} width={7} height={7} rx={1.5} />
+          <Rect x={14} y={14} width={7} height={7} rx={1.5} />
+        </>
+      );
+    case 'persona':
+      return (
+        <>
+          <Circle cx={12} cy={8} r={4} />
+          <Path d="M20 21a8 8 0 0 0-16 0" />
+        </>
+      );
+    case 'descargar':
+      return (
+        <>
+          <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <Path d="m7 10 5 5 5-5M12 15V3" />
+        </>
+      );
+    case 'basura':
+      return (
+        <>
+          <Path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+        </>
+      );
+    case 'reloj':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={9} />
+          <Path d="M12 7v5l3 2" />
+        </>
+      );
+    case 'flechaArriba':
+      return <Path d="M7 17 17 7M7 7h10v10" />;
+    case 'flechaAbajo':
+      return <Path d="M17 7 7 17M17 17H7V7" />;
+    case 'lapiz':
+      return (
+        <>
+          <Path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z" />
+        </>
+      );
+    case 'grafica':
+      return (
+        <>
+          <Path d="M3 3v16a2 2 0 0 0 2 2h16" />
+          <Path d="M18 17V9M13 17V5M8 17v-3" />
         </>
       );
     case 'porcentaje':

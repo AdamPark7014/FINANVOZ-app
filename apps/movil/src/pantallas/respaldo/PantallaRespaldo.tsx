@@ -46,6 +46,7 @@ import {
   textoCrearContrasenaTrasCorreo,
   textoRespaldasCon,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Ajustes → Respaldo (`02 §19`, RF-RES-01…04): último respaldo, "Respaldar ahora", respaldo automático semanal
@@ -77,7 +78,12 @@ export function PantallaRespaldo({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="respaldo-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="respaldo-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_RESPALDO}
       </Texto>
       {nube ? (

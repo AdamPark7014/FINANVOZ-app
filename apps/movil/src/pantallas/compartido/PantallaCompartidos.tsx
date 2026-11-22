@@ -42,6 +42,7 @@ import {
   TEXTO_COMPARTIDOS_VACIO,
   TITULO_GASTOS_COMPARTIDOS,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Modo =
   | { tipo: 'lista' }
@@ -151,7 +152,12 @@ export function PantallaCompartidos({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="compartidos-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="compartidos-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_GASTOS_COMPARTIDOS}
       </Texto>
 

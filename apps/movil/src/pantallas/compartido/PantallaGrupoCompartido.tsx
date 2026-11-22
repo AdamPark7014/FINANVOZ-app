@@ -63,6 +63,7 @@ import {
   textoRegistroPagoSaldar,
   TITULO_LO_COMPARTIDO,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Panel = 'ninguno' | 'agregar' | 'saldar' | 'codigo' | 'revincular' | 'salir';
 
@@ -257,7 +258,12 @@ function GrupoCompartido({ grupoId, alVolver }: { grupoId: string; alVolver?: ()
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="grupo-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="grupo-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {g.nombre}
       </Texto>
       <Texto variante="subtitulo" testID="grupo-saldo" accessibilityLabel={etiquetaHablada(g.saldo.texto)}>

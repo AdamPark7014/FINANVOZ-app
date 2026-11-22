@@ -74,6 +74,7 @@ import {
   textoSobrante,
   TOTAL,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Paso = 'marcar' | 'cantidad' | 'resultado';
 
@@ -172,7 +173,12 @@ export function PantallaArqueo({
           gap: espacio.s,
         }}
       >
-        <Texto testID="arqueo-titulo" variante="titulo" accessibilityRole="header">
+        <Texto
+          testID="arqueo-titulo"
+          variante="titulo"
+          accessibilityRole="header"
+          style={ESTILO_TITULO_PANTALLA}
+        >
           {TITULO}
         </Texto>
         {mostrarCerrar ? (

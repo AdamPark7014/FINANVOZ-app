@@ -61,6 +61,7 @@ import {
   tituloEstadoCuenta,
   VACIO_MOVIMIENTOS_TARJETA,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Panel = 'pagar' | 'editar' | 'corregir' | null;
 
@@ -156,7 +157,12 @@ function Detalle({
         />
       ) : null}
       <View style={{ gap: espacio.s }}>
-        <Texto variante="titulo" testID="tarjeta-nombre" accessibilityRole="header">
+        <Texto
+          variante="titulo"
+          testID="tarjeta-nombre"
+          accessibilityRole="header"
+          style={ESTILO_TITULO_PANTALLA}
+        >
           {d.nombre}
         </Texto>
         <Texto variante="secundario" tono="secundario" importantForAccessibility="no">

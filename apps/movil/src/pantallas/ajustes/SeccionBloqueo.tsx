@@ -3,7 +3,7 @@ import { Linking } from 'react-native';
 import { fijarBloqueo, obtenerBloqueo } from '../../servicios';
 import { autenticadorExpo, comprobarParaActivar, type Autenticador } from '../../seguridad';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
+import { Boton, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import {
   BTN_ABRIR_AJUSTES_SISTEMA,
@@ -20,6 +20,7 @@ import {
   pistaAbrirAjustesSistema,
   SECCION_BLOQUEO,
 } from './textos';
+import { CeldaGrupo, FilaInterruptor, Grupo } from '../../ui/componentes/Lista';
 
 type Mensaje = { texto: string; error: boolean; abrirAjustes: boolean };
 
@@ -113,22 +114,19 @@ export function SeccionBloqueo({ autenticador = autenticadorExpo }: { autenticad
   };
 
   return (
-    <Tarjeta testID="ajustes-seccion-bloqueo" style={{ gap: espacio.m }}>
-      <Texto variante="subtitulo" accessibilityRole="header">
-        {SECCION_BLOQUEO}
-      </Texto>
-      <Interruptor
+    <Grupo testID="ajustes-seccion-bloqueo" titulo={SECCION_BLOQUEO}>
+      <FilaInterruptor
         testID="ajustes-bloqueo"
-        etiqueta={etiquetaBloqueo()}
-        descripcion={DESC_BLOQUEO}
+        titulo={etiquetaBloqueo()}
+        apoyo={DESC_BLOQUEO}
         valor={bloqueo.activo}
         deshabilitado={verificando}
         alCambiar={(activo) => void cambiarBloqueo(activo)}
       />
-      <Interruptor
+      <FilaInterruptor
         testID="ajustes-multitarea"
-        etiqueta={ETIQUETA_MULTITAREA}
-        descripcion={descMultitarea()}
+        titulo={ETIQUETA_MULTITAREA}
+        apoyo={descMultitarea()}
         valor={bloqueo.ocultarEnMultitarea}
         alCambiar={(ocultarEnMultitarea) => {
           avisar(null);
@@ -136,7 +134,7 @@ export function SeccionBloqueo({ autenticador = autenticadorExpo }: { autenticad
         }}
       />
       {mensaje ? (
-        <>
+        <CeldaGrupo>
           <Texto
             variante="secundario"
             tono={mensaje.error ? 'faltante' : 'acento'}
@@ -157,8 +155,8 @@ export function SeccionBloqueo({ autenticador = autenticadorExpo }: { autenticad
               alPresionar={() => void Linking.openSettings().catch(() => undefined)}
             />
           ) : null}
-        </>
+        </CeldaGrupo>
       ) : null}
-    </Tarjeta>
+    </Grupo>
   );
 }

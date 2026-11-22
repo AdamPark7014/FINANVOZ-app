@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Boton, Texto } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import { ETIQUETA_VOLVER, PISTA_VOLVER_CUENTAS } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /** «Volver» arriba y el título como encabezado, igual en todas las pantallas que salen de Cuentas. */
 export function Encabezado({
@@ -30,7 +31,12 @@ export function Encabezado({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID={`${testID}-titulo`} accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID={`${testID}-titulo`}
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {titulo}
       </Texto>
       {children}

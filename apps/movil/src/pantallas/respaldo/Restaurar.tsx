@@ -44,6 +44,7 @@ import {
   TEXTO_RESPALDO_RECIENTE,
   TITULO_RESTAURAR,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Paso =
   | { tipo: 'elegir' }
@@ -141,7 +142,12 @@ export function Restaurar({ alVolver }: { alVolver?: () => void }) {
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="restaurar-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="restaurar-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_RESTAURAR}
       </Texto>
       <Texto variante="cuerpo" tono="secundario">

@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { View } from 'react-native';
 import { obtenerAjustes } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { FilaAjuste, Texto } from '../../ui';
+import { espacio } from '../../ui/tokens';
 import { useConfirmacionAlVolver } from './confirmacion';
 import {
   etiquetaFilaIngreso,
@@ -20,8 +22,10 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
   const configurado = vista.ingresoVariable || vista.ingreso !== null;
   const resumen = resumenIngreso(vista, ctx.reloj.hoy());
   return (
-    <>
+    <View>
       <FilaAjuste
+        icono="moneda"
+        familia="super"
         testID="ajustes-cambiar-ingreso"
         testIDTitulo="ajustes-ingreso-titulo"
         testIDValor="ajustes-ingreso-resumen"
@@ -38,10 +42,11 @@ export function SeccionIngreso({ alCambiar }: { alCambiar: () => void }) {
           tono="acento"
           accessibilityLiveRegion="polite"
           testID="ajustes-ingreso-confirmacion"
+          style={{ paddingHorizontal: espacio.l, paddingBottom: espacio.m }}
         >
           {confirmacion}
         </Texto>
       ) : null}
-    </>
+    </View>
   );
 }
