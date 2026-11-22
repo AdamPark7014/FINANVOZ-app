@@ -58,6 +58,8 @@ Deno.serve(async (req) => {
     return responder(500, { codigo: 'error' });
   }
   if (data === 'limite') return responder(429, { codigo: 'limite' });
-  if (data === 'invalido' || data === 'sin_vendedor') return responder(400, { codigo: data });
+  if (data === 'invalido') return responder(400, { codigo: data });
+  // Sin nadie activo en el equipo no hay a quién asignarlo: es configuración nuestra, no un error de quien escribe.
+  if (data === 'sin_vendedor') return responder(503, { codigo: 'sin_configurar' });
   return responder(200, { ok: true });
 });

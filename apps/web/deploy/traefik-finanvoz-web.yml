@@ -1,0 +1,47 @@
+## Traefik v2.11 — web de FinanVoz (venta + /admin)
+## Sustituye __DOMINIO__ por el host real (p. ej. finanvoz.com) antes de copiar al servidor.
+## El contenedor `finanvoz-web` debe estar en la red `proxy`.
+
+http:
+  routers:
+    finanvoz-web-http:
+      rule: Host(`__DOMINIO__`)
+      entryPoints: [web]
+      middlewares: [redirect-https-finanvoz-web]
+      service: dummy-finanvoz-web
+
+    finanvoz-web-https:
+      rule: Host(`__DOMINIO__`)
+      service: finanvoz-web
+      entryPoints: [websecure]
+      priority: 50
+      tls:
+        certResolver: letsencrypt
+      middlewares: [headers-finanvoz-web]
+
+  middlewares:
+    redirect-https-finanvoz-web:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    headers-finanvoz-web:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        referrerPolicy: strict-origin-when-cross-origin
+        browserXssFilter: true
+        customResponseHeaders:
+          Permissions-Policy: 'camera=(), microphone=(), geolocation=()'
+
+  services:
+    finanvoz-web:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: 'http://finanvoz-web:80'
+
+    dummy-finanvoz-web:
+      loadBalancer:
+        servers:
+          - url: 'http://localhost'

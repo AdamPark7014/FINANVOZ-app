@@ -1,6 +1,7 @@
 // Capa de datos de ejemplo, en memoria: deja ver y probar el panel completo sin servidor (`/admin?demo`).
 // Nada sale del navegador ni se guarda; el panel muestra un aviso mientras está activa.
 import { diasEntre, hoyMexico, inicioDeMes, sumarDias } from '../util/fecha';
+import type { FilaActividad } from './actividadTexto';
 import type {
   CapaDatos,
   Cliente,
@@ -198,8 +199,78 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
   function cambiarVenta(idVenta: string, cambio: Partial<Venta>): ResultadoDatos<Venta> {
     const v = ventas.find((x) => x.id === idVenta);
     if (!v) return { ok: false, error: 'No se encontró la venta.', codigo: 'otro' };
+    const antes = { ...v };
     Object.assign(v, cambio);
+    registrar(
+      'admin_ventas',
+      v.id,
+      'update',
+      antes as unknown as Record<string, unknown>,
+      {
+        ...v,
+      } as unknown as Record<string, unknown>,
+    );
     return ok({ ...v });
+  }
+
+  let bitacoraId = 0;
+  const bitacora: FilaActividad[] = [];
+  function registrar(
+    tabla: string,
+    registro_id: string,
+    accion: FilaActividad['accion'],
+    antes: Record<string, unknown> | null,
+    despues: Record<string, unknown> | null,
+    actor?: { usuario_id: string | null; usuario_nombre: string; creado_en?: string },
+  ) {
+    bitacora.unshift({
+      id: ++bitacoraId,
+      tabla,
+      registro_id,
+      accion,
+      antes,
+      despues,
+      usuario_id: actor?.usuario_id ?? sesion?.usuarioId ?? null,
+      usuario_nombre: actor?.usuario_nombre ?? sesion?.nombre ?? '',
+      creado_en: actor?.creado_en ?? new Date().toISOString(),
+    });
+  }
+
+  // Semilla: movimientos de ejemplo para que Actividad no abra vacía.
+  for (const v of [...ventas].reverse()) {
+    const actor = {
+      usuario_id: v.vendedor_id,
+      usuario_nombre: v.vendedor_nombre || nombreMiembro(v.vendedor_id),
+      creado_en: v.creado_en,
+    };
+    registrar('admin_ventas', v.id, 'insert', null, { ...v } as unknown as Record<string, unknown>, actor);
+    if (v.estado === 'pagada') {
+      registrar(
+        'admin_ventas',
+        v.id,
+        'update',
+        { ...v, estado: 'por_cobrar', pagada_en: null } as unknown as Record<string, unknown>,
+        { ...v } as unknown as Record<string, unknown>,
+        { usuario_id: DUENO, usuario_nombre: 'Adam', creado_en: v.pagada_en ?? v.creado_en },
+      );
+    }
+  }
+  for (const p of [...prospectos].reverse()) {
+    const dePagina = p.origen === 'pagina';
+    registrar(
+      'admin_prospectos',
+      p.id,
+      'insert',
+      null,
+      { ...p },
+      dePagina
+        ? { usuario_id: null, usuario_nombre: '', creado_en: `${hoy}T12:00:00-06:00` }
+        : {
+            usuario_id: p.vendedor_id,
+            usuario_nombre: nombreMiembro(p.vendedor_id),
+            creado_en: `${hoy}T12:00:00-06:00`,
+          },
+    );
   }
 
   return {
@@ -262,25 +333,31 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
         cliente_id: null,
       };
       prospectos.unshift(nuevo);
+      registrar('admin_prospectos', nuevo.id, 'insert', null, { ...nuevo });
       return ok({ ...nuevo });
     },
     async actualizarEtapaProspecto(idP, etapa, motivo) {
       const p = prospectos.find((x) => x.id === idP);
       if (!p) return { ok: false, error: 'No se encontró el prospecto.', codigo: 'otro' };
+      const antes = { ...p };
       p.etapa = etapa;
       p.motivo_perdida = etapa === 'perdido' ? (motivo ?? null) : null;
+      registrar('admin_prospectos', p.id, 'update', antes, { ...p });
       return ok({ ...p });
     },
     async convertirProspectoEnCliente(idP) {
       const p = prospectos.find((x) => x.id === idP);
       if (!p) return { ok: false, error: 'No se encontró el prospecto.', codigo: 'otro' };
+      const antes = { ...p };
       let c = clientes.find((x) => x.id === p.cliente_id);
       if (!c) {
         c = cliente(p.nombre, p.interes === 'plus' ? 'persona' : 'negocio', p.vendedor_id);
         clientes.push(c);
+        registrar('admin_clientes', c.id, 'insert', null, { ...c });
       }
       p.etapa = 'ganado';
       p.cliente_id = c.id;
+      registrar('admin_prospectos', p.id, 'update', antes, { ...p });
       return ok({ cliente: { ...c }, prospecto: { ...p } });
     },
     async listarClientes(q) {
@@ -296,6 +373,7 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
         return { ok: false, error: 'El RFC no tiene el formato correcto.', codigo: 'otro' };
       const nuevo: Cliente = { ...c, id: nuevoId('c'), rfc: c.rfc ? c.rfc.trim().toUpperCase() : null };
       clientes.push(nuevo);
+      registrar('admin_clientes', nuevo.id, 'insert', null, { ...nuevo });
       return ok({ ...nuevo });
     },
     async ventasDeCliente(c) {
@@ -331,6 +409,7 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
         vendedor_nombre: nombreMiembro(input.vendedor_id),
       };
       ventas.unshift(v);
+      registrar('admin_ventas', v.id, 'insert', null, { ...v } as unknown as Record<string, unknown>);
       return ok({ ...v });
     },
     async marcarVentaPagada(idV) {
@@ -354,8 +433,12 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
         ...(i >= 0 ? miembros[i] : {}),
         ...m,
       };
+      const antes = i >= 0 ? ({ ...miembros[i] } as unknown as Record<string, unknown>) : null;
       if (i >= 0) miembros[i] = nuevo;
       else miembros.push(nuevo);
+      registrar('admin_miembros', nuevo.usuario_id, antes ? 'update' : 'insert', antes, {
+        ...nuevo,
+      } as unknown as Record<string, unknown>);
       return ok({ ...nuevo });
     },
     async listarParametros() {
@@ -364,7 +447,9 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
     async guardarParametro(clave, valor) {
       const p = parametros.find((x) => x.clave === clave);
       if (!p) return { ok: false, error: 'Ese ajuste no existe.', codigo: 'otro' };
+      const antes = { clave: p.clave, valor: p.valor };
       p.valor = valor;
+      registrar('admin_parametros', clave, 'update', antes, { clave: p.clave, valor: p.valor });
       return ok({ ...p });
     },
     async parametrosPrecio() {
@@ -388,6 +473,17 @@ export function crearCapaDemo(hoy: string = hoyMexico()): CapaDatos {
     },
     async ultimasVentas(limite = 8) {
       return ok(visibles(ventas).slice(0, limite));
+    },
+    async listarActividad(opts = {}) {
+      if (!sesion) return sinSesion;
+      if (sesion.rol !== 'dueno')
+        return { ok: false, error: 'Sin permiso para ver la actividad.', codigo: 'sin_permiso' };
+      const limite = opts.limite ?? 50;
+      let filas = bitacora;
+      if (opts.tablas && opts.tablas.length > 0) filas = filas.filter((f) => opts.tablas?.includes(f.tabla));
+      const antesDe = opts.antesDe;
+      if (antesDe != null) filas = filas.filter((f) => f.id < antesDe);
+      return ok(filas.slice(0, limite).map((f) => ({ ...f })));
     },
   };
 }

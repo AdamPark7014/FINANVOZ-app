@@ -35,6 +35,9 @@ function capaParcial(parcial: Partial<CapaDatos>): CapaDatos {
     parametrosPrecio: vi.fn(),
     pendientesHoy: vi.fn(),
     ultimasVentas: vi.fn(),
+    listarActividad: vi.fn(),
+    crearProspecto: vi.fn(),
+    crearCliente: vi.fn(),
   };
   return { ...base, ...parcial } as CapaDatos;
 }

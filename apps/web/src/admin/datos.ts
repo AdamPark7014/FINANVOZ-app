@@ -1,7 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../config';
 import { hoyMexico, sumarDias } from '../util/fecha';
+import type { FilaActividad } from './actividadTexto';
 import { crearCapaDemo } from './demo';
+
+export type { FilaActividad } from './actividadTexto';
 
 export type Rol = 'dueno' | 'vendedor';
 
@@ -149,6 +152,12 @@ export interface CapaDatos {
   parametrosPrecio(): Promise<ResultadoDatos<Record<string, number>>>;
   pendientesHoy(): Promise<ResultadoDatos<{ ventasPorVencer: Venta[]; pasosVencidos: Prospecto[] }>>;
   ultimasVentas(limite?: number): Promise<ResultadoDatos<Venta[]>>;
+  listarActividad(opts?: {
+    /** Solo estas tablas (vacío o ausente = todas). */
+    tablas?: string[];
+    antesDe?: number;
+    limite?: number;
+  }): Promise<ResultadoDatos<FilaActividad[]>>;
 }
 
 function num(v: unknown): number {
@@ -483,6 +492,76 @@ export function crearCapaDatos(cliente?: SupabaseClient): CapaDatos {
         .limit(limite);
       if (error) return { ok: false, error: 'No se pudieron cargar las ventas.', codigo: 'red' };
       return { ok: true, datos: (data ?? []).map((r) => mapVenta(r as Record<string, unknown>)) };
+    },
+
+    async listarActividad(opts = {}) {
+      const limite = opts.limite ?? 50;
+      let query = sb
+        .from('admin_bitacora')
+        .select('id, tabla, registro_id, accion, antes, despues, usuario_id, creado_en')
+        .order('id', { ascending: false })
+        .limit(limite);
+      if (opts.tablas && opts.tablas.length > 0) query = query.in('tabla', opts.tablas);
+      if (opts.antesDe != null) query = query.lt('id', opts.antesDe);
+      const { data, error } = await query;
+      if (error) {
+        if (/permission|policy|row-level/i.test(error.message))
+          return { ok: false, error: 'Sin permiso para ver la actividad.', codigo: 'sin_permiso' };
+        return { ok: false, error: 'No se pudo cargar la actividad.', codigo: 'red' };
+      }
+      const filas = (data ?? []) as Array<{
+        id: number;
+        tabla: string;
+        registro_id: string;
+        accion: string;
+        antes: Record<string, unknown> | null;
+        despues: Record<string, unknown> | null;
+        usuario_id: string | null;
+        creado_en: string;
+      }>;
+      const ids = [...new Set(filas.map((f) => f.usuario_id).filter((id): id is string => Boolean(id)))];
+      const nombres = new Map<string, string>();
+      if (ids.length > 0) {
+        const { data: miembros } = await sb
+          .from('admin_miembros')
+          .select('usuario_id, nombre')
+          .in('usuario_id', ids);
+        for (const m of miembros ?? []) {
+          nombres.set(String(m.usuario_id), String(m.nombre ?? ''));
+        }
+      }
+      // La bitácora guarda la venta tal cual (solo `cliente_id`): se agrega el nombre para la frase.
+      const idsCliente = [
+        ...new Set(
+          filas
+            .filter((f) => f.tabla === 'admin_ventas')
+            .map((f) => String((f.despues ?? f.antes)?.cliente_id ?? ''))
+            .filter(Boolean),
+        ),
+      ];
+      if (idsCliente.length > 0) {
+        const { data: cs } = await sb.from('admin_clientes').select('id, nombre').in('id', idsCliente);
+        const porId = new Map((cs ?? []).map((c) => [String(c.id), String(c.nombre ?? '')]));
+        for (const f of filas) {
+          if (f.tabla !== 'admin_ventas' || !f.despues) continue;
+          const nombre = porId.get(String(f.despues.cliente_id ?? ''));
+          if (nombre) f.despues = { ...f.despues, cliente_nombre: nombre };
+        }
+      }
+      return {
+        ok: true,
+        datos: filas.map((f) => ({
+          id: Number(f.id),
+          tabla: f.tabla,
+          registro_id: f.registro_id,
+          accion: f.accion as FilaActividad['accion'],
+          antes: f.antes,
+          despues: f.despues,
+          usuario_id: f.usuario_id,
+          usuario_nombre: f.usuario_id ? (nombres.get(f.usuario_id) ?? '') : '',
+          creado_en: f.creado_en,
+        })),
+      };
     },
   };
 }
