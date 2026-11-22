@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Linking, View } from 'react-native';
 import { exportarCsv, exportarJson, fijarEstadisticas, obtenerCentroPrivacidad } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoTexto, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
+import { Boton, CampoTexto, espacio, Texto, useTema } from '../../ui';
+import { CeldaGrupo, Fila as FilaLista, FilaInterruptor, Grupo, IconoFila } from '../../ui/componentes/Lista';
 import { anunciar } from '../../ui/anunciar';
 import { compartirArchivo } from '../ajustes/compartir';
 import { TarjetaRespaldo } from '../respaldo/TarjetaRespaldo';
@@ -86,6 +87,7 @@ export function CentroPrivacidad({
   alRestaurar: () => void;
 }) {
   const { ctx, refrescar } = useSesion();
+  const { c } = useTema();
   const vista = useVista(obtenerCentroPrivacidad);
   const [exportando, setExportando] = useState<'json' | 'csv' | null>(null);
   const [mensaje, setMensajeBase] = useState<string | null>(null);
@@ -165,207 +167,233 @@ export function CentroPrivacidad({
         {INTRO_PRIVACIDAD}
       </Texto>
 
-      <Tarjeta testID="privacidad-guardado">
-        <Texto testID="privacidad-guardado-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_GUARDADO}
-        </Texto>
+      <Grupo
+        testID="privacidad-guardado"
+        titulo={SECCION_GUARDADO}
+        testIDTitulo="privacidad-guardado-titulo"
+        nota={NOTA_CIFRADO_GUARDADO}
+      >
         {guardadoVacio(g) ? (
-          <Texto testID="privacidad-guardado-vacio" variante="cuerpo" tono="secundario">
-            {TEXTO_GUARDADO_VACIO}
-          </Texto>
+          <CeldaGrupo>
+            <Texto testID="privacidad-guardado-vacio" variante="cuerpo" tono="secundario">
+              {TEXTO_GUARDADO_VACIO}
+            </Texto>
+          </CeldaGrupo>
         ) : (
-          lineasGuardado(g).map((linea) => (
-            <Texto key={linea} variante="cuerpo" accessibilityLabel={etiquetaLineaGuardado(linea)}>
-              {`• ${linea}`}
-            </Texto>
-          ))
+          <CeldaGrupo>
+            {lineasGuardado(g).map((linea) => (
+              <View
+                key={linea}
+                accessible
+                accessibilityLabel={etiquetaLineaGuardado(linea)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: espacio.m,
+                  paddingVertical: espacio.xxs,
+                }}
+              >
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    marginTop: 9,
+                    backgroundColor: c.acentoTexto,
+                  }}
+                />
+                <Texto variante="cuerpo" style={{ flex: 1 }} importantForAccessibility="no">
+                  {linea}
+                </Texto>
+              </View>
+            ))}
+          </CeldaGrupo>
         )}
-        <Texto variante="secundario" tono="secundario">
-          {NOTA_CIFRADO_GUARDADO}
-        </Texto>
-      </Tarjeta>
+      </Grupo>
 
-      <Tarjeta testID="privacidad-sale">
-        <Texto testID="privacidad-sale-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_SALE}
-        </Texto>
+      <Grupo
+        testID="privacidad-sale"
+        titulo={SECCION_SALE}
+        testIDTitulo="privacidad-sale-titulo"
+        nota={NOTA_SERVICIOS_FUERA_MX}
+      >
         {saleDelTelefono().map((s) => (
-          <View key={s.que} style={{ gap: espacio.xs }}>
-            <Texto variante="cuerpo">{s.que}</Texto>
-            <Texto variante="secundario" tono="secundario">
-              {s.quien}
-            </Texto>
-          </View>
+          <FilaLista key={s.que} titulo={s.que} apoyo={s.quien} />
         ))}
-        <Texto variante="secundario" tono="secundario">
-          {NOTA_SERVICIOS_FUERA_MX}
-        </Texto>
-        <Texto variante="cuerpo">{TEXTO_NUNCA_SALEN}</Texto>
-      </Tarjeta>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: espacio.m,
+            paddingHorizontal: espacio.l,
+            paddingVertical: espacio.m,
+          }}
+        >
+          <IconoFila icono="escudo" familia="super" />
+          <Texto variante="cuerpo" style={{ flex: 1, fontWeight: '600' }}>
+            {TEXTO_NUNCA_SALEN}
+          </Texto>
+        </View>
+      </Grupo>
 
-      <Tarjeta testID="privacidad-decisiones">
-        <Texto testID="privacidad-decisiones-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_DECISIONES}
-        </Texto>
-        <Interruptor
+      <Grupo
+        testID="privacidad-decisiones"
+        titulo={SECCION_DECISIONES}
+        testIDTitulo="privacidad-decisiones-titulo"
+      >
+        <FilaInterruptor
           testID="privacidad-estadisticas"
-          etiqueta={ETIQUETA_ESTADISTICAS}
-          descripcion={DESC_ESTADISTICAS}
+          titulo={ETIQUETA_ESTADISTICAS}
+          apoyo={DESC_ESTADISTICAS}
           valor={vista.estadisticas}
           alCambiar={cambiarEstadisticas}
         />
-        <Texto
-          variante="cuerpo"
-          testID="privacidad-captura"
-          accessibilityLabel={etiquetaAccesibleCaptura(vista.captura.activada, vista.captura.apps)}
-        >
-          {textoCaptura(vista.captura.activada, vista.captura.apps)}
-        </Texto>
-        {vista.consentimiento ? (
+        <CeldaGrupo>
           <Texto
-            variante="secundario"
-            tono="secundario"
-            testID="privacidad-consentimiento"
-            accessibilityLabel={etiquetaAccesibleConsentimiento(
-              vista.consentimiento.version,
-              vista.consentimiento.fecha,
-            )}
+            variante="cuerpo"
+            testID="privacidad-captura"
+            accessibilityLabel={etiquetaAccesibleCaptura(vista.captura.activada, vista.captura.apps)}
           >
-            {textoConsentimiento(vista.consentimiento.version, vista.consentimiento.fecha)}
+            {textoCaptura(vista.captura.activada, vista.captura.apps)}
           </Texto>
-        ) : (
-          <Texto variante="secundario" tono="secundario" testID="privacidad-sin-consentimiento">
-            {TEXTO_SIN_CONSENTIMIENTO}
-          </Texto>
-        )}
-      </Tarjeta>
-
-      <Tarjeta testID="privacidad-permisos">
-        <Texto testID="privacidad-permisos-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_PERMISOS}
-        </Texto>
-        {permisosTelefono().map((p) => (
-          <View key={p.nombre} style={{ gap: espacio.xs }}>
-            <Texto variante="cuerpo">{p.nombre}</Texto>
-            <Texto variante="secundario" tono="secundario">
-              {p.para}
+          {vista.consentimiento ? (
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              testID="privacidad-consentimiento"
+              accessibilityLabel={etiquetaAccesibleConsentimiento(
+                vista.consentimiento.version,
+                vista.consentimiento.fecha,
+              )}
+            >
+              {textoConsentimiento(vista.consentimiento.version, vista.consentimiento.fecha)}
             </Texto>
-          </View>
-        ))}
-        <Boton
-          testID="privacidad-ajustes-telefono"
-          variante="secundario"
-          etiqueta={BTN_PERMISOS_TELEFONO}
-          pista={pistaPermisosTelefono()}
-          alPresionar={() => void Linking.openSettings().catch(() => {})}
-        />
-      </Tarjeta>
+          ) : (
+            <Texto variante="secundario" tono="secundario" testID="privacidad-sin-consentimiento">
+              {TEXTO_SIN_CONSENTIMIENTO}
+            </Texto>
+          )}
+        </CeldaGrupo>
+      </Grupo>
 
-      <Tarjeta testID="privacidad-datos">
-        <Texto testID="privacidad-datos-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_DATOS}
-        </Texto>
-        <Texto variante="secundario" tono="secundario">
-          {TEXTO_DESCARGA_GRATIS}
-        </Texto>
-        <Boton
-          testID="privacidad-exportar-json"
-          variante="secundario"
-          etiqueta={BTN_EXPORTAR_JSON}
-          pista={PISTA_EXPORTAR_JSON}
-          cargando={exportando === 'json'}
-          deshabilitado={exportando !== null}
-          alPresionar={() => void exportar('json')}
-        />
-        <Boton
-          testID="privacidad-exportar-csv"
-          variante="secundario"
-          etiqueta={BTN_EXPORTAR_CSV}
-          pista={PISTA_EXPORTAR_CSV}
-          cargando={exportando === 'csv'}
-          deshabilitado={exportando !== null}
-          alPresionar={() => void exportar('csv')}
-        />
-        <Boton
-          testID="privacidad-aviso"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_LEER_AVISO}
-          pista={PISTA_LEER_AVISO}
-          alPresionar={alLeerAviso}
-        />
-        <Boton
-          testID="privacidad-terminos"
-          variante="texto"
-          ancho="contenido"
-          etiqueta={BTN_LEER_TERMINOS}
-          pista={PISTA_LEER_TERMINOS}
-          alPresionar={alLeerTerminos}
-        />
-        <Texto variante="secundario" tono="secundario" accessibilityLabel={etiquetaAccesibleDerechosArco()}>
-          {textoDerechosArco()}
-        </Texto>
-        {mensaje ? (
-          <Texto
-            testID="privacidad-mensaje"
+      <Grupo testID="privacidad-permisos" titulo={SECCION_PERMISOS} testIDTitulo="privacidad-permisos-titulo">
+        {permisosTelefono().map((p) => (
+          <FilaLista key={p.nombre} titulo={p.nombre} apoyo={p.para} />
+        ))}
+        <CeldaGrupo>
+          <Boton
+            testID="privacidad-ajustes-telefono"
             variante="secundario"
-            tono="faltante"
-            accessibilityRole="alert"
-            accessibilityLiveRegion="polite"
-          >
-            {mensaje}
+            etiqueta={BTN_PERMISOS_TELEFONO}
+            pista={pistaPermisosTelefono()}
+            alPresionar={() => void Linking.openSettings().catch(() => {})}
+          />
+        </CeldaGrupo>
+      </Grupo>
+
+      <Grupo testID="privacidad-datos" titulo={SECCION_DATOS} testIDTitulo="privacidad-datos-titulo">
+        <CeldaGrupo>
+          <Texto variante="secundario" tono="secundario">
+            {TEXTO_DESCARGA_GRATIS}
           </Texto>
-        ) : null}
-      </Tarjeta>
+          <Boton
+            testID="privacidad-exportar-json"
+            variante="secundario"
+            etiqueta={BTN_EXPORTAR_JSON}
+            pista={PISTA_EXPORTAR_JSON}
+            cargando={exportando === 'json'}
+            deshabilitado={exportando !== null}
+            alPresionar={() => void exportar('json')}
+          />
+          <Boton
+            testID="privacidad-exportar-csv"
+            variante="secundario"
+            etiqueta={BTN_EXPORTAR_CSV}
+            pista={PISTA_EXPORTAR_CSV}
+            cargando={exportando === 'csv'}
+            deshabilitado={exportando !== null}
+            alPresionar={() => void exportar('csv')}
+          />
+          <Boton
+            testID="privacidad-aviso"
+            variante="texto"
+            ancho="contenido"
+            etiqueta={BTN_LEER_AVISO}
+            pista={PISTA_LEER_AVISO}
+            alPresionar={alLeerAviso}
+          />
+          <Boton
+            testID="privacidad-terminos"
+            variante="texto"
+            ancho="contenido"
+            etiqueta={BTN_LEER_TERMINOS}
+            pista={PISTA_LEER_TERMINOS}
+            alPresionar={alLeerTerminos}
+          />
+          <Texto variante="secundario" tono="secundario" accessibilityLabel={etiquetaAccesibleDerechosArco()}>
+            {textoDerechosArco()}
+          </Texto>
+          {mensaje ? (
+            <Texto
+              testID="privacidad-mensaje"
+              variante="secundario"
+              tono="faltante"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+            >
+              {mensaje}
+            </Texto>
+          ) : null}
+        </CeldaGrupo>
+      </Grupo>
 
       <TarjetaRespaldo alRestaurar={alRestaurar} />
 
-      <Tarjeta testID="privacidad-borrar">
-        <Texto testID="privacidad-borrar-titulo" variante="subtitulo" accessibilityRole="header">
-          {SECCION_BORRAR}
-        </Texto>
-        {confirmando ? (
-          <>
-            <Texto variante="cuerpo">{TEXTO_BORRAR_ADVERTENCIA}</Texto>
-            <CampoTexto
-              testID="privacidad-borrar-palabra"
-              etiqueta={etiquetaConfirmarBorrar()}
-              valor={palabra}
-              alCambiar={setPalabra}
-              nativo={{ autoCapitalize: 'characters', autoCorrect: false }}
-            />
+      <Grupo testID="privacidad-borrar" titulo={SECCION_BORRAR} testIDTitulo="privacidad-borrar-titulo">
+        <CeldaGrupo>
+          {confirmando ? (
+            <>
+              <Texto variante="cuerpo">{TEXTO_BORRAR_ADVERTENCIA}</Texto>
+              <CampoTexto
+                testID="privacidad-borrar-palabra"
+                etiqueta={etiquetaConfirmarBorrar()}
+                valor={palabra}
+                alCambiar={setPalabra}
+                nativo={{ autoCapitalize: 'characters', autoCorrect: false }}
+              />
+              <Boton
+                testID="privacidad-borrar-confirmar"
+                etiqueta={BTN_BORRAR_CONFIRMAR}
+                pista={PISTA_BORRAR_CONFIRMAR}
+                deshabilitado={palabra.trim().toUpperCase() !== PALABRA_BORRAR}
+                cargando={borrando}
+                alPresionar={() => {
+                  setBorrando(true);
+                  void alBorrarTodo();
+                }}
+              />
+              <Boton
+                testID="privacidad-borrar-cancelar"
+                variante="texto"
+                etiqueta={BTN_CANCELAR}
+                pista={PISTA_BORRAR_CANCELAR}
+                alPresionar={() => {
+                  setConfirmando(false);
+                  setPalabra('');
+                }}
+              />
+            </>
+          ) : (
             <Boton
-              testID="privacidad-borrar-confirmar"
-              etiqueta={BTN_BORRAR_CONFIRMAR}
-              pista={PISTA_BORRAR_CONFIRMAR}
-              deshabilitado={palabra.trim().toUpperCase() !== PALABRA_BORRAR}
-              cargando={borrando}
-              alPresionar={() => {
-                setBorrando(true);
-                void alBorrarTodo();
-              }}
+              testID="privacidad-borrar-iniciar"
+              variante="secundario"
+              etiqueta={BTN_BORRAR_INICIAR}
+              pista={PISTA_BORRAR_INICIAR}
+              alPresionar={() => setConfirmando(true)}
             />
-            <Boton
-              testID="privacidad-borrar-cancelar"
-              variante="texto"
-              etiqueta={BTN_CANCELAR}
-              pista={PISTA_BORRAR_CANCELAR}
-              alPresionar={() => {
-                setConfirmando(false);
-                setPalabra('');
-              }}
-            />
-          </>
-        ) : (
-          <Boton
-            testID="privacidad-borrar-iniciar"
-            variante="secundario"
-            etiqueta={BTN_BORRAR_INICIAR}
-            pista={PISTA_BORRAR_INICIAR}
-            alPresionar={() => setConfirmando(true)}
-          />
-        )}
-      </Tarjeta>
+          )}
+        </CeldaGrupo>
+      </Grupo>
     </View>
   );
 }

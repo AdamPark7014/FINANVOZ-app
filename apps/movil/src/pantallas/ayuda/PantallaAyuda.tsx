@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
-import { Boton, espacio, OBJETIVO_TACTIL_MIN, Tarjeta, Texto, useTema } from '../../ui';
+import { Boton, espacio, Icono, Tarjeta, Texto, useTema } from '../../ui';
+import { Grupo } from '../../ui/componentes/Lista';
+import { animarDisposicion } from '../../ui/transicion';
 import { anunciar } from '../../ui/anunciar';
 import { CORREO_AYUDA, enlaceCorreoAyuda, preguntasFrecuentes } from './preguntas';
 import {
@@ -14,8 +16,6 @@ import {
   etiquetaAccesibleSinAppCorreo,
   ETIQUETA_VOLVER,
   etiquetaAccesibleIntro,
-  ICONO_PREGUNTA_ABIERTA,
-  ICONO_PREGUNTA_CERRADA,
   INTRO,
   mensajeSinAppCorreo,
   PISTA_ESCRIBIR_CORREO,
@@ -83,19 +83,30 @@ export function PantallaAyuda({
       >
         {INTRO}
       </Texto>
-      <Texto variante="subtitulo" testID="ayuda-preguntas-titulo" accessibilityRole="header">
+      <Texto
+        variante="etiqueta"
+        tono="secundario"
+        testID="ayuda-preguntas-titulo"
+        accessibilityRole="header"
+        style={{ paddingHorizontal: espacio.xs }}
+      >
         {PREGUNTAS_TITULO}
       </Texto>
 
-      <View style={{ gap: espacio.s }} testID="ayuda-preguntas" accessibilityRole="list">
-        {preguntasFrecuentes().map((p) => (
-          <Pregunta
-            key={p.id}
-            p={p}
-            abierta={abierta === p.id}
-            alTocar={() => setAbierta((a) => (a === p.id ? null : p.id))}
-          />
-        ))}
+      <View testID="ayuda-preguntas" accessibilityRole="list" style={{ marginTop: -espacio.m }}>
+        <Grupo>
+          {preguntasFrecuentes().map((p) => (
+            <Pregunta
+              key={p.id}
+              p={p}
+              abierta={abierta === p.id}
+              alTocar={() => {
+                animarDisposicion();
+                setAbierta((a) => (a === p.id ? null : p.id));
+              }}
+            />
+          ))}
+        </Grupo>
       </View>
 
       <Tarjeta testID="ayuda-contacto">
@@ -113,7 +124,7 @@ export function PantallaAyuda({
         </Texto>
         <Boton
           testID="ayuda-escribir"
-          variante="secundario"
+          variante="primario"
           etiqueta={BTN_ESCRIBIR_CORREO}
           etiquetaAccesible={ACCESIBILIDAD_ESCRIBIR_CORREO}
           pista={PISTA_ESCRIBIR_CORREO}
@@ -141,7 +152,7 @@ export function PantallaAyuda({
 function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: boolean; alTocar: () => void }) {
   const { c } = useTema();
   return (
-    <Tarjeta testID={`ayuda-${p.id}`}>
+    <View testID={`ayuda-${p.id}`}>
       <Pressable
         testID={`ayuda-pregunta-${p.id}`}
         onPress={alTocar}
@@ -150,30 +161,44 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
         accessibilityHint={pistaPreguntaFrecuente(abierta)}
         accessibilityState={{ expanded: abierta }}
         style={({ pressed }) => ({
-          minHeight: OBJETIVO_TACTIL_MIN,
+          minHeight: 56,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: espacio.s,
-          opacity: pressed ? 0.85 : 1,
+          gap: espacio.m,
+          paddingHorizontal: espacio.l,
+          paddingVertical: espacio.m,
+          backgroundColor: pressed ? c.superficieAlterna : 'transparent',
         })}
       >
         <View style={{ flex: 1 }}>
-          <Texto variante="cuerpoFuerte" importantForAccessibility="no">
+          <Texto variante="cuerpo" style={{ fontWeight: '600' }} importantForAccessibility="no">
             {p.pregunta}
           </Texto>
         </View>
-        <Texto
-          variante="cuerpoFuerte"
-          style={{ color: c.acentoTexto }}
+        <View
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            backgroundColor: abierta ? c.iconoFondo : 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: [{ rotate: abierta ? '180deg' : '0deg' }],
+          }}
         >
-          {abierta ? ICONO_PREGUNTA_ABIERTA : ICONO_PREGUNTA_CERRADA}
-        </Texto>
+          <Icono
+            nombre="chevronAbajo"
+            color={abierta ? c.acentoTexto : c.textoSecundario}
+            tamano={18}
+            grosor={2.2}
+          />
+        </View>
       </Pressable>
       {abierta ? (
         <View
-          style={{ gap: espacio.s }}
+          style={{ gap: espacio.s, paddingHorizontal: espacio.l, paddingBottom: espacio.l }}
           testID={`ayuda-respuesta-${p.id}`}
           accessibilityLiveRegion="polite"
           importantForAccessibility="yes"
@@ -182,6 +207,7 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
             <Texto
               key={parrafo}
               variante="cuerpo"
+              tono="secundario"
               accessibilityLabel={etiquetaAccesibleParrafoRespuesta(parrafo, i === 0)}
             >
               {parrafo}
@@ -189,6 +215,6 @@ function Pregunta({ p, abierta, alTocar }: { p: PreguntaFrecuente; abierta: bool
           ))}
         </View>
       ) : null}
-    </Tarjeta>
+    </View>
   );
 }

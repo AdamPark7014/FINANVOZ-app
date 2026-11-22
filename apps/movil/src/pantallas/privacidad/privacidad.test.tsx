@@ -127,7 +127,7 @@ describe('centro de privacidad (RF-PRI-03, 02 §12)', () => {
   it('dice qué se guarda, qué sale y a quién, y qué permisos usa', () => {
     renderRouter(RUTAS, { initialUrl: '/privacidad' });
     expect(screen.getByTestId('privacidad-guardado')).toHaveTextContent(/1 cuenta/);
-    expect(screen.getByTestId('privacidad-guardado')).toHaveTextContent(/1 movimiento\b/);
+    expect(screen.getByTestId('privacidad-guardado')).toHaveTextContent(/1 movimiento(?!s)/);
     const sale = screen.getByTestId('privacidad-sale');
     for (const quien of [
       'Supabase',
