@@ -504,3 +504,140 @@
   color: var(--color-texto);
   line-height: 1.45;
 }
+
+/* ——— Pulido 22-11 ——— */
+
+/* En celular la barra de arriba no se estira aunque el módulo sea corto (antes dejaba una franja en blanco). */
+@media (max-width: 899px) {
+  .admin {
+    display: block;
+  }
+  .admin-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+.admin-main > * {
+  animation: admin-entra 220ms ease-out both;
+}
+@keyframes admin-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.modulo-cabecera h1 {
+  font-size: 30px;
+  letter-spacing: -0.025em;
+}
+.panel,
+.tira {
+  box-shadow: var(--sombra-suave);
+}
+
+/* Tablas: todo centrado en su renglón, el nombre con más peso y el renglón responde al cursor. */
+.tabla th {
+  font-size: 13px;
+  padding-top: 12px;
+  padding-bottom: 10px;
+}
+.tabla td {
+  vertical-align: middle;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  transition: background var(--movimiento);
+}
+.tabla tbody td:first-child {
+  font-weight: 500;
+}
+.tabla tbody td:first-child .meta,
+.tabla tbody td:first-child .meta-movil {
+  font-weight: 400;
+  margin-top: 2px;
+}
+.tabla tbody tr:hover td {
+  background: var(--color-superficie-alterna);
+}
+.tabla .modulo-acciones {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+@media (max-width: 719px) {
+  .tabla .modulo-acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tabla td {
+    vertical-align: top;
+  }
+}
+
+.pestana {
+  transition:
+    background var(--movimiento),
+    border-color var(--movimiento);
+}
+.pestana:hover {
+  border-color: var(--color-borde-control);
+}
+.buscador:focus,
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.barra > span {
+  transition: width 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.cifra-valor {
+  letter-spacing: -0.02em;
+}
+
+/* Actividad: inicial de quien lo hizo, la frase y el cuándo a la derecha. */
+.lista-actividad li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+}
+.lista-actividad p {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+}
+.actividad-inicial {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-acento-suave);
+  color: var(--color-acento-oscuro);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.actividad-cuando {
+  flex: none;
+  font-size: 13px;
+  color: var(--color-terciario);
+  white-space: nowrap;
+}
+@media (max-width: 719px) {
+  .lista-actividad li {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+  .actividad-cuando {
+    flex-basis: 100%;
+    padding-left: 40px;
+    margin-top: -6px;
+  }
+}

@@ -9,7 +9,7 @@ const LINKS: { id: string; etiqueta: string; soloDueno?: boolean }[] = [
   { id: 'prospectos', etiqueta: 'Prospectos' },
   { id: 'clientes', etiqueta: 'Clientes' },
   { id: 'ventas', etiqueta: 'Ventas' },
-  { id: 'vendedores', etiqueta: 'Vendedores y comisiones' },
+  { id: 'vendedores', etiqueta: 'Vendedores' },
   { id: 'ajustes', etiqueta: 'Ajustes', soloDueno: true },
   { id: 'actividad', etiqueta: 'Actividad', soloDueno: true },
 ];

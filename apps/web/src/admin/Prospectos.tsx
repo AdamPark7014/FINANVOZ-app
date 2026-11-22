@@ -181,7 +181,7 @@ export function Prospectos({
                             className="btn btn-texto btn-texto-gris btn-control"
                             onClick={() => void mover(p, 'perdido')}
                           >
-                            Perdido
+                            Marcar perdido
                           </button>
                         ) : null}
                         {sig ? (

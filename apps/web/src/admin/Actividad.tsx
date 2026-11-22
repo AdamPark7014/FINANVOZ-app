@@ -86,11 +86,22 @@ export function Actividad({ datos, sesion }: { datos: CapaDatos; sesion: SesionA
       ) : (
         <section className="panel" aria-label="Movimientos">
           <ul className="lista-actividad">
-            {filas.map((f) => (
-              <li key={f.id}>
-                <p>{describirActividad(f)}</p>
-              </li>
-            ))}
+            {filas.map((f) => {
+              // «Quién hizo qué · cuándo»: el cuándo va aparte, a la derecha, para leer la columna de un vistazo.
+              const frase = describirActividad(f);
+              const corte = frase.lastIndexOf(' · ');
+              const que = corte > 0 ? frase.slice(0, corte) : frase;
+              const cuando = corte > 0 ? frase.slice(corte + 3) : '';
+              return (
+                <li key={f.id}>
+                  <span className="actividad-inicial" aria-hidden="true">
+                    {(f.usuario_nombre.trim()[0] ?? '·').toUpperCase()}
+                  </span>
+                  <p>{que}</p>
+                  {cuando ? <span className="actividad-cuando num">{cuando}</span> : null}
+                </li>
+              );
+            })}
           </ul>
           {hayMas ? (
             <div className="panel-cuerpo">
