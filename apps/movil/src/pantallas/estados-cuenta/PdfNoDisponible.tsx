@@ -8,6 +8,7 @@ import {
   PISTA_VOLVER_PDF,
   TITULO_PANTALLA,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /** ¿Este teléfono lee estados de cuenta en PDF? Solo Android tiene el lector (`07 §8`, M15). */
 export const leePdfEnEsteTelefono = (): boolean => Platform.OS === 'android';
@@ -29,7 +30,7 @@ export function PdfNoDisponible({ alVolver, texto }: { alVolver: () => void; tex
         alPresionar={alVolver}
         pista={PISTA_VOLVER_PDF}
       />
-      <Texto variante="titulo" accessibilityRole="header">
+      <Texto variante="titulo" accessibilityRole="header" style={ESTILO_TITULO_PANTALLA}>
         {TITULO_PANTALLA}
       </Texto>
       <Texto

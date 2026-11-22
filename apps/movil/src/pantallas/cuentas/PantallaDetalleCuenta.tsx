@@ -3,7 +3,21 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { corregirSaldoCuenta, detalleCuentaPropia } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, CampoMonto, Cifra, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import {
+  Boton,
+  CampoMonto,
+  Cifra,
+  coloresCuenta,
+  espacio,
+  EstadoVacio,
+  Icono,
+  Pantalla,
+  radio,
+  sombra,
+  Tarjeta,
+  Texto,
+  useTema,
+} from '../../ui';
 import { etiquetaContarEnCuenta, TITULO as TITULO_CONTAR_EFECTIVO } from '../arqueo/textos';
 import { conAnuncio, Encabezado, MensajeEnLinea } from './Encabezado';
 import {
@@ -110,20 +124,9 @@ export function PantallaDetalleCuenta({
         ) : null}
       </Encabezado>
 
+      <PlacaSaldo efectivo={c.subtipo === 'efectivo'} centavos={c.saldo} nombre={c.nombre} />
+
       <Tarjeta testID="cuenta-detalle-saldo-tarjeta">
-        <Texto
-          variante="etiqueta"
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {ETIQUETA_TIENES}
-        </Texto>
-        <Cifra
-          centavos={c.saldo}
-          tamano="grande"
-          contexto={`En ${c.nombre} tienes`}
-          testID="cuenta-detalle-saldo"
-        />
         {c.corregible ? (
           corrigiendo ? (
             <View style={{ gap: espacio.s }}>
@@ -195,5 +198,64 @@ export function PantallaDetalleCuenta({
         alPresionar={() => alVerMovimientos(c.id)}
       />
     </Pantalla>
+  );
+}
+
+/** La placa del saldo con el color de la cuenta (efectivo menta, débito azul; `D6`), con el anillo de adorno. */
+function PlacaSaldo({
+  efectivo,
+  centavos,
+  nombre,
+}: {
+  efectivo: boolean;
+  centavos: Centavos;
+  nombre: string;
+}) {
+  const { esquema } = useTema();
+  const p = coloresCuenta[esquema][efectivo ? 'efectivo' : 'debito'];
+  return (
+    <View
+      testID="cuenta-detalle-placa"
+      style={{
+        backgroundColor: p.fondo,
+        borderRadius: radio.xl,
+        padding: espacio.xl,
+        gap: espacio.s,
+        overflow: 'hidden',
+        ...sombra.tarjeta[esquema],
+      }}
+    >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          position: 'absolute',
+          right: -60,
+          top: -60,
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          borderWidth: 28,
+          borderColor: p.adorno,
+        }}
+      />
+      <View
+        style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.s }}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
+        <Icono nombre={efectivo ? 'billete' : 'banco'} color={p.textoSecundario} tamano={18} grosor={2} />
+        <Texto variante="etiqueta" style={{ color: p.textoSecundario }}>
+          {ETIQUETA_TIENES}
+        </Texto>
+      </View>
+      <Cifra
+        centavos={centavos}
+        tamano="heroe"
+        contexto={`En ${nombre} tienes`}
+        testID="cuenta-detalle-saldo"
+        style={{ color: p.texto, fontWeight: '300', letterSpacing: -1 }}
+      />
+    </View>
   );
 }

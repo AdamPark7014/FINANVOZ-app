@@ -42,6 +42,7 @@ import { obtenerRespaldoNube } from '../src/servicios';
 import { useControlApp } from '../src/sesion/ControlApp';
 import { useVista } from '../src/sesion/ProveedorSesion';
 import { Boton, espacio, FilaAjuste, Pantalla, Tarjeta, Texto } from '../src/ui';
+import { Grupo, TituloPantalla } from '../src/ui/componentes/Lista';
 import { BarraNativa } from '../src/ui/navegacion';
 
 const TOQUES_MENU_DEV = 7;
@@ -87,73 +88,84 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
         bordes={enPestana ? ['left', 'right', 'bottom'] : ['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Texto testID="ajustes-titulo" variante="titulo" accessibilityRole="header">
-          {enPestana ? 'Tú' : TITULO}
-        </Texto>
-        {enPestana ? (
-          <Texto variante="secundario" tono="secundario">
-            Tu ingreso, la app y tu privacidad.
-          </Texto>
-        ) : null}
+        <TituloPantalla
+          testID="ajustes-titulo"
+          titulo={enPestana ? 'Tú' : TITULO}
+          bajada={enPestana ? 'Tu ingreso, la app y tu privacidad.' : null}
+        />
 
-        <Grupo titulo={GRUPO_DINERO} />
-        <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
-        <SeccionColchon />
-        <SeccionDatosCobro />
+        <TituloGrupo titulo={GRUPO_DINERO} />
+        <Grupo sangria>
+          <SeccionIngreso alCambiar={() => router.push('/ajustes/ingreso')} />
+          <SeccionColchon />
+          <SeccionDatosCobro />
+        </Grupo>
 
-        <Grupo titulo={GRUPO_APP} />
+        <TituloGrupo titulo={GRUPO_APP} />
         <SeccionVoz />
         <SeccionAvisos />
         <SeccionCaptura />
         <SeccionWidget />
-        <SeccionApariencia />
+        <Grupo sangria>
+          <SeccionApariencia />
+        </Grupo>
 
-        <Grupo titulo={GRUPO_SEGURIDAD} />
+        <TituloGrupo titulo={GRUPO_SEGURIDAD} />
         <SeccionBloqueo />
-
-        <View testID="ajustes-respaldo">
+        <Grupo sangria>
+          <View testID="ajustes-respaldo">
+            <FilaAjuste
+              testID="ajustes-abrir-respaldo"
+              icono="nube"
+              familia="transporte"
+              titulo={SECCION_RESPALDO}
+              valor={respaldo.textoUltimo}
+              tonoValor={respaldo.pendiente ? 'faltante' : 'secundario'}
+              pista={PISTA_RESPALDO}
+              alPresionar={() => router.push('/respaldo')}
+            />
+          </View>
           <FilaAjuste
-            testID="ajustes-abrir-respaldo"
-            titulo={SECCION_RESPALDO}
-            valor={respaldo.textoUltimo}
-            tonoValor={respaldo.pendiente ? 'faltante' : 'secundario'}
-            pista={PISTA_RESPALDO}
-            alPresionar={() => router.push('/respaldo')}
+            testID="ajustes-privacidad"
+            icono="candado"
+            familia="casa"
+            titulo={SECCION_PRIVACIDAD}
+            valor={TEXTO_PRIVACIDAD}
+            pista={PISTA_PRIVACIDAD}
+            alPresionar={() => router.push('/privacidad')}
           />
-        </View>
+        </Grupo>
 
-        <FilaAjuste
-          testID="ajustes-privacidad"
-          titulo={SECCION_PRIVACIDAD}
-          valor={TEXTO_PRIVACIDAD}
-          pista={PISTA_PRIVACIDAD}
-          alPresionar={() => router.push('/privacidad')}
-        />
-
-        <Grupo titulo={GRUPO_AYUDA} />
+        <TituloGrupo titulo={GRUPO_AYUDA} />
         <SeccionPlan alAbrirPlan={() => router.push('/plan')} />
-        <FilaAjuste
-          testID="ajustes-abrir-ayuda"
-          titulo={SECCION_AYUDA}
-          valor={TEXTO_AYUDA}
-          pista={PISTA_AYUDA}
-          alPresionar={() => router.push('/ayuda')}
-        />
-
-        {/* El aviso legal va completo y fuera de la fila: se ve entero y el lector de pantalla lo lee (`08`). */}
-        <View testID="ajustes-acerca" style={{ gap: espacio.s }}>
-          <Texto variante="subtitulo" accessibilityRole="header">
-            {SECCION_ACERCA}
-          </Texto>
-          <Texto variante="secundario" tono="secundario" testID="ajustes-no-asesoria">
-            {TEXTO_NO_ASESORIA}
-          </Texto>
+        <Grupo sangria>
+          <FilaAjuste
+            testID="ajustes-abrir-ayuda"
+            icono="pregunta"
+            familia="salidas"
+            titulo={SECCION_AYUDA}
+            valor={TEXTO_AYUDA}
+            pista={PISTA_AYUDA}
+            alPresionar={() => router.push('/ayuda')}
+          />
           <FilaAjuste
             testID="ajustes-terminos"
+            icono="documento"
+            familia="otros"
             titulo={BTN_TERMINOS}
             pista={PISTA_TERMINOS}
             alPresionar={() => router.push('/terminos')}
           />
+        </Grupo>
+
+        {/* El aviso legal va completo y fuera de la fila: se ve entero y el lector de pantalla lo lee (`08`). */}
+        <View testID="ajustes-acerca" style={{ gap: espacio.xs, paddingHorizontal: espacio.xs }}>
+          <Texto variante="etiqueta" tono="secundario" accessibilityRole="header">
+            {SECCION_ACERCA}
+          </Texto>
+          <Texto variante="pequeno" tono="secundario" testID="ajustes-no-asesoria">
+            {TEXTO_NO_ASESORIA}
+          </Texto>
         </View>
 
         <Pressable
@@ -182,10 +194,14 @@ export function PantallaAjustes({ enPestana = false }: { enPestana?: boolean }) 
   );
 }
 
-/** Encabezado de un grupo de Ajustes (`02 §12`): separa lo de tu dinero, la app, la seguridad y la ayuda. */
-function Grupo({ titulo }: { titulo: string }) {
+/** Encabezado de uno de los cuatro grupos de Ajustes (`02 §12`): lo de tu dinero, la app, la seguridad y la ayuda. */
+function TituloGrupo({ titulo }: { titulo: string }) {
   return (
-    <Texto variante="etiqueta" tono="acento" accessibilityRole="header" style={{ marginTop: espacio.s }}>
+    <Texto
+      variante="subtitulo"
+      accessibilityRole="header"
+      style={{ marginTop: espacio.m, marginBottom: -espacio.s, fontWeight: '700', letterSpacing: -0.2 }}
+    >
       {titulo}
     </Texto>
   );

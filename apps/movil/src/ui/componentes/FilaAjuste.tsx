@@ -1,8 +1,9 @@
-import { View } from 'react-native';
-import { etiquetaHablada } from '../formato';
-import { espacio } from '../tokens';
-import { Tarjeta } from './Tarjeta';
-import { Texto, type TonoTexto } from './Texto';
+import type { FamiliaCategoria } from '../tokens';
+import type { NombreIcono } from './Iconos';
+import { etiquetaFilaAjuste, Fila } from './Lista';
+import type { TonoTexto } from './Texto';
+
+export { etiquetaFilaAjuste };
 
 export interface FilaAjusteProps {
   readonly titulo: string;
@@ -20,20 +21,14 @@ export interface FilaAjusteProps {
   readonly tituloEsEncabezado?: boolean;
   /** Si no se pasa, el lector de pantalla lee título y valor completos. */
   readonly etiquetaAccesible?: string;
+  /** Mosaico de color a la izquierda (pase de pulido, 22-11). */
+  readonly icono?: NombreIcono;
+  readonly familia?: FamiliaCategoria;
 }
 
 /**
- * Lo que lee el lector de pantalla: título, valor y (si se da) la acción, sin el chevron. El valor va completo
- * (quien no ve la pantalla oye lo mismo que se ve) y las cifras en palabras (`02 §15`).
- */
-export function etiquetaFilaAjuste(titulo: string, valor?: string | null, accion?: string): string {
-  const limpio = valor?.trim().replace(/[.\s]+$/, '');
-  return etiquetaHablada([titulo, limpio, accion].filter((p): p is string => Boolean(p)).join('. '));
-}
-
-/**
- * Fila de Ajustes estilo lista (`PLAN-UX-VOZ` §3.6): título, valor opcional y ›.
- * El chevron es decorativo; la pista y la etiqueta llevan el significado. El valor no se trunca (CA-M7-05).
+ * Fila de Ajustes (`PLAN-UX-VOZ` §3.6) dentro de un `Grupo`: mosaico, título, valor debajo y chevron. El chevron es
+ * decorativo; la pista y la etiqueta llevan el significado. El valor no se trunca (CA-M7-05).
  */
 export function FilaAjuste({
   titulo,
@@ -46,37 +41,24 @@ export function FilaAjuste({
   testIDValor,
   tituloEsEncabezado = false,
   etiquetaAccesible,
+  icono,
+  familia,
 }: FilaAjusteProps) {
   const valorLimpio = valor?.trim() ? valor.trim() : null;
-  const etiqueta = etiquetaAccesible ?? etiquetaFilaAjuste(titulo, valorLimpio);
   return (
-    <Tarjeta testID={testID} alPresionar={alPresionar} etiquetaAccesible={etiqueta} pista={pista}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: espacio.m,
-          minHeight: espacio.xxxl,
-        }}
-      >
-        <View style={{ flex: 1, gap: espacio.xs }}>
-          <Texto
-            variante="subtitulo"
-            {...(tituloEsEncabezado ? { accessibilityRole: 'header' as const } : {})}
-            {...(testIDTitulo ? { testID: testIDTitulo } : {})}
-          >
-            {titulo}
-          </Texto>
-          {valorLimpio ? (
-            <Texto variante="secundario" tono={tonoValor} {...(testIDValor ? { testID: testIDValor } : {})}>
-              {valorLimpio}
-            </Texto>
-          ) : null}
-        </View>
-        <Texto variante="titulo" tono="secundario" accessibilityElementsHidden importantForAccessibility="no">
-          ›
-        </Texto>
-      </View>
-    </Tarjeta>
+    <Fila
+      testID={testID}
+      titulo={titulo}
+      apoyo={valorLimpio}
+      tonoApoyo={tonoValor}
+      alPresionar={alPresionar}
+      pista={pista}
+      tituloEncabezado={tituloEsEncabezado}
+      etiquetaAccesible={etiquetaAccesible ?? etiquetaFilaAjuste(titulo, valorLimpio)}
+      {...(icono ? { icono } : {})}
+      {...(familia ? { familia } : {})}
+      {...(testIDTitulo ? { testIDTitulo } : {})}
+      {...(testIDValor ? { testIDApoyo: testIDValor } : {})}
+    />
   );
 }

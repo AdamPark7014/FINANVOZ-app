@@ -30,10 +30,13 @@ import {
   Icono,
   Mosaico,
   Pantalla,
+  radio,
   Tarjeta,
   Texto,
   useTema,
 } from '../../ui';
+import { AccionPildora, DatoFila } from '../../ui/componentes/Lista';
+import { animarDisposicion } from '../../ui/transicion';
 import { PorRevisarCapturas } from '../captura/PorRevisarCapturas';
 import { leerEntero } from '../onboarding/ingreso';
 import { capitalizar } from '../onboarding/pagos-fijos';
@@ -560,7 +563,10 @@ export function PantallaMovimientos({
               aMeses={conTarjeta.has(m.id)}
               {...(alAbrirPersona ? { alAbrirPersona } : {})}
               alAbrirDetalle={(id) => setAbierto(id)}
-              alTocar={() => setAbierto((a) => (a === m.id ? null : m.id))}
+              alTocar={() => {
+                animarDisposicion();
+                setAbierto((a) => (a === m.id ? null : m.id));
+              }}
               alCerrar={() => setAbierto(null)}
               alAnular={() => {
                 try {
@@ -767,38 +773,51 @@ function FilaMovimiento({
       )}
       {abierto ? (
         <View
-          style={{
-            gap: espacio.s,
-            marginTop: espacio.xs,
-            paddingTop: espacio.m,
-            borderTopWidth: 1,
-            borderTopColor: c.borde,
-          }}
+          style={{ gap: espacio.m, marginTop: espacio.xs, paddingBottom: espacio.s }}
           testID={`detalle-${m.id}`}
         >
-          {m.saleDe.length > 0 ? (
-            <Texto variante="secundario">{`Salió de: ${m.saleDe.join(', ')}`}</Texto>
+          {/* Los datos en un panel hundido, en dos columnas, como la hoja de un recibo. */}
+          <View
+            style={{
+              gap: espacio.xs,
+              padding: espacio.m,
+              borderRadius: radio.m,
+              backgroundColor: c.fondo,
+            }}
+          >
+            {m.saleDe.length > 0 ? <DatoFila etiqueta="Salió de" valor={m.saleDe.join(', ')} /> : null}
+            {m.llegaA.length > 0 ? <DatoFila etiqueta="Llegó a" valor={m.llegaA.join(', ')} /> : null}
+            {m.categoria ? <DatoFila etiqueta="Categoría" valor={m.categoria} /> : null}
+            {alAbrirPersona
+              ? m.personas.map((p) => (
+                  <Boton
+                    key={p.id}
+                    etiqueta={`Ver ${p.nombre}`}
+                    variante="texto"
+                    ancho="contenido"
+                    alPresionar={() => alAbrirPersona(p.id)}
+                    testID={`movimiento-persona-${m.id}-${p.id}`}
+                  />
+                ))
+              : null}
+            {m.reemplazaA ? <Historial id={m.id} /> : null}
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.xs, marginTop: espacio.xs }}
+            >
+              <Icono nombre="reloj" color={c.textoSecundario} tamano={14} />
+              <Texto variante="secundario" tono="secundario" style={{ fontSize: 13, lineHeight: 18 }}>
+                {`${NOMBRE_ORIGEN[m.origen] ?? 'Registrado'} · ${etiquetaDiaMes(m.fecha)}`}
+              </Texto>
+            </View>
+          </View>
+          {m.tipo === 'gasto' && m.extraordinaria ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.xs }}>
+              <Icono nombre="destello" color={c.textoSecundario} tamano={14} />
+              <Texto variante="secundario" tono="secundario" testID="nota-extraordinario">
+                Lo marcaste como extraordinario
+              </Texto>
+            </View>
           ) : null}
-          {m.llegaA.length > 0 ? (
-            <Texto variante="secundario">{`Llegó a: ${m.llegaA.join(', ')}`}</Texto>
-          ) : null}
-          {alAbrirPersona
-            ? m.personas.map((p) => (
-                <Boton
-                  key={p.id}
-                  etiqueta={`Ver ${p.nombre}`}
-                  variante="texto"
-                  ancho="contenido"
-                  alPresionar={() => alAbrirPersona(p.id)}
-                  testID={`movimiento-persona-${m.id}-${p.id}`}
-                />
-              ))
-            : null}
-          {m.categoria ? <Texto variante="secundario">{`Categoría: ${m.categoria}`}</Texto> : null}
-          {m.reemplazaA ? <Historial id={m.id} /> : null}
-          <Texto variante="secundario" tono="secundario">
-            {`${NOMBRE_ORIGEN[m.origen] ?? 'Registrado'} · ${etiquetaDiaMes(m.fecha)}`}
-          </Texto>
           {pasando ? (
             <PasarAMeses m={m} alTerminar={() => setPasando(false)} alAbrirDetalle={alAbrirDetalle} />
           ) : null}
@@ -813,53 +832,17 @@ function FilaMovimiento({
               alCancelar={() => setCorrigiendo(false)}
             />
           ) : null}
-          {esCorregible(m) && !ocupado ? (
-            <Boton
-              etiqueta={BTN_CORREGIR_MOVIMIENTO}
-              variante="secundario"
-              ancho="contenido"
-              alPresionar={() => setCorrigiendo(true)}
-              pista={PISTA_CORREGIR_MOVIMIENTO}
-              testID="boton-corregir"
-            />
-          ) : null}
-          {aMeses && !ocupado ? (
-            <Boton
-              etiqueta="Pasar a meses"
-              variante="secundario"
-              ancho="contenido"
-              alPresionar={() => setPasando(true)}
-              testID="boton-pasar-a-meses"
-            />
-          ) : null}
-          {m.tipo === 'gasto' && m.extraordinaria ? (
-            <Texto variante="secundario" tono="secundario" testID="nota-extraordinario">
-              Lo marcaste como extraordinario
-            </Texto>
-          ) : null}
-          {m.tipo === 'gasto' && !ocupado ? (
-            m.extraordinaria ? (
-              <Boton
-                etiqueta="Volver a contarlo"
-                variante="texto"
-                ancho="contenido"
-                pista="Lo vuelvo a usar para estimar si llegas a tu próximo ingreso"
-                alPresionar={alExtraordinario}
-                testID="boton-volver-a-contar"
-              />
-            ) : (
-              <Boton
-                etiqueta="Fue algo extraordinario"
-                variante="texto"
-                ancho="contenido"
-                pista="No lo uso para estimar si llegas a tu próximo ingreso"
-                alPresionar={alExtraordinario}
-                testID="boton-extraordinario"
-              />
-            )
-          ) : null}
-          {pasando || corrigiendo ? null : confirmando ? (
-            <View style={{ gap: espacio.s }} testID={`confirmar-anular-${m.id}`}>
+          {confirmando && !pasando && !corrigiendo ? (
+            <View
+              style={{
+                gap: espacio.s,
+                padding: espacio.m,
+                borderRadius: radio.m,
+                borderWidth: 1,
+                borderColor: c.borde,
+              }}
+              testID={`confirmar-anular-${m.id}`}
+            >
               <Texto
                 variante="cuerpo"
                 testID={`texto-confirmar-anular-${m.id}`}
@@ -877,15 +860,54 @@ function FilaMovimiento({
               />
               <Boton etiqueta="Cancelar" variante="texto" alPresionar={() => setConfirmando(false)} />
             </View>
-          ) : (
-            <Boton
-              etiqueta={BTN_BORRAR_MOVIMIENTO}
-              variante="secundario"
-              ancho="contenido"
-              alPresionar={() => setConfirmando(true)}
-              pista={PISTA_ANULAR_MOVIMIENTO}
-              testID="boton-anular"
-            />
+          ) : null}
+          {ocupado ? null : (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+              {esCorregible(m) ? (
+                <AccionPildora
+                  etiqueta={BTN_CORREGIR_MOVIMIENTO}
+                  icono="lapiz"
+                  alPresionar={() => setCorrigiendo(true)}
+                  pista={PISTA_CORREGIR_MOVIMIENTO}
+                  testID="boton-corregir"
+                />
+              ) : null}
+              {aMeses ? (
+                <AccionPildora
+                  etiqueta="Pasar a meses"
+                  icono="calendario"
+                  alPresionar={() => setPasando(true)}
+                  testID="boton-pasar-a-meses"
+                />
+              ) : null}
+              {m.tipo === 'gasto' ? (
+                m.extraordinaria ? (
+                  <AccionPildora
+                    etiqueta="Volver a contarlo"
+                    icono="repetir"
+                    pista="Lo vuelvo a usar para estimar si llegas a tu próximo ingreso"
+                    alPresionar={alExtraordinario}
+                    testID="boton-volver-a-contar"
+                  />
+                ) : (
+                  <AccionPildora
+                    etiqueta="Fue algo extraordinario"
+                    icono="destello"
+                    pista="No lo uso para estimar si llegas a tu próximo ingreso"
+                    alPresionar={alExtraordinario}
+                    testID="boton-extraordinario"
+                  />
+                )
+              ) : null}
+              <AccionPildora
+                etiqueta={BTN_BORRAR_MOVIMIENTO}
+                icono="basura"
+                destructiva
+                alPresionar={() => setConfirmando(true)}
+                pista={PISTA_ANULAR_MOVIMIENTO}
+                testID="boton-anular"
+              />
+            </View>
           )}
           {ocupado ? null : (
             <Boton

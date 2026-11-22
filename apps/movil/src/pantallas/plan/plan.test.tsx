@@ -363,7 +363,7 @@ describe('Plus de prueba (EXPO_PUBLIC_PLUS_SIN_TIENDA=1 y sin tienda)', () => {
         expect(TEXTO_PLUS_DE_PRUEBA).toBe(
           'Estás usando Finanvoz Plus de prueba. Mientras dure la prueba no hay cobro.',
         );
-        for (const f of FUNCIONES_PLUS) expect(screen.getByText(`• ${f}`)).toBeTruthy();
+        for (const f of FUNCIONES_PLUS) expect(screen.getByText(f)).toBeTruthy();
         expect(screen.getByTestId(ID.notaPlusDePrueba)).toHaveTextContent(NOTA_PLUS_DE_PRUEBA);
         expect(screen.queryByTestId(ID.soloIos)).toBeNull();
         expect(screen.queryByTestId(ID.sinTienda)).toBeNull();

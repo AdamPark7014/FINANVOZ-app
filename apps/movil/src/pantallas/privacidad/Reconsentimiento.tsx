@@ -31,6 +31,7 @@ import {
   TITULO_AVISO_PRIVACIDAD,
   TITULO_RECONSENTIMIENTO,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Aviso de privacidad actualizado (pendiente 31): aceptar la nueva versión, seguir en solo lectura o borrar todo.
@@ -91,7 +92,12 @@ export function Reconsentimiento({ alBorrarTodo }: { alBorrarTodo: () => Promise
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Texto testID="reconsent-titulo" variante="titulo" accessibilityRole="header">
+      <Texto
+        testID="reconsent-titulo"
+        variante="titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_RECONSENTIMIENTO}
       </Texto>
       <Texto

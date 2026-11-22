@@ -24,6 +24,7 @@ import {
   useTema,
   type NombreIcono,
 } from '../../ui';
+import { Fila as FilaLista, Grupo } from '../../ui/componentes/Lista';
 import { BTN_COMPARTIDOS_CUENTAS } from '../compartido/textos';
 import {
   BTN_VER,
@@ -55,6 +56,11 @@ import {
   etiquetaVacioCuentasTienes,
   partesTotalesCuentas,
   TITULO_LO_QUE_VIENE,
+  TITULO_MAS_CUENTAS,
+  APOYO_TANDAS_CUENTAS,
+  APOYO_COMPARTIDOS_CUENTAS,
+  APOYO_SUSCRIPCIONES_CUENTAS,
+  APOYO_DEDUCCIONES_CUENTAS,
 } from './textos';
 
 /** «••2231» si el nombre no lo trae; si no, el tipo («Débito»), salvo que repita el nombre («Efectivo · Efectivo»). */
@@ -301,48 +307,69 @@ export function PantallaCuentas({
         ) : null}
       </Seccion>
 
-      {alAbrirTandas ? (
-        <Seccion titulo="Tandas" testID="seccion-tandas">
-          <Boton
-            etiqueta={BTN_TANDAS_CUENTAS}
-            variante="secundario"
-            alPresionar={alAbrirTandas}
-            testID="boton-tandas"
-          />
-        </Seccion>
-      ) : null}
-
-      {alAbrirCompartidos ? (
-        <Seccion titulo="Gastos compartidos" testID="seccion-compartidos">
-          <Boton
-            etiqueta={BTN_COMPARTIDOS_CUENTAS}
-            variante="secundario"
-            alPresionar={alAbrirCompartidos}
-            testID="boton-compartidos"
-          />
-        </Seccion>
-      ) : null}
-
-      {alAbrirSuscripciones ? (
-        <Seccion titulo="Suscripciones" testID="seccion-suscripciones">
-          <Boton
-            etiqueta={BTN_SUSCRIPCIONES_CUENTAS}
-            variante="secundario"
-            alPresionar={alAbrirSuscripciones}
-            testID="boton-suscripciones"
-          />
-        </Seccion>
-      ) : null}
-
-      {alAbrirDeducciones ? (
-        <Seccion titulo="Deducciones" testID="seccion-deducciones">
-          <Boton
-            etiqueta={BTN_DEDUCCIONES_CUENTAS}
-            variante="secundario"
-            alPresionar={alAbrirDeducciones}
-            testID="boton-deducciones"
-          />
-        </Seccion>
+      {alAbrirTandas || alAbrirCompartidos || alAbrirSuscripciones || alAbrirDeducciones ? (
+        <Grupo titulo={TITULO_MAS_CUENTAS} sangria>
+          {alAbrirTandas ? (
+            <View testID="seccion-tandas">
+              <FilaLista
+                testID="boton-tandas"
+                testIDTitulo="seccion-tandas-titulo"
+                tituloEncabezado
+                icono="personas"
+                familia="antojos"
+                titulo="Tandas"
+                apoyo={APOYO_TANDAS_CUENTAS}
+                etiquetaAccesible={BTN_TANDAS_CUENTAS}
+                alPresionar={alAbrirTandas}
+              />
+            </View>
+          ) : null}
+          {alAbrirCompartidos ? (
+            <View testID="seccion-compartidos">
+              <FilaLista
+                testID="boton-compartidos"
+                testIDTitulo="seccion-compartidos-titulo"
+                tituloEncabezado
+                icono="corazon"
+                familia="comidaFuera"
+                titulo={BTN_COMPARTIDOS_CUENTAS}
+                apoyo={APOYO_COMPARTIDOS_CUENTAS}
+                etiquetaAccesible={BTN_COMPARTIDOS_CUENTAS}
+                alPresionar={alAbrirCompartidos}
+              />
+            </View>
+          ) : null}
+          {alAbrirSuscripciones ? (
+            <View testID="seccion-suscripciones">
+              <FilaLista
+                testID="boton-suscripciones"
+                testIDTitulo="seccion-suscripciones-titulo"
+                tituloEncabezado
+                icono="repetir"
+                familia="salidas"
+                titulo="Suscripciones"
+                apoyo={APOYO_SUSCRIPCIONES_CUENTAS}
+                etiquetaAccesible={BTN_SUSCRIPCIONES_CUENTAS}
+                alPresionar={alAbrirSuscripciones}
+              />
+            </View>
+          ) : null}
+          {alAbrirDeducciones ? (
+            <View testID="seccion-deducciones">
+              <FilaLista
+                testID="boton-deducciones"
+                testIDTitulo="seccion-deducciones-titulo"
+                tituloEncabezado
+                icono="documento"
+                familia="super"
+                titulo="Deducciones"
+                apoyo={APOYO_DEDUCCIONES_CUENTAS}
+                etiquetaAccesible={BTN_DEDUCCIONES_CUENTAS}
+                alPresionar={alAbrirDeducciones}
+              />
+            </View>
+          ) : null}
+        </Grupo>
       ) : null}
     </Pantalla>
   );

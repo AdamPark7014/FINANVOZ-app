@@ -13,6 +13,7 @@ import {
   PISTA_VOLVER,
   TITULO_EDITAR,
 } from './ingreso-textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 import { valoresDeIngreso } from './ingreso';
 
 /**
@@ -68,7 +69,12 @@ export function EditarIngreso({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="editar-ingreso-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="editar-ingreso-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_EDITAR}
       </Texto>
       <Texto variante="cuerpo" tono="secundario" testID="editar-ingreso-intro">

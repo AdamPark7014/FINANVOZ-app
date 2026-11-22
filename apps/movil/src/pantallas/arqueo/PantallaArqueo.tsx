@@ -14,6 +14,8 @@ import { useAnalitica } from '../../sesion/ProveedorAnalitica';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import {
   Boton,
+  coloresCuenta,
+  Icono,
   CampoMonto,
   Cifra,
   espacio,
@@ -74,6 +76,7 @@ import {
   textoSobrante,
   TOTAL,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 type Paso = 'marcar' | 'cantidad' | 'resultado';
 
@@ -172,7 +175,12 @@ export function PantallaArqueo({
           gap: espacio.s,
         }}
       >
-        <Texto testID="arqueo-titulo" variante="titulo" accessibilityRole="header">
+        <Texto
+          testID="arqueo-titulo"
+          variante="titulo"
+          accessibilityRole="header"
+          style={ESTILO_TITULO_PANTALLA}
+        >
           {TITULO}
         </Texto>
         {mostrarCerrar ? (
@@ -214,6 +222,8 @@ function Arqueo({
   alCerrar: () => void;
 }) {
   const { ctx, refrescar } = useSesion();
+  const { esquema } = useTema();
+  const efectivo = coloresCuenta[esquema].efectivo;
   const registrarEvento = useAnalitica();
   // La vista se lee una vez: lo que se confirma es lo que se mostró.
   const [inicial] = useState(vista);
@@ -283,9 +293,27 @@ function Arqueo({
         accessibilityHint={PISTA_TARJETA_CONTEO_LISTO}
         accessibilityRole="summary"
       >
-        <Tarjeta accionesAnidadas>
+        <Tarjeta
+          accionesAnidadas
+          style={{ alignItems: 'center', paddingVertical: espacio.xxl, gap: espacio.l }}
+        >
+          <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 36,
+              backgroundColor: efectivo.fondo,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Icono nombre="palomita" color={efectivo.texto} tamano={36} grosor={2.6} />
+          </View>
           <Texto
-            variante="cuerpoFuerte"
+            variante="subtitulo"
+            alinear="center"
             testID="arqueo-mensaje-hecho"
             importantForAccessibility="yes"
             accessibilityLiveRegion="polite"
@@ -347,26 +375,56 @@ function Arqueo({
               testID="arqueo-cambiar-marcar"
             />
           ) : null}
-          <Texto variante="subtitulo" testID="arqueo-esperado" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {preguntaCantidad}
-          </Texto>
-          <GrupoChips
-            opciones={[
-              {
-                valor: 'exacto',
-                etiqueta: formatearCentavos(esperado),
-                etiquetaAccesible: etiquetaChipExacto(esperado),
-              },
-              { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
-            ]}
-            valor={eleccion}
-            alCambiar={(v) => {
-              setError(null);
-              setEleccion(v);
+          <View
+            style={{
+              backgroundColor: efectivo.fondo,
+              borderRadius: radio.xl,
+              padding: espacio.xl,
+              gap: espacio.l,
+              overflow: 'hidden',
             }}
-            prefijoTestID="arqueo"
-            etiqueta={preguntaCantidad}
-          />
+          >
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={{
+                position: 'absolute',
+                right: -50,
+                top: -50,
+                width: 160,
+                height: 160,
+                borderRadius: 80,
+                borderWidth: 24,
+                borderColor: efectivo.adorno,
+              }}
+            />
+            <Icono nombre="billete" color={efectivo.texto} tamano={26} grosor={1.9} />
+            <Texto
+              variante="subtitulo"
+              testID="arqueo-esperado"
+              {...OCULTAR_ETIQUETA_VISIBLE}
+              style={{ color: efectivo.texto, fontSize: 22, lineHeight: 30, fontWeight: '700' }}
+            >
+              {preguntaCantidad}
+            </Texto>
+            <GrupoChips
+              opciones={[
+                {
+                  valor: 'exacto',
+                  etiqueta: formatearCentavos(esperado),
+                  etiquetaAccesible: etiquetaChipExacto(esperado),
+                },
+                { valor: 'otra', etiqueta: ETIQUETA_OTRA_CANTIDAD },
+              ]}
+              valor={eleccion}
+              alCambiar={(v) => {
+                setError(null);
+                setEleccion(v);
+              }}
+              prefijoTestID="arqueo"
+              etiqueta={preguntaCantidad}
+            />
+          </View>
           {eleccion === 'otra' ? (
             <CampoMonto
               etiqueta={ETIQUETA_MONTO_TRAES}

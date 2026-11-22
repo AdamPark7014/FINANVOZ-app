@@ -17,11 +17,11 @@ import {
   Interruptor,
   OBJETIVO_TACTIL_MIN,
   radio,
-  Tarjeta,
   Texto,
   useTema,
 } from '../../ui';
 import { cargarVoces, hayInternet } from '../../voz/catalogo';
+import { FilaInterruptor, Grupo } from '../../ui/componentes/Lista';
 import { IndicadorVoz } from '../../voz/IndicadorVoz';
 import { configurarVoz, hablar, type FinHabla, type OpcionesHabla } from '../../voz/respuesta';
 import { useHablando } from '../../voz/useVozAsistente';
@@ -110,15 +110,12 @@ export function SeccionVoz({ fuentes = FUENTES_TELEFONO }: { fuentes?: FuentesVo
   }, [ajustes.voz, ajustes.velocidad, ajustes.enSilencio]);
 
   return (
-    <Tarjeta testID="ajustes-voz">
-      <Texto variante="subtitulo" testID="ajustes-voz-titulo" accessibilityRole="header">
-        {SECCION_VOZ}
-      </Texto>
-      <View style={{ marginTop: espacio.s }}>
-        <Interruptor
+    <View testID="ajustes-voz" style={{ gap: espacio.s }}>
+      <Grupo titulo={SECCION_VOZ} testIDTitulo="ajustes-voz-titulo">
+        <FilaInterruptor
           testID="ajustes-voz-contestar"
-          etiqueta={ETIQUETA_CONTESTAR_EN_VOZ}
-          descripcion={DESC_CONTESTAR_EN_VOZ}
+          titulo={ETIQUETA_CONTESTAR_EN_VOZ}
+          apoyo={DESC_CONTESTAR_EN_VOZ}
           pista={pistaContestarEnVoz()}
           valor={activa}
           alCambiar={(valor) => guardar(() => fijarVozRespuesta(ctx, valor))}
@@ -143,14 +140,14 @@ export function SeccionVoz({ fuentes = FUENTES_TELEFONO }: { fuentes?: FuentesVo
             }}
           />
         ) : null}
-        <Interruptor
+        <FilaInterruptor
           testID="ajustes-voz-confirmar"
-          etiqueta={ETIQUETA_CONFIRMAR_POR_VOZ}
-          descripcion={DESC_CONFIRMAR_POR_VOZ}
+          titulo={ETIQUETA_CONFIRMAR_POR_VOZ}
+          apoyo={DESC_CONFIRMAR_POR_VOZ}
           valor={confirmar}
           alCambiar={(valor) => guardar(() => fijarConfirmarPorVoz(ctx, valor))}
         />
-      </View>
+      </Grupo>
       {error ? (
         <Texto
           variante="secundario"
@@ -162,7 +159,7 @@ export function SeccionVoz({ fuentes = FUENTES_TELEFONO }: { fuentes?: FuentesVo
           {MENSAJE_NO_GUARDAR}
         </Texto>
       ) : null}
-    </Tarjeta>
+    </View>
   );
 }
 
@@ -243,7 +240,10 @@ function ComoSuena({
   };
 
   return (
-    <View testID="ajustes-voz-como-suena" style={{ gap: espacio.s, paddingVertical: espacio.s }}>
+    <View
+      testID="ajustes-voz-como-suena"
+      style={{ gap: espacio.m, paddingHorizontal: espacio.l, paddingVertical: espacio.m }}
+    >
       <View style={{ gap: espacio.xs }}>
         <Texto variante="cuerpo" accessibilityRole="header">
           {ETIQUETA_VOZ}

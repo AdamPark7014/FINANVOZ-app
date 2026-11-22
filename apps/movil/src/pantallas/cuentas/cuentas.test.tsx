@@ -408,7 +408,7 @@ describe('Detalle de un pago fijo', () => {
       <PantallaDetallePagoFijo programadoId={renta} alVolver={jest.fn()} alQuitado={alQuitado} />,
     );
     expect(screen.getByTestId('pago-detalle-titulo')).toHaveTextContent('Renta');
-    expect(screen.getByText('día 1 de cada mes')).toBeTruthy();
+    expect(screen.getByText('Día 1 de cada mes')).toBeTruthy();
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId('pago-detalle-cambiar-monto'));
     fireEvent.changeText(screen.getByTestId('pago-detalle-monto-nuevo'), '8,500');
@@ -481,7 +481,7 @@ describe('Lista de pagos fijos y de personas', () => {
       <PantallaPagosFijos alVolver={jest.fn()} alAgregar={alAgregar} alAbrir={alAbrir} />,
     );
     expect(screen.getByText('Predial')).toBeTruthy();
-    expect(screen.getByText('cada 15 de febrero')).toBeTruthy();
+    expect(screen.getByText(/^Cada 15 de febrero/)).toBeTruthy();
     expect(auditar(screen.toJSON() as never)).toEqual([]);
     fireEvent.press(screen.getByTestId(`pago-fijo-${predial}-abrir`));
     expect(alAbrir).toHaveBeenCalledWith(predial);

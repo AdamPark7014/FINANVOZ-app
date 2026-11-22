@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Linking, View } from 'react-native';
 import { fijarPreferenciasAvisos, obtenerPreferenciasAvisos, type PreferenciasAvisos } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, GrupoChips, Interruptor, OCULTAR_ETIQUETA_VISIBLE, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, GrupoChips, OCULTAR_ETIQUETA_VISIBLE, Texto } from '../../ui';
+import { CeldaGrupo, FilaInterruptor, Grupo } from '../../ui/componentes/Lista';
 import { anunciar } from '../../ui/anunciar';
 import { useNotificaciones, type PermisoAvisos } from '../avisos/notificaciones';
 import {
@@ -82,149 +83,154 @@ export function SeccionAvisos() {
   };
 
   return (
-    <Tarjeta testID="ajustes-avisos">
-      <Texto variante="subtitulo" testID="ajustes-avisos-titulo" accessibilityRole="header">
-        {SECCION_AVISOS}
-      </Texto>
-      {permiso !== null && permiso !== 'concedido' && notificaciones ? (
-        <View style={{ gap: espacio.s }}>
+    <View testID="ajustes-avisos" style={{ gap: espacio.l }}>
+      <Grupo titulo={SECCION_AVISOS} testIDTitulo="ajustes-avisos-titulo">
+        {permiso !== null && permiso !== 'concedido' && notificaciones ? (
+          <CeldaGrupo>
+            <Texto
+              variante="secundario"
+              tono="secundario"
+              testID="ajustes-avisos-sin-permiso"
+              accessibilityRole="alert"
+              accessibilityLabel={ETIQUETA_AVISOS_APAGADOS_TELEFONO}
+            >
+              {AVISOS_APAGADOS_EN_TELEFONO}
+            </Texto>
+            <Boton
+              testID="ajustes-avisos-permitir"
+              variante="secundario"
+              etiqueta={permiso === 'sin_preguntar' ? BTN_PERMITIR_AVISOS : BTN_ABRIR_AJUSTES_TELEFONO}
+              pista={permiso === 'sin_preguntar' ? PISTA_PERMITIR_AVISOS : PISTA_ABRIR_AJUSTES_AVISOS}
+              alPresionar={() => {
+                if (permiso === 'denegado') {
+                  // Sin el atajo del puerto de avisos, los ajustes del sistema se abren directo: el botón nunca
+                  // se queda sin hacer nada.
+                  if (notificaciones.abrirAjustesSistema) notificaciones.abrirAjustesSistema();
+                  else void Linking.openSettings().catch(() => undefined);
+                  return;
+                }
+                notificaciones
+                  .pedirPermiso()
+                  .then((p) => {
+                    setPermiso(p);
+                    refrescar();
+                  })
+                  .catch(() => undefined);
+              }}
+            />
+          </CeldaGrupo>
+        ) : null}
+        <FilaInterruptor
+          testID="ajustes-aviso-corte"
+          titulo={AVISO_CORTE}
+          apoyo={DESC_CORTE}
+          valor={pref.corte}
+          alCambiar={(corte) => guardar({ corte })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-limite"
+          titulo={AVISO_LIMITE}
+          apoyo={DESC_LIMITE}
+          valor={pref.fechaLimite}
+          alCambiar={(fechaLimite) => guardar({ fechaLimite })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-riesgo"
+          titulo={AVISO_RIESGO}
+          apoyo={DESC_RIESGO}
+          valor={pref.riesgo}
+          alCambiar={(riesgo) => guardar({ riesgo })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-respaldo"
+          titulo={AVISO_RESPALDO}
+          apoyo={DESC_RESPALDO}
+          valor={pref.respaldo}
+          alCambiar={(respaldo) => guardar({ respaldo })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-tanda"
+          titulo={AVISO_TANDA}
+          apoyo={DESC_TANDA}
+          valor={pref.tanda}
+          alCambiar={(tanda) => guardar({ tanda })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-compromiso"
+          titulo={AVISO_COMPROMISO}
+          apoyo={DESC_COMPROMISO}
+          valor={pref.compromiso}
+          alCambiar={(compromiso) => guardar({ compromiso })}
+        />
+        <FilaInterruptor
+          testID="ajustes-aviso-ingreso"
+          titulo={AVISO_INGRESO}
+          apoyo={DESC_INGRESO}
+          valor={pref.ingreso}
+          alCambiar={(ingreso) => guardar({ ingreso })}
+        />
+      </Grupo>
+      <Grupo>
+        <CeldaGrupo>
+          <Texto variante="etiqueta" testID="ajustes-aviso-hora-titulo" {...OCULTAR_ETIQUETA_VISIBLE}>
+            {ETIQUETA_HORA_AVISOS}
+          </Texto>
+          <GrupoChips
+            prefijoTestID="ajustes-aviso-hora"
+            etiqueta={PREGUNTA_HORA_AVISOS}
+            opciones={opcionesHora(HORAS_AVISOS, pref.hora)}
+            valor={pref.hora}
+            alCambiar={(hora) => guardar({ hora }, CONFIRMACION_HORARIO)}
+          />
+        </CeldaGrupo>
+        <CeldaGrupo>
+          <Texto
+            variante="etiqueta"
+            testID="ajustes-avisos-horario-titulo"
+            accessibilityRole="header"
+            accessibilityLabel={ETIQUETA_BLOQUE_HORARIO_SILENCIOSO}
+          >
+            {ETIQUETA_HORARIO_SILENCIOSO}
+          </Texto>
           <Texto
             variante="secundario"
             tono="secundario"
-            testID="ajustes-avisos-sin-permiso"
-            accessibilityRole="alert"
-            accessibilityLabel={ETIQUETA_AVISOS_APAGADOS_TELEFONO}
+            testID="ajustes-avisos-horario-desc"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
           >
-            {AVISOS_APAGADOS_EN_TELEFONO}
+            {DESC_HORARIO_SILENCIOSO}
           </Texto>
-          <Boton
-            testID="ajustes-avisos-permitir"
-            variante="secundario"
-            etiqueta={permiso === 'sin_preguntar' ? BTN_PERMITIR_AVISOS : BTN_ABRIR_AJUSTES_TELEFONO}
-            pista={permiso === 'sin_preguntar' ? PISTA_PERMITIR_AVISOS : PISTA_ABRIR_AJUSTES_AVISOS}
-            alPresionar={() => {
-              if (permiso === 'denegado') {
-                // Sin el atajo del puerto de avisos, los ajustes del sistema se abren directo: el botón nunca
-                // se queda sin hacer nada.
-                if (notificaciones.abrirAjustesSistema) notificaciones.abrirAjustesSistema();
-                else void Linking.openSettings().catch(() => undefined);
-                return;
+          <View style={{ gap: espacio.s }}>
+            <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+              {PREGUNTA_SILENCIO_DESDE}
+            </Texto>
+            <GrupoChips
+              prefijoTestID="ajustes-silencio-inicio"
+              etiqueta={PREGUNTA_SILENCIO_DESDE}
+              opciones={opcionesHora(HORAS_SILENCIO_DESDE, pref.silencio.inicio)}
+              valor={pref.silencio.inicio}
+              alCambiar={(inicio) =>
+                guardar({ silencio: { inicio, fin: pref.silencio.fin } }, CONFIRMACION_HORARIO)
               }
-              notificaciones
-                .pedirPermiso()
-                .then((p) => {
-                  setPermiso(p);
-                  refrescar();
-                })
-                .catch(() => undefined);
-            }}
-          />
-        </View>
-      ) : null}
-      <Interruptor
-        testID="ajustes-aviso-corte"
-        etiqueta={AVISO_CORTE}
-        descripcion={DESC_CORTE}
-        valor={pref.corte}
-        alCambiar={(corte) => guardar({ corte })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-limite"
-        etiqueta={AVISO_LIMITE}
-        descripcion={DESC_LIMITE}
-        valor={pref.fechaLimite}
-        alCambiar={(fechaLimite) => guardar({ fechaLimite })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-riesgo"
-        etiqueta={AVISO_RIESGO}
-        descripcion={DESC_RIESGO}
-        valor={pref.riesgo}
-        alCambiar={(riesgo) => guardar({ riesgo })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-respaldo"
-        etiqueta={AVISO_RESPALDO}
-        descripcion={DESC_RESPALDO}
-        valor={pref.respaldo}
-        alCambiar={(respaldo) => guardar({ respaldo })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-tanda"
-        etiqueta={AVISO_TANDA}
-        descripcion={DESC_TANDA}
-        valor={pref.tanda}
-        alCambiar={(tanda) => guardar({ tanda })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-compromiso"
-        etiqueta={AVISO_COMPROMISO}
-        descripcion={DESC_COMPROMISO}
-        valor={pref.compromiso}
-        alCambiar={(compromiso) => guardar({ compromiso })}
-      />
-      <Interruptor
-        testID="ajustes-aviso-ingreso"
-        etiqueta={AVISO_INGRESO}
-        descripcion={DESC_INGRESO}
-        valor={pref.ingreso}
-        alCambiar={(ingreso) => guardar({ ingreso })}
-      />
-      <Texto variante="etiqueta" testID="ajustes-aviso-hora-titulo" {...OCULTAR_ETIQUETA_VISIBLE}>
-        {ETIQUETA_HORA_AVISOS}
-      </Texto>
-      <GrupoChips
-        prefijoTestID="ajustes-aviso-hora"
-        etiqueta={PREGUNTA_HORA_AVISOS}
-        opciones={opcionesHora(HORAS_AVISOS, pref.hora)}
-        valor={pref.hora}
-        alCambiar={(hora) => guardar({ hora }, CONFIRMACION_HORARIO)}
-      />
-      <Texto
-        variante="etiqueta"
-        testID="ajustes-avisos-horario-titulo"
-        accessibilityRole="header"
-        accessibilityLabel={ETIQUETA_BLOQUE_HORARIO_SILENCIOSO}
-      >
-        {ETIQUETA_HORARIO_SILENCIOSO}
-      </Texto>
-      <Texto
-        variante="secundario"
-        tono="secundario"
-        testID="ajustes-avisos-horario-desc"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
-        {DESC_HORARIO_SILENCIOSO}
-      </Texto>
-      <View style={{ gap: espacio.s }}>
-        <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-          {PREGUNTA_SILENCIO_DESDE}
-        </Texto>
-        <GrupoChips
-          prefijoTestID="ajustes-silencio-inicio"
-          etiqueta={PREGUNTA_SILENCIO_DESDE}
-          opciones={opcionesHora(HORAS_SILENCIO_DESDE, pref.silencio.inicio)}
-          valor={pref.silencio.inicio}
-          alCambiar={(inicio) =>
-            guardar({ silencio: { inicio, fin: pref.silencio.fin } }, CONFIRMACION_HORARIO)
-          }
-        />
-      </View>
-      <View style={{ gap: espacio.s }}>
-        <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
-          {PREGUNTA_SILENCIO_HASTA}
-        </Texto>
-        <GrupoChips
-          prefijoTestID="ajustes-silencio-fin"
-          etiqueta={PREGUNTA_SILENCIO_HASTA}
-          opciones={opcionesHora(HORAS_SILENCIO_HASTA, pref.silencio.fin)}
-          valor={pref.silencio.fin}
-          alCambiar={(fin) =>
-            guardar({ silencio: { inicio: pref.silencio.inicio, fin } }, CONFIRMACION_HORARIO)
-          }
-        />
-      </View>
+            />
+          </View>
+          <View style={{ gap: espacio.s }}>
+            <Texto variante="secundario" {...OCULTAR_ETIQUETA_VISIBLE}>
+              {PREGUNTA_SILENCIO_HASTA}
+            </Texto>
+            <GrupoChips
+              prefijoTestID="ajustes-silencio-fin"
+              etiqueta={PREGUNTA_SILENCIO_HASTA}
+              opciones={opcionesHora(HORAS_SILENCIO_HASTA, pref.silencio.fin)}
+              valor={pref.silencio.fin}
+              alCambiar={(fin) =>
+                guardar({ silencio: { inicio: pref.silencio.inicio, fin } }, CONFIRMACION_HORARIO)
+              }
+            />
+          </View>
+        </CeldaGrupo>
+      </Grupo>
       {mensaje ? (
         <Texto
           variante="secundario"
@@ -237,6 +243,6 @@ export function SeccionAvisos() {
           {mensaje}
         </Texto>
       ) : null}
-    </Tarjeta>
+    </View>
   );
 }

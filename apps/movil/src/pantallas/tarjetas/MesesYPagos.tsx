@@ -290,6 +290,8 @@ export function SeccionMeses({ tarjetaId, planes }: { tarjetaId: string; planes:
     <Seccion titulo={TITULO_MESES_SIN_INTERESES} testID="tarjeta-meses">
       {planes.length === 0 ? (
         <EstadoVacio
+          icono="calendario"
+          compacto
           texto={VACIO_MSI_TARJETA}
           testID="tarjeta-meses-vacio"
           etiquetaAccesible={etiquetaVacioMsiTarjeta()}

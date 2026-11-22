@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { useCaptura } from '../../captura/ProveedorCaptura';
 import { desactivarCaptura, fijarModoAvisoCaptura, obtenerEstadoCaptura } from '../../servicios';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
-import { Boton, espacio, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Texto } from '../../ui';
 import { ActivarCaptura } from '../captura/ActivarCaptura';
 import { GrupoChips, OCULTAR_ETIQUETA_VISIBLE } from '../principal/Chip';
 import {
@@ -24,6 +24,7 @@ import {
   SECCION_CAPTURA,
   textoCapturaActiva,
 } from './captura-textos';
+import { CeldaGrupo, Grupo } from '../../ui/componentes/Lista';
 
 /**
  * Ajustes → Captura automática (`08 §3.1`: "Puedes desactivarlo cuando quieras en Ajustes"). Desactivar vacía
@@ -44,84 +45,87 @@ function SeccionCapturaAndroid() {
   // iOS no deja que una app lea los avisos de otras: en iPhone la sección solo diría «No disponible».
   if (Platform.OS === 'ios') return null;
   return (
-    <Tarjeta testID="ajustes-captura">
-      <Texto variante="subtitulo" testID="ajustes-captura-titulo" accessibilityRole="header">
-        {SECCION_CAPTURA}
-      </Texto>
-      {activando ? (
-        <ActivarCaptura testID="ajustes-captura" alTerminar={() => setActivando(false)} />
-      ) : estado.activada ? (
-        <>
-          <Texto
-            variante="cuerpo"
-            testID="ajustes-captura-estado"
-            accessibilityLabel={etiquetaCapturaActiva(estado.apps.length)}
-          >
-            {textoCapturaActiva(estado.apps.length)}
-          </Texto>
-          <Texto
-            variante="etiqueta"
-            testID="ajustes-captura-aviso-titulo"
-            accessibilityRole="header"
-            accessibilityLabel={ETIQUETA_BLOQUE_AVISO_CAPTURAR}
-          >
-            {ETIQUETA_AVISO_AL_CAPTURAR}
-          </Texto>
-          <Texto
-            variante="secundario"
-            tono="secundario"
-            testID="ajustes-captura-aviso-desc"
-            {...OCULTAR_ETIQUETA_VISIBLE}
-          >
-            {DESC_AVISO_AL_CAPTURAR}
-          </Texto>
-          <Texto variante="secundario" testID="ajustes-captura-aviso-pregunta" {...OCULTAR_ETIQUETA_VISIBLE}>
-            {PREGUNTA_MODO_AVISO}
-          </Texto>
-          <GrupoChips
-            prefijoTestID="ajustes-captura-aviso"
-            etiqueta={PREGUNTA_MODO_AVISO}
-            opciones={OPCIONES_MODO_AVISO}
-            valor={estado.modoAviso}
-            alCambiar={(modo) => {
-              fijarModoAvisoCaptura(ctx, modo);
-              refrescar();
-            }}
-          />
-          <Boton
-            etiqueta={BTN_DESACTIVAR_CAPTURA}
-            variante="secundario"
-            alPresionar={() => {
-              desactivarCaptura(ctx);
-              void puente?.fijarListaBlanca([]);
-              refrescar();
-            }}
-            testID="ajustes-captura-desactivar"
-            pista={PISTA_DESACTIVAR_CAPTURA}
-            style={{ marginTop: espacio.s }}
-          />
-        </>
-      ) : (
-        <>
-          <Texto
-            variante="cuerpo"
-            tono="secundario"
-            testID="ajustes-captura-estado"
-            accessibilityLabel={puente ? ETIQUETA_CAPTURA_APAGADA : ETIQUETA_CAPTURA_NO_DISPONIBLE}
-          >
-            {puente ? ESTADO_APAGADA : ESTADO_NO_DISPONIBLE}
-          </Texto>
-          {puente ? (
-            <Boton
-              etiqueta={BTN_ACTIVAR_CAPTURA}
+    <Grupo testID="ajustes-captura" titulo={SECCION_CAPTURA} testIDTitulo="ajustes-captura-titulo">
+      <CeldaGrupo>
+        {activando ? (
+          <ActivarCaptura testID="ajustes-captura" alTerminar={() => setActivando(false)} />
+        ) : estado.activada ? (
+          <>
+            <Texto
+              variante="cuerpo"
+              testID="ajustes-captura-estado"
+              accessibilityLabel={etiquetaCapturaActiva(estado.apps.length)}
+            >
+              {textoCapturaActiva(estado.apps.length)}
+            </Texto>
+            <Texto
+              variante="etiqueta"
+              testID="ajustes-captura-aviso-titulo"
+              accessibilityRole="header"
+              accessibilityLabel={ETIQUETA_BLOQUE_AVISO_CAPTURAR}
+            >
+              {ETIQUETA_AVISO_AL_CAPTURAR}
+            </Texto>
+            <Texto
               variante="secundario"
-              alPresionar={() => setActivando(true)}
-              testID="ajustes-captura-activar"
-              pista={PISTA_ACTIVAR_CAPTURA}
+              tono="secundario"
+              testID="ajustes-captura-aviso-desc"
+              {...OCULTAR_ETIQUETA_VISIBLE}
+            >
+              {DESC_AVISO_AL_CAPTURAR}
+            </Texto>
+            <Texto
+              variante="secundario"
+              testID="ajustes-captura-aviso-pregunta"
+              {...OCULTAR_ETIQUETA_VISIBLE}
+            >
+              {PREGUNTA_MODO_AVISO}
+            </Texto>
+            <GrupoChips
+              prefijoTestID="ajustes-captura-aviso"
+              etiqueta={PREGUNTA_MODO_AVISO}
+              opciones={OPCIONES_MODO_AVISO}
+              valor={estado.modoAviso}
+              alCambiar={(modo) => {
+                fijarModoAvisoCaptura(ctx, modo);
+                refrescar();
+              }}
             />
-          ) : null}
-        </>
-      )}
-    </Tarjeta>
+            <Boton
+              etiqueta={BTN_DESACTIVAR_CAPTURA}
+              variante="secundario"
+              alPresionar={() => {
+                desactivarCaptura(ctx);
+                void puente?.fijarListaBlanca([]);
+                refrescar();
+              }}
+              testID="ajustes-captura-desactivar"
+              pista={PISTA_DESACTIVAR_CAPTURA}
+              style={{ marginTop: espacio.s }}
+            />
+          </>
+        ) : (
+          <>
+            <Texto
+              variante="cuerpo"
+              tono="secundario"
+              testID="ajustes-captura-estado"
+              accessibilityLabel={puente ? ETIQUETA_CAPTURA_APAGADA : ETIQUETA_CAPTURA_NO_DISPONIBLE}
+            >
+              {puente ? ESTADO_APAGADA : ESTADO_NO_DISPONIBLE}
+            </Texto>
+            {puente ? (
+              <Boton
+                etiqueta={BTN_ACTIVAR_CAPTURA}
+                variante="secundario"
+                alPresionar={() => setActivando(true)}
+                testID="ajustes-captura-activar"
+                pista={PISTA_ACTIVAR_CAPTURA}
+              />
+            ) : null}
+          </>
+        )}
+      </CeldaGrupo>
+    </Grupo>
   );
 }

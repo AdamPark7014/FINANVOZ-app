@@ -59,17 +59,39 @@ export function Seccion({
 }
 
 /** Una fila "etiqueta … cifra" del detalle. */
-export function Dato({ etiqueta, valor, testID }: { etiqueta: string; valor: string; testID?: string }) {
+export function Dato({
+  etiqueta,
+  valor,
+  testID,
+  color,
+  colorEtiqueta,
+}: {
+  etiqueta: string;
+  valor: string;
+  testID?: string;
+  /** Sobre la placa de color de la tarjeta: el valor y la etiqueta con los colores de la placa. */
+  color?: string;
+  colorEtiqueta?: string;
+}) {
   return (
     <View
       accessible
       accessibilityLabel={etiquetaAccesibleDato(etiqueta, valor)}
       style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}
     >
-      <Texto variante="cuerpo" style={{ flex: 1 }} importantForAccessibility="no">
+      <Texto
+        variante="cuerpo"
+        style={[{ flex: 1 }, colorEtiqueta ? { color: colorEtiqueta } : null]}
+        importantForAccessibility="no"
+      >
         {etiqueta}
       </Texto>
-      <Texto variante="cuerpoFuerte" importantForAccessibility="no" {...(testID ? { testID } : {})}>
+      <Texto
+        variante="cuerpoFuerte"
+        importantForAccessibility="no"
+        style={color ? { color } : undefined}
+        {...(testID ? { testID } : {})}
+      >
         {valor}
       </Texto>
     </View>

@@ -100,6 +100,7 @@ import {
   tituloPantallaDeducciones,
   DESC_LENTES,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 /**
  * Personal → Deducciones (`02 §24`, RF-FIS-01…03): importar facturas, pedir el perfil fiscal la primera vez,
  * "Llevas $25,900 deducibles en 2026 (estimación)" por tipo, lo que no es deducible con su motivo, el ISR que
@@ -158,7 +159,12 @@ export function PantallaDeducciones({
           pista={PISTA_VOLVER}
         />
       ) : null}
-      <Texto variante="titulo" testID="deducciones-titulo-pantalla" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="deducciones-titulo-pantalla"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {tituloPantallaDeducciones(v.ejercicio)}
       </Texto>
       {v.ejercicios.length > 1 ? (
@@ -215,6 +221,7 @@ export function PantallaDeducciones({
       </Texto>
       {v.facturas.length === 0 ? (
         <EstadoVacio
+          icono="documento"
           texto={TEXTO_FACTURAS_VACIO}
           testID="deducciones-sin-facturas"
           etiquetaAccesible={etiquetaVacioFacturas()}
@@ -654,7 +661,12 @@ export function ImportarCompartidas({
       bordes={['top', 'left', 'right', 'bottom']}
       contenidoStyle={{ gap: espacio.xl }}
     >
-      <Texto variante="titulo" testID="importar-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="importar-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_IMPORTAR_COMPARTIDAS}
       </Texto>
       {estado.tipo === 'leyendo' ? (
@@ -666,6 +678,8 @@ export function ImportarCompartidas({
       {estado.tipo === 'error' ? <MensajeError texto={MENSAJE_IMPORTAR_ERROR} /> : null}
       {estado.tipo === 'vacio' ? (
         <EstadoVacio
+          icono="documento"
+          compacto
           texto={TEXTO_IMPORTAR_VACIO}
           testID="importar-vacio"
           etiquetaAccesible={etiquetaVacioImportar()}

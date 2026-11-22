@@ -15,8 +15,10 @@ import {
   CampoTexto,
   espacio,
   EstadoVacio,
+  Icono,
   OBJETIVO_TACTIL_MIN,
   Pantalla,
+  radio,
   Tarjeta,
   Texto,
   useTema,
@@ -64,6 +66,7 @@ import {
   textoConfirmarNoEs,
   type AccionSuscripcion,
 } from './textos';
+import { AccionPildora, BotonIcono, ESTILO_TITULO_PANTALLA, IconoFila } from '../../ui/componentes/Lista';
 
 const HACER: Record<AccionSuscripcion, (ctx: Contexto, comercio: string) => unknown> = {
   compromiso: convertirEnCompromiso,
@@ -111,9 +114,26 @@ export function PantallaSuscripciones({ alVolver }: { alVolver?: () => void }) {
         variante="titulo"
         accessibilityRole="header"
         accessibilityLabel={TITULO_PANTALLA}
+        style={ESTILO_TITULO_PANTALLA}
       >
         {TITULO_PANTALLA}
       </Texto>
+      {v.textoResumen ? (
+        <Texto
+          variante="subtitulo"
+          testID="suscripciones-resumen"
+          accessibilityLabel={etiquetaAccesibleResumenSuscripciones(v.textoResumen)}
+        >
+          {v.textoResumen}
+        </Texto>
+      ) : (
+        <EstadoVacio
+          icono="repetir"
+          texto={TEXTO_SUSCRIPCIONES_VACIO}
+          testID="suscripciones-vacio"
+          etiquetaAccesible={etiquetaVacioSuscripciones()}
+        />
+      )}
       {v.activas.length > 0 ? (
         <Texto
           variante="secundario"
@@ -124,21 +144,6 @@ export function PantallaSuscripciones({ alVolver }: { alVolver?: () => void }) {
           {PISTA_AYUDA}
         </Texto>
       ) : null}
-      {v.textoResumen ? (
-        <Texto
-          variante="cuerpoFuerte"
-          testID="suscripciones-resumen"
-          accessibilityLabel={etiquetaAccesibleResumenSuscripciones(v.textoResumen)}
-        >
-          {v.textoResumen}
-        </Texto>
-      ) : (
-        <EstadoVacio
-          texto={TEXTO_SUSCRIPCIONES_VACIO}
-          testID="suscripciones-vacio"
-          etiquetaAccesible={etiquetaVacioSuscripciones()}
-        />
-      )}
       {mensaje ? (
         <Texto
           variante="secundario"
@@ -241,6 +246,7 @@ function Fila({
   alHacer: (a: AccionSuscripcion) => void;
   alRenombrar: (nombre: string) => void;
 }) {
+  const { c } = useTema();
   const id = `suscripcion-${s.comercio.replace(/ /g, '-').toLowerCase()}`;
   const [editandoNombre, setEditandoNombre] = useState(false);
   const [nombre, setNombre] = useState(s.nombre);
@@ -267,8 +273,47 @@ function Fila({
   return (
     <View testID={id} role="listitem">
       <Tarjeta>
-        <View style={{ gap: espacio.xs }}>
-          {editandoNombre ? (
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: espacio.m }}>
+          <IconoFila icono="repetir" familia="salidas" />
+          <View style={{ flex: 1, gap: 2 }}>
+            {editandoNombre ? (
+              <Texto variante="cuerpoFuerte">{s.nombre}</Texto>
+            ) : (
+              <Texto variante="cuerpoFuerte" testID={`${id}-nombre`} accessibilityRole="header">
+                {s.nombre}
+              </Texto>
+            )}
+            <Texto
+              variante="cuerpo"
+              testID={`${id}-monto`}
+              accessibilityLabel={etiquetaAccesibleMontoSuscripcion(s.textoMonto, s.textoAntes)}
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
+            </Texto>
+            {s.textoProximo ? (
+              <Texto
+                variante="secundario"
+                tono="secundario"
+                testID={`${id}-proximo`}
+                accessibilityLabel={etiquetaAccesibleProximoSuscripcion(s.textoProximo)}
+              >
+                {s.textoProximo}
+              </Texto>
+            ) : null}
+          </View>
+          {editandoNombre ? null : (
+            <BotonIcono
+              testID={`${id}-editar-nombre`}
+              etiqueta={ETIQUETA_EDITAR_NOMBRE}
+              icono="lapiz"
+              alPresionar={() => setEditandoNombre(true)}
+              pista={PISTA_EDITAR_NOMBRE}
+            />
+          )}
+        </View>
+        {editandoNombre ? (
+          <View style={{ gap: espacio.s }}>
             <CampoTexto
               etiqueta={ETIQUETA_NOMBRE}
               valor={nombre}
@@ -277,21 +322,6 @@ function Fila({
               alEnviar={guardarNombre}
               ayuda={AYUDA_NOMBRE}
             />
-          ) : (
-            <Texto variante="cuerpoFuerte" testID={`${id}-nombre`} accessibilityRole="header">
-              {s.nombre}
-            </Texto>
-          )}
-          {!editandoNombre ? (
-            <Boton
-              testID={`${id}-editar-nombre`}
-              etiqueta={ETIQUETA_EDITAR_NOMBRE}
-              variante="texto"
-              ancho="contenido"
-              alPresionar={() => setEditandoNombre(true)}
-              pista={PISTA_EDITAR_NOMBRE}
-            />
-          ) : (
             <Boton
               testID={`${id}-guardar-nombre`}
               etiqueta={ETIQUETA_GUARDAR_NOMBRE}
@@ -299,27 +329,13 @@ function Fila({
               alPresionar={guardarNombre}
               pista={PISTA_GUARDAR_NOMBRE}
             />
-          )}
-          <Texto
-            variante="cuerpo"
-            testID={`${id}-monto`}
-            accessibilityLabel={etiquetaAccesibleMontoSuscripcion(s.textoMonto, s.textoAntes)}
-          >
-            {s.textoAntes ? `${s.textoMonto} (${s.textoAntes})` : s.textoMonto}
-          </Texto>
-          {s.textoProximo ? (
-            <Texto
-              variante="secundario"
-              tono="secundario"
-              testID={`${id}-proximo`}
-              accessibilityLabel={etiquetaAccesibleProximoSuscripcion(s.textoProximo)}
-            >
-              {s.textoProximo}
-            </Texto>
-          ) : null}
-        </View>
+          </View>
+        ) : null}
         {confirmando ? (
-          <View style={{ gap: espacio.xs }} testID={`${id}-confirmacion`}>
+          <View
+            style={{ gap: espacio.xs, padding: espacio.m, borderRadius: radio.m, backgroundColor: c.fondo }}
+            testID={`${id}-confirmacion`}
+          >
             <Texto variante="cuerpo" testID={`${id}-confirmacion-texto`} accessibilityLiveRegion="polite">
               {textoConfirmacion}
             </Texto>
@@ -342,50 +358,47 @@ function Fila({
               pista={PISTA_NO_DEJALA}
             />
           </View>
-        ) : s.compromiso ? (
-          <View style={{ gap: espacio.xs }}>
-            <Texto
-              variante="secundario"
-              tono="acento"
-              testID={`${id}-apartada`}
-              accessibilityLabel={etiquetaAccesibleHoyApartaSuscripcion(s.nombre)}
-            >
-              {TEXTO_HOY_APARTA}
-            </Texto>
-            <Boton
-              testID={`${id}-cancelada`}
-              etiqueta={ETIQUETA_CANCELADA}
-              variante="texto"
-              ancho="contenido"
-              alPresionar={() => preguntar('cancelada')}
-              pista={PISTA_CANCELADA}
-            />
-          </View>
         ) : (
-          <View style={{ gap: espacio.xs }}>
-            <Boton
-              testID={`${id}-compromiso`}
-              etiqueta={ETIQUETA_COMPROMISO}
-              variante="secundario"
-              alPresionar={() => alHacer('compromiso')}
-              pista={PISTA_COMPROMISO}
-            />
-            <Boton
-              testID={`${id}-cancelada`}
-              etiqueta={ETIQUETA_CANCELADA}
-              variante="texto"
-              ancho="contenido"
-              alPresionar={() => preguntar('cancelada')}
-              pista={PISTA_CANCELADA}
-            />
-            <Boton
-              testID={`${id}-no-es`}
-              etiqueta={ETIQUETA_NO_ES}
-              variante="texto"
-              ancho="contenido"
-              alPresionar={() => preguntar('no_es')}
-              pista={PISTA_NO_ES}
-            />
+          <View style={{ gap: espacio.s }}>
+            {s.compromiso ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: espacio.xs }}>
+                <Icono nombre="palomita" color={c.acentoTexto} tamano={16} grosor={2.2} />
+                <Texto
+                  variante="secundario"
+                  tono="acento"
+                  testID={`${id}-apartada`}
+                  accessibilityLabel={etiquetaAccesibleHoyApartaSuscripcion(s.nombre)}
+                >
+                  {TEXTO_HOY_APARTA}
+                </Texto>
+              </View>
+            ) : (
+              <Boton
+                testID={`${id}-compromiso`}
+                etiqueta={ETIQUETA_COMPROMISO}
+                variante="secundario"
+                alPresionar={() => alHacer('compromiso')}
+                pista={PISTA_COMPROMISO}
+              />
+            )}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: espacio.s }}>
+              <AccionPildora
+                testID={`${id}-cancelada`}
+                etiqueta={ETIQUETA_CANCELADA}
+                icono="palomita"
+                alPresionar={() => preguntar('cancelada')}
+                pista={PISTA_CANCELADA}
+              />
+              {s.compromiso ? null : (
+                <AccionPildora
+                  testID={`${id}-no-es`}
+                  etiqueta={ETIQUETA_NO_ES}
+                  icono="cerrar"
+                  alPresionar={() => preguntar('no_es')}
+                  pista={PISTA_NO_ES}
+                />
+              )}
+            </View>
           </View>
         )}
       </Tarjeta>

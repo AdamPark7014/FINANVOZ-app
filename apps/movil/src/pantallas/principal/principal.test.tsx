@@ -826,7 +826,7 @@ describe('Movimientos', () => {
 
     fireEvent.press(screen.getByTestId(`movimiento-${id}`));
     const detalle = screen.getByTestId(`detalle-${id}`);
-    expect(within(detalle).getByText('Salió de: Cartera')).toBeTruthy();
+    expect(within(detalle).getByLabelText('Salió de: Cartera')).toBeTruthy();
     expect(within(detalle).getByText('Registrado escribiendo · 11 oct')).toBeTruthy();
     expect(within(detalle).getByTestId('boton-anular')).toHaveProp(
       'accessibilityHint',

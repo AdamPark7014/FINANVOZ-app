@@ -76,6 +76,7 @@ import {
   TITULO_DUDOSOS,
   TITULO_PANTALLA,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /** Lee el texto del PDF en el teléfono (el módulo nativo en la app; uno falso en las pruebas). */
 export type ExtraerPdf = (contrasena: string | null) => Promise<ResultadoExtraccionPdf>;
@@ -168,7 +169,12 @@ export function LeerEstadoCuenta({
 
   return (
     <Pantalla testID="pantalla-estado-cuenta" bordes={['top', 'left', 'right', 'bottom']}>
-      <Texto variante="titulo" testID="estado-cuenta-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="estado-cuenta-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_PANTALLA}
       </Texto>
       {estado.tipo === 'leyendo' ? (

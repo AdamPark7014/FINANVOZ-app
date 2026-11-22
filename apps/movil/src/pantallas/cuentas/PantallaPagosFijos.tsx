@@ -1,8 +1,10 @@
 import { View } from 'react-native';
 import { listarPagosFijos } from '../../servicios';
 import { useVista } from '../../sesion/ProveedorSesion';
-import { Boton, Cifra, espacio, EstadoVacio, Pantalla, Tarjeta, Texto } from '../../ui';
+import { Boton, Cifra, espacio, EstadoVacio, Pantalla, Texto } from '../../ui';
 import { capitalizar, describirRegla } from '../onboarding/pagos-fijos';
+import { Fila, Grupo, IconoFila } from '../../ui/componentes/Lista';
+import { CuadroFecha, LADO_CUADRO_FECHA } from './CuadroFecha';
 import { Encabezado } from './Encabezado';
 import {
   BTN_AGREGAR_PAGO_FIJO,
@@ -45,50 +47,45 @@ export function PantallaPagosFijos({
       }
     >
       <Encabezado titulo={TITULO_PAGOS_FIJOS} {...(alVolver ? { alVolver } : {})} testID="pagos-fijos" />
-      <Texto variante="secundario" tono="secundario">
+      <Texto variante="cuerpo" tono="secundario" style={{ marginTop: -espacio.m }}>
         {INTRO_PAGOS_FIJOS}
       </Texto>
       {pagos.length === 0 ? (
-        <EstadoVacio texto={TEXTO_PAGOS_FIJOS_VACIO} testID="pagos-fijos-vacio" />
+        <EstadoVacio icono="calendario" texto={TEXTO_PAGOS_FIJOS_VACIO} testID="pagos-fijos-vacio" />
       ) : (
-        <View accessibilityRole="list" testID="pagos-fijos-lista" style={{ gap: espacio.s }}>
-          {pagos.map((p) => {
-            const titulo = capitalizar(p.concepto);
-            const regla = describirRegla(p.regla);
-            const proximo = textoProximoPago(p.proxima);
-            return (
-              <View key={p.id} role="listitem" testID={`pago-fijo-${p.id}`}>
-                <Tarjeta
-                  alPresionar={() => alAbrir(p.id)}
-                  etiquetaAccesible={etiquetaFila({
-                    titulo,
-                    subtitulo: `${regla}. ${proximo}`,
-                    contexto: 'Apartas',
-                    centavos: p.monto,
-                  })}
-                  pista={PISTA_ABRIR_COMPROMISO}
-                  testID={`pago-fijo-${p.id}-abrir`}
-                >
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
-                    <View style={{ flex: 1, gap: espacio.xs }}>
-                      <Texto variante="cuerpoFuerte">{titulo}</Texto>
-                      <Texto variante="secundario" tono="secundario">
-                        {regla}
-                      </Texto>
-                      <Texto variante="secundario" tono="secundario">
-                        {proximo}
-                      </Texto>
-                    </View>
-                    <Cifra
-                      centavos={p.monto}
-                      contexto={`${titulo}, ${regla}`}
-                      testID={`pago-fijo-${p.id}-monto`}
-                    />
-                  </View>
-                </Tarjeta>
-              </View>
-            );
-          })}
+        <View accessibilityRole="list" testID="pagos-fijos-lista">
+          <Grupo sangria={pagos.some((p) => p.proxima) ? LADO_CUADRO_FECHA : true}>
+            {pagos.map((p) => {
+              const titulo = capitalizar(p.concepto);
+              const regla = describirRegla(p.regla);
+              const proximo = textoProximoPago(p.proxima);
+              return (
+                <View key={p.id} role="listitem" testID={`pago-fijo-${p.id}`}>
+                  <Fila
+                    testID={`pago-fijo-${p.id}-abrir`}
+                    titulo={titulo}
+                    apoyo={p.proxima ? capitalizar(regla) : `${capitalizar(regla)} · ${proximo}`}
+                    inicio={p.proxima ? <CuadroFecha fecha={p.proxima} /> : <IconoFila icono="calendario" />}
+                    etiquetaAccesible={etiquetaFila({
+                      titulo,
+                      subtitulo: `${regla}. ${proximo}`,
+                      contexto: 'Apartas',
+                      centavos: p.monto,
+                    })}
+                    pista={PISTA_ABRIR_COMPROMISO}
+                    alPresionar={() => alAbrir(p.id)}
+                    derecha={
+                      <Cifra
+                        centavos={p.monto}
+                        contexto={`${titulo}, ${regla}`}
+                        testID={`pago-fijo-${p.id}-monto`}
+                      />
+                    }
+                  />
+                </View>
+              );
+            })}
+          </Grupo>
         </View>
       )}
     </Pantalla>

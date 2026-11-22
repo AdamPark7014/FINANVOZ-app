@@ -1,3 +1,4 @@
+import { StyleSheet, View } from 'react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   borrarCuentaRespaldo,
@@ -10,7 +11,7 @@ import {
 import { useControlApp } from '../../sesion/ControlApp';
 import { useSesion, useVista } from '../../sesion/ProveedorSesion';
 import { usePlanTienda } from '../../suscripciones/ProveedorPlan';
-import { Boton, espacio, Interruptor, Tarjeta, Texto } from '../../ui';
+import { Boton, espacio, Icono, Interruptor, radio, Tarjeta, Texto, useTema } from '../../ui';
 import { anunciar } from '../../ui/anunciar';
 import { FlujoCorreo } from './FlujoCorreo';
 import { FormularioContrasena } from './FormularioContrasena';
@@ -46,6 +47,7 @@ import {
   textoCrearContrasenaTrasCorreo,
   textoRespaldasCon,
 } from './textos';
+import { ESTILO_TITULO_PANTALLA } from '../../ui/componentes/Lista';
 
 /**
  * Ajustes → Respaldo (`02 §19`, RF-RES-01…04): último respaldo, "Respaldar ahora", respaldo automático semanal
@@ -77,7 +79,12 @@ export function PantallaRespaldo({
           alPresionar={alVolver}
         />
       ) : null}
-      <Texto variante="titulo" testID="respaldo-titulo" accessibilityRole="header">
+      <Texto
+        variante="titulo"
+        testID="respaldo-titulo"
+        accessibilityRole="header"
+        style={ESTILO_TITULO_PANTALLA}
+      >
         {TITULO_RESPALDO}
       </Texto>
       {nube ? (
@@ -101,17 +108,50 @@ export function PantallaRespaldo({
 /** Build sin nube (p. ej. TestFlight sin Supabase): el último archivo exportado, o la invitación a exportar uno. */
 function UltimoRespaldoSinNube() {
   const vista = useVista((ctx) => obtenerRespaldoNube(ctx, { conNube: false }));
+  const { c } = useTema();
   return (
-    <>
-      <Texto variante="cuerpo" testID="respaldo-ultimo">
-        {vista.textoUltimo}
-      </Texto>
-      {vista.pendiente ? (
-        <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente" accessibilityRole="alert">
-          {AVISO_PENDIENTE}
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: espacio.l,
+        alignItems: 'flex-start',
+        padding: espacio.l,
+        borderRadius: radio.l,
+        backgroundColor: c.superficie,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: c.borde,
+      }}
+    >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: 24,
+          backgroundColor: vista.pendiente ? c.atencion : c.iconoFondo,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icono
+          nombre="nube"
+          color={vista.pendiente ? c.sobreAtencion : c.acentoTexto}
+          tamano={24}
+          grosor={1.9}
+        />
+      </View>
+      <View style={{ flex: 1, gap: espacio.xs }}>
+        <Texto variante="cuerpo" testID="respaldo-ultimo">
+          {vista.textoUltimo}
         </Texto>
-      ) : null}
-    </>
+        {vista.pendiente ? (
+          <Texto variante="secundario" tono="faltante" testID="respaldo-pendiente" accessibilityRole="alert">
+            {AVISO_PENDIENTE}
+          </Texto>
+        ) : null}
+      </View>
+    </View>
   );
 }
 

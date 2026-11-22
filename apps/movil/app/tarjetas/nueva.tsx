@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { tomarPrellenado } from '../../src/asistente/flujos';
 import { FormularioTarjetaNueva } from '../../src/pantallas/tarjetas';
 import { espacio, Pantalla, Texto } from '../../src/ui';
+import { ESTILO_TITULO_PANTALLA } from '../../src/ui/componentes/Lista';
 import { BarraNativa } from '../../src/ui/navegacion';
 
 const TITULO_NUEVA_TARJETA = 'Tarjeta de crédito';
@@ -25,7 +26,7 @@ export default function NuevaTarjetaRuta() {
         bordes={['top', 'left', 'right', 'bottom']}
         contenidoStyle={{ gap: espacio.xl }}
       >
-        <Texto variante="titulo" accessibilityRole="header">
+        <Texto variante="titulo" accessibilityRole="header" style={ESTILO_TITULO_PANTALLA}>
           {TITULO_NUEVA_TARJETA}
         </Texto>
         <FormularioTarjetaNueva
